@@ -22,10 +22,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TraceEventPropertySource</u></b>
  * <p>
  * Property source implementation for the trace probe event component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceProbeEventPropertySource extends TraceEventPropertySource {
 

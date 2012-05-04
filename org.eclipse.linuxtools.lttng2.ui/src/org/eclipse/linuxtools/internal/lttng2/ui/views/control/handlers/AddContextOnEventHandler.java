@@ -25,10 +25,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>AddContextOnEventHandler</u></b>
  * <p>
  * Command handler implementation to add contexts to a given event.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class AddContextOnEventHandler extends BaseAddContextHandler {
 

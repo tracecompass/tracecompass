@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <b><u>IConfirmDialog</u></b>
  * <p>
  * Interface for a confirmation dialog.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IConfirmDialog {
     

@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>TraceEnablement</u></b>
  * <p>
  * Enumeration for enabled/disabled states.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public enum TraceEnablement {
 

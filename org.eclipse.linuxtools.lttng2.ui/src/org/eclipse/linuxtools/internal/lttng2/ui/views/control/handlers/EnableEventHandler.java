@@ -19,10 +19,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent;
 
 /**
- * <b><u>EnableEventHandler</u></b>
  * <p>
  * Command handler implementation to enable one or more events session, domain and channel.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class EnableEventHandler extends ChangeEventStateHandler {
 

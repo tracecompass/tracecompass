@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 201s Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,10 +15,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * <b><u>Messages</u></b>
  * <p>
  * Messages file for the trace control package. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 final public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.messages"; //$NON-NLS-1$

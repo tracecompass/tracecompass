@@ -35,10 +35,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>EnableChannelHandler</u></b>
  * <p>
  * Base Command handler implementation to enable or disabling a trace channel.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
 

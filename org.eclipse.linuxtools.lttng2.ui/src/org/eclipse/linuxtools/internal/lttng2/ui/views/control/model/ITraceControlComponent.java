@@ -19,11 +19,12 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngCon
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <b><u>ITraceControlComponent</u></b>
  * <p>
  * Interface for trace control components that can be displayed in the 
  * trace control tree viewer. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface ITraceControlComponent extends IAdaptable {
 

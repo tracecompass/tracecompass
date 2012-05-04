@@ -28,10 +28,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>BaseControlViewHandler</u></b>
  * <p>
  * Abstract Command handler implementation for all control view handlers.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract public class BaseControlViewHandler extends AbstractHandler {
 

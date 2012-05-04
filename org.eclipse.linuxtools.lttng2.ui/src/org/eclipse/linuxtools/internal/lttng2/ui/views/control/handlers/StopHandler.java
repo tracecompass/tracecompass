@@ -17,10 +17,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionSta
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**
- * <b><u>StopHandler</u></b>
  * <p>
  * Command handler implementation to stop one or more trace sessions.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class StopHandler extends ChangeSessionStateHandler {
 

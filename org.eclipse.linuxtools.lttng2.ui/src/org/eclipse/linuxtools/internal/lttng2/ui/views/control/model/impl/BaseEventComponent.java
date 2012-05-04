@@ -20,10 +20,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BaseEven
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
- * <b><u>BaseEventComponent</u></b>
  * <p>
  * Implementation of the base trace event component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class BaseEventComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------

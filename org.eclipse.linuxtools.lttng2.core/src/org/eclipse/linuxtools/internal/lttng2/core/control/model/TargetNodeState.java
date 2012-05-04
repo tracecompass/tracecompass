@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>TargetNodeState</u></b>
  * <p>
  *  Enumeration for the node connection state. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public enum TargetNodeState {
      DISCONNECTED, 

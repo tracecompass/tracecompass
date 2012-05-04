@@ -24,10 +24,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * <b><u>ControlPreferencePage</u></b>
  * <p>
  * Preference page implementation for configuring LTTng tracer control preferences.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ControlPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 

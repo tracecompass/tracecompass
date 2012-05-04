@@ -34,10 +34,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>CreateSessionDialog</u></b>
  * <p>
  * Dialog box for collecting session creation information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class CreateSessionDialog extends Dialog implements ICreateSessionDialog {
 

@@ -16,10 +16,11 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 
 /**
- * <b><u>TraceControlContentProvider</u></b>
  * <p>
  * Tree content provider implementation for trace control view.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceControlContentProvider implements ITreeContentProvider {
     // ------------------------------------------------------------------------

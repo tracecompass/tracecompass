@@ -31,10 +31,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
- * <b><u>TraceSessionComponent</u></b>
  * <p>
  * Implementation of the trace session component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceSessionComponent extends TraceControlComponent {
 

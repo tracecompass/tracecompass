@@ -27,10 +27,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceDom
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
- * <b><u>TraceDomainComponent</u></b>
  * <p>
  * Implementation of the trace domain component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceDomainComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------

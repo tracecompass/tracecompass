@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 import java.util.List;
 
 /**
- * <b><u>IUstProviderInfo</u></b>
  * <p>
  * Interface for retrieval of UST provider information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IUstProviderInfo extends ITraceInfo {
    

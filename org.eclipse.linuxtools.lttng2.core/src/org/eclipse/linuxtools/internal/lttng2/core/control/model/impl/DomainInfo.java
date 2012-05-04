@@ -19,11 +19,12 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IDomainInfo;
 
 /**
- * <b><u>DomainInfo</u></b>
  * <p>
  * Implementation of the trace domain interface (IDomainInfo) to store domain
  * related data. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class DomainInfo extends TraceInfo implements IDomainInfo {
 

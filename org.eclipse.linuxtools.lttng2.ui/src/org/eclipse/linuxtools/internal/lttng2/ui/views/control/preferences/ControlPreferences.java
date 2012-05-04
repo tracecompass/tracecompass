@@ -17,10 +17,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCommandLogger;
 
 /**
- * <b><u>ControlPreference</u></b>
  * <p>
  * Singleton class to access LTTng tracer control preferences.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ControlPreferences {
 

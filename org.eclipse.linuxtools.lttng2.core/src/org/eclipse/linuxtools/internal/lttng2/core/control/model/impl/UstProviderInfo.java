@@ -19,11 +19,12 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IUstProviderInfo;
 
 /**
- * <b><u>UstProviderInfo</u></b>
  * <p>
  * Implementation of the Ust Provider interface (IUstProviderInfo) to store UST 
  * provider related data. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
 

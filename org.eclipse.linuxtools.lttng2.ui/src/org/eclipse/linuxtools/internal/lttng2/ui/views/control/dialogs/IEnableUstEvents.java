@@ -17,10 +17,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 
 /**
- * <b><u>IEnableKernelEvents</u></b>
  * <p>
  * Interface for providing information about UST events to be enabled.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IEnableUstEvents {
 

@@ -21,10 +21,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.UstProvi
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
- * <b><u>UstProviderComponent</u></b>
  * <p>
  * Implementation of the UST provider component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class UstProviderComponent extends TraceControlComponent {
     

@@ -12,11 +12,12 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model;
 
 /**
- * <b><u>ITraceControlComponentChangedListener</u></b>
  * <p>
  * Listener interface a class can implement to be notified about changes 
  * of components 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface ITraceControlComponentChangedListener {
     /**

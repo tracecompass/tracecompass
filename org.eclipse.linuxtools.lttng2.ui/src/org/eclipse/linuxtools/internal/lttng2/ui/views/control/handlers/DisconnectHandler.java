@@ -16,10 +16,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState;
 
 /**
- * <b><u>DisconnectHandler</u></b>
  * <p>
  * Command handler implementation to disconnect from a target host.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class DisconnectHandler extends BaseNodeHandler {
 

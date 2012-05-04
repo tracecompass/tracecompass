@@ -29,10 +29,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 /**
- * <b><u>BaseAddContextHandler</u></b>
  * <p>
  * Base command handler implementation to add contexts.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract public class BaseAddContextHandler extends BaseControlViewHandler {
 

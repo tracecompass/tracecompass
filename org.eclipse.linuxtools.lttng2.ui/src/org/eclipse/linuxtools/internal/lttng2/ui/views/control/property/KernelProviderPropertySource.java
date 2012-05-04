@@ -17,10 +17,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>KernelProviderPropertySource</u></b>
  * <p>
  * Property source implementation for the kernl provider component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class KernelProviderPropertySource extends BasePropertySource {
 

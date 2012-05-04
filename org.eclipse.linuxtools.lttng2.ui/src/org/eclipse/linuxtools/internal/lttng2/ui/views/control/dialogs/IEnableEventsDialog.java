@@ -15,10 +15,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceD
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup;
 
 /**
- * <b><u>IEnableKernelEvents</u></b>
  * <p>
  * Interface for providing information about Kernel or UST events to be enabled.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IEnableEventsDialog extends IEnableKernelEvents, IEnableUstEvents {
 

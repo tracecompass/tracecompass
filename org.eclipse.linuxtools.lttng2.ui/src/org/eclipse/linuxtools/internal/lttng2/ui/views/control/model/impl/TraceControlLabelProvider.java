@@ -16,10 +16,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceContr
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <b><u>TraceControlLabelProvider</u></b>
  * <p>
  * Label provider for trace control tree viewer.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceControlLabelProvider extends ColumnLabelProvider {
 

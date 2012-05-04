@@ -14,11 +14,12 @@ package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IProbeEventInfo;
 
 /**
-* <b><u>ProbleEventInfo</u></b>
 * <p>
 * Implementation of the trace event interface (IProbeEventInfo) to store probe event
 * related data. 
 * </p>
+* 
+* @author Bernd Hufmann
 */
 public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
 

@@ -18,10 +18,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 
 /**
- * <b><u>TraceSessionGroup</u></b>
  * <p>
  * Implementation of the trace session group.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceSessionGroup extends TraceControlComponent {
     // ------------------------------------------------------------------------

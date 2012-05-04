@@ -15,11 +15,12 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement;
 
 /**
-* <b><u>EventInfo</u></b>
 * <p>
 * Implementation of the trace event interface (IEventInfo) to store event
 * related data. 
 * </p>
+* 
+* @author Bernd Hufmann
 */
 public class EventInfo extends BaseEventInfo implements IEventInfo {
 

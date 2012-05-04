@@ -17,10 +17,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>UstProviderPropertySource</u></b>
  * <p>
  * Property source implementation for the UST provider component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class UstProviderPropertySource extends BasePropertySource {
 

@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.service;
 import java.util.regex.Pattern;
 
 /**
- * <b><u>LTTngControlServiceConstants</u></b>
  * <p>
  * Constants for LTTng Control Service.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class LTTngControlServiceConstants {
 

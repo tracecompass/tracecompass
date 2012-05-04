@@ -31,10 +31,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>CalibrateHandler</u></b>
  * <p>
  * Command handler implementation to execute command calibrate to quantify LTTng overhead.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class CalibrateHandler extends BaseControlViewHandler {
 

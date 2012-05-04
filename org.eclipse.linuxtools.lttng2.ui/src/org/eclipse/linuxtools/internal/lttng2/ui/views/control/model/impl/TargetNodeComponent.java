@@ -38,10 +38,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
- * <b><u>TargetNodeComponent</u></b>
  * <p>
  * Implementation of the trace node component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TargetNodeComponent extends TraceControlComponent implements ICommunicationsListener {
 

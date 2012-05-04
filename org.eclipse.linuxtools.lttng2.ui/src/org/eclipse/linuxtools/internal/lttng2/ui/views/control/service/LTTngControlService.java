@@ -43,10 +43,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandRe
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandShell;
 
 /**
- * <b><u>LTTngControlService</u></b>
  * <p>
  * Service for sending LTTng trace control commands to remote host.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class LTTngControlService implements ILttngControlService {
  

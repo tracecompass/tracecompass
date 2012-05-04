@@ -29,10 +29,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>CreateSessionHandler</u></b>
  * <p>
  * Command handler implementation to create a trace session.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class CreateSessionHandler extends BaseControlViewHandler {
 

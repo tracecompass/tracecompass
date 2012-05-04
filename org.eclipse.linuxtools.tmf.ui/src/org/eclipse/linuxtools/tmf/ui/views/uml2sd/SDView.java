@@ -1060,10 +1060,9 @@ public class SDView extends ViewPart {
     }
     
     /**
-     * @version 1.0
-     * 
      * Loader for a blank sequence diagram.
      * 
+     * @version 1.0
      */
     public static class BlankUml2SdLoader implements IUml2SDLoader {
         /*

@@ -22,10 +22,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.KernelPr
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
- * <b><u>KernelProviderComponent</u></b>
  * <p>
- * TODO
+ * Implementation of the Kernel provider component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class KernelProviderComponent extends TraceControlComponent {
     

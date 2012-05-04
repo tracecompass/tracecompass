@@ -33,10 +33,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>ChangeSessionStateHandler</u></b>
  * <p>
  * Abstract command handler implementation to start or stop one or more trace sessions.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
 

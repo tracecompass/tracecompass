@@ -17,10 +17,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TraceChannelPropertySource</u></b>
  * <p>
  * Property source implementation for the trace channel component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceChannelPropertySource extends BasePropertySource {
 

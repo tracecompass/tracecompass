@@ -14,11 +14,12 @@ package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.ITraceInfo;
 
 /**
- * <b><u>TraceInfo</u></b>
  * <p>
  * Implementation of the base trace information interface (ITraceInfo) to
  * store common data.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceInfo implements ITraceInfo {
 

@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionGroup;
 
 /**
- * <b><u>ICreateSessionDialog</u></b>
  * <p>
  * Interface for create session dialog.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface ICreateSessionDialog {
     

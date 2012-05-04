@@ -15,7 +15,9 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceD
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**
- *  Class containing parameter for the command execution. 
+ * Class containing parameter for the command execution.
+ * 
+ *  @author Bernd Hufmann
  */
 public class DomainCommandParameter extends CommandParameter {
 

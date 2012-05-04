@@ -27,10 +27,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>EnableEventOnChannelHandler</u></b>
  * <p>
  * Command handler implementation to enable events for a known channel.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
 

@@ -15,10 +15,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceContr
 import org.eclipse.rse.core.model.IHost;
 
 /**
- * <b><u>INewConnectionDialog</u></b>
  * <p>
  * Interface for connection information dialog.
  * </p>
+ * 
+ *  @author Bernd Hufmann
  */
 public interface INewConnectionDialog {
     

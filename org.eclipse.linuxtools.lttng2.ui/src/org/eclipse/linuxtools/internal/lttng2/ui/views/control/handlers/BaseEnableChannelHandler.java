@@ -29,10 +29,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
- * <b><u>BaseEnableChannelHandler</u></b>
  * <p>
  * Base implementation of a command handler to enable a trace channel.  
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
 

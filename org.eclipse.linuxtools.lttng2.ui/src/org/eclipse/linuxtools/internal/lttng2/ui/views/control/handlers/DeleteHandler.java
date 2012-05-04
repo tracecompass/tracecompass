@@ -17,10 +17,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 
 /**
- * <b><u>DeleteHandler</u></b>
  * <p>
  * Command handler implementation to delete a target host.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class DeleteHandler extends BaseNodeHandler {
 

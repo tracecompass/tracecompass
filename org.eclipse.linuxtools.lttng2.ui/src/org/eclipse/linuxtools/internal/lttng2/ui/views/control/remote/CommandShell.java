@@ -33,10 +33,12 @@ import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
 
 /**
- * <b><u>CommandShell</u></b>
  * <p>
  * Implementation of remote command execution using RSE's shell service. 
  * </p>
+ * 
+ * @author Patrick Tasse
+ * @author Bernd Hufmann
  */
 public class CommandShell implements ICommandShell {
 

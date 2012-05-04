@@ -31,10 +31,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>NewConnectionHandler</u></b>
  * <p>
  * Command handler for creation new connection for trace control.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class NewConnectionHandler extends BaseControlViewHandler {
 

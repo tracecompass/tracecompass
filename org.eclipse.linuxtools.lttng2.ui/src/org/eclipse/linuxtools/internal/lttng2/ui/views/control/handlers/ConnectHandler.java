@@ -16,10 +16,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState;
 
 /**
- * <b><u>ConnectHandler</u></b>
  * <p>
  * Command handler implementation to connect to a target host.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ConnectHandler extends BaseNodeHandler {
 

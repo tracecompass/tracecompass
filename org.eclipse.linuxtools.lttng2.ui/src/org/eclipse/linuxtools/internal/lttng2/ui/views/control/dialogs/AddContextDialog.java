@@ -35,10 +35,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <b><u>AddContextDialog</u></b>
  * <p>
  * Dialog box for collecting information about contexts to be added to channels/events.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class AddContextDialog extends Dialog implements IAddContextDialog  {
 

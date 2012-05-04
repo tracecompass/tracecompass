@@ -17,10 +17,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TraceDomainPropertySource</u></b>
  * <p>
  * Property source implementation for the trace domain component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceDomainPropertySource extends BasePropertySource {
 

@@ -36,10 +36,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>DestroySessionHandler</u></b>
  * <p>
  * Command handler implementation to destroy one or more trace sessions.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class DestroySessionHandler extends BaseControlViewHandler {
 

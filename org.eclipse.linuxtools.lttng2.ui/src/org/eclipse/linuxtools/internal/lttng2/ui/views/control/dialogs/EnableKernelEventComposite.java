@@ -38,10 +38,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>EnableKernelEventsComposite</u></b>
  * <p>
  * A composite for collecting information about kernel events to be enabled.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class EnableKernelEventComposite extends Composite implements IEnableKernelEvents {
 

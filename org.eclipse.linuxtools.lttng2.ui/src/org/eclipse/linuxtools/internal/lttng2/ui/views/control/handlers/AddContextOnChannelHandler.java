@@ -25,10 +25,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>AddContextOnChannelHandler</u></b>
  * <p>
  * Command handler implementation to add contexts to a given channel and all of its events.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class AddContextOnChannelHandler extends BaseAddContextHandler {
 

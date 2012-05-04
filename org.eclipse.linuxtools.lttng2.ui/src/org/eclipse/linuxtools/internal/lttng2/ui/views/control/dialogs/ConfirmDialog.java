@@ -18,10 +18,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <b><u>ConfirmDialog</u></b>
  * <p>
  * Confirmation dialog implementation.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 
 public class ConfirmDialog implements IConfirmDialog {

@@ -30,10 +30,11 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 
 /**
- * <b><u>TraceEventComponent</u></b>
  * <p>
  * Implementation of the trace channel component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceEventComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------

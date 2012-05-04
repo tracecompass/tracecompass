@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>IEventInfo</u></b>
  * <p>
  * Interface for retrieval of trace event information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IEventInfo extends IBaseEventInfo {
 

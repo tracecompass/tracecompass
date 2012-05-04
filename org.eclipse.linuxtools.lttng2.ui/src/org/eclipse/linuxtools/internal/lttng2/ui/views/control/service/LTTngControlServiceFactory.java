@@ -20,11 +20,12 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandRe
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandShell;
 
 /**
- * <b><u>LTTngControlServiceFactory</u></b>
  * <p>
  * Factory to create LTTngControlService instances depending on the version of the LTTng Trace Control
  * installed on the remote host.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class LTTngControlServiceFactory {
 
@@ -64,6 +65,7 @@ public class LTTngControlServiceFactory {
     /**
      * Gets the LTTng Control Service implementation based on the version of the 
      * remote LTTng Tools.
+     * 
      * @param shell - the shell implementation to pass to the service
      * @return - LTTng Control Service implementation
      * @throws ExecutionException

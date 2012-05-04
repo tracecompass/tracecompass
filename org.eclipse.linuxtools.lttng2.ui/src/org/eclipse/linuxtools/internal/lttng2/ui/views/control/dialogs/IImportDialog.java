@@ -17,10 +17,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**
- * <b><u>IImportDialog</u></b>
  * <p>
  * Interface for import traces dialog.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IImportDialog {
     

@@ -27,11 +27,12 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>EnableEventOnDomainHandler</u></b>
  * <p>
  * Command handler implementation to enable events for a known domain and default channel 'channel0'
  * (which will be created if doesn't exist).
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
 

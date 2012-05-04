@@ -23,10 +23,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 
 /**
- * <b><u>TraceProviderGroup</u></b>
  * <p>
  * Implementation of the trace provider group.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceProviderGroup extends TraceControlComponent {
     // ------------------------------------------------------------------------

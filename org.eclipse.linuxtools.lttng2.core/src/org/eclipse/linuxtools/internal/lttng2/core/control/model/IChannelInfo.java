@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 import java.util.List;
 
 /**
- * <b><u>IChannelInfo</u></b>
  * <p>
  * Interface for retrieval of trace channel information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IChannelInfo extends ITraceInfo {
 

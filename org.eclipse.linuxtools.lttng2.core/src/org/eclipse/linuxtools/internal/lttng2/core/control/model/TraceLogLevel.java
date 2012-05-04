@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>TraceLogLevels</u></b>
  * <p>
  * Log Level enumeration.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 @SuppressWarnings("nls")
 public enum TraceLogLevel {

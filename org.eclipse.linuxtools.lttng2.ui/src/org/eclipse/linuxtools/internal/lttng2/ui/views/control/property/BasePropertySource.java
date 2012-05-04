@@ -15,10 +15,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
- * <b><u>BaseEventPropertySource</u></b>
  * <p>
  * Base property source implementation.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract public class BasePropertySource implements IPropertySource {
 

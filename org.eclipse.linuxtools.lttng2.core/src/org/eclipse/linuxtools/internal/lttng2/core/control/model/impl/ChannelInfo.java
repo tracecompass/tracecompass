@@ -20,11 +20,12 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement;
 
 /**
- * <b><u>ChannelInfo</u></b>
  * <p>
  * Implementation of the trace channel interface (IChannelInfo) to store channel
  * related data. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ChannelInfo extends TraceInfo implements IChannelInfo {
 

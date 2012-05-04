@@ -12,12 +12,12 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>ITraceInfo</u></b>
  * <p>
  * Interface for retrieve trace comon information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
-
 public interface ITraceInfo {
     /**
      * @return the name of the information element.

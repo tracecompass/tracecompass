@@ -13,10 +13,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 
 
 /**
- * <b><u>TraceControlRoot</u></b>
  * <p>
  * Root element in trace control tree.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceControlRoot extends TraceControlComponent {
 

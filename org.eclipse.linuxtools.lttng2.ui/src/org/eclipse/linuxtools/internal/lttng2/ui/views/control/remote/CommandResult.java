@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote;
 import java.util.Arrays;
 
 /**
- * <b><u>CommandResult</u></b>
  * <p>
  * Class containing command result of remote command execution.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class CommandResult implements ICommandResult {
     

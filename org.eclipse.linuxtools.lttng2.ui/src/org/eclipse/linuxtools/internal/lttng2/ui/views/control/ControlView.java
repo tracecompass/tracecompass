@@ -34,10 +34,11 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
 /**
- * <b><u>ControlView</u></b>
  * <p>
  * View implementation for Trace Control. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ControlView extends ViewPart implements ITraceControlComponentChangedListener {
 

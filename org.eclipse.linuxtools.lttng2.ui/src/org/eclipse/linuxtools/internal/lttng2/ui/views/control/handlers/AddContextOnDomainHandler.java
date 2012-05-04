@@ -25,10 +25,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>AddContextOnDomainHandler</u></b>
  * <p>
  * Command handler implementation to add contexts to all channels and all events.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class AddContextOnDomainHandler extends BaseAddContextHandler {
 

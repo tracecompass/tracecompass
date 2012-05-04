@@ -20,16 +20,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 
 /**
- * <b><u>ControlCommandLogger</u></b>
  * <p>
  * Class to log control commands.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ControlCommandLogger {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    /**
+     * The bufferd writer reference
+     */
     private static BufferedWriter fTraceLog = null;
     
     // ------------------------------------------------------------------------

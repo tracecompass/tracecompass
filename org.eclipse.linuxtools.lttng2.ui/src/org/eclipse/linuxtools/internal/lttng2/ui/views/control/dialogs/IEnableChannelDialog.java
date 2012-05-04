@@ -15,10 +15,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
- * <b><u>IEnableChannelDialog</u></b>
  * <p>
  * Interface for the enable channel dialog when domain is known.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IEnableChannelDialog {
     

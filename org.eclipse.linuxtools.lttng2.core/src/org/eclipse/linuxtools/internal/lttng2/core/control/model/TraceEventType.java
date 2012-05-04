@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>TraceEventType</u></b>
  * <p>
  * Trace event type enumeration.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public enum TraceEventType { 
     TRACEPOINT("tracepoint"), //$NON-NLS-1$

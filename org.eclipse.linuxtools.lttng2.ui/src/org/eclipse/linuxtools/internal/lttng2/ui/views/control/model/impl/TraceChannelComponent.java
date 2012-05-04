@@ -33,10 +33,11 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 
 /**
- * <b><u>TraceChannelComponent</u></b>
  * <p>
  * Implementation of the trace channel component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceChannelComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------

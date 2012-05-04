@@ -15,10 +15,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceC
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**
- * <b><u>IEnableEventsDialog</u></b>
  * <p>
  * Interface for a dialog box for collecting information about the events to enable.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IGetEventInfoDialog {
     

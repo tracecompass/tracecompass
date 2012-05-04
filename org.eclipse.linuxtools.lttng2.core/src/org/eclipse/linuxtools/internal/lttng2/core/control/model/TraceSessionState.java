@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>TraceSessionState</u></b>
  * <p>
  * Session state enumeration.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public enum TraceSessionState {
     

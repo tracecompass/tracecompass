@@ -40,11 +40,12 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.UstPro
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>AssignEventHandler</u></b>
  * <p>
  * Command handler implementation to assign events to a session and channel and enable/configure them.
  * This is done on the trace provider level.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class AssignEventHandler extends BaseControlViewHandler {
 

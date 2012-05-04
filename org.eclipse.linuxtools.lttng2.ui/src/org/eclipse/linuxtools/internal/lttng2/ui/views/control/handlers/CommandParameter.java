@@ -14,7 +14,9 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**
- *  Class containing parameter for the command execution. 
+ * Class containing parameter for the command execution.
+ * 
+ * @author Bernd Hufmann 
  */
 public class CommandParameter implements Cloneable {
 

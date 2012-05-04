@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote;
 
 /**
- * <b><u>IommandResult</u></b>
  * <p>
  * Interface for providing command execution result.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface ICommandResult {
     /**

@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 import java.util.List;
 
 /**
- * <b><u>IEnableKernelEvents</u></b>
  * <p>
  * Interface for providing information about kernel events to be enabled.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IEnableKernelEvents {
 

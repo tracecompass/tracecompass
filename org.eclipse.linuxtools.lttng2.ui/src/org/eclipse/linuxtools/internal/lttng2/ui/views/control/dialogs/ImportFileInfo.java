@@ -14,23 +14,39 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 
 /**
- * <b><u>ImportFileInfo</u></b>
  * <p>
  * Helper class for storing information about a remote file to import.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ImportFileInfo {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    /**
+     * Remote file reference
+     */
     private IRemoteFile fRemoteFile;
+    /**
+     * Local Trace Name
+     */
     private String fLocalTraceName;
+    /**
+     * Global overwrite flag
+     */
     private boolean fIsOverwrite;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Standard constructor
+     * @param file A remote file reference
+     * @param traceName A trace name
+     * @param isOverwrite global overwrite flag
+     */
     public ImportFileInfo(IRemoteFile file, String traceName, boolean isOverwrite) {
         fRemoteFile = file;
         fLocalTraceName = traceName;

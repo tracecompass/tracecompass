@@ -15,7 +15,9 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceE
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**
- *  Class containing parameter for a command execution. 
+ * Class containing parameter for a command execution.
+ *  
+ * @author Bernd Hufmann
  */
 public class EventCommandParameter extends CommandParameter {
 

@@ -33,10 +33,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>EnableChannelDialog</u></b>
  * <p>
  * Dialog box for collecting channel information when enabling a channel (which will be created).
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class EnableChannelDialog extends Dialog implements IEnableChannelDialog {
 

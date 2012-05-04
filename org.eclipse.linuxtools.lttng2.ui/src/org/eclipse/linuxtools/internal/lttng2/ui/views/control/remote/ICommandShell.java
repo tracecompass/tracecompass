@@ -15,10 +15,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
- * <b><u>ICommandShell</u></b>
  * <p>
  * Interface for a command shell implementation
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface ICommandShell {
     

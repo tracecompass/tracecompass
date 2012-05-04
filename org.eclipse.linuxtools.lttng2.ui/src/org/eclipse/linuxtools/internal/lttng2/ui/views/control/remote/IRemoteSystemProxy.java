@@ -20,10 +20,11 @@ import org.eclipse.rse.services.terminals.ITerminalService;
 import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
 
 /**
- * <b><u>IRemoteSystemProxy</u></b>
  * <p>
  * Remote System Proxy interface.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IRemoteSystemProxy {
 

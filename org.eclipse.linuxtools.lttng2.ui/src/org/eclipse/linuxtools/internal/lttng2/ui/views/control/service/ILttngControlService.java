@@ -23,10 +23,12 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 
 
-/** <b><u>ILttngControlService</u></b>
+/**
 * <p>
 * Interface for LTTng trace control command service. 
 * </p>
+* 
+* @author Bernd Hufmann
 */
 public interface ILttngControlService {
 

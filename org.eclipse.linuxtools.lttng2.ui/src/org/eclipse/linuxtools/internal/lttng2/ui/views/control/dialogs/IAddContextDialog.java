@@ -14,10 +14,11 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 import java.util.List;
 
 /**
- * <b><u>IAddContextDialog</u></b>
  * <p>
  * Interface for providing information about contexts to be added to channels/events.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IAddContextDialog {
 

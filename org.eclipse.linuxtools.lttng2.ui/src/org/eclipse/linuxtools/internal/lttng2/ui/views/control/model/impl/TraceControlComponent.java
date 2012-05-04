@@ -24,10 +24,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngCon
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <b><u>TraceControlComponent</u></b>
  * <p>
  * Base implementation for trace control component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceControlComponent implements ITraceControlComponent {
 

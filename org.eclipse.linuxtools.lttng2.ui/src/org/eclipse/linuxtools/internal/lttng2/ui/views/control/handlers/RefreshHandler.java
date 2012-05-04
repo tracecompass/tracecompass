@@ -24,10 +24,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceC
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>RefreshHandler</u></b>
  * <p>
  * Command handler implementation to refresh node configuration.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class RefreshHandler extends BaseControlViewHandler {
 

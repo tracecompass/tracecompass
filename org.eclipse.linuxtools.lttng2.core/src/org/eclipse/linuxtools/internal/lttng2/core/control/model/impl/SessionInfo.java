@@ -20,11 +20,12 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionState;
 
 /**
- * <b><u>SessionInfo</u></b>
  * <p>
  * Implementation of the trace session interface (ISessionInfo) to store session
  * related data. 
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class SessionInfo extends TraceInfo implements ISessionInfo {
 

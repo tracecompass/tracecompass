@@ -11,12 +11,12 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 
-
 /**
- * <b><u>IImportConfirmationDialog</u></b>
  * <p>
  * Interface for dialog box for updating file import information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IImportConfirmationDialog {
     

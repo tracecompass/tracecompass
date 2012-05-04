@@ -51,10 +51,11 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * <b><u>ImportDialog</u></b>
  * <p>
  * Dialog box for collecting trace import information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ImportDialog extends Dialog implements IImportDialog {
 

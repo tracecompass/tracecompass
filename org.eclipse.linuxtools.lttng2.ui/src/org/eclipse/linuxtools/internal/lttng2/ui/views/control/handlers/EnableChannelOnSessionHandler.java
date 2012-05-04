@@ -26,11 +26,12 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>EnableChannelOnSessionHandler</u></b>
  * <p>
  * Command handler implementation to enable a trace channel for unknown domain 
  * (on session level).
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class EnableChannelOnSessionHandler extends BaseEnableChannelHandler {
 

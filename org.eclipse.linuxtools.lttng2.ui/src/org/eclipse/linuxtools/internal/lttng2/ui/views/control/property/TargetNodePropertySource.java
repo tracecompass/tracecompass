@@ -17,10 +17,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TargetNodePropertySource</u></b>
  * <p>
  * Property source implementation for the target node component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TargetNodePropertySource extends BasePropertySource {
 

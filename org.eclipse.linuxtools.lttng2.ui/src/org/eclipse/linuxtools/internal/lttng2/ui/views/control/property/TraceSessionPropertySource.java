@@ -17,10 +17,11 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TraceSessionPropertySource</u></b>
  * <p>
  * Property source implementation for the trace session component.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class TraceSessionPropertySource extends BasePropertySource {
 

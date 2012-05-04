@@ -36,10 +36,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>NewConnectionDialog</u></b>
  * <p>
  * Dialog box for connection information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class NewConnectionDialog extends Dialog implements INewConnectionDialog {
 

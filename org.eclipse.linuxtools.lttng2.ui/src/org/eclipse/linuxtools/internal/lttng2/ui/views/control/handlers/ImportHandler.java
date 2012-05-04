@@ -45,10 +45,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>ImportHandler</u></b>
  * <p>
  * Command handler implementation to import traces from a (remote) session to a tracing project.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ImportHandler extends BaseControlViewHandler {
 

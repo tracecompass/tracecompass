@@ -15,10 +15,11 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
- * <b><u>ControlPreferenceInitializer</u></b>
  * <p>
  * A class to initialize the preferences.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class ControlPreferenceInitializer extends AbstractPreferenceInitializer {
     /*

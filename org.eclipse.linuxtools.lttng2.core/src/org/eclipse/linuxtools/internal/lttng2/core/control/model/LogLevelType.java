@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>LogLevelType</u></b>
  * <p>
  * Type of log Level enumeration.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public enum LogLevelType {
     

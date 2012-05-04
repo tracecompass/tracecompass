@@ -16,11 +16,12 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 
 /**
-* <b><u>BaseEventInfo</u></b>
 * <p>
 * Implementation of the basic trace event interface (IEventInfo) to store event
 * related data. 
 * </p>
+* 
+* @author Bernd Hufmann
 */
 public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
 

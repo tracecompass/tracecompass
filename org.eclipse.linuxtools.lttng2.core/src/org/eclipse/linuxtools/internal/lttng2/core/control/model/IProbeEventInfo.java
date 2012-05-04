@@ -12,10 +12,11 @@
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 /**
- * <b><u>IProbeEventInfo</u></b>
  * <p>
  * Interface for retrieval of probe event information.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public interface IProbeEventInfo extends IEventInfo {
 

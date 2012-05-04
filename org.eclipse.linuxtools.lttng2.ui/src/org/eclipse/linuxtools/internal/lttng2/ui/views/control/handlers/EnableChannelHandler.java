@@ -19,10 +19,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
- * <b><u>EnableChannelHandler</u></b>
  * <p>
  * Command handler implementation to enable one or more trace channels per session and domain.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class EnableChannelHandler extends ChangeChannelStateHandler {
 

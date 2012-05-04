@@ -34,10 +34,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <b><u>EnableEventsDialog</u></b>
  * <p>
  * Dialog box for collecting information about the events to enable.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
 

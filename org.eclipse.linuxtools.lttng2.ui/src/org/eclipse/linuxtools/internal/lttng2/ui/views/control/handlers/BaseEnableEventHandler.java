@@ -34,10 +34,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>EnableEventOnSessionHandler</u></b>
  * <p>
  * Base command handler implementation to enable events.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
 

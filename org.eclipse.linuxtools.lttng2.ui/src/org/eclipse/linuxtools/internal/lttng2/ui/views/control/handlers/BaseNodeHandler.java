@@ -18,10 +18,11 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.Target
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>BaseNodeHandler</u></b>
  * <p>
  * Command handler implementation to delete a target host.
  * </p>
+ * 
+ * @author Bernd Hufmann
  */
 abstract public class BaseNodeHandler extends BaseControlViewHandler {
 
