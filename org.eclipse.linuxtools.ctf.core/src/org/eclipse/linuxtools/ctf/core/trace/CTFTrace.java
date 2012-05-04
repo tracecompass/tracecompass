@@ -24,6 +24,8 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -130,7 +132,7 @@ public class CTFTrace implements IDefinitionScope {
     private final HashMap<String, CTFClock> clocks;
 
     /** FileChannels to the streams */
-    private final FileChannel[] streamFileChannels;
+    private final List<FileChannel> streamFileChannels;
 
     /** Handlers for the metadata files */
     private final static FileFilter metadataFileFilter = new MetadataFileFilter();
@@ -162,14 +164,15 @@ public class CTFTrace implements IDefinitionScope {
         this.path = path;
         this.metadata = new Metadata(this);
 
-        if (!this.path.isDirectory()) {
-            throw new CTFReaderException("Path must be a valid directory"); //$NON-NLS-1$
-        }
-
         /* Set up the internal containers for this trace */
         streams = new HashMap<Long, Stream>();
         environment = new HashMap<String, String>();
         clocks = new HashMap<String, CTFClock>();
+        streamFileChannels = new LinkedList<FileChannel>();
+
+        if (!this.path.isDirectory()) {
+            throw new CTFReaderException("Path must be a valid directory"); //$NON-NLS-1$
+        }
 
         /* Open and parse the metadata file */
         metadata.parse();
@@ -190,9 +193,8 @@ public class CTFTrace implements IDefinitionScope {
         Arrays.sort(files, metadataComparator);
 
         /* Try to open each file */
-        streamFileChannels = new FileChannel[files.length];
-        for (int i = 0; i < files.length; i++) {
-            openStreamInput(files[i], i);
+        for (File streamFile : files) {
+            openStreamInput(streamFile);
         }
 
         /* Create their index */
@@ -425,10 +427,12 @@ public class CTFTrace implements IDefinitionScope {
      *            must use
      * @throws CTFReaderException
      */
-    private void openStreamInput(File streamFile, int index)
+    private void openStreamInput(File streamFile)
             throws CTFReaderException {
         MappedByteBuffer byteBuffer;
         BitBuffer streamBitBuffer;
+        Stream stream;
+        FileChannel fc;
 
         if (!streamFile.canRead()) {
             throw new CTFReaderException("Unreadable file : " //$NON-NLS-1$
@@ -437,11 +441,11 @@ public class CTFTrace implements IDefinitionScope {
 
         try {
             /* Open the file and get the FileChannel */
-            streamFileChannels[index] = new FileInputStream(streamFile).getChannel();
+            fc = new FileInputStream(streamFile).getChannel();
+            streamFileChannels.add(fc);
 
             /* Map one memory page of 4 kiB */
-            byteBuffer = streamFileChannels[index].map(MapMode.READ_ONLY, 0,
-                    4096);
+            byteBuffer = fc.map(MapMode.READ_ONLY, 0, 4096);
         } catch (IOException e) {
             /* Shouldn't happen at this stage if every other check passed */
             throw new CTFReaderException();
@@ -489,25 +493,17 @@ public class CTFTrace implements IDefinitionScope {
             long streamID = streamIDDef.getValue();
 
             /* Get the stream to which this trace file belongs to */
-            Stream stream = streams.get(streamID);
-
-            /* Create the stream input */
-            StreamInput streamInput = new StreamInput(stream,
-                    streamFileChannels[index], streamFile);
-
-            /* Add a reference to the streamInput in the stream */
-            stream.addInput(streamInput);
+            stream = streams.get(streamID);
         } else {
             /* No packet header, we suppose there is only one stream */
-            Stream stream = streams.get(null);
-
-            /* Create the stream input */
-            StreamInput streamInput = new StreamInput(stream,
-                    streamFileChannels[index], streamFile);
-
-            /* Add a reference to the streamInput in the stream */
-            stream.addInput(streamInput);
+            stream = streams.get(null);
         }
+
+        /* Create the stream input */
+        StreamInput streamInput = new StreamInput(stream, fc, streamFile);
+
+        /* Add a reference to the streamInput in the stream */
+        stream.addInput(streamInput);
     }
 
     /**
