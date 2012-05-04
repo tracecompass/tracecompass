@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,72 +7,110 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ * Francois Chouinard - Initial API and implementation
+ * Francois Chouinard - Updated as per TMF Trace Model 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.experiment;
 
-import java.util.Arrays;
-
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
- * <b><u>TmfExperimentLocation</u></b>
+ * The experiment location in TMF.
  * <p>
- * The experiment location is the set of its traces' locations.
+ * An experiment location is actually the set of locations of the traces it
+ * contains. By setting the individual traces to their corresponding locations,
+ * the experiment can be positioned to read the next chronological event.
+ * <p>
+ * It is the responsibility of the user the individual trace locations are valid
+ * and that they are matched to the correct trace.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
+ * 
+ * @see TmfLocationArray
  */
-public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
+public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> implements Cloneable {
 
-    private long[] fRanks;
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
 
-	public TmfExperimentLocation(TmfLocationArray locations, long[] ranks) {
-		super(locations);
-		fRanks = ranks;
-	}
-
-	@Override
-	public TmfExperimentLocation clone() {
-		super.clone();	// To keep FindBugs happy
-		TmfLocationArray array = (TmfLocationArray) getLocation();
-		TmfLocationArray clones = array.clone();
-		return new TmfExperimentLocation(clones, fRanks.clone());
-	}
-
-	@Override
-    @SuppressWarnings("nls")
-	public String toString() {
-		StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-		TmfLocationArray array = (TmfLocationArray) getLocation();
-		for (int i = 0; i < array.locations.length; i++) {
-			result.append("[" + array.locations[i].toString() + "," + fRanks[i] + "]");
-		}
-		result.append("]");
-		return result.toString();
-	}
-
-	public long[] getRanks() {
-        return fRanks;
+    /**
+     * The standard constructor
+     * 
+     * @param locations the set of trace locations
+     */
+    public TmfExperimentLocation(TmfLocationArray locations) {
+        super(locations);
     }
 
+    /**
+     * The copy constructor
+     * 
+     * @param location the other experiment location
+     */
+    public TmfExperimentLocation(TmfExperimentLocation location) {
+        this(location.getLocation());
+    }
+
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#clone()
+     */
+    @Override
+    public TmfExperimentLocation clone() {
+//        super.clone(); // To keep FindBugs happy
+        TmfLocationArray array = (TmfLocationArray) getLocation();
+        TmfLocationArray clones = array.clone();
+        return new TmfExperimentLocation(clones);
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#toString()
+     */
+    @Override
+    @SuppressWarnings("nls")
+    public String toString() {
+        StringBuilder result = new StringBuilder("[TmfExperimentLocation");
+        ITmfLocation<? extends Comparable<?>>[] locations = ((TmfLocationArray) getLocation()).getLocations();
+        for (ITmfLocation<?> location : locations) {
+            result.append("[" + location.toString() + "]");
+        }
+        result.append("]");
+        return result.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#hashCode()
+     */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + Arrays.hashCode(fRanks);
-        return result;
+        return super.hashCode();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        TmfExperimentLocation other = (TmfExperimentLocation) obj;
-        if (!Arrays.equals(fRanks, other.fRanks))
-            return false;
+        }
         return true;
     }
 

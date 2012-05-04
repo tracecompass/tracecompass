@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 20112 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -35,14 +35,12 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
- * <b><u>TmfTraceTest</u></b>
- * <p>
  * Test suite for the TmfTrace class.
  */
 @SuppressWarnings("nls")
@@ -125,7 +123,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getType",  TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", TmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
         assertEquals("getName", TEST_STREAM, trace.getName());
 
@@ -154,7 +152,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getType",  TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", TmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
         assertEquals("getName", TEST_STREAM, trace.getName());
 
@@ -327,7 +325,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getType", TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
-        assertEquals("getCacheSize", TmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
         assertEquals("getName", path, trace.getName());
 
@@ -356,7 +354,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getType", TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
-        assertEquals("getCacheSize", TmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
         assertEquals("getName", name, trace.getName());
 
@@ -375,7 +373,7 @@ public class TmfTraceTest extends TestCase {
         assertFalse ("Open trace", trace == null);
         assertNull  ("getType",  trace.getType());
         assertNull  ("getResource", trace.getResource());
-        assertEquals("getCacheSize", TmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
         assertEquals("getName", "", trace.getName());
 
@@ -404,7 +402,7 @@ public class TmfTraceTest extends TestCase {
         assertFalse ("Open trace", trace == null);
         assertEquals("getType",  TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
-        assertEquals("getCacheSize", TmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
         assertEquals("getName", TEST_STREAM, trace.getName());
 
@@ -619,17 +617,12 @@ public class TmfTraceTest extends TestCase {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         // Position trace at event passed the end
-        tmpContext = fTrace.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
-        context = fTrace.seekEvent(tmpContext.getLocation());
-        assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
-
-        event = fTrace.parseEvent(context);
-        assertEquals("Event timestamp", null, event);
+        context = fTrace.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
+        assertNull("Event timestamp", context.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         event = fTrace.readNextEvent(context);
-        assertEquals("Event timestamp", null, event);
-        assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
+        assertNull("Event", event);
     }
 
     // ------------------------------------------------------------------------
@@ -765,15 +758,15 @@ public class TmfTraceTest extends TestCase {
 
         // Position trace at event passed the end
         context = fTrace.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
-        assertEquals("Event rank", NB_EVENTS, context.getRank());
+        assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", null, event);
-        assertEquals("Event rank", NB_EVENTS, context.getRank());
+        assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         event = fTrace.readNextEvent(context);
         assertEquals("Event timestamp", null, event);
-        assertEquals("Event rank", NB_EVENTS, context.getRank());
+        assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
     }
 
     // ------------------------------------------------------------------------
@@ -881,7 +874,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("Event rank", 4501, context.getRank());
     }
 
-    public void testSeekEventOnRankOfScope() throws Exception {
+    public void testSeekEventOnRankOutOfScope() throws Exception {
 
         // Position trace at beginning
         ITmfContext context = fTrace.seekEvent(-1);
@@ -900,11 +893,11 @@ public class TmfTraceTest extends TestCase {
         assertEquals("Event rank", NB_EVENTS, context.getRank());
 
         event = fTrace.parseEvent(context);
-        assertEquals("Event timestamp", null, event);
+        assertNull("Event", event);
         assertEquals("Event rank", NB_EVENTS, context.getRank());
 
         event = fTrace.readNextEvent(context);
-        assertEquals("Event timestamp", null, event);
+        assertNull("Event", event);
         assertEquals("Event rank", NB_EVENTS, context.getRank());
     }
 

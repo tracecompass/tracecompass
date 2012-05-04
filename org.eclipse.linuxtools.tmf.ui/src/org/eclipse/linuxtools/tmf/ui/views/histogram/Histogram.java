@@ -384,14 +384,16 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                             return;
                         fDataModel.setCurrentEvent(fCurrentEventTime);
                         fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight, HISTOGRAM_BAR_WIDTH);
-                        if (fScaledData != null) {
-                            fCanvas.redraw();
-                            // Display histogram and update X-,Y-axis labels
-                            fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getFirstBucketTime()));
-                            fTimeRangeEndText.setText(HistogramUtils.nanosecondsToString(fDataModel.getEndTime()));
-                            fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
-                            // The Y-axis area might need to be re-sized
-                            fMaxNbEventsText.getParent().layout();
+                        synchronized(fScaledData) {
+                            if (fScaledData != null) {
+                                fCanvas.redraw();
+                                // Display histogram and update X-,Y-axis labels
+                                fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getFirstBucketTime()));
+                                fTimeRangeEndText.setText(HistogramUtils.nanosecondsToString(fDataModel.getEndTime()));
+                                fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
+                                // The Y-axis area might need to be re-sized
+                                fMaxNbEventsText.getParent().layout();
+                            }
                         }
                     }
                 }

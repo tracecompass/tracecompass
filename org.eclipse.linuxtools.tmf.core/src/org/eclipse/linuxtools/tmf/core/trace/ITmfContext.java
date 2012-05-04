@@ -20,13 +20,12 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * The context should be sufficient to allow the trace to position itself so
  * that performing a trace read operation will yield the corresponding event.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
  * @see ITmfLocation
  */
-public interface ITmfContext extends Cloneable {
+public interface ITmfContext {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -79,10 +78,6 @@ public interface ITmfContext extends Cloneable {
      * Cleanup hook
      */
     public void dispose();
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the context

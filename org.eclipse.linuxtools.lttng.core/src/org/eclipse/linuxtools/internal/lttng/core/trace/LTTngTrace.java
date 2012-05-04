@@ -121,7 +121,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         initialize(resource, path, eventType);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     protected synchronized void initialize(final IResource resource, final String path, final Class<LttngEvent> eventType)
             throws TmfTraceException {
@@ -153,8 +152,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
 
-        fParser = (ITmfEventParser<LttngEvent>) this;
-        fCacheSize = CHECKPOINT_PAGE_SIZE;
+        setParser((ITmfEventParser<LttngEvent>) this);
+        setCacheSize(CHECKPOINT_PAGE_SIZE);
  
         // // Bypass indexing if asked
         // if ( bypassIndexing == false ) {
@@ -188,7 +187,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         final LttngEvent event = readNextEvent(context);
         setEndTime(TmfTimestamp.BIG_BANG);
         final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BIG_BANG.getValue();
-        fStreamingInterval = LTTNG_STREAMING_INTERVAL;
+        setStreamingInterval(LTTNG_STREAMING_INTERVAL);
 
         final Thread thread = new Thread("Streaming Monitor for trace " + getName()) { //$NON-NLS-1$
 
@@ -543,14 +542,14 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
 //            timestamp = getStartTime();
 
         // Position the trace at the checkpoint
-        final ITmfContext checkpointContext = fIndexer.seekIndex(rank);
+        final ITmfContext checkpointContext = getIndexer().seekIndex(rank);
         LttngLocation location = (LttngLocation) checkpointContext.getLocation();
         ITmfTimestamp timestamp = location.getLocation();
         long index = rank / getCacheSize();
 
         // Seek to the found time
         final TmfContext tmpContext = seekEvent(timestamp);
-        tmpContext.setRank((index + 1) * fCacheSize);
+        tmpContext.setRank((index + 1) * getCacheSize());
         previousLocation = (LttngLocation) tmpContext.getLocation();
 
         // Ajust the index of the event we found at this check point position

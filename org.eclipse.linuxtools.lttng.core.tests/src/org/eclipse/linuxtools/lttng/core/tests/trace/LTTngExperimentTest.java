@@ -101,7 +101,6 @@ public class LTTngExperimentTest extends TestCase {
     public void testBasicTmfExperimentConstructor() {
 
         assertEquals("GetId", EXPERIMENT, fExperiment.getName());
-        assertEquals("GetEpoch", TmfTimestamp.ZERO, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
 
         final long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();

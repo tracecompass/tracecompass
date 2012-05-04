@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 20112 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Vector;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -33,9 +33,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
- * <b><u>TmfTraceTest</u></b>
- * <p>
- * Test suite for the TmfTrace class.
+ * Test suite for the TmfCheckpointIndexTest class.
  */
 @SuppressWarnings("nls")
 public class TmfCheckpointIndexTest extends TestCase {
@@ -80,18 +78,19 @@ public class TmfCheckpointIndexTest extends TestCase {
         public TestIndexer(TestTrace testTrace) {
             super((ITmfTrace) testTrace);
         }
-        public Vector<TmfCheckpoint> getCheckpoints() {
-            return fTraceIndex;
+        public List<TmfCheckpoint> getCheckpoints() {
+            return getTraceIndex();
         }
     }
 
     private class TestTrace extends TmfTraceStub {
         public TestTrace(String path, int blockSize) throws TmfTraceException {
             super(path, blockSize);
-            fIndexer = new TestIndexer(this);
+            setIndexer(new TestIndexer(this));
         }
+        @Override
         public TestIndexer getIndexer() {
-            return (TestIndexer) fIndexer;
+            return (TestIndexer) super.getIndexer();
         }
     }
 
@@ -129,7 +128,7 @@ public class TmfCheckpointIndexTest extends TestCase {
         assertEquals("getStartTime",   1,          fTrace.getStartTime().getValue());
         assertEquals("getEndTime",     NB_EVENTS,  fTrace.getEndTime().getValue());
 
-        Vector<TmfCheckpoint> checkpoints = fTrace.getIndexer().getCheckpoints();
+        List<TmfCheckpoint> checkpoints = fTrace.getIndexer().getCheckpoints();
         int pageSize = fTrace.getCacheSize();
         assertTrue("Checkpoints exist",  checkpoints != null);
 

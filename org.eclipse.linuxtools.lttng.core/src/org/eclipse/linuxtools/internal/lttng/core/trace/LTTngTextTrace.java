@@ -76,18 +76,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
         if ( positionToFirstEvent() == false )
             throw new IOException("Fail to position to the beginning of the trace"); //$NON-NLS-1$
         else {
-//            fCacheSize = 1000;
-
-            // Skip indexing if asked
-            //        	if ( skipIndexing == true ) {
-//            fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L), new TmfLocation<Long>(0L)));
+            setCacheSize(1000);
             ITmfContext context = new TmfContext(new TmfLocation<Long>(0L), 0);
-            fIndexer.updateIndex(context, new LttngTimestamp(0L));
-            fParser = (ITmfEventParser<LttngEvent>) this;
-            //        	}
-            //        	else {
-            //        		indexTrace(true);
-            //        	}
+            getIndexer().updateIndex(context, new LttngTimestamp(0L));
+            setParser((ITmfEventParser<LttngEvent>) this);
 
             final Long endTime = currentLttngEvent.getTimestamp().getValue();
             positionToFirstEvent();

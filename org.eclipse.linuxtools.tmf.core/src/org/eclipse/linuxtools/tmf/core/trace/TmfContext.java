@@ -19,7 +19,6 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * It ties a trace location to an event rank. The context should be enough to
  * restore the trace state so the corresponding event can be read.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -74,8 +73,9 @@ public class TmfContext implements ITmfContext, Cloneable {
      * @param context the other context
      */
     public TmfContext(final TmfContext context) {
-        if (context == null)
+        if (context == null) {
             throw new IllegalArgumentException();
+        }
         fLocation = context.fLocation;
         fRank = context.fRank;
     }
@@ -140,8 +140,9 @@ public class TmfContext implements ITmfContext, Cloneable {
      */
     @Override
     public void increaseRank() {
-        if (hasValidRank())
+        if (hasValidRank()) {
             fRank++;
+        }
     }
 
     /* (non-Javadoc)
@@ -180,20 +181,26 @@ public class TmfContext implements ITmfContext, Cloneable {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final TmfContext other = (TmfContext) obj;
         if (fLocation == null) {
-            if (other.fLocation != null)
+            if (other.fLocation != null) {
                 return false;
-        } else if (!fLocation.equals(other.fLocation))
+            }
+        } else if (!fLocation.equals(other.fLocation)) {
             return false;
-        if (fRank != other.fRank)
+        }
+        if (fRank != other.fRank) {
             return false;
+        }
         return true;
     }
 

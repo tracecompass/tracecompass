@@ -23,13 +23,10 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * <p>
  * This location is trace-specific and must be comparable.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
- *
- * @see TmfLocation
  */
-public interface ITmfLocation<L extends Comparable<?>> extends Cloneable {
+public interface ITmfLocation<L extends Comparable<?>> {
 
     // ------------------------------------------------------------------------
     // Getters
@@ -41,7 +38,7 @@ public interface ITmfLocation<L extends Comparable<?>> extends Cloneable {
     public L getLocation();
 
     // ------------------------------------------------------------------------
-    // Cloneable
+    // Operations
     // ------------------------------------------------------------------------
 
     /**

@@ -77,10 +77,8 @@ public abstract class LttngTestPreparation extends TestCase {
             final ITmfTrace<LttngEvent> trace = prepareStreamToTest();
             traces[0] = trace;
 
-            // create experiment and associate traces
             fTestExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class,
                     expId, traces, TmfTimestamp.ZERO, TmfExperiment.DEFAULT_BLOCK_SIZE, true);
-            // fTestExperiment.indexExperiment(waitForCompletion);
 
             // Set the current selected experiment as the test experiment
             final TmfExperimentSelectedSignal<LttngEvent> signal = new TmfExperimentSelectedSignal<LttngEvent>(

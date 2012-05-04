@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * <b><u>HistogramRequest</u></b>
@@ -38,7 +38,7 @@ public class HistogramRequest extends TmfEventRequest<ITmfEvent> {
     // ------------------------------------------------------------------------
 
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, int nbEvents, ITmfDataRequest.ExecutionType execType) {
-        super(ITmfEvent.class, range, rank, nbEvents, TmfTrace.DEFAULT_TRACE_CACHE_SIZE, execType);
+        super(ITmfEvent.class, range, rank, nbEvents, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, execType);
         fHistogram = histogram;
     }
 
