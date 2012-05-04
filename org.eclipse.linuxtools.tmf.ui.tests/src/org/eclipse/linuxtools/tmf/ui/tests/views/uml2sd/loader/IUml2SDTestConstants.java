@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader;
 public interface IUml2SDTestConstants {
     
     final static public int WAIT_FOR_JOBS_DELAY = 1000; 
-    final static public int GUI_REFESH_DELAY = 500;
+    final static public int GUI_REFESH_DELAY = 1000;
     final static public int INITIAL_INDEX_DELAY = 1000;
     final static public int BROADCAST_DELAY = 2000;
     
