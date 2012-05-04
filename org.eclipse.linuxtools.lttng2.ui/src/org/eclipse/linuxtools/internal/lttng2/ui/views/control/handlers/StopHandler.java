@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessionState;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**

@@ -11,9 +11,9 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;
 
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableChannelDialog;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**

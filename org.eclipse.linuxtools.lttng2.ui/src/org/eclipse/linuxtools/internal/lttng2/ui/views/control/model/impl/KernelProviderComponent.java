@@ -15,8 +15,8 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.KernelProviderPropertySource;
 import org.eclipse.ui.views.properties.IPropertySource;

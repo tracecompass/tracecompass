@@ -11,10 +11,11 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.EventInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceEventType;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BaseEventPropertySource;
 import org.eclipse.ui.views.properties.IPropertySource;
 

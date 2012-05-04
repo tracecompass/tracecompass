@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model;
 import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.swt.graphics.Image;
 

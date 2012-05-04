@@ -12,7 +12,6 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ICommandShell;
 import org.eclipse.rse.core.model.IRSECallback;
 import org.eclipse.rse.core.subsystems.ICommunicationsListener;
 import org.eclipse.rse.core.subsystems.ISubSystem;

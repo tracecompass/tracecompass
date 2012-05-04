@@ -20,13 +20,13 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TargetNodeState;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceEnablement;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceEventType;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.KernelProviderComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TargetNodeComponent;

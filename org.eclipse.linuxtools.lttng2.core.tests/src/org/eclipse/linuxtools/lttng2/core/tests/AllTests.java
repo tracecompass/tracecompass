@@ -27,6 +27,7 @@ public class AllTests {
 
         // Plug-in
         suite.addTestSuite(ActivatorTest.class);
+        suite.addTest(org.eclipse.linuxtools.lttng2.core.tests.control.model.impl.AllTests.suite());
 
         // $JUnit-END$
         return suite;

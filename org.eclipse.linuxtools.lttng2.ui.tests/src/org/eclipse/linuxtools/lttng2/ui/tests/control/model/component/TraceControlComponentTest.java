@@ -18,16 +18,15 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState;
 import org.eclipse.linuxtools.internal.lttng2.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TargetNodeState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlRoot;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlService;
-import org.eclipse.linuxtools.lttng2.ui.tests.control.model.impl.ListenerValidator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;

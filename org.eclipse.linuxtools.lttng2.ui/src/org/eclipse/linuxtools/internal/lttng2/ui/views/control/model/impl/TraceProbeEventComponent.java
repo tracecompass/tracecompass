@@ -11,7 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ProbeEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceProbeEventPropertySource;
 import org.eclipse.ui.views.properties.IPropertySource;

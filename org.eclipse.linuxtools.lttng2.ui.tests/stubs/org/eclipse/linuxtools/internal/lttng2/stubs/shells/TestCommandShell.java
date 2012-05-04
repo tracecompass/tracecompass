@@ -13,9 +13,9 @@ package org.eclipse.linuxtools.internal.lttng2.stubs.shells;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.CommandResult;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ICommandResult;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ICommandShell;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.CommandResult;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandResult;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandShell;
 
 public class TestCommandShell implements ICommandShell {
 

@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 
 /**

@@ -16,12 +16,13 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IDomainInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.DomainInfo;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceDomainPropertySource;
 import org.eclipse.ui.views.properties.IPropertySource;
 

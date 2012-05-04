@@ -13,7 +13,6 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 
 /**
  * <b><u>ControlPreferenceInitializer</u></b>
@@ -28,7 +27,8 @@ public class ControlPreferenceInitializer extends AbstractPreferenceInitializer 
      */
     @Override
     public void initializeDefaultPreferences() {
-        final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        final IPreferenceStore store = ControlPreferences.getInstance().getPreferenceStore();
+
         //Set default User ID if none already stored in preferences
         store.setDefault(ControlPreferences.TRACE_CONTROL_TRACING_GROUP_PREF, ControlPreferences.TRACE_CONTROL_DEFAULT_TRACING_GROUP);
         store.setDefault(ControlPreferences.TRACE_CONTROL_LOG_APPEND_PREF, false);

@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
 /**

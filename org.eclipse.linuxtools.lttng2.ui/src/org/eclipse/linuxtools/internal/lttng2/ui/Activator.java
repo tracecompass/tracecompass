@@ -74,7 +74,7 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        ControlPreferences.getInstance().init();
+        ControlPreferences.getInstance().init(getPreferenceStore());
     }
 
     /* (non-Javadoc)

@@ -23,6 +23,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlContentProvider;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlLabelProvider;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlRoot;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.swt.SWT;

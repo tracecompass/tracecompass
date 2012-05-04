@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup;
 

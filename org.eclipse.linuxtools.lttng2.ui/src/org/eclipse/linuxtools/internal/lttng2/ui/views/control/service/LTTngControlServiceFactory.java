@@ -15,7 +15,9 @@ import java.util.regex.Matcher;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandResult;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandShell;
 
 /**
  * <b><u>LTTngControlServiceFactory</u></b>

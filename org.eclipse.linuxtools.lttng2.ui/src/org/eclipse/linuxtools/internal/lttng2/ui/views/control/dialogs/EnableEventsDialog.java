@@ -15,10 +15,10 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup;
 import org.eclipse.swt.SWT;

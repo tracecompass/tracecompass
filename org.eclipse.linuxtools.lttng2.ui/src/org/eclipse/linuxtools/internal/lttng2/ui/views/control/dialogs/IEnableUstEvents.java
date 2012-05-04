@@ -13,8 +13,8 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 
 /**
  * <b><u>IEnableKernelEvents</u></b>

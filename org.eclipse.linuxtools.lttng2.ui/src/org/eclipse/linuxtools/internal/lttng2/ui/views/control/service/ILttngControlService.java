@@ -15,12 +15,12 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IBaseEventInfo;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IUstProviderInfo;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 
 
 /** <b><u>ILttngControlService</u></b>

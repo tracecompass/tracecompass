@@ -16,10 +16,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TargetNodeState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.swt.graphics.Image;
 

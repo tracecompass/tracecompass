@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventComponent;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;

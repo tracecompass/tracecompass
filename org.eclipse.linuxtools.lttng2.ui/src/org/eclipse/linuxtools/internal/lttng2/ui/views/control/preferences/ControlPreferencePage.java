@@ -18,9 +18,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCommandLogger;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -45,7 +44,7 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         super(FieldEditorPreferencePage.GRID);
 
         // Set the preference store for the preference page.
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        IPreferenceStore store = ControlPreferences.getInstance().getPreferenceStore();
         setPreferenceStore(store);
     }
     

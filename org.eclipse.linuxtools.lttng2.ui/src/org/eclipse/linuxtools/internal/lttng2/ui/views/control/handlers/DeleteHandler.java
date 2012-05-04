@@ -13,8 +13,8 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.TargetNodeState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TargetNodeState;
 
 /**
  * <b><u>DeleteHandler</u></b>
