@@ -44,6 +44,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.util,
+ org.eclipse.linuxtools.tmf.ui.widgets.rawviewer,
  org.eclipse.linuxtools.tmf.ui.widgets.timegraph,
  org.eclipse.linuxtools.tmf.ui.widgets.timegraph.dialogs,
  org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model,

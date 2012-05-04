@@ -10,7 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.widgets.virtualtable;
+package org.eclipse.linuxtools.tmf.ui.widgets.rawviewer;
 
 import java.util.ArrayList;
 
@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Slider;
  * It is essentially a Composite of a StyledText area and a Slider, where the number
  * of visible lines in the StyledText control is set to fill the viewer display area.
  * An underlying data model is used to store a cache of event raw text line data.
- * The slider is rank-based.
+ * The slider is ratio-based.
  */
 public class TmfRawEventViewer extends Composite implements ControlListener, SelectionListener,
                 KeyListener, CaretListener, MouseMoveListener, MouseTrackListener, MouseWheelListener {
