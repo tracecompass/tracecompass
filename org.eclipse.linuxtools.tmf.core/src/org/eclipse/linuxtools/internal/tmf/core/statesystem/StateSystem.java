@@ -51,6 +51,10 @@ public class StateSystem {
         transState = new TransientState(null);
     }
 
+    public int getNbAttributes() {
+        return attributeTree.getNbAttributes();
+    }
+
     /**
      * @name Quark-retrieving methods
      */

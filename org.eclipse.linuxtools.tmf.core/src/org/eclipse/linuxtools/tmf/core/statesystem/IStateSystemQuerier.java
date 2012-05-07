@@ -44,6 +44,13 @@ public interface IStateSystemQuerier {
     public long getCurrentEndTime();
 
     /**
+     * Return the current total amount of attributes in the system.
+     * 
+     * @return
+     */
+    public int getNbAttributes();
+
+    /**
      * @name Read-only quark-getting methods
      */
 
