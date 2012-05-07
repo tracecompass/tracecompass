@@ -145,18 +145,10 @@ class CtfKernelHandler implements Runnable {
             case 1: // "exit_syscall":
             /* Fields: int64 ret */
             {
-                /* Pop "syscall" from the Exec_mode_stack */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
-                try {
-                    ss.popAttribute(ts, quark);
-                } catch (AttributeNotFoundException e1) {
-                    /*
-                     * meh, can happen if we're missing events, we'll just
-                     * silently ignore it.
-                     */
-                    System.err.println(event.getTimestamp()
-                            + " Popping empty attribute: " + e1.getMessage()); //$NON-NLS-1$
-                }
+                /* Clear the current system call on the process */
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
+                value = TmfStateValue.nullValue();
+                ss.modifyAttribute(ts, value, quark);
             }
                 break;
 
@@ -358,13 +350,10 @@ class CtfKernelHandler implements Runnable {
                      * syscall names are listed into the event type
                      */
 
-                    /*
-                     * Push the syscall name on the Exec_mode_stack of the
-                     * relevant PID
-                     */
-                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
+                    /* Assign the new system call to the process */
+                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
                     value = TmfStateValue.newValueString(eventName);
-                    ss.pushAttribute(ts, value, quark);
+                    ss.modifyAttribute(ts, value, quark);
                 }
             }
                 break;
@@ -420,7 +409,7 @@ class CtfKernelHandler implements Runnable {
     private void initThreadNode(int currentThreadNode) {
         ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.PPID);
         ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_NAME);
-        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
+        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
         ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
     }
 

@@ -39,7 +39,7 @@ public abstract class Attributes {
     public static final String PPID = "PPID";
     public static final String STATUS = "Status";
     public static final String EXEC_NAME = "Exec_name";
-    public static final String EXEC_MODE_STACK = "Exec_mode_stack";
+    public static final String SYSTEM_CALL = "System_call";
 
     /* Attributes under "Resources" */
     public static final String IRQS = "IRQs";

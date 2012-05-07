@@ -127,7 +127,7 @@ public class StateSystemFullHistoryTest {
 
         List<ITmfStateInterval> list;
         ITmfStateInterval interval;
-        int quark, quark2, valueInt;
+        int quark, valueInt;
         String valueStr;
 
         list = ssb.loadStateAtTime(interestingTimestamp1);
@@ -142,12 +142,8 @@ public class StateSystemFullHistoryTest {
         valueStr = interval.getStateValue().unboxStr();
         assertEquals("gdbus", valueStr);
 
-        /* Query a stack attribute, has to be done in two passes */
-        quark = ssb.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_MODE_STACK);
+        quark = ssb.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.SYSTEM_CALL);
         interval = list.get(quark);
-        valueInt = interval.getStateValue().unboxInt(); /* The stack depth */
-        quark2 = ssb.getQuarkRelative(quark, Integer.toString(valueInt));
-        interval = list.get(quark2);
         valueStr = interval.getStateValue().unboxStr();
         assertTrue(valueStr.equals("sys_poll"));
     }
