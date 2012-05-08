@@ -106,7 +106,7 @@ class HT_IO {
      * memory it's a bit faster to use this directly (when opening a file from
      * disk for example)
      */
-    HTNode readNodeFromDisk(int seqNumber) {
+    synchronized HTNode readNodeFromDisk(int seqNumber) {
         HTNode readNode;
         try {
             seekFCToNodePos(fcIn, seqNumber);
