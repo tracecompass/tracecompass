@@ -27,7 +27,8 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".experiment"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
-		suite.addTestSuite(TmfExperimentTest.class);
+		suite.addTestSuite(TmfExperimentCheckpointIndexTest.class);
+        suite.addTestSuite(TmfExperimentTest.class);
 		suite.addTestSuite(TmfMultiTraceExperimentTest.class);
 		//$JUnit-END$
 		return suite;

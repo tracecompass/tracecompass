@@ -44,7 +44,7 @@ public class TmfCheckpointIndexTest extends TestCase {
 
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "A-Test-10K";
-    private static final int    BLOCK_SIZE  = 500;
+    private static final int    BLOCK_SIZE  = 100;
     private static final int    NB_EVENTS   = 10000;
     private static TestTrace    fTrace      = null;
 
@@ -76,7 +76,7 @@ public class TmfCheckpointIndexTest extends TestCase {
     private class TestIndexer extends TmfCheckpointIndexer<ITmfTrace<ITmfEvent>> {
         @SuppressWarnings({ "unchecked", "rawtypes" })
         public TestIndexer(TestTrace testTrace) {
-            super((ITmfTrace) testTrace);
+            super((ITmfTrace) testTrace, BLOCK_SIZE);
         }
         public List<TmfCheckpoint> getCheckpoints() {
             return getTraceIndex();
@@ -131,6 +131,7 @@ public class TmfCheckpointIndexTest extends TestCase {
         List<TmfCheckpoint> checkpoints = fTrace.getIndexer().getCheckpoints();
         int pageSize = fTrace.getCacheSize();
         assertTrue("Checkpoints exist",  checkpoints != null);
+        assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE, checkpoints.size());
 
         // Validate that each checkpoint points to the right event
         for (int i = 0; i < checkpoints.size(); i++) {

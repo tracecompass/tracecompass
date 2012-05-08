@@ -112,6 +112,9 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("GetId", EXPERIMENT, fExperiment.getName());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
 
+        final long nbExperimentEvents = fExperiment.getNbEvents();
+        assertEquals("GetNbEvents", NB_EVENTS, nbExperimentEvents);
+
         final long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
         assertEquals("GetNbEvents", NB_EVENTS, nbTraceEvents);
 
@@ -119,28 +122,6 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("getStartTime", 1, timeRange.getStartTime().getValue());
         assertEquals("getEndTime", NB_EVENTS, timeRange.getEndTime().getValue());
     }
-
-    // ------------------------------------------------------------------------
-    // Verify checkpoints
-    // ------------------------------------------------------------------------
-
-//    public void testValidateCheckpoints() throws Exception {
-//
-//        final Vector<TmfCheckpoint> checkpoints = fExperiment.getCheckpoints();
-//        final int pageSize = fExperiment.getCacheSize();
-//        assertTrue("Checkpoints exist", checkpoints != null);
-//
-//        // Validate that each checkpoint points to the right event
-//        long expectedTS = 1;
-//        for (TmfCheckpoint checkpoint : checkpoints) {
-//            final TmfExperimentContext context = fExperiment.seekEvent(checkpoint.getLocation());
-//            final ITmfEvent event = fExperiment.readNextEvent(context);
-//            assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
-//            assertTrue("Timestamp", (checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
-//            assertEquals("Timestamp", expectedTS, checkpoint.getTimestamp().getValue());
-//            expectedTS += pageSize;
-//        }
-//    }
 
     // ------------------------------------------------------------------------
     // seekEvent on rank

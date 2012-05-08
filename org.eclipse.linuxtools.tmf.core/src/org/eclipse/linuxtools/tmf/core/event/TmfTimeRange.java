@@ -37,7 +37,7 @@ public final class TmfTimeRange implements Cloneable {
      * The null time range
      */
     public static final TmfTimeRange NULL_RANGE =
-            new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_BANG);
+            new TmfTimeRange(TmfTimestamp.BIG_CRUNCH, TmfTimestamp.BIG_BANG);
 
     // ------------------------------------------------------------------------
     // Attributes

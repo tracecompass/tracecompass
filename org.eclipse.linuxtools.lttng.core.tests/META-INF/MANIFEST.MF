@@ -7,7 +7,6 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.core.tests
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.eclipse.linuxtools.lttng.jni
 Fragment-Host: org.eclipse.linuxtools.lttng.core
 Require-Bundle: org.junit;bundle-version="3.8.2",
  org.eclipse.core.runtime;bundle-version="3.7.0",

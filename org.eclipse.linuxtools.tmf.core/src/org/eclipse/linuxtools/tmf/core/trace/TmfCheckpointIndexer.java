@@ -129,7 +129,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         fTraceIndex.clear();
 
         // Build a background request for all the trace data. The index is
-        // updated as we go by getNextEvent().
+        // updated as we go by readNextEvent().
         final ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY,
                 TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
         {
@@ -265,7 +265,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
      * @return the corresponding context
      */
     private ITmfContext seekCheckpoint(final int checkpoint) {
-        ITmfLocation<?> location;
+        ITmfLocation<?> location = null;
         int index = checkpoint;
         synchronized (fTraceIndex) {
             if (!fTraceIndex.isEmpty()) {
@@ -273,8 +273,6 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
                     index = fTraceIndex.size() - 1;
                 }
                 location = fTraceIndex.get(index).getLocation();
-            } else {
-                location = null;
             }
         }
         final ITmfContext context = fTrace.seekEvent(location);

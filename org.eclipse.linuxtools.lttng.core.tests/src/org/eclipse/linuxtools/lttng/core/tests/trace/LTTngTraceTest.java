@@ -11,6 +11,7 @@ import org.eclipse.linuxtools.internal.lttng.core.event.LttngLocation;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.osgi.framework.FrameworkUtil;
 
@@ -144,7 +145,7 @@ public class LTTngTraceTest extends TestCase {
 
     public void testSeekEventTimestamp() {
         TmfEvent tmpEvent = null;
-        TmfContext tmpContext = new TmfContext(null, 0);
+        ITmfContext tmpContext = new TmfContext(null, 0);
         final LTTngTrace testStream1 = prepareStreamToTest();
 
         // We should be at the beginning of the trace, we will seek at a certain timestamp
@@ -174,7 +175,7 @@ public class LTTngTraceTest extends TestCase {
 
     public void testSeekEventIndex() {
         TmfEvent tmpEvent = null;
-        TmfContext tmpContext = new TmfContext(null, 0);
+        ITmfContext tmpContext = new TmfContext(null, 0);
         final LTTngTrace testStream1 = prepareStreamToTest();
 
         // We should be at the beginning of the trace, we will seek at a certain timestamp
@@ -204,7 +205,7 @@ public class LTTngTraceTest extends TestCase {
 
     public void testSeekLocation() {
         TmfEvent tmpEvent = null;
-        TmfContext tmpContext = new TmfContext(null, 0);
+        ITmfContext tmpContext = new TmfContext(null, 0);
         final LTTngTrace testStream1 = prepareStreamToTest();
 
         // We should be at the beginning of the trace, we will seek at a certain timestamp
@@ -234,7 +235,7 @@ public class LTTngTraceTest extends TestCase {
 
     public void testLocationOperations() {
         TmfEvent tmpEvent = null;
-        TmfContext tmpContext = new TmfContext(null, 0);
+        ITmfContext tmpContext = new TmfContext(null, 0);
         final LTTngTrace testStream1 = prepareStreamToTest();
 
         // Test LttngLocation after a seek

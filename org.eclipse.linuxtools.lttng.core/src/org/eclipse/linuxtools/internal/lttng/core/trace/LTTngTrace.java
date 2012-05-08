@@ -172,7 +172,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         if (jniTrace == null
                 || (!jniTrace.isLiveTraceSupported() || !LiveTraceManager.isLiveTrace(jniTrace.getTracepath()))) {
             // Set the time range of the trace
-            final TmfContext context = seekEvent(0);
+            final ITmfContext context = seekEvent(0);
             final LttngEvent event = readNextEvent(context);
             final LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
             final LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
@@ -183,7 +183,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         }
 
         // Set the time range of the trace
-        final TmfContext context = seekEvent(0);
+        final ITmfContext context = seekEvent(0);
         final LttngEvent event = readNextEvent(context);
         setEndTime(TmfTimestamp.BIG_BANG);
         final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BIG_BANG.getValue();
@@ -444,30 +444,23 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfContext
      */
     @Override
-    public synchronized TmfContext seekEvent(final ITmfLocation<?> location) {
-
-        // // [lmcfrch]
-        // lastTime = 0;
+    public synchronized ITmfContext seekEvent(final ITmfLocation<?> location) {
 
         if (PRINT_DEBUG)
             System.out.println("seekLocation(location) location -> " + location); //$NON-NLS-1$
 
         // If the location in context is null, create a new one
-        LttngLocation curLocation = null;
         if (location == null) {
-            curLocation = new LttngLocation();
-            final TmfContext context = seekEvent(curLocation.getOperationTime());
+            LttngLocation curLocation = new LttngLocation();
+            final ITmfContext context = seekEvent(curLocation.getOperationTime());
             context.setRank(0);
             return context;
-        } else
-            curLocation = (LttngLocation) location;
-
-        // *** NOTE :
-        // Update to location should (and will) be done in SeekEvent.
-
+        }
+        
         // The only seek valid in LTTng is with the time, we call
         // seekEvent(timestamp)
-        final TmfContext context = seekEvent(curLocation.getOperationTime());
+        LttngLocation curLocation = (LttngLocation) location;
+        final ITmfContext context = seekEvent(curLocation.getOperationTime());
 
         // If the location is marked with the read next flag
         // then it is pointing to the next event following the operation time

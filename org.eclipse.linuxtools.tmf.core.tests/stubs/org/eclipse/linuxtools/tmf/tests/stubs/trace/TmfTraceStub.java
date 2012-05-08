@@ -130,6 +130,9 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
             throw new TmfTraceException(e.getMessage());
         }
         setParser(new TmfEventParserStub(this));
+        if (waitForCompletion) {
+            indexTrace();
+        }
     }
 
     /**
