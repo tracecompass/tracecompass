@@ -157,13 +157,7 @@ public class CtfIteratorTest {
 
         int result = fixture.compareTo(o);
 
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-        assertEquals(0, result);
+        assertEquals(1L, result);
     }
 
     /**
@@ -193,13 +187,7 @@ public class CtfIteratorTest {
 
         int result = fixture.compareTo(o);
 
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-        assertEquals(0, result);
+        assertEquals(1, result);
     }
 
     /**
@@ -220,14 +208,7 @@ public class CtfIteratorTest {
         CtfIterator o = new CtfIterator(createTrace());
 
         int result = fixture.compareTo(o);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-        assertEquals(0, result);
+        assertEquals(1, result);
     }
 
     /**
@@ -247,13 +228,6 @@ public class CtfIteratorTest {
         fixture.increaseRank();
 
         fixture.dispose();
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
     }
 
     /**
@@ -458,7 +432,7 @@ public class CtfIteratorTest {
         //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
         //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
         //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-        assertEquals(0L, result);
+        assertEquals(1L, result);
     }
 
     /**

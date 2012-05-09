@@ -22,7 +22,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -239,7 +238,7 @@ public class CtfTmfTraceTest {
         // An unexpected exception was thrown in user code while executing this test:
         //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
         //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertNotNull(result);
+        assertNull(result);
     }
 
     @Test
@@ -477,7 +476,7 @@ public class CtfTmfTraceTest {
     public void testGetNext_1()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
-        ITmfContext context = new TmfContext();
+        ITmfContext context = fixture.seekEvent(0);
 
         CtfTmfEvent result = fixture.getNext(context);
 
@@ -766,7 +765,7 @@ public class CtfTmfTraceTest {
     public void testReadNextEvent_1()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
-        ITmfContext context = new TmfContext();
+        ITmfContext context = fixture.seekEvent(0);
 
         CtfTmfEvent result = fixture.readNextEvent(context);
 
