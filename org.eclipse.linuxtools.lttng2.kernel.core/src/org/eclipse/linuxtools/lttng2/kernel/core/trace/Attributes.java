@@ -52,10 +52,11 @@ public abstract class Attributes {
     public static final String STATISTICS = "Stats";
     public static final String EVENT_TYPES = "Event_types";
 
-    /* Process status (note these are *values*, not attribute names */
-    public static final int STATUS_WAIT_CPU = 1;
-    public static final int STATUS_RUN = 2;
-    public static final int STATUS_INTERRUPTED = 3;
+    /* Process status (note these are *values*, not attribute names) */
+    public static final int STATUS_WAIT = 1;
+    public static final int STATUS_RUN_USERMODE = 2;
+    public static final int STATUS_RUN_SYSCALL = 3;
+    public static final int STATUS_INTERRUPTED = 4;
 
     /* SoftIRQ-specific stuff. -1: null/disabled, >= 0: running on that CPU */
     public static final int SOFT_IRQ_RAISED = -2;

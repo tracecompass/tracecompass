@@ -149,6 +149,11 @@ class CtfKernelHandler implements Runnable {
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
                 value = TmfStateValue.nullValue();
                 ss.modifyAttribute(ts, value, quark);
+
+                /* Put the process' status back to user mode */
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_USERMODE);
+                ss.modifyAttribute(ts, value, quark);
             }
                 break;
 
@@ -181,9 +186,7 @@ class CtfKernelHandler implements Runnable {
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the previous process back to running */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
-                ss.modifyAttribute(ts, value, quark);
+                setProcessToRunning(ts, currentThreadNode);
             }
                 break;
 
@@ -216,9 +219,7 @@ class CtfKernelHandler implements Runnable {
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the previous process back to running */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
-                ss.modifyAttribute(ts, value, quark);
+                setProcessToRunning(ts, currentThreadNode);
             }
                 break;
 
@@ -230,7 +231,7 @@ class CtfKernelHandler implements Runnable {
                 /* Mark this SoftIRQ as *raised* in the resource tree.
                  * State value = -2 */
                 quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
-                value = TmfStateValue.newValueInt(-2);
+                value = TmfStateValue.newValueInt(Attributes.SOFT_IRQ_RAISED);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -243,7 +244,7 @@ class CtfKernelHandler implements Runnable {
             {
 
                 Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
-                Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
+                //Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
 
                 String nextProcessName = (String) content.getField(LttngStrings.NEXT_COMM).getValue();
                 Integer nextTid = ((Long) content.getField(LttngStrings.NEXT_TID).getValue()).intValue();
@@ -254,9 +255,7 @@ class CtfKernelHandler implements Runnable {
                 currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
                 /* Set the status of the new scheduled process */
-                quark = ss.getQuarkRelative(newCurrentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
-                ss.modifyAttribute(ts, value, quark);
+                setProcessToRunning(ts, newCurrentThreadNode);
 
                 /* Set the exec name of the new process */
                 quark = ss.getQuarkRelative(newCurrentThreadNode, Attributes.EXEC_NAME);
@@ -265,7 +264,7 @@ class CtfKernelHandler implements Runnable {
 
                 /* Set the status of the process that got scheduled out */
                 quark = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString(), Attributes.STATUS);
-                value = TmfStateValue.newValueInt(prevState.intValue());
+                value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the current scheduled process on the relevant CPU */
@@ -353,6 +352,11 @@ class CtfKernelHandler implements Runnable {
                     /* Assign the new system call to the process */
                     quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
                     value = TmfStateValue.newValueString(eventName);
+                    ss.modifyAttribute(ts, value, quark);
+
+                    /* Put the process in system call mode */
+                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                    value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_SYSCALL);
                     ss.modifyAttribute(ts, value, quark);
                 }
             }
@@ -444,5 +448,29 @@ class CtfKernelHandler implements Runnable {
     private int getEventIndex(String eventName) {
         Integer ret = knownEventNames.get(eventName);
         return (ret != null) ? ret : -1;
+    }
+
+    /**
+     * When we want to set a process back to a "running" state, first check
+     * its current System_call attribute. If there is a system call active, we
+     * put the process back in the syscall state. If not, we put it back in
+     * user mode state.
+     */
+    private void setProcessToRunning(long ts, int currentThreadNode)
+            throws AttributeNotFoundException, TimeRangeException,
+            StateValueTypeException {
+        int quark;
+        ITmfStateValue value;
+
+        quark = ss.getQuarkRelative(currentThreadNode, Attributes.SYSTEM_CALL);
+        if (ss.queryOngoingState(quark).isNull()) {
+            /* We were in user mode before the interruption */
+            value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_USERMODE);
+        } else {
+            /* We were previously in kernel mode */
+            value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_SYSCALL);
+        }
+        quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+        ss.modifyAttribute(ts, value, quark);
     }
 }
