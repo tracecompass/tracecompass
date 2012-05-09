@@ -18,11 +18,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
+import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**
  * This is the extension of the StateSystem, which will save the state intervals
@@ -133,12 +136,16 @@ public class StateHistorySystem extends StateSystem implements
         if (transState.isActive()) {
             transState.doQuery(stateInfo, t);
         }
-        // We should have previously inserted an interval for every attribute
-        // for all possible timestamps (and those could contain 'nullValues').
-        // There should be no 'null' objects at this point.
+
+        /*
+         * We should have previously inserted an interval for every attribute.
+         * If we do happen do see a 'null' object here, just replace it with a a
+         * dummy internal with a null value, to avoid NPE's further up.
+         */
         for (int i = 0; i < stateInfo.size(); i++) {
             if (stateInfo.get(i) == null) {
-                assert (false);
+                logMissingInterval(i, t);
+                stateInfo.set(i, new TmfStateInterval(t, t, i, TmfStateValue.nullValue()));
             }
         }
         return stateInfo;
@@ -154,7 +161,16 @@ public class StateHistorySystem extends StateSystem implements
         } else {
             ret = backend.doSingularQuery(t, attributeQuark);
         }
-        assert (ret != null);
+
+        /*
+         * Return a fake interval if we could not find anything in the history.
+         * We do NOT want to return 'null' here.
+         */
+        if (ret == null) {
+            logMissingInterval(attributeQuark, t);
+            return new TmfStateInterval(t, this.getCurrentEndTime(),
+                    attributeQuark, TmfStateValue.nullValue());
+        }
         return ret;
     }
 
@@ -234,6 +250,12 @@ public class StateHistorySystem extends StateSystem implements
             intervals.add(currentInterval);
         }
         return intervals;
+    }
+
+    private static void logMissingInterval(int attribute, long timestamp) {
+        Tracer.traceInfo("No data found in history for attribute " + //$NON-NLS-1$
+                attribute + " at time " + timestamp + //$NON-NLS-1$
+                ", returning dummy interval"); //$NON-NLS-1$
     }
 
     /**
