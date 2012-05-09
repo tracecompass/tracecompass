@@ -318,7 +318,7 @@ class StreamInputPacketReader implements IDefinitionScope {
         if( lostEvents > lostSoFar)
         {
             EventDefinition eventDef = EventDeclaration.getLostEventDeclaration().createDefinition(streamInputReader);
-            eventDef.timestamp = this.lastTimestamp;
+            eventDef.setTimestamp(this.lastTimestamp);
             ++lostSoFar;
             return eventDef;
         }
@@ -390,22 +390,22 @@ class StreamInputPacketReader implements IDefinitionScope {
         /*
          * Read the event context.
          */
-        if (eventDef.context != null) {
-            eventDef.context.read(currentBitBuffer);
+        if (eventDef.getContext() != null) {
+            eventDef.getContext().read(currentBitBuffer);
         }
 
         /*
          * Read the event fields.
          */
-        if (eventDef.fields != null) {
-            eventDef.fields.read(currentBitBuffer);
+        if (eventDef.getFields() != null) {
+            eventDef.getFields().read(currentBitBuffer);
         }
 
         /*
          * Set the event timestamp using the timestamp calculated by
          * updateTimestamp.
          */
-        eventDef.timestamp = timestamp;
+        eventDef.setTimestamp(timestamp);
 
         return eventDef;
     }

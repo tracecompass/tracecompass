@@ -1,10 +1,14 @@
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * The class <code>CtfTmfEventTypeTest</code> contains tests for the class <code>{@link CtfTmfEventType}</code>.
@@ -22,19 +26,18 @@ public class CtfTmfEventTypeTest {
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testCtfTmfEventType_1()
-        throws Exception {
-        String contextId = "";
-        String eventName = "";
-        ITmfEventField content = new TmfEventField("", new ITmfEventField[] {});
+    public void testCtfTmfEventType_1() {
+        String contextId = ""; //$NON-NLS-1$
+        String eventName = ""; //$NON-NLS-1$
+        ITmfEventField content = new TmfEventField("", new ITmfEventField[] {}); //$NON-NLS-1$
 
-        CtfTmfEventType result = new CtfTmfEventType(contextId, eventName, content);
+        CtfTmfEventType result = new CtfTmfEventType( eventName, content);
 
         // add additional test code here
         assertNotNull(result);
-        assertEquals("", result.toString());
-        assertEquals("", result.getName());
-        assertEquals("", result.getContext());
+        assertEquals("", result.toString()); //$NON-NLS-1$
+        assertEquals("", result.getName()); //$NON-NLS-1$
+        assertEquals("Ctf Event", result.getContext()); //$NON-NLS-1$
     }
 
     /**
@@ -47,12 +50,12 @@ public class CtfTmfEventTypeTest {
     @Test
     public void testToString_1()
         throws Exception {
-        CtfTmfEventType fixture = new CtfTmfEventType("", "", new TmfEventField("", new ITmfEventField[] {}));
+        CtfTmfEventType fixture = new CtfTmfEventType("", new TmfEventField("", new ITmfEventField[] {})); //$NON-NLS-1$ //$NON-NLS-2$
 
         String result = fixture.toString();
 
         // add additional test code here
-        assertEquals("", result);
+        assertEquals("", result); //$NON-NLS-1$
     }
 
     /**

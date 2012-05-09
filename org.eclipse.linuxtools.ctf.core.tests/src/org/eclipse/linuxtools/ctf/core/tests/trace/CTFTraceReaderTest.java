@@ -147,7 +147,7 @@ public class CTFTraceReaderTest {
     @Test
     public void testEquals() throws CTFReaderException {
         CTFTraceReader fixture2 = new CTFTraceReader(TestParams.createTrace());
-        assertFalse(fixture.equals(fixture2));
+        assertTrue(fixture.equals(fixture2));
     }
 
     /**
@@ -328,6 +328,6 @@ public class CTFTraceReaderTest {
      * @return
      */
     private long getTimestamp() {
-        return fixture.getCurrentEventDef().timestamp;
+        return fixture.getCurrentEventDef().getTimestamp();
     }
 }

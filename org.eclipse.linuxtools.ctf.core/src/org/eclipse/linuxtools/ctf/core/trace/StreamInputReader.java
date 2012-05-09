@@ -188,7 +188,7 @@ public class StreamInputReader {
          */
         readNextEvent();
         boolean done = (this.getCurrentEvent() == null);
-        while (!done && (this.getCurrentEvent().timestamp < timestamp)) {
+        while (!done && (this.getCurrentEvent().getTimestamp() < timestamp)) {
             readNextEvent();
             done = (this.getCurrentEvent() == null);
             offset++;

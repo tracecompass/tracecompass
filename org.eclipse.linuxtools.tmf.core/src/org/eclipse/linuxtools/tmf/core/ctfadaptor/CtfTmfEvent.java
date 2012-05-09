@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -38,7 +39,7 @@ public final class CtfTmfEvent implements ITmfEvent {
 
     private static final String NO_STREAM = "No stream"; //$NON-NLS-1$
     private static final String EMPTY_CTF_EVENT_NAME = "Empty CTF event"; //$NON-NLS-1$
-    private static final String CONTEXT_ID = "Ctf Event"; //$NON-NLS-1$
+
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -82,7 +83,7 @@ public final class CtfTmfEvent implements ITmfEvent {
 
         /* Read the base event info */
         Long offset = originTrace.getCTFTrace().getOffset();
-        this.timestamp = eventDef.timestamp + offset;
+        this.timestamp = eventDef.getTimestamp() + offset;
         this.sourceCPU = eventDef.getCPU();
         this.typeId = eventDef.getDeclaration().getId();
         this.eventName = eventDef.getDeclaration().getName();
@@ -101,7 +102,7 @@ public final class CtfTmfEvent implements ITmfEvent {
 
      * @return CtfTmfEventField[]
      */
-    private static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
+    public static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
         List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
 
         StructDefinition structFields = eventDef.getFields();
@@ -109,16 +110,12 @@ public final class CtfTmfEvent implements ITmfEvent {
         String curFieldName;
         Definition curFieldDef;
         CtfTmfEventField curField;
-
-        for (Entry<String, Definition> entry : definitions.entrySet()) {
+        Iterator<Entry<String, Definition>> it = definitions.entrySet().iterator();
+        while(it.hasNext()) {
+            Entry<String, Definition> entry = it.next();
             curFieldName = entry.getKey();
             curFieldDef = entry.getValue();
             curField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
-            if (curField == null) {
-//                TmfCorePlugin.getDefault().log(
-//                        "We've parsed an unimplemented field type for event \"" + this.eventName //$NON-NLS-1$
-//                                + "\", field \"" + curFieldName + "\" of type " + curFieldDef.getClass().toString()); //$NON-NLS-1$ //$NON-NLS-2$
-            }
             fields.add(curField);
         }
 
@@ -156,7 +153,7 @@ public final class CtfTmfEvent implements ITmfEvent {
         this.typeId = -1;
         this.fileName = NO_STREAM;
         this.eventName = EMPTY_CTF_EVENT_NAME;
-        this.fContent = new CtfTmfContent("", new CtfTmfEventField[0]);
+        this.fContent = new CtfTmfContent("", new CtfTmfEventField[0]); //$NON-NLS-1$
 
     }
 
@@ -273,7 +270,6 @@ public final class CtfTmfEvent implements ITmfEvent {
         return fSource;
     }
 
-    private CtfTmfEventType type = null;
     /**
      * Method getType.
      * @return ITmfEventType
@@ -281,10 +277,7 @@ public final class CtfTmfEvent implements ITmfEvent {
      */
     @Override
     public ITmfEventType getType() {
-        if(type == null){
-            type = new CtfTmfEventType(CONTEXT_ID, eventName, fContent);
-        }
-        return type;
+        return CtfTmfEventType.get(eventName);
     }
 
     /**

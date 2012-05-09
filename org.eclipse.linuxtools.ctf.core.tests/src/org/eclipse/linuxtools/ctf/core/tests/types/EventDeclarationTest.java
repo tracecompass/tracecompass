@@ -356,8 +356,43 @@ public class EventDeclarationTest {
         assertNotNull(ed.lookupDefinition("fields")); //$NON-NLS-1$
         assertNull(ed.lookupDefinition("other")); //$NON-NLS-1$
         assertNotNull(ed.toString());
-        ed.context = ed.getFields();
+        ed.setContext( ed.getFields());
         assertNotNull(ed.toString());
+    }
 
+    EventDeclaration e1;
+    EventDeclaration e2;
+
+
+    @Test
+    public void testEquals1(){
+        e1 = new EventDeclaration();
+        assertFalse(e1.equals(null));
+    }
+
+    @Test
+    public void testEquals2(){
+        e1 = EventDeclaration.getLostEventDeclaration();
+        assertFalse(e1.equals(new Long(23L)));
+    }
+
+    @Test
+    public void testEquals3(){
+        e1 = EventDeclaration.getLostEventDeclaration();
+        assertEquals(e1,e1);
+    }
+
+    @Test
+    public void testEquals4(){
+        e1 = EventDeclaration.getLostEventDeclaration();
+        e2 = EventDeclaration.getLostEventDeclaration();
+        assertEquals(e1,e2);
+    }
+
+    @Test
+    public void testEquals5(){
+        e1 = EventDeclaration.getLostEventDeclaration();
+        e2 = new EventDeclaration();
+        assertFalse(e1.equals(e2));
     }
 }

@@ -178,7 +178,7 @@ public class StreamInputReaderTest {
     public void testSeek_eventDefinition() throws CTFReaderException {
         EventDefinition eventDefinition = new EventDefinition(
                 new EventDeclaration(), getStreamInputReader());
-        eventDefinition.timestamp = 1L;
+        eventDefinition.setTimestamp(1L);
         fixture.setCurrentEvent(eventDefinition);
     }
 }

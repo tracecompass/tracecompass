@@ -24,13 +24,16 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
+import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
@@ -138,6 +141,9 @@ public class CTFTrace implements IDefinitionScope {
     private final static FileFilter metadataFileFilter = new MetadataFileFilter();
     private final static Comparator<File> metadataComparator = new MetadataComparator();
 
+    /** map of all the event types */
+    private final HashMap<Long, EventDeclaration> events;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -151,6 +157,7 @@ public class CTFTrace implements IDefinitionScope {
      */
     public CTFTrace(String path) throws CTFReaderException {
         this(new File(path));
+
     }
 
     /**
@@ -196,11 +203,26 @@ public class CTFTrace implements IDefinitionScope {
         for (File streamFile : files) {
             openStreamInput(streamFile);
         }
-
+        events = new HashMap<Long, EventDeclaration>();
         /* Create their index */
         for (Map.Entry<Long, Stream> stream : streams.entrySet()) {
             Set<StreamInput> inputs = stream.getValue().getStreamInputs();
             for (StreamInput s : inputs) {
+                /*
+                 * Copy the events
+                 */
+                Iterator<Entry<Long, EventDeclaration>> it = s.getStream()
+                        .getEvents().entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<Long, EventDeclaration> pairs = it.next();
+                    Long eventNum = pairs.getKey();
+                    EventDeclaration eventDec = pairs.getValue();
+                    events.put(eventNum, eventDec);
+                }
+
+                /*
+                 * index the trace
+                 */
                 s.createIndex();
             }
         }
@@ -214,6 +236,7 @@ public class CTFTrace implements IDefinitionScope {
                 try {
                     fc.close();
                 } catch (IOException e) {
+                    // do nothing it's ok, we tried to close it.
                 }
             }
         }
@@ -222,6 +245,26 @@ public class CTFTrace implements IDefinitionScope {
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
+
+    /**
+     * Get an event by it's ID
+     *
+     * @param id
+     *            the ID of the event
+     * @return the event declaration
+     */
+    public EventDeclaration getEventType(long id) {
+        return events.get(id);
+    }
+
+    /**
+     * Get the number of events in the trace so far.
+     *
+     * @return the number of events in the trace
+     */
+    public int getNbEventTypes() {
+        return events.size();
+    }
 
     /**
      * Method getStream gets the stream for a given id
@@ -427,8 +470,7 @@ public class CTFTrace implements IDefinitionScope {
      *            must use
      * @throws CTFReaderException
      */
-    private void openStreamInput(File streamFile)
-            throws CTFReaderException {
+    private void openStreamInput(File streamFile) throws CTFReaderException {
         MappedByteBuffer byteBuffer;
         BitBuffer streamBitBuffer;
         Stream stream;
@@ -459,20 +501,23 @@ public class CTFTrace implements IDefinitionScope {
             packetHeaderDef.read(streamBitBuffer);
 
             /* Check the magic number */
-            IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
+            IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef
+                    .lookupDefinition("magic"); //$NON-NLS-1$
             int magic = (int) magicDef.getValue();
             if (magic != Utils.CTF_MAGIC) {
                 throw new CTFReaderException("CTF magic mismatch"); //$NON-NLS-1$
             }
 
             /* Check UUID */
-            ArrayDefinition uuidDef = (ArrayDefinition) packetHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
+            ArrayDefinition uuidDef = (ArrayDefinition) packetHeaderDef
+                    .lookupDefinition("uuid"); //$NON-NLS-1$
             assert ((uuidDef != null) && (uuidDef.getDeclaration().getLength() == Utils.UUID_LEN));
             if (uuidDef != null) {
                 byte[] uuidArray = new byte[Utils.UUID_LEN];
 
                 for (int i = 0; i < Utils.UUID_LEN; i++) {
-                    IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getElem(i);
+                    IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef
+                            .getElem(i);
                     uuidArray[i] = (byte) uuidByteDef.getValue();
                 }
 
@@ -487,7 +532,8 @@ public class CTFTrace implements IDefinitionScope {
             // TODO: it hasn't been checked that the stream_id field exists and
             // is an unsigned
             // integer
-            IntegerDefinition streamIDDef = (IntegerDefinition) packetHeaderDef.lookupDefinition("stream_id"); //$NON-NLS-1$
+            IntegerDefinition streamIDDef = (IntegerDefinition) packetHeaderDef
+                    .lookupDefinition("stream_id"); //$NON-NLS-1$
             assert (streamIDDef != null);
 
             long streamID = streamIDDef.getValue();

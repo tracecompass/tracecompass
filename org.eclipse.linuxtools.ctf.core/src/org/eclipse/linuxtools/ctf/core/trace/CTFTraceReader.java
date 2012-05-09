@@ -102,7 +102,7 @@ public class CTFTraceReader {
          */
         this.startTime = 0;// prio.peek().getPacketReader().getCurrentPacket().getTimestampBegin();
         if (hasMoreEvents()) {
-            this.startTime = prio.peek().getCurrentEvent().timestamp;
+            this.startTime = prio.peek().getCurrentEvent().getTimestamp();
             this.endTime = this.startTime;
             this.fIndex = 0;
         }
@@ -270,7 +270,7 @@ public class CTFTraceReader {
              * Add it back in the queue.
              */
             this.prio.add(top);
-            final long topEnd = top.getCurrentEvent().timestamp;
+            final long topEnd = top.getCurrentEvent().getTimestamp();
             this.endTime = Math.max(topEnd, this.endTime);
             this.eventCountPerTraceFile[top.getName()]++;
             /*
@@ -370,7 +370,7 @@ public class CTFTraceReader {
                     }
                     if (currentEvent != null) {
                         tempTimestamp = Math.max(tempTimestamp,
-                                currentEvent.timestamp);
+                                currentEvent.getTimestamp());
                     } else {
                         /*
                          * probably beyond the last event
@@ -404,7 +404,7 @@ public class CTFTraceReader {
             /*
              * advance for offset
              */
-            while ((prio.peek().getCurrentEvent().timestamp < tempTimestamp)
+            while ((prio.peek().getCurrentEvent().getTimestamp() < tempTimestamp)
                     && hasMoreEvents()) {
                 this.advance();
             }

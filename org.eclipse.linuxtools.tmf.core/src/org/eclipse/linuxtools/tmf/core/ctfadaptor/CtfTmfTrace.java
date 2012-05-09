@@ -15,9 +15,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -56,13 +59,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     // The trace resource
     private IResource fResource;
 
-    /*
-     * Since in TMF, "traces" can read events, this trace here will have its own
-     * iterator. The user can instantiate extra iterator if they want to seek at
-     * many places at the same time.
-     */
-    protected CtfIterator iterator;
-
     /* Reference to the state system assigned to this trace */
     protected IStateSystemQuerier ss = null;
 
@@ -82,13 +78,17 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * @throws TmfTraceException
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(IResource, String, Class<CtfTmfEvent>)
      */
-    @SuppressWarnings("unused")
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
             throws TmfTraceException {
         this.fResource = resource;
         try {
             this.fTrace = new CTFTrace(path);
+            for( int i =0 ; i< this.fTrace.getNbEventTypes(); i++) {
+                EventDeclaration ed = this.fTrace.getEventType(i);
+                ITmfEventField eventField = parseDeclaration(ed);
+                new CtfTmfEventType(ed.getName(), eventField);
+            }
         } catch (final CTFReaderException e) {
             /*
              * If it failed at the init(), we can assume it's because the file
@@ -97,9 +97,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
              */
             throw new TmfTraceException(e.getMessage());
         }
-        this.iterator = new CtfIterator(this, 0, 0);
+        CtfIterator iterator = new CtfIterator(this, 0, 0);
         setStartTime(TmfTimestamp.BIG_BANG);
-        if( !this.iterator.getLocation().equals(CtfIterator.nullLocation)) {
+        if( !iterator.getLocation().equals(CtfIterator.NULL_LOCATION)) {
             setStartTime(iterator.getCurrentEvent().getTimestamp());
         }
         TmfSignalManager.register(this);
@@ -114,6 +114,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
                 throw new TmfTraceException(e.getMessage());
             }
         }
+    }
+
+    private static ITmfEventField parseDeclaration(EventDeclaration ed) {
+        EventDefinition eventDef = ed.createDefinition(null);
+        return new CtfTmfContent(ITmfEventField.ROOT_FIELD_ID,
+                CtfTmfEvent.parseFields(eventDef));
     }
 
     /**
@@ -142,7 +148,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * @return boolean
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(IProject, String)
      */
-    @SuppressWarnings("unused")
     @Override
     public boolean validate(final IProject project, final String path) {
         try {
@@ -273,13 +278,13 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     }
 
     /**
-     * Method getCurrentLocation.
-     * @return ITmfLocation<?>
+     * Method getCurrentLocation. This is not applicable in CTF
+     * @return null, since the trace has no knowledge of the current location
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getCurrentLocation()
      */
     @Override
     public ITmfLocation<?> getCurrentLocation() {
-        return iterator.getLocation();
+        return null;
     }
 
     // ------------------------------------------------------------------------
@@ -348,11 +353,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * @param context ITmfContext
      * @return CtfTmfEvent
      */
-    @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent getNext(final ITmfContext context) {
-        iterator.advance();
-        return iterator.getCurrentEvent();
+        return readNextEvent(context);
     }
 
     // ------------------------------------------------------------------------
@@ -371,10 +374,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         if (currentLocation == null) {
             currentLocation = new CtfLocation(0L);
         }
-        if( !iterator.getLocation().equals(CtfIterator.nullLocation)) {
-            iterator.setLocation(currentLocation);
-        }
-        return iterator;
+        CtfIterator context = new CtfIterator(this);
+        context.setLocation(currentLocation);
+        context.setRank(ITmfContext.UNKNOWN_RANK);
+        return context;
     }
 
     /**
@@ -386,6 +389,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     @Override
     public double getLocationRatio(final ITmfLocation<?> location) {
         final CtfLocation curLocation = (CtfLocation) location;
+        CtfIterator iterator = new CtfIterator(this);
         iterator.seek(curLocation.getLocation());
         return ((double) iterator.getCurrentEvent().getTimestampValue() - iterator
                 .getStartTime())
@@ -410,8 +414,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      */
     @Override
     public ITmfContext seekEvent(final ITmfTimestamp timestamp) {
-        iterator.seek(timestamp.getValue());
-        return iterator;
+        CtfIterator context = new CtfIterator(this);
+        context.seek(timestamp.getValue());
+        context.setRank(ITmfContext.UNKNOWN_RANK);
+        return context;
     }
 
     /**
@@ -422,8 +428,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      */
     @Override
     public ITmfContext seekEvent(final long rank) {
-        iterator.setRank(rank);
-        return iterator;
+        CtfIterator context = new CtfIterator(this);
+        context.seekRank(rank);
+        context.setRank(rank);
+        return context;
     }
 
     /**
@@ -434,8 +442,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      */
     @Override
     public ITmfContext seekEvent(final double ratio) {
-        iterator.seek((long) (this.fNbEvents * ratio));
-        return iterator;
+        CtfIterator context = new CtfIterator(this);
+        context.seek((long) (this.fNbEvents * ratio));
+        context.setRank(ITmfContext.UNKNOWN_RANK);
+        return context;
     }
 
     /**
@@ -444,11 +454,15 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * @return CtfTmfEvent
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readNextEvent(ITmfContext)
      */
-    @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent readNextEvent(final ITmfContext context) {
-        iterator.advance();
-        return iterator.getCurrentEvent();
+        CtfTmfEvent event = null;
+        if (context instanceof CtfIterator) {
+            CtfIterator ctfIterator = (CtfIterator) context;
+            event = ctfIterator.getCurrentEvent();
+            ctfIterator.advance();
+        }
+        return event;
     }
 
     /**
@@ -483,7 +497,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * sub-classes.
      * @throws TmfTraceException
      */
-    @SuppressWarnings({ "unused", "static-method" })
     protected void buildStateSystem() throws TmfTraceException {
         /*
          * Nothing is done in the basic implementation, please specify

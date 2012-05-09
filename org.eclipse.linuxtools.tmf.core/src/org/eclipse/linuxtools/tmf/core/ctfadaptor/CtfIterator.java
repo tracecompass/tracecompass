@@ -25,7 +25,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
 
     private final CtfTmfTrace ctfTmfTrace;
 
-    final public static CtfLocation nullLocation = new CtfLocation(
+    final public static CtfLocation NULL_LOCATION = new CtfLocation(
             CtfLocation.INVALID_LOCATION);
     private CtfLocation curLocation;
     private long curRank;
@@ -52,7 +52,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      *
      */
     private void setUnknownLocation() {
-        this.curLocation = nullLocation;
+        this.curLocation = NULL_LOCATION;
         this.curRank = UNKNOWN_RANK;
     }
 
@@ -119,6 +119,8 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
 
         if (ret) {
             curLocation.setLocation(getCurrentEvent().getTimestampValue());
+        } else {
+            curLocation = NULL_LOCATION;
         }
         return ret;
     }
@@ -134,6 +136,8 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
 
         if (ret) {
             curLocation.setLocation(getCurrentEvent().getTimestampValue());
+        } else {
+            curLocation = NULL_LOCATION;
         }
         return ret;
     }
@@ -145,7 +149,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      */
     @Override
     public long getRank() {
-        return super.getIndex();
+        return curRank;
     }
 
     /**
@@ -155,9 +159,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      */
     @Override
     public void setRank(final long rank) {
-        if(!this.curLocation.equals(nullLocation)) {
-            seekRank(rank);
-        }
+        curRank = rank;
     }
 
     /*
@@ -230,7 +232,13 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      */
     @Override
     public boolean advance() {
-        return super.advance();
+        boolean ret = super.advance();
+        if (ret) {
+            curLocation.setLocation(getCurrentEvent().getTimestampValue());
+        } else {
+            curLocation = NULL_LOCATION;
+        }
+        return ret;
     }
 
     /**
