@@ -328,6 +328,6 @@ public class CTFTraceReaderTest {
      * @return
      */
     private long getTimestamp() {
-        return fixture.getCurrentEventDef().timestamp;
+        return fixture.getCurrentEventDef().getTimestamp();
     }
 }

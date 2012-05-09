@@ -45,8 +45,8 @@ public class StreamInputReaderTimestampComparator implements
         if (b.getCurrentEvent() == null) {
             return 0;
         }
-        long ta = a.getCurrentEvent().timestamp;
-        long tb = b.getCurrentEvent().timestamp;
+        long ta = a.getCurrentEvent().getTimestamp();
+        long tb = b.getCurrentEvent().getTimestamp();
 
         if (ta < tb) {
             return -1;

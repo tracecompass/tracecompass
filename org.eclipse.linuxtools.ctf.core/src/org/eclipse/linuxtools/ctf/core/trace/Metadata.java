@@ -81,7 +81,7 @@ public class Metadata {
 
     /**
      * Constructs a Metadata object.
-     * 
+     *
      * @param trace
      *            The trace to which belongs this metadata file.
      */
@@ -102,7 +102,7 @@ public class Metadata {
 
     /**
      * Returns the ByteOrder that was detected while parsing the metadata.
-     * 
+     *
      * @return The byte order.
      */
     public ByteOrder getDetectedByteOrder() {
@@ -115,7 +115,7 @@ public class Metadata {
 
     /**
      * Parse the metadata file.
-     * 
+     *
      * @throws CTFReaderException
      */
     public void parse() throws CTFReaderException {
@@ -196,18 +196,21 @@ public class Metadata {
             try {
                 metadataTextInput.close();
             } catch (IOException e) {
+                // Do nothing
             }
         }
         if (metadataFileChannel != null) {
             try {
                 metadataFileChannel.close();
             } catch (IOException e) {
+                // Do nothing
             }
         }
         if (fis != null) {
             try {
                 fis.close();
             } catch (IOException e) {
+                // Do nothing
             }
         }
 
@@ -220,7 +223,7 @@ public class Metadata {
      * Determines whether the metadata file is packet-based by looking at the
      * TSDL magic number. If it is packet-based, it also gives information about
      * the endianness of the trace using the detectedByteOrder attribute.
-     * 
+     *
      * @param metadataFileChannel
      *            FileChannel of the metadata file.
      * @return True if the metadata is packet-based.
@@ -266,7 +269,7 @@ public class Metadata {
     /**
      * Reads a metadata packet from the given metadata FileChannel, do some
      * basic validation and append the text to the StringBuffer.
-     * 
+     *
      * @param metadataFileChannel
      *            Metadata FileChannel
      * @param metadataText

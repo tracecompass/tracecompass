@@ -29,7 +29,7 @@ public class ReadTrace {
      */
     @SuppressWarnings("nls")
     public static void main(String[] args) {
-        final String TRACE_PATH = "/home/ematkho/lttng-traces/lt-hello-4175-20120405-092230";
+        final String TRACE_PATH = "traces/kernel";
 
         // Change this to enable text output
         final boolean USE_TEXT = true;
@@ -66,7 +66,7 @@ public class ReadTrace {
                     }
                     prev = traceReader.getIndex();
                     if (USE_TEXT) {
-                        String output = formatDate(ed.timestamp
+                        String output = formatDate(ed.getTimestamp()
                                 + trace.getOffset());
                         System.out.println(traceReader.getIndex() + ", "
                                 + output + ", " + ed.getDeclaration().getName()
@@ -102,7 +102,7 @@ public class ReadTrace {
      */
     private static long getTimestamp(CTFTraceReader fixture) {
         if (fixture.getCurrentEventDef() != null) {
-            return fixture.getCurrentEventDef().timestamp;
+            return fixture.getCurrentEventDef().getTimestamp();
         }
         return Long.MIN_VALUE;
     }

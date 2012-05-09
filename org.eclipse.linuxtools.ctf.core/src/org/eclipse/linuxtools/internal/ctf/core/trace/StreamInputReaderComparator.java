@@ -39,8 +39,8 @@ public class StreamInputReaderComparator implements
     @Override
     public int compare(StreamInputReader a, StreamInputReader b) {
         // TODO: use unsigned comparison to avoid sign errors if needed
-        long ta = a.getCurrentEvent().timestamp;
-        long tb = b.getCurrentEvent().timestamp;
+        long ta = a.getCurrentEvent().getTimestamp();
+        long tb = b.getCurrentEvent().getTimestamp();
 
         if (ta < tb) {
             return -1;

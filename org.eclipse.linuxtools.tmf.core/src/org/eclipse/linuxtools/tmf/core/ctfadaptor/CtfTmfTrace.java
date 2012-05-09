@@ -15,9 +15,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -89,6 +92,11 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         this.fResource = resource;
         try {
             this.fTrace = new CTFTrace(path);
+            for( int i =0 ; i< this.fTrace.getNbEventTypes(); i++) {
+                EventDeclaration ed = this.fTrace.getEventType(i);
+                ITmfEventField eventField = parseDeclaration(ed);
+                new CtfTmfEventType(ed.getName(), eventField);
+            }
         } catch (final CTFReaderException e) {
             /*
              * If it failed at the init(), we can assume it's because the file
@@ -114,6 +122,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
                 throw new TmfTraceException(e.getMessage());
             }
         }
+    }
+
+    private static ITmfEventField parseDeclaration(EventDeclaration ed) {
+        EventDefinition eventDef = ed.createDefinition(null);
+        return new CtfTmfContent(ITmfEventField.ROOT_FIELD_ID,
+                CtfTmfEvent.parseFields(eventDef));
     }
 
     /**
@@ -348,11 +362,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * @param context ITmfContext
      * @return CtfTmfEvent
      */
-    @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent getNext(final ITmfContext context) {
-        iterator.advance();
-        return iterator.getCurrentEvent();
+        return readNextEvent(context);
     }
 
     // ------------------------------------------------------------------------
@@ -447,8 +459,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent readNextEvent(final ITmfContext context) {
+        CtfTmfEvent event = iterator.getCurrentEvent();
         iterator.advance();
-        return iterator.getCurrentEvent();
+        return event;
     }
 
     /**

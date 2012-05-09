@@ -356,7 +356,7 @@ public class EventDeclarationTest {
         assertNotNull(ed.lookupDefinition("fields")); //$NON-NLS-1$
         assertNull(ed.lookupDefinition("other")); //$NON-NLS-1$
         assertNotNull(ed.toString());
-        ed.context = ed.getFields();
+        ed.setContext( ed.getFields());
         assertNotNull(ed.toString());
 
     }

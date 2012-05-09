@@ -72,11 +72,11 @@ public class EventDeclaration {
         EventDefinition event = new EventDefinition(this, streamInputReader);
 
         if (context != null) {
-            event.context = context.createDefinition(event, "context"); //$NON-NLS-1$
+            event.setContext( context.createDefinition(event, "context")); //$NON-NLS-1$
         }
 
         if (this.fields != null) {
-            event.fields = this.fields.createDefinition(event, "fields"); //$NON-NLS-1$
+            event.setFields(this.fields.createDefinition(event, "fields")); //$NON-NLS-1$
         }
 
         return event;

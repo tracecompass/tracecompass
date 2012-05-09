@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,17 +28,17 @@ public class Benchmark {
      */
     @SuppressWarnings("nls")
     public static void main(final String[] args) {
-        final String TRACE_PATH = "../org.eclipse.linuxtools.ctf.core.tests/Tests/traces/trace20m1";
+        final String TRACE_PATH = "testfiles/kernel";
         final int NUM_LOOPS = 100;
 
         // Change this to enable text output
-        final boolean USE_TEXT = false;
+        final boolean USE_TEXT = true;
 
-        try {
-            System.in.read();
-        } catch (final IOException e1) {
-            e1.printStackTrace();
-        }
+//        try {
+//            System.in.read();
+//        } catch (final IOException e1) {
+//            e1.printStackTrace();
+//        }
         // Work variables
         Long nbEvent = 0L;
         final Vector<Double> benchs = new Vector<Double>();
@@ -64,10 +63,10 @@ public class Benchmark {
                 while (current != null) {
                     nbEvent++;
                     if (USE_TEXT) {
-                        final String output = formatDate(current.getTimestampValue());
+
                         System.out.println("Event " + traceReader.getRank() + " Time "
-                                + output + " type " + current.getSource()
-                                + " on CPU " + current.getCPU());
+                                + current.getTimestamp().toString() + " type " + current.getEventName()
+                                + " on CPU " + current.getSource() + " " + current.getContent().toString()) ;
                     }
                     traceReader.advance();
                     current = traceReader.getCurrentEvent();
@@ -80,8 +79,9 @@ public class Benchmark {
         }
         System.out.println("");
         double avg = 0;
-        for (final Double val : benchs)
+        for (final Double val : benchs) {
             avg += val;
+        }
         avg /= benchs.size();
         System.out.println("Time to read = " + avg + " events/ns");
         for (final Double val : benchs) {

@@ -34,22 +34,22 @@ public class EventDefinition implements IDefinitionScope {
     /**
      * The corresponding event declaration.
      */
-    public final EventDeclaration declaration;
+    private final EventDeclaration declaration;
 
     /**
      * The timestamp of the current event.
      */
-    public long timestamp;
+    private long timestamp;
 
     /**
      * The event context structure definition.
      */
-    public StructDefinition context;
+    private StructDefinition context;
 
     /**
      * The event fields structure definition.
      */
-    public StructDefinition fields;
+    private StructDefinition fields;
 
     /**
      * The StreamInputReader that reads this event definition.
@@ -103,6 +103,34 @@ public class EventDefinition implements IDefinitionScope {
 
     public int getCPU() {
         return streamInputReader.getCPU();
+    }
+
+    /**
+     * @return the timestamp
+     */
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * @param timestamp the timestamp to set
+     */
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
+     * @param context the context to set
+     */
+    public void setContext(StructDefinition context) {
+        this.context = context;
+    }
+
+    /**
+     * @param fields the fields to set
+     */
+    public void setFields(StructDefinition fields) {
+        this.fields = fields;
     }
 
     // ------------------------------------------------------------------------
