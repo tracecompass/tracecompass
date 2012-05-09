@@ -87,4 +87,45 @@ public class StructDeclaration implements IDeclaration {
         return "[declaration] struct[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result)
+                + ((fieldsList == null) ? 0 : fieldsList.hashCode());
+        result = (prime * result) + (int) (maxAlign ^ (maxAlign >>> 32));
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof StructDeclaration)) {
+            return false;
+        }
+        StructDeclaration other = (StructDeclaration) obj;
+        if (fieldsList == null) {
+            if (other.fieldsList != null) {
+                return false;
+            }
+        } else if (!fieldsList.equals(other.fieldsList)) {
+            return false;
+        }
+        if (maxAlign != other.maxAlign) {
+            return false;
+        }
+        return true;
+    }
+
 }
