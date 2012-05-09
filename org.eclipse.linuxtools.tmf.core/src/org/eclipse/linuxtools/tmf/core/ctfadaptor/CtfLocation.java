@@ -104,4 +104,15 @@ public class CtfLocation implements ITmfLocation<Long> {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        if( this.getLocation().equals(CtfLocation.INVALID_LOCATION )) {
+            return "CtfLocation: INVALID"; //$NON-NLS-1$
+        }
+        return "CtfLocation: " + getLocation().toString(); //$NON-NLS-1$
+    }
+
 }
