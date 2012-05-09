@@ -1,10 +1,14 @@
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * The class <code>CtfLocationTest</code> contains tests for the class <code>{@link CtfLocation}</code>.
@@ -17,13 +21,11 @@ public class CtfLocationTest {
     /**
      * Run the CtfLocation(Long) constructor test.
      *
-     * @throws Exception
-     *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
+    @SuppressWarnings("static-method")
     @Test
-    public void testCtfLocation_1()
-        throws Exception {
+    public void testCtfLocation_1() {
         Long location = new Long(1L);
 
         CtfLocation result = new CtfLocation(location);
@@ -36,13 +38,11 @@ public class CtfLocationTest {
     /**
      * Run the CtfLocation(ITmfTimestamp) constructor test.
      *
-     * @throws Exception
-     *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
+    @SuppressWarnings("static-method")
     @Test
-    public void testCtfLocation_2()
-        throws Exception {
+    public void testCtfLocation_2() {
         ITmfTimestamp timestamp = new TmfTimestamp();
 
         CtfLocation result = new CtfLocation(timestamp);
@@ -55,13 +55,11 @@ public class CtfLocationTest {
     /**
      * Run the CtfLocation clone() method test.
      *
-     * @throws Exception
-     *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
+    @SuppressWarnings("static-method")
     @Test
-    public void testClone_1()
-        throws Exception {
+    public void testClone_1() {
         CtfLocation fixture = new CtfLocation(new Long(1L));
         fixture.setLocation(new Long(1L));
 
@@ -75,13 +73,11 @@ public class CtfLocationTest {
     /**
      * Run the Long getLocation() method test.
      *
-     * @throws Exception
-     *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
+    @SuppressWarnings("static-method")
     @Test
-    public void testGetLocation_1()
-        throws Exception {
+    public void testGetLocation_1() {
         CtfLocation fixture = new CtfLocation(new Long(1L));
         fixture.setLocation(new Long(1L));
 
@@ -89,7 +85,7 @@ public class CtfLocationTest {
 
         // add additional test code here
         assertNotNull(result);
-        assertEquals("1", result.toString());
+        assertEquals("1", result.toString()); //$NON-NLS-1$
         assertEquals((byte) 1, result.byteValue());
         assertEquals((short) 1, result.shortValue());
         assertEquals(1, result.intValue());
@@ -101,13 +97,11 @@ public class CtfLocationTest {
     /**
      * Run the void setLocation(Long) method test.
      *
-     * @throws Exception
-     *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
+    @SuppressWarnings("static-method")
     @Test
-    public void testSetLocation_1()
-        throws Exception {
+    public void testSetLocation_1() {
         CtfLocation fixture = new CtfLocation(new Long(1L));
         fixture.setLocation(new Long(1L));
         Long location = new Long(1L);
@@ -117,31 +111,37 @@ public class CtfLocationTest {
         // add additional test code here
     }
 
+    @SuppressWarnings("static-method")
+    @Test
+    public void testToString1(){
+        CtfLocation fixture = new CtfLocation(new Long(1337L));
+        assertEquals("CtfLocation: 1337",fixture.toString()); //$NON-NLS-1$
+    }
+
+    @SuppressWarnings("static-method")
+    @Test
+    public void testToString2(){
+        CtfLocation fixture = new CtfLocation(new Long(-1L));
+        assertEquals("CtfLocation: INVALID",fixture.toString()); //$NON-NLS-1$
+    }
+
     /**
      * Perform pre-test initialization.
-     *
-     * @throws Exception
-     *         if the initialization fails for some reason
      *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Before
-    public void setUp()
-        throws Exception {
+    public void setUp() {
         // add additional set up code here
     }
 
     /**
      * Perform post-test clean-up.
      *
-     * @throws Exception
-     *         if the clean-up fails for some reason
-     *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @After
-    public void tearDown()
-        throws Exception {
+    public void tearDown() {
         // Add additional tear down code here
     }
 
