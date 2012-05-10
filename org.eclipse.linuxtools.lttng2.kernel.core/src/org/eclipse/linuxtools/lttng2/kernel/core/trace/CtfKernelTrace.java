@@ -95,10 +95,5 @@ public class CtfKernelTrace extends CtfTmfTrace {
 
         this.ss = builder.getStateSystemQuerier();
         builder.run(); /* Start the construction of the history */
-
-        //FIXME We will have to call close() once we are notified that the
-        //construction is done. Until this is implemented, we will just
-        //block here.
-        builder.close();
     }
 }

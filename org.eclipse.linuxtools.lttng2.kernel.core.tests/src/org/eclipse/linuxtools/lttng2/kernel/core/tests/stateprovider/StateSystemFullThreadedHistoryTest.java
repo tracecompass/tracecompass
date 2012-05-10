@@ -52,7 +52,6 @@ public class StateSystemFullThreadedHistoryTest extends
         }
         builder.run();
         ssb = builder.getStateSystemBuilder();
-        builder.close(); /* Waits for the construction to finish */
     }
 
     @Override

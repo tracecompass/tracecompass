@@ -70,7 +70,6 @@ public class StateSystemFullHistoryTest {
         }
         builder.run();
         ssb = builder.getStateSystemBuilder();
-        builder.close(); /* Waits for the construction to finish */
     }
 
     @AfterClass
@@ -101,7 +100,6 @@ public class StateSystemFullHistoryTest {
         zehp = new HistoryTreeBackend(stateFileBenchmark, zeinput.getStartTime());
         zebuilder = new HistoryBuilder(zeinput, zehp);
         zebuilder.run();
-        zebuilder.close();
 
         assertEquals(CtfTestFiles.startTime, zehp.getStartTime());
         assertEquals(CtfTestFiles.endTime, zehp.getEndTime());

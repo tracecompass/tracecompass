@@ -15,6 +15,12 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 import java.io.IOException;
 
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateHistorySystem;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 
 /**
  * This is the high-level wrapper around the State History and its input and
@@ -32,8 +38,6 @@ public class HistoryBuilder implements Runnable {
     private final IStateChangeInput sci;
     private final StateHistorySystem shs;
     private final IStateHistoryBackend hb;
-
-    private final Thread sciThread;
 
     /**
      * Instantiate a new HistoryBuilder helper.
@@ -57,7 +61,6 @@ public class HistoryBuilder implements Runnable {
         shs = new StateHistorySystem(hb, true);
 
         sci.assignTargetStateSystem(shs);
-        sciThread = new Thread(sci, "Input Plugin"); //$NON-NLS-1$
     }
 
     /**
@@ -79,17 +82,14 @@ public class HistoryBuilder implements Runnable {
 
     @Override
     public void run() {
-        sciThread.start();
-    }
+        /* Send a TMF request for all the events in the trace */
+        final ITmfEventRequest<CtfTmfEvent> request;
+        request = new StateSystemBuildRequest(sci);
 
-    /**
-     * Since HistoryBuilder.run() simply starts the processing asynchronously,
-     * you should call .close() when you know the state history is completely
-     * built (or when the user closes the trace, whichever comes first).
-     */
-    public void close() {
+        /* Submit the request and wait for completion */
+        sci.getTrace().sendRequest(request);
         try {
-            sciThread.join();
+            request.waitForCompletion();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -114,5 +114,38 @@ public class HistoryBuilder implements Runnable {
     public IStateSystemQuerier getStateSystemQuerier() {
         return shs;
     }
+}
 
+class StateSystemBuildRequest extends TmfEventRequest<CtfTmfEvent> {
+
+    /** The amount of events queried at a time through the requests */
+    private final static int chunkSize = 50000;
+
+    private final IStateChangeInput sci;
+
+    StateSystemBuildRequest(IStateChangeInput sci) {
+        super((Class<CtfTmfEvent>) sci.getExpectedEventType().getClass(),
+                TmfTimeRange.ETERNITY, TmfDataRequest.ALL_DATA, chunkSize,
+                ITmfDataRequest.ExecutionType.BACKGROUND);
+        this.sci = sci;
+    }
+
+    @Override
+    public void handleData(final CtfTmfEvent event) {
+        super.handleData(event);
+        if (event != null) {
+            sci.processEvent(event);
+        }
+    }
+
+    @Override
+    public void handleSuccess() {
+        //
+    }
+
+    @Override
+    public void handleCompleted() {
+        super.handleCompleted();
+        sci.dispose();
+    }
 }

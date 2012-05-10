@@ -12,6 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.core.statesystem;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+
 /**
  * This is the interface used to define the "state change input", which is the
  * main type of input that goes in the state system.
@@ -22,8 +25,16 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
  * @author alexmont
  * 
  */
-public interface IStateChangeInput extends Runnable {
+public interface IStateChangeInput {
 
+    /**
+     * Get the trace with which this state input plugin is associated.
+     * 
+     * @return The associated trace
+     */
+    @SuppressWarnings("rawtypes")
+    public ITmfTrace getTrace();
+    
     /**
      * Return the start time of this "state change input", which is normally the
      * start time of the originating trace (or it can be the time of the first
@@ -32,6 +43,17 @@ public interface IStateChangeInput extends Runnable {
      * @return The start time
      */
     public long getStartTime();
+
+    /**
+     * Method for the input plugin to specify which type of events it expects.
+     * This will guarantee that all events it receives via processEvent() are
+     * indeed of the given type, so it should be safe to cast to that type.
+     * 
+     * @return An example event of the expected class, which implements
+     *         ITmfEvent. The contents of that event doesn't matter, only the
+     *         class will be checked.
+     */
+    public ITmfEvent getExpectedEventType();
 
     /**
      * Assign the target state system where this SCI will insert its state
@@ -43,4 +65,21 @@ public interface IStateChangeInput extends Runnable {
      * @param ssb
      */
     public void assignTargetStateSystem(IStateSystemBuilder ssb);
+
+    /**
+     * Send an event to this input plugin for processing. The implementation
+     * should check the contents, and call the state-modifying methods of its
+     * IStateSystemBuilder object accordingly.
+     * 
+     * @param event
+     *            The event (which should be safe to cast to the
+     *            expectedEventType) that has to be processed.
+     */
+    public void processEvent(ITmfEvent event);
+
+    /**
+     * Indicate to the state history building process that we are done (for now),
+     * and that it should close its current history.
+     */
+    public void dispose();
 }

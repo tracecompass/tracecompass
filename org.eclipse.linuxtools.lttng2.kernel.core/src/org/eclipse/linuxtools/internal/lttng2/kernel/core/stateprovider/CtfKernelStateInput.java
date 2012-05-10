@@ -16,9 +16,9 @@ import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
 
@@ -33,11 +33,11 @@ import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
  */
 public class CtfKernelStateInput implements IStateChangeInput {
 
-    final static int EVENTS_QUEUE_SIZE = 10000;
+    private static final int EVENTS_QUEUE_SIZE = 10000;
 
     private final BlockingQueue<CtfTmfEvent> eventsQueue;
 
-    private final CtfIterator traceReader;
+    private final CtfTmfTrace trace;
     private final CtfKernelHandler eventHandler;
 
     private final Thread eventHandlerThread;
@@ -55,7 +55,7 @@ public class CtfKernelStateInput implements IStateChangeInput {
      */
     public CtfKernelStateInput(CtfTmfTrace trace) {
         eventsQueue = new ArrayBlockingQueue<CtfTmfEvent>(EVENTS_QUEUE_SIZE);
-        traceReader = new CtfIterator(trace);
+        this.trace = trace;
         eventHandler = new CtfKernelHandler(eventsQueue);
         ssAssigned = false;
 
@@ -64,43 +64,54 @@ public class CtfKernelStateInput implements IStateChangeInput {
     }
 
     @Override
-    public void run() {
-        if (!ssAssigned) {
-            System.err.println("Cannot start Input thread without a target state system"); //$NON-NLS-1$
-            return;
-        }
+    public CtfTmfTrace getTrace() {
+        return trace;
+    }
 
-        CtfTmfEvent currentEvent;
+    @Override
+    public long getStartTime() {
+        return trace.getStartTime().getValue();
+    }
 
-        eventHandlerThread.start();
-
-        try {
-            currentEvent = traceReader.getCurrentEvent();
-            while (currentEvent != null) {
-                traceReader.advance();
-                eventsQueue.put(currentEvent);
-                currentEvent = traceReader.getCurrentEvent();
-            }
-            /*
-             * We're done reading the trace, insert a null event in the queue to
-             * stop the handler
-             */
-            eventsQueue.put(CtfTmfEvent.getNullEvent());
-            eventHandlerThread.join();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public CtfTmfEvent getExpectedEventType() {
+        return CtfTmfEvent.getNullEvent();
     }
 
     @Override
     public void assignTargetStateSystem(IStateSystemBuilder ssb) {
         eventHandler.assignStateSystem(ssb);
         ssAssigned = true;
+        eventHandlerThread.start();
     }
 
     @Override
-    public long getStartTime() {
-        return traceReader.getCtfTmfTrace().getStartTime().getValue();
+    public void processEvent(ITmfEvent event) {
+        /* Make sure the target state system has been assigned */
+        if (!ssAssigned) {
+            System.err.println("Cannot process event without a target state system"); //$NON-NLS-1$
+            return;
+        }
+        
+        /* Insert the event we're received into the events queue */
+        CtfTmfEvent currentEvent = (CtfTmfEvent) event;
+        try {
+            eventsQueue.put(currentEvent);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        /* Insert a null event in the queue to stop the event handler's thread. */
+        try {
+            eventsQueue.put(CtfTmfEvent.getNullEvent());
+            eventHandlerThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ssAssigned = false;
+        eventHandler.assignStateSystem(null);
     }
 }
