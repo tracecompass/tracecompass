@@ -44,7 +44,7 @@ public class Utils {
 
     static public final Object[] _empty = new Object[0];
 
-    static enum Resolution {
+    public static enum Resolution {
         SECONDS, MILLISEC, MICROSEC, NANOSEC
     };
 
