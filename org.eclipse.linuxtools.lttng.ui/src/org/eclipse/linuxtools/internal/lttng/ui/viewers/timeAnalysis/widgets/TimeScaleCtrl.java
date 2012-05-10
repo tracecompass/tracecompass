@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.Messages;
 import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.widgets.Utils.Resolution;
@@ -55,7 +54,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
     private static final double LOG10_3 = Math.log10(3);
     private static final double LOG10_5 = Math.log10(5);
     
-    private static final Calendar GREGORIAN_CALENDAR = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+    private static final Calendar GREGORIAN_CALENDAR = GregorianCalendar.getInstance();
     
 	private ITimeDataProvider _timeProvider;
 	private int _dragState = 0;
@@ -476,18 +475,6 @@ abstract class TimeDraw {
     protected static final SimpleDateFormat sdayformatheader = new SimpleDateFormat("yyyy");         //$NON-NLS-1$
     protected static final SimpleDateFormat smonthformat = new SimpleDateFormat("yyyy MMM");         //$NON-NLS-1$
     protected static final SimpleDateFormat syearformat = new SimpleDateFormat("yyyy");              //$NON-NLS-1$
-    static {
-        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT"));       //$NON-NLS-1$
-        stimeformatheader.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
-        sminformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
-        sminformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
-        shrsformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
-        shrsformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
-        sdayformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
-        sdayformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
-        smonthformat.setTimeZone(TimeZone.getTimeZone("GMT"));      //$NON-NLS-1$
-        syearformat.setTimeZone(TimeZone.getTimeZone("GMT"));       //$NON-NLS-1$
-    }
 	
 	static String pad(long n) {
 		String s = S;

@@ -18,7 +18,6 @@ package org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.widgets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.ITimeAnalysisViewer.TimeFormat;
 import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITimeEvent;
@@ -47,10 +46,6 @@ public class Utils {
 
 	static private final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
 	static private final SimpleDateFormat sdateformat = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
-	static {
-        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
-        sdateformat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
-	}
 
 //	static private String _externalPlugin[] = { "org.eclipse.debug.ui",
 //			"org.eclipse.debug.ui", "org.eclipse.debug.ui",

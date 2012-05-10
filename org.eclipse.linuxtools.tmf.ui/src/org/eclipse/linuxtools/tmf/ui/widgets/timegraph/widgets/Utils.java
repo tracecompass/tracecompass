@@ -18,7 +18,6 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -50,10 +49,6 @@ public class Utils {
 
     static private final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
     static private final SimpleDateFormat sdateformat = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
-    static {
-        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
-        sdateformat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
-    }
 
     static Rectangle clone(Rectangle source) {
         return new Rectangle(source.x, source.y, source.width, source.height);
