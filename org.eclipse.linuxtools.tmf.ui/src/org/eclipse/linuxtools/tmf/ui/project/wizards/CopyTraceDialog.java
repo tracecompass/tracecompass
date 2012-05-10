@@ -199,6 +199,9 @@ public class CopyTraceDialog extends SelectionStatusDialog {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
+                    // Copy supplementary files first
+                    fTrace.copySupplementaryFiles(newName);
+                    // Copy the trace
                     fTrace.getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
                     // Delete any bookmarks file found in copied trace folder
                     IFolder folder = fTraceFolder.getFolder(newName);

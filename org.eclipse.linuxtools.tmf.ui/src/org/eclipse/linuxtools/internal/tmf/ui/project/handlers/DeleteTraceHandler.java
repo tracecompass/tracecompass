@@ -135,6 +135,11 @@ public class DeleteTraceHandler extends AbstractHandler {
 
                     // Finally, delete the trace
                     resource.delete(true, new NullProgressMonitor());
+
+                    // Delete supplementary files
+                    trace.deleteSupplementaryFiles();
+
+                    // Refresh the project
                     trace.getProject().refresh();
 
                 } catch (IOException e1) {

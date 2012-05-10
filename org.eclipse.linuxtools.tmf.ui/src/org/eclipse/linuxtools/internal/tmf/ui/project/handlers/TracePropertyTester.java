@@ -32,6 +32,7 @@ public class TracePropertyTester extends PropertyTester {
     
     private static String isInTraceFolder = "isInTraceFolder"; //$NON-NLS-1$
     private static String isExperimentTrace = "isExperimentTrace"; //$NON-NLS-1$
+    private static String hasHistoryFile = "hasHistoryFile"; //$NON-NLS-1$
     
     // ------------------------------------------------------------------------
     // Constructor
@@ -77,6 +78,27 @@ public class TracePropertyTester extends PropertyTester {
             if (receiver != null && receiver instanceof TmfTraceElement) {
             TmfTraceElement trace = (TmfTraceElement) receiver;
                 return trace.getParent() instanceof TmfExperimentElement;
+            }
+            return false;
+        }
+
+        if (hasHistoryFile.equals(property)) {
+            if (receiver == null) {
+                return false;
+            }
+
+            if (receiver instanceof TmfTraceElement) {
+                TmfTraceElement trace = (TmfTraceElement) receiver;
+                // If trace is under an experiment, use the original trace from the traces folder
+                trace = trace.getElementUnderTraceFolder();
+                return trace.hasSupplementaryFiles();
+            } else if (receiver instanceof TmfExperimentElement) {
+                TmfExperimentElement trace = (TmfExperimentElement) receiver;
+                for (TmfTraceElement aTrace : trace.getTraces()) {
+                    // Since trace is under an experiment, use the original trace from the traces folder
+                    aTrace = aTrace.getElementUnderTraceFolder();
+                    return aTrace.hasSupplementaryFiles();
+                }
             }
             return false;
         }

@@ -127,7 +127,11 @@ public class OpenExperimentHandler extends AbstractHandler {
             String experimentEditorId = null;
             final ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
             for (int i = 0; i < nbTraces; i++) {
-                final TmfTraceElement element = traceEntries.get(i);
+                TmfTraceElement element = traceEntries.get(i);
+
+                // Since trace is under an experiment, use the original trace from the traces folder
+                element = element.getElementUnderTraceFolder();
+
                 final ITmfTrace trace = element.instantiateTrace();
                 final ITmfEvent traceEvent = element.instantiateEvent();
                 if ((trace == null) || (traceEvent == null)) {

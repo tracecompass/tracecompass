@@ -16,11 +16,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtEvent;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
@@ -79,6 +85,9 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         sfIsLinkedDescriptor.setCategory(sfInfoCategory);
     }
 
+    private static final String[] SUPPLEMENATARY_FILES_EXTENSIONS = { ".ht" }; //$NON-NLS-1$
+    public static final String SUPPLEMENATARY_FILES_PREFIX = "."; //$NON-NLS-1$
+    
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -213,7 +222,84 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         }
         return null;
     }
+    
+    public TmfTraceElement getElementUnderTraceFolder() {
+        
+        // If trace is under an experiment, return original trace from the traces folder
+        if (getParent() instanceof TmfExperimentElement) {
+            for (TmfTraceElement aTrace : getProject().getTracesFolder().getTraces()) {
+                if (aTrace.getName().equals(getName())) {
+                    return aTrace;
+                }
+            }
+        }
+        return this;
+    }
 
+    public boolean hasSupplementaryFiles() {
+        // Check for all supplementary files
+        for (int i = 0; i < SUPPLEMENATARY_FILES_EXTENSIONS.length; i++) {
+            IFile supplFile = createSupplemenatryFile(fResource.getName(), SUPPLEMENATARY_FILES_EXTENSIONS[i]);
+
+            if (supplFile.exists()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void deleteSupplementaryFiles() {
+        // Delete all supplementary files
+        for (int i = 0; i < SUPPLEMENATARY_FILES_EXTENSIONS.length; i++) {
+            IFile supplFile = createSupplemenatryFile(fResource.getName(), SUPPLEMENATARY_FILES_EXTENSIONS[i]);
+            if (supplFile.exists()) {
+                try {
+                    supplFile.delete(true, new NullProgressMonitor());
+                } catch (CoreException e) {
+                    TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error deleting resource supplementary file " + supplFile, e)); //$NON-NLS-1$
+                }
+            }
+        }
+    }
+
+    public void renameSupplementaryFiles(String newTraceName) {
+        // Rename all supplementary files
+        for (int i = 0; i < SUPPLEMENATARY_FILES_EXTENSIONS.length; i++) {
+            IFile oldSupplFile = createSupplemenatryFile(fResource.getName(), SUPPLEMENATARY_FILES_EXTENSIONS[i]);
+            IFile newSupplFile = createSupplemenatryFile(newTraceName, SUPPLEMENATARY_FILES_EXTENSIONS[i]);
+
+            if (oldSupplFile.exists()) {
+                try {
+                    oldSupplFile.move(newSupplFile.getFullPath(), true, new NullProgressMonitor());
+                } catch (CoreException e) {
+                    TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error renaming resource supplementary file " + oldSupplFile, e)); //$NON-NLS-1$
+                }
+            }
+        }
+    }
+    
+    public void copySupplementaryFiles(String newTraceName) {
+        // Copy all supplementary files
+        for (int i = 0; i < SUPPLEMENATARY_FILES_EXTENSIONS.length; i++) {
+            IFile oldSupplFile = createSupplemenatryFile(fResource.getName(), SUPPLEMENATARY_FILES_EXTENSIONS[i]);
+            IFile newSupplFile = createSupplemenatryFile(newTraceName, SUPPLEMENATARY_FILES_EXTENSIONS[i]);
+
+            if (oldSupplFile.exists()) {
+                try {
+                    oldSupplFile.copy(newSupplFile.getFullPath(), true, new NullProgressMonitor());
+                } catch (CoreException e) {
+                    TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error copying resource supplementary file " + oldSupplFile, e)); //$NON-NLS-1$
+                }
+            }
+        }
+    }
+    
+    private IFile createSupplemenatryFile(String fileName, String extension) {
+        String name = SUPPLEMENATARY_FILES_PREFIX + fileName + extension;
+        IFolder folder = (IFolder)fResource.getParent();
+        return folder.getFile(name);
+    }
+    
     // ------------------------------------------------------------------------
     // IActionFilter
     // ------------------------------------------------------------------------

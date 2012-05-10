@@ -519,6 +519,36 @@
                name="org.eclipse.linuxtools.tmf.ui.separator2"
                visible="true">
          </separator>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.deleteSupplementaryFiles"
+               label="%commands.trace.deleteSupplementaryFiles"
+               mnemonic="%commands.trace.deleteSupplementaryFiles.mnemonic"
+               style="push"
+               tooltip="%commands.trace.deleteSupplementaryFiles.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                       ifEmpty="false"
+                       operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.linuxtools.tmf.ui.hasHistoryFile">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator3"
+               visible="true">
+         </separator>
          <menu
                label="%commands.trace.select_trace_type"
                mnemonic="%commands.trace.select_trace_type.mnemonic"
@@ -567,7 +597,7 @@
             </visibleWhen>
          </command>
          <separator
-               name="org.eclipse.linuxtools.tmf.ui.separator3"
+               name="org.eclipse.linuxtools.tmf.ui.separator4"
                visible="true">
          </separator>
          <command
@@ -620,7 +650,7 @@
             </visibleWhen>
          </command>
          <separator
-               name="org.eclipse.linuxtools.tmf.ui.separator4"
+               name="org.eclipse.linuxtools.tmf.ui.separator5"
                visible="true">
          </separator>
          <command
@@ -719,7 +749,37 @@
             </visibleWhen>
          </command>
          <separator
-               name="org.eclipse.linuxtools.tmf.ui.separator5"
+               name="org.eclipse.linuxtools.tmf.ui.separator6"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.deleteSupplementaryFiles"
+               label="%commands.experiment.deleteSupplementaryFiles"
+               mnemonic="%commands.experiment.deleteSupplementaryFiles.mnemonic"
+               style="push"
+               tooltip="%commands.experiment.deleteSupplementaryFiles.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                       ifEmpty="false"
+                       operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.linuxtools.tmf.ui.hasHistoryFile">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator7"
                visible="true">
          </separator>
          <command
@@ -790,6 +850,12 @@
             description="%commands.trace.rename.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.trace.rename"
             name="%commands.trace.rename">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            description="%commands.trace.deleteSupplementaryFiles.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.deleteSupplementaryFiles"
+            name="%commands.trace.deleteSupplementaryFiles">
       </command>
       <category
             description="%commands.experiment_folder.category.description"
@@ -869,6 +935,12 @@
             description="%commands.experiment.delete.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"
             name="%commands.experiment.delete">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.deleteSupplementaryFiles.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.deleteSupplementaryFiles"
+            name="%commands.experiment.deleteSupplementaryFiles">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
@@ -1006,6 +1078,10 @@
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete">
       </handler>
       <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceSupplementaryFilesHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.deleteSupplementaryFiles">
+      </handler>
+      <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTraceTypeHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.select_trace_type">
       </handler>
@@ -1036,6 +1112,10 @@
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteExperimentSupplementaryFilesHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.deleteSupplementaryFiles">
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RefreshHandler"
@@ -1113,8 +1193,8 @@
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.TracePropertyTester"
             id="org.eclipse.linuxtools.tmf.ui.tracePropertyTester"
             namespace="org.eclipse.linuxtools.tmf.ui"
-            properties="isExperimentTrace"
-            type="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+            properties="isExperimentTrace,hasHistoryFile"
+            type="org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement">
       </propertyTester>
    </extension>
    <extension
@@ -1124,12 +1204,12 @@
             event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
             icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.type.ctf"
-            name="CTF Trace"
+            name="%tracetype.type.generic"
             trace_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace">
       </type>
       <category
             id="org.eclipse.linuxtools.tmf.ui.category.generic"
-            name="Generic">
+            name="%tracetype.category.generic">
       </category>
    </extension>
 

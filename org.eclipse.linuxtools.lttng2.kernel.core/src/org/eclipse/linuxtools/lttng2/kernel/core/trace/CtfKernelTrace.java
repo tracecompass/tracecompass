@@ -15,7 +15,10 @@ package org.eclipse.linuxtools.lttng2.kernel.core.trace;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -53,9 +56,13 @@ public class CtfKernelTrace extends CtfTmfTrace {
     @Override
     protected void buildStateSystem() throws TmfTraceException {
         /* Set up the path to the history tree file we'll use */
-        final String htPath = this.getPath() + ".ht"; //$NON-NLS-1$
-        final File htFile = new File(htPath);
+        IResource resource = getResource();
+        String name = '.' + resource.getName() + ".ht"; //$NON-NLS-1$
+        IFolder folder = (IFolder)resource.getParent();
+        IFile file = folder.getFile(name);
 
+        final File htFile = new File(file.getLocationURI());
+        
         IStateHistoryBackend htBackend;
         IStateChangeInput htInput;
         HistoryBuilder builder;

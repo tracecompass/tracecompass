@@ -99,14 +99,7 @@ public class RenameTraceHandler extends AbstractHandler {
             return null;
 
         // If trace is under an experiment, use the original trace from the traces folder
-        if (fTrace.getParent() instanceof TmfExperimentElement) {
-            for (TmfTraceElement trace : fTrace.getProject().getTracesFolder().getTraces()) {
-                if (trace.getName().equals(fTrace.getName())) {
-                    fTrace = trace;
-                    break;
-                }
-            }
-        }
+        fTrace = fTrace.getElementUnderTraceFolder();
 
         // Fire the Rename Trace dialog
         Shell shell = window.getShell();
