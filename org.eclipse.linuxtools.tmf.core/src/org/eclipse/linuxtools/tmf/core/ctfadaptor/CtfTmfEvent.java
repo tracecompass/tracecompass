@@ -143,8 +143,12 @@ public final class CtfTmfEvent implements ITmfEvent {
     }
 
     /**
-     * Inner constructor to create "null" events. Don't use this directly, use
-     * CTFEvent.getNullEvent();
+     * Inner constructor to create "null" events. Don't use this directly in
+     * normal usage, use CtfTmfEvent.getNullEvent() to get an instance of an
+     * empty event.
+     * 
+     * This needs to be public however because it's used in extension points,
+     * and the framework will use this constructor to get the class type.
      */
     public CtfTmfEvent() {
         this.fTrace = null;
@@ -154,7 +158,6 @@ public final class CtfTmfEvent implements ITmfEvent {
         this.fileName = NO_STREAM;
         this.eventName = EMPTY_CTF_EVENT_NAME;
         this.fContent = new CtfTmfContent("", new CtfTmfEventField[0]); //$NON-NLS-1$
-
     }
 
     // ------------------------------------------------------------------------
