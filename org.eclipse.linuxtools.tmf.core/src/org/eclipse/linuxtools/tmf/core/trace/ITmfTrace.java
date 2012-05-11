@@ -46,21 +46,21 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * <b>Example 1</b>: Process a whole trace
  * <pre>
  * ITmfContext context = trace.seekEvent(0);
- * ITmfEvent event = trace.readEvent(context);
+ * ITmfEvent event = trace.getNext(context);
  * while (event != null) {
  *     processEvent(event);
- *     event = trace.readNextEvent(context);
+ *     event = trace.getNext(context);
  * }
  * </pre>
  * <b>Example 2</b>: Process 50 events starting from the 1000th event
  * <pre>
  * int nbEventsRead = 0;
  * ITmfContext context = trace.seekEvent(1000);
- * ITmfEvent event = trace.readNextEvent(context);
+ * ITmfEvent event = trace.getNext(context);
  * while (event != null && nbEventsRead < 50) {
  *     nbEventsRead++;
  *     processEvent(event);
- *     event = trace.readNextEvent(context);
+ *     event = trace.getNext(context);
  * }
  * </pre>
  * <b>Example 3</b>: Process the events between 2 timestamps (inclusive)
@@ -68,10 +68,10 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * ITmfTimestamp startTime = ...;
  * ITmfTimestamp endTime = ...;
  * ITmfContext context = trace.seekEvent(startTime);
- * ITmfEvent event = trace.readNextEvent(context);
+ * ITmfEvent event = trace.getNext(context);
  * while (event != null && event.getTimestamp().compareTo(endTime) <= 0) {
  *     processEvent(event);
- *     event = trace.readNextEvent(context);
+ *     event = trace.getNext(context);
  * }
  * </pre>
  * A trace is also an event provider so it can process event requests
@@ -277,18 +277,5 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @return a context which can later be used to read the corresponding event
      */
     public ITmfContext seekEvent(double ratio);
-
-    // ------------------------------------------------------------------------
-    // Read operations (returning an actual event)
-    // ------------------------------------------------------------------------
-
-    /**
-     * Return the event pointed by the supplied context (or null if no event
-     * left) and updates the context to point the next event.
-     * 
-     * @param context the read context (will be updated)
-     * @return the event pointed to by the context
-     */
-    public ITmfEvent readNextEvent(ITmfContext context);
 
 }

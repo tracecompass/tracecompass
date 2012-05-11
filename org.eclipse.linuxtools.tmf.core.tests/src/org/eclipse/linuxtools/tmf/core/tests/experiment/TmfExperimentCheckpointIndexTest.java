@@ -157,8 +157,8 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
             trcContexts[0] = new TmfContext(locations.getLocations()[0], (i * pageSize) / 2);
             trcContexts[1] = new TmfContext(locations.getLocations()[1], (i * pageSize) / 2);
             TmfExperimentContext expContext = new TmfExperimentContext(trcContexts);
-            expContext.getEvents()[0] = fTraces[0].readNextEvent(fTraces[0].seekEvent((i * pageSize) / 2));
-            expContext.getEvents()[1] = fTraces[1].readNextEvent(fTraces[1].seekEvent((i * pageSize) / 2));
+            expContext.getEvents()[0] = fTraces[0].getNext(fTraces[0].seekEvent((i * pageSize) / 2));
+            expContext.getEvents()[1] = fTraces[1].getNext(fTraces[1].seekEvent((i * pageSize) / 2));
             ITmfEvent event = fExperiment.parseEvent(expContext);
             assertTrue(expContext.getRank() == i * pageSize);
             assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));

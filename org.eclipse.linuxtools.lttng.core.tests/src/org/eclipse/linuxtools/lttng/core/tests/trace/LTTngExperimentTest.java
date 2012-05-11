@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.experiment.TmfLegacyExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.FrameworkUtil;
 
@@ -47,7 +47,7 @@ public class LTTngExperimentTest extends TestCase {
     private static final TmfTimestamp  fEndTime   = new TmfTimestamp(13589907059242L, (byte) -9);
 
     private static ITmfTrace<LttngEvent>[] fTraces;
-    private static TmfExperiment<LttngEvent> fExperiment;
+    private static TmfLegacyExperiment<LttngEvent> fExperiment;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -75,7 +75,7 @@ public class LTTngExperimentTest extends TestCase {
 
     private synchronized static void setupExperiment() {
         if (fExperiment == null)
-            fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.ZERO, 1000, true);
+            fExperiment = new TmfLegacyExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.ZERO, 1000, true);
     }
 
     public LTTngExperimentTest(final String name) throws Exception {

@@ -130,7 +130,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext context = fExperiment.seekEvent(0);
         assertEquals("Context rank", 0, context.getRank());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Context rank", 1, context.getRank());
 
@@ -138,7 +138,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(cacheSize);
         assertEquals("Context rank", cacheSize, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize + 1, event.getTimestamp().getValue());
         assertEquals("Context rank", cacheSize + 1, context.getRank());
 
@@ -146,7 +146,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(4 * cacheSize);
         assertEquals("Context rank", 4 * cacheSize, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4 * cacheSize + 1, event.getTimestamp().getValue());
         assertEquals("Context rank", 4 * cacheSize + 1, context.getRank());
     }
@@ -159,7 +159,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext context = fExperiment.seekEvent(9);
         assertEquals("Context rank", 9, context.getRank());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Context rank", 10, context.getRank());
 
@@ -167,7 +167,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(cacheSize - 1);
         assertEquals("Context rank", cacheSize - 1, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize, event.getTimestamp().getValue());
         assertEquals("Context rank", cacheSize, context.getRank());
 
@@ -175,7 +175,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(cacheSize + 1);
         assertEquals("Context rank", cacheSize + 1, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize + 2, event.getTimestamp().getValue());
         assertEquals("Context rank", cacheSize + 2, context.getRank());
 
@@ -183,7 +183,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(4500);
         assertEquals("Context rank", 4500, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Context rank", 4501, context.getRank());
     }
@@ -194,7 +194,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext context = fExperiment.seekEvent(-1);
         assertEquals("Event rank", 0, context.getRank());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Context rank", 1, context.getRank());
 
@@ -202,7 +202,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(NB_EVENTS);
         assertEquals("Context rank", NB_EVENTS, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertNull("Event", event);
         assertEquals("Context rank", NB_EVENTS, context.getRank());
     }
@@ -219,7 +219,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(1, SCALE, 0));
         assertEquals("Context rank", 0, context.getRank());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Context rank", 1, context.getRank());
 
@@ -227,7 +227,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(new TmfTimestamp(cacheSize + 1, SCALE, 0));
         assertEquals("Event rank", cacheSize, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize + 1, event.getTimestamp().getValue());
         assertEquals("Context rank", cacheSize + 1, context.getRank());
 
@@ -235,7 +235,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(new TmfTimestamp(4 * cacheSize + 1, SCALE, 0));
         assertEquals("Context rank", 4 * cacheSize, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4 * cacheSize + 1, event.getTimestamp().getValue());
         assertEquals("Context rank", 4 * cacheSize + 1, context.getRank());
     }
@@ -246,7 +246,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(2, SCALE, 0));
         assertEquals("Context rank", 1, context.getRank());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
         assertEquals("Context rank", 2, context.getRank());
 
@@ -254,7 +254,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(new TmfTimestamp(10, SCALE, 0));
         assertEquals("Context rank", 9, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Context rank", 10, context.getRank());
 
@@ -262,7 +262,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(new TmfTimestamp(1000, SCALE, 0));
         assertEquals("Context rank", 999, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Context rank", 1000, context.getRank());
 
@@ -270,7 +270,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(new TmfTimestamp(1002, SCALE, 0));
         assertEquals("Context rank", 1001, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Context rank", 1002, context.getRank());
 
@@ -278,7 +278,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(new TmfTimestamp(4501, SCALE, 0));
         assertEquals("Context rank", 4500, context.getRank());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Context rank", 4501, context.getRank());
     }
@@ -289,13 +289,13 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(-1, SCALE, 0));
         assertEquals("Event rank", 0, context.getRank());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
         // Position trace at event passed the end
         context = fExperiment.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertNull("Event location", event);
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
     }
@@ -312,30 +312,30 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext tmpContext = fExperiment.seekEvent(0);
         ITmfContext context = fExperiment.seekEvent(tmpContext.getLocation());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
 
         // Position trace at event rank 'cacheSize'
         tmpContext = fExperiment.seekEvent(cacheSize);
         context = fExperiment.seekEvent(tmpContext.getLocation());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize + 1, event.getTimestamp().getValue());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize + 2, event.getTimestamp().getValue());
 
         // Position trace at event rank 4 * 'cacheSize'
         tmpContext = fExperiment.seekEvent(4 * cacheSize);
         context = fExperiment.seekEvent(tmpContext.getLocation());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4 * cacheSize + 1, event.getTimestamp().getValue());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4 * cacheSize + 2, event.getTimestamp().getValue());
     }
 
@@ -347,10 +347,10 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         ITmfContext tmpContext = fExperiment.seekEvent(cacheSize - 1);
         ITmfContext context = fExperiment.seekEvent(tmpContext.getLocation());
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize, event.getTimestamp().getValue());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", cacheSize + 1, event.getTimestamp().getValue());
 
         // Position trace at event rank 2 * 'cacheSize' - 1
@@ -358,20 +358,20 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         context = fExperiment.seekEvent(tmpContext.getLocation());
         context = fExperiment.seekEvent(2 * cacheSize - 1);
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 2 * cacheSize, event.getTimestamp().getValue());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 2 * cacheSize + 1, event.getTimestamp().getValue());
 
         // Position trace at event rank 4500
         tmpContext = fExperiment.seekEvent(4500);
         context = fExperiment.seekEvent(tmpContext.getLocation());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
 
-        event = fExperiment.readNextEvent(context);
+        event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 4502, event.getTimestamp().getValue());
     }
 
@@ -380,7 +380,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         // Position trace at beginning
         ITmfContext context = fExperiment.seekEvent((ITmfLocation<?>) null);
 
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
     }
 
@@ -392,11 +392,11 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         // On lower bound, returns the first event (ts = 0)
         final ITmfContext context = fExperiment.seekEvent(0);
-        ITmfEvent event = fExperiment.readNextEvent(context);
+        ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
 
         for (int i = 2; i < 20; i++) {
-            event = fExperiment.readNextEvent(context);
+            event = fExperiment.getNext(context);
             assertEquals("Event timestamp", i, event.getTimestamp().getValue());
         }
     }

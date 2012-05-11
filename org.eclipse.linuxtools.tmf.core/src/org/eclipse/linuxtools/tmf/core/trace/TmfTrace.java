@@ -434,9 +434,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         // And locate the requested event context
         long pos = context.getRank();
         if (pos < rank) {
-            ITmfEvent event = readNextEvent(context);
+            ITmfEvent event = getNext(context);
             while (event != null && ++pos < rank) {
-                event = readNextEvent(context);
+                event = getNext(context);
             }
         }
         return context;
@@ -460,11 +460,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
         // And locate the requested event context
         final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
-        ITmfEvent event = readNextEvent(nextEventContext);
+        ITmfEvent event = getNext(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
             context.setLocation(nextEventContext.getLocation().clone());
             context.increaseRank();
-            event = readNextEvent(nextEventContext);
+            event = getNext(nextEventContext);
         }
         if (event == null) {
             context.setLocation(null);
@@ -481,9 +481,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readNextEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @Override
-    public synchronized ITmfEvent readNextEvent(final ITmfContext context) {
+    public synchronized T getNext(final ITmfContext context) {
         // parseEvent() does not update the context
-        final ITmfEvent event = fParser.parseEvent(context);
+        final T event = fParser.parseEvent(context);
         if (event != null) {
             updateAttributes(context, event.getTimestamp());
             context.setLocation(getCurrentLocation());
@@ -546,17 +546,17 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         return seekEvent(request.getIndex());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public T getNext(final ITmfContext context) {
-        if (context instanceof TmfContext) {
-            return (T) readNextEvent(context);
-        }
-        return null;
-    }
+//    /* (non-Javadoc)
+//     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
+//     */
+//    @Override
+//    @SuppressWarnings("unchecked")
+//    public T getNext(final ITmfContext context) {
+//        if (context instanceof TmfContext) {
+//            return (T) readNextEvent(context);
+//        }
+//        return null;
+//    }
 
 
     // ------------------------------------------------------------------------

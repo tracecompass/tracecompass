@@ -384,14 +384,14 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
      */
     public abstract ITmfContext armRequest(ITmfDataRequest<T> request);
 
-    /**
-     * Return the next event based on the context supplied. The context
-     * will be updated for the subsequent read.
-     * 
-     * @param context the trace read context (updated)
-     * @return the event referred to by context
-     */
-    public abstract T getNext(ITmfContext context);
+//    /**
+//     * Return the next event based on the context supplied. The context
+//     * will be updated for the subsequent read.
+//     * 
+//     * @param context the trace read context (updated)
+//     * @return the event referred to by context
+//     */
+//    public abstract T getNext(ITmfContext context);
 
     /**
      * Checks if the data meets the request completion criteria.

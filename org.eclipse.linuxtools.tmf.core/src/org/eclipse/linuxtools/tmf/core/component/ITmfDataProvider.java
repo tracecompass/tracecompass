@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.component;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 
 /**
  * <b><u>ITmfDataRequest</u></b>
@@ -32,4 +33,13 @@ public interface ITmfDataProvider<T extends ITmfEvent> extends ITmfComponent {
     public void sendRequest(ITmfDataRequest<T> request);
     public void fireRequest();
     public void notifyPendingRequest(boolean isIncrement);
+
+    /**
+     * Return the next event based on the context supplied. The context
+     * will be updated for the subsequent read.
+     * 
+     * @param context the trace read context (updated)
+     * @return the event referred to by context
+     */
+    public T getNext(ITmfContext context);
 }
