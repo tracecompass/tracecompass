@@ -275,10 +275,10 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     @Override
     public synchronized ITmfEvent readNextEvent(final ITmfContext context) {
-        // parseEvent() does not update the context
+        final ITmfContext previousContext = (TmfExperimentContext) context.clone();
         final ITmfEvent event = parseEvent(context);
         if (event != null) {
-            updateAttributes(context, event.getTimestamp());
+            updateAttributes(previousContext, event.getTimestamp());
 
             TmfExperimentContext expContext = (TmfExperimentContext) context;
             int trace = expContext.getLastTrace();
