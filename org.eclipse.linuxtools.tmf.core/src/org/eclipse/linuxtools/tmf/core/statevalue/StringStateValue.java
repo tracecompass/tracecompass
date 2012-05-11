@@ -29,7 +29,7 @@ final class StringStateValue extends TmfStateValue {
 
     @Override
     public byte getType() {
-        return 1;
+        return ITmfStateValue.TYPE_STRING;
     }
 
     @Override

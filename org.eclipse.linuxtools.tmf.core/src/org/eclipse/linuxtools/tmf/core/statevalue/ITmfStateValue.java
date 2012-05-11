@@ -23,6 +23,10 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
  */
 public interface ITmfStateValue {
 
+    public static final byte TYPE_NULL = -1;
+    public static final byte TYPE_INTEGER = 0;
+    public static final byte TYPE_STRING = 1;
+
     /**
      * Each implementation has to supply a "type" number. This will get written
      * as-is in the History file to recognize the type, so it needs to be unique
