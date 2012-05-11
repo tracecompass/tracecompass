@@ -35,9 +35,12 @@ public class CtfTmfContent extends TmfEventField {
     @Override
     public String toString() {
         StringBuilder retVal = new StringBuilder();
-        for( ITmfEventField field : getFields())        {
+        for( int i=0; i < getFields().length;i++){
+            ITmfEventField field = getFields()[i];
+            if(i != 0) {
+                retVal.append(", ");//$NON-NLS-1$
+            }
             retVal.append(field.toString());
-            retVal.append('\t');
         }
         return retVal.toString();
     }
