@@ -90,7 +90,7 @@ public class EventDeclaration {
     public synchronized static EventDeclaration getLostEventDeclaration(){
         EventDeclaration lostEvent = new EventDeclaration();
         lostEvent.fields = new StructDeclaration(1);
-        lostEvent.id = (long) -1;
+        lostEvent.id = -1L;
         lostEvent.name = "Lost event"; //$NON-NLS-1$
         return lostEvent;
     }

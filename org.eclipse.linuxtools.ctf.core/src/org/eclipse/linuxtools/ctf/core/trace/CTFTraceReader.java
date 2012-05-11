@@ -516,7 +516,7 @@ public class CTFTraceReader {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof CTFTraceReader)) {
             return false;
         }
         CTFTraceReader other = (CTFTraceReader) obj;

@@ -214,14 +214,11 @@ public class IOStructGen {
             }
             for (CommonTree event : events) {
                 parseEvent(event);
-                CommonTree name = (CommonTree) event.getChild(0).getChild(1)
-                        .getChild(0).getChild(0);
                 if (DEBUG_) {
-                    out.write("Name = " + name); //$NON-NLS-1$
-                }
-                CommonTree id = (CommonTree) event.getChild(1).getChild(1)
-                        .getChild(0).getChild(0);
-                if (DEBUG_) {
+                    CommonTree name = (CommonTree) event.getChild(0).getChild(1)
+                            .getChild(0).getChild(0);
+                    CommonTree id = (CommonTree) event.getChild(1).getChild(1)
+                            .getChild(0).getChild(0);
                     out.write("Name = " + name + " Id = " + id + '\n'); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
@@ -348,19 +345,19 @@ public class IOStructGen {
 
         String left = concatenateUnaryStrings(leftStrings);
 
-        if (left.equals("major")) { //$NON-NLS-1$
+        if (left.equals(CTFStrings.MAJOR)) {
             if (trace.majortIsSet()) {
                 throw new ParseException("major is already set"); //$NON-NLS-1$
             }
 
             trace.setMajor(getMajorOrMinor(rightNode));
-        } else if (left.equals("minor")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.MINOR)) {
             if (trace.minorIsSet()) {
                 throw new ParseException("minor is already set"); //$NON-NLS-1$
             }
 
             trace.setMinor(getMajorOrMinor(rightNode));
-        } else if (left.equals("uuid")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.UUID_STRING)) {
             UUID uuid = getUUID(rightNode);
 
             /*
@@ -376,7 +373,7 @@ public class IOStructGen {
                 trace.setUUID(uuid);
             }
 
-        } else if (left.equals("byte_order")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.BYTE_ORDER)) {
             ByteOrder byteOrder = getByteOrder(rightNode);
 
             /*
@@ -393,7 +390,7 @@ public class IOStructGen {
             } else {
                 trace.setByteOrder(byteOrder);
             }
-        } else if (left.equals("packet.header")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.PACKET_HEADER)) {
             if (trace.packetHeaderIsSet()) {
                 throw new ParseException("packet.header already defined"); //$NON-NLS-1$
             }
@@ -450,7 +447,7 @@ public class IOStructGen {
 
         if (stream.idIsSet()) {
             if (!trace.packetHeaderIsSet()
-                    || !trace.getPacketHeader().hasField("stream_id")) { //$NON-NLS-1$
+                    || !trace.getPacketHeader().hasField(CTFStrings.STREAM_ID)) {
                 throw new ParseException(
                         "Stream has an ID, but there is no stream_id field in packet header."); //$NON-NLS-1$
             }
@@ -484,7 +481,7 @@ public class IOStructGen {
 
         String left = concatenateUnaryStrings(leftStrings);
 
-        if (left.equals("id")) { //$NON-NLS-1$
+        if (left.equals(CTFStrings.ID)) {
             if (stream.idIsSet()) {
                 throw new ParseException("stream id already defined"); //$NON-NLS-1$
             }
@@ -492,7 +489,7 @@ public class IOStructGen {
             long streamID = getStreamID(rightNode);
 
             stream.setId(streamID);
-        } else if (left.equals("event.header")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.EVENT_HEADER)) {
             if (stream.eventHeaderIsSet()) {
                 throw new ParseException("event.header already defined"); //$NON-NLS-1$
             }
@@ -512,7 +509,7 @@ public class IOStructGen {
             }
 
             stream.setEventHeader((StructDeclaration) eventHeaderDecl);
-        } else if (left.equals("event.context")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.EVENT_CONTEXT)) {
             if (stream.eventContextIsSet()) {
                 throw new ParseException("event.context already defined"); //$NON-NLS-1$
             }
@@ -532,7 +529,7 @@ public class IOStructGen {
             }
 
             stream.setEventContext((StructDeclaration) eventContextDecl);
-        } else if (left.equals("packet.context")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.PACKET_CONTEXT)) {
             if (stream.packetContextIsSet()) {
                 throw new ParseException("packet.context already defined"); //$NON-NLS-1$
             }
@@ -648,7 +645,7 @@ public class IOStructGen {
 
         String left = concatenateUnaryStrings(leftStrings);
 
-        if (left.equals("name")) { //$NON-NLS-1$
+        if (left.equals(CTFStrings.NAME2)) {
             if (event.nameIsSet()) {
                 throw new ParseException("name already defined"); //$NON-NLS-1$
             }
@@ -656,7 +653,7 @@ public class IOStructGen {
             String name = getEventName(rightNode);
 
             event.setName(name);
-        } else if (left.equals("id")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.ID)) {
             if (event.idIsSet()) {
                 throw new ParseException("id already defined"); //$NON-NLS-1$
             }
@@ -664,7 +661,7 @@ public class IOStructGen {
             long id = getEventID(rightNode);
 
             event.setId(id);
-        } else if (left.equals("stream_id")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.STREAM_ID)) {
             if (event.streamIsSet()) {
                 throw new ParseException("stream id already defined"); //$NON-NLS-1$
             }
@@ -678,7 +675,7 @@ public class IOStructGen {
             }
 
             event.setStream(stream);
-        } else if (left.equals("context")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.CONTEXT)) {
             if (event.contextIsSet()) {
                 throw new ParseException("context already defined"); //$NON-NLS-1$
             }
@@ -697,7 +694,7 @@ public class IOStructGen {
             }
 
             event.setContext((StructDeclaration) contextDecl);
-        } else if (left.equals("fields")) { //$NON-NLS-1$
+        } else if (left.equals(CTFStrings.FIELDS_STRING)) {
             if (event.fieldsIsSet()) {
                 throw new ParseException("fields already defined"); //$NON-NLS-1$
             }
@@ -721,7 +718,7 @@ public class IOStructGen {
             final StructDeclaration fields = (StructDeclaration) fieldsDecl;
             event.setFields(fields);
         }
-        else if (left.equals("loglevel")){ //$NON-NLS-1$
+        else if (left.equals(CTFStrings.LOGLEVEL2)){
 
             long logLevel = parseUnaryInteger((CommonTree) rightNode.getChild(0)) ;
             event.setLogLevel(logLevel);
@@ -1196,11 +1193,8 @@ public class IOStructGen {
         FloatDeclaration floatDeclaration = null;
         ByteOrder byteOrder = trace.getByteOrder();
         long alignment = 0;
-        int base = 2;
         int exponent = 8;
         int mantissa = 24;
-
-        Encoding encoding = Encoding.NONE;
 
         /* Iterate on all integer children */
         for (CommonTree child : children) {
@@ -1225,13 +1219,13 @@ public class IOStructGen {
                 }
                 String left = concatenateUnaryStrings(leftStrings);
 
-                if (left.equals("exp_dig")) { //$NON-NLS-1$
+                if (left.equals(CTFStrings.EXP_DIG)) {
                     exponent = (int) parseUnaryInteger((CommonTree) rightNode.getChild(0));
-                } else if (left.equals("byte_order")) { //$NON-NLS-1$
+                } else if (left.equals(CTFStrings.BYTE_ORDER)) {
                     byteOrder = getByteOrder(rightNode);
-                } else if (left.equals("mant_dig")) { //$NON-NLS-1$
+                } else if (left.equals(CTFStrings.MANT_DIG)) {
                     mantissa = (int) parseUnaryInteger((CommonTree) rightNode.getChild(0));
-                } else if (left.equals("align")) { //$NON-NLS-1$
+                } else if (left.equals(CTFStrings.ALIGN)) {
                     alignment = getAlignment(rightNode);
                 } else {
                     throw new ParseException("Float: unknown attribute " + left); //$NON-NLS-1$
@@ -1256,7 +1250,7 @@ public class IOStructGen {
             }
         }
 
-        floatDeclaration = new FloatDeclaration(exponent, mantissa, byteOrder, encoding, alignment);
+        floatDeclaration = new FloatDeclaration(exponent, mantissa, byteOrder, alignment);
 
         assert (floatDeclaration != null);
         return floatDeclaration;
@@ -1351,11 +1345,11 @@ public class IOStructGen {
 
                 if (left.equals("signed")) { //$NON-NLS-1$
                     signed = getSigned(rightNode);
-                } else if (left.equals("byte_order")) { //$NON-NLS-1$
+                } else if (left.equals(CTFStrings.BYTE_ORDER)) {
                     byteOrder = getByteOrder(rightNode);
                 } else if (left.equals("size")) { //$NON-NLS-1$
                     size = getSize(rightNode);
-                } else if (left.equals("align")) { //$NON-NLS-1$
+                } else if (left.equals(CTFStrings.ALIGN)) {
                     alignment = getAlignment(rightNode);
                 } else if (left.equals("base")) { //$NON-NLS-1$
                     base = getBase(rightNode);
@@ -2454,9 +2448,9 @@ public class IOStructGen {
         if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals("true") || strval.equals("TRUE")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (strval.equals(CTFStrings.TRUE) || strval.equals(CTFStrings.TRUE2)) {
                 ret = true;
-            } else if (strval.equals("false") || strval.equals("FALSE")) { //$NON-NLS-1$ //$NON-NLS-2$
+            } else if (strval.equals(CTFStrings.FALSE) || strval.equals(CTFStrings.FALSE2)) {
                 ret = false;
             } else {
                 throw new ParseException("Invalid boolean value " //$NON-NLS-1$
@@ -2502,11 +2496,11 @@ public class IOStructGen {
         if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals("le")) { //$NON-NLS-1$
+            if (strval.equals(CTFStrings.LE)) {
                 return ByteOrder.LITTLE_ENDIAN;
-            } else if (strval.equals("be") || strval.equals("network")) { //$NON-NLS-1$ //$NON-NLS-2$
+            } else if (strval.equals(CTFStrings.BE) || strval.equals(CTFStrings.NETWORK)) {
                 return ByteOrder.BIG_ENDIAN;
-            } else if (strval.equals("native")) { //$NON-NLS-1$
+            } else if (strval.equals(CTFStrings.NATIVE)) {
                 return trace.getByteOrder();
             } else {
                 throw new ParseException("Invalid value for byte order"); //$NON-NLS-1$
@@ -2618,18 +2612,18 @@ public class IOStructGen {
         } else if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals("decimal") || strval.equals("dec") //$NON-NLS-1$ //$NON-NLS-2$
-                    || strval.equals("d") || strval.equals("i") //$NON-NLS-1$ //$NON-NLS-2$
-                    || strval.equals("u")) { //$NON-NLS-1$
+            if (strval.equals(CTFStrings.DECIMAL) || strval.equals(CTFStrings.DEC)
+                    || strval.equals(CTFStrings.DEC_CTE) || strval.equals(CTFStrings.INT_MOD)
+                    || strval.equals(CTFStrings.UNSIGNED_CTE)) {
                 return 10;
-            } else if (strval.equals("hexadecimal") || strval.equals("hex") //$NON-NLS-1$ //$NON-NLS-2$
-                    || strval.equals("x") || strval.equals("X") //$NON-NLS-1$ //$NON-NLS-2$
-                    || strval.equals("p")) { //$NON-NLS-1$
+            } else if (strval.equals(CTFStrings.HEXADECIMAL) || strval.equals(CTFStrings.HEX)
+                    || strval.equals(CTFStrings.X) || strval.equals(CTFStrings.X2)
+                    || strval.equals(CTFStrings.POINTER)) {
                 return 16;
-            } else if (strval.equals("octal") || strval.equals("oct") //$NON-NLS-1$ //$NON-NLS-2$
-                    || strval.equals("o")) { //$NON-NLS-1$
+            } else if (strval.equals(CTFStrings.OCTAL) || strval.equals(CTFStrings.OCT)
+                    || strval.equals(CTFStrings.OCTAL_CTE)) {
                 return 8;
-            } else if (strval.equals("binary") || strval.equals("b")) { //$NON-NLS-1$ //$NON-NLS-2$
+            } else if (strval.equals(CTFStrings.BINARY) || strval.equals(CTFStrings.BIN)) {
                 return 2;
             } else {
                 throw new ParseException("Invalid value for base"); //$NON-NLS-1$
@@ -2656,11 +2650,11 @@ public class IOStructGen {
         if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals("UTF8")) { //$NON-NLS-1$
+            if (strval.equals(CTFStrings.UTF8)) {
                 return Encoding.UTF8;
-            } else if (strval.equals("ASCII")) { //$NON-NLS-1$
+            } else if (strval.equals(CTFStrings.ASCII)) {
                 return Encoding.ASCII;
-            } else if (strval.equals("none")) { //$NON-NLS-1$
+            } else if (strval.equals(CTFStrings.NONE)) {
                 return Encoding.NONE;
             } else {
                 throw new ParseException("Invalid value for encoding"); //$NON-NLS-1$

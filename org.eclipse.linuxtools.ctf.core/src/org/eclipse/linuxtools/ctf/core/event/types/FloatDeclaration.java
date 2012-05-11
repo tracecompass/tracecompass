@@ -23,7 +23,6 @@ public class FloatDeclaration implements IDeclaration {
     private final int mant;
     private final int exp;
     private final ByteOrder byteOrder;
-    private final Encoding encoding;
     private final long alignment;
 
     // ------------------------------------------------------------------------
@@ -31,11 +30,10 @@ public class FloatDeclaration implements IDeclaration {
     // ------------------------------------------------------------------------
 
     public FloatDeclaration(int exponent, int mantissa, ByteOrder byteOrder,
-            Encoding encoding, long alignment) {
+            long alignment) {
         mant = mantissa;
         exp = exponent;
         this.byteOrder = byteOrder;
-        this.encoding = encoding;
         this.alignment = alignment;
 
     }
@@ -63,13 +61,6 @@ public class FloatDeclaration implements IDeclaration {
      */
     public ByteOrder getByteOrder() {
         return byteOrder;
-    }
-
-    /**
-     * @return the encoding
-     */
-    public Encoding getEncoding() {
-        return encoding;
     }
 
     @Override

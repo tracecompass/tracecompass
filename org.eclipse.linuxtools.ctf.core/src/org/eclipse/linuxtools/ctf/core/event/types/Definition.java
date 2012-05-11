@@ -23,13 +23,13 @@ public abstract class Definition {
     // Attributes
     // ------------------------------------------------------------------------
 
-    /* The name of the field in its container */
+    /** The name of the field in its container */
     protected final String fieldName;
 
-    /* The complete path of this field */
+    /** The complete path of this field */
     protected final String path;
 
-    /*
+    /**
      * The definition scope in which this definition is found.
      *
      * The complete path of a definition is thus the path of the definition

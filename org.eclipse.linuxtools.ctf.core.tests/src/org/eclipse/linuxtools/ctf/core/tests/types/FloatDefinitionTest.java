@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
@@ -64,8 +63,8 @@ public class FloatDefinitionTest {
 
     @Test
     public void testFloat248() {
-        parent = new FloatDeclaration(8, 24, ByteOrder.nativeOrder(), Encoding.NONE, 0);
-        singleFixture = (FloatDefinition) parent.createDefinition(null, fieldName);
+        parent = new FloatDeclaration(8, 24, ByteOrder.nativeOrder(), 0);
+        singleFixture = parent.createDefinition(null, fieldName);
         assertNotNull(singleFixture);
     }
 
@@ -73,8 +72,8 @@ public class FloatDefinitionTest {
 
     @Test
     public void testFloat5311() {
-        parent = new FloatDeclaration(11, 53, ByteOrder.nativeOrder(), Encoding.NONE, 0);
-        doubleFixture = (FloatDefinition) parent.createDefinition(null, fieldName);
+        parent = new FloatDeclaration(11, 53, ByteOrder.nativeOrder(), 0);
+        doubleFixture = parent.createDefinition(null, fieldName);
         assertNotNull(doubleFixture);
     }
 
@@ -82,8 +81,8 @@ public class FloatDefinitionTest {
     public void testFloat32Bit(){
         for(int i = 1; i < 31 ; i++)
         {
-            parent = new FloatDeclaration(i, 32-i, ByteOrder.nativeOrder(), Encoding.NONE, 0);
-            fixture = (FloatDefinition) parent.createDefinition(null, fieldName);
+            parent = new FloatDeclaration(i, 32-i, ByteOrder.nativeOrder(), 0);
+            fixture = parent.createDefinition(null, fieldName);
             assertNotNull(fixture);
             fixture.setValue(2.0);
             assertTrue(fixture.toString().contains("2")); //$NON-NLS-1$
@@ -94,8 +93,8 @@ public class FloatDefinitionTest {
     public void testFloat64Bit(){
         for(int i = 1; i < 63 ; i++)
         {
-            parent = new FloatDeclaration(i, 64-i, ByteOrder.nativeOrder(), Encoding.NONE, 0);
-            fixture = (FloatDefinition) parent.createDefinition(null, fieldName);
+            parent = new FloatDeclaration(i, 64-i, ByteOrder.nativeOrder(), 0);
+            fixture = parent.createDefinition(null, fieldName);
             assertNotNull(fixture);
             BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
             fixture.read(input);
@@ -106,8 +105,8 @@ public class FloatDefinitionTest {
 
     @Test
     public void testFloat48Bit(){
-        parent = new FloatDeclaration(12, 32, ByteOrder.nativeOrder(), Encoding.NONE, 0);
-        fixture = (FloatDefinition) parent.createDefinition(null, fieldName);
+        parent = new FloatDeclaration(12, 32, ByteOrder.nativeOrder(), 0);
+        fixture = parent.createDefinition(null, fieldName);
         assertNotNull(fixture);
         BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
         fixture.read(input);

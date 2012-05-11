@@ -139,7 +139,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /** Handlers for the metadata files */
     private final static FileFilter metadataFileFilter = new MetadataFileFilter();
-    private final static Comparator<File> metadataComparator = new MetadataComparator();
+    private final static Comparator<File> metadataComparator = new MetadataComparator(); // $codepro.audit.disable fieldJavadoc
 
     /** map of all the event types */
     private final HashMap<Long, EventDeclaration> events;
@@ -239,6 +239,11 @@ public class CTFTrace implements IDefinitionScope {
                     // do nothing it's ok, we tried to close it.
                 }
             }
+        }
+        try {
+            super.finalize();
+        } catch (Throwable e) {
+            // TODO Auto-generated catch block
         }
     }
 

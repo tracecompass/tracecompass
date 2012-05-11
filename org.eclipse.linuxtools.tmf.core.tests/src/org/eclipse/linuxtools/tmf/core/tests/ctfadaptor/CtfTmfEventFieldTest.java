@@ -133,7 +133,7 @@ public class CtfTmfEventFieldTest {
         IntegerDeclaration intDec = new IntegerDeclaration(8, false, 8,
                 ByteOrder.BIG_ENDIAN, Encoding.NONE, null, 8);
         FloatDeclaration flDec = new FloatDeclaration(8, 24,
-                ByteOrder.BIG_ENDIAN, Encoding.NONE, 8);
+                ByteOrder.BIG_ENDIAN, 8);
         ArrayDeclaration arrDec = new ArrayDeclaration(2, intDec);
         SequenceDeclaration seqDec = new SequenceDeclaration(LEN, intDec);
         sDec.addField(INT, intDec);

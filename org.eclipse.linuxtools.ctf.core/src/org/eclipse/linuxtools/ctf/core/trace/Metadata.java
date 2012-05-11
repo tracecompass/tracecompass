@@ -49,12 +49,12 @@ public class Metadata {
     /**
      * Name of the metadata file in the trace directory
      */
-    final String METADATA_FILENAME = "metadata"; //$NON-NLS-1$
+    final static String METADATA_FILENAME = "metadata"; //$NON-NLS-1$
 
     /**
      * Size of the metadata packet header, in bytes, computed by hand.
      */
-    final int METADATA_PACKET_HEADER_SIZE = 37;
+    final static int METADATA_PACKET_HEADER_SIZE = 37;
 
     // ------------------------------------------------------------------------
     // Attributes

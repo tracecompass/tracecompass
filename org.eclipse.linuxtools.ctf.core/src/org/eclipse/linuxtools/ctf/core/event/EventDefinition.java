@@ -54,7 +54,7 @@ public class EventDefinition implements IDefinitionScope {
     /**
      * The StreamInputReader that reads this event definition.
      */
-    public final StreamInputReader streamInputReader;
+    private final StreamInputReader streamInputReader;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -150,32 +150,33 @@ public class EventDefinition implements IDefinitionScope {
 
     @Override
     public String toString() {
-        HashMap<String, Definition> f;
+        HashMap<String, Definition> definitions;
         List<String> list;
-        StringBuilder b = new StringBuilder();
+        StringBuilder retString = new StringBuilder();
+        final String cr = System.getProperty("line.separator");//$NON-NLS-1$
 
-        b.append("Event type: " + declaration.getName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        b.append("Timestamp: " + Long.toString(timestamp) + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        retString.append("Event type: " + declaration.getName() + cr); //$NON-NLS-1$
+        retString.append("Timestamp: " + Long.toString(timestamp) + cr); //$NON-NLS-1$
 
         if (context != null) {
-            f = context.getDefinitions();
+            definitions = context.getDefinitions();
             list = context.getDeclaration().getFieldsList();
 
             for (String field : list) {
-                b.append(field + " : " + f.get(field).toString() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+                retString.append(field + " : " + definitions.get(field).toString() + cr); //$NON-NLS-1$
             }
         }
 
         if (fields != null) {
-            f = fields.getDefinitions();
+            definitions = fields.getDefinitions();
             list = fields.getDeclaration().getFieldsList();
 
             for (String field : list) {
-                b.append(field + " : " + f.get(field).toString() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+                retString.append(field + " : " + definitions.get(field).toString() + cr); //$NON-NLS-1$
             }
         }
 
-        return b.toString();
+        return retString.toString();
     }
 
 }

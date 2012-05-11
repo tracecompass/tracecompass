@@ -74,6 +74,7 @@ public class IntegerDeclaration implements IDeclaration {
         return length;
     }
 
+    @Override
     public long getAlignment(){
         return alignment;
     }
