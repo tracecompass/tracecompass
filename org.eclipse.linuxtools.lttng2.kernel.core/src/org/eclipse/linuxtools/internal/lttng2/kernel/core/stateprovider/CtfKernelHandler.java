@@ -242,7 +242,6 @@ class CtfKernelHandler implements Runnable {
              *         string next_comm, int32 next_tid, int32 next_prio
              */
             {
-
                 Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
                 //Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
 
@@ -251,21 +250,35 @@ class CtfKernelHandler implements Runnable {
 
                 /* Update the currentThreadNodes pointer */
                 Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, nextTid.toString());
-                initThreadNode(newCurrentThreadNode);
                 currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
                 /* Set the status of the new scheduled process */
                 setProcessToRunning(ts, newCurrentThreadNode);
 
-                /* Set the exec name of the new process */
-                quark = ss.getQuarkRelative(newCurrentThreadNode, Attributes.EXEC_NAME);
-                value = TmfStateValue.newValueString(nextProcessName);
-                ss.modifyAttribute(ts, value, quark);
-
                 /* Set the status of the process that got scheduled out */
                 quark = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString(), Attributes.STATUS);
                 value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT);
                 ss.modifyAttribute(ts, value, quark);
+
+                /* Set the exec name of the new process */
+                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.EXEC_NAME);
+                value = TmfStateValue.newValueString(nextProcessName);
+                ss.modifyAttribute(ts, value, quark);
+
+                /*
+                 * Check if we need to set the syscall state and the PPID of
+                 * the new process (in case we haven't seen this process before)
+                 */
+                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
+                if (quark == ss.getNbAttributes()) {
+                    value = TmfStateValue.nullValue();
+                    ss.modifyAttribute(ts, value, quark);
+                }
+                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.PPID);
+                if (quark == ss.getNbAttributes()) {
+                    value = TmfStateValue.nullValue();
+                    ss.modifyAttribute(ts, value, quark);
+                }
 
                 /* Set the current scheduled process on the relevant CPU */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
@@ -288,19 +301,25 @@ class CtfKernelHandler implements Runnable {
                 Integer childTid = ((Long) content.getField(LttngStrings.CHILD_TID).getValue()).intValue();
 
                 tidNode = ss.getQuarkRelativeAndAdd(threadsNode, childTid.toString());
-                initThreadNode(tidNode);
 
-                /*
-                 * Add the new process with its known TID, PPID, and initial
-                 * Exec_name
-                 */
-                quark = ss.getQuarkRelative(tidNode, Attributes.PPID);
+                /* Assign the PPID to the new process */
+                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.PPID);
                 value = TmfStateValue.newValueInt(parentTid);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the new process' exec_name */
-                quark = ss.getQuarkRelative(tidNode, Attributes.EXEC_NAME);
+                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(childProcessName);
+                ss.modifyAttribute(ts, value, quark);
+
+                /* Set the new process' status */
+                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT);
+                ss.modifyAttribute(ts, value, quark);
+
+                /* Set the process' syscall state */
+                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.SYSTEM_CALL);
+                value = TmfStateValue.nullValue();
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -407,16 +426,6 @@ class CtfKernelHandler implements Runnable {
         }
     }
 
-    /**
-     * Ensure we always have some sub-attributes available for every "TID" node.
-     */
-    private void initThreadNode(int currentThreadNode) {
-        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.PPID);
-        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_NAME);
-        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
-        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-    }
-
     private void setupCommonLocations() {
         cpusNode = ss.getQuarkAbsoluteAndAdd(Attributes.CPUS);
         threadsNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS);
@@ -462,7 +471,7 @@ class CtfKernelHandler implements Runnable {
         int quark;
         ITmfStateValue value;
 
-        quark = ss.getQuarkRelative(currentThreadNode, Attributes.SYSTEM_CALL);
+        quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
         if (ss.queryOngoingState(quark).isNull()) {
             /* We were in user mode before the interruption */
             value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_USERMODE);
