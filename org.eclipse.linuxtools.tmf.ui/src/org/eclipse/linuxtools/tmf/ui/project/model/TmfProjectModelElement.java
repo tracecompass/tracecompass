@@ -16,11 +16,19 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 
 /**
  * <b><u>TmfProjectModelElement</u></b>
@@ -145,4 +153,36 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
         return element.fName.equals(fName) && element.fLocation.equals(fLocation);
     }
 
+    
+    /**
+     * Returns the trace specific supplementary directory under the project's supplementary folder.
+     * The folder will be created if it doesn't exist. 
+     * 
+     * @param supplFoldername - folder name.
+     * @return returns the trace specific supplementary directory
+     */
+    public IFolder getTraceSupplementaryFolder(String supplFoldername) {
+        IFolder supplFolderParent = getSupplementaryFolderParent();
+        return supplFolderParent.getFolder(supplFoldername);
+    }
+
+    /**
+     * Returns the supplementary folder for this project
+     * 
+     * @return the supplementary folder for this project  
+     */
+    public IFolder getSupplementaryFolderParent() {
+        TmfProjectElement project = getProject();
+        IProject projectResource = (IProject)project.getResource();
+        IFolder supplFolderParent = projectResource.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
+
+        if (!supplFolderParent.exists()) {
+            try {
+                supplFolderParent.create(true, true, new NullProgressMonitor());
+            } catch (CoreException e) {
+                TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error creating project specific supplementary folder " + supplFolderParent, e)); //$NON-NLS-1$
+            }
+        }
+        return supplFolderParent;
+    }
 }

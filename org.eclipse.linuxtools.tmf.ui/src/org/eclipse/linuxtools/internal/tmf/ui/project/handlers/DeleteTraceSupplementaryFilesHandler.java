@@ -22,7 +22,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.project.dialogs.SelectSupplementaryResourcesDialog;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -55,6 +57,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
         if (selectionProvider == null) {
             return false;
         }
+
         ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only selection and that it is an experiment
@@ -66,9 +69,20 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
                 TmfTraceElement trace = (TmfTraceElement) element;
                 // If trace is under an experiment, use the original trace from the traces folder
                 trace = trace.getElementUnderTraceFolder();
-                trace.deleteSupplementaryFiles();
-                // Refresh folder
-                IResource resource = trace.getParent().getResource();
+
+                // Delete the selected resources
+                IResource[] resources = trace.getSupplementaryResources();
+                
+                SelectSupplementaryResourcesDialog dialog = new SelectSupplementaryResourcesDialog(window.getShell(), resources);
+                if (dialog.open() != Window.OK) {
+                    return null;
+                }
+
+                trace.deleteSupplementaryResources(dialog.getResources());
+
+                // Refresh project
+                IResource resource = trace.getProject().getResource();
+
                 if (resource != null) {
                     try {
                         if (resource != null) {

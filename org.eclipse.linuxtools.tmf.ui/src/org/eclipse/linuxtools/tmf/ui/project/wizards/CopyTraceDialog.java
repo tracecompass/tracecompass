@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
@@ -200,14 +201,14 @@ public class CopyTraceDialog extends SelectionStatusDialog {
                         throw new OperationCanceledException();
                     }
                     // Copy supplementary files first
-                    fTrace.copySupplementaryFiles(newName);
+                    fTrace.copySupplementaryFolder(newName);
                     // Copy the trace
                     fTrace.getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
                     // Delete any bookmarks file found in copied trace folder
                     IFolder folder = fTraceFolder.getFolder(newName);
                     if (folder.exists()) {
                         for (IResource member : folder.members()) {
-                            if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfTraceElement.TRACETYPE))) {
+                            if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
                                 member.delete(true, null);
                             }
                         }
