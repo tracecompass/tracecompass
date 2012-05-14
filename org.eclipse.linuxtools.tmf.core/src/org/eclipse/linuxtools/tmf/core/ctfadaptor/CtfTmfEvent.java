@@ -146,7 +146,7 @@ public final class CtfTmfEvent implements ITmfEvent {
      * Inner constructor to create "null" events. Don't use this directly in
      * normal usage, use CtfTmfEvent.getNullEvent() to get an instance of an
      * empty event.
-     * 
+     *
      * This needs to be public however because it's used in extension points,
      * and the framework will use this constructor to get the class type.
      */
@@ -280,7 +280,11 @@ public final class CtfTmfEvent implements ITmfEvent {
      */
     @Override
     public ITmfEventType getType() {
-        return CtfTmfEventType.get(eventName);
+        CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(eventName);
+        if( ctfTmfEventType == null ){
+            ctfTmfEventType = new CtfTmfEventType( this.getEventName(), this.getContent());
+        }
+        return ctfTmfEventType;
     }
 
     /**
