@@ -170,7 +170,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
                 }
                 while (true) {
                     long rank = context.getRank();
-                    ITmfEvent event = trace.readNextEvent(context);
+                    ITmfEvent event = trace.getNext(context);
                     if (event == null) {
                         done = true;
                         break;
@@ -435,7 +435,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
                         if (interrupted)
                             return;
                         long rank = fContext.getRank();
-                        ITmfEvent event = trace.readNextEvent(fContext);
+                        ITmfEvent event = trace.getNext(fContext);
                         if (event == null) {
                             break;
                         }

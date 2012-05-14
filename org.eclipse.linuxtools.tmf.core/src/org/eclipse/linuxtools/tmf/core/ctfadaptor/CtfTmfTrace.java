@@ -341,22 +341,22 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return seekEvent(request.getIndex());
     }
 
-    /**
-     * The trace reader keeps its own iterator: the "context" parameter here
-     * will be ignored.
-     *
-     * If you wish to specify a new context, instantiate a new CtfIterator and
-     * seek() it to where you want, and use that to read events.
-     *
-     * FIXME merge with getNextEvent below once they both use the same parameter
-     * type.
-     * @param context ITmfContext
-     * @return CtfTmfEvent
-     */
-    @Override
-    public CtfTmfEvent getNext(final ITmfContext context) {
-        return readNextEvent(context);
-    }
+//    /**
+//     * The trace reader keeps its own iterator: the "context" parameter here
+//     * will be ignored.
+//     *
+//     * If you wish to specify a new context, instantiate a new CtfIterator and
+//     * seek() it to where you want, and use that to read events.
+//     *
+//     * FIXME merge with getNextEvent below once they both use the same parameter
+//     * type.
+//     * @param context ITmfContext
+//     * @return CtfTmfEvent
+//     */
+//    @Override
+//    public CtfTmfEvent getNext(final ITmfContext context) {
+//        return readNextEvent(context);
+//    }
 
     // ------------------------------------------------------------------------
     // ITmfTrace
@@ -452,10 +452,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * Method readNextEvent.
      * @param context ITmfContext
      * @return CtfTmfEvent
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readNextEvent(ITmfContext)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getNext(ITmfContext)
      */
     @Override
-    public CtfTmfEvent readNextEvent(final ITmfContext context) {
+    public CtfTmfEvent getNext(final ITmfContext context) {
         CtfTmfEvent event = null;
         if (context instanceof CtfIterator) {
             CtfIterator ctfIterator = (CtfIterator) context;

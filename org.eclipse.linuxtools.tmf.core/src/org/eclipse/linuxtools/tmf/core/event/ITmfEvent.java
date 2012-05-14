@@ -28,7 +28,6 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * used as e.g. a location marker (filename:lineno) to indicate where the event
  * was generated.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -37,7 +36,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @see ITmfEventField
  * @see TmfEvent
  */
-public interface ITmfEvent extends Cloneable {
+public interface ITmfEvent {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -106,10 +105,6 @@ public interface ITmfEvent extends Cloneable {
      * @return the event reference
      */
     public String getReference();
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the event

@@ -19,8 +19,7 @@ import junit.framework.TestSuite;
 import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
 
 /**
- * <b><u>AllTests</u></b>
- * <p>
+ * Test suite for org.eclipse.linuxtools.tmf.core.trace
  */
 @SuppressWarnings("nls")
 public class AllTests {

@@ -20,8 +20,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
- * <b><u>TmfTimeRangeTest</u></b>
- * <p>
  * Test suite for the TmfTimeRange class.
  */
 @SuppressWarnings("nls")

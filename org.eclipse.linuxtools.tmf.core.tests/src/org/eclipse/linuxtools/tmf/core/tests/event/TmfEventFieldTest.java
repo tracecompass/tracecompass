@@ -19,8 +19,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 /**
- * <b><u>TmfEventFieldTest</u></b>
- * <p>
  * Test suite for the TmfEventField class.
  */
 @SuppressWarnings("nls")

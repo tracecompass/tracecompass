@@ -121,7 +121,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         initialize(resource, path, eventType);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     protected synchronized void initialize(final IResource resource, final String path, final Class<LttngEvent> eventType)
             throws TmfTraceException {
@@ -153,8 +152,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
 
-        fParser = (ITmfEventParser<LttngEvent>) this;
-        fCacheSize = CHECKPOINT_PAGE_SIZE;
+        setParser((ITmfEventParser<LttngEvent>) this);
+        setCacheSize(CHECKPOINT_PAGE_SIZE);
  
         // // Bypass indexing if asked
         // if ( bypassIndexing == false ) {
@@ -173,8 +172,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         if (jniTrace == null
                 || (!jniTrace.isLiveTraceSupported() || !LiveTraceManager.isLiveTrace(jniTrace.getTracepath()))) {
             // Set the time range of the trace
-            final TmfContext context = seekEvent(0);
-            final LttngEvent event = readNextEvent(context);
+            final ITmfContext context = seekEvent(0);
+            final LttngEvent event = getNext(context);
             final LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
             final LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
             setTimeRange(new TmfTimeRange(startTime, endTime));
@@ -184,11 +183,11 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         }
 
         // Set the time range of the trace
-        final TmfContext context = seekEvent(0);
-        final LttngEvent event = readNextEvent(context);
+        final ITmfContext context = seekEvent(0);
+        final LttngEvent event = getNext(context);
         setEndTime(TmfTimestamp.BIG_BANG);
         final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BIG_BANG.getValue();
-        fStreamingInterval = LTTNG_STREAMING_INTERVAL;
+        setStreamingInterval(LTTNG_STREAMING_INTERVAL);
 
         final Thread thread = new Thread("Streaming Monitor for trace " + getName()) { //$NON-NLS-1$
 
@@ -445,35 +444,28 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfContext
      */
     @Override
-    public synchronized TmfContext seekEvent(final ITmfLocation<?> location) {
-
-        // // [lmcfrch]
-        // lastTime = 0;
+    public synchronized ITmfContext seekEvent(final ITmfLocation<?> location) {
 
         if (PRINT_DEBUG)
             System.out.println("seekLocation(location) location -> " + location); //$NON-NLS-1$
 
         // If the location in context is null, create a new one
-        LttngLocation curLocation = null;
         if (location == null) {
-            curLocation = new LttngLocation();
-            final TmfContext context = seekEvent(curLocation.getOperationTime());
+            LttngLocation curLocation = new LttngLocation();
+            final ITmfContext context = seekEvent(curLocation.getOperationTime());
             context.setRank(0);
             return context;
-        } else
-            curLocation = (LttngLocation) location;
-
-        // *** NOTE :
-        // Update to location should (and will) be done in SeekEvent.
-
+        }
+        
         // The only seek valid in LTTng is with the time, we call
         // seekEvent(timestamp)
-        final TmfContext context = seekEvent(curLocation.getOperationTime());
+        LttngLocation curLocation = (LttngLocation) location;
+        final ITmfContext context = seekEvent(curLocation.getOperationTime());
 
         // If the location is marked with the read next flag
         // then it is pointing to the next event following the operation time
         if (curLocation.isLastOperationReadNext())
-            readNextEvent(context);
+            getNext(context);
 
         return context;
     }
@@ -543,14 +535,14 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
 //            timestamp = getStartTime();
 
         // Position the trace at the checkpoint
-        final ITmfContext checkpointContext = fIndexer.seekIndex(rank);
+        final ITmfContext checkpointContext = getIndexer().seekIndex(rank);
         LttngLocation location = (LttngLocation) checkpointContext.getLocation();
         ITmfTimestamp timestamp = location.getLocation();
         long index = rank / getCacheSize();
 
         // Seek to the found time
         final TmfContext tmpContext = seekEvent(timestamp);
-        tmpContext.setRank((index + 1) * fCacheSize);
+        tmpContext.setRank((index + 1) * getCacheSize());
         previousLocation = (LttngLocation) tmpContext.getLocation();
 
         // Ajust the index of the event we found at this check point position
@@ -618,7 +610,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
     public int nbEventsRead = 0;
 
     @Override
-    public synchronized LttngEvent readNextEvent(final ITmfContext context) {
+    public synchronized LttngEvent getNext(final ITmfContext context) {
 
         if (PRINT_DEBUG)
             System.out.println("getNextEvent(context) context.getLocation() -> " //$NON-NLS-1$

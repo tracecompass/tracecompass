@@ -77,7 +77,7 @@ public class LttngEventTest extends TestCase {
 
         try {
             final LTTngTextTrace tmpStream = initializeEventStream();
-            tmpEvent = (LttngEvent)tmpStream.readNextEvent(new TmfContext(new TmfLocation<Long>(0L), 0) );
+            tmpEvent = (LttngEvent)tmpStream.getNext(new TmfContext(new TmfLocation<Long>(0L), 0) );
         }
         catch (final Exception e) {
             System.out.println("ERROR : Could not open " + tracepath1);

@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
  * copy of the event is needed, use the copy constructor. Otherwise (deep copy)
  * use clone().
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  * 
@@ -32,7 +31,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
  * @see ITmfEventField
  * @see ITmfTrace
 */
-public class TmfEvent implements ITmfEvent {
+public class TmfEvent implements ITmfEvent, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes

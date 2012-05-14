@@ -14,11 +14,11 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+
 /**
  * A generic timestamp implementation. The timestamp is represented by the
  * tuple { value, scale, precision }.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -186,7 +186,7 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#normalize(long, int)
      */
     @Override
-    public ITmfTimestamp normalize(final long offset, final int scale) throws ArithmeticException {
+    public ITmfTimestamp normalize(final long offset, final int scale) {
 
         long value = fValue;
         int precision = fPrecision;

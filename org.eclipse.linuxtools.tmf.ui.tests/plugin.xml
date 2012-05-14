@@ -56,4 +56,22 @@
     </uml2SDLoader>
  </extension>
 
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetype">
+      <category
+            id="org.eclipse.linuxtools.tmf.tests.category.tracetype"
+            name="Test trace">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.tmf.tests.category.tracetype"
+            event_type="org.eclipse.linuxtools.tmf.core.event.TmfEvent"
+            id="org.eclipse.linuxtools.tmf.tests.tracetype"
+            name="TMF Tests"
+            trace_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
+         <eventsTableType
+               class="org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable">
+         </eventsTableType>
+      </type>
+   </extension>
+
 </plugin>
