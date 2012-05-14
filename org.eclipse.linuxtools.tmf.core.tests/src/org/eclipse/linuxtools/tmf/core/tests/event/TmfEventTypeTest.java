@@ -20,8 +20,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 
 /**
- * <b><u>TmfEventTypeTest</u></b>
- * <p>
  * Test suite for the TmfEventType class.
  */
 @SuppressWarnings("nls")

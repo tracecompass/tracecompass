@@ -86,7 +86,7 @@ public class LttngEventContentTest extends TestCase {
         try {
             testStream = null;
             final LTTngTextTrace tmpStream = initializeEventStream();
-            tmpEventContent = (LttngEventContent)tmpStream.readNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent();
+            tmpEventContent = (LttngEventContent)tmpStream.getNext( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent();
         }
         catch (final Exception e) {
             fail("ERROR : Failed to get content!");
@@ -148,7 +148,7 @@ public class LttngEventContentTest extends TestCase {
         // Require an event
         tmpStream = initializeEventStream();
         tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
-        tmpEvent = (LttngEvent)tmpStream.readNextEvent(tmpContext);
+        tmpEvent = (LttngEvent)tmpStream.getNext(tmpContext);
         testContent = prepareToTest();
         // getFieldS()
         assertNotSame("getFields() returned null!", null, testContent.getFields() );
@@ -177,10 +177,10 @@ public class LttngEventContentTest extends TestCase {
         // Skip first events and seek to event pass metadata
         tmpContext= tmpStream.seekEvent(new LttngTimestamp(timestampAfterMetadata) );
         // Skip first one
-        tmpEvent = (LttngEvent)tmpStream.readNextEvent(tmpContext);
+        tmpEvent = (LttngEvent)tmpStream.getNext(tmpContext);
 
         // Second event past metadata should have more fields
-        tmpEvent = (LttngEvent)tmpStream.readNextEvent(tmpContext);
+        tmpEvent = (LttngEvent)tmpStream.getNext(tmpContext);
         // Get the content
         testContent = tmpEvent.getContent();
 
@@ -211,7 +211,7 @@ public class LttngEventContentTest extends TestCase {
         // Require an event
         tmpStream = initializeEventStream();
         tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
-        tmpEvent = (LttngEvent)tmpStream.readNextEvent(tmpContext);
+        tmpEvent = (LttngEvent)tmpStream.getNext(tmpContext);
 
         final LttngEventContent tmpContent = prepareToTest();
         try {
@@ -240,7 +240,7 @@ public class LttngEventContentTest extends TestCase {
         // Require an event
         tmpStream = initializeEventStream();
         tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
-        tmpEvent = (LttngEvent)tmpStream.readNextEvent(tmpContext);
+        tmpEvent = (LttngEvent)tmpStream.getNext(tmpContext);
         // Get the content
         testContent = tmpEvent.getContent();
         // Get all the fields to make sure there is something in the HashMap

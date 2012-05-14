@@ -16,14 +16,13 @@ package org.eclipse.linuxtools.tmf.core.event;
  * The generic event payload in TMF. Each field can be either a terminal or
  * further decomposed into subfields.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
  * @see ITmfEvent
  * @see ITmfEventType
  */
-public interface ITmfEventField extends Cloneable {
+public interface ITmfEventField {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -72,10 +71,6 @@ public interface ITmfEventField extends Cloneable {
      * @return a specific subfield by index (null if absent or inexistent)
      */
     public ITmfEventField getField(int index);
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the event field

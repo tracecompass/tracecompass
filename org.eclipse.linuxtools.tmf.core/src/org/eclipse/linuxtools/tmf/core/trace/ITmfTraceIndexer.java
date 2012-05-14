@@ -18,7 +18,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 /**
  * The generic trace indexer in TMF.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *

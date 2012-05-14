@@ -767,7 +767,7 @@ public class CtfTmfTraceTest {
         CtfTmfTrace fixture = initTrace();
         ITmfContext context = fixture.seekEvent(0);
 
-        CtfTmfEvent result = fixture.readNextEvent(context);
+        CtfTmfEvent result = fixture.getNext(context);
 
         // add additional test code here
         // An unexpected exception was thrown in user code while executing this test:

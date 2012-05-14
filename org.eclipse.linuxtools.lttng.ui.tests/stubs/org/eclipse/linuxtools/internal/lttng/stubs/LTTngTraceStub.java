@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -55,7 +56,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(final IResource resource) throws TmfTraceException {
-        this(resource, DEFAULT_TRACE_CACHE_SIZE);
+        this(resource, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE);
     }
 
     /**
@@ -76,7 +77,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
     }
 
     public void indexTrace() {
-        fIndexer.buildIndex(true);
+        getIndexer().buildIndex(true);
     }
 
     // ========================================================================

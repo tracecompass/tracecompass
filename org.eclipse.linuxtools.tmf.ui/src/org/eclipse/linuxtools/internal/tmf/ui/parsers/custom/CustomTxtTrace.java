@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
@@ -168,9 +167,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     }
 
     @Override
-    public synchronized TmfEvent readNextEvent(final ITmfContext context) {
+    public synchronized CustomTxtEvent getNext(final ITmfContext context) {
         final ITmfContext savedContext = context.clone();
-        final TmfEvent event = parseEvent(context);
+        final CustomTxtEvent event = parseEvent(context);
         if (event != null) {
             updateAttributes(savedContext, event.getTimestamp());
             context.increaseRank();

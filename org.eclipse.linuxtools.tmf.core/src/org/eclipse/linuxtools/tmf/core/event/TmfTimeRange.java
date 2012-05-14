@@ -16,7 +16,6 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * A utility class to define and manage time ranges.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  * 
@@ -38,7 +37,7 @@ public final class TmfTimeRange implements Cloneable {
      * The null time range
      */
     public static final TmfTimeRange NULL_RANGE =
-            new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_BANG);
+            new TmfTimeRange(TmfTimestamp.BIG_CRUNCH, TmfTimestamp.BIG_BANG);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -163,7 +162,7 @@ public final class TmfTimeRange implements Cloneable {
      * @see java.lang.Object#clone()
      */
     @Override
-    public TmfTimeRange clone() {
+    public TmfTimeRange clone() throws CloneNotSupportedException {
         TmfTimeRange clone = null;
         try {
             clone = (TmfTimeRange) super.clone();
