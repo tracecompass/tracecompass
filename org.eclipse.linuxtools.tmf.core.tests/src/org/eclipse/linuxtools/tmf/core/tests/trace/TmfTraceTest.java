@@ -390,6 +390,7 @@ public class TmfTraceTest extends TestCase {
 
         // InitTrace and wait for indexing completion...
         trace.initTrace(null, testfile.getPath(), TmfEvent.class);
+        trace.indexTrace();
         int nbSecs = 0;
         while (trace.getNbEvents() < NB_EVENTS && nbSecs < 10) {
             Thread.sleep(1000);

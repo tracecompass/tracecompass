@@ -54,7 +54,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     private static int          NB_EVENTS    = 20000;
     private static int          BLOCK_SIZE   = 1000;
 
-    private static ITmfTrace<?>[] fTraces;
+    private static ITmfTrace<?>[] fTestTraces;
     private static TestExperiment fExperiment;
 
     // ------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     private class TestExperiment extends TmfExperiment<ITmfEvent> {
         @SuppressWarnings("unchecked")
         public TestExperiment() {
-            super(ITmfEvent.class, EXPERIMENT, (ITmfTrace<ITmfEvent>[]) fTraces, TmfTimestamp.ZERO, BLOCK_SIZE, false);
+            super(ITmfEvent.class, EXPERIMENT, (ITmfTrace<ITmfEvent>[]) fTestTraces, TmfTimestamp.ZERO, BLOCK_SIZE, false);
             setIndexer(new TestIndexer(this));
             getIndexer().buildIndex(true);
         }
@@ -109,17 +109,17 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     }
 
     private static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
-        if (fTraces == null) {
-            fTraces = new ITmfTrace[2];
+        if (fTestTraces == null) {
+            fTestTraces = new ITmfTrace[2];
             try {
                 URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path1), null);
                 File test = new File(FileLocator.toFileURL(location).toURI());
                 final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true);
-                fTraces[0] = trace1;
+                fTestTraces[0] = trace1;
                 location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path2), null);
                 test = new File(FileLocator.toFileURL(location).toURI());
                 final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true);
-                fTraces[1] = trace2;
+                fTestTraces[1] = trace2;
             } catch (final TmfTraceException e) {
                 e.printStackTrace();
             } catch (final URISyntaxException e) {
@@ -128,7 +128,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
                 e.printStackTrace();
             }
         }
-        return fTraces;
+        return fTestTraces;
     }
 
     // ------------------------------------------------------------------------
@@ -157,8 +157,8 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
             trcContexts[0] = new TmfContext(locations.getLocations()[0], (i * pageSize) / 2);
             trcContexts[1] = new TmfContext(locations.getLocations()[1], (i * pageSize) / 2);
             TmfExperimentContext expContext = new TmfExperimentContext(trcContexts);
-            expContext.getEvents()[0] = fTraces[0].getNext(fTraces[0].seekEvent((i * pageSize) / 2));
-            expContext.getEvents()[1] = fTraces[1].getNext(fTraces[1].seekEvent((i * pageSize) / 2));
+            expContext.getEvents()[0] = fTestTraces[0].getNext(fTestTraces[0].seekEvent((i * pageSize) / 2));
+            expContext.getEvents()[1] = fTestTraces[1].getNext(fTestTraces[1].seekEvent((i * pageSize) / 2));
             ITmfEvent event = fExperiment.parseEvent(expContext);
             assertTrue(expContext.getRank() == i * pageSize);
             assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));

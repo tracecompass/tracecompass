@@ -183,7 +183,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     }
 
     public void indexTrace() {
-        getIndexer().buildIndex(true);
+        indexTrace(true);
     }
 
     @Override

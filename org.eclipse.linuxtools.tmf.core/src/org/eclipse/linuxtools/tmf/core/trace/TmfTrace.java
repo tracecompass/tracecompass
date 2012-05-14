@@ -192,7 +192,6 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @Override
     public void initTrace(final IResource resource, final String path, final Class<T> type) throws TmfTraceException {
         initialize(resource, path, type);
-        fIndexer.buildIndex(false);
     }
 
     /**
@@ -236,6 +235,15 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     protected boolean fileExists(final String path) {
         final File file = new File(path);
         return file.exists();
+    }
+
+    /**
+     * Index the trace
+     * 
+     * @param waitForCompletion index synchronously (true) or not (false)
+     */
+    protected void indexTrace(boolean waitForCompletion) {
+        getIndexer().buildIndex(waitForCompletion);
     }
 
     // ------------------------------------------------------------------------
