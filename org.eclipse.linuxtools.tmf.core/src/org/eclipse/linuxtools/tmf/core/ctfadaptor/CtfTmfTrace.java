@@ -81,17 +81,22 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
             throws TmfTraceException {
+        EventDeclaration ed;
+        ITmfEventField eventField;
+        @SuppressWarnings("unused")
+        CtfTmfEventType type;
+
         this.fResource = resource;
         try {
             this.fTrace = new CTFTrace(path);
             for( int i =0 ; i< this.fTrace.getNbEventTypes(); i++) {
-                EventDeclaration ed = this.fTrace.getEventType(i);
-                ITmfEventField eventField = parseDeclaration(ed);
+                ed = this.fTrace.getEventType(i);
+                eventField = parseDeclaration(ed);
                 /*
                  * Populate the event manager with event types that are there in
                  * the beginning.
                  */
-                new CtfTmfEventType(ed.getName(), eventField);
+                type = new CtfTmfEventType(ed.getName(), eventField);
             }
 
             /* Set the start and (current) end times for this trace */

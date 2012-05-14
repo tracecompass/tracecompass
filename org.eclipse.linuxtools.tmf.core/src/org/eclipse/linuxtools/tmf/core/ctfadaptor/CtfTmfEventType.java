@@ -26,8 +26,7 @@ public class CtfTmfEventType extends TmfEventType {
      * @param eventName String
      * @param content ITmfEventField
      */
-    public CtfTmfEventType( String eventName,
-            ITmfEventField content) {
+    public CtfTmfEventType(String eventName, ITmfEventField content) {
         super(CONTEXT_ID, eventName, content);
     }
 
@@ -36,8 +35,7 @@ public class CtfTmfEventType extends TmfEventType {
      * @return String
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.getName();
     }
 
