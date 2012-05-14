@@ -87,8 +87,24 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
             for( int i =0 ; i< this.fTrace.getNbEventTypes(); i++) {
                 EventDeclaration ed = this.fTrace.getEventType(i);
                 ITmfEventField eventField = parseDeclaration(ed);
+                /*
+                 * Populate the event manager with event types that are there in
+                 * the beginning.
+                 */
                 new CtfTmfEventType(ed.getName(), eventField);
             }
+
+            /* Set the start and (current) end times for this trace */
+            final CtfIterator iterator = new CtfIterator(this, 0, 0);
+            if(iterator.getLocation().equals(CtfIterator.NULL_LOCATION)) {
+                /* Handle the case where the trace is empty */
+                this.setStartTime(TmfTimestamp.BIG_BANG);
+            } else {
+                this.setStartTime(iterator.getCurrentEvent().getTimestamp());
+                iterator.goToLastEvent();
+                this.setEndTime(iterator.getCurrentEvent().getTimestamp());
+            }
+
         } catch (final CTFReaderException e) {
             /*
              * If it failed at the init(), we can assume it's because the file
@@ -97,13 +113,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
              */
             throw new TmfTraceException(e.getMessage());
         }
-        CtfIterator iterator = new CtfIterator(this, 0, 0);
-        setStartTime(TmfTimestamp.BIG_BANG);
-        if( !iterator.getLocation().equals(CtfIterator.NULL_LOCATION)) {
-            setStartTime(iterator.getCurrentEvent().getTimestamp());
-        }
+
         TmfSignalManager.register(this);
-        // FIXME this should become a request
+        //FIXME This should be called via the ExperimentUpdated signal
         buildStateSystem();
 
         /* Refresh the project, so it can pick up new files that got created. */
