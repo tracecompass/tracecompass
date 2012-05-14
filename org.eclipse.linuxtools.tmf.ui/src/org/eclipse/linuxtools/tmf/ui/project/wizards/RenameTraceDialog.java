@@ -217,7 +217,7 @@ public class RenameTraceDialog extends SelectionStatusDialog {
                         }
                     }
 
-                    fTrace.renameSupplementaryFiles(newName);
+                    fTrace.renameSupplementaryFolder(newName);
                     fTrace.getResource().move(newPath, IResource.FORCE | IResource.SHALLOW, null);
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();

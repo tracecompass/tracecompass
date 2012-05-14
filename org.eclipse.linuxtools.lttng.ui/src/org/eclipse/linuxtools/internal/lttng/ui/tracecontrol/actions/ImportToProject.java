@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResour
 import org.eclipse.linuxtools.internal.lttng.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.dialogs.ImportTraceDialog;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.ISubSystem;
@@ -271,9 +271,9 @@ public class ImportToProject implements IObjectActionDelegate, IWorkbenchWindowA
             folder.createLink(sourceFolder.toURI(), IResource.REPLACE, null);
             // Set the trace properties for this resource
             // FIXME: update from extension point properties
-            folder.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, Activator.PLUGIN_ID);
-            folder.setPersistentProperty(TmfTraceElement.TRACETYPE, "org.eclipse.linuxtools.lttng.tracetype.kernel"); //$NON-NLS-1$
-            folder.setPersistentProperty(TmfTraceElement.TRACEICON, "icons/obj16/tux2.png"); //$NON-NLS-1$
+            folder.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, Activator.PLUGIN_ID);
+            folder.setPersistentProperty(TmfCommonConstants.TRACETYPE, "org.eclipse.linuxtools.lttng.tracetype.kernel"); //$NON-NLS-1$
+            folder.setPersistentProperty(TmfCommonConstants.TRACEICON, "icons/obj16/tux2.png"); //$NON-NLS-1$
         } catch (CoreException e) {
             MessageDialog.openWarning(shell,
                     Messages.ImportToProject_ImportFailed,

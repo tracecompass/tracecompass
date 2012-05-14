@@ -31,13 +31,13 @@ import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
@@ -123,7 +123,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
                 if (resource == null) {
                     return new TmfEventsTable(parent, cacheSize);
                 }
-                String traceType = resource.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                String traceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
                 if (commonTraceType != null && !commonTraceType.equals(traceType)) {
                     return new TmfEventsTable(parent, cacheSize);
                 }

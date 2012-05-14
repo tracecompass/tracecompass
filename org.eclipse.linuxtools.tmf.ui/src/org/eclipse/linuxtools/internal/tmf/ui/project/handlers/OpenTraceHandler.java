@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -34,7 +35,6 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.EventsViewEditor;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorInput;
@@ -116,12 +116,7 @@ public class OpenTraceHandler extends AbstractHandler {
             return null;
 
         // If trace is under an experiment, use the original trace from the traces folder
-        if (fTrace.getParent() instanceof TmfExperimentElement)
-            for (final TmfTraceElement trace : fTrace.getProject().getTracesFolder().getTraces())
-                if (trace.getName().equals(fTrace.getName())) {
-                    fTrace = trace;
-                    break;
-                }
+        fTrace = fTrace.getElementUnderTraceFolder();
 
         final ITmfTrace trace = fTrace.instantiateTrace();
         final ITmfEvent traceEvent = fTrace.instantiateEvent();
@@ -137,7 +132,7 @@ public class OpenTraceHandler extends AbstractHandler {
         try {
             trace.initTrace(fTrace.getResource(), fTrace.getLocation().getPath(), traceEvent.getClass());
         } catch (final TmfTraceException e) {
-            displayErrorMsg(Messages.OpenTraceHandler_NoTrace);
+            displayErrorMsg(Messages.OpenTraceHandler_NoTrace + "\n\n" + e); //$NON-NLS-1$
             return null;
         }
 
@@ -160,9 +155,9 @@ public class OpenTraceHandler extends AbstractHandler {
                     file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
                 file.setHidden(true);
                 if (usesEditor)
-                    file.setPersistentProperty(TmfTraceElement.TRACETYPE, fTrace.getTraceType());
+                    file.setPersistentProperty(TmfCommonConstants.TRACETYPE, fTrace.getTraceType());
                 else
-                    file.setPersistentProperty(TmfTraceElement.TRACETYPE, TmfTrace.class.getCanonicalName());
+                    file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfTrace.class.getCanonicalName());
             } catch (final CoreException e) {
                 e.printStackTrace();
             }

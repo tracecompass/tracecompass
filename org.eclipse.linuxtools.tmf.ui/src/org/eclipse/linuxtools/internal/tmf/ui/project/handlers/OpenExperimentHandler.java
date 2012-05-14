@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -117,7 +118,7 @@ public class OpenExperimentHandler extends AbstractHandler {
             if (!file.exists())
                 file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
             file.setHidden(true);
-            file.setPersistentProperty(TmfTraceElement.TRACETYPE, TmfExperiment.class.getCanonicalName());
+            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfExperiment.class.getCanonicalName());
 
             // Instantiate the experiment's traces
             final List<TmfTraceElement> traceEntries = fExperiment.getTraces();

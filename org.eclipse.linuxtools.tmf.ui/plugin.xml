@@ -538,7 +538,7 @@
                         </instanceof>
                         <test
                               forcePluginActivation="true"
-                              property="org.eclipse.linuxtools.tmf.ui.hasHistoryFile">
+                              property="org.eclipse.linuxtools.tmf.ui.hasSupplementaryFiles">
                         </test>
                      </and>
                   </iterate>
@@ -771,7 +771,7 @@
                         </instanceof>
                         <test
                               forcePluginActivation="true"
-                              property="org.eclipse.linuxtools.tmf.ui.hasHistoryFile">
+                              property="org.eclipse.linuxtools.tmf.ui.hasSupplementaryFiles">
                         </test>
                      </and>
                   </iterate>
@@ -1193,7 +1193,7 @@
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.TracePropertyTester"
             id="org.eclipse.linuxtools.tmf.ui.tracePropertyTester"
             namespace="org.eclipse.linuxtools.tmf.ui"
-            properties="isExperimentTrace,hasHistoryFile"
+            properties="isExperimentTrace,hasSupplementaryFiles"
             type="org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement">
       </propertyTester>
    </extension>

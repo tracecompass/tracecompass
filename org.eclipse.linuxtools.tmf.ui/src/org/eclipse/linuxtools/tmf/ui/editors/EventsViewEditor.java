@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -103,7 +104,7 @@ public class EventsViewEditor extends TmfEditor {
                 return;
             }
             try {
-                final String traceTypeId = fFile.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                final String traceTypeId = fFile.getPersistentProperty(TmfCommonConstants.TRACETYPE);
                 if (traceTypeId == null)
                     throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                 if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {

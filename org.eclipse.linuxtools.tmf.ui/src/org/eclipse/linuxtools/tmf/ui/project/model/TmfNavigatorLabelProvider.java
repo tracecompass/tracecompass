@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISharedImages;
@@ -85,8 +86,8 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
             TmfTraceElement trace = (TmfTraceElement) element;
             String icon = null;
             try {
-                String name = trace.getResource().getPersistentProperty(TmfTraceElement.TRACEBUNDLE);
-                icon = trace.getResource().getPersistentProperty(TmfTraceElement.TRACEICON);
+                String name = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACEBUNDLE);
+                icon = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACEICON);
                 if (name != null && icon != null) {
                     Bundle bundle = Platform.getBundle(name);
                     return loadIcon(bundle, icon);
