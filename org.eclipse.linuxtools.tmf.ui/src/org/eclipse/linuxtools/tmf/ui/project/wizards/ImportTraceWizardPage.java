@@ -49,7 +49,6 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
@@ -815,9 +814,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                         if (resource != null) {
                             try {
                                 // Set the trace properties for this resource
-                                resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, traceBundle);
-                                resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
-                                resource.setPersistentProperty(TmfCommonConstants.TRACEICON, traceIcon);
+                                resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, traceBundle);
+                                resource.setPersistentProperty(TmfTraceElement.TRACETYPE, traceTypeId);
+                                resource.setPersistentProperty(TmfTraceElement.TRACEICON, traceIcon);
                                 for (TmfTraceElement traceElement : TmfProjectRegistry.getProject(resource.getProject()).getTracesFolder().getTraces()) {
                                     if (traceElement.getName().equals(resource.getName())) {
                                         traceElement.refreshTraceType();

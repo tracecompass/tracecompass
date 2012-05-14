@@ -193,10 +193,12 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
             for (IResource resource : members) {
                 String name = resource.getName();
                 ITmfProjectModelElement trace = childrenMap.get(name);
-                if (trace == null) {
-                    trace = new TmfTraceElement(name, resource, tmfTraceFolder);
+                if (!name.startsWith(TmfTraceElement.SUPPLEMENATARY_FILES_PREFIX)) {
+                    if (trace == null) {
+                        trace = new TmfTraceElement(name, resource, tmfTraceFolder);
+                    }
+                    children.add(trace);
                 }
-                children.add(trace);
                 childrenMap.remove(name);
             }
         } catch (CoreException e) {

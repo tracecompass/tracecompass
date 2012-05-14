@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -142,12 +141,6 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
                 folder.create(true, true, null);
 
             folder = project.getFolder(TmfExperimentFolder.EXPER_FOLDER_NAME);
-            if (!folder.exists())
-                folder.create(true, true, null);
-
-            // create folder for supplementary tracing files
-            folder = project.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
-
             if (!folder.exists())
                 folder.create(true, true, null);
 

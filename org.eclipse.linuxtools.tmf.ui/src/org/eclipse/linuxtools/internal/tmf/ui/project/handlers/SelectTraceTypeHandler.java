@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -109,7 +109,16 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         boolean ok = true;
         for (Object element : fSelection.toList()) {
             TmfTraceElement trace = (TmfTraceElement) element;
-            trace = trace.getElementUnderTraceFolder();
+            // If trace is under an experiment, use the original trace from the traces folder
+            if (trace.getParent() instanceof TmfExperimentElement) {
+                for (TmfTraceElement aTrace : trace.getProject().getTracesFolder().getTraces()) {
+                    if (aTrace.getName().equals(trace.getName())) {
+                        trace = aTrace;
+                        break;
+                    }
+                }
+            }
+
             IResource resource = trace.getResource();
             if (resource != null) {
                 try {
@@ -138,9 +147,9 @@ public class SelectTraceTypeHandler extends AbstractHandler {
     private boolean propagateProperties(TmfTraceElement trace, String bundleName, String traceType, String iconUrl) throws CoreException {
 
         IResource svResource = trace.getResource();
-        String svBundleName = svResource.getPersistentProperty(TmfCommonConstants.TRACEBUNDLE);
-        String svTraceType = svResource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
-        String svIconUrl = svResource.getPersistentProperty(TmfCommonConstants.TRACEICON);
+        String svBundleName = svResource.getPersistentProperty(TmfTraceElement.TRACEBUNDLE);
+        String svTraceType = svResource.getPersistentProperty(TmfTraceElement.TRACETYPE);
+        String svIconUrl = svResource.getPersistentProperty(TmfTraceElement.TRACEICON);
 
         setProperties(trace.getResource(), bundleName, traceType, iconUrl);
         trace.refreshTraceType();
@@ -172,9 +181,9 @@ public class SelectTraceTypeHandler extends AbstractHandler {
     }
 
     private void setProperties(IResource resource, String bundleName, String traceType, String iconUrl) throws CoreException {
-        resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
-        resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
-        resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
+        resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, bundleName);
+        resource.setPersistentProperty(TmfTraceElement.TRACETYPE, traceType);
+        resource.setPersistentProperty(TmfTraceElement.TRACEICON, iconUrl);
     }
 
     private boolean validateTraceType(TmfTraceElement trace) {

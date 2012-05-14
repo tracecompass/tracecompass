@@ -33,7 +33,6 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -99,7 +98,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (fFile == null)
                 throw new PartInitException("Invalid IFileEditorInput: " + input); //$NON-NLS-1$
             try {
-                final String traceTypeId = fFile.getPersistentProperty(TmfCommonConstants.TRACETYPE);
+                final String traceTypeId = fFile.getPersistentProperty(TmfTraceElement.TRACETYPE);
                 if (traceTypeId == null)
                     throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                 if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
@@ -275,7 +274,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         try {
             if (fTrace.getResource() == null)
                 return null;
-            final String traceType = fTrace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
+            final String traceType = fTrace.getResource().getPersistentProperty(TmfTraceElement.TRACETYPE);
             if (traceType == null)
                 return null;
             if (traceType.startsWith(CustomTxtTrace.class.getCanonicalName()))
@@ -337,7 +336,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 final IResource resource = trace.getResource();
                 if (resource == null)
                     return null;
-                final String traceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
+                final String traceType = resource.getPersistentProperty(TmfTraceElement.TRACETYPE);
                 if ((commonTraceType != null) && !commonTraceType.equals(traceType))
                     return null;
                 commonTraceType = traceType;
@@ -453,7 +452,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             try {
                 fTrace.getName();
                 fTrace = null;
-                final String traceTypeId = fFile.getPersistentProperty(TmfCommonConstants.TRACETYPE);
+                final String traceTypeId = fFile.getPersistentProperty(TmfTraceElement.TRACETYPE);
                 if (traceTypeId != null)
                     for (final IConfigurationElement ce : TmfTraceType.getTypeElements())
                         if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {

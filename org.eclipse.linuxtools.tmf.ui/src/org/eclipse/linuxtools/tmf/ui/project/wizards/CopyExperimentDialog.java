@@ -27,11 +27,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -203,7 +203,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
                     IFolder folder = fExperimentFolder.getFolder(newName);
                     if (folder.exists()) {
                         for (IResource member : folder.members()) {
-                            if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
+                            if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfTraceElement.TRACETYPE))) {
                                 member.delete(true, null);
                             }
                         }

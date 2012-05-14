@@ -45,7 +45,7 @@ public class Messages extends NLS {
 	public static String SelectTracesWizardPage_WindowTitle;
 	public static String SelectTracesWizardPage_Description;
 
-    public static String Dialog_EmptyNameError;
+	public static String Dialog_EmptyNameError;
     public static String Dialog_ExistingNameError;
 
     public static String NewExperimentDialog_DialogTitle;
@@ -68,10 +68,10 @@ public class Messages extends NLS {
     public static String CopyTraceDialog_TraceNewName;
 
     static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-    private Messages() {
-    }
+	private Messages() {
+	}
 }

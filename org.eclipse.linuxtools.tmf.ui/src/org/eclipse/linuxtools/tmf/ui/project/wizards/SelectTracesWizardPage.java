@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -167,9 +166,9 @@ public class SelectTracesWizardPage extends WizardPage {
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
             Map<QualifiedName, String> properties = trace.getResource().getPersistentProperties();
-            String bundleName = properties.get(TmfCommonConstants.TRACEBUNDLE);
-            String traceType = properties.get(TmfCommonConstants.TRACETYPE);
-            String iconUrl = properties.get(TmfCommonConstants.TRACEICON);
+            String bundleName = properties.get(TmfTraceElement.TRACEBUNDLE);
+            String traceType = properties.get(TmfTraceElement.TRACETYPE);
+            String iconUrl = properties.get(TmfTraceElement.TRACEICON);
             
             if (resource instanceof IFolder) {
                 IFolder folder = experiment.getFolder(trace.getName());
@@ -195,9 +194,9 @@ public class SelectTracesWizardPage extends WizardPage {
     }
 
     private void setProperties(IResource resource, String bundleName, String traceType, String iconUrl) throws CoreException {
-        resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
-        resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
-        resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
+        resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, bundleName);
+        resource.setPersistentProperty(TmfTraceElement.TRACETYPE, traceType);
+        resource.setPersistentProperty(TmfTraceElement.TRACEICON, iconUrl);
     }
 
     /**
