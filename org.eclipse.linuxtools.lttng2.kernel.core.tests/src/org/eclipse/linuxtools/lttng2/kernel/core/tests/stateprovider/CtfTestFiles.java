@@ -34,13 +34,9 @@ public abstract class CtfTestFiles {
     public final static long startTime = 1331668247314038062L;
     public final static long endTime = 1331668259054285979L; /* Expected end time of history */
 
-    private static CtfTmfTrace trace = null;
-
     public synchronized static CtfTmfTrace getTestTrace() throws TmfTraceException {
-        if (trace == null) {
-            trace = new CtfTmfTrace();
-            trace.initTrace(null, traceFile, CtfTmfEvent.class);
-        }
+        CtfTmfTrace trace = new CtfTmfTrace();
+        trace.initTrace(null, traceFile, CtfTmfEvent.class);
         return trace;
     }
 
