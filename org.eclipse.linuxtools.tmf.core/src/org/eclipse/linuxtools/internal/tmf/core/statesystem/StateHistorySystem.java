@@ -249,6 +249,13 @@ public class StateHistorySystem extends StateSystem implements
 
             intervals.add(currentInterval);
         }
+
+        /* Add the interval at t2, if it wasn't included already. */
+        if (currentInterval.getEndTime() < t2 &&
+                t2 <= this.getCurrentEndTime()) {
+            currentInterval = querySingleState(t2, attributeQuark);
+            intervals.add(currentInterval);
+        } 
         return intervals;
     }
 
