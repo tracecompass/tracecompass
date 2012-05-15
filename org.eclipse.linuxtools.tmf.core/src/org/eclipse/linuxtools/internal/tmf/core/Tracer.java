@@ -10,7 +10,6 @@ import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 
 @SuppressWarnings("nls")
@@ -128,15 +127,19 @@ public class Tracer {
     }
 
     // Tracers
-    public static void trace(String msg) {
+    public static synchronized void trace(String msg) {
         long currentTime = System.currentTimeMillis();
         StringBuilder message = new StringBuilder("[");
         message.append(currentTime / 1000);
         message.append(".");
         message.append(String.format("%1$03d", currentTime % 1000));
         message.append("] ");
+
+        message.append("[Th=");
+        message.append(String.format("%1$03d", Thread.currentThread().getId()));
+        message.append("] ");
+
         message.append(msg);
-//		System.out.println(message);
 
         if (fTraceLog != null) {
             try {
@@ -155,17 +158,8 @@ public class Tracer {
     }
 
     public static void traceRequest(ITmfDataRequest<?> request, String msg) {
-        String message = ("[REQ] Req=" + request.getRequestId()
-                + (request.getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? " (BG)" : " (FG)") + " Thread="
-                + Thread.currentThread().getId() + " Type=" + simpleType(request.getClass().getName()) + " Index="
-                + request.getIndex() + " NbReq=" + request.getNbRequested()
-                + (request instanceof ITmfEventRequest ? " Range=" + ((ITmfEventRequest<?>) request).getRange() : "")
-                + " DataType=" + request.getDataType().getSimpleName() + " " + msg);
+        String message = ("[REQ] Req=" + request.getRequestId() + " " + msg);
         trace(message);
-    }
-
-    private static String simpleType(String type) {
-        return type.substring(type.lastIndexOf('.') + 1);
     }
 
     public static void traceSignal(TmfSignal signal, String msg) {

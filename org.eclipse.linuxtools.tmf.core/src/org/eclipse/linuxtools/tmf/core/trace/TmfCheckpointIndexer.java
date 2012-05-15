@@ -125,6 +125,8 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         };
         job.schedule();
 
+        System.out.println("TmfCheckpointIndexer.buildIndex()");;
+
         // Clear the checkpoints
         fTraceIndex.clear();
 
@@ -208,7 +210,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             if (fTraceIndex.size() == position) {
                 final ITmfLocation<?> location = context.getLocation().clone();
                 fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), location));
-                System.out.println(this + "[" + (fTraceIndex.size() - 1) + "] " + timestamp + ", " + location.toString());
+                System.out.println("TmfCheckpointIndexer.updateIndex()" + "[" + (fTraceIndex.size() - 1) + "] " + timestamp + ", " + location.toString());
             }
         }
     }

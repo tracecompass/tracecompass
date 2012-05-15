@@ -74,7 +74,8 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
                     eventRequest.getIndex(), eventRequest.getNbRequested(), eventRequest.getBlockSize(), eventRequest.getExecType());
             coalescedRequest.addRequest(eventRequest);
             if (Tracer.isRequestTraced()) {
-                Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                Tracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                Tracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
             }
             fPendingCoalescedRequests.add(coalescedRequest);
         } else {

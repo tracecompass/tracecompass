@@ -149,6 +149,17 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 		return ok;
 	}
 
+	@SuppressWarnings("nls")
+    public String getSubRequestIds() {
+	    StringBuffer result = new StringBuffer("[");
+	    for (int i = 0; i < fRequests.size(); i++) {
+	        if (i != 0) result.append(", ");
+	        result.append(fRequests.get(i).getRequestId());
+	    }
+	    result.append("]");
+	    return result.toString();
+	}
+
     // ------------------------------------------------------------------------
     // ITmfDataRequest
     // ------------------------------------------------------------------------
