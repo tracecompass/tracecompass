@@ -53,8 +53,9 @@ public class HistoryBuilder implements Runnable {
      */
     public HistoryBuilder(IStateChangeInput stateChangeInput,
             IStateHistoryBackend backend) throws IOException {
-        assert (stateChangeInput != null);
-        assert (backend != null);
+        if (stateChangeInput == null || backend == null) {
+            throw new IllegalArgumentException();
+        }
 
         sci = stateChangeInput;
         hb = backend;
@@ -84,7 +85,7 @@ public class HistoryBuilder implements Runnable {
     public void run() {
         /* Send a TMF request for all the events in the trace */
         final ITmfEventRequest<CtfTmfEvent> request;
-        request = new StateSystemBuildRequest(sci);
+        request = new StateSystemBuildRequest(this);
 
         /* Submit the request and wait for completion */
         sci.getTrace().sendRequest(request);
@@ -114,20 +115,37 @@ public class HistoryBuilder implements Runnable {
     public IStateSystemQuerier getStateSystemQuerier() {
         return shs;
     }
+
+    /**
+     * @name Methods reserved for the request object below
+     */
+    
+    /** Get the input plugin object */
+    IStateChangeInput getInputPlugin() {
+        return sci;
+    }
+
+    /** Tell the backend to cleanup if the request is cancelled */
+    void cleanup() {
+        hb.removeFiles();
+    }
 }
+
 
 class StateSystemBuildRequest extends TmfEventRequest<CtfTmfEvent> {
 
     /** The amount of events queried at a time through the requests */
     private final static int chunkSize = 50000;
 
+    private final HistoryBuilder builder;
     private final IStateChangeInput sci;
 
-    StateSystemBuildRequest(IStateChangeInput sci) {
-        super((Class<CtfTmfEvent>) sci.getExpectedEventType().getClass(),
+    StateSystemBuildRequest(HistoryBuilder builder) {
+        super((Class<CtfTmfEvent>) builder.getInputPlugin().getExpectedEventType().getClass(),
                 TmfTimeRange.ETERNITY, TmfDataRequest.ALL_DATA, chunkSize,
                 ITmfDataRequest.ExecutionType.BACKGROUND);
-        this.sci = sci;
+        this.builder = builder;
+        this.sci = builder.getInputPlugin();
     }
 
     @Override
@@ -141,6 +159,12 @@ class StateSystemBuildRequest extends TmfEventRequest<CtfTmfEvent> {
     @Override
     public void handleSuccess() {
         //
+    }
+
+    @Override
+    public void handleCancel() {
+        sci.dispose();
+        builder.cleanup();
     }
 
     @Override

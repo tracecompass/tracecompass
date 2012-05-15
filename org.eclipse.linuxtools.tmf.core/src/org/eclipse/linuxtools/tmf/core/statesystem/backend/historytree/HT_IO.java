@@ -33,6 +33,7 @@ class HT_IO {
     private final HistoryTree tree;
 
     /* Fields related to the file I/O */
+    private final File historyTreeFile;
     private FileInputStream fis;
     private FileOutputStream fos;
     private FileChannel fcIn;
@@ -48,7 +49,7 @@ class HT_IO {
      */
     HT_IO(HistoryTree tree, boolean newFile) throws IOException {
         this.tree = tree;
-        File historyTreeFile = tree.config.stateFile;
+        historyTreeFile = tree.config.stateFile;
         boolean success1 = true, success2;
 
         if (newFile) {
@@ -153,6 +154,13 @@ class HT_IO {
     long supplyATWriterFilePos() {
         return HistoryTree.getTreeHeaderSize()
                 + ((long) tree.getNodeCount() * tree.config.blockSize);
+    }
+
+    synchronized void deleteFile() {
+        if(!historyTreeFile.delete()) {
+            /* We didn't succeed in deleting the file */
+            //TODO log it?
+        }
     }
 
     /**
