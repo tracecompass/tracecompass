@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -392,6 +393,11 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
             currentLocation = new CtfLocation(0L);
         }
         CtfIterator context = new CtfIterator(this);
+        
+        if (currentLocation.getLocation() == CtfLocation.INVALID_LOCATION) {
+            ((CtfTmfTimestamp)getEndTime()).setType(TimestampType.NANOS);
+            currentLocation.setLocation( getEndTime().getValue() + 1);
+        }
         context.setLocation(currentLocation);
         context.setRank(ITmfContext.UNKNOWN_RANK);
         return context;

@@ -208,6 +208,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             if (fTraceIndex.size() == position) {
                 final ITmfLocation<?> location = context.getLocation().clone();
                 fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), location));
+                System.out.println(this + "[" + (fTraceIndex.size() - 1) + "] " + timestamp + ", " + location.toString());
             }
         }
     }
