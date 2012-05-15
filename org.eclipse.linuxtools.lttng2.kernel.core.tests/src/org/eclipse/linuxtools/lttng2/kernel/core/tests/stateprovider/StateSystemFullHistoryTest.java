@@ -128,7 +128,7 @@ public class StateSystemFullHistoryTest {
         int quark, valueInt;
         String valueStr;
 
-        list = ssb.loadStateAtTime(interestingTimestamp1);
+        list = ssb.queryFullState(interestingTimestamp1);
 
         quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         interval = list.get(quark);
@@ -248,14 +248,14 @@ public class StateSystemFullHistoryTest {
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime1() throws TimeRangeException {
         long ts = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC;
-        ssb.loadStateAtTime(ts);
+        ssb.queryFullState(ts);
 
     }
 
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime2() throws TimeRangeException {
         long ts = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC;
-        ssb.loadStateAtTime(ts);
+        ssb.queryFullState(ts);
 
     }
 
@@ -324,7 +324,7 @@ public class StateSystemFullHistoryTest {
         ITmfStateInterval interval;
         int quark;
 
-        list = ssb.loadStateAtTime(interestingTimestamp1);
+        list = ssb.queryFullState(interestingTimestamp1);
         quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         interval = list.get(quark);
 
@@ -339,7 +339,7 @@ public class StateSystemFullHistoryTest {
         ITmfStateInterval interval;
         int quark;
 
-        list = ssb.loadStateAtTime(interestingTimestamp1);
+        list = ssb.queryFullState(interestingTimestamp1);
         quark = ssb.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
         interval = list.get(quark);
 

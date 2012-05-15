@@ -193,18 +193,18 @@ public interface IStateSystemQuerier {
      *             If the 't' parameter is outside of the range of the state
      *             history.
      */
-    public List<ITmfStateInterval> loadStateAtTime(long t)
+    public List<ITmfStateInterval> queryFullState(long t)
             throws TimeRangeException;
 
     /**
      * Singular query method. This one does not update the whole stateInfo
-     * vector, like loadStateAtTimes() does. It only searches for one specific
+     * vector, like queryFullState() does. It only searches for one specific
      * entry in the state history.
      * 
      * It should be used when you only want very few entries, instead of the
      * whole state (or many entries, but all at different timestamps). If you do
      * request many entries all at the same time, you should use the
-     * conventional loadStateAtTime() + List.get() method.
+     * conventional queryFullState() + List.get() method.
      * 
      * @param t
      *            The timestamp at which we want the state
@@ -224,9 +224,9 @@ public interface IStateSystemQuerier {
      * attribute between timestamps t1 and t2. The list will be ordered by
      * ascending time.
      * 
-     * Note that contrary to loadStateAtTime(), the returned list here is in the
+     * Note that contrary to queryFullState(), the returned list here is in the
      * "direction" of time (and not in the direction of attributes, as is the
-     * case with loadStateAtTime()).
+     * case with queryFullState()).
      * 
      * @param attributeQuark
      *            Which attribute this query is interested in

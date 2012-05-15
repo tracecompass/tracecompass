@@ -116,7 +116,7 @@ public class StateHistorySystem extends StateSystem implements
      */
 
     @Override
-    public synchronized List<ITmfStateInterval> loadStateAtTime(long t)
+    public synchronized List<ITmfStateInterval> queryFullState(long t)
             throws TimeRangeException {
         List<ITmfStateInterval> stateInfo = new ArrayList<ITmfStateInterval>(
                 attributeTree.getNbAttributes());
