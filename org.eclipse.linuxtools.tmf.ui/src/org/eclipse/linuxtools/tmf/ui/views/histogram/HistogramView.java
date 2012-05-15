@@ -445,7 +445,7 @@ public class HistogramView extends TmfView {
         fCurrentTimestamp = 0;
 
         TmfTimeRange timeRange = fCurrentExperiment.getTimeRange();
-        if (timeRange != TmfTimeRange.NULL_RANGE) {
+        if (!timeRange.equals(TmfTimeRange.NULL_RANGE)) {
             fExperimentStartTime = timeRange.getStartTime().getValue();
             fExperimentEndTime = timeRange.getEndTime().getValue();
             fCurrentTimestamp = fExperimentStartTime;
