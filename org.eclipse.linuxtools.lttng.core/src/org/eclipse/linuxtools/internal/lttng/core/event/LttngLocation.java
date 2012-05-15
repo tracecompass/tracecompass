@@ -41,26 +41,8 @@ public class LttngLocation implements ITmfLocation<LttngTimestamp>, Comparable<L
 
     @Override
     public LttngLocation clone() {
-
-        LttngLocation newLocation = null;
-
-        try {
-            newLocation = (LttngLocation)super.clone();
-
-            // *** IMPORTANT ***
-            // Basic type in java are immutable!
-            // Thus, using assignation ("=") on basic type is VALID.
-            newLocation.isLastOperationParse = this.isLastOperationParse;
-            newLocation.isLastOperationReadNext = this.isLastOperationReadNext;
-            newLocation.isLastOperationSeek = this.isLastOperationSeek;
-
-            // For other type, we need to create a new timestamp
-            newLocation.operationTime  = new LttngTimestamp( this.operationTime );
-        }
-        catch (final CloneNotSupportedException e) {
-            System.out.println("Cloning failed with : " + e.getMessage()); //$NON-NLS-1$
-        }
-
+        LttngLocation newLocation = new LttngLocation(this);
+        newLocation.operationTime  = new LttngTimestamp( this.operationTime );
         return newLocation;
     }
 

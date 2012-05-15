@@ -14,7 +14,6 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
@@ -47,7 +46,6 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * TmfCheckpointIndexer (default). In this case, the trace cache size will be
  * used as checkpoint interval.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -56,15 +54,6 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * @see ITmfEventParser
  */
 public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> implements ITmfTrace<T> {
-
-    // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
-    /**
-     * The default trace cache size
-     */
-    public static final int DEFAULT_TRACE_CACHE_SIZE = 10000;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -76,34 +65,24 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     // The trace path
     private String fPath;
 
-    /**
-     * The trace cache page size
-     */
-    protected int fCacheSize = DEFAULT_TRACE_CACHE_SIZE;
+    // The trace cache page size
+    private int fCacheSize = ITmfTrace.DEFAULT_TRACE_CACHE_SIZE;
 
-    /**
-     * The number of events collected (so far)
-     */
-    protected long fNbEvents = 0;
+    // The number of events collected (so far)
+    private long fNbEvents = 0;
 
     // The time span of the event stream
     private ITmfTimestamp fStartTime = TmfTimestamp.BIG_CRUNCH;
     private ITmfTimestamp fEndTime = TmfTimestamp.BIG_BANG;
 
-    /**
-     * The trace streaming interval (0 = no streaming)
-     */
-    protected long fStreamingInterval = 0;
+    // The trace streaming interval (0 = no streaming)
+    private long fStreamingInterval = 0;
 
-    /**
-     * The trace indexer
-     */
-    protected ITmfTraceIndexer<ITmfTrace<ITmfEvent>> fIndexer;
+    // The trace indexer
+    private ITmfTraceIndexer<ITmfTrace<ITmfEvent>> fIndexer;
 
-    /**
-     * The trace parser
-     */
-    protected ITmfEventParser<T> fParser;
+    // The trace parser
+    private ITmfEventParser<T> fParser;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -160,7 +139,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize,
             final long interval, final ITmfTraceIndexer<?> indexer) throws TmfTraceException {
-        this(resource, type, path, cacheSize, interval, null, null);
+        this(resource, type, path, cacheSize, interval, indexer, null);
     }
 
     /**
@@ -178,7 +157,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize,
             final long interval, final ITmfTraceIndexer<?> indexer, final ITmfEventParser<T> parser) throws TmfTraceException {
         super();
-        fCacheSize = (cacheSize > 0) ? cacheSize : DEFAULT_TRACE_CACHE_SIZE;
+        fCacheSize = (cacheSize > 0) ? cacheSize : ITmfTrace.DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
         fIndexer = (indexer != null) ? indexer : new TmfCheckpointIndexer(this, fCacheSize);
         fParser = parser;
@@ -193,8 +172,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public TmfTrace(final TmfTrace<T> trace) throws TmfTraceException {
         super();
-        if (trace == null)
+        if (trace == null) {
             throw new IllegalArgumentException();
+        }
         fCacheSize = trace.getCacheSize();
         fStreamingInterval = trace.getStreamingInterval();
         fIndexer = new TmfCheckpointIndexer(this);
@@ -212,7 +192,6 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @Override
     public void initTrace(final IResource resource, final String path, final Class<T> type) throws TmfTraceException {
         initialize(resource, path, type);
-        fIndexer.buildIndex(false);
     }
 
     /**
@@ -222,12 +201,13 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param path the trace path
      * @param type the trace event type
      * 
-     * @throws FileNotFoundException
+     * @throws TmfTraceException
      */
     @SuppressWarnings("unchecked")
     protected void initialize(final IResource resource, final String path, final Class<T> type) throws TmfTraceException {
-        if (path == null)
+        if (path == null) {
             throw new TmfTraceException("Invalid trace path"); //$NON-NLS-1$
+        }
         fPath = path;
         fResource = resource;
         String traceName = (resource != null) ? resource.getName() : null;
@@ -255,6 +235,15 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     protected boolean fileExists(final String path) {
         final File file = new File(path);
         return file.exists();
+    }
+
+    /**
+     * Index the trace
+     * 
+     * @param waitForCompletion index synchronously (true) or not (false)
+     */
+    protected void indexTrace(boolean waitForCompletion) {
+        getIndexer().buildIndex(waitForCompletion);
     }
 
     // ------------------------------------------------------------------------
@@ -302,6 +291,20 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         return fStreamingInterval;
     }
 
+    /**
+     * @return the trace indexer
+     */
+    protected ITmfTraceIndexer<ITmfTrace<ITmfEvent>> getIndexer() {
+        return fIndexer;
+    }
+
+    /**
+     * @return the trace parser
+     */
+    protected ITmfEventParser<T> getParser() {
+        return fParser;
+    }
+
     // ------------------------------------------------------------------------
     // ITmfTrace - Trace characteristics getters
     // ------------------------------------------------------------------------
@@ -339,8 +342,27 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     // ------------------------------------------------------------------------
-    // Convenience setters
+    // Convenience setters/getters
     // ------------------------------------------------------------------------
+
+    /**
+     * Set the trace cache size. Must be done at initialization time.
+     * 
+     * @param cacheSize The trace cache size
+     */
+    protected void setCacheSize(final int cacheSize) {
+        fCacheSize = cacheSize;
+    }
+
+    /**
+     * Set the trace known number of events. This can be quite dynamic
+     * during indexing or for live traces.
+     * 
+     * @param nbEvents The number of events
+     */
+    protected synchronized void setNbEvents(final long nbEvents) {
+        fNbEvents = (nbEvents > 0) ? nbEvents : 0;
+    }
 
     /**
      * Update the trace events time range
@@ -371,12 +393,30 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     /**
-     * Update the trace streaming interval
+     * Set the polling interval for live traces (default = 0 = no streaming).
      * 
      * @param interval the new trace streaming interval
      */
     protected void setStreamingInterval(final long interval) {
         fStreamingInterval = (interval > 0) ? interval : 0;
+    }
+
+    /**
+     * Set the trace indexer. Must be done at initialization time.
+     * 
+     * @param indexer the trace indexer
+     */
+    protected void setIndexer(final ITmfTraceIndexer<ITmfTrace<ITmfEvent>> indexer) {
+        fIndexer = indexer;
+    }
+
+    /**
+     * Set the trace parser. Must be done at initialization time.
+     * 
+     * @param parser the new trace parser
+     */
+    protected void setParser(final ITmfEventParser<T> parser) {
+        fParser = parser;
     }
 
     // ------------------------------------------------------------------------
@@ -402,9 +442,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         // And locate the requested event context
         long pos = context.getRank();
         if (pos < rank) {
-            ITmfEvent event = readNextEvent(context);
+            ITmfEvent event = getNext(context);
             while (event != null && ++pos < rank) {
-                event = readNextEvent(context);
+                event = getNext(context);
             }
         }
         return context;
@@ -428,11 +468,15 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
         // And locate the requested event context
         final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
-        ITmfEvent event = readNextEvent(nextEventContext);
+        ITmfEvent event = getNext(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
             context.setLocation(nextEventContext.getLocation().clone());
             context.increaseRank();
-            event = readNextEvent(nextEventContext);
+            event = getNext(nextEventContext);
+        }
+        if (event == null) {
+            context.setLocation(null);
+            context.setRank(ITmfContext.UNKNOWN_RANK);
         }
         return context;
     }
@@ -445,9 +489,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readNextEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @Override
-    public synchronized ITmfEvent readNextEvent(final ITmfContext context) {
+    public synchronized T getNext(final ITmfContext context) {
         // parseEvent() does not update the context
-        final ITmfEvent event = fParser.parseEvent(context);
+        final T event = fParser.parseEvent(context);
         if (event != null) {
             updateAttributes(context, event.getTimestamp());
             context.setLocation(getCurrentLocation());
@@ -499,8 +543,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @Override
     public ITmfContext armRequest(final ITmfDataRequest<T> request) {
         if (request instanceof ITmfEventRequest<?>
-        && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
-        && request.getIndex() == 0) {
+            && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
+            && request.getIndex() == 0)
+        {
             final ITmfContext context = seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
             ((ITmfEventRequest<T>) request).setStartIndex((int) context.getRank());
             return context;
@@ -509,16 +554,17 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         return seekEvent(request.getIndex());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public T getNext(final ITmfContext context) {
-        if (context instanceof TmfContext)
-            return (T) readNextEvent(context);
-        return null;
-    }
+//    /* (non-Javadoc)
+//     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
+//     */
+//    @Override
+//    @SuppressWarnings("unchecked")
+//    public T getNext(final ITmfContext context) {
+//        if (context instanceof TmfContext) {
+//            return (T) readNextEvent(context);
+//        }
+//        return null;
+//    }
 
 
     // ------------------------------------------------------------------------

@@ -23,14 +23,13 @@ import java.util.Map;
  * Non-value fields are structural (i.e. used to represent the event structure
  * including optional fields) while the valued fields are actual event fields.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  * 
  * @see ITmfEvent
  * @see ITmfEventType
  */
-public class TmfEventField implements ITmfEventField {
+public class TmfEventField implements ITmfEventField, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes

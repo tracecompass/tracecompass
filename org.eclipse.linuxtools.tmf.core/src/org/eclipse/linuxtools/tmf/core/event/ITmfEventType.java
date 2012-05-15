@@ -18,14 +18,13 @@ package org.eclipse.linuxtools.tmf.core.event;
  * <p>
  * Types are unique within their context space.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  * 
  * @see ITmfEvent
  * @see ITmfEventField
  */
-public interface ITmfEventType extends Cloneable {
+public interface ITmfEventType {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -70,10 +69,6 @@ public interface ITmfEventType extends Cloneable {
      * @return the corresponding event field label
      */
     public String getFieldName(int index);
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the event type

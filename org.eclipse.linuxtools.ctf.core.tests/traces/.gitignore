@@ -1,2 +1,5 @@
+*.bz2
 /kernel
 /trace2
+*.ht
+

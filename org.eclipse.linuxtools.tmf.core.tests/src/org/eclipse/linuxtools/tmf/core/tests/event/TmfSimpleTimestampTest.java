@@ -19,8 +19,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfSimpleTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
- * <b><u>TmfSimpleTimestampTest</u></b>
- * <p>
  * Test suite for the TmfSimpleTimestampTest class.
  */
 @SuppressWarnings("nls")
