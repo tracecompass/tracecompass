@@ -252,13 +252,21 @@ class CtfKernelHandler implements Runnable {
                 Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, nextTid.toString());
                 currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
+                /*
+                 * Set the status of the process that got scheduled out, but
+                 * only in the case where that process is currently active.
+                 */
+                Integer formerThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString());
+                quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.EXEC_NAME);
+                value = ss.queryOngoingState(quark);
+                if (!value.isNull()) {
+                    quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
+                    value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT);
+                    ss.modifyAttribute(ts, value, quark);
+                }
+
                 /* Set the status of the new scheduled process */
                 setProcessToRunning(ts, newCurrentThreadNode);
-
-                /* Set the status of the process that got scheduled out */
-                quark = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString(), Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT);
-                ss.modifyAttribute(ts, value, quark);
 
                 /* Set the exec name of the new process */
                 quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.EXEC_NAME);
@@ -270,7 +278,7 @@ class CtfKernelHandler implements Runnable {
                  * the new process (in case we haven't seen this process before)
                  */
                 quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
-                if (quark == ss.getNbAttributes()) {
+                if (quark == ss.getNbAttributes()) { /* Did we just add this attribute? */
                     value = TmfStateValue.nullValue();
                     ss.modifyAttribute(ts, value, quark);
                 }
