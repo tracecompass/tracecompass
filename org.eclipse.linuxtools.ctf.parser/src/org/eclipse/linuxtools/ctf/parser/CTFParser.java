@@ -11028,7 +11028,7 @@ public class CTFParser extends Parser {
         }
     }
 
-    class DFA10 extends DFA {
+    static class DFA10 extends DFA {
 
         public DFA10(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
@@ -11316,7 +11316,7 @@ public class CTFParser extends Parser {
         }
     }
 
-    class DFA32 extends DFA {
+    static class DFA32 extends DFA {
 
         public DFA32(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
@@ -11367,7 +11367,7 @@ public class CTFParser extends Parser {
         }
     }
 
-    class DFA54 extends DFA {
+    static class DFA54 extends DFA {
 
         public DFA54(BaseRecognizer recognizer) {
             this.recognizer = recognizer;

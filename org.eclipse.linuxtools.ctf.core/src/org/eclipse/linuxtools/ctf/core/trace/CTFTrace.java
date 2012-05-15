@@ -229,7 +229,7 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable{
         /* If this trace gets closed, release the descriptors to the streams */
         for (FileChannel fc : streamFileChannels) {
             if (fc != null) {
@@ -240,11 +240,8 @@ public class CTFTrace implements IDefinitionScope {
                 }
             }
         }
-        try {
-            super.finalize();
-        } catch (Throwable e) {
-            // TODO Auto-generated catch block
-        }
+        super.finalize();
+
     }
 
     // ------------------------------------------------------------------------
@@ -516,7 +513,6 @@ public class CTFTrace implements IDefinitionScope {
             /* Check UUID */
             ArrayDefinition uuidDef = (ArrayDefinition) packetHeaderDef
                     .lookupDefinition("uuid"); //$NON-NLS-1$
-            assert ((uuidDef != null) && (uuidDef.getDeclaration().getLength() == Utils.UUID_LEN));
             if (uuidDef != null) {
                 byte[] uuidArray = new byte[Utils.UUID_LEN];
 
