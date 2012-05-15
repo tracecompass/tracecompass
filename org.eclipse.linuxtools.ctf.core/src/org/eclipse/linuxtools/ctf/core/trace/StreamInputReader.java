@@ -233,30 +233,45 @@ public class StreamInputReader {
         /*
          * Search in the index for the packet to search in.
          */
-        int len = this.streamInput.getIndex().getEntries().size();
-        int back = 0;
-        long desired_timestamp = -1;
-        do {
-            back++;
-            StreamInputPacketIndexEntry entry = this.streamInput.getIndex()
-                    .getEntries().get(len - back);
-            desired_timestamp = entry.getTimestampBegin() + 1;
-            seek(desired_timestamp);
+        final int len = this.streamInput.getIndex().getEntries().size();
 
-        } while (!this.packetReader.hasMoreEvents());
+        StreamInputPacketIndexEntry entry = null;
+        /*
+         * Go to beginning of trace.
+         */
+        seek(0);
+        /*
+         * if the trace is empty.
+         */
+        if((len == 0) ||(this.packetReader.hasMoreEvents() == false)) {
+            /*
+             * This means the trace is empty. abort.
+             */
+            return;
+        }
+        /*
+         * Go to the last packet that contains events.
+         */
+        for( int pos = len -1 ; pos > 0 ; pos--){
+            entry = this.streamInput.getIndex().getEntries().get(pos);
+            this.packetReader.setCurrentPacket(entry);
+            if(this.packetReader.hasMoreEvents()) {
+                break;
+            }
+        }
+
         /*
          * Go until the end of that packet
          */
-
-        int packet_size = 0;
-        while (this.packetReader.hasMoreEvents()) {
-            this.packetReader.readNextEvent();
-            packet_size++;
+        EventDefinition prevEvent = null;
+        while (this.currentEvent != null) {
+            prevEvent = this.currentEvent;
+            this.readNextEvent();
         }
-        seek(desired_timestamp);
-        for (int i = 0; i < (packet_size - 1); i++) {
-            this.packetReader.readNextEvent();
-        }
+        /*
+         * Go back to the previous event
+         */
+        this.setCurrentEvent(prevEvent);
     }
 
     public void setCurrentEvent(EventDefinition currentEvent) {

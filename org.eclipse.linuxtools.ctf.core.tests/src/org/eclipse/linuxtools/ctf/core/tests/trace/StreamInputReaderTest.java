@@ -146,8 +146,33 @@ public class StreamInputReaderTest {
      * @throws CTFReaderException
      */
     @Test
-    public void testGoToLastEvent() throws CTFReaderException {
+    public void testGoToLastEvent1() throws CTFReaderException {
+        final long endTimestamp = goToEnd();
+        final long endTime = 4287422460315L;
+        assertEquals(endTime , endTimestamp  );
+    }
+
+    /**
+     * Run the void goToLastEvent() method test.
+     *
+     * @throws CTFReaderException
+     */
+    @Test
+    public void testGoToLastEvent2() throws CTFReaderException {
+        long timestamp = -1;
+        while(fixture.readNextEvent()) {
+            timestamp = fixture.getCurrentEvent().getTimestamp();
+        }
+        long endTimestamp = goToEnd();
+        assertEquals(0 , timestamp- endTimestamp );
+    }
+
+    /**
+     * @throws CTFReaderException
+     */
+    private long goToEnd() throws CTFReaderException {
         fixture.goToLastEvent();
+        return fixture.getCurrentEvent().getTimestamp();
     }
 
     /**
