@@ -106,7 +106,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
                 this.setStartTime(TmfTimestamp.BIG_BANG);
             } else {
                 this.setStartTime(iterator.getCurrentEvent().getTimestamp());
-                iterator.goToLastEvent();
+                /*
+                 * is the trace empty
+                 */
+                if( iterator.hasMoreEvents()){
+                    iterator.goToLastEvent();
+                }
                 this.setEndTime(iterator.getCurrentEvent().getTimestamp());
             }
 
@@ -514,6 +519,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * sub-classes.
      * @throws TmfTraceException
      */
+    @SuppressWarnings({ "static-method", "unused" })
     protected void buildStateSystem() throws TmfTraceException {
         /*
          * Nothing is done in the basic implementation, please specify
