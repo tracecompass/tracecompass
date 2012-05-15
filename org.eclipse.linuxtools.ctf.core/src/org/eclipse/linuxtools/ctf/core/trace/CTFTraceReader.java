@@ -302,7 +302,10 @@ public class CTFTraceReader {
         }
         int count = prio.size();
         for (int i = 0; i < (count - 1); i++) {
-            advance();
+            /*
+             * Cull all the streams aside from the last one
+             */
+            prio.poll();
         }
     }
 
