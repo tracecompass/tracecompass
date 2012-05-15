@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
@@ -268,7 +269,7 @@ public class HistogramView extends TmfView {
     public void updateCurrentEventTime(long newTime) {
         if (fCurrentExperiment != null) {
             TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BIG_CRUNCH);
-            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, 1, ExecutionType.FOREGROUND) {
+            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, 1, 0, ExecutionType.FOREGROUND) {
                 @Override
                 public void handleData(ITmfEvent event) {
                     if (event != null) {
@@ -462,7 +463,8 @@ public class HistogramView extends TmfView {
 
         fTimeRangeHistogram.clear();
         fTimeRangeHistogram.setTimeRange(startTime, endTime - startTime);
-        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, ExecutionType.FOREGROUND);
+        int cacheSize = fCurrentExperiment.getCacheSize();
+        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, TmfDataRequest.ALL_DATA, cacheSize, ExecutionType.FOREGROUND);
         fCurrentExperiment.sendRequest(fTimeRangeRequest);
     }
 
@@ -470,8 +472,9 @@ public class HistogramView extends TmfView {
         if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
         }
+        int cacheSize = fCurrentExperiment.getCacheSize();
         fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(), fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
-                ExecutionType.BACKGROUND);
+                TmfDataRequest.ALL_DATA, cacheSize, ExecutionType.BACKGROUND);
         fCurrentExperiment.sendRequest(fFullTraceRequest);
     }
 

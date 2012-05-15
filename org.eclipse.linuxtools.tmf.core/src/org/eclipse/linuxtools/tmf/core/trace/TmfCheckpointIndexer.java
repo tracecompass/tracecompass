@@ -246,16 +246,16 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     @Override
     public ITmfContext seekIndex(final long rank) {
 
-      // A rank < 0 indicates to seek the first event
-      if (rank < 0) {
-          return fTrace.seekEvent(0);
-      }
+        // A rank < 0 indicates to seek the first event
+        if (rank < 0) {
+            return fTrace.seekEvent(0);
+        }
 
-      // Find the checkpoint at or before the requested rank.
-      final int index = (int) rank / fCheckpointInterval;
+        // Find the checkpoint at or before the requested rank.
+        final int index = (int) rank / fCheckpointInterval;
 
-      // Position the trace at the checkpoint
-      return seekCheckpoint(index);
+        // Position the trace at the checkpoint
+        return seekCheckpoint(index);
     }
 
     /**
