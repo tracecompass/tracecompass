@@ -109,29 +109,12 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
     public boolean seek(final long timestamp) {
         boolean ret = false;
         final long offsetTimestamp = timestamp
-                - this.getCtfTmfTrace().getCTFTrace().getOffset();
+                - this.getTrace().getOffset();
         if (offsetTimestamp < 0) {
             ret = super.seek(timestamp);
         } else {
             ret = super.seek(offsetTimestamp);
         }
-
-        if (ret) {
-            curLocation.setLocation(getCurrentEvent().getTimestampValue());
-        } else {
-            curLocation = NULL_LOCATION;
-        }
-        return ret;
-    }
-
-    /**
-     * Method seekRank. seeks to a given rank
-     * @param rank long the rank to seek to
-     * @return boolean
-     */
-    public boolean seekRank(final long rank) {
-        boolean ret = false;
-        ret = super.seekIndex(rank);
 
         if (ret) {
             curLocation.setLocation(getCurrentEvent().getTimestampValue());

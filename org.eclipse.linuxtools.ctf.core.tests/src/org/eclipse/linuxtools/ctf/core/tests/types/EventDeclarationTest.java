@@ -6,7 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.nio.channels.FileChannel;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
@@ -99,12 +100,13 @@ public class EventDeclarationTest {
      * Run the EventDefinition createDefinition(StreamInputReader) method test.
      *
      * @throws CTFReaderException
+     * @throws FileNotFoundException
      */
     @Test
-    public void testCreateDefinition() throws CTFReaderException {
+    public void testCreateDefinition() throws CTFReaderException, FileNotFoundException {
         StreamInputReader streamInputReader = new StreamInputReader(
                 new StreamInput(new Stream(TestParams.createTrace()),
-                        (FileChannel) null, TestParams.getTraceFile()));
+                       (new FileInputStream(TestParams.getTraceFile())).getChannel(), TestParams.getTraceFile()));
 
         EventDefinition result = fixture.createDefinition(streamInputReader);
         assertNotNull(result);

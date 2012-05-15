@@ -20,7 +20,6 @@ import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -31,7 +30,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
-public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParser{
+public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParser<CtfTmfEvent>{
 
     //-------------------------------------------
     //        Fields
@@ -280,11 +279,22 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
     }
 
     //-------------------------------------------
+    //        Clocks
+    //-------------------------------------------
+
+    public long getOffset(){
+        if( fTrace != null ) {
+            return fTrace.getOffset();
+        }
+        return 0;
+    }
+
+    //-------------------------------------------
     //        Parser
     //-------------------------------------------
 
     @Override
-    public ITmfEvent parseEvent(ITmfContext context) {
+    public CtfTmfEvent parseEvent(ITmfContext context) {
         CtfTmfEvent event = null;
         if( context instanceof CtfIterator ){
             CtfIterator itt = (CtfIterator) context;

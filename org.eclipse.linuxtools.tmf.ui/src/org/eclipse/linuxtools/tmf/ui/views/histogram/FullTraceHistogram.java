@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Changed to updated histogram data model
@@ -97,7 +97,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         // Check if we are outside the time range; if so, just set the current
         // event
         long timestamp = getTimestamp(event.x);
-        if (timestamp < fZoom.getStartTime() || timestamp > fZoom.getEndTime()) {
+        if ((timestamp < fZoom.getStartTime()) || (timestamp > fZoom.getEndTime())) {
             super.mouseDown(event);
             return;
         }
@@ -125,8 +125,9 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
             int nbBuckets = event.x - fStartPosition;
             long delta = nbBuckets * fScaledData.fBucketDuration;
             long newStart = fZoom.getStartTime() + delta;
-            if (newStart < getStartTime())
+            if (newStart < getStartTime()) {
                 newStart = getStartTime();
+            }
             long newEnd = newStart + fZoom.getDuration();
             if (newEnd > getEndTime()) {
                 newEnd = getEndTime();
@@ -151,7 +152,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         Image rangeRectangleImage = new Image(image.getDevice(), image, SWT.IMAGE_COPY);
         GC rangeWindowGC = new GC(rangeRectangleImage);
 
-        if (fScaledData != null && fRangeStartTime != 0) {
+        if ((fScaledData != null) && (fRangeStartTime != 0)) {
             drawTimeRangeWindow(rangeWindowGC, rangeRectangleImage);
         }
 
@@ -165,7 +166,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
     private void drawTimeRangeWindow(GC imageGC, Image image) {
 
         // Map times to histogram coordinates
-        long bucketSpan = fScaledData.fBucketDuration;
+        long bucketSpan = Math.max(fScaledData.fBucketDuration,1);
         int rangeWidth = (int) (fRangeDuration / bucketSpan);
 
         int left = (int) ((fRangeStartTime - fDataModel.getFirstBucketTime()) / bucketSpan);
@@ -190,9 +191,9 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         imageGC.setLineWidth(1);
         imageGC.setLineStyle(SWT.LINE_SOLID);
 
-        int chHalfWidth = ((rangeWidth < 60) ? rangeWidth * 2 / 3 : 40) / 2;
+        int chHalfWidth = ((rangeWidth < 60) ? (rangeWidth * 2) / 3 : 40) / 2;
         imageGC.drawLine(center - chHalfWidth, height / 2, center + chHalfWidth, height / 2);
-        imageGC.drawLine(center, height / 2 - chHalfWidth, center, height / 2 + chHalfWidth);
+        imageGC.drawLine(center, (height / 2) - chHalfWidth, center, (height / 2) + chHalfWidth);
     }
 
 }

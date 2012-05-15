@@ -7,17 +7,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
@@ -53,7 +50,7 @@ public class CtfTmfTraceTest {
         // add additional test code here
         assertNotNull(result);
         assertEquals(null, result.getEventType());
-        assertEquals(50000, result.getCacheSize());
+        assertEquals(1000, result.getCacheSize());
         assertEquals(0L, result.getNbEvents());
         assertEquals(0L, result.getStreamingInterval());
         assertEquals(null, result.getStateSystem());
@@ -61,30 +58,6 @@ public class CtfTmfTraceTest {
         assertEquals(1000, result.getQueueSize());
         assertEquals(null, result.getType());
     }
-
-    /**
-     * Run the ITmfContext armRequest(ITmfDataRequest<CtfTmfEvent>) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testArmRequest_1()
-        throws Exception {
-        CtfTmfTrace fixture = initTrace();
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
-
-        ITmfContext result = fixture.armRequest(request);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertNotNull(result);
-    }
-
 
     /**
      * @return
@@ -95,77 +68,6 @@ public class CtfTmfTraceTest {
         fixture.initTrace((IResource) null, PATH, CtfTmfEvent.class);
         return fixture;
     }
-
-    /**
-     * Run the ITmfContext armRequest(ITmfDataRequest<CtfTmfEvent>) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testArmRequest_2()
-        throws Exception {
-        CtfTmfTrace fixture = initTrace();
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
-
-        ITmfContext result = fixture.armRequest(request);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertNotNull(result);
-    }
-
-    /**
-     * Run the ITmfContext armRequest(ITmfDataRequest<CtfTmfEvent>) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testArmRequest_3()
-        throws Exception {
-        CtfTmfTrace fixture = initTrace();
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
-
-        ITmfContext result = fixture.armRequest(request);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertNotNull(result);
-    }
-
-    /**
-     * Run the ITmfContext armRequest(ITmfDataRequest<CtfTmfEvent>) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testArmRequest_4()
-        throws Exception {
-        CtfTmfTrace fixture = initTrace();
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
-
-        ITmfContext result = fixture.armRequest(request);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertNotNull(result);
-    }
-
-
     /**
      * Run the void broadcast(TmfSignal) method test.
      *
@@ -222,7 +124,7 @@ public class CtfTmfTraceTest {
         // An unexpected exception was thrown in user code while executing this test:
         //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
         //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertEquals(50000, result);
+        assertEquals(1000, result);
     }
 
     /**
@@ -339,7 +241,7 @@ public class CtfTmfTraceTest {
         // An unexpected exception was thrown in user code while executing this test:
         //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
         //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**

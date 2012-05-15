@@ -223,7 +223,7 @@ public class CTFTrace implements IDefinitionScope {
                 /*
                  * index the trace
                  */
-                s.createIndex();
+                s.setupIndex();
             }
         }
     }

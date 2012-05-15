@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
  * <p>
  * Reads the events of a packet of a trace file.
  */
-class StreamInputPacketReader implements IDefinitionScope {
+public class StreamInputPacketReader implements IDefinitionScope {
 
     // ------------------------------------------------------------------------
     // Constants

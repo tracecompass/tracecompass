@@ -37,6 +37,7 @@ public class CTFTraceReaderTest {
 
     /**
      * Perform pre-test initialization.
+     *
      * @throws CTFReaderException
      */
     @Before
@@ -55,6 +56,7 @@ public class CTFTraceReaderTest {
     /**
      * Run the CTFTraceReader(CTFTrace) constructor test. Open a known good
      * trace.
+     *
      * @throws CTFReaderException
      */
     @Test
@@ -105,17 +107,26 @@ public class CTFTraceReaderTest {
     /**
      * Run the boolean advance() method test. Test advancing when we're at the
      * end, so we expect that there is no more events.
-     *
-     * @throws CTFReaderException
      */
     @Test
-    public void testAdvance_end() throws CTFReaderException {
-        fixture.goToLastEvent();
-        while (fixture.hasMoreEvents()) {
-            fixture.advance();
-        }
+    public void testAdvance_end() {
+        int i = 0;
         boolean result = fixture.advance();
+        while (result) {
+            result = fixture.advance();
+            i++;
+        }
+        fixture.seek(0);
+        fixture.advance();
+        fixture.goToLastEvent();
+        i = 1;
+        result = fixture.advance();
+        while (result) {
+            result = fixture.advance();
+            i++;
+        }
         assertFalse(result);
+        assertEquals(i, 1);
     }
 
     /**
@@ -142,12 +153,13 @@ public class CTFTraceReaderTest {
      *
      * Both trace reader are different objects, so they shouldn't "equals" each
      * other.
+     *
      * @throws CTFReaderException
      */
     @Test
     public void testEquals() throws CTFReaderException {
         CTFTraceReader fixture2 = new CTFTraceReader(TestParams.createTrace());
-        assertTrue(fixture.equals(fixture2));
+        assertEquals(fixture, fixture2);
     }
 
     /**
@@ -163,11 +175,9 @@ public class CTFTraceReaderTest {
     /**
      * Run the getCurrentEventDef() method test. Get the last event's
      * definition.
-     *
-     * @throws CTFReaderException
      */
     @Test
-    public void testGetCurrentEventDef_last() throws CTFReaderException {
+    public void testGetCurrentEventDef_last() {
         fixture.goToLastEvent();
         EventDefinition result = fixture.getCurrentEventDef();
         assertNotNull(result);
@@ -201,8 +211,7 @@ public class CTFTraceReaderTest {
         fixture.goToLastEvent();
         long ts1 = getTimestamp();
         long ts2 = fixture.getEndTime();
-        // the end time can be later than the last event.
-        assertTrue(ts1 <= ts2);
+        assertEquals(ts1, ts2);
     }
 
     /**
@@ -283,51 +292,14 @@ public class CTFTraceReaderTest {
     }
 
 
-    /**
-     * Run the boolean seek(long) method test.
-     * @throws CTFReaderException
-     */
-    @Test
-    public void testSeekIndex() throws CTFReaderException {
-        long rank = 30000L;
-        long first, second = 0, third , fourth;
-        /*
-         * we need to read the trace before seeking
-         */
-        first = getTimestamp();
-        for( int i = 0 ; i < 60000; i++ )
-        {
-            if( i == rank) {
-                second = getTimestamp();
-            }
-            fixture.advance();
-        }
-        boolean result= fixture.seekIndex(0);
-
-        third = getTimestamp();
-        boolean result2 = fixture.seekIndex(rank);
-        fourth = getTimestamp();
-        /*
-         * in blocks to see where code coverage fails
-         */
-        {
-            assertTrue(result);
-        }
-        {
-            assertTrue(result2);
-        }
-        {
-            assertEquals( first , third);
-        }
-        {
-            assertEquals( second , fourth);
-        }
-    }
 
     /**
      * @return
      */
     private long getTimestamp() {
-        return fixture.getCurrentEventDef().getTimestamp();
+        if (fixture.getCurrentEventDef() != null) {
+            return fixture.getCurrentEventDef().getTimestamp()+ this.fixture.getTrace().getOffset();
+        }
+        return -1;
     }
 }

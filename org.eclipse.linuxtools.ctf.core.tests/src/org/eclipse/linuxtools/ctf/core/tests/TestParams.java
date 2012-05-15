@@ -20,7 +20,7 @@ public abstract class TestParams {
     private static final String testTracePath1 = "traces/kernel"; //$NON-NLS-1$
     private static CTFTrace testTrace1 = null;
     private static CTFTrace testTraceFromFile1 = null;
-    private static final File testTraceFile1 = new File(testTracePath1);
+    private static final File testTraceFile1 = new File(testTracePath1+"/channel0_0"); //$NON-NLS-1$
 
     private static final File emptyFile = new File(""); //$NON-NLS-1$
     private static CTFTrace emptyTrace = null;

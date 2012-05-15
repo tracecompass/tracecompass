@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Bernd Hufmann - Implementation of new interfaces/listeners and support for 
+ *   Bernd Hufmann - Implementation of new interfaces/listeners and support for
  *                   time stamp in any order
  *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
@@ -44,12 +44,12 @@ import org.eclipse.core.runtime.ListenerList;
  * 2<i>d</i>). This compaction happens as needed as the trace is read.
  * <p>
  * The model allows for timestamps in not increasing order. The timestamps can
- * be fed to the model in any order. If an event has a timestamp less than the 
+ * be fed to the model in any order. If an event has a timestamp less than the
  * <i>basetime</i>, the buckets will be moved to the right to account for the
- * new smaller timestamp. The new <i>basetime</i> is a multiple of the bucket 
+ * new smaller timestamp. The new <i>basetime</i> is a multiple of the bucket
  * duration smaller then the previous <i>basetime</i>. Note that the <i>basetime</i>
  * might not be anymore a timestamp of an event. If necessary, the buckets will
- * be compacted before moving to the right. This might be necessary to not 
+ * be compacted before moving to the right. This might be necessary to not
  * loose any event counts at the end of the buckets array.
  * <p>
  * The mapping from the model to the UI is performed by the <i>scaleTo()</i>
@@ -72,7 +72,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     public static final int DEFAULT_NUMBER_OF_BUCKETS = 16 * 1000;
 
     public static final int REFRESH_FREQUENCY = DEFAULT_NUMBER_OF_BUCKETS;
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -90,10 +90,10 @@ public class HistogramDataModel implements IHistogramDataModel {
     private long fLastEventTime;
     private long fCurrentEventTime;
     private long fTimeLimit;
-    
+
     // Private listener lists
     private final ListenerList fModelListeners;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -112,7 +112,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     public HistogramDataModel(HistogramDataModel other) {
         fNbBuckets = other.fNbBuckets;
         fBuckets = Arrays.copyOf(other.fBuckets, fNbBuckets);
-        fBucketDuration = other.fBucketDuration;
+        fBucketDuration = Math.max(other.fBucketDuration,1);
         fNbEvents = other.fNbEvents;
         fLastBucket = other.fLastBucket;
         fFirstBucketTime = other.fFirstBucketTime;
@@ -142,7 +142,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     public long getBucketDuration() {
         return fBucketDuration;
     }
-    
+
     public long getFirstBucketTime() {
         return fFirstBucketTime;
     }
@@ -150,7 +150,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     public long getStartTime() {
         return fFirstEventTime;
     }
-    
+
     public long getEndTime() {
         return fLastEventTime;
     }
@@ -162,15 +162,15 @@ public class HistogramDataModel implements IHistogramDataModel {
     public long getTimeLimit() {
         return fTimeLimit;
     }
-    
+
     // ------------------------------------------------------------------------
     // Listener handling
     // ------------------------------------------------------------------------
-    
+
     public void addHistogramListener(IHistogramModelListener listener) {
-        fModelListeners.add(listener);        
+        fModelListeners.add(listener);
     }
-    
+
     public void removeHistogramListener(IHistogramModelListener listener) {
         fModelListeners.remove(listener);
     }
@@ -178,17 +178,17 @@ public class HistogramDataModel implements IHistogramDataModel {
     private void fireModelUpdateNotification() {
         fireModelUpdateNotification(0);
     }
-    
+
     private void fireModelUpdateNotification(long count) {
-        if (count % REFRESH_FREQUENCY == 0) {
+        if ((count % REFRESH_FREQUENCY) == 0) {
             Object[] listeners = fModelListeners.getListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                IHistogramModelListener listener = (IHistogramModelListener) listeners[i];
+            for (Object listener2 : listeners) {
+                IHistogramModelListener listener = (IHistogramModelListener) listener2;
                 listener.modelUpdated();
             }
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -216,7 +216,7 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     /**
      * Sets the current event time
-     * 
+     *
      * @param timestamp
      */
     public void setCurrentEvent(long timestamp) {
@@ -225,42 +225,42 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     /**
      * Sets the current event time
-     * 
+     *
      * @param timestamp
      */
     public void setCurrentEventNotifyListeners(long timestamp) {
         fCurrentEventTime = timestamp;
         fireModelUpdateNotification();
     }
-    
+
     /**
      * Add event to the correct bucket, compacting the if needed.
-     * 
+     *
      * @param timestamp the timestamp of the event to count
      */
     @Override
     public void countEvent(long eventCount, long timestamp) {
-        
+
         // Validate
         if (timestamp < 0) {
             return;
         }
-        
+
         // Set the start/end time if not already done
-        if (fLastBucket == 0 && fBuckets[0] == 0 && timestamp > 0) {
+        if ((fLastBucket == 0) && (fBuckets[0] == 0) && (timestamp > 0)) {
             fFirstBucketTime = timestamp;
             fFirstEventTime = timestamp;
             updateEndTime();
         }
-        
+
         if (timestamp < fFirstEventTime) {
             fFirstEventTime = timestamp;
         }
-        
+
         if (fLastEventTime < timestamp) {
             fLastEventTime = timestamp;
         }
-        
+
         if (timestamp >= fFirstBucketTime) {
 
             // Compact as needed
@@ -269,37 +269,38 @@ public class HistogramDataModel implements IHistogramDataModel {
             }
 
         } else {
-            
+
             // get offset for adjustment
             int offset = getOffset(timestamp);
 
             // Compact as needed
-            while(fLastBucket + offset >= fNbBuckets) {
+            while((fLastBucket + offset) >= fNbBuckets) {
                 mergeBuckets();
                 offset = getOffset(timestamp);
             }
-            
+
             moveBuckets(offset);
 
             fLastBucket = fLastBucket + offset;
 
-            fFirstBucketTime = fFirstBucketTime - offset*fBucketDuration;
+            fFirstBucketTime = fFirstBucketTime - (offset*fBucketDuration);
             updateEndTime();
         }
-        
+
         // Increment the right bucket
         int index = (int) ((timestamp - fFirstBucketTime) / fBucketDuration);
         fBuckets[index]++;
         fNbEvents++;
-        if (fLastBucket < index)
+        if (fLastBucket < index) {
             fLastBucket = index;
-        
+        }
+
         fireModelUpdateNotification(eventCount);
     }
 
     /**
      * Scale the model data to the width, height and bar width requested.
-     * 
+     *
      * @param width
      * @param height
      * @param barWidth
@@ -309,29 +310,33 @@ public class HistogramDataModel implements IHistogramDataModel {
     @Override
     public HistogramScaledData scaleTo(int width, int height, int barWidth) {
         // Basic validation
-        if (width <= 0 ||  height <= 0 || barWidth <= 0)
+        if ((width <= 0) ||  (height <= 0) || (barWidth <= 0))
+         {
             throw new AssertionError("Invalid histogram dimensions (" + width + "x" + height + ", barWidth=" + barWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        }
 
         // The result structure
         HistogramScaledData result = new HistogramScaledData(width, height, barWidth);
 
         // Scale horizontally
         result.fMaxValue = 0;
-        
+
         int nbBars = width / barWidth;
-        int bucketsPerBar = fLastBucket / nbBars + 1;
-        result.fBucketDuration = bucketsPerBar * fBucketDuration;
+        int bucketsPerBar = (fLastBucket / nbBars) + 1;
+        result.fBucketDuration = Math.max(bucketsPerBar * fBucketDuration,1);
         for (int i = 0; i < nbBars; i++) {
             int count = 0;
-            for (int j = i * bucketsPerBar; j < (i + 1) * bucketsPerBar; j++) {
-                if (fNbBuckets <= j)
+            for (int j = i * bucketsPerBar; j < ((i + 1) * bucketsPerBar); j++) {
+                if (fNbBuckets <= j) {
                     break;
+                }
                 count += fBuckets[j];
             }
             result.fData[i] = count;
             result.fLastBucket = i;
-            if (result.fMaxValue < count)
+            if (result.fMaxValue < count) {
                 result.fMaxValue = count;
+            }
         }
 
         // Scale vertically
@@ -339,11 +344,13 @@ public class HistogramDataModel implements IHistogramDataModel {
             result.fScalingFactor = (double) height / result.fMaxValue;
         }
 
+        fBucketDuration = Math.max(fBucketDuration, 1);
         // Set the current event index in the scaled histogram
-        if (fCurrentEventTime >= fFirstBucketTime && fCurrentEventTime <= fLastEventTime)
+        if ((fCurrentEventTime >= fFirstBucketTime) && (fCurrentEventTime <= fLastEventTime)) {
             result.fCurrentBucket = (int) ((fCurrentEventTime - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
-        else
+        } else {
             result.fCurrentBucket = HistogramScaledData.OUT_OF_RANGE_BUCKET;
+        }
 
         result.fFirstBucketTime = fFirstBucketTime;
         result.fFirstEventTime = fFirstEventTime;
@@ -355,22 +362,22 @@ public class HistogramDataModel implements IHistogramDataModel {
     // ------------------------------------------------------------------------
 
     private void updateEndTime() {
-        fTimeLimit = fFirstBucketTime + fNbBuckets * fBucketDuration;
+        fTimeLimit = fFirstBucketTime + (fNbBuckets * fBucketDuration);
     }
 
     private void mergeBuckets() {
-        for (int i = 0; i < fNbBuckets / 2; i++) {
-            fBuckets[i] = fBuckets[2 * i] + fBuckets[2 * i + 1];
+        for (int i = 0; i < (fNbBuckets / 2); i++) {
+            fBuckets[i] = fBuckets[2 * i] + fBuckets[(2 * i) + 1];
         }
         Arrays.fill(fBuckets, fNbBuckets / 2, fNbBuckets, 0);
         fBucketDuration *= 2;
         updateEndTime();
-        fLastBucket = fNbBuckets / 2 - 1;
+        fLastBucket = (fNbBuckets / 2) - 1;
     }
-    
+
     private void moveBuckets(int offset) {
         for(int i = fNbBuckets - 1; i >= offset; i--) {
-            fBuckets[i] = fBuckets[i-offset]; 
+            fBuckets[i] = fBuckets[i-offset];
         }
 
         for (int i = 0; i < offset; i++) {
@@ -380,7 +387,7 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     private int getOffset(long timestamp) {
         int offset = (int) ((fFirstBucketTime - timestamp) / fBucketDuration);
-        if ((fFirstBucketTime - timestamp) % fBucketDuration != 0) {
+        if (((fFirstBucketTime - timestamp) % fBucketDuration) != 0) {
             offset++;
         }
         return offset;

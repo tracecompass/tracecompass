@@ -592,61 +592,6 @@ public class CtfIteratorTest {
         assertTrue(result);
     }
 
-    /**
-     * Run the boolean seekRank(long) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testSeekRank_1()
-        throws Exception {
-        CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
-        ctfLocation.setLocation(Long.valueOf(1));
-        fixture.setLocation(ctfLocation);
-        fixture.increaseRank();
-        long rank = 1L;
-
-        boolean result = fixture.seekRank(rank);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-        assertTrue(result);
-    }
-
-    /**
-     * Run the boolean seekRank(long) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testSeekRank_2()
-        throws Exception {
-        CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
-        ctfLocation.setLocation(Long.valueOf(1));
-        fixture.setLocation(ctfLocation);
-        fixture.increaseRank();
-        long rank = 1L;
-
-        boolean result = fixture.seekRank(rank);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-        assertTrue(result);
-    }
 
     /**
      * Run the void setLocation(ITmfLocation<?>) method test.
@@ -676,59 +621,6 @@ public class CtfIteratorTest {
         //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
     }
 
-    /**
-     * Run the void setRank(long) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testSetRank_1()
-        throws Exception {
-        CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
-        ctfLocation.setLocation(Long.valueOf(1));
-        fixture.setLocation(ctfLocation);
-        fixture.increaseRank();
-        long rank = 1L;
-
-        fixture.setRank(rank);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-    }
-
-    /**
-     * Run the void setRank(long) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testSetRank_2()
-        throws Exception {
-        CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
-        ctfLocation.setLocation(Long.valueOf(1));
-        fixture.setLocation(ctfLocation);
-        fixture.increaseRank();
-        long rank = 1L;
-
-        fixture.setRank(rank);
-
-        // add additional test code here
-        // An unexpected exception was thrown in user code while executing this test:
-        //    java.lang.NullPointerException
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.createStreamInputReaders(CTFTraceReader.java:152)
-        //       at org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader.<init>(CTFTraceReader.java:92)
-        //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator.<init>(CtfIterator.java:40)
-    }
 
     /**
      * Perform pre-test initialization.

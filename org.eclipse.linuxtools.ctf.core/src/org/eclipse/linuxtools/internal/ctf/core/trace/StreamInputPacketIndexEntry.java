@@ -23,7 +23,7 @@ public class StreamInputPacketIndexEntry {
     // Attributes
     // ------------------------------------------------------------------------
 
-
+    public static final long INVALID_INDEX = Long.MAX_VALUE;
 
     /**
      * Offset of the packet in the file, in bytes
@@ -54,11 +54,6 @@ public class StreamInputPacketIndexEntry {
      * End timestamp
      */
     private long timestampEnd = 0;
-
-
-    private long indexBegin = Long.MAX_VALUE;
-
-    private long indexEnd = Long.MAX_VALUE;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -91,18 +86,16 @@ public class StreamInputPacketIndexEntry {
         return (ts >= timestampBegin) && (ts <= timestampEnd);
     }
 
-    boolean includesIndex(long index){
-        return (index >= indexBegin) && (index <= indexEnd);
-    }
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         return "StreamInputPacketIndexEntry [offsetBytes=" + offsetBytes //$NON-NLS-1$
                 + ", timestampBegin=" + timestampBegin + ", timestampEnd=" //$NON-NLS-1$ //$NON-NLS-2$
-                + timestampEnd + ", indexBegin=" + indexBegin + ", indexEnd=" //$NON-NLS-1$ //$NON-NLS-2$
-                + indexEnd + "]"; //$NON-NLS-1$
+                + timestampEnd + "]"; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -124,7 +117,8 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param dataOffsetBits the dataOffsetBits to set
+     * @param dataOffsetBits
+     *            the dataOffsetBits to set
      */
     public void setDataOffsetBits(int dataOffsetBits) {
         this.dataOffsetBits = dataOffsetBits;
@@ -138,7 +132,8 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param packetSizeBits the packetSizeBits to set
+     * @param packetSizeBits
+     *            the packetSizeBits to set
      */
     public void setPacketSizeBits(int packetSizeBits) {
         this.packetSizeBits = packetSizeBits;
@@ -152,7 +147,8 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param contentSizeBits the contentSizeBits to set
+     * @param contentSizeBits
+     *            the contentSizeBits to set
      */
     public void setContentSizeBits(int contentSizeBits) {
         this.contentSizeBits = contentSizeBits;
@@ -166,7 +162,8 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param timestampBegin the timestampBegin to set
+     * @param timestampBegin
+     *            the timestampBegin to set
      */
     public void setTimestampBegin(long timestampBegin) {
         this.timestampBegin = timestampBegin;
@@ -180,37 +177,11 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param timestampEnd the timestampEnd to set
+     * @param timestampEnd
+     *            the timestampEnd to set
      */
     public void setTimestampEnd(long timestampEnd) {
         this.timestampEnd = timestampEnd;
     }
 
-    /**
-     * @return the indexBegin
-     */
-    public long getIndexBegin() {
-        return indexBegin;
-    }
-
-    /**
-     * @param indexBegin the indexBegin to set
-     */
-    public void setIndexBegin(long indexBegin) {
-        this.indexBegin = indexBegin;
-    }
-
-    /**
-     * @return the indexEnd
-     */
-    public long getIndexEnd() {
-        return indexEnd;
-    }
-
-    /**
-     * @param indexEnd the indexEnd to set
-     */
-    public void setIndexEnd(long indexEnd) {
-        this.indexEnd = indexEnd;
-    }
 }
