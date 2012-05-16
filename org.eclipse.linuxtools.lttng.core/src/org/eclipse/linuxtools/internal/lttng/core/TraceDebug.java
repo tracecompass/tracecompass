@@ -75,7 +75,7 @@ public class TraceDebug {
 			try {
 				triggerException(message);
 			} catch (Exception e) {
-				e.printStackTrace();
+			    Activator.getDefault().logError("Unexpected Error", e);  //$NON-NLS-1$
 			}
 		}
 	}

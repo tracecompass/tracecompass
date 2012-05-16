@@ -125,7 +125,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
         	return;
         }
         
-        if (nameStatus.isOK() == false) {
+        if (!nameStatus.isOK()) {
         	updateStatus(nameStatus);
         	return;
         }

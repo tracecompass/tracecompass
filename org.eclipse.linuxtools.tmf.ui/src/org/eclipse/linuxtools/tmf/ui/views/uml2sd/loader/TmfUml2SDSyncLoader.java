@@ -1278,7 +1278,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             try {
                 fSearchRequest.waitForCompletion();
             } catch (InterruptedException e) {
-                TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Search request interrupted!", e)); //$NON-NLS-1$
+                TmfUiPlugin.getDefault().logError("Search request interrupted!", e); //$NON-NLS-1$
             }
 
             IStatus status = Status.OK_STATUS;

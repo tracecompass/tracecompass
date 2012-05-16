@@ -35,7 +35,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
     private static final Image downImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
     private final CustomXmlParserWizard wizard;
     private CustomXmlTraceDefinition definition;
-    ArrayList<Output> outputs = new ArrayList<Output>();
+    List<Output> outputs = new ArrayList<Output>();
     //    Output messageOutput;
     Composite container;
     SashForm sash;
@@ -205,9 +205,9 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
         } catch (final TmfTraceException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating CustomXmlTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating CustomXmlTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
         }
 
         tableContainer.layout();

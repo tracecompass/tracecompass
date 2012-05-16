@@ -726,12 +726,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             doc = db.parse(new ByteArrayInputStream(string.getBytes()));
             documentElement = doc.getDocumentElement();
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
             documentElement = null;
         } catch (SAXException e) {
             documentElement = null;
         } catch (IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
             documentElement = null;
         }
     }
@@ -825,8 +825,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private class ElementNode {
         final InputElement inputElement;
         final Group group;
-        ArrayList<Attribute> attributes = new ArrayList<Attribute>();
-        ArrayList<ElementNode> childElements = new ArrayList<ElementNode>();
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        List<ElementNode> childElements = new ArrayList<ElementNode>();
         Text elementNameText;
         Composite tagComposite;
         Combo tagCombo;
@@ -1008,7 +1008,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 if (element != null) {
                     previewText.setText(CustomXmlTrace.parseElement(element, new StringBuffer()).toString());
                     if (logEntryButton.getSelection()) {
-                        if (logEntryFound == false) {
+                        if (!logEntryFound) {
                             logEntryFound = true;
                             logEntriesCount++;
                         } else {

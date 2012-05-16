@@ -391,7 +391,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         try {
             dbuffer = new Image(getDisplay(), getClientArea().width, getClientArea().height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR,TmfUiPlugin.PLUGIN_ID, "Error creating image", e)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error creating image", e); //$NON-NLS-1$
         }
         gcim = new GC(dbuffer);
         for (int i = 0; i < fNodeList.size() - 1; i++) {
@@ -475,7 +475,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         try {
             gc.drawImage(dbuffer, 0, 0, getClientArea().width, getClientArea().height, 0, 0, getClientArea().width, getClientArea().height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR,TmfUiPlugin.PLUGIN_ID, "Error drawing image", e)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error drawing image", e); //$NON-NLS-1$
         }
         gcim.dispose();
         if (dbuffer != null) {

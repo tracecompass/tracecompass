@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
@@ -184,11 +185,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                         }
                 }
             } catch (final InvalidRegistryObjectException e) {
-                e.printStackTrace();
-            } catch (final PartInitException e) {
-                throw e;
+                TmfUiPlugin.getDefault().logError("Error initializing TmfEventsEditor", e); //$NON-NLS-1$
             } catch (final CoreException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error initializing TmfEventsEditor", e); //$NON-NLS-1$
             }
         } else
             throw new PartInitException("Invalid IEditorInput: " + input.getClass()); //$NON-NLS-1$
@@ -299,23 +298,23 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     break;
                 }
         } catch (final InvalidRegistryObjectException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final CoreException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final ClassNotFoundException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final SecurityException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final NoSuchMethodException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final IllegalArgumentException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final InstantiationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final IllegalAccessException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         } catch (final InvocationTargetException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
         }
         return eventsTable;
     }
@@ -365,23 +364,23 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     break;
                 }
         } catch (final CoreException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final InvalidRegistryObjectException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final SecurityException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final IllegalArgumentException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final ClassNotFoundException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final NoSuchMethodException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final InstantiationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final IllegalAccessException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         } catch (final InvocationTargetException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
         }
         return eventsTable;
     }
@@ -464,11 +463,11 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             break;
                         }
             } catch (final InvalidRegistryObjectException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error handling signal TmfTraceParserUpdatedSignal", e); //$NON-NLS-1$
             } catch (final TmfTraceException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error handling signal TmfTraceParserUpdatedSignal", e); //$NON-NLS-1$
             } catch (final CoreException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error handling signal TmfTraceParserUpdatedSignal", e); //$NON-NLS-1$
             }
             fEventsTable.dispose();
             if (fTrace != null) {

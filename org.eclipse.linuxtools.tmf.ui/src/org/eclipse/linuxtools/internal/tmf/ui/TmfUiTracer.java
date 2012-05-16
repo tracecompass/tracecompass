@@ -27,7 +27,7 @@ public class TmfUiTracer {
 		try {
 			outfile = new BufferedWriter(new FileWriter(filename));
 		} catch (IOException e) {
-			e.printStackTrace();
+		    TmfUiPlugin.getDefault().logError("Error creating log file " + LOGNAME, e); //$NON-NLS-1$
 		}
 		return outfile;
 	}
@@ -87,7 +87,7 @@ public class TmfUiTracer {
 			fTraceLog.close();
 			fTraceLog = null;
 		} catch (IOException e) {
-			e.printStackTrace();
+	          TmfUiPlugin.getDefault().logError("Error closing log file " + LOGNAME, e); //$NON-NLS-1$
 		}
 	}
 
@@ -124,7 +124,7 @@ public class TmfUiTracer {
 				fTraceLog.newLine();
 				fTraceLog.flush();
 			} catch (IOException e) {
-				e.printStackTrace();
+		         TmfUiPlugin.getDefault().logError("Error writing to log file " + LOGNAME, e); //$NON-NLS-1$
 			}
 		}
 	}

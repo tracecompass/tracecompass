@@ -13,7 +13,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -126,7 +126,7 @@ public class TmfStatisticsView extends TmfView {
      */
     @Override
     public void createPartControl(Composite parent) {
-        final Vector<TmfBaseColumnData> columnDataList = getColumnDataProvider().getColumnData();
+        final List<TmfBaseColumnData> columnDataList = getColumnDataProvider().getColumnData();
         parent.setLayout(new FillLayout());
 
         fTreeViewer = new TreeViewer(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);

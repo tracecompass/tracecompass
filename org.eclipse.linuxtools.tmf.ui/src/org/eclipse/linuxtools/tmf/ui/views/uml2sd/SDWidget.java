@@ -1081,7 +1081,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                 return;
             }
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR,TmfUiPlugin.PLUGIN_ID, "Error creating image", e)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error creating image", e); //$NON-NLS-1$
             return;
         }
         printUI(sdPrinter.getDialogUI());
@@ -1296,7 +1296,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         try {
             dbuffer = new Image(getDisplay(), area.width, area.height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR,TmfUiPlugin.PLUGIN_ID, "Error creating image", e)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error creating image", e); //$NON-NLS-1$
         }
 
         gcim = new GC(dbuffer);
@@ -1884,7 +1884,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         try {
             gc.drawImage(dbuffer, 0, 0, area.width, area.height, 0, 0, area.width, area.height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR,TmfUiPlugin.PLUGIN_ID, "Error drawin content", e)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error drawin content", e); //$NON-NLS-1$
         }
         dbuffer.dispose();
         setHScrollBarIncrement(Math.round(SDViewPref.getInstance().getLifelineWidth() / (float) 2 * fZoomValue));

@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputAttribute;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputElement;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
@@ -98,10 +99,10 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             }
             return context;
         } catch (final FileNotFoundException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return context;
         } catch (final IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return context;
         }
 
@@ -125,10 +126,10 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         } catch (final FileNotFoundException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } catch (final IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } finally {
             if (raFile != null) {
@@ -149,9 +150,9 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                 return (double) ((Long) location.getLocation()) / raFile.length();
             }
         } catch (final FileNotFoundException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting location ration. File not found: " + getPath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error getting location ration. File: " + getPath(), e); //$NON-NLS-1$
         } finally {
             if (raFile != null) {
                 try {
@@ -216,7 +217,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                     rawPos = context.raFile.getFilePointer();
                 }
             } catch (final IOException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error pasing event. File: " + getPath(), e); //$NON-NLS-1$
+                
             }
             context.setLocation(NULL_LOCATION);
             return event;
@@ -253,11 +255,11 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             final Document doc = db.parse(new ByteArrayInputStream(elementBuffer.toString().getBytes()));
             return doc.getDocumentElement();
         } catch (final ParserConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error parsing element buffer. File:" + getPath(), e); //$NON-NLS-1$
         } catch (final SAXException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error parsing element buffer. File:" + getPath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error parsing element buffer. File: " + getPath(), e); //$NON-NLS-1$
         }
         return null;
     }
@@ -345,7 +347,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                     buffer.append(separator);
                 }
                 final Element element = (Element) node;
-                if (element.hasChildNodes() == false) {
+                if (!element.hasChildNodes()) {
                     buffer.append(element.getNodeName());
                 } else if (element.getChildNodes().getLength() == 1 && element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
                     buffer.append(element.getNodeName() + ":" + element.getFirstChild().getNodeValue().trim()); //$NON-NLS-1$

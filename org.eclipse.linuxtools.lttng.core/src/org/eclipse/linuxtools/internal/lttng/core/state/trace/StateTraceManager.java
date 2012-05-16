@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.eclipse.linuxtools.internal.lttng.core.Activator;
 import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent;
@@ -536,7 +537,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 			try {
 				fCheckPointStateModel.init(this);
 			} catch (LttngStateException e) {
-				e.printStackTrace();
+			    Activator.getDefault().logError("Unexpected Error", e);  //$NON-NLS-1$
 			}
 		}
 	}

@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -159,7 +160,7 @@ public class OpenTraceHandler extends AbstractHandler {
                 else
                     file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfTrace.class.getCanonicalName());
             } catch (final CoreException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error opening trace " + fTrace.getName(), e); //$NON-NLS-1$
             }
 
         if (usesEditor)
@@ -178,7 +179,7 @@ public class OpenTraceHandler extends AbstractHandler {
                         IDE.setDefaultEditor((IFile) resource, editorId);
                 }
             } catch (final PartInitException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error opening trace " + fTrace.getName(), e); //$NON-NLS-1$
             }
         else {
             // Create the experiment

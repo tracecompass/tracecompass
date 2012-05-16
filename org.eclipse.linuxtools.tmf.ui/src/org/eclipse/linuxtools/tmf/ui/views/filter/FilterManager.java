@@ -36,9 +36,9 @@ public class FilterManager {
 	        fRoot = new TmfFilterXMLParser(SAVED_FILTERS_PATH_NAME).getTree();
         } catch (FileNotFoundException e) {
         } catch (SAXException e) {
-	        e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error parsing saved filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         } catch (IOException e) {
-	        e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error parsing saved filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         }
     }
     
@@ -55,9 +55,9 @@ public class FilterManager {
 	        TmfFilterXMLWriter writerXML = new TmfFilterXMLWriter(fRoot);
 	        writerXML.saveTree(SAVED_FILTERS_PATH_NAME);
         } catch (IOException e) {
-	        e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         } catch (ParserConfigurationException e) {
-	        e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         }
     }
 }

@@ -661,7 +661,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                 setErrorMessage(Messages.ImportTraceWizard_CannotImportFilesUnderAVirtualFolder);
                 return false;
             }
-            if (createLinksInWorkspaceButton == null || createLinksInWorkspaceButton.getSelection() == false) {
+            if (createLinksInWorkspaceButton == null || !createLinksInWorkspaceButton.getSelection()) {
                 setMessage(null);
                 setErrorMessage(Messages.ImportTraceWizard_HaveToCreateLinksUnderAVirtualFolder);
                 return false;
@@ -825,7 +825,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                                     }
                                 }
                             } catch (CoreException e) {
-                                e.printStackTrace();
+                                TmfUiPlugin.getDefault().logError("Error importing trace resource " + resource.getName(), e); //$NON-NLS-1$
                             }
                         }
                     }

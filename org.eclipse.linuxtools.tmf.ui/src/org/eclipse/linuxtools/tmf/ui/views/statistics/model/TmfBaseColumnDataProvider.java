@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -35,7 +36,7 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
     /**
      * Contains the list of the columns
      */
-    static Vector<TmfBaseColumnData> fColumnData = null;
+    protected List<TmfBaseColumnData> fColumnData = null;
 
     /**
      * Level column names
@@ -131,7 +132,7 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
      * Provide the columns to represent statistics data
      */
     @Override
-    public Vector<TmfBaseColumnData> getColumnData() {
+    public List<TmfBaseColumnData> getColumnData() {
         return fColumnData;
     }
 

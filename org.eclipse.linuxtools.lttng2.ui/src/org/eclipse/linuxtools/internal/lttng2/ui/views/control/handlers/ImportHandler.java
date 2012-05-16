@@ -198,9 +198,9 @@ public class ImportHandler extends BaseControlViewHandler {
             fsss.downloadMultiple(sources, destinations, encodings, new NullProgressMonitor());
             
         } catch (SystemMessageException e) {
-            throw new ExecutionException(e.fillInStackTrace().toString());
+            throw new ExecutionException(e.toString(), e);
         } catch (CoreException e) {
-            throw new ExecutionException(e.fillInStackTrace().toString());
+            throw new ExecutionException(e.toString(), e);
         }
     }
 }

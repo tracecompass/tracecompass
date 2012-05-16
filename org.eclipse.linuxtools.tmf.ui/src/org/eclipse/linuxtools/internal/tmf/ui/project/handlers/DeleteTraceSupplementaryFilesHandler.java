@@ -17,8 +17,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
@@ -89,7 +87,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
                             resource.refreshLocal(IResource.DEPTH_INFINITE, null);
                         }
                     } catch (CoreException e) {
-                        TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error refreshing resource " + resource, e)); //$NON-NLS-1$
+                        TmfUiPlugin.getDefault().logError("Error refreshing resource " + resource, e); //$NON-NLS-1$
                     }
                 }
             }

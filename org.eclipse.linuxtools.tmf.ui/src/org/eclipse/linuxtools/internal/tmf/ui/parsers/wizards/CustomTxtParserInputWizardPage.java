@@ -954,7 +954,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         Label cardinalityMaxLabel;
         Text cardinalityMaxText;
         Button infiniteButton;
-        ArrayList<InputGroup> inputs = new ArrayList<InputGroup>();
+        List<InputGroup> inputs = new ArrayList<InputGroup>();
         Button addGroupButton;
         Label addGroupLabel;
         

@@ -153,7 +153,7 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
 
             return project;
         } catch (CoreException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating TMF project " + project.getName(), e); //$NON-NLS-1$            
         }
         return null;
     }

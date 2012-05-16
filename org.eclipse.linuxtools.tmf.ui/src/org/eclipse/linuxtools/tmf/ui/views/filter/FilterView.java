@@ -98,7 +98,7 @@ public class FilterView extends TmfView {
 		try {
             fWorkspace.getRoot().refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error refreshing workspace", e); //$NON-NLS-1$
         }
         
         fRoot = new TmfFilterRootNode();
@@ -261,9 +261,9 @@ public class FilterView extends TmfView {
 		        }
 				
 			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
+			    TmfUiPlugin.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
 			} catch (IOException e) {
-				e.printStackTrace();
+			    TmfUiPlugin.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
 			}
 		}
 	}
@@ -286,9 +286,9 @@ public class FilterView extends TmfView {
 			        }
 					
 				} catch (SAXException e) {
-					e.printStackTrace();
+				    TmfUiPlugin.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
 				} catch (IOException e) {
-					e.printStackTrace();
+				    TmfUiPlugin.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
 				}
 
 				if (root != null) {

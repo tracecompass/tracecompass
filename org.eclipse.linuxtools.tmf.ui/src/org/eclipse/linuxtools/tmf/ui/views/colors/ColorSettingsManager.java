@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.colors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -34,7 +35,7 @@ public class ColorSettingsManager {
 	public static final int PRIORITY_NONE = Integer.MAX_VALUE;
 	
 	private static ColorSetting[] fColorSettings = ColorSettingsXML.load(COLOR_SETTINGS_PATH_NAME);
-	private static ArrayList<IColorSettingsListener> fListeners = new ArrayList<IColorSettingsListener>();
+	private static List<IColorSettingsListener> fListeners = new ArrayList<IColorSettingsListener>();
 	
 	public static ColorSetting[] getColorSettings() {
 		return (fColorSettings != null) ? Arrays.copyOf(fColorSettings, fColorSettings.length) : null;

@@ -614,7 +614,6 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                             try {
                                 Thread.sleep(2000); // allow time for target to pause traces before disconnecting the channel
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
                             }
                         }
                     });

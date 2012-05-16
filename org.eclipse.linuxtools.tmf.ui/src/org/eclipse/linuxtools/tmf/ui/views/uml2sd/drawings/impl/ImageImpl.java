@@ -108,7 +108,7 @@ public class ImageImpl implements IImage {
             ImageDescriptor img = ImageDescriptor.createFromURL(url);
             return img.createImage();
         } catch (MalformedURLException e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error opening image file", e));  //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error opening image file", e);  //$NON-NLS-1$
         }
         return null;
     }

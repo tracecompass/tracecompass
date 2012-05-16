@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.internal.lttng.core.state.experiment;
 
+import org.eclipse.linuxtools.internal.lttng.core.Activator;
 import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.internal.lttng.core.state.LttngStateException;
@@ -82,7 +83,7 @@ public class StateManagerFactory {
             }
 
         } catch (LttngStateException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError("Unexpected Error", e);  //$NON-NLS-1$
         }
 
         experiment.addChild(manager);

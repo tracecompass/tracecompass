@@ -121,7 +121,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
              * was not found or was not recognized as a CTF trace. Throw into
              * the new type of exception expected by the rest of TMF.
              */
-            throw new TmfTraceException(e.getMessage());
+            throw new TmfTraceException(e.getMessage(), e);
         }
 
         TmfSignalManager.register(this);
@@ -133,7 +133,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
             try {
                 resource.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
             } catch (CoreException e) {
-                throw new TmfTraceException(e.getMessage());
+                throw new TmfTraceException(e.getMessage(), e);
             }
         }
     }

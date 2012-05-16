@@ -157,23 +157,23 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
                 }
             }
         } catch (CoreException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (InvalidRegistryObjectException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (SecurityException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         }
         return new TmfEventsTable(parent, cacheSize);
     }
