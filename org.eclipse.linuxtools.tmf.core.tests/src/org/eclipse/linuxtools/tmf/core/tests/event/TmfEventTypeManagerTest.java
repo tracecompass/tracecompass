@@ -22,10 +22,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventTypeManager;
 
 /**
- * <b><u>TmfEventTypeManagerTest</u></b>
- * <p>
  * Test suite for the TmfEventTypeManager class.
- * <p>
  */
 @SuppressWarnings("nls")
 public class TmfEventTypeManagerTest extends TestCase {

@@ -28,14 +28,13 @@ package org.eclipse.linuxtools.tmf.core.event;
  * timestamps in different scales). Default: 0.
  * </ul>
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  * 
  * @see ITmfEvent
  * @see TmfTimeRange
  */
-public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
+public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
 
     // ------------------------------------------------------------------------
     // Getters
@@ -85,10 +84,6 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
      * @return the time difference (this - other) as an ITmfTimestamp
      */
     public ITmfTimestamp getDelta(ITmfTimestamp ts);
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the timestamp

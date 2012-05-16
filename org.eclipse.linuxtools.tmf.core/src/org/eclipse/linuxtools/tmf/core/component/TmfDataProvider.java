@@ -199,7 +199,8 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                     request.getNbRequested(), request.getBlockSize(), request.getExecType());
             coalescedRequest.addRequest(request);
             if (Tracer.isRequestTraced()) {
-                Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                Tracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                Tracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
             }
             fPendingCoalescedRequests.add(coalescedRequest);
         }
@@ -211,7 +212,8 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                 if (coalescedRequest.isCompatible(request)) {
                     coalescedRequest.addRequest(request);
                     if (Tracer.isRequestTraced()) {
-                        Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                        Tracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                        Tracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
                     }
                     return;
                 }
@@ -246,8 +248,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
             @Override
             public void run() {
 
-                if (Tracer.isRequestTraced())
-                    Tracer.trace("Request #" + request.getRequestId() + " is being serviced by " + provider.getName()); //$NON-NLS-1$//$NON-NLS-2$
+                if (Tracer.isRequestTraced()) {
+                    Tracer.traceRequest(request, "is being serviced by " + provider.getName()); //$NON-NLS-1$
+                }
 
                 // Extract the generic information
                 request.start();
@@ -265,10 +268,10 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                     // Get the ordered events
                     T data = getNext(context);
                     if (Tracer.isRequestTraced())
-                        Tracer.trace("Request #" + request.getRequestId() + " read first event"); //$NON-NLS-1$ //$NON-NLS-2$
+                        Tracer.traceRequest(request, "read first event"); //$NON-NLS-1$
                     while (data != null && !isCompleted(request, data, nbRead)) {
-                        if (fLogData)
-                            Tracer.traceEvent(provider, request, data);
+//                        if (fLogData)
+//                            Tracer.traceEvent(provider, request, data);
                         if (request.getDataType().isInstance(data)) {
                             request.handleData(data);
                         }
@@ -280,7 +283,7 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                         }
                     }
                     if (Tracer.isRequestTraced())
-                        Tracer.trace("Request #" + request.getRequestId() + " finished"); //$NON-NLS-1$//$NON-NLS-2$
+                        Tracer.traceRequest(request, "COMPLETED"); //$NON-NLS-1$
 
                     if (request.isCancelled()) {
                         request.cancel();
@@ -304,16 +307,23 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
         };
 
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(request, "queued"); //$NON-NLS-1$
+            Tracer.traceRequest(request, "QUEUED"); //$NON-NLS-1$
         fExecutor.execute(thread);
 
     }
 
     protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
 
+        final TmfDataProvider<T> provider = this;
+
         Thread thread = new Thread() {
             @Override
             public void run() {
+
+                if (Tracer.isRequestTraced()) {
+                    Tracer.traceRequest(request, "is being serviced by " + provider.getName()); //$NON-NLS-1$
+                }
+
                 request.start();
 
                 final Integer[] CHUNK_SIZE = new Integer[1];
@@ -384,14 +394,14 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
      */
     public abstract ITmfContext armRequest(ITmfDataRequest<T> request);
 
-    /**
-     * Return the next event based on the context supplied. The context
-     * will be updated for the subsequent read.
-     * 
-     * @param context the trace read context (updated)
-     * @return the event referred to by context
-     */
-    public abstract T getNext(ITmfContext context);
+//    /**
+//     * Return the next event based on the context supplied. The context
+//     * will be updated for the subsequent read.
+//     * 
+//     * @param context the trace read context (updated)
+//     * @return the event referred to by context
+//     */
+//    public abstract T getNext(ITmfContext context);
 
     /**
      * Checks if the data meets the request completion criteria.

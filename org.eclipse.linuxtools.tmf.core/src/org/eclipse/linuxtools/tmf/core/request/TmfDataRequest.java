@@ -219,8 +219,16 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
         fRequestFailed = false;
         fRequestCanceled = false;
 
-        if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "created"); //$NON-NLS-1$
+        if (!(this instanceof ITmfEventRequest) && Tracer.isRequestTraced()) {
+            String type = getClass().getName();
+            type = type.substring(type.lastIndexOf('.') + 1);
+            @SuppressWarnings("nls")
+            String message = "CREATED " 
+                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") 
+                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
+                    + " DataType=" + getDataType().getSimpleName();
+            Tracer.traceRequest(this, message);
+        }
     }
 
     /**
@@ -366,7 +374,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     @Override
     public void handleStarted() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "started"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "STARTED"); //$NON-NLS-1$
     }
 
     /**
@@ -396,25 +404,25 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
             handleSuccess();
         }
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "completed (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
+            Tracer.traceRequest(this, "COMPLETED (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
     public void handleSuccess() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "succeeded"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "SUCCEEDED"); //$NON-NLS-1$
     }
 
     @Override
     public void handleFailure() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "failed"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "FAILED"); //$NON-NLS-1$
     }
 
     @Override
     public void handleCancel() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "cancelled"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "CANCELLED"); //$NON-NLS-1$
     }
 
     /**

@@ -19,8 +19,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
- * <b><u>TmfLocationTest</u></b>
- * <p>
  * Test suite for the TmfLocation class.
  */
 @SuppressWarnings("nls")

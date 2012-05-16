@@ -18,7 +18,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 /**
  * The generic trace parser in TMF.
  *  
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *

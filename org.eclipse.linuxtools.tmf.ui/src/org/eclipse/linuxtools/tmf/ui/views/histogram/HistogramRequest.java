@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * <b><u>HistogramRequest</u></b>
@@ -37,17 +37,9 @@ public class HistogramRequest extends TmfEventRequest<ITmfEvent> {
     // Constructor
     // ------------------------------------------------------------------------
 
-    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, int nbEvents, ITmfDataRequest.ExecutionType execType) {
-        super(ITmfEvent.class, range, rank, nbEvents, TmfTrace.DEFAULT_TRACE_CACHE_SIZE, execType);
+    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, int nbEvents, int blockSize, ITmfDataRequest.ExecutionType execType) {
+        super(ITmfEvent.class, range, rank, nbEvents, (blockSize > 0) ? blockSize : ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, execType);
         fHistogram = histogram;
-    }
-
-    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, ITmfDataRequest.ExecutionType execType) {
-        this(histogram, range, 0, ALL_DATA, execType);
-    }
-
-    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, ITmfDataRequest.ExecutionType execType) {
-        this(histogram, range, rank, ALL_DATA, execType);
     }
 
     // ------------------------------------------------------------------------

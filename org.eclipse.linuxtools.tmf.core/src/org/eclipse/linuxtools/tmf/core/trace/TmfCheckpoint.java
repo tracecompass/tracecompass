@@ -19,15 +19,13 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
  * A basic implementation of ITmfCheckpoint. It simply maps an event timestamp
  * to a generic location.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
- * @see ITmfCheckpoint
  * @see ITmfLocation
  * @see ITmfTimestamp
  */
-public class TmfCheckpoint implements ITmfCheckpoint {
+public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -67,8 +65,9 @@ public class TmfCheckpoint implements ITmfCheckpoint {
      * @param other the other checkpoint
      */
     public TmfCheckpoint(final TmfCheckpoint other) {
-        if (other == null)
+        if (other == null) {
             throw new IllegalArgumentException();
+        }
         fTimestamp = other.fTimestamp;
         fLocation = other.fLocation;
     }
@@ -154,23 +153,30 @@ public class TmfCheckpoint implements ITmfCheckpoint {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (!(obj instanceof TmfCheckpoint))
+        }
+        if (!(obj instanceof TmfCheckpoint)) {
             return false;
+        }
         final TmfCheckpoint other = (TmfCheckpoint) obj;
         if (fLocation == null) {
-            if (other.fLocation != null)
+            if (other.fLocation != null) {
                 return false;
-        } else if (!fLocation.equals(other.fLocation))
+            }
+        } else if (!fLocation.equals(other.fLocation)) {
             return false;
+        }
         if (fTimestamp == null) {
-            if (other.fTimestamp != null)
+            if (other.fTimestamp != null) {
                 return false;
-        } else if (!fTimestamp.equals(other.fTimestamp))
+            }
+        } else if (!fTimestamp.equals(other.fTimestamp)) {
             return false;
+        }
         return true;
     }
 

@@ -37,8 +37,6 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
- * <b><u>TmfEventTest</u></b>
- * <p>
  * Test suite for the TmfEvent class.
  */
 @SuppressWarnings("nls")

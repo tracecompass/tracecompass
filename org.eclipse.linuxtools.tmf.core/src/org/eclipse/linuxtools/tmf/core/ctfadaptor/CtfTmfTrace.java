@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -363,22 +364,22 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return seekEvent(request.getIndex());
     }
 
-    /**
-     * The trace reader keeps its own iterator: the "context" parameter here
-     * will be ignored.
-     *
-     * If you wish to specify a new context, instantiate a new CtfIterator and
-     * seek() it to where you want, and use that to read events.
-     *
-     * FIXME merge with getNextEvent below once they both use the same parameter
-     * type.
-     * @param context ITmfContext
-     * @return CtfTmfEvent
-     */
-    @Override
-    public CtfTmfEvent getNext(final ITmfContext context) {
-        return readNextEvent(context);
-    }
+//    /**
+//     * The trace reader keeps its own iterator: the "context" parameter here
+//     * will be ignored.
+//     *
+//     * If you wish to specify a new context, instantiate a new CtfIterator and
+//     * seek() it to where you want, and use that to read events.
+//     *
+//     * FIXME merge with getNextEvent below once they both use the same parameter
+//     * type.
+//     * @param context ITmfContext
+//     * @return CtfTmfEvent
+//     */
+//    @Override
+//    public CtfTmfEvent getNext(final ITmfContext context) {
+//        return readNextEvent(context);
+//    }
 
     // ------------------------------------------------------------------------
     // ITmfTrace
@@ -397,6 +398,11 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
             currentLocation = new CtfLocation(0L);
         }
         CtfIterator context = new CtfIterator(this);
+        
+        if (currentLocation.getLocation() == CtfLocation.INVALID_LOCATION) {
+            ((CtfTmfTimestamp) getEndTime()).setType(TimestampType.NANOS);
+            currentLocation.setLocation(getEndTime().getValue() + 1);
+        }
         context.setLocation(currentLocation);
         context.setRank(ITmfContext.UNKNOWN_RANK);
         return context;
@@ -474,10 +480,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * Method readNextEvent.
      * @param context ITmfContext
      * @return CtfTmfEvent
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readNextEvent(ITmfContext)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getNext(ITmfContext)
      */
     @Override
-    public CtfTmfEvent readNextEvent(final ITmfContext context) {
+    public CtfTmfEvent getNext(final ITmfContext context) {
         CtfTmfEvent event = null;
         if (context instanceof CtfIterator) {
             CtfIterator ctfIterator = (CtfIterator) context;

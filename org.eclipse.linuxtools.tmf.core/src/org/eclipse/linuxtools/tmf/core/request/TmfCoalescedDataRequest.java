@@ -142,11 +142,21 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 	public boolean isCompatible(ITmfDataRequest<T> request) {
 
 		boolean ok = request.getIndex() == getIndex();
-		ok &= request.getNbRequested()  == getNbRequested();
-		ok &= request.getExecType()     == getExecType();
-		//ok &= request.getDataType()     == getDataType();
+		ok &= request.getNbRequested() == getNbRequested();
+		ok &= request.getExecType() == getExecType();
 		
 		return ok;
+	}
+
+	@SuppressWarnings("nls")
+    public String getSubRequestIds() {
+	    StringBuffer result = new StringBuffer("[");
+	    for (int i = 0; i < fRequests.size(); i++) {
+	        if (i != 0) result.append(", ");
+	        result.append(fRequests.get(i).getRequestId());
+	    }
+	    result.append("]");
+	    return result.toString();
 	}
 
     // ------------------------------------------------------------------------
