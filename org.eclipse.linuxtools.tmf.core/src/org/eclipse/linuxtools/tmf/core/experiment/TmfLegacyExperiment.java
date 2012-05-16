@@ -724,7 +724,7 @@ public class TmfLegacyExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
     // The index page size
     private static final int DEFAULT_INDEX_PAGE_SIZE = 5000;
 //    protected int fIndexPageSize;
-    protected boolean fIndexing = false;
+//    protected boolean fIndexing = false;
     protected TmfTimeRange fIndexingPendingRange = TmfTimeRange.NULL_RANGE;
 
 //    private Integer fEndSynchReference;

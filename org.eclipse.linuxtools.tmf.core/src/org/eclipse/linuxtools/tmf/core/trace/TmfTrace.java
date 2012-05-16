@@ -554,19 +554,6 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         return seekEvent(request.getIndex());
     }
 
-//    /* (non-Javadoc)
-//     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
-//     */
-//    @Override
-//    @SuppressWarnings("unchecked")
-//    public T getNext(final ITmfContext context) {
-//        if (context instanceof TmfContext) {
-//            return (T) readNextEvent(context);
-//        }
-//        return null;
-//    }
-
-
     // ------------------------------------------------------------------------
     // toString
     // ------------------------------------------------------------------------

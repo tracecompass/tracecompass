@@ -84,7 +84,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         try {
             super.initTrace(resource, path, type);
         } catch (TmfTraceException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -208,9 +207,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
             timestamp = null;
         }
 
-        if (request.getIndex() == 600001) {
-            System.out.println("Aie"); //$NON-NLS-1$
-        }
         ITmfContext context = null;
         if (timestamp != null) { // Seek by timestamp
             context = seekEvent(timestamp);

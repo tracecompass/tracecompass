@@ -220,7 +220,7 @@ public final class TmfTimeRange implements Cloneable {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfTimeRange [" + fStartTime + ", " + fEndTime + "]";
+        return "TmfTimeRange [fStartTime=" + fStartTime + ", fEndTime=" + fEndTime + "]";
     }
 
 }

@@ -473,9 +473,9 @@ public class HistogramView extends TmfView {
         if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
         }
-//        if (fullRange.equals(TmfTimeRange.NULL_RANGE)) {
-//            return;
-//        }
+        if (fullRange.equals(TmfTimeRange.NULL_RANGE)) {
+            return;
+        }
         int cacheSize = fCurrentExperiment.getCacheSize();
         fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(), fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
                 TmfDataRequest.ALL_DATA, cacheSize, ExecutionType.BACKGROUND);

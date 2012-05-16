@@ -355,16 +355,7 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        if (equals(BIG_BANG)) {
-            return "BIG_BANG";
-        }
-        if (equals(BIG_CRUNCH)) {
-            return "BIG_CRUNCH";
-        }
-        if (equals(ZERO)) {
-            return "ZERO";
-        }
-        return "[" + fValue + "," + fScale + "," + fPrecision + "]";
+        return "TmfTimestamp [fValue=" + fValue + ", fScale=" + fScale + ", fPrecision=" + fPrecision + "]";
     }
 
 }
