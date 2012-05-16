@@ -395,8 +395,8 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         CtfIterator context = new CtfIterator(this);
         
         if (currentLocation.getLocation() == CtfLocation.INVALID_LOCATION) {
-            ((CtfTmfTimestamp)getEndTime()).setType(TimestampType.NANOS);
-            currentLocation.setLocation( getEndTime().getValue() + 1);
+            ((CtfTmfTimestamp) getEndTime()).setType(TimestampType.NANOS);
+            currentLocation.setLocation(getEndTime().getValue() + 1);
         }
         context.setLocation(currentLocation);
         context.setRank(ITmfContext.UNKNOWN_RANK);

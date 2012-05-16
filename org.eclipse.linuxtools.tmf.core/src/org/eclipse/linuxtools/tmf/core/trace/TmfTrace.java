@@ -518,10 +518,10 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param timestamp the corresponding timestamp
      */
     protected synchronized void updateAttributes(final ITmfContext context, final ITmfTimestamp timestamp) {
-        if (fStartTime.compareTo(timestamp, false) > 0) {
+        if (fStartTime.equals(TmfTimestamp.BIG_BANG) || fStartTime.compareTo(timestamp, false) > 0) {
             fStartTime = timestamp;
         }
-        if (fEndTime.compareTo(timestamp, false) < 0) {
+        if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || fEndTime.compareTo(timestamp, false) < 0) {
             fEndTime = timestamp;
         }
         if (context.hasValidRank()) {

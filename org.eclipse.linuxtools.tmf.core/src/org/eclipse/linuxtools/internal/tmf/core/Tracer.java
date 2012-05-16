@@ -153,7 +153,7 @@ public class Tracer {
     }
 
     public static void traceComponent(ITmfComponent component, String msg) {
-        String message = ("[CMP] Thread=" + Thread.currentThread().getId() + " Cmp=" + component.getName() + " " + msg);
+        String message = ("[CMP] Cmp=" + component.getName() + " " + msg);
         trace(message);
     }
 
@@ -163,23 +163,22 @@ public class Tracer {
     }
 
     public static void traceSignal(TmfSignal signal, String msg) {
-        String message = ("[SIG] Type=" + signal.getClass().getSimpleName() + " Target=" + msg);
+        String message = ("[SIG] Sig=" + signal.getClass().getSimpleName() + " Target=" + msg);
         trace(message);
     }
 
-    public static void traceEvent(ITmfDataProvider<?> provider, ITmfDataRequest<?> request, ITmfEvent data) {
-        String message = ("[EVT] Provider=" + provider.toString() + ", Req=" + request.getRequestId() + ", Event=" + data
-                .toString());
+    public static void traceEvent(ITmfDataProvider<?> provider, ITmfDataRequest<?> request, ITmfEvent event) {
+        String message = ("[EVT] Provider=" + provider.toString() + ", Req=" + request.getRequestId() + ", Event=" + event.getTimestamp());
         trace(message);
     }
 
     public static void traceError(String msg) {
-        String message = ("[ERR] Thread=" + Thread.currentThread().getId() + " " + msg);
+        String message = ("[ERR] Err=" + msg);
         trace(message);
     }
 
     public static void traceInfo(String msg) {
-        String message = ("[INF] Thread=" + Thread.currentThread().getId() + " " + msg);
+        String message = ("[INF] " + msg);
         trace(message);
     }
 

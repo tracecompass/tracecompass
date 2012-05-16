@@ -164,8 +164,8 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
             @SuppressWarnings("nls")
             String message = "CREATED " 
                     + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") 
-                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
-                    + " Range=" + getRange().toString()
+                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested() 
+                    + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
             Tracer.traceRequest(this, message);
         }

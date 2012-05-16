@@ -208,6 +208,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
             timestamp = null;
         }
 
+        if (request.getIndex() == 600001) {
+            System.out.println("Aie"); //$NON-NLS-1$
+        }
         ITmfContext context = null;
         if (timestamp != null) { // Seek by timestamp
             context = seekEvent(timestamp);

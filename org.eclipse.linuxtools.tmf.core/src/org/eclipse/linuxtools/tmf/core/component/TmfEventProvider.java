@@ -91,10 +91,17 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
 			return;
 		}
 
+        final TmfDataProvider<T> provider = this;
+
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
-				request.start();
+
+                if (Tracer.isRequestTraced()) {
+                    Tracer.traceRequest(request, "is being serviced by " + provider.getName()); //$NON-NLS-1$
+                }
+
+			    request.start();
 
 				final Integer[] CHUNK_SIZE = new Integer[1];
 				CHUNK_SIZE[0] = Math.min(request.getNbRequested(), blockSize + ((indexing) ? 1 : 0));

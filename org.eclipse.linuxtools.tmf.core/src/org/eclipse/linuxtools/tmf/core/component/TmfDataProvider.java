@@ -248,8 +248,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
             @Override
             public void run() {
 
-                if (Tracer.isRequestTraced())
+                if (Tracer.isRequestTraced()) {
                     Tracer.traceRequest(request, "is being serviced by " + provider.getName()); //$NON-NLS-1$
+                }
 
                 // Extract the generic information
                 request.start();
@@ -269,8 +270,8 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                     if (Tracer.isRequestTraced())
                         Tracer.traceRequest(request, "read first event"); //$NON-NLS-1$
                     while (data != null && !isCompleted(request, data, nbRead)) {
-                        if (fLogData)
-                            Tracer.traceEvent(provider, request, data);
+//                        if (fLogData)
+//                            Tracer.traceEvent(provider, request, data);
                         if (request.getDataType().isInstance(data)) {
                             request.handleData(data);
                         }
@@ -313,9 +314,16 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
     protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
 
+        final TmfDataProvider<T> provider = this;
+
         Thread thread = new Thread() {
             @Override
             public void run() {
+
+                if (Tracer.isRequestTraced()) {
+                    Tracer.traceRequest(request, "is being serviced by " + provider.getName()); //$NON-NLS-1$
+                }
+
                 request.start();
 
                 final Integer[] CHUNK_SIZE = new Integer[1];
