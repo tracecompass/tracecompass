@@ -180,11 +180,18 @@ public class StateHistorySystem extends StateSystem implements
             AttributeNotFoundException {
         List<ITmfStateInterval> intervals;
         ITmfStateInterval currentInterval;
-        long ts;
+        long ts, tEnd;
 
         /* Make sure the time range makes sense */
         if (t2 <= t1) {
             throw new TimeRangeException();
+        }
+
+        /* Set the actual, valid end time of the range query */
+        if (t2 > this.getCurrentEndTime()) {
+            tEnd = this.getCurrentEndTime();
+        } else {
+            tEnd = t2;
         }
 
         /* Get the initial state at time T1 */
@@ -194,18 +201,9 @@ public class StateHistorySystem extends StateSystem implements
 
         /* Get the following state changes */
         ts = currentInterval.getEndTime();
-        while (ts != -1 && ts < t2) {
+        while (ts != -1 && ts < tEnd) {
             ts++; /* To "jump over" to the next state in the history */
-            try {
-                currentInterval = querySingleState(ts, attributeQuark);
-            } catch (TimeRangeException e) {
-                /*
-                 * If the next timestamp is invalid (this probably means t2 was
-                 * greater than the end of the trace), simply stop the queries
-                 * here and return what we have so far.
-                 */
-                break;
-            }
+            currentInterval = querySingleState(ts, attributeQuark);
             intervals.add(currentInterval);
             ts = currentInterval.getEndTime();
         }
@@ -218,11 +216,18 @@ public class StateHistorySystem extends StateSystem implements
             AttributeNotFoundException {
         List<ITmfStateInterval> intervals;
         ITmfStateInterval currentInterval;
-        long ts;
+        long ts, tEnd;
 
         /* Make sure the time range makes sense */
         if (t2 <= t1 || resolution <= 0) {
             throw new TimeRangeException();
+        }
+
+        /* Set the actual, valid end time of the range query */
+        if (t2 > this.getCurrentEndTime()) {
+            tEnd = this.getCurrentEndTime();
+        } else {
+            tEnd = t2;
         }
 
         /* Get the initial state at time T1 */
@@ -234,26 +239,18 @@ public class StateHistorySystem extends StateSystem implements
          * Iterate over the "resolution points". We skip unneeded queries in the
          * case the current interval is longer than the resolution.
          */
-        for (ts = t1; (currentInterval.getEndTime() != -1) && (ts < t2);
+        for (ts = t1; (currentInterval.getEndTime() != -1) && (ts < tEnd);
                 ts += resolution) {
             if (ts <= currentInterval.getEndTime()) {
                 continue;
             }
-
-            try {
-                currentInterval = querySingleState(ts, attributeQuark);
-            } catch (TimeRangeException e) {
-                /* Stop the queries, return the intervals we have so far. */
-                break;
-            }
-
+            currentInterval = querySingleState(ts, attributeQuark);
             intervals.add(currentInterval);
         }
 
         /* Add the interval at t2, if it wasn't included already. */
-        if (currentInterval.getEndTime() < t2 &&
-                t2 <= this.getCurrentEndTime()) {
-            currentInterval = querySingleState(t2, attributeQuark);
+        if (currentInterval.getEndTime() < tEnd) {
+            currentInterval = querySingleState(tEnd, attributeQuark);
             intervals.add(currentInterval);
         } 
         return intervals;
