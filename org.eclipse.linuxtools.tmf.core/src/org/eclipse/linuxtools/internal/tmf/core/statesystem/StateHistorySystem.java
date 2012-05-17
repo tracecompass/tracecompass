@@ -234,8 +234,8 @@ public class StateHistorySystem extends StateSystem implements
          * Iterate over the "resolution points". We skip unneeded queries in the
          * case the current interval is longer than the resolution.
          */
-        for (ts = currentInterval.getStartTime(); (currentInterval.getEndTime() != -1)
-                && (ts < t2); ts += resolution) {
+        for (ts = t1; (currentInterval.getEndTime() != -1) && (ts < t2);
+                ts += resolution) {
             if (ts <= currentInterval.getEndTime()) {
                 continue;
             }
