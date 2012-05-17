@@ -314,6 +314,11 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     }
 
     @Override
+    public void setNbEvents(final long nbEvents) {
+        super.setNbEvents(nbEvents);
+    }
+
+    @Override
     public void setTimeRange(final TmfTimeRange range) {
         super.setTimeRange(range);
     }

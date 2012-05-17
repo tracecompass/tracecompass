@@ -497,6 +497,27 @@ public class TmfTraceTest extends TestCase {
         trace.dispose();
     }
 
+    public void testSetNbEvents() throws Exception {
+        final TmfTraceStub trace = new TmfTraceStub(fTrace);
+        trace.indexTrace();
+
+        assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+
+        trace.setNbEvents(0);
+        assertEquals("getNbEvents", 0, trace.getNbEvents());
+
+        trace.setNbEvents(-1);
+        assertEquals("getNbEvents", 0, trace.getNbEvents());
+
+        trace.setNbEvents(NB_EVENTS + 1);
+        assertEquals("getNbEvents", NB_EVENTS + 1, trace.getNbEvents());
+
+        trace.setNbEvents(NB_EVENTS);
+        assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+
+        trace.dispose();
+    }
+
     // ------------------------------------------------------------------------
     // seekEvent on location (note: does not reliably set the rank)
     // ------------------------------------------------------------------------

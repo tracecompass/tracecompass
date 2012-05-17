@@ -24,12 +24,14 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfEmptyTraceStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
@@ -42,11 +44,12 @@ public class TmfCheckpointIndexTest extends TestCase {
     // Variables
     // ------------------------------------------------------------------------
 
-    private static final String DIRECTORY   = "testfiles";
-    private static final String TEST_STREAM = "A-Test-10K";
-    private static final int    BLOCK_SIZE  = 100;
-    private static final int    NB_EVENTS   = 10000;
-    private static TestTrace    fTrace      = null;
+    private static final String    DIRECTORY   = "testfiles";
+    private static final String    TEST_STREAM = "A-Test-10K";
+    private static final int       BLOCK_SIZE  = 100;
+    private static final int       NB_EVENTS   = 10000;
+    private static TestTrace       fTrace      = null;
+    private static EmptyTestTrace  fEmptyTrace = null;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -59,7 +62,7 @@ public class TmfCheckpointIndexTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
+        setupTrace(DIRECTORY + File.separator + TEST_STREAM);
     }
 
     @Override
@@ -67,6 +70,8 @@ public class TmfCheckpointIndexTest extends TestCase {
         super.tearDown();
         fTrace.dispose();
         fTrace = null;
+        fEmptyTrace.dispose();
+        fEmptyTrace = null;
     }
 
     // ------------------------------------------------------------------------
@@ -76,6 +81,10 @@ public class TmfCheckpointIndexTest extends TestCase {
     private class TestIndexer extends TmfCheckpointIndexer<ITmfTrace<ITmfEvent>> {
         @SuppressWarnings({ "unchecked", "rawtypes" })
         public TestIndexer(TestTrace testTrace) {
+            super((ITmfTrace) testTrace, BLOCK_SIZE);
+        }
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        public TestIndexer(EmptyTestTrace testTrace) {
             super((ITmfTrace) testTrace, BLOCK_SIZE);
         }
         public List<TmfCheckpoint> getCheckpoints() {
@@ -94,11 +103,22 @@ public class TmfCheckpointIndexTest extends TestCase {
         }
     }
 
+    private class EmptyTestTrace extends TmfEmptyTraceStub {
+        public EmptyTestTrace() {
+            super();
+            setIndexer(new TestIndexer(this));
+        }
+        @Override
+        public TestIndexer getIndexer() {
+            return (TestIndexer) super.getIndexer();
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Helper functions
     // ------------------------------------------------------------------------
 
-    private TestTrace setupTrace(final String path) {
+    private synchronized void setupTrace(final String path) {
         if (fTrace == null) {
             try {
                 final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
@@ -113,7 +133,11 @@ public class TmfCheckpointIndexTest extends TestCase {
                 e.printStackTrace();
             }
         }
-        return fTrace;
+
+        if (fEmptyTrace == null) {
+            fEmptyTrace = new EmptyTestTrace();
+            fEmptyTrace.indexTrace();
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -138,6 +162,29 @@ public class TmfCheckpointIndexTest extends TestCase {
             TmfCheckpoint checkpoint = checkpoints.get(i);
             TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
             ITmfEvent event = fTrace.parseEvent(context);
+            assertTrue(context.getRank() == i * pageSize);
+            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
+        }
+    }
+
+    public void testEmptyTmfTraceIndexing() throws Exception {
+        assertEquals("getCacheSize",   ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, fEmptyTrace.getCacheSize());
+        assertEquals("getTraceSize",   0,  fEmptyTrace.getNbEvents());
+        assertEquals("getRange-start", TmfTimestamp.BIG_CRUNCH, fEmptyTrace.getTimeRange().getStartTime());
+        assertEquals("getRange-end",   TmfTimestamp.BIG_BANG, fEmptyTrace.getTimeRange().getEndTime());
+        assertEquals("getStartTime",   TmfTimestamp.BIG_CRUNCH, fEmptyTrace.getStartTime());
+        assertEquals("getEndTime",     TmfTimestamp.BIG_BANG, fEmptyTrace.getEndTime());
+
+        List<TmfCheckpoint> checkpoints = fEmptyTrace.getIndexer().getCheckpoints();
+        int pageSize = fEmptyTrace.getCacheSize();
+        assertTrue("Checkpoints exist",  checkpoints != null);
+        assertEquals("Checkpoints size", 0, checkpoints.size());
+
+        // Validate that each checkpoint points to the right event
+        for (int i = 0; i < checkpoints.size(); i++) {
+            TmfCheckpoint checkpoint = checkpoints.get(i);
+            TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
+            ITmfEvent event = fEmptyTrace.parseEvent(context);
             assertTrue(context.getRank() == i * pageSize);
             assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
         }
