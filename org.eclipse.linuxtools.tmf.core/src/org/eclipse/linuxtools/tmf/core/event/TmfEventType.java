@@ -109,7 +109,7 @@ public class TmfEventType implements ITmfEventType, Cloneable {
      */
     @Override
     public String[] getFieldNames() {
-        return (fRootField != null) ? fRootField.getFieldNames() : null;
+        return (fRootField != null) ? fRootField.getFieldNames() : new String[0];
     }
 
     /* (non-Javadoc)

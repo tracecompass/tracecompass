@@ -96,7 +96,7 @@ public final class TmfEventTypeManager {
         if (types != null) {
             return types.values().toArray(new ITmfEventType[types.size()]);
         }
-        return null;
+        return new ITmfEventType[0];
     }
 
     /**

@@ -77,7 +77,7 @@ public class TmfEventTypeTest extends TestCase {
         assertEquals("getContext", TmfEventType.DEFAULT_CONTEXT_ID, type.getContext());
         assertEquals("getName", TmfEventType.DEFAULT_TYPE_ID, type.getName());
         assertNull("getRootField", type.getRootField());
-        assertNull("getFieldNames", type.getFieldNames());
+        assertEquals("getFieldNames", 0, type.getFieldNames().length);
         assertNull("getFieldName", type.getFieldName(0));
     }
 

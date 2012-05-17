@@ -151,7 +151,7 @@ public class TmfEventField implements ITmfEventField, Cloneable {
      */
     @Override
     public ITmfEventField[] getFields() {
-        return (fFields != null) ? Arrays.copyOf(fFields, fFields.length) : null;
+        return (fFields != null) ? Arrays.copyOf(fFields, fFields.length) : new ITmfEventField[0];
     }
 
     /* (non-Javadoc)
