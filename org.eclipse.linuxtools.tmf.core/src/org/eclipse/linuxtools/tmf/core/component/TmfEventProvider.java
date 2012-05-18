@@ -70,7 +70,7 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
     protected synchronized void newCoalescedDataRequest(ITmfDataRequest<T> request) {
         if (request instanceof ITmfEventRequest<?>) {
             ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
-            TmfCoalescedEventRequest<T> coalescedRequest = new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(),
+            TmfCoalescedEventRequest<T> coalescedRequest = new TmfCoalescedEventRequest<T>(eventRequest.getDataType(), eventRequest.getRange(),
                     eventRequest.getIndex(), eventRequest.getNbRequested(), eventRequest.getBlockSize(), eventRequest.getExecType());
             coalescedRequest.addRequest(eventRequest);
             if (Tracer.isRequestTraced()) {
