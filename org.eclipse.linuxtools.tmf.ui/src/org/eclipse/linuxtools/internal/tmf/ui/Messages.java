@@ -93,23 +93,6 @@ public class Messages extends NLS {
     public static String TmfTimeTipHandler_TRACE_STATE;
     public static String TmfTimeTipHandler_TRACE_STOP_TIME;
 
-    public static String TmfTimeGraphViewer_ResetScaleActionNameText;
-    public static String TmfTimeGraphViewer_ResetScaleActionToolTipText;
-    public static String TmfTimeGraphViewer_LegendActionNameText;
-    public static String TmfTimeGraphViewer_LegendActionToolTipText;
-    public static String TmfTimeGraphViewer_NextEventActionNameText;
-    public static String TmfTimeGraphViewer_NextEventActionToolTipText;
-    public static String TmfTimeGraphViewer_PreviousEventActionNameText;
-    public static String TmfTimeGraphViewer_PreviousEventActionToolTipText;
-    public static String TmfTimeGraphViewer_NextItemActionNameText;
-    public static String TmfTimeGraphViewer_NextItemActionToolTipText;
-    public static String TmfTimeGraphViewer_PreviousItemActionNameText;
-    public static String TmfTimeGraphViewer_PreviousItemActionToolTipText;
-    public static String TmfTimeGraphViewer_ZoomInActionNameText;
-    public static String TmfTimeGraphViewer_ZoomInActionToolTipText;
-    public static String TmfTimeGraphViewer_ZoomOutActionNameText;
-    public static String TmfTimeGraphViewer_ZoomOutActionToolTipText;
-    
     public static String ColorsView_AddActionToolTipText;
     public static String ColorsView_BackgroundButtonText;
     public static String ColorsView_BackgroundDialogText;

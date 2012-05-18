@@ -32,8 +32,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -204,13 +202,10 @@ public class TimeGraphCombo extends Composite {
             if (fInhibitTreeSelection) {
                 return;
             }
-            Object element = ((IStructuredSelection) event.getSelection()).getFirstElement();
-            if (element instanceof ITimeGraphEntry) {
-                ITimeGraphEntry entry = (ITimeGraphEntry) element;
-                if (entry != selection) {
-                    selection = entry;
-                    listener.selectionChanged(new TimeGraphSelectionEvent(event.getSource(), selection));
-                }
+            ITimeGraphEntry entry = (ITimeGraphEntry) ((IStructuredSelection) event.getSelection()).getFirstElement();
+            if (entry != selection) {
+                selection = entry;
+                listener.selectionChanged(new TimeGraphSelectionEvent(event.getSource(), selection));
             }
         }
 
@@ -250,8 +245,6 @@ public class TimeGraphCombo extends Composite {
         tree.addControlListener(new ControlAdapter() {
             @Override
             public void controlResized(ControlEvent e) {
-                fTreeViewer.getTree().getVerticalBar().setEnabled(false);
-                fTreeViewer.getTree().getVerticalBar().setVisible(false);
                 fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
             }
         });
@@ -289,8 +282,6 @@ public class TimeGraphCombo extends Composite {
                     event.doit = false;
                     ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
                     if (treeItems.size() == 0) {
-                        fTreeViewer.setSelection(new StructuredSelection());
-                        fTimeGraphViewer.setSelection(null);
                         return;
                     }
                     // this prevents from scrolling up when selecting
@@ -323,8 +314,6 @@ public class TimeGraphCombo extends Composite {
             public void handleEvent(Event event) {
                 ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
                 if (treeItems.size() == 0) {
-                    fTreeViewer.setSelection(new StructuredSelection());
-                    event.doit = false;
                     return;
                 }
                 if (event.keyCode == SWT.ARROW_DOWN) {
@@ -371,10 +360,10 @@ public class TimeGraphCombo extends Composite {
                 }
                 if (event.getSelection() instanceof IStructuredSelection) {
                     Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+                    ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
                     if (selection instanceof ITimeGraphEntry) {
                         fTimeGraphViewer.setSelection((ITimeGraphEntry) selection);
                     }
-                    ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
                     if (treeItems.size() == 0) {
                         return;
                     }
@@ -408,18 +397,6 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.getVerticalBar().addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
-                if (treeItems.size() == 0) {
-                    return;
-                }
-                TreeItem treeItem = treeItems.get(fTimeGraphViewer.getTopIndex());
-                tree.setTopItem(treeItem);
-            }
-        });
-
-        fTimeGraphViewer.getTimeGraphControl().addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(MouseEvent e) {
                 ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
                 if (treeItems.size() == 0) {
                     return;
@@ -479,19 +456,6 @@ public class TimeGraphCombo extends Composite {
      */
     public TimeGraphViewer getTimeGraphViewer() {
         return fTimeGraphViewer;
-    }
-
-    // ------------------------------------------------------------------------
-    // Control
-    // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Control#redraw()
-     */
-    @Override
-    public void redraw() {
-        fTimeGraphViewer.getControl().redraw();
-        super.redraw();
     }
 
     // ------------------------------------------------------------------------
@@ -573,13 +537,12 @@ public class TimeGraphCombo extends Composite {
      * 
      * @param timeGraphProvider the time graph provider
      */
-    public void setTimeGraphProvider(ITimeGraphPresentationProvider timeGraphProvider) {
+    public void setTimeGraphProvider(ITimeGraphProvider timeGraphProvider) {
         fTimeGraphViewer.setTimeGraphProvider(timeGraphProvider);
     }
 
     /**
      * Sets or clears the input for this time graph combo.
-     * The input array should only contain top-level elements.
      *
      * @param input the input of this time graph combo, or <code>null</code> if none
      */

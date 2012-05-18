@@ -31,14 +31,7 @@ public interface ITmfImageConstants {
     public static final String IMG_UI_SEARCH_MATCH = ICONS_PATH + "elcl16/search_match.gif";
     public static final String IMG_UI_FIRST_PAGE = ICONS_PATH + "elcl16/backward_nav.gif";
     public static final String IMG_UI_LAST_PAGE = ICONS_PATH + "elcl16/forward_nav.gif";
-    public static final String IMG_UI_SHOW_LEGEND = ICONS_PATH + "elcl16/show_legend.gif";
-    public static final String IMG_UI_NEXT_EVENT = ICONS_PATH + "elcl16/next_event.gif";
-    public static final String IMG_UI_PREV_EVENT = ICONS_PATH + "elcl16/prev_event.gif";
-//    public static final String IMG_UI_NEXT_ITEM = ICONS_PATH + "elcl16/next_item.gif";
-//    public static final String IMG_UI_PREV_ITEM = ICONS_PATH + "elcl16/prev_item.gif";
-    public static final String IMG_UI_NEXT_ITEM = IMG_UI_NEXT_PAGE;
-    public static final String IMG_UI_PREV_ITEM = IMG_UI_PREV_PAGE;
-
+    
     /* eview16 */
     public static final String IMG_UI_SEQ_DIAGRAM_OBJ = ICONS_PATH + "eview16/sequencediagram_view.gif";
 

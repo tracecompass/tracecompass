@@ -15,6 +15,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
 
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphProvider.StateColor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
@@ -41,6 +42,13 @@ public class TimeGraphColorScheme {
 
     static public final int STATES0 = 0;
     static public final int STATES1 = 15;
+
+    // State element index to name mapping, must keep the same order as above
+    public static final StateColor stateColors[] = { StateColor.BLACK,
+        StateColor.GREEN, StateColor.DARK_BLUE, StateColor.ORANGE,
+        StateColor.GOLD, StateColor.RED, StateColor.GRAY, StateColor.DARK_GREEN, StateColor.DARK_YELLOW, StateColor.MAGENTA3, StateColor.PURPLE1, 
+        StateColor.PINK1, StateColor.AQUAMARINE, StateColor.LIGHT_BLUE, StateColor.CADET_BLUE, StateColor.OLIVE
+    };
 
     // selected state elements color indices
     static public final int BLACK_STATE_SEL = 16;
@@ -360,5 +368,9 @@ public class TimeGraphColorScheme {
         if (selected)
             return getColor(GR_FOREGROUND_SEL_NOFOCUS);
         return getColor(GR_FOREGROUND);
+    }
+
+    public static StateColor[] getStateColors() {
+        return stateColors;
     }
 }

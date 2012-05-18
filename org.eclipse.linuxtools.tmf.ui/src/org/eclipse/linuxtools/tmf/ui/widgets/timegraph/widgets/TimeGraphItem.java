@@ -21,7 +21,6 @@ public class TimeGraphItem {
     public boolean _expanded;
     public boolean _selected;
     public boolean _hasChildren;
-    public int itemHeight;
     public int level;
     public List<TimeGraphItem> children;
     public String _name;

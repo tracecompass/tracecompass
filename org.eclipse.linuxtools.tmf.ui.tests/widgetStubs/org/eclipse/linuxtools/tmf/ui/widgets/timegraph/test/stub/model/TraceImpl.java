@@ -74,7 +74,7 @@ public class TraceImpl implements ITimeGraphEntry {
 	}
 
 	@Override
-	public long getEndTime() {
+	public long getStopTime() {
 		return stopTime;
 	}
 

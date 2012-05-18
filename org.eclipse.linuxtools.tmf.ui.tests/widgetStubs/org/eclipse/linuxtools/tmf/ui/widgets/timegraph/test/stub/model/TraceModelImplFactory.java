@@ -72,7 +72,7 @@ public class TraceModelImplFactory {
 		Long eventTime;
 		int numEvents = 5000;
 		long sTime = trace.getStartTime();
-		long eTime = trace.getEndTime();
+		long eTime = trace.getStopTime();
 		long duration = (long) ((eTime - sTime)/numEvents);
 		for (int i = 0; i < numEvents; i++) {
 			eventTime = sTime + (i * duration);
