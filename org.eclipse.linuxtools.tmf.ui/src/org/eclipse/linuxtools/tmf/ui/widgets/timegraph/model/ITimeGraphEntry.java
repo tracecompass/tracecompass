@@ -54,11 +54,11 @@ public interface ITimeGraphEntry {
     public long getStartTime();
 
     /**
-     * Returns the stop time of this entry in nanoseconds.
+     * Returns the end time of this entry in nanoseconds.
      *
-     * @return the stop time
+     * @return the end time
      */
-    public long getStopTime();
+    public long getEndTime();
 
     /**
      * Get an iterator which returns all timeevents
