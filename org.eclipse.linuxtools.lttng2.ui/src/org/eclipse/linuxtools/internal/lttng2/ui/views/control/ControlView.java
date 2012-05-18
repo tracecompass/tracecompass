@@ -71,11 +71,9 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-
+    
     /**
-     * Returns the trace control tree node (model)
-     * 
-     * @return the trace control tree node (model).
+     * @return returns the trace control tree node (model).
      */
     public ITraceControlComponent getTraceControlRoot() {
         return fRoot;

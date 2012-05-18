@@ -12,36 +12,27 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.common.EventIterator;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
 public class ResourcesEntry implements ITimeGraphEntry {
-    public static enum Type { NULL, CPU, IRQ, SOFT_IRQ };
-
-    private int fQuark;
     private CtfKernelTrace fTrace;
     private ITimeGraphEntry fParent = null;
     private ITimeGraphEntry[] children = null;
     private String fName;
-    private Type fType;
-    private int fId;
     private long fStartTime;
     private long fEndTime;
-    private List<ITimeEvent> fEventList = new ArrayList<ITimeEvent>();
-    private List<ITimeEvent> fZoomedEventList = null;
+    List<ITimeEvent> list = new LinkedList<ITimeEvent>();
 
-    public ResourcesEntry(int quark, CtfKernelTrace trace, Type type, int id) {
-        fQuark = quark;
+    public ResourcesEntry(ITimeGraphEntry parent, CtfKernelTrace trace, String cpuName) {
+        fParent = parent;
         fTrace = trace;
-        fType = type;
-        fId = id;
-        fName = type.toString() + ' ' + Integer.toString(id);
+        fName = cpuName;
     }
 
     @Override
@@ -70,50 +61,28 @@ public class ResourcesEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public long getEndTime() {
+    public long getStopTime() {
         return fEndTime;
     }
 
     @Override
     public Iterator<ITimeEvent> getTimeEventsIterator() {
-        return new EventIterator(fEventList, fZoomedEventList);
+        return list.iterator();
     }
 
     @Override
     public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration) {
-        return new EventIterator(fEventList, fZoomedEventList, startTime, stopTime);
+        return getTimeEventsIterator();
     }
 
-    public void setParent(ITimeGraphEntry parent) {
-        fParent = parent;
-    }
-
-    public int getQuark() {
-        return fQuark;
-    }
-
-    public CtfKernelTrace getTrace() {
-        return fTrace;
-    }
-
-    public Type getType() {
-        return fType;
-    }
-
-    public int getId() {
-        return fId;
-    }
-
-    public void setEventList(List<ITimeEvent> eventList) {
-        fEventList = eventList;
-        if (eventList != null && eventList.size() > 0) {
-            fStartTime = eventList.get(0).getTime();
-            ITimeEvent lastEvent = eventList.get(eventList.size() - 1);
-            fEndTime = lastEvent.getTime() + lastEvent.getDuration();
+    public void addTraceEvent(ITimeEvent event) {
+        long time = event.getTime();
+        list.add(event);
+        if (fStartTime == -1 || time < fStartTime) {
+            fStartTime = time;
         }
-    }
-
-    public void setZoomedEventList(List<ITimeEvent> eventList) {
-        fZoomedEventList = eventList;
+        if (fEndTime == -1 || time > fEndTime) {
+            fEndTime = time;
+        }
     }
 }
