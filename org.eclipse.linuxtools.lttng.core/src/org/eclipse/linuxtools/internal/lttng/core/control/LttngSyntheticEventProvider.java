@@ -429,7 +429,6 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			try {
 				request.waitForCompletion();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 		}
 	}
@@ -454,7 +453,6 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		try {
 			fmainRequest.waitForCompletion();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		return null;
 	}

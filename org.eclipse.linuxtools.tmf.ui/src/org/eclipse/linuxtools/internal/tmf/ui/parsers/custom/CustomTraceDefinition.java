@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -51,7 +50,6 @@ public abstract class CustomTraceDefinition {
 
     public String formatTimeStamp(TmfTimestamp timestamp) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(timeStampOutputFormat);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
         return simpleDateFormat.format(timestamp.getValue());
     }
     

@@ -68,7 +68,7 @@ public class StateSystemFullHistoryTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        builder.run();
+        builder.startBuilding(null);
         ssb = builder.getStateSystemBuilder();
     }
 
@@ -99,7 +99,7 @@ public class StateSystemFullHistoryTest {
         zeinput = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
         zehp = new HistoryTreeBackend(stateFileBenchmark, zeinput.getStartTime());
         zebuilder = new HistoryBuilder(zeinput, zehp);
-        zebuilder.run();
+        zebuilder.startBuilding(null);
 
         assertEquals(CtfTestFiles.startTime, zehp.getStartTime());
         assertEquals(CtfTestFiles.endTime, zehp.getEndTime());
@@ -235,9 +235,9 @@ public class StateSystemFullHistoryTest {
 
         quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         intervals = ssb.queryHistoryRange(quark, time1, time2, resolution);
-        assertEquals(129, intervals.size()); /* Number of context switches! */
+        assertEquals(126, intervals.size()); /* Number of context switches! */
         assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
-        assertEquals(1331668248784789238L, intervals.get(100).getEndTime());
+        assertEquals(1331668248815698779L, intervals.get(100).getEndTime());
     }
 
     /**

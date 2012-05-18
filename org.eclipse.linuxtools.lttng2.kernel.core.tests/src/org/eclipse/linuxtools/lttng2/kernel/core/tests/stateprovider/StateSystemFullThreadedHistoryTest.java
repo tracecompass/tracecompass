@@ -50,7 +50,7 @@ public class StateSystemFullThreadedHistoryTest extends
         } catch (Exception e) {
             e.printStackTrace();
         }
-        builder.run();
+        builder.startBuilding(null);
         ssb = builder.getStateSystemBuilder();
     }
 
@@ -66,7 +66,7 @@ public class StateSystemFullThreadedHistoryTest extends
             zehp = new ThreadedHistoryTreeBackend(stateFileBenchmark,
                     zeinput.getStartTime(), 2000);
             zebuilder = new HistoryBuilder(zeinput, zehp);
-            zebuilder.run();
+            zebuilder.startBuilding(null);
         } catch (Exception e) {
             e.printStackTrace();
         }

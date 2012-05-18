@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.lttng.core.state.experiment;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.internal.lttng.core.Activator;
 import org.eclipse.linuxtools.internal.lttng.core.LttngConstants;
 import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.internal.lttng.core.control.LttngCoreProviderFactory;
@@ -357,7 +358,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
                 try {
                     traceManager = (IStateTraceManager) traceStateManagerNode;
                 } catch (ClassCastException e) {
-                    e.printStackTrace();
+                    Activator.getDefault().logError("Unexpected Error", e);  //$NON-NLS-1$
                     return null;
                 }
 
@@ -471,7 +472,6 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
 

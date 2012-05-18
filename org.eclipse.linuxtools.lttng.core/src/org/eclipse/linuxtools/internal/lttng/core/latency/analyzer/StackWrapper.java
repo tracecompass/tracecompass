@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 
+import org.eclipse.linuxtools.internal.lttng.core.Activator;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 
 /**
@@ -114,7 +115,7 @@ public class StackWrapper {
             stack.pop();
             removed = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Activator.getDefault().logError("Error removing Event", e); //$NON-NLS-1$
         }
 
         // Remove the stack from the stack list if it is empty

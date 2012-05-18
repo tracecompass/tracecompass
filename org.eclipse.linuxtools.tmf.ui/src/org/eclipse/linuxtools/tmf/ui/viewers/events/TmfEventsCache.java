@@ -13,11 +13,13 @@
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
@@ -43,7 +45,7 @@ public class TmfEventsCache {
     private ITmfTrace<?> fTrace;
     private final TmfEventsTable fTable;
     private ITmfFilter fFilter;
-    private final ArrayList<Integer> fFilterIndex = new ArrayList<Integer>(); // contains the event rank at each 'cache size' filtered events
+    private final List<Integer> fFilterIndex = new ArrayList<Integer>(); // contains the event rank at each 'cache size' filtered events
 
     public TmfEventsCache(int cacheSize, TmfEventsTable table) {
     	fCache = new CachedEvent[cacheSize];
@@ -182,6 +184,7 @@ public class TmfEventsCache {
 			request.waitForCompletion();
 			return ((DataRequest<ITmfEvent>) request).getFilteredIndex();
 		} catch (InterruptedException e) {
+		    TmfUiPlugin.getDefault().logError("Filter request interrupted!", e); //$NON-NLS-1$
 		}
     	return 0;
     }
@@ -272,7 +275,7 @@ public class TmfEventsCache {
                 try {
                     request.waitForCompletion();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    TmfUiPlugin.getDefault().logError("Wait for completion interrupted for populateCache ", e); //$NON-NLS-1$
                 }
 
                 fTable.cacheUpdated(true);

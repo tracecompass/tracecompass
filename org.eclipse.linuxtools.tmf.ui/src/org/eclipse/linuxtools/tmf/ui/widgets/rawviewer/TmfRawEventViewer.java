@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.widgets.rawviewer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -78,7 +79,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private Font fFixedFont;
 	private Slider fSlider;
 
-	private ArrayList<LineData> fLines = new ArrayList<LineData>();
+	private List<LineData> fLines = new ArrayList<LineData>();
 	private boolean fActualRanks = false;
 	private int fTopLineIndex;
 	private int fLastTopLineIndex;

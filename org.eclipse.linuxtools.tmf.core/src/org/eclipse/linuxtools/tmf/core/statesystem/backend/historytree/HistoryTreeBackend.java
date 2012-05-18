@@ -132,6 +132,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     }
 
     @Override
+    public void removeFiles() {
+        treeIO.deleteFile();
+    }
+
+    @Override
     public void doQuery(List<ITmfStateInterval> stateInfo, long t)
             throws TimeRangeException {
         if (!checkValidTime(t)) {

@@ -81,7 +81,7 @@ public class TraceHelper {
                 prefs.flush();
                 return true;
             } catch (org.osgi.service.prefs.BackingStoreException e) {
-                e.printStackTrace();
+                Activator.getDefault().logError("Unexpected Error", e);  //$NON-NLS-1$
             }
 
         }
@@ -106,7 +106,7 @@ public class TraceHelper {
                 prefs.flush();
                 return true;
             } catch (org.osgi.service.prefs.BackingStoreException e) {
-                e.printStackTrace();
+                Activator.getDefault().logError("Unexpected Error", e);  //$NON-NLS-1$
             }
 
         }

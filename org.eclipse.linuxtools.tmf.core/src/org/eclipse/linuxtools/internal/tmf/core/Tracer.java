@@ -34,7 +34,7 @@ public class Tracer {
         try {
             outfile = new BufferedWriter(new FileWriter(filename));
         } catch (IOException e) {
-            e.printStackTrace();
+            TmfCorePlugin.getDefault().logError("Error opening log file " + filename, e);
         }
         return outfile;
     }
@@ -101,7 +101,7 @@ public class Tracer {
             fTraceLog.close();
             fTraceLog = null;
         } catch (IOException e) {
-            e.printStackTrace();
+            TmfCorePlugin.getDefault().logError("Error closing log file", e);
         }
     }
 
@@ -147,7 +147,7 @@ public class Tracer {
                 fTraceLog.newLine();
                 fTraceLog.flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                TmfCorePlugin.getDefault().logError("Error writing to log file", e);
             }
         }
     }

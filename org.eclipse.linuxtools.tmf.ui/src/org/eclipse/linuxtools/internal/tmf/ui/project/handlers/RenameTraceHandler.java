@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
@@ -174,7 +175,7 @@ public class RenameTraceHandler extends AbstractHandler {
                     folder.setPersistentProperty(TmfCommonConstants.TRACEICON, traceIcon);
                 }
                 else {
-                    System.out.println("Invalid Trace Location"); //$NON-NLS-1$
+                    TmfUiPlugin.getDefault().logError("RenamaeTraceHandler: Invalid Trace Location: " + location); //$NON-NLS-1$
                 }
             }
             else {
@@ -186,12 +187,12 @@ public class RenameTraceHandler extends AbstractHandler {
                     file.setPersistentProperty(TmfCommonConstants.TRACEICON, traceIcon);
                 }
                 else {
-                    System.out.println("Invalid Trace Location"); //$NON-NLS-1$
+                    TmfUiPlugin.getDefault().logError("RenamaeTraceHandler: Invalid Trace Location: " + location); //$NON-NLS-1$
                 }
             }
             experiment.refresh();
         } catch (CoreException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error renaming trace" + trace.getName(), e); //$NON-NLS-1$
         }
     }
 

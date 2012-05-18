@@ -215,14 +215,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
                         try {
                             request.waitForCompletion();
                         } catch (final InterruptedException e) {
-                            e.printStackTrace();
                         }
                     } else
                         updateJniTrace();
                     try {
                         Thread.sleep(LTTNG_STREAMING_INTERVAL);
                     } catch (final InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
             }

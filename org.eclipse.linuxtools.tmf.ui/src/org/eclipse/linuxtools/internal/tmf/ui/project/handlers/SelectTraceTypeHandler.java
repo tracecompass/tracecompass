@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
@@ -119,7 +120,7 @@ public class SelectTraceTypeHandler extends AbstractHandler {
                     String iconUrl = event.getParameter(ICON_PARAMETER);
                     ok &= propagateProperties(trace, bundleName, traceType, iconUrl);
                 } catch (CoreException e) {
-                    e.printStackTrace();
+                    TmfUiPlugin.getDefault().logError("Error selecting trace type for trace" + trace.getName(), e); //$NON-NLS-1$
                 }
             }
         }

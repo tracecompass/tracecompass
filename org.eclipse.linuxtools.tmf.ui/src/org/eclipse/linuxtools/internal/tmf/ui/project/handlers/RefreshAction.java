@@ -20,6 +20,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement;
@@ -84,13 +85,13 @@ public class RefreshAction extends Action {
                 handlerService.executeCommand(REFRESH_EXPERIMENT_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error refreshing resource " + element.getName(), e); //$NON-NLS-1$
         } catch (NotDefinedException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error refreshing resource " + element.getName(), e); //$NON-NLS-1$
         } catch (NotEnabledException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error refreshing resource " + element.getName(), e); //$NON-NLS-1$
         } catch (NotHandledException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error refreshing resource " + element.getName(), e); //$NON-NLS-1$
         }
     }
 

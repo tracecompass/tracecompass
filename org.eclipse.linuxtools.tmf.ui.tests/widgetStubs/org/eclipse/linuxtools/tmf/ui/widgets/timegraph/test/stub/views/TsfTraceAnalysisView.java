@@ -425,7 +425,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			public void run() {
 				TimeGraphViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
-					inFocusViewer.selectNextTrace();
+					inFocusViewer.selectNextItem();
 				}
 			}
 		};
@@ -438,7 +438,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			public void run() {
 				TimeGraphViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
-					inFocusViewer.selectPrevTrace();
+					inFocusViewer.selectPrevItem();
 				}
 			}
 		};

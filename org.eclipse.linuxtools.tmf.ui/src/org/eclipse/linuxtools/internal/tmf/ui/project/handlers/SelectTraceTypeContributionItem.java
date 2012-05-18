@@ -15,7 +15,9 @@ package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -53,9 +55,9 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
 
     @Override
     protected IContributionItem[] getContributionItems() {
-        LinkedList<IContributionItem> list = new LinkedList<IContributionItem>();
+        List<IContributionItem> list = new LinkedList<IContributionItem>();
 
-        HashMap<String, MenuManager> categoriesMap = new HashMap<String, MenuManager>();
+        Map<String, MenuManager> categoriesMap = new HashMap<String, MenuManager>();
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(
                 TmfTraceType.TMF_TRACE_TYPE_ID);
         for (IConfigurationElement ce : config) {
@@ -76,7 +78,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
             list.add(subMenu);
         }
 
-        HashSet<String> selectedTraceTypes = new HashSet<String>();
+        Set<String> selectedTraceTypes = new HashSet<String>();
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         ISelection selection = page.getSelection();
@@ -127,7 +129,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
         return list.toArray(new IContributionItem[list.size()]);
     }
 
-    private void addContributionItem(LinkedList<IContributionItem> list,
+    private void addContributionItem(List<IContributionItem> list,
             String traceBundle, String traceTypeId, String traceIcon, String label, boolean selected,
             MenuManager subMenu) {
         Map<String, String> params;

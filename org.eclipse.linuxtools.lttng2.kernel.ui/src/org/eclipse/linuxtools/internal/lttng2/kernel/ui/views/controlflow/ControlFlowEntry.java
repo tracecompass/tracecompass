@@ -12,60 +12,58 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.common.EventIterator;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
 public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlowEntry> {
+    private int fThreadQuark;
     private CtfKernelTrace fTrace;
-    private ITimeGraphEntry parent = null;
-    private ITimeGraphEntry[] children = null;
+    private ControlFlowEntry fParent = null;
+    private ArrayList<ControlFlowEntry> fChildren = new ArrayList<ControlFlowEntry>();
     private String fName;
     private int fThreadId;
     private int fPpid;
+    private long fBirthTime = -1;
     private long fStartTime = -1;
     private long fEndTime = -1;
-    List<ITimeEvent> list = new LinkedList<ITimeEvent>();
+    private List<ITimeEvent> fEventList = new ArrayList<ITimeEvent>();
+    private List<ITimeEvent> fZoomedEventList = null;
 
-    public ControlFlowEntry(CtfKernelTrace trace, String execName, int threadId, int ppid, long startTime, long endTime) {
+    public ControlFlowEntry(int threadQuark, CtfKernelTrace trace, String execName, int threadId, int ppid, long birthTime, long startTime, long endTime) {
+        fThreadQuark = threadQuark;
         fTrace = trace;
         fName = execName;
         fThreadId = threadId;
         fPpid = ppid;
+        fBirthTime = birthTime;
         fStartTime = startTime;
         fEndTime = endTime;
     }
 
     @Override
     public ITimeGraphEntry getParent() {
-        return parent;
+        return fParent;
     }
 
     @Override
     public boolean hasChildren() {
-        return children != null && children.length > 0;
+        return fChildren != null && fChildren.size() > 0;
     }
 
     @Override
-    public ITimeGraphEntry[] getChildren() {
-        return children;
+    public ControlFlowEntry[] getChildren() {
+        return fChildren.toArray(new ControlFlowEntry[0]);
     }
 
     @Override
     public String getName() {
         return fName;
-    }
-
-    public int getThreadId() {
-        return fThreadId;
-    }
-
-    public int getPPID() {
-        return fPpid;
     }
 
     @Override
@@ -74,29 +72,18 @@ public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlow
     }
 
     @Override
-    public long getStopTime() {
+    public long getEndTime() {
         return fEndTime;
     }
 
     @Override
     public Iterator<ITimeEvent> getTimeEventsIterator() {
-        return list.iterator();
+        return new EventIterator(fEventList, fZoomedEventList);
     }
 
     @Override
     public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration) {
-        return getTimeEventsIterator();
-    }
-
-    public void addTraceEvent(ITimeEvent event) {
-        long time = event.getTime();
-        list.add(event);
-        if (fStartTime == -1 || time < fStartTime) {
-            fStartTime = time;
-        }
-        if (fEndTime == -1 || time > fEndTime) {
-            fEndTime = time;
-        }
+        return new EventIterator(fEventList, fZoomedEventList, startTime, stopTime);
     }
 
     @Override
@@ -108,4 +95,50 @@ public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlow
         return result;
     }
 
+    public int getThreadQuark() {
+        return fThreadQuark;
+    }
+
+    public CtfKernelTrace getTrace() {
+        return fTrace;
+    }
+
+    public int getThreadId() {
+        return fThreadId;
+    }
+
+    public int getPPID() {
+        return fPpid;
+    }
+
+    public long getBirthTime() {
+        return fBirthTime;
+    }
+
+    public void addEvent(ITimeEvent event) {
+        long start = event.getTime();
+        long end = start + event.getDuration();
+        synchronized (fEventList) {
+            fEventList.add(event);
+            if (fStartTime == -1 || start < fStartTime) {
+                fStartTime = start;
+            }
+            if (fEndTime == -1 || end > fEndTime) {
+                fEndTime = end;
+            }
+        }
+    }
+
+    public void setEventList(List<ITimeEvent> eventList) {
+        fEventList = eventList;
+    }
+
+    public void setZoomedEventList(List<ITimeEvent> eventList) {
+        fZoomedEventList = eventList;
+    }
+
+    public void addChild(ControlFlowEntry child) {
+        child.fParent = this;
+        fChildren.add(child);
+    }
 }

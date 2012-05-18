@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.swt.SWT;
@@ -32,8 +31,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-public class TimeGraphScale extends TimeGraphBaseControl implements MouseListener,
-MouseMoveListener {
+public class TimeGraphScale extends TimeGraphBaseControl implements MouseListener, MouseMoveListener {
 
     public TimeGraphScale(Composite parent, TimeGraphColorScheme colors) {
         super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS
@@ -54,7 +52,7 @@ MouseMoveListener {
     private static final double LOG10_3 = Math.log10(3);
     private static final double LOG10_5 = Math.log10(5);
 
-    private static final Calendar GREGORIAN_CALENDAR = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+    private static final Calendar GREGORIAN_CALENDAR = GregorianCalendar.getInstance();
 
     private ITimeDataProvider _timeProvider;
     private int _dragState = 0;
@@ -359,20 +357,20 @@ MouseMoveListener {
             }
         }
 
-        //		Trace.debug("timeRange: " + timeRange + " numDigits: " + numDigits);
         return numDigits;
     }
 
     @Override
     public void mouseDown(MouseEvent e) {
+        getParent().setFocus();
         if (_dragState == 0 && null != _timeProvider) {
-            if (1 == e.button) {
+            int x = e.x - _timeProvider.getNameSpace();
+            if (1 == e.button && x > 0) {
                 setCapture(true);
                 _dragState = 1;
             } else if (3 == e.button) {
                 _dragState = 3;
             }
-            int x = e.x - _timeProvider.getNameSpace();
             if (x < 0) {
                 x = 0;
             } else if (x > getSize().x - _timeProvider.getNameSpace()) {
@@ -391,12 +389,12 @@ MouseMoveListener {
             _dragState = 0;
 
             // Notify time provider to check the need for listener notification
-            if (_dragX != _dragX0) {
+            if (_dragX != _dragX0 && _timeProvider.getTime0() != _timeProvider.getTime1()) {
                 _timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
             }
         } else if (e.button == 3 && _dragState == 3 && null != _timeProvider) {
             _dragState = 0;
-            if (_dragX0 == _dragX) {
+            if (_dragX0 == _dragX || _timeProvider.getTime0() == _timeProvider.getTime1()) {
                 return;
             }
             int timeSpace = _timeProvider.getTimeSpace();
@@ -430,6 +428,9 @@ MouseMoveListener {
         if (1 == _dragState) {
             if (x > 0 && size.x > leftSpace && _dragX != x) {
                 _dragX = x;
+                if (_timeProvider.getTime0() == _timeProvider.getTime1()) {
+                    return;
+                }
                 long time1 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX0 / _dragX));
                 _timeProvider.setStartFinishTime(_time0bak, time1);
             }
@@ -447,7 +448,7 @@ MouseMoveListener {
 
     @Override
     public void mouseDoubleClick(MouseEvent e) {
-        if (null != _timeProvider) {
+        if (null != _timeProvider && _timeProvider.getTime0() != _timeProvider.getTime1()) {
             _timeProvider.resetStartFinishTime();
             _time0bak = _timeProvider.getTime0();
             _time1bak = _timeProvider.getTime1();
@@ -463,24 +464,12 @@ abstract class TimeDraw {
     protected static final SimpleDateFormat stimeformatheader = new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
     protected static final SimpleDateFormat sminformat = new SimpleDateFormat("HH:mm");              //$NON-NLS-1$
     protected static final SimpleDateFormat sminformatheader = new SimpleDateFormat("yyyy MMM dd");  //$NON-NLS-1$
-    protected static final SimpleDateFormat shrsformat = new SimpleDateFormat("MMM dd HH:mm"); 	     //$NON-NLS-1$
+    protected static final SimpleDateFormat shrsformat = new SimpleDateFormat("MMM dd HH:mm");       //$NON-NLS-1$
     protected static final SimpleDateFormat shrsformatheader = new SimpleDateFormat("yyyy");         //$NON-NLS-1$
     protected static final SimpleDateFormat sdayformat = new SimpleDateFormat("MMM dd");             //$NON-NLS-1$
     protected static final SimpleDateFormat sdayformatheader = new SimpleDateFormat("yyyy");         //$NON-NLS-1$
     protected static final SimpleDateFormat smonthformat = new SimpleDateFormat("yyyy MMM");         //$NON-NLS-1$
     protected static final SimpleDateFormat syearformat = new SimpleDateFormat("yyyy");              //$NON-NLS-1$
-    static {
-        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT"));       //$NON-NLS-1$
-        stimeformatheader.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
-        sminformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
-        sminformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
-        shrsformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
-        shrsformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
-        sdayformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
-        sdayformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
-        smonthformat.setTimeZone(TimeZone.getTimeZone("GMT"));      //$NON-NLS-1$
-        syearformat.setTimeZone(TimeZone.getTimeZone("GMT"));       //$NON-NLS-1$
-    }
 
     static String pad(long n) {
         String s = S;
@@ -711,7 +700,7 @@ class TimeDrawAbsMillisec extends TimeDraw {
         String stime = stimeformat.format(new Date((long) (time / 1000000)));
         String ns = Utils.formatNs(time, Resolution.MILLISEC);
 
-        Utils.drawText(gc, stime + " " + ns, rect, true); //$NON-NLS-1$
+        Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
     }
 
     @Override
@@ -737,7 +726,7 @@ class TimeDrawAbsMicroSec extends TimeDraw {
     public void draw(GC gc, long time, Rectangle rect) {
         String stime = stimeformat.format(new Date((long) (time / 1000000)));
         String micr = Utils.formatNs(time, Resolution.MICROSEC);
-        Utils.drawText(gc, stime + " " + micr, rect, true); //$NON-NLS-1$
+        Utils.drawText(gc, stime + "." + micr, rect, true); //$NON-NLS-1$
     }
 
     @Override
@@ -763,7 +752,7 @@ class TimeDrawAbsNanoSec extends TimeDraw {
     public void draw(GC gc, long time, Rectangle rect) {
         String stime = stimeformat.format(new Date((long) (time / 1000000)));
         String ns = Utils.formatNs(time, Resolution.NANOSEC);
-        Utils.drawText(gc, stime + " " + ns, rect, true); //$NON-NLS-1$
+        Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
     }
 
     @Override

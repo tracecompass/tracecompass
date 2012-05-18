@@ -13,8 +13,6 @@
 package org.eclipse.linuxtools.tmf.core.exceptions;
 
 /**
- * <b><u>TmfTraceException</u></b>
- * <p>
  * TMF trace related exception
  */
 public class TmfTraceException extends Exception {
@@ -25,10 +23,21 @@ public class TmfTraceException extends Exception {
     private static final long serialVersionUID = -6829650938285722133L;
 
     /**
+     * Constructor
+     * 
      * @param errMsg the error message
      */
     public TmfTraceException(String errMsg) {
         super(errMsg);
     }
 
+    /**
+     * Constructor 
+     * 
+     * @param errMsg the error message
+     * @param cause the error cause (<code>null</code> is permitted which means no cause is available) 
+     */
+    public TmfTraceException(String errMsg, Throwable cause) {
+        super(errMsg, cause);
+    }
 }

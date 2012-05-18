@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * <b><u>ITmfColumnDataProvider</u></b>
@@ -25,5 +25,5 @@ public interface ITmfColumnDataProvider {
      * Return a list of the column created for the view
      * @return columns list
      */
-    public Vector<TmfBaseColumnData> getColumnData();
+    public List<TmfBaseColumnData> getColumnData();
 }

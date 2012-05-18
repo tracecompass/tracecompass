@@ -20,6 +20,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
@@ -86,13 +87,13 @@ public class DeleteAction extends Action {
                 handlerService.executeCommand(DELETE_EXPERIMENT_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting resources", e); //$NON-NLS-1$
         } catch (NotDefinedException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting resources", e); //$NON-NLS-1$
         } catch (NotEnabledException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting resources", e); //$NON-NLS-1$
         } catch (NotHandledException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting resources", e); //$NON-NLS-1$
         }
     }
 

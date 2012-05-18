@@ -14,6 +14,8 @@ package org.eclipse.linuxtools.internal.lttng2.ui;
 
 import java.net.URL;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferences;
@@ -98,14 +100,35 @@ public class Activator extends AbstractUIPlugin {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Gets an image object using given path within plug-in.
+     *  
+     * @param path path to image file
+     * 
+     * @return image object
+     */
     public Image getImageFromPath(String path) {
         return getImageDescripterFromPath(path).createImage();
     }
 
+    /**
+     * Gets an image descriptor using given path within plug-in.
+     *  
+     * @param path path to image file 
+     * 
+     * @return image descriptor object
+     */
     public ImageDescriptor getImageDescripterFromPath(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
+    /**
+     * Gets a image object from the image registry based on the given path.
+     * If the image is not in the registry it will be registered.  
+     *  
+     * @param path to the image file 
+     * @return image object
+     */
     public Image getImageFromImageRegistry(String path) {
         Image icon = getImageRegistry().get(path);
         if (icon == null) {
@@ -130,6 +153,63 @@ public class Activator extends AbstractUIPlugin {
             plugin.getImageRegistry().put(key, icon);
         }
         return icon;
+    }
+    
+    /**
+     * Logs a message with severity INFO in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     */
+    public void logInfo(String message) {
+        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+    }
+    
+    /**
+     * Logs a message and exception with severity INFO in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     * @param exception A exception to log
+     */
+    public void logInfo(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, exception));
+    }
+
+    /**
+     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     */
+    public void logWarning(String message) {
+        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+    }
+    
+    /**
+     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     * @param exception A exception to log
+     */
+    public void logWarning(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, exception));
+    }
+
+    /**
+     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     */
+    public void logError(String message) {
+        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
+    }
+    
+    /**
+     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     * @param exception A exception to log
+     */
+    public void logError(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
     }
 
 }

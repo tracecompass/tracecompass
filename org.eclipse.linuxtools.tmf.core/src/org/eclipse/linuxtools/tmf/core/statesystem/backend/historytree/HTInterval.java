@@ -171,19 +171,16 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
         byteArrayToWrite = sv.toByteArray();
 
         if (byteArrayToWrite == null) {
-            /* We write the 'valueOffset' field as a straight value */
-            if (sv.isNull()) {
-                buffer.putInt(0);
-            } else {
-                try {
-                    buffer.putInt(sv.unboxInt());
-                } catch (StateValueTypeException e) {
-                    /*
-                     * This should not happen, since the value told us it was of
-                     * type Integer (corrupted value?)
-                     */
-                    e.printStackTrace();
-                }
+            /* We write the 'valueOffset' field as a straight value. In the case
+             * of a null value, it will be unboxed as -1 */
+            try {
+                buffer.putInt(sv.unboxInt());
+            } catch (StateValueTypeException e) {
+                /*
+                 * This should not happen, since the value told us it was of
+                 * type Null or Integer (corrupted value?)
+                 */
+                e.printStackTrace();
             }
             return 0; /* we didn't use a Strings section entry */
 

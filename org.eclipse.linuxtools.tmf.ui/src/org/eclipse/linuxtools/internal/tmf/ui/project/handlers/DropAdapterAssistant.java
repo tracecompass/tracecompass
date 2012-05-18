@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
@@ -109,16 +110,19 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
     public IStatus handleDrop(CommonDropAdapter aDropAdapter, DropTargetEvent aDropTargetEvent, Object aTarget) {
         boolean ok = false;
 
+        // Use local variable to avoid parameter assignment
+        Object targetToUse = aTarget;
+
         // If target is a trace, use its parent (either trace folder or experiment)
-        if (aTarget instanceof TmfTraceElement) {
-            aTarget = ((TmfTraceElement) aTarget).getParent();
+        if (targetToUse instanceof TmfTraceElement) {
+            targetToUse = ((TmfTraceElement) targetToUse).getParent();
         }
 
         // If target is a project, use its trace folder
-        if (aTarget instanceof IProject) {
-            TmfProjectElement projectElement = TmfProjectRegistry.getProject((IProject) aTarget);
+        if (targetToUse instanceof IProject) {
+            TmfProjectElement projectElement = TmfProjectRegistry.getProject((IProject) targetToUse);
             if (projectElement != null) {
-                aTarget = projectElement.getTracesFolder();
+                targetToUse = projectElement.getTracesFolder();
             }
         }
 
@@ -149,11 +153,11 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                             }
                         }
                     }
-                    if (aTarget instanceof TmfExperimentElement) {
-                        TmfExperimentElement targetExperiment = (TmfExperimentElement) aTarget;
+                    if (targetToUse instanceof TmfExperimentElement) {
+                        TmfExperimentElement targetExperiment = (TmfExperimentElement) targetToUse;
                         ok |= drop(sourceTrace, targetExperiment);
-                    } else if (aTarget instanceof TmfTraceFolder) {
-                        TmfTraceFolder traceFolder = (TmfTraceFolder) aTarget;
+                    } else if (targetToUse instanceof TmfTraceFolder) {
+                        TmfTraceFolder traceFolder = (TmfTraceFolder) targetToUse;
                         ok |= drop(sourceTrace, traceFolder);
                     }
                 } else if (source instanceof IResource) {
@@ -161,11 +165,11 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     if (sourceResource.getType() != IResource.FILE && sourceResource.getType() != IResource.FOLDER) {
                         continue;
                     }
-                    if (aTarget instanceof TmfExperimentElement) {
-                        TmfExperimentElement targetExperiment = (TmfExperimentElement) aTarget;
+                    if (targetToUse instanceof TmfExperimentElement) {
+                        TmfExperimentElement targetExperiment = (TmfExperimentElement) targetToUse;
                         ok |= drop(sourceResource, targetExperiment);
-                    } else if (aTarget instanceof TmfTraceFolder) {
-                        TmfTraceFolder traceFolder = (TmfTraceFolder) aTarget;
+                    } else if (targetToUse instanceof TmfTraceFolder) {
+                        TmfTraceFolder traceFolder = (TmfTraceFolder) targetToUse;
                         ok |= drop(sourceResource, traceFolder);
                     }
                 }
@@ -174,11 +178,11 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             String[] sources = (String[]) aDropTargetEvent.data;
             for (String source : sources) {
                 Path path = new Path(source);
-                if (aTarget instanceof TmfExperimentElement) {
-                    TmfExperimentElement targetExperiment = (TmfExperimentElement) aTarget;
+                if (targetToUse instanceof TmfExperimentElement) {
+                    TmfExperimentElement targetExperiment = (TmfExperimentElement) targetToUse;
                     ok |= drop(path, targetExperiment);
-                } else if (aTarget instanceof TmfTraceFolder) {
-                    TmfTraceFolder traceFolder = (TmfTraceFolder) aTarget;
+                } else if (targetToUse instanceof TmfTraceFolder) {
+                    TmfTraceFolder traceFolder = (TmfTraceFolder) targetToUse;
                     ok |= drop(path, traceFolder);
                 }
             }
@@ -215,30 +219,34 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
      */
     private boolean drop(IResource sourceResource, TmfExperimentElement targetExperiment) {
         boolean doit = true;
-        TmfProjectElement projectElement = TmfProjectRegistry.getProject(sourceResource.getProject());
+
+        //Use local variable to avoid parameter assignment
+        IResource sourceResourceToUse = sourceResource;
+
+        TmfProjectElement projectElement = TmfProjectRegistry.getProject(sourceResourceToUse.getProject());
         for (TmfTraceElement trace : targetExperiment.getTraces()) {
-            if (trace.getName().equals(sourceResource.getName())) {
+            if (trace.getName().equals(sourceResourceToUse.getName())) {
                 doit = false;
                 break;
             }
         }
         if (doit && !targetExperiment.getProject().equals(projectElement)) {
             for (TmfTraceElement trace : targetExperiment.getProject().getTracesFolder().getTraces()) {
-                if (trace.getName().equals(sourceResource.getName())) {
+                if (trace.getName().equals(sourceResourceToUse.getName())) {
                     doit = false;
                     break;
                 }
             }
             if (doit) {
                 try {
-                    IPath destination = targetExperiment.getProject().getTracesFolder().getResource().getFullPath().addTrailingSeparator().append(sourceResource.getName());
-                    sourceResource.copy(destination, false, null);
+                    IPath destination = targetExperiment.getProject().getTracesFolder().getResource().getFullPath().addTrailingSeparator().append(sourceResourceToUse.getName());
+                    sourceResourceToUse.copy(destination, false, null);
                     cleanupBookmarks(destination);
                     // use the copied resource for the experiment
-                    if (sourceResource.getType() == IResource.FILE) {
-                        sourceResource = targetExperiment.getProject().getTracesFolder().getResource().getFile(sourceResource.getName());
-                    } else if (sourceResource.getType() == IResource.FOLDER) {
-                        sourceResource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(sourceResource.getName());
+                    if (sourceResourceToUse.getType() == IResource.FILE) {
+                        sourceResourceToUse = targetExperiment.getProject().getTracesFolder().getResource().getFile(sourceResourceToUse.getName());
+                    } else if (sourceResourceToUse.getType() == IResource.FOLDER) {
+                        sourceResourceToUse = targetExperiment.getProject().getTracesFolder().getResource().getFolder(sourceResourceToUse.getName());
                     }
                 } catch (CoreException e) {
                     doit = false;
@@ -247,8 +255,8 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
         }
         if (doit) {
-            if (sourceResource != null && sourceResource.exists()) {
-                createLink(targetExperiment.getResource(), sourceResource);
+            if (sourceResourceToUse != null && sourceResourceToUse.exists()) {
+                createLink(targetExperiment.getResource(), sourceResourceToUse);
                 return true;
             }
         }
@@ -311,32 +319,36 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
      */
     private boolean drop(Path path, TmfExperimentElement targetExperiment) {
         boolean doit = true;
+        
+        // Use local variable to avoid parameter assignment
+        Path pathToUse = path;
+
         for (TmfTraceElement trace : targetExperiment.getTraces()) {
-            if (trace.getName().equals(path.lastSegment())) {
+            if (trace.getName().equals(pathToUse.lastSegment())) {
                 doit = false;
                 break;
             }
         }
-        if (doit && !path.toString().startsWith(targetExperiment.getProject().getResource().getLocation().toString())) {
+        if (doit && !pathToUse.toString().startsWith(targetExperiment.getProject().getResource().getLocation().toString())) {
             for (TmfTraceElement trace : targetExperiment.getProject().getTracesFolder().getTraces()) {
-                if (trace.getName().equals(path.lastSegment())) {
+                if (trace.getName().equals(pathToUse.lastSegment())) {
                     doit = false;
                     break;
                 }
             }
             if (doit) {
-                importTrace(targetExperiment.getProject().getTracesFolder().getResource(), path);
+                importTrace(targetExperiment.getProject().getTracesFolder().getResource(), pathToUse);
                 // use the imported trace for the experiment
-                path = new Path(targetExperiment.getProject().getTracesFolder().getResource().getFile(path.lastSegment()).getLocation().toString());
+                pathToUse = new Path(targetExperiment.getProject().getTracesFolder().getResource().getFile(pathToUse.lastSegment()).getLocation().toString());
             }
         }
         if (doit) {
             IResource resource = null;
-            File file = new File(path.toString());
+            File file = new File(pathToUse.toString());
             if (file.exists() && file.isFile()) {
-                resource = targetExperiment.getProject().getTracesFolder().getResource().getFile(path.lastSegment());
+                resource = targetExperiment.getProject().getTracesFolder().getResource().getFile(pathToUse.lastSegment());
             } else if (file.exists() && file.isDirectory()) {
-                resource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(path.lastSegment());
+                resource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(pathToUse.lastSegment());
             }
             if (resource != null && resource.exists()) {
                 createLink(targetExperiment.getResource(), resource);
@@ -425,7 +437,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     setProperties(folder, bundleName, traceType, iconUrl, supplFolder);
 
                 } else {
-                    System.out.println("Invalid Trace Location"); //$NON-NLS-1$
+                    TmfUiPlugin.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
             } else {
                 IFile file = parentFolder.getFile(resource.getName());
@@ -434,7 +446,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     file.createLink(location, IResource.REPLACE, null);
                     setProperties(file, bundleName, traceType, iconUrl, supplFolder);
                 } else {
-                    System.out.println("Invalid Trace Location"); //$NON-NLS-1$
+                    TmfUiPlugin.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
             }
         } catch (CoreException e) {

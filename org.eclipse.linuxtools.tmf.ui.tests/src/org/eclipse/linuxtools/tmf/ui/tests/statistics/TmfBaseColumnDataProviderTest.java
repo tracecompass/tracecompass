@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.tests.statistics;
 
-import java.util.Vector;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -116,7 +116,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testGetColumnData() {
-        Vector<TmfBaseColumnData> columnsData = provider.getColumnData();
+        List<TmfBaseColumnData> columnsData = provider.getColumnData();
         assertNotNull("getColumnData", columnsData);
         assertEquals("getColumnData", 2, columnsData.size());
 

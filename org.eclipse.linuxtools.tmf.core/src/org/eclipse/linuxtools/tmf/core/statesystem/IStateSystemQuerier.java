@@ -263,7 +263,8 @@ public interface IStateSystemQuerier {
      *            The "step" of this query
      * @return The List of states that happened between t1 and t2
      * @throws TimeRangeException
-     *             If t1 is invalid, or if t2 <= t1
+     *             If t1 is invalid, if t2 <= t1, or if the resolution isn't
+     *             greater than zero.
      * @throws AttributeNotFoundException
      *             If the attribute doesn't exist
      */

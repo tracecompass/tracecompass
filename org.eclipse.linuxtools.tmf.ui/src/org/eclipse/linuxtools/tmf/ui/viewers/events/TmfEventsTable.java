@@ -18,6 +18,7 @@ package org.eclipse.linuxtools.tmf.ui.viewers.events;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -170,7 +171,7 @@ ITmfEventsFilterProvider {
     protected final Object fFilterSyncObj = new Object();
     protected SearchThread fSearchThread;
     protected final Object fSearchSyncObj = new Object();
-    protected ArrayList<ITmfEventsFilterListener> fEventsFilterListeners = new ArrayList<ITmfEventsFilterListener>();
+    protected List<ITmfEventsFilterListener> fEventsFilterListeners = new ArrayList<ITmfEventsFilterListener>();
 
     // Bookmark map <Rank, MarkerId>
     protected Map<Long, Long> fBookmarksMap = new HashMap<Long, Long>();
@@ -188,7 +189,7 @@ ITmfEventsFilterProvider {
         Messages.TmfEventsTable_SourceColumnHeader, Messages.TmfEventsTable_TypeColumnHeader,
         Messages.TmfEventsTable_ReferenceColumnHeader, Messages.TmfEventsTable_ContentColumnHeader };
 
-    static private ColumnData[] COLUMN_DATA = new ColumnData[] { new ColumnData(COLUMN_NAMES[0], 100, SWT.LEFT),
+    static private final ColumnData[] COLUMN_DATA = new ColumnData[] { new ColumnData(COLUMN_NAMES[0], 100, SWT.LEFT),
         new ColumnData(COLUMN_NAMES[1], 100, SWT.LEFT), new ColumnData(COLUMN_NAMES[2], 100, SWT.LEFT),
         new ColumnData(COLUMN_NAMES[3], 100, SWT.LEFT), new ColumnData(COLUMN_NAMES[4], 100, SWT.LEFT) };
 

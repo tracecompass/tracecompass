@@ -52,6 +52,11 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
  * </p>
  */
 public class StopTrace implements IObjectActionDelegate, IWorkbenchWindowActionDelegate, IViewActionDelegate {
+
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    private static final int DEFAULT_WAIT_TIMEOUT = 2000; 
     
     // ------------------------------------------------------------------------
     // Attributes
@@ -272,11 +277,9 @@ public class StopTrace implements IObjectActionDelegate, IWorkbenchWindowActionD
         }
         
         if (success) {
-            //FIXME: wait 2 seconds to allow time for channels to be written before destroying the trace
             try {
-				Thread.sleep(2000);
+				Thread.sleep(DEFAULT_WAIT_TIMEOUT);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
         }
     }

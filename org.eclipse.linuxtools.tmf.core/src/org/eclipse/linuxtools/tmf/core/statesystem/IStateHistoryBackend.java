@@ -103,6 +103,17 @@ public interface IStateHistoryBackend {
     public long supplyAttributeTreeWriterFilePosition();
 
     /**
+     * Delete any generated files or anything that might have been created by
+     * the history backend (either temporary or save files). By calling this, we
+     * return to the state as it was before ever building the history.
+     * 
+     * You might not want to call automatically if, for example, you want an
+     * index file to persist on disk. This could be limited to actions
+     * originating from the user.
+     */
+    public void removeFiles();
+
+    /**
      * @name Query methods
      */
 

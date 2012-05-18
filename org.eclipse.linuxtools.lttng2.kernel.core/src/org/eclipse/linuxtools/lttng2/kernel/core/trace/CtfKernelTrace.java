@@ -68,7 +68,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
             // get the directory where the history file will be stored.
             supplDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
         } catch (CoreException e) {
-            throw new TmfTraceException(e.getMessage());
+            throw new TmfTraceException(e.toString(), e);
         }
 
         final File htFile = new File(supplDirectory + File.separator + HISTORY_TREE_FILE_NAME);
@@ -107,10 +107,9 @@ public class CtfKernelTrace extends CtfTmfTrace {
              * If it fails here however, it means there was a problem writing
              * to the disk, so throw a real exception this time.
              */
-            throw new TmfTraceException(e.getMessage());
+            throw new TmfTraceException(e.toString(), e);
         }
 
         this.ss = builder.getStateSystemQuerier();
-        builder.run(); /* Start the construction of the history */
     }
 }

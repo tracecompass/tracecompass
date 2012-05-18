@@ -365,17 +365,17 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             writer.write(xmlString);
             writer.close();
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerFactoryConfigurationError e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
     }
 
@@ -467,11 +467,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
             return defList.toArray(new CustomTxtTraceDefinition[0]);
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
         return new CustomTxtTraceDefinition[0];
     }
@@ -521,11 +521,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 }
             }
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
         return null;
     }
@@ -652,17 +652,17 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             writer.write(xmlString);
             writer.close();
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (IOException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (TransformerFactoryConfigurationError e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (TransformerException e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         }
     }
 }

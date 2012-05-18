@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.internal.lttng.core.state.model;
 
+import org.eclipse.linuxtools.internal.lttng.core.Activator;
 import org.eclipse.linuxtools.internal.lttng.core.state.LttngStateException;
 import org.eclipse.linuxtools.internal.lttng.core.state.resource.ILttngStateContext;
 
@@ -53,7 +54,7 @@ public class StateModelFactory {
 		try {
 			traceState.init(stateInputRef);
 		} catch (LttngStateException e) {
-			e.printStackTrace();
+		    Activator.getDefault().logError("Unexpected Error", e);  //$NON-NLS-1$
 		}
 		return traceState;
 	}

@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -200,11 +201,9 @@ public class EventsViewEditor extends TmfEditor {
                         }
                 }
             } catch (final InvalidRegistryObjectException e) {
-                e.printStackTrace();
-            } catch (final PartInitException e) {
-                throw e;
+                TmfUiPlugin.getDefault().logError("Error initializing EventsViewEditor", e); //$NON-NLS-1$
             } catch (final CoreException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().logError("Error initializing EventsViewEditor", e); //$NON-NLS-1$
             }
             input = new TmfEditorInput(fFile, fTrace);
         } else
@@ -264,7 +263,7 @@ public class EventsViewEditor extends TmfEditor {
                             adapter.gotoMarker(fGotoMarker);
                     }
                 } catch (final PartInitException e) {
-                    e.printStackTrace();
+                    TmfUiPlugin.getDefault().logError("Error setting focus", e); //$NON-NLS-1$
                 }
             }
         });

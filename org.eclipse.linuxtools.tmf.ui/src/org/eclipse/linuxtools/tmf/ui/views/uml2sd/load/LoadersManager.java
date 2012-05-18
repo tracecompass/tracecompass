@@ -190,7 +190,7 @@ public class LoadersManager {
 
             return loader;
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error getting loader class", e)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error getting loader class", e); //$NON-NLS-1$
         }
         return null;
     }
@@ -245,7 +245,7 @@ public class LoadersManager {
                     }
 
                 } catch (Exception e) {
-                    TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error setting current loader class", e)); //$NON-NLS-1$
+                    TmfUiPlugin.getDefault().logError("Error setting current loader class", e); //$NON-NLS-1$
                 }
             }
             // The old loader is going to be kicked
@@ -372,9 +372,9 @@ public class LoadersManager {
                 setCurrentLoader(l, viewId);
             }
         } catch (CoreException e4) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error 'uml2SDLoader' Extension point", e4)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error 'uml2SDLoader' Extension point", e4); //$NON-NLS-1$
         } catch (Exception e5) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error 'uml2SDLoader' Extension point", e5)); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().logError("Error 'uml2SDLoader' Extension point", e5); //$NON-NLS-1$
         }
     }
 }

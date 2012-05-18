@@ -12,7 +12,9 @@
 
 package org.eclipse.linuxtools.internal.lttng2.core;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -82,5 +84,61 @@ public class Activator extends Plugin {
 		plugin = null;
 		super.stop(context);
 	}
+	
+    /**
+     * Logs a message with severity INFO in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     */
+    public void logInfo(String message) {
+        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+    }
+    
+    /**
+     * Logs a message and exception with severity INFO in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     * @param exception A exception to log
+     */
+    public void logInfo(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, exception));
+    }
 
+    /**
+     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     */
+    public void logWarning(String message) {
+        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+    }
+    
+    /**
+     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     * @param exception A exception to log
+     */
+    public void logWarning(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, exception));
+    }
+
+    /**
+     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     */
+    public void logError(String message) {
+        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
+    }
+    
+    /**
+     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
+     * 
+     * @param message A message to log
+     * @param exception A exception to log
+     */
+    public void logError(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
+    }
 }

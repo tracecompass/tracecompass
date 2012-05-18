@@ -15,8 +15,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 
 /**
@@ -62,8 +60,7 @@ public class ControlCommandLogger {
             fTraceLog.close();
             fTraceLog = null;
         } catch (IOException e) {
-            Activator.getDefault().getLog().log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, IStatus.WARNING, 
-                    "Can't close log file of the trace control", e)); //$NON-NLS-1$
+            Activator.getDefault().logWarning("Can't close log file of the trace control", e); //$NON-NLS-1$
         }
     }
     
@@ -86,8 +83,7 @@ public class ControlCommandLogger {
                 fTraceLog.newLine();
                 fTraceLog.flush();
             } catch (IOException e) {
-                Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, 
-                        "Can't log message in log file of the tracer control", e)); //$NON-NLS-1$
+                Activator.getDefault().logError("Can't log message in log file of the tracer control", e); //$NON-NLS-1$
             }
         }
     }
@@ -106,8 +102,7 @@ public class ControlCommandLogger {
         try {
             outfile = new BufferedWriter(new FileWriter(filename, append));
         } catch (IOException e) {
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, 
-                    "Can't open log file for logging of tracer control commands: " + filename, e)); //$NON-NLS-1$
+            Activator.getDefault().logError("Can't open log file for logging of tracer control commands: " + filename, e); //$NON-NLS-1$
         }
         return outfile;
     }

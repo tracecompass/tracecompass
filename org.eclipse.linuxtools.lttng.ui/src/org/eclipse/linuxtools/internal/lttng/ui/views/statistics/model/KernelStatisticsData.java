@@ -938,7 +938,6 @@ public class KernelStatisticsData extends StatisticsData {
                 clone.fName = fName;
                 clone.fValue = fValue;
             } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
             }
             return clone;
         }
@@ -950,10 +949,11 @@ public class KernelStatisticsData extends StatisticsData {
          *            The name to set.
          */
         public void setName(String name) {
-            if (fName != null)
+            if (fName != null) {
                 this.fName = name;
-            else
+            } else {
                 this.fName = UNKNOWN_PREFIX;
+            }
         }
 
         /**
