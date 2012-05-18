@@ -364,6 +364,9 @@ public class TimeGraphCombo extends Composite {
                     if (selection instanceof ITimeGraphEntry) {
                         fTimeGraphViewer.setSelection((ITimeGraphEntry) selection);
                     }
+                    if (treeItems.size() == 0) {
+                        return;
+                    }
                     TreeItem treeItem = treeItems.get(fTimeGraphViewer.getTopIndex());
                     tree.setTopItem(treeItem);
                 }
