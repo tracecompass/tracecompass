@@ -111,6 +111,5 @@ public class CtfKernelTrace extends CtfTmfTrace {
         }
 
         this.ss = builder.getStateSystemQuerier();
-        builder.run(); /* Start the construction of the history */
     }
 }

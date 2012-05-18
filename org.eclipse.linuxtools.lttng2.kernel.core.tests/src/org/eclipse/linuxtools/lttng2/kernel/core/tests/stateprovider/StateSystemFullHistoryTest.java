@@ -68,7 +68,7 @@ public class StateSystemFullHistoryTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        builder.run();
+        builder.startBuilding(null);
         ssb = builder.getStateSystemBuilder();
     }
 
@@ -99,7 +99,7 @@ public class StateSystemFullHistoryTest {
         zeinput = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
         zehp = new HistoryTreeBackend(stateFileBenchmark, zeinput.getStartTime());
         zebuilder = new HistoryBuilder(zeinput, zehp);
-        zebuilder.run();
+        zebuilder.startBuilding(null);
 
         assertEquals(CtfTestFiles.startTime, zehp.getStartTime());
         assertEquals(CtfTestFiles.endTime, zehp.getEndTime());
