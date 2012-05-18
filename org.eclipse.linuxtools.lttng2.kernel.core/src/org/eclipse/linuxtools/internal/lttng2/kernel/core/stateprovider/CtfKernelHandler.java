@@ -96,6 +96,9 @@ class CtfKernelHandler implements Runnable {
 
     private void closeStateSystem() {
         /* Close the History system, if there is one */
+        if (currentEvent == null) {
+            return;
+        }
         try {
             ss.closeHistory(currentEvent.getTimestamp().getValue());
         } catch (TimeRangeException e) {
