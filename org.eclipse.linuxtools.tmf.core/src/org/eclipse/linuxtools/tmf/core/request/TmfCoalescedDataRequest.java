@@ -63,7 +63,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      */
-    public TmfCoalescedDataRequest(Class<T> dataType, int index) {
+    public TmfCoalescedDataRequest(Class<T> dataType, long index) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
@@ -75,7 +75,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param index the index of the first event to retrieve
      * @param priority the requested execution priority
      */
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, ExecutionType priority) {
+    public TmfCoalescedDataRequest(Class<T> dataType, long index, ExecutionType priority) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
@@ -87,7 +87,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
      */
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested) {
+    public TmfCoalescedDataRequest(Class<T> dataType, long index, int nbRequested) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
@@ -100,7 +100,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param nbRequested the number of events requested
      * @param priority the requested execution priority
      */
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType priority) {
+    public TmfCoalescedDataRequest(Class<T> dataType, long index, int nbRequested, ExecutionType priority) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, priority);
     }
 
@@ -113,7 +113,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param nbRequested the number of events requested
      * @param blockSize the number of events per block
      */
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
+    public TmfCoalescedDataRequest(Class<T> dataType, long index, int nbRequested, int blockSize) {
         super(dataType, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
@@ -127,7 +127,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfCoalescedDataRequest(Class<T> dataType, long index, int nbRequested, int blockSize, ExecutionType priority) {
         super(dataType, index, nbRequested, blockSize, priority);
     }
 
@@ -142,11 +142,21 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 	public boolean isCompatible(ITmfDataRequest<T> request) {
 
 		boolean ok = request.getIndex() == getIndex();
-		ok &= request.getNbRequested()  == getNbRequested();
-		ok &= request.getExecType()     == getExecType();
-		//ok &= request.getDataType()     == getDataType();
+		ok &= request.getNbRequested() == getNbRequested();
+		ok &= request.getExecType() == getExecType();
 		
 		return ok;
+	}
+
+	@SuppressWarnings("nls")
+    public String getSubRequestIds() {
+	    StringBuffer result = new StringBuffer("[");
+	    for (int i = 0; i < fRequests.size(); i++) {
+	        if (i != 0) result.append(", ");
+	        result.append(fRequests.get(i).getRequestId());
+	    }
+	    result.append("]");
+	    return result.toString();
 	}
 
     // ------------------------------------------------------------------------

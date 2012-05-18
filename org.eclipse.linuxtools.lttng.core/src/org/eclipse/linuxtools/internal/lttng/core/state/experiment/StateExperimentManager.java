@@ -28,7 +28,6 @@ import org.eclipse.linuxtools.internal.lttng.core.signal.StateExperimentListener
 import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.internal.lttng.core.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -37,6 +36,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
  * @author alvaro

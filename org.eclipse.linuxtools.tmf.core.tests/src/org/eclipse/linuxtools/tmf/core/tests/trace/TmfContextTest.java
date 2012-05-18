@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Adapted for TMF Trace Model 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.trace;
@@ -21,8 +22,6 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
- * <b><u>TmfContextTest</u></b>
- * <p>
  * Test suite for the TmfContext class.
  */
 @SuppressWarnings("nls")

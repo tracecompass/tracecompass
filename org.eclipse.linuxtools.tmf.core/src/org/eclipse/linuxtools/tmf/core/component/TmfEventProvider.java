@@ -74,7 +74,8 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
                     eventRequest.getIndex(), eventRequest.getNbRequested(), eventRequest.getBlockSize(), eventRequest.getExecType());
             coalescedRequest.addRequest(eventRequest);
             if (Tracer.isRequestTraced()) {
-                Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                Tracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                Tracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
             }
             fPendingCoalescedRequests.add(coalescedRequest);
         } else {
@@ -90,10 +91,17 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
 			return;
 		}
 
+        final TmfDataProvider<T> provider = this;
+
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
-				request.start();
+
+                if (Tracer.isRequestTraced()) {
+                    Tracer.traceRequest(request, "is being serviced by " + provider.getName()); //$NON-NLS-1$
+                }
+
+			    request.start();
 
 				final Integer[] CHUNK_SIZE = new Integer[1];
 				CHUNK_SIZE[0] = Math.min(request.getNbRequested(), blockSize + ((indexing) ? 1 : 0));
@@ -104,7 +112,7 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
 				final Boolean[] isFinished = new Boolean[1];
 				isFinished[0] = Boolean.FALSE;
 
-				int startIndex = request.getIndex();
+				long startIndex = request.getIndex();
 				
 				while (!isFinished[0]) {
 

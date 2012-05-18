@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -111,8 +112,7 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
      * @param blockSize the number of events per block
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-        super(dataType, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
-        fRange = range;
+        this(dataType, range, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
     /**
@@ -126,8 +126,7 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
      * @param priority the requested execution priority
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType priority) {
-        super(dataType, 0, nbRequested, blockSize, priority);
-        fRange = range;
+        this(dataType, range, 0, nbRequested, blockSize, priority);
     }
 
     /**
@@ -141,9 +140,21 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
         super(dataType, index, nbRequested, blockSize, priority);
         fRange = range;
+
+        if (Tracer.isRequestTraced()) {
+            String type = getClass().getName();
+            type = type.substring(type.lastIndexOf('.') + 1);
+            @SuppressWarnings("nls")
+            String message = "CREATED " 
+                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") 
+                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested() 
+                    + " Range=" + getRange()
+                    + " DataType=" + getDataType().getSimpleName();
+            Tracer.traceRequest(this, message);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -152,22 +163,24 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
 
 	@Override
 	public boolean isCompatible(ITmfDataRequest<T> request) {
-		if (request instanceof ITmfEventRequest<?>) {
-			boolean ok = getNbRequested() == request.getNbRequested();
-			ok &= getIndex() == request.getIndex();
-			ok &= getExecType() == request.getExecType();
-            //ok &= getDataType() == request.getDataType();
-			if (ok) {
-				ITmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
-				ITmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
-				if (!fRange.contains(startTime))
-					fRange = new TmfTimeRange(startTime, fRange.getEndTime());
-				if (!fRange.contains(endTime))
-					fRange = new TmfTimeRange(fRange.getStartTime(), endTime);
-			}
-			return ok;
-		}
-		return false;
+	    if (request instanceof ITmfEventRequest<?>) {
+	        boolean ok = super.isCompatible(request);
+	        if (ok) {
+	            ITmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
+	            ITmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
+	            ok &= (startTime.compareTo(endTime) <= 0) && (fRange.getStartTime().compareTo(fRange.getEndTime()) <= 0);
+	            if (ok) {
+	                if (!fRange.contains(startTime) && fRange.getStartTime().compareTo(startTime) > 0) {
+	                    fRange = new TmfTimeRange(startTime, fRange.getEndTime());
+	                }
+	                if (!fRange.contains(endTime) && fRange.getEndTime().compareTo(endTime) < 0) {
+	                    fRange = new TmfTimeRange(fRange.getStartTime(), endTime);
+	                }
+	            }
+	        }
+	        return ok;
+	    }
+	    return false;
 	}
 
     // ------------------------------------------------------------------------

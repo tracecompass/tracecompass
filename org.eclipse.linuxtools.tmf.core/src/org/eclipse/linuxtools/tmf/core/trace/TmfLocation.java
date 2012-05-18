@@ -19,11 +19,10 @@ import java.lang.reflect.Method;
  * A convenience implementation on of ITmfLocation. The generic class (L) must
  * be comparable.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
+public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -40,7 +39,6 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
      */
     @SuppressWarnings("unused")
     private TmfLocation() {
-        fLocation = null;
     }
 
     /**
@@ -91,8 +89,9 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
                 final Method method = clazz.getMethod("clone", new Class[0]); //$NON-NLS-1$
                 final Object copy = method.invoke(this.fLocation, new Object[0]);
                 clone.fLocation = (L) copy;
-            } else
+            } else {
                 clone.fLocation = null;
+            }
         } catch (final CloneNotSupportedException e) {
         } catch (final NoSuchMethodException e) {
         } catch (final Exception e) {
@@ -122,18 +121,23 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
     @Override
     @SuppressWarnings("unchecked")
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final TmfLocation<L> other = (TmfLocation<L>) obj;
         if (fLocation == null) {
-            if (other.fLocation != null)
+            if (other.fLocation != null) {
                 return false;
-        } else if (!fLocation.equals(other.fLocation))
+            }
+        } else if (!fLocation.equals(other.fLocation)) {
             return false;
+        }
         return true;
     }
 

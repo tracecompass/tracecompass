@@ -13,8 +13,8 @@ package org.eclipse.linuxtools.lttng.core.tests.control;
 
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.tests.LttngTestPreparation;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 @SuppressWarnings("nls")
 public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {

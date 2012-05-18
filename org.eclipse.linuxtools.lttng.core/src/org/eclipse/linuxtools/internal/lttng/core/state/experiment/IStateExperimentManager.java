@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.internal.lttng.core.state.experiment;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 public interface IStateExperimentManager {
 

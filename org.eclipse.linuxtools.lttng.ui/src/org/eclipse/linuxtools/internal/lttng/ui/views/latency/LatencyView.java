@@ -29,7 +29,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
@@ -38,6 +37,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -212,7 +212,7 @@ public class LatencyView extends TmfView implements IGraphModelListener {
 
             TmfTimeRange experimentTRange = experiment.getTimeRange();
 
-            if (experimentTRange != TmfTimeRange.NULL_RANGE) {
+            if (!experimentTRange.equals(TmfTimeRange.NULL_RANGE)) {
                 TmfExperimentSelectedSignal<TmfEvent> signal = new TmfExperimentSelectedSignal<TmfEvent>(this, experiment);
                 experimentSelected(signal);
             }
@@ -260,10 +260,10 @@ public class LatencyView extends TmfView implements IGraphModelListener {
     }    
     @TmfSignalHandler
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-        if (fTimeRange == TmfTimeRange.NULL_RANGE && signal.getExperiment().equals(fExperiment)) {
+        if (fTimeRange.equals(TmfTimeRange.NULL_RANGE) && signal.getExperiment().equals(fExperiment)) {
             TmfTimeRange experimentTRange = signal.getRange();
 
-            if (experimentTRange != TmfTimeRange.NULL_RANGE) {
+            if (!experimentTRange.equals(TmfTimeRange.NULL_RANGE)) {
                 fTimeRange = new TmfTimeRange(experimentTRange.getStartTime(), 
                         new TmfTimestamp(experimentTRange.getStartTime().getValue() + INITIAL_WINDOW_SPAN, experimentTRange.getStartTime().getScale(), experimentTRange.getStartTime().getPrecision()));
                 fController.refreshModels(fExperiment, fTimeRange);

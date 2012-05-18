@@ -65,6 +65,11 @@ public class CTFTraceReader {
      */
     private long endTime;
 
+    
+    protected void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
     /**
      * Current event index
      */
@@ -103,7 +108,7 @@ public class CTFTraceReader {
         this.startTime = 0;// prio.peek().getPacketReader().getCurrentPacket().getTimestampBegin();
         if (hasMoreEvents()) {
             this.startTime = prio.peek().getCurrentEvent().getTimestamp();
-            this.endTime = this.startTime;
+            this.setEndTime(this.startTime);
             this.fIndex = 0;
         }
         startIndex = new HashMap<Integer, Long>();
@@ -117,7 +122,7 @@ public class CTFTraceReader {
 
         newReader = new CTFTraceReader(this.trace);
         newReader.startTime = this.startTime;
-        newReader.endTime = this.endTime;
+        newReader.setEndTime(this.endTime);
         return newReader;
     }
 
@@ -270,8 +275,8 @@ public class CTFTraceReader {
              * Add it back in the queue.
              */
             this.prio.add(top);
-            final long topEnd = top.getCurrentEvent().getTimestamp();
-            this.endTime = Math.max(topEnd, this.endTime);
+            final long topEnd = top.getCurrentEvent().getTimestamp() + this.getTrace().getOffset();
+            this.setEndTime( Math.max(topEnd, this.getEndTime()));
             this.eventCountPerTraceFile[top.getName()]++;
             /*
              * increment the index

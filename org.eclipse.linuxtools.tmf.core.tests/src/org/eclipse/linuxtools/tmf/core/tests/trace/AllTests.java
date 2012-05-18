@@ -19,8 +19,7 @@ import junit.framework.TestSuite;
 import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
 
 /**
- * <b><u>AllTests</u></b>
- * <p>
+ * Test suite for org.eclipse.linuxtools.tmf.core.trace
  */
 @SuppressWarnings("nls")
 public class AllTests {
@@ -33,6 +32,10 @@ public class AllTests {
 		suite.addTestSuite(TmfCheckpointTest.class);
         suite.addTestSuite(TmfCheckpointIndexTest.class);
 		suite.addTestSuite(TmfTraceTest.class);
+
+        suite.addTestSuite(TmfExperimentCheckpointIndexTest.class);
+        suite.addTestSuite(TmfExperimentTest.class);
+        suite.addTestSuite(TmfMultiTraceExperimentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

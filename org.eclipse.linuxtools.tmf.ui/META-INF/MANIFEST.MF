@@ -8,16 +8,24 @@ Bundle-SymbolicName: org.eclipse.linuxtools.tmf.ui;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
- org.eclipse.ui.ide;bundle-version="3.7.0",
- org.eclipse.core.resources;bundle-version="3.7.100",
+Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.core.filesystem;bundle-version="1.3.100",
+ org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.linuxtools.tmf.core;bundle-version="0.5.0",
+ org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.ui.ide;bundle-version="3.7.0",
  org.eclipse.ui.navigator;bundle-version="3.5.100",
- org.eclipse.ui.navigator.resources;bundle-version="3.4.300",
- org.eclipse.core.expressions
+ org.eclipse.ui.navigator.resources;bundle-version="3.4.300"
 Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.linuxtools.tmf.ui.tests",
+ org.eclipse.linuxtools.internal.tmf.ui.commands;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.dialogs;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.editors.handlers;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.preferences;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.project.handlers;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.signal;x-internal:=true,
  org.eclipse.linuxtools.tmf.ui.editors,
  org.eclipse.linuxtools.tmf.ui.project.model,
  org.eclipse.linuxtools.tmf.ui.project.wizards,

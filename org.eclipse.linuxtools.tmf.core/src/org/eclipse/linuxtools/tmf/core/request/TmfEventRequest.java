@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
@@ -124,7 +125,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param nbRequested the number of events requested
      * @param blockSize the number of events per block
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize) {
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize) {
         this(dataType, range, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
@@ -153,9 +154,21 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
     	super(dataType, index, nbRequested, blockSize, priority);
     	fRange = range;
+
+        if (Tracer.isRequestTraced()) {
+            String type = getClass().getName();
+            type = type.substring(type.lastIndexOf('.') + 1);
+            @SuppressWarnings("nls")
+            String message = "CREATED " 
+                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") 
+                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested() 
+                    + " Range=" + getRange()
+                    + " DataType=" + getDataType().getSimpleName();
+            Tracer.traceRequest(this, message);
+        }
     }
 
     // ------------------------------------------------------------------------

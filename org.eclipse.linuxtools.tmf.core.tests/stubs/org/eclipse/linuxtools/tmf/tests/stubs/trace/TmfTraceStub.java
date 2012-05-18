@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
@@ -62,7 +63,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      */
     public TmfTraceStub() {
         super();
-        fParser = new TmfEventParserStub(this);
+        setParser(new TmfEventParserStub(this));
     }
 
     /**
@@ -70,7 +71,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path) throws TmfTraceException {
-        this(path, DEFAULT_TRACE_CACHE_SIZE, false);
+        this(path, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false);
     }
 
     /**
@@ -94,7 +95,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        fParser = new TmfEventParserStub(this);
+        setParser(new TmfEventParserStub(this));
     }
 
     /**
@@ -112,7 +113,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path, final boolean waitForCompletion) throws TmfTraceException {
-        this(path, DEFAULT_TRACE_CACHE_SIZE, waitForCompletion);
+        this(path, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, waitForCompletion);
     }
 
     /**
@@ -128,7 +129,10 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        fParser = new TmfEventParserStub(this);
+        setParser(new TmfEventParserStub(this));
+        if (waitForCompletion) {
+            indexTrace();
+        }
     }
 
     /**
@@ -144,7 +148,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        fParser = new TmfEventParserStub(this);
+        setParser(new TmfEventParserStub(this));
     }
 
     /**
@@ -162,7 +166,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        fParser = (parser != null) ? parser : new TmfEventParserStub(this);
+        setParser((parser != null) ? parser : new TmfEventParserStub(this));
     }
 
     /**
@@ -175,11 +179,11 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        fParser = new TmfEventParserStub(this);
+        setParser(new TmfEventParserStub(this));
     }
 
     public void indexTrace() {
-        fIndexer.buildIndex(true);
+        indexTrace(true);
     }
 
     @Override
@@ -189,7 +193,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        fParser = new TmfEventParserStub(this);
+        setParser(new TmfEventParserStub(this));
         super.initTrace(resource, path, type);
     }
 
@@ -299,17 +303,19 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         fLock.lock();
         try {
             // parseNextEvent will update the context
-            if (fTrace != null) {
-                final TmfEvent event = fParser.parseEvent(context.clone());
+            if (fTrace != null && getParser() != null && context != null) {
+                final TmfEvent event = getParser().parseEvent(context.clone());
                 return event;
             }
-//        }
-//        catch (final IOException e) {
-//            e.printStackTrace();
         } finally {
             fLock.unlock();
         }
         return null;
+    }
+
+    @Override
+    public void setNbEvents(final long nbEvents) {
+        super.setNbEvents(nbEvents);
     }
 
     @Override

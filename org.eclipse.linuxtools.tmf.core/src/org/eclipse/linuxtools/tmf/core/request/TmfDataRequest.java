@@ -90,7 +90,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     private final Class<T> fDataType;
     private final ExecutionType fExecType;
     private final int fRequestId; // A unique request ID
-    private int fIndex; // The index (rank) of the requested event
+    private long fIndex; // The index (rank) of the requested event
     private final int fNbRequested; // The number of requested events (ALL_DATA for all)
     private final int fBlockSize; // The block size (for BG requests)
     private int fNbRead; // The number of reads so far
@@ -141,7 +141,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      */
-    public TmfDataRequest(Class<T> dataType, int index) {
+    public TmfDataRequest(Class<T> dataType, long index) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
@@ -153,7 +153,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * @param index the index of the first event to retrieve
      * @param priority the requested execution priority
      */
-    public TmfDataRequest(Class<T> dataType, int index, ExecutionType priority) {
+    public TmfDataRequest(Class<T> dataType, long index, ExecutionType priority) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
@@ -165,7 +165,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
      */
-    public TmfDataRequest(Class<T> dataType, int index, int nbRequested) {
+    public TmfDataRequest(Class<T> dataType, long index, int nbRequested) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
@@ -178,7 +178,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * @param nbRequested the number of events requested
      * @param priority the requested execution priority
      */
-    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType priority) {
+    public TmfDataRequest(Class<T> dataType, long index, int nbRequested, ExecutionType priority) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, priority);
     }
 
@@ -191,7 +191,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * @param nbRequested the number of events requested
      * @param blockSize the number of events per block
      */
-    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
+    public TmfDataRequest(Class<T> dataType, long index, int nbRequested, int blockSize) {
         this(dataType, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
@@ -205,7 +205,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfDataRequest(Class<T> dataType, long index, int nbRequested, int blockSize, ExecutionType priority) {
         fRequestId = fRequestNumber++;
         fDataType = dataType;
         fIndex = index;
@@ -219,8 +219,16 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
         fRequestFailed = false;
         fRequestCanceled = false;
 
-        if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "created"); //$NON-NLS-1$
+        if (!(this instanceof ITmfEventRequest) && Tracer.isRequestTraced()) {
+            String type = getClass().getName();
+            type = type.substring(type.lastIndexOf('.') + 1);
+            @SuppressWarnings("nls")
+            String message = "CREATED " 
+                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") 
+                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
+                    + " DataType=" + getDataType().getSimpleName();
+            Tracer.traceRequest(this, message);
+        }
     }
 
     /**
@@ -247,7 +255,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * @return the index of the first event requested
      */
     @Override
-    public int getIndex() {
+    public long getIndex() {
         return fIndex;
     }
 
@@ -366,7 +374,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     @Override
     public void handleStarted() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "started"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "STARTED"); //$NON-NLS-1$
     }
 
     /**
@@ -396,25 +404,25 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
             handleSuccess();
         }
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "completed (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
+            Tracer.traceRequest(this, "COMPLETED (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
     public void handleSuccess() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "succeeded"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "SUCCEEDED"); //$NON-NLS-1$
     }
 
     @Override
     public void handleFailure() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "failed"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "FAILED"); //$NON-NLS-1$
     }
 
     @Override
     public void handleCancel() {
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "cancelled"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "CANCELLED"); //$NON-NLS-1$
     }
 
     /**

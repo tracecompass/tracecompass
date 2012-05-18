@@ -22,10 +22,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventTypeManager;
 
 /**
- * <b><u>TmfEventTypeManagerTest</u></b>
- * <p>
  * Test suite for the TmfEventTypeManager class.
- * <p>
  */
 @SuppressWarnings("nls")
 public class TmfEventTypeManagerTest extends TestCase {
@@ -154,7 +151,7 @@ public class TmfEventTypeManagerTest extends TestCase {
     public void testClear() {
         fInstance.clear();
         assertEquals("clear", 0, fInstance.getContexts().length);
-        assertNull("clear", fInstance.getTypes(null));
+        assertEquals("clear", 0, fInstance.getTypes(null).length);
         assertNull("clear", fInstance.getType(null, null));
         assertEquals("clear", "TmfEventTypeManager [fEventTypes={}]", fInstance.toString());
     }
@@ -173,7 +170,7 @@ public class TmfEventTypeManagerTest extends TestCase {
         assertEquals("clear context", fContext2, contexts[0]);
 
         ITmfEventType[] types = fInstance.getTypes(fContext1);
-        assertNull("clear context", types);
+        assertEquals("clear context", 0, types.length);
 
         ITmfEventType type = fInstance.getType(fContext1, fType0.getName());
         assertNull("clear context", type);

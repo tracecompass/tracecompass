@@ -16,14 +16,13 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * A basic implementation of ITmfEventType.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  * 
  * @see ITmfEvent
  * @see ITmfEventField
  */
-public class TmfEventType implements ITmfEventType {
+public class TmfEventType implements ITmfEventType, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -110,7 +109,7 @@ public class TmfEventType implements ITmfEventType {
      */
     @Override
     public String[] getFieldNames() {
-        return (fRootField != null) ? fRootField.getFieldNames() : null;
+        return (fRootField != null) ? fRootField.getFieldNames() : new String[0];
     }
 
     /* (non-Javadoc)

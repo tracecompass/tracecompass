@@ -12,8 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Vector;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,11 +42,9 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
  * Locating a specific checkpoint is trivial for both rank (rank % interval) and
  * timestamp (bsearch in the array).
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
- * @see ITmfTraceIndexer
  * @see ITmfTrace
  * @see ITmfEvent
  */
@@ -55,21 +54,20 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     // Attributes
     // ------------------------------------------------------------------------
 
-    /**
-     * The event trace to index
-     */
+    // The event trace to index
     private final ITmfTrace<ITmfEvent> fTrace;
 
-    /**
-     * The interval between checkpoints
-     */
-    protected final int fCheckpointInterval;
+    // The interval between checkpoints
+    private final int fCheckpointInterval;
+
+    // The event trace to index
+    private boolean fIsIndexing;
 
     /**
      * The trace index. It is composed of checkpoints taken at intervals of
      * fCheckpointInterval events.
      */
-    protected final Vector<TmfCheckpoint> fTraceIndex;
+    private final List<TmfCheckpoint> fTraceIndex;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -94,7 +92,20 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     public TmfCheckpointIndexer(final ITmfTrace<ITmfEvent> trace, final int interval) {
         fTrace = trace;
         fCheckpointInterval = interval;
-        fTraceIndex = new Vector<TmfCheckpoint>();
+        fTraceIndex = new ArrayList<TmfCheckpoint>();
+        fIsIndexing = false;
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfTraceIndexer - isIndexing
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#isIndexing()
+     */
+    @Override
+    public boolean isIndexing() {
+        return fIsIndexing;
     }
 
     // ------------------------------------------------------------------------
@@ -102,16 +113,25 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#indexTrace(boolean)
      * 
      * The index is a list of contexts that point to events at regular interval
      * (rank-wise) in the trace. After it is built, the index can be used to
      * quickly access any event by rank or timestamp (using seekIndex()).
      * 
      * The index is built simply by reading the trace
+     *
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#buildIndex(long, org.eclipse.linuxtools.tmf.core.event.TmfTimeRange, boolean)
      */
     @Override
-    public void buildIndex(final boolean waitForCompletion) {
+    public void buildIndex(final long offset, final TmfTimeRange range, final boolean waitForCompletion) {
+
+        // Don't do anything if we are already indexing 
+        synchronized (fTraceIndex) {
+            if (fIsIndexing) {
+                return;
+            }
+            fIsIndexing = true;
+        }
 
         // The monitoring job
         final Job job = new Job("Indexing " + fTrace.getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -134,12 +154,12 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         fTraceIndex.clear();
 
         // Build a background request for all the trace data. The index is
-        // updated as we go by getNextEvent().
-        final ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY,
-                TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
+        // updated as we go by readNextEvent().
+        final ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class,
+                range, offset, TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
         {
-            ITmfTimestamp startTime = null;
-            ITmfTimestamp lastTime = null;
+            private ITmfTimestamp startTime = null;
+            private ITmfTimestamp lastTime = null;
 
             @Override
             public void handleData(final ITmfEvent event) {
@@ -167,6 +187,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             public void handleCompleted() {
                 job.cancel();
                 super.handleCompleted();
+                fIsIndexing = false;
             }
 
             private void updateTraceStatus() {
@@ -228,8 +249,9 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     public synchronized ITmfContext seekIndex(final ITmfTimestamp timestamp) {
 
         // A null timestamp indicates to seek the first event
-        if (timestamp == null)
+        if (timestamp == null) {
             return fTrace.seekEvent(0);
+        }
 
         // Find the checkpoint at or before the requested timestamp.
         // In the very likely event that the timestamp is not at a checkpoint
@@ -250,34 +272,33 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     @Override
     public ITmfContext seekIndex(final long rank) {
 
-      // A rank < 0 indicates to seek the first event
-      if (rank < 0)
-          return fTrace.seekEvent(0);
+        // A rank < 0 indicates to seek the first event
+        if (rank < 0) {
+            return fTrace.seekEvent(0);
+        }
 
-      // Find the checkpoint at or before the requested rank.
-      final int index = (int) rank / fCheckpointInterval;
+        // Find the checkpoint at or before the requested rank.
+        final int index = (int) rank / fCheckpointInterval;
 
-      // Position the trace at the checkpoint
-      return seekCheckpoint(index);
+        // Position the trace at the checkpoint
+        return seekCheckpoint(index);
     }
 
     /**
      * Position the trace at the given checkpoint
      * 
-     * @param index
-     *            the checkpoint index
+     * @param checkpoint the checkpoint index
      * @return the corresponding context
      */
-    private ITmfContext seekCheckpoint(int index) {
-        ITmfLocation<?> location;
+    private ITmfContext seekCheckpoint(final int checkpoint) {
+        ITmfLocation<?> location = null;
+        int index = checkpoint;
         synchronized (fTraceIndex) {
             if (!fTraceIndex.isEmpty()) {
                 if (index >= fTraceIndex.size()) {
                     index = fTraceIndex.size() - 1;
                 }
-                location = fTraceIndex.elementAt(index).getLocation();
-            } else {
-                location = null;
+                location = fTraceIndex.get(index).getLocation();
             }
         }
         final ITmfContext context = fTrace.seekEvent(location);
@@ -285,4 +306,14 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         return context;
     }
 
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
+
+    /**
+     * @return the trace index
+     */
+    protected List<TmfCheckpoint> getTraceIndex() {
+        return fTraceIndex;
+    }
 }

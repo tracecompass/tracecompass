@@ -19,7 +19,6 @@ import java.util.Map;
  * A central repository for the available event types. Types are managed by
  * context space.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  * 
@@ -97,7 +96,7 @@ public final class TmfEventTypeManager {
         if (types != null) {
             return types.values().toArray(new ITmfEventType[types.size()]);
         }
-        return null;
+        return new ITmfEventType[0];
     }
 
     /**

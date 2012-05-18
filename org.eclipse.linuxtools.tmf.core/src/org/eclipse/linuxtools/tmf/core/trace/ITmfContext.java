@@ -15,18 +15,18 @@ package org.eclipse.linuxtools.tmf.core.trace;
 
 /**
  * The basic trace context structure in TMF. The purpose of the context is to
- * associate a trace location to an event of a specific rank (order).
+ * associate a trace location to an event at a specific rank (order).
  * <p>
  * The context should be sufficient to allow the trace to position itself so
- * that performing a trace read operation will yield the corresponding event.
+ * that performing a trace read operation will yield the corresponding 'nth'
+ * event.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
  * @see ITmfLocation
  */
-public interface ITmfContext extends Cloneable {
+public interface ITmfContext {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -42,12 +42,12 @@ public interface ITmfContext extends Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * @return the rank of the event referred to by the context
+     * @return the rank of the event at the context location
      */
     public long getRank();
 
     /**
-     * @return the location of the event referred to by the context
+     * @return the location of the event at the context rank
      */
     public ITmfLocation<? extends Comparable<?>> getLocation();
 
@@ -79,10 +79,6 @@ public interface ITmfContext extends Cloneable {
      * Cleanup hook
      */
     public void dispose();
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the context

@@ -15,11 +15,10 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * A simplified timestamp where scale and precision are set to 0.
  * 
- * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfSimpleTimestamp extends TmfTimestamp {
+public class TmfSimpleTimestamp extends TmfTimestamp implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -61,7 +60,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#normalize(long, int)
      */
     @Override
-    public ITmfTimestamp normalize(final long offset, final int scale) throws ArithmeticException {
+    public ITmfTimestamp normalize(final long offset, final int scale) {
         if (scale == 0) {
             return new TmfSimpleTimestamp(getValue() + offset);
         }

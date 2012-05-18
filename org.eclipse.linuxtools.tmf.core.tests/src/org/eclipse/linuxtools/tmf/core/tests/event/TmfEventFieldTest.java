@@ -19,8 +19,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 /**
- * <b><u>TmfEventFieldTest</u></b>
- * <p>
  * Test suite for the TmfEventField class.
  */
 @SuppressWarnings("nls")
@@ -81,7 +79,7 @@ public class TmfEventFieldTest extends TestCase {
     public void testTerminalStructConstructor() {
         assertSame("getName", fFieldName1, fStructTerminalField1.getName());
         assertNull("getValue", fStructTerminalField1.getValue());
-        assertNull("getFields", fStructTerminalField1.getFields());
+        assertEquals("getFields", 0, fStructTerminalField1.getFields().length);
         assertNull("getField(name)", fStructTerminalField1.getField(fFieldName1));
         assertNull("getField(index)", fStructTerminalField1.getField(0));
         assertEquals("getFieldNames", 0, fStructTerminalField1.getFieldNames().length);
@@ -111,7 +109,7 @@ public class TmfEventFieldTest extends TestCase {
     public void testTerminalConstructor() {
         assertSame("getName", fFieldName1, fField1.getName());
         assertSame("getValue", fValue1, fField1.getValue());
-        assertNull("getFields", fField1.getFields());
+        assertEquals("getFields", 0, fField1.getFields().length);
         assertNull("getField(name)", fField1.getField(fFieldName1));
         assertNull("getField(index)", fField1.getField(0));
         assertEquals("getFieldNames", 0, fField1.getFieldNames().length);
@@ -119,7 +117,7 @@ public class TmfEventFieldTest extends TestCase {
 
         assertSame("getName", fFieldName2, fField2.getName());
         assertSame("getValue", fValue2, fField2.getValue());
-        assertNull("getFields", fField2.getFields());
+        assertEquals("getFields", 0, fField2.getFields().length);
         assertNull("getField(name)", fField2.getField(fFieldName2));
         assertNull("getField(index)", fField2.getField(0));
         assertEquals("getFieldNames", 0, fField2.getFieldNames().length);
@@ -157,7 +155,7 @@ public class TmfEventFieldTest extends TestCase {
         final TmfEventField copy = new TmfEventField(fField1);
         assertSame("getName", fFieldName1, copy.getName());
         assertSame("getValue", fValue1, copy.getValue());
-        assertNull("getFields", copy.getFields());
+        assertEquals("getFields", 0, copy.getFields().length);
         assertNull("getField(name)", copy.getField(fFieldName1));
         assertNull("getField(index)", copy.getField(0));
         assertEquals("getFieldNames", 0, copy.getFieldNames().length);

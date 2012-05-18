@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.signal;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
  * <b><u>TmfExperimentSelectedSignal</u></b>

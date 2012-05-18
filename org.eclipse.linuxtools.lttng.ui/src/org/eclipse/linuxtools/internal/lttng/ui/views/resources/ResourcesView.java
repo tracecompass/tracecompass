@@ -36,7 +36,6 @@ import org.eclipse.linuxtools.internal.lttng.ui.views.resources.model.ResourceMo
 import org.eclipse.linuxtools.internal.lttng.ui.views.resources.model.ResourcesTimeRangeViewerProvider;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -44,6 +43,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -144,7 +144,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
 			TmfTimeRange experimentTRange = experiment.getTimeRange();
-			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
+			if (!experimentTRange.equals(TmfTimeRange.NULL_RANGE)) {
 				long time0 = experimentTRange.getStartTime().getValue();
 				long time1 = experimentTRange.getEndTime().getValue();
 				ParamsUpdater paramUpdater = getParamsUpdater();
@@ -503,7 +503,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 			TmfTimeRange experimentTRange = signal.getExperiment().getTimeRange();
 
 			initTimeRange = TmfTimeRange.NULL_RANGE;
-			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
+			if (!experimentTRange.equals(TmfTimeRange.NULL_RANGE)) {
 				// prepare time intervals in widget
 				modelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
 
@@ -515,10 +515,10 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	@TmfSignalHandler
 	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-		if (initTimeRange == TmfTimeRange.NULL_RANGE && signal.getExperiment().equals(TmfExperiment.getCurrentExperiment())) {
+		if (initTimeRange.equals(TmfTimeRange.NULL_RANGE) && signal.getExperiment().equals(TmfExperiment.getCurrentExperiment())) {
 			TmfTimeRange experimentTRange = signal.getRange();
 
-			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
+			if (!experimentTRange.equals(TmfTimeRange.NULL_RANGE)) {
 				// prepare time intervals in widget
 				modelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
 
@@ -532,7 +532,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
         if (signal.getExperiment().equals(TmfExperiment.getCurrentExperiment())) {
             final TmfTimeRange range = signal.getExperiment().getTimeRange();
-            if (range != TmfTimeRange.NULL_RANGE) {
+            if (!range.equals(TmfTimeRange.NULL_RANGE)) {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {

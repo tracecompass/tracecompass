@@ -82,35 +82,35 @@ public class TmfEventParserStub implements ITmfEventParser<TmfEvent> {
         // no need to use synchronized since it's already cover by the calling method
 
         long location = 0;
-        if (context != null)
+        if (context != null && context.getLocation() != null) {
             location = ((TmfLocation<Long>) (context.getLocation())).getLocation();
+            try {
+                stream.seek(location);
 
-        try {
-            stream.seek(location);
+                final long ts        = stream.readLong();
+                final String source  = stream.readUTF();
+                final String type    = stream.readUTF();
+                final Integer reference  = stream.readInt();
+                final int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
+                final String[] fields = new String[typeIndex];
+                for (int i = 0; i < typeIndex; i++)
+                    fields[i] = stream.readUTF();
 
-            final long ts        = stream.readLong();
-            final String source  = stream.readUTF();
-            final String type    = stream.readUTF();
-            final Integer reference  = stream.readInt();
-            final int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
-            final String[] fields = new String[typeIndex];
-            for (int i = 0; i < typeIndex; i++)
-                fields[i] = stream.readUTF();
+                final StringBuffer content = new StringBuffer("[");
+                if (typeIndex > 0)
+                    content.append(fields[0]);
+                for (int i = 1; i < typeIndex; i++)
+                    content.append(", ").append(fields[i]);
+                content.append("]");
 
-            final StringBuffer content = new StringBuffer("[");
-            if (typeIndex > 0)
-                content.append(fields[0]);
-            for (int i = 1; i < typeIndex; i++)
-                content.append(", ").append(fields[i]);
-            content.append("]");
-
-            final TmfEventField root = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content.toString());
-            final TmfEvent event = new TmfEvent(fEventStream,
-                    new TmfTimestamp(ts, -3, 0),     // millisecs
-                    source, fTypes[typeIndex], root, reference.toString());
-            return event;
-        } catch (final EOFException e) {
-        } catch (final IOException e) {
+                final TmfEventField root = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content.toString());
+                final TmfEvent event = new TmfEvent(fEventStream,
+                        new TmfTimestamp(ts, -3, 0),     // millisecs
+                        source, fTypes[typeIndex], root, reference.toString());
+                return event;
+            } catch (final EOFException e) {
+            } catch (final IOException e) {
+            }
         }
         return null;
     }

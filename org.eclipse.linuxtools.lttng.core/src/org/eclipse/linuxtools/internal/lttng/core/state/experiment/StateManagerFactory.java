@@ -18,8 +18,8 @@ import org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.internal.lttng.core.state.LttngStateException;
 import org.eclipse.linuxtools.internal.lttng.core.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.internal.lttng.core.state.trace.StateTraceManager;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
  * @author alvaro
