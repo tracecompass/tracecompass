@@ -24,9 +24,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
+import org.eclipse.linuxtools.internal.tmf.core.trace.TmfLegacyExperiment;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfLegacyExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.FrameworkUtil;
 

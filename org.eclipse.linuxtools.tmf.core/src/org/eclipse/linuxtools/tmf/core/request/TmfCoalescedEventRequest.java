@@ -140,7 +140,7 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
         super(dataType, index, nbRequested, blockSize, priority);
         fRange = range;
 

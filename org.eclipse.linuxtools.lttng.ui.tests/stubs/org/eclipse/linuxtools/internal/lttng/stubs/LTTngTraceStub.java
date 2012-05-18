@@ -19,6 +19,7 @@ import java.io.RandomAccessFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
@@ -77,7 +78,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
     }
 
     public void indexTrace() {
-        getIndexer().buildIndex(true);
+        getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
     }
 
     // ========================================================================

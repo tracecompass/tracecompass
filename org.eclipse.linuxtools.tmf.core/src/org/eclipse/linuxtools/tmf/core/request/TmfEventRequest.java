@@ -125,7 +125,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param nbRequested the number of events requested
      * @param blockSize the number of events per block
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize) {
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize) {
         this(dataType, range, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
@@ -154,7 +154,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
     	super(dataType, index, nbRequested, blockSize, priority);
     	fRange = range;
 

@@ -36,7 +36,6 @@ import org.eclipse.linuxtools.internal.lttng.ui.views.resources.model.ResourceMo
 import org.eclipse.linuxtools.internal.lttng.ui.views.resources.model.ResourcesTimeRangeViewerProvider;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -44,6 +43,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;

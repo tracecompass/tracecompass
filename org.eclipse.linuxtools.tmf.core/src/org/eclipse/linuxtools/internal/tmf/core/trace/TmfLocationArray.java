@@ -11,7 +11,7 @@
  * Francois Chouinard - Put in shape for 1.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.experiment;
+package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import java.util.Arrays;
 

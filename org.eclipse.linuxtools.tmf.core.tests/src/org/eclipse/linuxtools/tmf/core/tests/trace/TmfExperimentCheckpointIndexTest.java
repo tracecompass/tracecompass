@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.tests.experiment;
+package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,25 +22,25 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
+import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentLocation;
+import org.eclipse.linuxtools.internal.tmf.core.trace.TmfLocationArray;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperimentContext;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperimentLocation;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfLocationArray;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
-import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
  * Test suite for the TmfCheckpointIndexTest class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfExperimentCheckpointIndexTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -54,35 +54,8 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     private static int          NB_EVENTS    = 20000;
     private static int          BLOCK_SIZE   = 1000;
 
-    private static ITmfTrace<?>[] fTestTraces;
-    private static TestExperiment fExperiment;
-
-    // ------------------------------------------------------------------------
-    // Helper classes
-    // ------------------------------------------------------------------------
-
-    private class TestIndexer extends TmfCheckpointIndexer<ITmfTrace<ITmfEvent>> {
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        public TestIndexer(TestExperiment testExperiment) {
-            super((ITmfTrace) testExperiment, BLOCK_SIZE);
-        }
-        public List<TmfCheckpoint> getCheckpoints() {
-            return getTraceIndex();
-        }
-    }
-
-    private class TestExperiment extends TmfExperiment<ITmfEvent> {
-        @SuppressWarnings("unchecked")
-        public TestExperiment() {
-            super(ITmfEvent.class, EXPERIMENT, (ITmfTrace<ITmfEvent>[]) fTestTraces, TmfTimestamp.ZERO, BLOCK_SIZE, false);
-            setIndexer(new TestIndexer(this));
-            getIndexer().buildIndex(true);
-        }
-        @Override
-        public TestIndexer getIndexer() {
-            return (TestIndexer) super.getIndexer();
-        }
-    }
+    private static ITmfTrace<TmfEvent>[] fTestTraces;
+    private static TmfExperimentStub fExperiment;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -97,7 +70,8 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
         super.setUp();
         setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
         if (fExperiment == null) {
-            fExperiment = new TestExperiment();
+            fExperiment = new TmfExperimentStub(EXPERIMENT, fTestTraces, BLOCK_SIZE);
+            fExperiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
         }
     }
 
@@ -108,6 +82,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
         fExperiment = null;
     }
 
+    @SuppressWarnings("unchecked")
     private static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
         if (fTestTraces == null) {
             fTestTraces = new ITmfTrace[2];

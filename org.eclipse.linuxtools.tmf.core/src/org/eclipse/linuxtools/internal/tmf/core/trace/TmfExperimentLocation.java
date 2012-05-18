@@ -11,7 +11,7 @@
  * Francois Chouinard - Updated as per TMF Trace Model 1.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.experiment;
+package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;

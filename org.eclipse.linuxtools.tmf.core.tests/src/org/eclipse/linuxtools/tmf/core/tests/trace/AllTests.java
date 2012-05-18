@@ -32,6 +32,10 @@ public class AllTests {
 		suite.addTestSuite(TmfCheckpointTest.class);
         suite.addTestSuite(TmfCheckpointIndexTest.class);
 		suite.addTestSuite(TmfTraceTest.class);
+
+        suite.addTestSuite(TmfExperimentCheckpointIndexTest.class);
+        suite.addTestSuite(TmfExperimentTest.class);
+        suite.addTestSuite(TmfMultiTraceExperimentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -11,7 +11,7 @@
  * Francois Chouinard - Put in shape for 1.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.experiment;
+package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -41,7 +41,7 @@ public class TmfExperimentContext extends TmfContext {
     /**
      * No last trace read indicator
      */
-    static final int NO_TRACE = -1;
+    public static final int NO_TRACE = -1;
 
     // ------------------------------------------------------------------------
     // Attributes

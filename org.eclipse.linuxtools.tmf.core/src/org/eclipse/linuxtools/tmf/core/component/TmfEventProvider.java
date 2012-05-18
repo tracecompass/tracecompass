@@ -112,7 +112,7 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
 				final Boolean[] isFinished = new Boolean[1];
 				isFinished[0] = Boolean.FALSE;
 
-				int startIndex = request.getIndex();
+				long startIndex = request.getIndex();
 				
 				while (!isFinished[0]) {
 

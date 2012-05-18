@@ -49,7 +49,7 @@ public interface ITmfDataRequest<T extends ITmfEvent> {
     /**
 	 * @return the index of the first event requested
      */
-    public int getIndex();
+    public long getIndex();
 
     /**
      * @return the number of requested events

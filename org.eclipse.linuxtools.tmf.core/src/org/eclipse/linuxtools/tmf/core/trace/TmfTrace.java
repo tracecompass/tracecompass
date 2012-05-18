@@ -108,7 +108,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @throws TmfTraceException
      */
     protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize) throws TmfTraceException {
-        this(resource, type, path, cacheSize, 0, null);
+        this(resource, type, path, cacheSize, 0);
     }
 
     /**
@@ -243,7 +243,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param waitForCompletion index synchronously (true) or not (false)
      */
     protected void indexTrace(boolean waitForCompletion) {
-        getIndexer().buildIndex(waitForCompletion);
+        getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, waitForCompletion);
     }
 
     // ------------------------------------------------------------------------
@@ -541,7 +541,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#armRequest(org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest)
      */
     @Override
-    public ITmfContext armRequest(final ITmfDataRequest<T> request) {
+    protected ITmfContext armRequest(final ITmfDataRequest<T> request) {
         if (request instanceof ITmfEventRequest<?>
             && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
             && request.getIndex() == 0)

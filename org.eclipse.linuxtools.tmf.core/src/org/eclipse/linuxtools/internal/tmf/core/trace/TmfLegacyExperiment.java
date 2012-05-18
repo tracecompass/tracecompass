@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.experiment;
+package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import java.util.Collections;
 import java.util.Vector;
@@ -39,6 +39,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
  * <b><u>TmfLegacyExperiment</u></b>
@@ -113,7 +114,7 @@ public class TmfLegacyExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
     public TmfLegacyExperiment(final Class<T> type, final String id, final ITmfTrace<T>[] traces, final ITmfTimestamp epoch,
             final int indexPageSize, final boolean preIndexExperiment)
     {
-        super(type, id, traces, epoch, indexPageSize, false);
+        super(type, id, traces, indexPageSize);
 //        fNbEvents = 0;
         setTimeRange(TmfTimeRange.NULL_RANGE);
         fEpoch = epoch;
@@ -142,8 +143,11 @@ public class TmfLegacyExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
      * @param traces
      * @param indexPageSize
      */
-    public TmfLegacyExperiment(final Class<T> type, final String id, final ITmfTrace<T>[] traces, final int indexPageSize) {
+    public TmfLegacyExperiment(final Class<T> type, final String id, final ITmfTrace<T>[] traces, final int indexPageSize, boolean preIndexExperiment) {
         this(type, id, traces, TmfTimestamp.ZERO, indexPageSize);
+        if (preIndexExperiment) {
+            getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
+        }
     }
 
     /**
@@ -745,6 +749,8 @@ public class TmfLegacyExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
 //            return fIndexing;
 //        }
 //    }
+
+    private boolean fIndexing = false;
 
     @SuppressWarnings("unchecked")
     private void indexExperiment(final boolean waitForCompletion, final int index, final TmfTimeRange timeRange) {

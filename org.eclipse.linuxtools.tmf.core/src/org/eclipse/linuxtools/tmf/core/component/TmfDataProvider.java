@@ -392,7 +392,7 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
      * @param request
      * @return an application specific context; null if request can't be serviced
      */
-    public abstract ITmfContext armRequest(ITmfDataRequest<T> request);
+    protected abstract ITmfContext armRequest(ITmfDataRequest<T> request);
 
 //    /**
 //     * Return the next event based on the context supplied. The context

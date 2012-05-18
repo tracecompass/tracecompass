@@ -14,9 +14,10 @@ package org.eclipse.linuxtools.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
- * The generic trace indexer in TMF.
+ * The generic trace indexer in TMF with support for incremental indexing.
  * 
  * @version 1.0
  * @author Francois Chouinard
@@ -30,10 +31,39 @@ public interface ITmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> {
      * Start an asynchronous index building job and waits for the job completion
      * if required. Typically, the indexing job sends notifications at regular
      * intervals to indicate its progress.
+     * <p>
+     * <b>Example 1</b>: Index a whole trace asynchronously
+     * <pre>
+     * trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, false);
+     * </pre>
+     * <b>Example 2</b>: Index a whole trace synchronously
+     * <pre>
+     * trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
+     * </pre>
+     * <b>Example 3</b>: Index a trace asynchronously, starting at rank 100
+     * <pre>
+     * trace.getIndexer().buildIndex(100, TmfTimeRange.ETERNITY, false);
+     * </pre>
+     * <b>Example 4</b>: Index a trace asynchronously, starting at rank 100 for events between
+     * T1 and T2 (inclusive). This is used for incremental indexing.
+     * <pre>
+     * TmfTimeRange range = new TmfTimeRange(T1, T2);
+     * trace.getIndexer().buildIndex(100, range, false);
+     * </pre>
      * 
+     * @param offset The offset of the first event to consider
+     * @param range The time range to consider
      * @param waitForCompletion
      */
-    public void buildIndex(boolean waitForCompletion);
+    public void buildIndex(long offset, TmfTimeRange range, boolean waitForCompletion);
+    
+    /**
+     * Indicates that the indexer is busy indexing the trace.
+     * Will always return false if the indexing is done synchronously. 
+     * 
+     * @return the state of the indexer (indexing or not)
+     */
+    public boolean isIndexing();
     
     /**
      * Adds an entry to the trace index. 

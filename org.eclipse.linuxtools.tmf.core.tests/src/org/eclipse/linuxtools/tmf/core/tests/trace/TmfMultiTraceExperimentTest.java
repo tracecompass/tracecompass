@@ -11,7 +11,7 @@
  *   Francois Chouinard - Adjusted for new Trace Model
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.tests.experiment;
+package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,32 +28,33 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
- * Test suite for the TmfExperiment class (single trace).
+ * Test suite for the TmfExperiment class (multiple traces).
  */
 @SuppressWarnings("nls")
-public class TmfExperimentTest extends TestCase {
+public class TmfMultiTraceExperimentTest extends TestCase {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private static final String DIRECTORY   = "testfiles";
-    private static final String TEST_STREAM = "A-Test-10K";
-    private static final String EXPERIMENT  = "MyExperiment";
-    private static int          NB_EVENTS   = 10000;
-    private static int          BLOCK_SIZE  = 1000;
+    private static final String DIRECTORY    = "testfiles";
+    private static final String TEST_STREAM1 = "O-Test-10K";
+    private static final String TEST_STREAM2 = "E-Test-10K";
+    private static final String EXPERIMENT   = "MyExperiment";
+    private static int          NB_EVENTS    = 20000;
+    private static int          BLOCK_SIZE   = 1000;
 
     private static ITmfTrace<?>[] fTraces;
-    private static TmfExperiment<TmfEvent> fExperiment;
+    private static TmfExperimentStub fExperiment;
 
     private static byte SCALE = (byte) -3;
 
@@ -61,14 +62,18 @@ public class TmfExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private synchronized static ITmfTrace<?>[] setupTrace(final String path) {
+    private synchronized static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
         if (fTraces == null) {
-            fTraces = new ITmfTrace[1];
+            fTraces = new ITmfTrace[2];
             try {
-                final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
-                final File test = new File(FileLocator.toFileURL(location).toURI());
-                final TmfTraceStub trace = new TmfTraceStub(test.getPath(), 0, true);
-                fTraces[0] = trace;
+                URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path1), null);
+                File test = new File(FileLocator.toFileURL(location).toURI());
+                final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true);
+                fTraces[0] = trace1;
+                location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path2), null);
+                test = new File(FileLocator.toFileURL(location).toURI());
+                final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true);
+                fTraces[1] = trace2;
             } catch (final TmfTraceException e) {
                 e.printStackTrace();
             } catch (final URISyntaxException e) {
@@ -80,22 +85,19 @@ public class TmfExperimentTest extends TestCase {
         return fTraces;
     }
 
-    @SuppressWarnings("unchecked")
-    private synchronized static void setupExperiment() {
-        if (fExperiment == null) {
-            fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, TmfTimestamp.ZERO, 1000, true);
-        }
-    }
-
-    public TmfExperimentTest(final String name) throws Exception {
+    public TmfMultiTraceExperimentTest(final String name) throws Exception {
         super(name);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        setupTrace(DIRECTORY + File.separator + TEST_STREAM);
-        setupExperiment();
+        setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
+        if (fExperiment == null) {
+            fExperiment = new TmfExperimentStub(EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, BLOCK_SIZE);
+            fExperiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
+        }
     }
 
     @Override
@@ -111,12 +113,6 @@ public class TmfExperimentTest extends TestCase {
 
         assertEquals("GetId", EXPERIMENT, fExperiment.getName());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
-
-        final long nbExperimentEvents = fExperiment.getNbEvents();
-        assertEquals("GetNbEvents", NB_EVENTS, nbExperimentEvents);
-
-        final long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
-        assertEquals("GetNbEvents", NB_EVENTS, nbTraceEvents);
 
         final TmfTimeRange timeRange = fExperiment.getTimeRange();
         assertEquals("getStartTime", 1, timeRange.getStartTime().getValue());
