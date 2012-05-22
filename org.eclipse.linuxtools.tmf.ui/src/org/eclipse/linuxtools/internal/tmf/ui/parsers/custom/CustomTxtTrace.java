@@ -64,9 +64,8 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
         final CustomTxtTraceContext context = new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile())
             return context;
-        BufferedRandomAccessFile raFile = null;
         try {
-            raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+            BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
             if (location != null && location.getLocation() instanceof Long) {
                 raFile.seek((Long)location.getLocation());
             }
@@ -94,13 +93,6 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
         } catch (final IOException e) {
             TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return context;
-        } finally {
-            if (raFile != null) {
-                try {
-                    raFile.close();
-                } catch (final IOException e) {
-                }
-            }
         }
 
     }
