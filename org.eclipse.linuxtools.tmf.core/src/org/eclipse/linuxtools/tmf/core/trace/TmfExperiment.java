@@ -24,6 +24,8 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
@@ -70,6 +72,10 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      * The experiment bookmarks file
      */
     private IFile fBookmarksFile;
+
+
+    // Saved experiment context (optimization)
+    private TmfExperimentContext fExperimentContext;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -213,6 +219,30 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     }
 
     // ------------------------------------------------------------------------
+    // Request management
+    // ------------------------------------------------------------------------
+
+    @Override
+    protected ITmfContext armRequest(final ITmfDataRequest<T> request) {
+        if (request instanceof ITmfEventRequest<?>
+            && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
+            && request.getIndex() == 0)
+        {
+            final ITmfContext context = seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
+            ((ITmfEventRequest<T>) request).setStartIndex((int) context.getRank());
+            return context;
+
+        }
+
+        // Check if we are already at the right index
+        if ((fExperimentContext != null) && fExperimentContext.getRank() == request.getIndex()) {
+            return fExperimentContext;
+        }
+
+        return seekEvent(request.getIndex());
+    }
+
+    // ------------------------------------------------------------------------
     // ITmfTrace trace positioning
     // ------------------------------------------------------------------------
 
@@ -254,6 +284,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         context.setLocation(expLocation);
         context.setLastTrace(TmfExperimentContext.NO_TRACE);
         context.setRank(ITmfContext.UNKNOWN_RANK);
+
+        fExperimentContext = context;
+
         return (ITmfContext) context;
     }
 
@@ -303,11 +336,11 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         if (event != null) {
             updateAttributes(previousContext, event.getTimestamp());
 
-            TmfExperimentContext expContext = (TmfExperimentContext) context;
-            int trace = expContext.getLastTrace();
+            fExperimentContext = (TmfExperimentContext) context;
+            int trace = fExperimentContext.getLastTrace();
             if (trace != TmfExperimentContext.NO_TRACE) {
-                TmfExperimentLocation location = (TmfExperimentLocation) expContext.getLocation();
-                location.getLocation().getLocations()[trace] = expContext.getContexts()[trace].getLocation();
+                TmfExperimentLocation location = (TmfExperimentLocation) fExperimentContext.getLocation();
+                location.getLocation().getLocations()[trace] = fExperimentContext.getContexts()[trace].getLocation();
             }
             
             context.increaseRank();
