@@ -61,7 +61,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public long getStopTime() {
+    public long getEndTime() {
         return fStopTime;
     }
 

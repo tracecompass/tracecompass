@@ -157,7 +157,7 @@ public class Utils {
         str.append(sec);
         String ns = formatNs(time, resolution);
         if (!ns.equals("")) { //$NON-NLS-1$
-            str.append(':');
+            str.append('.');
             str.append(ns);
         }
 
@@ -186,7 +186,8 @@ public class Utils {
 
         // format time from nanoseconds to calendar time HH:MM:SS
         String stime = stimeformat.format(new Date((long) (time * 1E-6)));
-        str.append(stime + " "); //$NON-NLS-1$
+        str.append(stime);
+        str.append('.');
         // append the Milliseconds, MicroSeconds and NanoSeconds as specified in
         // the Resolution
         str.append(formatNs(time, res));
@@ -204,7 +205,7 @@ public class Utils {
      * @return the formatted nanosec
      */
     public static String formatNs(long time, Resolution res) {
-        StringBuffer temp = new StringBuffer();
+        StringBuffer str = new StringBuffer();
         boolean neg = time < 0;
         if (neg) {
             time = -time;
@@ -215,60 +216,35 @@ public class Utils {
         // String strVal = String.format("%09d", time);
         // String tmp = strVal.substring(strVal.length() - 9);
 
-        // number of segments to be included
-        int segments = 0;
-        switch (res) {
-        case MILLISEC:
-            segments = 1;
-            break;
-        case MICROSEC:
-            segments = 2;
-            break;
-        case NANOSEC:
-            segments = 3;
-            break;
-        default:
-            break;
-        }
-
         long ns = time;
         ns %= 1000000000;
         if (ns < 10) {
-            temp.append("00000000"); //$NON-NLS-1$
+            str.append("00000000"); //$NON-NLS-1$
         } else if (ns < 100) {
-            temp.append("0000000"); //$NON-NLS-1$
+            str.append("0000000"); //$NON-NLS-1$
         } else if (ns < 1000) {
-            temp.append("000000"); //$NON-NLS-1$
+            str.append("000000"); //$NON-NLS-1$
         } else if (ns < 10000) {
-            temp.append("00000"); //$NON-NLS-1$
+            str.append("00000"); //$NON-NLS-1$
         } else if (ns < 100000) {
-            temp.append("0000"); //$NON-NLS-1$
+            str.append("0000"); //$NON-NLS-1$
         } else if (ns < 1000000) {
-            temp.append("000"); //$NON-NLS-1$
+            str.append("000"); //$NON-NLS-1$
         } else if (ns < 10000000) {
-            temp.append("00"); //$NON-NLS-1$
+            str.append("00"); //$NON-NLS-1$
         } else if (ns < 100000000) {
-            temp.append("0"); //$NON-NLS-1$
+            str.append("0"); //$NON-NLS-1$
         }
-        temp.append(ns);
+        str.append(ns);
 
-        StringBuffer str = new StringBuffer();
-        if (segments > 0) {
-            // append ms
-            str.append(temp.substring(0, 3));
+        if (res == Resolution.MILLISEC) {
+            return str.substring(0, 3);
+        } else if (res == Resolution.MICROSEC) {
+            return str.substring(0, 6);
+        } else if (res == Resolution.NANOSEC) {
+            return str.substring(0, 9);
         }
-        if (segments > 1) {
-            // append Micro secs
-            str.append("."); //$NON-NLS-1$
-            str.append(temp.substring(3, 6));
-        }
-        if (segments > 2) {
-            // append Nano seconds
-            str.append("."); //$NON-NLS-1$
-            str.append(temp.substring(6));
-        }
-
-        return str.toString();
+        return ""; //$NON-NLS-1$
     }
 
     static public int loadIntOption(String opt, int def, int min, int max) {

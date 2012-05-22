@@ -27,7 +27,7 @@ public abstract class TimeGraphBaseControl extends Canvas implements PaintListen
 
     static public final int MARGIN = 4;
     static public final int EXPAND_SIZE = 9; // the [+] or [-] control size
-    static public final int RIGHT_MARGIN = 2; // 2 pixels less to make sure end time is visible
+    static public final int RIGHT_MARGIN = 1; // 1 pixels less to make sure end time is visible
     static public final int SMALL_ICON_SIZE = 16;
 
     protected TimeGraphColorScheme _colors;
