@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.internal.lttng.core.state.experiment.IStateExperim
 import org.eclipse.linuxtools.internal.lttng.core.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
-import org.eclipse.linuxtools.internal.tmf.core.trace.TmfLegacyExperiment;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -42,7 +41,7 @@ public abstract class LttngTestPreparation extends TestCase {
     static LTTngTextTrace ftextStream_T1 = null;
     private static LTTngTrace frealStream = null;
 
-    private TmfLegacyExperiment<LttngEvent> fTestExperiment = null;
+    private TmfExperiment<LttngEvent> fTestExperiment = null;
     protected volatile int feventCount = 0;
     protected boolean validSequence = true;
 
@@ -72,12 +71,11 @@ public abstract class LttngTestPreparation extends TestCase {
 
             // Define traces in experiment
             @SuppressWarnings("unchecked")
-            final
-            ITmfTrace<LttngEvent>[] traces = new ITmfTrace[nbTraces];
+            final ITmfTrace<LttngEvent>[] traces = new ITmfTrace[nbTraces];
             final ITmfTrace<LttngEvent> trace = prepareStreamToTest();
             traces[0] = trace;
 
-            fTestExperiment = new TmfLegacyExperiment<LttngEvent>(LttngEvent.class, expId, traces, TmfExperiment.DEFAULT_BLOCK_SIZE, true);
+            fTestExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, expId, traces, TmfExperiment.DEFAULT_BLOCK_SIZE);
 
             // Set the current selected experiment as the test experiment
             final TmfExperimentSelectedSignal<LttngEvent> signal = new TmfExperimentSelectedSignal<LttngEvent>(
@@ -104,7 +102,7 @@ public abstract class LttngTestPreparation extends TestCase {
             traces[0] = trace;
 
             // create experiment and associate traces
-            fTestExperiment = new TmfLegacyExperiment<LttngEvent>(LttngEvent.class, expId, traces);
+            fTestExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, expId, traces);
 
             // Set the current selected experiment as the test experiment
             final TmfExperimentSelectedSignal<LttngEvent> signal = new TmfExperimentSelectedSignal<LttngEvent>(

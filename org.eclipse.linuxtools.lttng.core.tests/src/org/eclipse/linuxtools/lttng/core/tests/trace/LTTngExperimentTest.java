@@ -24,10 +24,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
-import org.eclipse.linuxtools.internal.tmf.core.trace.TmfLegacyExperiment;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.osgi.framework.FrameworkUtil;
 
 /**
@@ -48,7 +48,18 @@ public class LTTngExperimentTest extends TestCase {
     private static final TmfTimestamp  fEndTime   = new LttngTimestamp(13589906758692L);
 
     private static ITmfTrace<LttngEvent>[] fTestTraces;
-    private static TmfLegacyExperiment<LttngEvent> fExperiment;
+    private static TestExperiment fExperiment;
+
+    // ------------------------------------------------------------------------
+    // Helper class
+    // ------------------------------------------------------------------------
+
+    private static class TestExperiment extends TmfExperiment<LttngEvent> {
+        public TestExperiment() {
+            super(LttngEvent.class, EXPERIMENT, fTestTraces, 1000);
+            getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -76,7 +87,7 @@ public class LTTngExperimentTest extends TestCase {
 
     private synchronized static void setupExperiment() {
         if (fExperiment == null) {
-            fExperiment = new TmfLegacyExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTestTraces, TmfTimestamp.ZERO, 1000, true);
+            fExperiment = new TestExperiment();
         }
     }
 
