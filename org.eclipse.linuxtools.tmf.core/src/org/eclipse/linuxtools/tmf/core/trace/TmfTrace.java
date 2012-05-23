@@ -91,10 +91,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * The default, parameterless, constructor
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public TmfTrace() {
         super();
-        fIndexer = new TmfCheckpointIndexer(this);
     }
 
     /**
@@ -190,7 +188,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(org.eclipse.core.resources.IResource, java.lang.String, java.lang.Class)
      */
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void initTrace(final IResource resource, final String path, final Class<T> type) throws TmfTraceException {
+        fIndexer = new TmfCheckpointIndexer(this, fCacheSize);
         initialize(resource, path, type);
     }
 
