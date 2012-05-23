@@ -301,7 +301,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 oldSupplFolder.copy(destination.getFullPath(), true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
+                TmfUiPlugin.getDefault().logError("Error copying supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
             }
         }
     }
