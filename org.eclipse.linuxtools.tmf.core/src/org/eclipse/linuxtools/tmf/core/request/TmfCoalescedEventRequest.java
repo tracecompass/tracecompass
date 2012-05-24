@@ -161,27 +161,40 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
     // Management
     // ------------------------------------------------------------------------
 
+    @Override
+    public void addRequest(ITmfDataRequest<T> request) {
+        super.addRequest(request);
+        if (request instanceof ITmfEventRequest<?>) {
+            merge((ITmfEventRequest<T>) request);
+        }
+    }
+
 	@Override
 	public boolean isCompatible(ITmfDataRequest<T> request) {
 	    if (request instanceof ITmfEventRequest<?>) {
-	        boolean ok = super.isCompatible(request);
-	        if (ok) {
-	            ITmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
-	            ITmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
-	            ok &= (startTime.compareTo(endTime) <= 0) && (fRange.getStartTime().compareTo(fRange.getEndTime()) <= 0);
-	            if (ok) {
-	                if (!fRange.contains(startTime) && fRange.getStartTime().compareTo(startTime) > 0) {
-	                    fRange = new TmfTimeRange(startTime, fRange.getEndTime());
-	                }
-	                if (!fRange.contains(endTime) && fRange.getEndTime().compareTo(endTime) < 0) {
-	                    fRange = new TmfTimeRange(fRange.getStartTime(), endTime);
-	                }
-	            }
+	        if (super.isCompatible(request)) {
+	            return overlaps((ITmfEventRequest<T>) request);
 	        }
-	        return ok;
 	    }
 	    return false;
 	}
+
+    private boolean overlaps(ITmfEventRequest<T> request) {
+        ITmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
+        ITmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
+        return (startTime.compareTo(endTime) <= 0) && (fRange.getStartTime().compareTo(fRange.getEndTime()) <= 0);
+    }
+
+    private void merge(ITmfEventRequest<T> request) {
+        ITmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
+        ITmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
+        if (!fRange.contains(startTime) && fRange.getStartTime().compareTo(startTime) > 0) {
+            fRange = new TmfTimeRange(startTime, fRange.getEndTime());
+        }
+        if (!fRange.contains(endTime) && fRange.getEndTime().compareTo(endTime) < 0) {
+            fRange = new TmfTimeRange(fRange.getStartTime(), endTime);
+        }
+    }
 
     // ------------------------------------------------------------------------
     // ITmfDataRequest
@@ -196,7 +209,7 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
             } else {
                 if (request instanceof TmfEventRequest<?>) {
                     TmfEventRequest<T> req = (TmfEventRequest<T>) request;
-                    if (!req.isCompleted()) {
+                    if (!req.isCompleted() && (getNbRead() > request.getIndex())) {
                         ITmfTimestamp ts = data.getTimestamp();
                         if (req.getRange().contains(ts)) {
                             if (req.getDataType().isInstance(data)) {

@@ -90,8 +90,8 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     private final Class<T> fDataType;
     private final ExecutionType fExecType;
     private final int fRequestId; // A unique request ID
-    private long fIndex; // The index (rank) of the requested event
-    private final int fNbRequested; // The number of requested events (ALL_DATA for all)
+    protected long fIndex; // The index (rank) of the requested event
+    protected int fNbRequested; // The number of requested events (ALL_DATA for all)
     private final int fBlockSize; // The block size (for BG requests)
     private int fNbRead; // The number of reads so far
 

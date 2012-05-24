@@ -137,16 +137,43 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 
 	public void addRequest(ITmfDataRequest<T> request) {
 		fRequests.add(request);
+        merge(request);
 	}
 
 	public boolean isCompatible(ITmfDataRequest<T> request) {
-
-		boolean ok = request.getIndex() == getIndex();
-		ok &= request.getNbRequested() == getNbRequested();
-		ok &= request.getExecType() == getExecType();
-		
-		return ok;
+		if (request.getExecType() == getExecType()) {
+	        return overlaps(request);
+		}
+		return false;
 	}
+
+    private boolean overlaps(ITmfDataRequest<T> request) {
+        long start = request.getIndex();
+        long end = start + request.getNbRequested();
+
+        // Return true if either the start or end index falls within
+        // the coalesced request boundaries
+        return (start <= (fIndex + fNbRequested + 1) && (end >= fIndex - 1));
+    }
+
+    private void merge(ITmfDataRequest<T> request) {
+        long start = request.getIndex();
+        long end = Math.min(start + request.getNbRequested(), TmfDataRequest.ALL_DATA);
+        
+        if (start < fIndex) {
+            if (fNbRequested != TmfDataRequest.ALL_DATA) {
+                fNbRequested += (fIndex - start);
+            }
+            fIndex = start;
+        }
+        if ((request.getNbRequested() == TmfDataRequest.ALL_DATA) ||
+             (fNbRequested == TmfDataRequest.ALL_DATA))
+        {
+            fNbRequested = TmfDataRequest.ALL_DATA;
+        } else {
+            fNbRequested = (int) Math.max(end - fIndex, fNbRequested);
+        }
+    }
 
 	@SuppressWarnings("nls")
     public String getSubRequestIds() {
@@ -170,10 +197,15 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 		// TmfCoalescedDataRequest; extended classes should call
 		// the sub-requests handleData().
 		if (getClass() == TmfCoalescedDataRequest.class) {
+		    long index = getNbRead();
 	    	for (ITmfDataRequest<T> request : fRequests) {
 	    	    if (!request.isCompleted()) {
                     if (request.getDataType().isInstance(data)) {
-                        request.handleData(data);
+                        long start = request.getIndex();
+                        long end = start + request.getNbRequested() - 1;
+                        if (index >= start && index < end) {
+                            request.handleData(data);
+                        }
                     }
 	    	    }
 	    	}

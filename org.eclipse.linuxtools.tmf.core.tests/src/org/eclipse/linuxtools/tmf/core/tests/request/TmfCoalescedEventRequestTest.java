@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -269,10 +270,48 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 		TmfEventRequest<TmfEvent> request2 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range2, 100, 200);
 		TmfEventRequest<TmfEvent> request3 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 101, 200);
 
-        assertTrue ("isCompatible", coalescedRequest.isCompatible(request1));
-        assertTrue ("isCompatible", coalescedRequest.isCompatible(request2));
-        assertFalse("isCompatible", coalescedRequest.isCompatible(request3));
+        assertTrue("isCompatible", coalescedRequest.isCompatible(request1));
+        assertTrue("isCompatible", coalescedRequest.isCompatible(request2));
+        assertTrue("isCompatible", coalescedRequest.isCompatible(request3));
 	}
+
+    // ------------------------------------------------------------------------
+    // addEvent
+    // ------------------------------------------------------------------------
+
+    public void testAddEvent1() {
+        TmfCoalescedEventRequest<TmfEvent> coalescedRequest = new TmfCoalescedEventRequest<TmfEvent>(TmfEvent.class, range1, 0, 2147483647, 200, ExecutionType.FOREGROUND);
+        TmfEventRequest<TmfEvent> request1 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 0, 2147483647, 200);
+        TmfEventRequest<TmfEvent> request2 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 1, 2147483647, 200);
+
+        assertTrue("isCompatible", coalescedRequest.isCompatible(request1));
+        assertTrue("isCompatible", coalescedRequest.isCompatible(request2));
+
+        coalescedRequest.addRequest(request1);
+        coalescedRequest.addRequest(request2);
+
+        assertEquals("addRequest",          0, coalescedRequest.getIndex());
+        assertEquals("addRequest", 2147483647, coalescedRequest.getNbRequested());
+        assertEquals("addRequest",        200, coalescedRequest.getBlockSize());
+
+    }
+
+    public void testAddEvent2() {
+        TmfCoalescedEventRequest<TmfEvent> coalescedRequest = new TmfCoalescedEventRequest<TmfEvent>(TmfEvent.class, range1, 1, 2147483647, 200, ExecutionType.FOREGROUND);
+        TmfEventRequest<TmfEvent> request1 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 1, 2147483647, 200);
+        TmfEventRequest<TmfEvent> request2 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 0, 2147483647, 200);
+
+        assertTrue("isCompatible", coalescedRequest.isCompatible(request1));
+        assertTrue("isCompatible", coalescedRequest.isCompatible(request2));
+
+        coalescedRequest.addRequest(request1);
+        coalescedRequest.addRequest(request2);
+
+        assertEquals("addRequest",          0, coalescedRequest.getIndex());
+        assertEquals("addRequest", 2147483647, coalescedRequest.getNbRequested());
+        assertEquals("addRequest",        200, coalescedRequest.getBlockSize());
+
+    }
 
 	// ------------------------------------------------------------------------
 	// done

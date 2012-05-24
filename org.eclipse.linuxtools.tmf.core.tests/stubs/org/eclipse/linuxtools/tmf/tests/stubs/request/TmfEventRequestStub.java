@@ -57,6 +57,16 @@ public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> 
         super(dataType, range, nbRequested, blockSize);
     }
 
+    /**
+     * @param dataType
+     * @param range
+     * @param nbRequested
+     * @param blockSize
+     */
+    public TmfEventRequestStub(final Class<T> dataType, final TmfTimeRange range, final long index, final int nbRequested, final int blockSize) {
+        super(dataType, range, index, nbRequested, blockSize);
+    }
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
      */
