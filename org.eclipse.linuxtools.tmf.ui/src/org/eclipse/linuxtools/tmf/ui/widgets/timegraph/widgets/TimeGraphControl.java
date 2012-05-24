@@ -351,76 +351,117 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return sel;
     }
 
+    
+    // TODO select implementation for selectTrace
+//    public void selectTrace(int n) {
+//        if (n != 1 && n != -1)
+//            return;
+//        boolean changed = false;
+//        int lastSelection = -1;
+//        for (int i = 0; i < _data._expandedItems.length; i++) {
+//            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[i];
+//            if (item._selected) {
+//                lastSelection = i;
+//                if (1 == n && i < _data._expandedItems.length - 1) {
+//                    item._selected = false;
+//                    if (item._hasChildren) {
+//                        _data.expandItem(i);
+//                        fireTreeEvent(item._trace, item._expanded);
+//                    }
+//                    item = (TimeGraphItem) _data._expandedItems[i + 1];
+//                    if (item._hasChildren) {
+//                        _data.expandItem(i + 1);
+//                        fireTreeEvent(item._trace, item._expanded);
+//                        item = (TimeGraphItem) _data._expandedItems[i + 2];
+//                    }
+//                    item._selected = true;
+//                    changed = true;
+//                } else if (-1 == n && i > 0) {
+//                    i--;
+//                    TimeGraphItem prevItem = (TimeGraphItem) _data._expandedItems[i];
+//                    if (prevItem._hasChildren) {
+//                        if (prevItem._expanded) {
+//                            if (i > 0) {
+//                                i--;
+//                                prevItem = (TimeGraphItem) _data._expandedItems[i];
+//                            }
+//                        }
+//                        if (!prevItem._expanded) {
+//                            _data.expandItem(i);
+//                            fireTreeEvent(prevItem._trace, prevItem._expanded);
+//                            prevItem = (TimeGraphItem) _data._expandedItems[i + prevItem.children.size()];
+//                            item._selected = false;
+//                            prevItem._selected = true;
+//                            changed = true;
+//                        }
+//                    } else {
+//                        item._selected = false;
+//                        prevItem._selected = true;
+//                        changed = true;
+//                    }
+//                }
+//                break;
+//            }
+//        }
+//        if (lastSelection < 0 && _data._expandedItems.length > 0) {
+//            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[0];
+//            if (item._hasChildren) {
+//                _data.expandItem(0);
+//                fireTreeEvent(item._trace, item._expanded);
+//                item = (TimeGraphItem) _data._expandedItems[1];
+//                item._selected = true;
+//                changed = true;
+//            } else {
+//                item._selected = true;
+//                changed = true;
+//            }
+//        }
+//        if (changed) {
+//            ensureVisibleItem(-1, false);
+//            redraw();
+//            fireSelectionChanged();
+//        }
+//    }
+
     public void selectTrace(int n) {
-        if (n != 1 && n != -1)
+        if ((n != 1) && (n != -1)) {
             return;
+        }
+
         boolean changed = false;
         int lastSelection = -1;
         for (int i = 0; i < _data._expandedItems.length; i++) {
             TimeGraphItem item = (TimeGraphItem) _data._expandedItems[i];
             if (item._selected) {
                 lastSelection = i;
-                if (1 == n && i < _data._expandedItems.length - 1) {
+                if ((1 == n) && (i < _data._expandedItems.length - 1)) {
                     item._selected = false;
-                    if (item._hasChildren) {
-                        _data.expandItem(i);
-                        fireTreeEvent(item._trace, item._expanded);
-                    }
                     item = (TimeGraphItem) _data._expandedItems[i + 1];
-                    if (item._hasChildren) {
-                        _data.expandItem(i + 1);
-                        fireTreeEvent(item._trace, item._expanded);
-                        item = (TimeGraphItem) _data._expandedItems[i + 2];
-                    }
                     item._selected = true;
                     changed = true;
-                } else if (-1 == n && i > 0) {
-                    i--;
-                    TimeGraphItem prevItem = (TimeGraphItem) _data._expandedItems[i];
-                    if (prevItem._hasChildren) {
-                        if (prevItem._expanded) {
-                            if (i > 0) {
-                                i--;
-                                prevItem = (TimeGraphItem) _data._expandedItems[i];
-                            }
-                        }
-                        if (!prevItem._expanded) {
-                            _data.expandItem(i);
-                            fireTreeEvent(prevItem._trace, prevItem._expanded);
-                            prevItem = (TimeGraphItem) _data._expandedItems[i + prevItem.children.size()];
-                            item._selected = false;
-                            prevItem._selected = true;
-                            changed = true;
-                        }
-                    } else {
-                        item._selected = false;
-                        prevItem._selected = true;
-                        changed = true;
-                    }
+                } else if ((-1 == n) && (i > 0)) {
+                    item._selected = false;
+                    item = (TimeGraphItem) _data._expandedItems[i - 1];
+                    item._selected = true;
+                    changed = true;
                 }
                 break;
             }
         }
+
         if (lastSelection < 0 && _data._expandedItems.length > 0) {
             TimeGraphItem item = (TimeGraphItem) _data._expandedItems[0];
-            if (item._hasChildren) {
-                _data.expandItem(0);
-                fireTreeEvent(item._trace, item._expanded);
-                item = (TimeGraphItem) _data._expandedItems[1];
-                item._selected = true;
-                changed = true;
-            } else {
-                item._selected = true;
-                changed = true;
-            }
+            item._selected = true;
+            changed = true;
         }
+
         if (changed) {
             ensureVisibleItem(-1, false);
             redraw();
             fireSelectionChanged();
         }
     }
-
+    
     public void selectEvent(int n) {
         if (null == _timeProvider)
             return;
@@ -448,10 +489,10 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                     nextTime = endTime;
                 }
             }
-            _timeProvider.setSelectedTimeInt(nextTime, true);
+            _timeProvider.setSelectedTimeNotify(nextTime, true);
             fireSelectionChanged();
         } else if (1 == n) {
-            _timeProvider.setSelectedTimeInt(endTime, true);
+            _timeProvider.setSelectedTimeNotify(endTime, true);
             fireSelectionChanged();
         }
     }
@@ -1305,7 +1346,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 _timeProvider.notifyStartFinishTime();
                 if (_dragX == _dragX0) { // click without drag
                     long time = getTimeAtX(e.x);
-                    _timeProvider.setSelectedTimeInt(time, false);
+                    _timeProvider.setSelectedTimeNotify(time, false);
                 }
             } else if (DRAG_SPLIT_LINE == _dragState) {
                 redraw();

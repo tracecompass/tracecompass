@@ -128,6 +128,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             setTimeRange(input);
             _verticalScrollBar.setEnabled(true);
             setTopIndex(0);
+            _selectedTime = 0;
             refreshAllData(input);
         }
     }
@@ -494,7 +495,16 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     @Override
-    public void setSelectedTimeInt(long time, boolean ensureVisible) {
+    public void setSelectedTimeNotify(long time, boolean ensureVisible) {
+        setSelectedTimeInt(time, ensureVisible, true);
+    }
+    
+    @Override
+    public void setSelectedTime(long time, boolean ensureVisible) {
+        setSelectedTimeInt(time, ensureVisible, false);
+    }
+
+    private void setSelectedTimeInt(long time, boolean ensureVisible, boolean doNotify) {
         long time0 = _time0;
         long time1 = _time1;
         if (ensureVisible) {
@@ -523,11 +533,16 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _stateCtrl.adjustScrolls();
         _stateCtrl.redraw();
         _timeScaleCtrl.redraw();
-        if (time0 != _time0 || time1 != _time1) {
+        
+        
+        boolean notifySelectedTime = (time != _selectedTime);
+        _selectedTime = time;
+        
+        if (doNotify && ((time0 != _time0) || (time1 != _time1))) {
             notifyRangeListeners(_time0, _time1);
         }
-        if (time != _selectedTime) {
-            _selectedTime = time;
+        
+        if (doNotify && notifySelectedTime) {
             notifyTimeListeners(_selectedTime);
         }
     }
@@ -647,7 +662,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             return;
         }
 
-        setSelectedTimeInt(time, ensureVisible);
+        setSelectedTimeNotify(time, ensureVisible);
     }
 
     public void setSelectedEvent(ITimeEvent event, Object source) {
@@ -657,7 +672,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _selectedEntry = event.getEntry();
         _stateCtrl.selectItem(_selectedEntry, false);
 
-        setSelectedTimeInt(event.getTime(), true);
+        setSelectedTimeInt(event.getTime(), true, true);
         adjustVerticalScrollBar();
     }
 
@@ -668,7 +683,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _selectedEntry = trace;
         _stateCtrl.selectItem(trace, false);
 
-        setSelectedTimeInt(time, true);
+        setSelectedTimeInt(time, true, true);
     }
 
     public void setSelection(ITimeGraphEntry trace) {

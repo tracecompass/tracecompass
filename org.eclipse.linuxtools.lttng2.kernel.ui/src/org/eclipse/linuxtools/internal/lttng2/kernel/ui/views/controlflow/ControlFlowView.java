@@ -41,6 +41,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
@@ -78,6 +79,11 @@ public class ControlFlowView extends TmfView {
      */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.views.controlflow"; //$NON-NLS-1$
 
+    /**
+     * Initial time range
+     */
+    private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
+    
     private static final String PROCESS_COLUMN    = Messages.ControlFlowView_processColumn;
     private static final String TID_COLUMN        = Messages.ControlFlowView_tidColumn;
     private static final String PPID_COLUMN       = Messages.ControlFlowView_ppidColumn;
@@ -208,16 +214,16 @@ public class ControlFlowView extends TmfView {
     }
 
     private class ZoomThread extends Thread {
-        private long fStartTime;
-        private long fEndTime;
+        private long fZoomStartTime;
+        private long fZoomEndTime;
         private long fResolution;
         private boolean fCancelled = false;
 
         public ZoomThread(long startTime, long endTime) {
             super("ControlFlowView zoom"); //$NON-NLS-1$
-            fStartTime = startTime;
-            fEndTime = endTime;
-            fResolution = Math.max(1, (fEndTime - fStartTime) / fDisplayWidth);
+            fZoomStartTime = startTime;
+            fZoomEndTime = endTime;
+            fResolution = Math.max(1, (fZoomEndTime - fZoomStartTime) / fDisplayWidth);
         }
 
         @Override
@@ -235,7 +241,7 @@ public class ControlFlowView extends TmfView {
         }
 
         private void zoom(ControlFlowEntry entry) {
-            List<ITimeEvent> zoomedEventList = getEventList(entry, fStartTime, fEndTime, fResolution);
+            List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, fResolution);
             entry.setZoomedEventList(zoomedEventList);
             for (ControlFlowEntry child : entry.getChildren()) {
                 if (fCancelled) {
@@ -333,7 +339,30 @@ public class ControlFlowView extends TmfView {
             
             @Override
             public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-                return new HashMap<String, String>();
+                Map<String, String> retMap = new HashMap<String, String>();
+                if (event instanceof ControlFlowEvent) {
+                    int status = ((ControlFlowEvent) event).getStatus();
+                    if (status == Attributes.STATUS_RUN_SYSCALL) {
+                        ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
+                        IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+                        try {
+                            int syscallQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
+                            ITmfStateInterval value = ssq.querySingleState(event.getTime(), syscallQuark);
+                            if (!value.getStateValue().isNull()) {
+                                ITmfStateValue state = value.getStateValue();
+                                retMap.put(Messages.ControlFlowView_attributeSyscallName, state.toString());
+                            }
+                            
+                        } catch (AttributeNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (TimeRangeException e) {
+                            e.printStackTrace();
+                        }
+//                        List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution);
+                    } 
+                }
+                
+                return retMap;
             }
         });
 
@@ -350,8 +379,7 @@ public class ControlFlowView extends TmfView {
                 if (fZoomThread != null) {
                     fZoomThread.cancel();
                 }
-                fZoomThread = new ZoomThread(startTime, endTime);
-                fZoomThread.start();
+                startZoomThread(startTime, endTime);
             }
         });
 
@@ -425,7 +453,7 @@ public class ControlFlowView extends TmfView {
                 if (fTimeGraphCombo.isDisposed()) {
                     return;
                 }
-                fTimeGraphCombo.getTimeGraphViewer().setSelectedTime(time, true, signal.getSource());
+                fTimeGraphCombo.getTimeGraphViewer().setSelectedTime(time, true);
             }
         });
     }
@@ -445,7 +473,8 @@ public class ControlFlowView extends TmfView {
                     return;
                 }
                 fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
-                fTimeGraphCombo.getTimeGraphViewer().setSelectedTime(time, false, signal.getSource());
+                fTimeGraphCombo.getTimeGraphViewer().setSelectedTime(time, false);
+                startZoomThread(startTime, endTime);
             }
         });
     }
@@ -520,7 +549,7 @@ public class ControlFlowView extends TmfView {
                 }
             }
             buildTree();
-            refresh();
+            refresh(INITIAL_WINDOW_OFFSET);
             ControlFlowEntry[] entries = fEntryList.toArray(new ControlFlowEntry[0]);
             Arrays.sort(entries);
             for (ControlFlowEntry entry : entries) {
@@ -600,7 +629,7 @@ public class ControlFlowView extends TmfView {
         return eventList;
     }
 
-    private void refresh() {
+    private void refresh(final long windowRange) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -611,10 +640,18 @@ public class ControlFlowView extends TmfView {
                 Arrays.sort(entries);
                 fTimeGraphCombo.setInput(entries);
                 fTimeGraphCombo.getTimeGraphViewer().setTimeBounds(fStartTime, fEndTime);
-                fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(fStartTime, fEndTime);
+                
+                long endTime = fStartTime + windowRange;
+
+                if (fEndTime < endTime) {
+                    endTime = fEndTime;
+                }
+                fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(fStartTime, endTime);
                 for (TreeColumn column : fTimeGraphCombo.getTreeViewer().getTree().getColumns()) {
                     column.pack();
                 }
+
+                startZoomThread(fStartTime, endTime);
             }
         });
     }
@@ -632,6 +669,14 @@ public class ControlFlowView extends TmfView {
         });
     }
 
+    private void startZoomThread(long startTime, long endTime) {
+        if (fZoomThread != null) {
+            fZoomThread.cancel();
+        }
+        fZoomThread = new ZoomThread(startTime, endTime);
+        fZoomThread.start();
+    }
+    
     private void makeActions() {
         fPreviousResourceAction = fTimeGraphCombo.getTimeGraphViewer().getPreviousItemAction();
         fPreviousResourceAction.setText(Messages.ControlFlowView_previousProcessActionNameText);

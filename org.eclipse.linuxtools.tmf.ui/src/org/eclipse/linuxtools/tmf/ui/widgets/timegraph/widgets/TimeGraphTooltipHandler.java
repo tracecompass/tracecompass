@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Widget;
 
 
 public class TimeGraphTooltipHandler {
@@ -129,7 +128,8 @@ public class TimeGraphTooltipHandler {
                     ITimeEvent threadEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 2);
                     ITimeEvent nextEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 1);
                     // thread name
-                    addItem(Messages.TmfTimeTipHandler_TRACE_NAME, thrd.getName());
+//                    addItem(Messages.TmfTimeTipHandler_TRACE_NAME, thrd.getName());
+                    addItem(_utilImp.getStateTypeName(), thrd.getName());
                     // class name
                     String traceClass = _utilImp.getTraceClassName(thrd);
                     if (traceClass != null) {

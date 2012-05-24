@@ -70,6 +70,11 @@ public class ResourcesView extends TmfView {
      */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.views.resources"; //$NON-NLS-1$
 
+    /**
+     * Initial time range
+     */
+    private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
+    
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
@@ -97,7 +102,6 @@ public class ResourcesView extends TmfView {
     
     // The previous resource action
     private Action fPreviousResourceAction;
-
 
     // The zoom thread
     private ZoomThread fZoomThread;
@@ -179,14 +183,14 @@ public class ResourcesView extends TmfView {
     }
 
     private class ZoomThread extends Thread {
-        private long fStartTime;
-        private long fEndTime;
+        private long fZoomStartTime;
+        private long fZoomEndTime;
         private boolean fCancelled = false;
 
         public ZoomThread(long startTime, long endTime) {
             super("ResourcesView zoom"); //$NON-NLS-1$
-            fStartTime = startTime;
-            fEndTime = endTime;
+            fZoomStartTime = startTime;
+            fZoomEndTime = endTime;
         }
 
         @Override
@@ -194,14 +198,14 @@ public class ResourcesView extends TmfView {
             if (fEntryList == null) {
                 return;
             }
-            long resolution = Math.max(1, (fEndTime - fStartTime) / fDisplayWidth);
+            long resolution = Math.max(1, (fZoomEndTime - fZoomStartTime) / fDisplayWidth);
             for (TraceEntry traceEntry : fEntryList) {
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
                     ResourcesEntry entry = (ResourcesEntry) child;
                     if (fCancelled) {
                         break;
                     }
-                    List<ITimeEvent> zoomedEventList = getEventList(entry, fStartTime, fEndTime, resolution, true);
+                    List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, resolution, true);
                     entry.setZoomedEventList(zoomedEventList);
                     redraw();
                 }
@@ -283,7 +287,7 @@ public class ResourcesView extends TmfView {
                         new StateItem(new RGB(0, 200, 0), BUSY),
                         new StateItem(new RGB(200, 100, 100), INTERRUPTED),
                         new StateItem(new RGB(200, 200, 0), RAISED),
-                        new StateItem(new RGB(200, 100, 100), ACTIVE)
+                        new StateItem(new RGB(200, 150, 100), ACTIVE)
                 };
             }
 
@@ -322,11 +326,7 @@ public class ResourcesView extends TmfView {
                 TmfTimeRange range = new TmfTimeRange(new CtfTmfTimestamp(startTime), new CtfTmfTimestamp(endTime));
                 TmfTimestamp time = new CtfTmfTimestamp(fTimeGraphViewer.getSelectedTime());
                 broadcast(new TmfRangeSynchSignal(ResourcesView.this, range, time));
-                if (fZoomThread != null) {
-                    fZoomThread.cancel();
-                }
-                fZoomThread = new ZoomThread(startTime, endTime);
-                fZoomThread.start();
+                startZoomThread(startTime, endTime);
             }
         });
 
@@ -391,7 +391,7 @@ public class ResourcesView extends TmfView {
                 if (fTimeGraphViewer.getControl().isDisposed()) {
                     return;
                 }
-                fTimeGraphViewer.setSelectedTime(time, true, signal.getSource());
+                fTimeGraphViewer.setSelectedTime(time, true);
             }
         });
     }
@@ -411,7 +411,8 @@ public class ResourcesView extends TmfView {
                     return;
                 }
                 fTimeGraphViewer.setStartFinishTime(startTime, endTime);
-                fTimeGraphViewer.setSelectedTime(time, false, signal.getSource());
+                fTimeGraphViewer.setSelectedTime(time, true);
+                startZoomThread(startTime, endTime);
             }
         });
     }
@@ -465,7 +466,7 @@ public class ResourcesView extends TmfView {
                 }
             }
         }
-        refresh();
+        refresh(INITIAL_WINDOW_OFFSET);
         for (TraceEntry traceEntry : fEntryList) {
             CtfKernelTrace ctfKernelTrace = ((TraceEntry) traceEntry).getTrace();
             IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
@@ -558,7 +559,7 @@ public class ResourcesView extends TmfView {
         return eventList;
     }
 
-    private void refresh() {
+    private void refresh(final long windowRange) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -569,7 +570,15 @@ public class ResourcesView extends TmfView {
                 Arrays.sort(entries);
                 fTimeGraphViewer.setInput(entries);
                 fTimeGraphViewer.setTimeBounds(fStartTime, fEndTime);
-                fTimeGraphViewer.setStartFinishTime(fStartTime, fEndTime);
+                
+                long endTime = fStartTime + windowRange;
+
+                if (fEndTime < endTime) {
+                    endTime = fEndTime;
+                }
+                fTimeGraphViewer.setStartFinishTime(fStartTime, endTime);
+                
+                startZoomThread(fStartTime, endTime);
             }
         });
     }
@@ -588,6 +597,14 @@ public class ResourcesView extends TmfView {
         });
     }
 
+    private void startZoomThread(long startTime, long endTime) {
+        if (fZoomThread != null) {
+            fZoomThread.cancel();
+        }
+        fZoomThread = new ZoomThread(startTime, endTime);
+        fZoomThread.start();
+    }
+    
     private void makeActions() {
         fPreviousResourceAction = fTimeGraphViewer.getPreviousItemAction();
         fPreviousResourceAction.setText(Messages.ResourcesView_previousResourceActionNameText);

@@ -54,7 +54,23 @@ public interface ITimeDataProvider {
      */
     void notifyStartFinishTime();
 
-    void setSelectedTimeInt(long time, boolean ensureVisible);
+    /**
+     * Updates the selected time, adjusts the time range if necessary and notifies
+     * any registered listeners about the new selected time and new range (if necessary)
+     *  
+     * @param time - A Time to set
+     * @param ensureVisible - Ensure visibility of new time (will adjust time range if necessary)
+     */
+    public void setSelectedTimeNotify(long time, boolean ensureVisible);
+    
+    /**
+     * Updates the selected time and adjusts the time range if necessary 
+     * without notifying registered listeners.
+     *  
+     * @param time - A Time to set
+     * @param ensureVisible - Ensure visibility of new time (will adjust time range if necessary)
+     */
+    public void setSelectedTime(long time, boolean ensureVisible);
 
     void resetStartFinishTime();
 
