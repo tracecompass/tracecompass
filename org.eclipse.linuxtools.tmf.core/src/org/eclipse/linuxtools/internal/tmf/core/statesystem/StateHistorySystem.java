@@ -219,7 +219,7 @@ public class StateHistorySystem extends StateSystem implements
         long ts, tEnd;
 
         /* Make sure the time range makes sense */
-        if (t2 <= t1 || resolution <= 0) {
+        if (t2 < t1 || resolution <= 0) {
             throw new TimeRangeException();
         }
 
