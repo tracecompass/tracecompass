@@ -19,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -74,7 +76,7 @@ public class ResourcesView extends TmfView {
      * Initial time range
      */
     private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
-    
+
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
@@ -96,10 +98,10 @@ public class ResourcesView extends TmfView {
 
     // The display width
     private int fDisplayWidth;
-    
+
     // The next resource action
     private Action fNextResourceAction;
-    
+
     // The previous resource action
     private Action fPreviousResourceAction;
 
@@ -185,12 +187,13 @@ public class ResourcesView extends TmfView {
     private class ZoomThread extends Thread {
         private long fZoomStartTime;
         private long fZoomEndTime;
-        private boolean fCancelled = false;
+        private IProgressMonitor fMonitor;
 
         public ZoomThread(long startTime, long endTime) {
             super("ResourcesView zoom"); //$NON-NLS-1$
             fZoomStartTime = startTime;
             fZoomEndTime = endTime;
+            fMonitor = new NullProgressMonitor();
         }
 
         @Override
@@ -202,10 +205,13 @@ public class ResourcesView extends TmfView {
             for (TraceEntry traceEntry : fEntryList) {
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
                     ResourcesEntry entry = (ResourcesEntry) child;
-                    if (fCancelled) {
+                    if (fMonitor.isCanceled()) {
                         break;
                     }
-                    List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, resolution, true);
+                    List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, resolution, true, fMonitor);
+                    if (fMonitor.isCanceled()) {
+                        break;
+                    }
                     entry.setZoomedEventList(zoomedEventList);
                     redraw();
                 }
@@ -213,7 +219,7 @@ public class ResourcesView extends TmfView {
         }
 
         public void cancel() {
-            fCancelled = true;
+            fMonitor.setCanceled(true);
         }
     }
 
@@ -249,7 +255,7 @@ public class ResourcesView extends TmfView {
             public String getStateTypeName() {
                 return Messages.ResourcesView_stateTypeName;
             }
-            
+
             @Override
             public String getEventName(ITimeEvent event) {
                 if (event instanceof ResourcesEvent) {
@@ -273,12 +279,12 @@ public class ResourcesView extends TmfView {
                 }
                 return UNKNOWN;
             }
-            
+
             @Override
             public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
                 return new HashMap<String, String>();
             }
-            
+
             @Override
             public StateItem[] getStateTable() {
                 return new StateItem[] {
@@ -292,7 +298,7 @@ public class ResourcesView extends TmfView {
             }
 
             @Override
-            public int getEventTableIndex(ITimeEvent event) {
+            public int getStateTableIndex(ITimeEvent event) {
                 if (event instanceof ResourcesEvent) {
                     ResourcesEvent resourcesEvent = (ResourcesEvent) event;
                     if (resourcesEvent.getType() == Type.CPU) {
@@ -347,7 +353,7 @@ public class ResourcesView extends TmfView {
             }
         };
         thread.start();
-        
+
         // View Action Handling
         makeActions();
         contributeToActionBars();
@@ -375,7 +381,8 @@ public class ResourcesView extends TmfView {
             @Override
             public void run() {
                 selectExperiment(signal.getExperiment());
-            }};
+            }
+        };
         thread.start();
     }
 
@@ -474,14 +481,17 @@ public class ResourcesView extends TmfView {
             long endTime = ssq.getCurrentEndTime() + 1;
             long resolution = (endTime - startTime) / fDisplayWidth;
             for (ResourcesEntry entry : traceEntry.getChildren()) {
-                List<ITimeEvent> eventList = getEventList(entry, startTime, endTime, resolution, false);
+                List<ITimeEvent> eventList = getEventList(entry, startTime, endTime, resolution, false, new NullProgressMonitor());
                 entry.setEventList(eventList);
                 redraw();
             }
         }
     }
 
-    private List<ITimeEvent> getEventList(ResourcesEntry entry, long startTime, long endTime, long resolution, boolean includeNull) {
+    private List<ITimeEvent> getEventList(ResourcesEntry entry, long startTime, long endTime, long resolution, boolean includeNull, IProgressMonitor monitor) {
+        if (endTime <= startTime) {
+            return null;
+        }
         IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
         List<ITimeEvent> eventList = null;
         int quark = entry.getQuark();
@@ -492,6 +502,9 @@ public class ResourcesView extends TmfView {
                 eventList = new ArrayList<ITimeEvent>(currentThreadIntervals.size());
                 long lastEndTime = -1;
                 for (ITmfStateInterval currentThreadInterval : currentThreadIntervals) {
+                    if (monitor.isCanceled()) {
+                        return null;
+                    }
                     if (!currentThreadInterval.getStateValue().isNull()) {
                         int currentThread = currentThreadInterval.getStateValue().unboxInt();
                         long time = currentThreadInterval.getStartTime();
@@ -509,6 +522,9 @@ public class ResourcesView extends TmfView {
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
                 for (ITmfStateInterval irqInterval : irqIntervals) {
+                    if (monitor.isCanceled()) {
+                        return null;
+                    }
                     long time = irqInterval.getStartTime();
                     long duration = irqInterval.getEndTime() - time + 1;
                     if (!irqInterval.getStateValue().isNull()) {
@@ -532,6 +548,9 @@ public class ResourcesView extends TmfView {
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
                 for (ITmfStateInterval softIrqInterval : softIrqIntervals) {
+                    if (monitor.isCanceled()) {
+                        return null;
+                    }
                     long time = softIrqInterval.getStartTime();
                     long duration = softIrqInterval.getEndTime() - time + 1;
                     if (!softIrqInterval.getStateValue().isNull()) {
@@ -570,14 +589,14 @@ public class ResourcesView extends TmfView {
                 Arrays.sort(entries);
                 fTimeGraphViewer.setInput(entries);
                 fTimeGraphViewer.setTimeBounds(fStartTime, fEndTime);
-                
+
                 long endTime = fStartTime + windowRange;
 
                 if (fEndTime < endTime) {
                     endTime = fEndTime;
                 }
                 fTimeGraphViewer.setStartFinishTime(fStartTime, endTime);
-                
+
                 startZoomThread(fStartTime, endTime);
             }
         });
@@ -604,7 +623,7 @@ public class ResourcesView extends TmfView {
         fZoomThread = new ZoomThread(startTime, endTime);
         fZoomThread.start();
     }
-    
+
     private void makeActions() {
         fPreviousResourceAction = fTimeGraphViewer.getPreviousItemAction();
         fPreviousResourceAction.setText(Messages.ResourcesView_previousResourceActionNameText);
@@ -613,12 +632,12 @@ public class ResourcesView extends TmfView {
         fNextResourceAction.setText(Messages.ResourcesView_nextResourceActionNameText);
         fNextResourceAction.setToolTipText(Messages.ResourcesView_previousResourceActionToolTipText);
     }
-    
+
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         fillLocalToolBar(bars.getToolBarManager());
     }
-    
+
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.add(fTimeGraphViewer.getShowLegendAction());
         manager.add(new Separator());
