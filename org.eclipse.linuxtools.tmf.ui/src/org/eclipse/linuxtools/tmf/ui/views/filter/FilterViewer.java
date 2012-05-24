@@ -339,7 +339,7 @@ class FilterViewer extends Composite {
                     for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                         if (ce.getAttribute(TmfTraceType.EVENT_TYPE_ATTR).equals(eventTypeNode.getEventType())) {
                             try {
-                                ITmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                                ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                                 ITmfEventType eventType = event.getType();
                                 if (eventType != null) {
                                     for (String field : eventType.getRootField().getFieldNames()) {
@@ -376,7 +376,7 @@ class FilterViewer extends Composite {
             }
             for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                 try {
-                    TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                    ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                     ITmfEventType eventType = event.getType();
                     if (eventType != null) {
                         fieldsList.add("[" + TmfTraceType.getCategoryName(ce.getAttribute(TmfTraceType.CATEGORY_ATTR)) + //$NON-NLS-1$

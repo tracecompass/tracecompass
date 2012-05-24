@@ -267,7 +267,7 @@ ITmfEventsFilterProvider {
                         }
                         if (selectedTableItem.getData(Key.TIMESTAMP) instanceof TmfTimestamp) {
                             final TmfTimestamp ts = (TmfTimestamp) selectedTableItem.getData(Key.TIMESTAMP);
-                            broadcast(new TmfTimeSynchSignal(fTable, ts));
+                            broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, ts));
                         }
                     }
                 }
@@ -419,7 +419,7 @@ ITmfEventsFilterProvider {
                 if ((selection != null) && (selection.length > 0)) {
                     final TmfTimestamp ts = (TmfTimestamp) fTable.getSelection()[0].getData(Key.TIMESTAMP);
                     if (ts != null)
-                        broadcast(new TmfTimeSynchSignal(fTable, ts));
+                        broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, ts));
                 }
             }
         });
@@ -1582,7 +1582,7 @@ ITmfEventsFilterProvider {
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void currentTimeUpdated(final TmfTimeSynchSignal signal) {
-        if ((signal.getSource() != fTable) && (fTrace != null) && (!fTable.isDisposed())) {
+        if ((signal.getSource() != this) && (fTrace != null) && (!fTable.isDisposed())) {
 
             // Create a request for one event that will be queued after other ongoing requests. When this request is
             // completed
