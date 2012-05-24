@@ -18,7 +18,6 @@ import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -61,18 +60,13 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
     }
 
     @Override
-    public int getEventTableIndex(ITimeEvent event) {
+    public int getStateTableIndex(ITimeEvent event) {
         int priority = ((TimeChartEvent) event).getColorSettingPriority();
         if (currX == lastX) {
             priority = Math.min(priority, lastPriority);
         }
         lastPriority = priority;
         return ColorSettingsManager.getColorSetting(priority).getTickColorIndex();
-    }
-
-    @Override
-    public String getTraceClassName(ITimeGraphEntry entry) {
-        return null;
     }
 
     @Override

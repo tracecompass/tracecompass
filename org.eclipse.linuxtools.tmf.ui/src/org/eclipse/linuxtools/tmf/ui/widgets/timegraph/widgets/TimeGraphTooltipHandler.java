@@ -44,7 +44,6 @@ public class TimeGraphTooltipHandler {
 
     private Shell _tipShell;
     private Table _tipTable;
-    private TimeGraphItem _tipItem;
     private Point _tipPosition;
     private ITimeDataProvider _timeDataProvider;
     ITimeGraphPresentationProvider _utilImp = null;
@@ -107,7 +106,6 @@ public class TimeGraphTooltipHandler {
                 if (_tipShell.isVisible()) {
                     _tipShell.setVisible(false);
                 }
-                _tipItem = null;
             }
 
             private void addItem(String name, String value) {
@@ -127,14 +125,8 @@ public class TimeGraphTooltipHandler {
                     ITimeGraphEntry thrd = item._trace;
                     ITimeEvent threadEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 2);
                     ITimeEvent nextEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 1);
-                    // thread name
-//                    addItem(Messages.TmfTimeTipHandler_TRACE_NAME, thrd.getName());
+                    // state name
                     addItem(_utilImp.getStateTypeName(), thrd.getName());
-                    // class name
-                    String traceClass = _utilImp.getTraceClassName(thrd);
-                    if (traceClass != null) {
-                        addItem(Messages.TmfTimeTipHandler_TRACE_CLASS_NAME, traceClass);
-                    }
                     if (threadEvent == null) {
                         return;
                     }
@@ -229,7 +221,6 @@ public class TimeGraphTooltipHandler {
                 _tipTable.getColumn(1).pack();
                 _tipTable.setSize(_tipTable.computeSize(SWT.DEFAULT, 200));
                 _tipShell.pack();
-                _tipItem = item;
                 _tipPosition = control.toDisplay(pt);
                 _tipShell.pack();
                 setHoverLocation(_tipShell, _tipPosition);

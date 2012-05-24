@@ -85,7 +85,6 @@ public class Messages extends NLS {
     public static String TmfTimeStatesCtrl_UNDEFINED_GROUP;
     public static String TmfTimeTipHandler_DURATION;
     public static String TmfTimeTipHandler_NUMBER_OF_TRACES;
-    public static String TmfTimeTipHandler_TRACE_CLASS_NAME;
     public static String TmfTimeTipHandler_TRACE_DATE;
     public static String TmfTimeTipHandler_TRACE_EVENT_TIME;
     public static String TmfTimeTipHandler_TRACE_GROUP_NAME;

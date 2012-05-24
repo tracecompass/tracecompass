@@ -16,9 +16,7 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model.EventImpl;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model.TraceImpl;
 
 @SuppressWarnings("nls")
 public class TsfImplProvider extends TimeGraphPresentationProvider {
@@ -27,7 +25,7 @@ public class TsfImplProvider extends TimeGraphPresentationProvider {
 	// Methods
 	// ========================================================================
 	@Override
-	public int getEventTableIndex(ITimeEvent event) {
+	public int getStateTableIndex(ITimeEvent event) {
 	    return 0;
 	}
 
@@ -48,16 +46,6 @@ public class TsfImplProvider extends TimeGraphPresentationProvider {
 		if (event instanceof EventImpl) {
 			EventImpl devent = (EventImpl) event;
 			name = devent.getType().toString();
-		}
-		return name;
-	}
-
-	@Override
-	public String getTraceClassName(ITimeGraphEntry trace) {
-		String name = "";
-		if (trace instanceof TraceImpl) {
-			TraceImpl dTrace = (TraceImpl) trace;
-			name = dTrace.getClassName();
 		}
 		return name;
 	}

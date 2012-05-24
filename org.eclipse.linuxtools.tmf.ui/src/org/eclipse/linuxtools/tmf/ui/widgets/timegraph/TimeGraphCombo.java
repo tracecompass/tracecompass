@@ -75,7 +75,7 @@ public class TimeGraphCombo extends Composite {
     private boolean fInhibitTreeSelection = false;
 
     // Number of filler rows used by the tree content provider
-    private static int fNumFillerRows;
+    private int fNumFillerRows;
 
     // Calculated item height for Linux workaround
     private int fLinuxItemHeight = 0;
@@ -84,6 +84,10 @@ public class TimeGraphCombo extends Composite {
     // Classes
     // ------------------------------------------------------------------------
 
+    /**
+     * The TreeContentProviderWrapper is used to insert filler items after
+     * the elements of the tree's real content provider.
+     */
     private class TreeContentProviderWrapper implements ITreeContentProvider {
         private ITreeContentProvider contentProvider;
 
@@ -140,6 +144,10 @@ public class TimeGraphCombo extends Composite {
         }
     }
 
+    /**
+     * The TreeLabelProviderWrapper is used to intercept the filler items
+     * from the calls to the tree's real label provider.
+     */
     private class TreeLabelProviderWrapper implements ITableLabelProvider {
         private ITableLabelProvider labelProvider;
 
@@ -191,6 +199,12 @@ public class TimeGraphCombo extends Composite {
 
     }
 
+    /**
+     * The SelectionListenerWrapper is used to intercept the filler items from
+     * the time graph combo's real selection listener, and to prevent double
+     * notifications from being sent when selection changes in both tree and
+     * time graph at the same time.
+     */
     private class SelectionListenerWrapper implements ISelectionChangedListener, ITimeGraphSelectionListener {
         private ITimeGraphSelectionListener listener;
         private ITimeGraphEntry selection = null;
@@ -228,6 +242,13 @@ public class TimeGraphCombo extends Composite {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructs a new instance of this class given its parent
+     * and a style value describing its behavior and appearance.
+     * 
+     * @param parent a widget which will be the parent of the new instance (cannot be null)
+     * @param style the style of widget to construct
+     */
     public TimeGraphCombo(Composite parent, int style) {
         super(parent, style);
         setLayout(new FillLayout());
@@ -245,6 +266,8 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
         fTimeGraphViewer.setNameWidthPref(0);
 
+        // Feature in Windows. The tree vertical bar reappears when
+        // the control is resized so we need to hide it again. 
         // Bug in Linux. The tree header height is 0 in constructor,
         // so we need to reset it later when the control is resized.
         tree.addControlListener(new ControlAdapter() {
@@ -256,6 +279,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure synchronization of expanded items between tree and time graph
         fTreeViewer.addTreeListener(new ITreeViewerListener() {
             @Override
             public void treeCollapsed(TreeExpansionEvent event) {
@@ -268,6 +292,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure synchronization of expanded items between tree and time graph
         fTimeGraphViewer.addTreeListener(new ITimeGraphTreeListener() {
             @Override
             public void treeCollapsed(TimeGraphTreeExpansionEvent event) {
@@ -302,6 +327,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // prevent mouse wheel from scrolling down into filler tree items
         tree.addListener(SWT.MouseWheel, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -351,6 +377,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure alignment of top item between tree and time graph
         fTimeGraphViewer.getTimeGraphControl().addControlListener(new ControlAdapter() {
             @Override
             public void controlResized(ControlEvent e) {
@@ -363,6 +390,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure synchronization of selected item between tree and time graph
         fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
@@ -384,6 +412,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure synchronization of selected item between tree and time graph
         fTimeGraphViewer.addSelectionListener(new ITimeGraphSelectionListener() {
             @Override
             public void selectionChanged(TimeGraphSelectionEvent event) {
@@ -405,6 +434,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure alignment of top item between tree and time graph
         fTimeGraphViewer.getVerticalBar().addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -417,6 +447,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure alignment of top item between tree and time graph
         fTimeGraphViewer.getTimeGraphControl().addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
@@ -429,34 +460,12 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // The filler rows are required to ensure alignment when the tree does not have a
+        // visible horizontal scroll bar. The tree does not allow its top item to be set
+        // to a value that would cause blank space to be drawn at the bottom of the tree.
         fNumFillerRows = Display.getDefault().getBounds().height / getItemHeight(tree);
 
         sash.setWeights(new int[] { 1, 1 });
-    }
-
-    private ArrayList<TreeItem> getVisibleExpandedItems(Tree tree) {
-        ArrayList<TreeItem> items = new ArrayList<TreeItem>();
-        for (TreeItem item : tree.getItems()) {
-            if (item.getData() == FILLER) {
-                break;
-            }
-            items.add(item);
-            if (item.getExpanded()) {
-                items.addAll(getVisibleExpandedItems(item));
-            }
-        }
-        return items;
-    }
-
-    private ArrayList<TreeItem> getVisibleExpandedItems(TreeItem treeItem) {
-        ArrayList<TreeItem> items = new ArrayList<TreeItem>();
-        for (TreeItem item : treeItem.getItems()) {
-            items.add(item);
-            if (item.getExpanded()) {
-                items.addAll(getVisibleExpandedItems(item));
-            }
-        }
-        return items;
     }
 
     // ------------------------------------------------------------------------
@@ -492,43 +501,6 @@ public class TimeGraphCombo extends Composite {
     public void redraw() {
         fTimeGraphViewer.getControl().redraw();
         super.redraw();
-    }
-
-    // ------------------------------------------------------------------------
-    // Internal
-    // ------------------------------------------------------------------------
-
-    public int getItemHeight(final Tree tree) {
-        /*
-         * Bug in Linux.  The method getItemHeight doesn't always return the correct value.
-         */
-        if (fLinuxItemHeight >= 0 && System.getProperty("os.name").contains("Linux")) { //$NON-NLS-1$ //$NON-NLS-2$
-            if (fLinuxItemHeight != 0) {
-                return fLinuxItemHeight;
-            }
-            ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
-            if (treeItems.size() > 1) {
-                final TreeItem treeItem0 = treeItems.get(0);
-                final TreeItem treeItem1 = treeItems.get(1);
-                PaintListener paintListener = new PaintListener() {
-                    @Override
-                    public void paintControl(PaintEvent e) {
-                        tree.removePaintListener(this);
-                        int y0 = treeItem0.getBounds().y;
-                        int y1 = treeItem1.getBounds().y;
-                        int itemHeight = y1 - y0;
-                        if (itemHeight > 0) {
-                            fLinuxItemHeight = itemHeight;
-                            fTimeGraphViewer.setItemHeight(itemHeight);
-                        }
-                    }
-                };
-                tree.addPaintListener(paintListener);
-            }
-        } else {
-            fLinuxItemHeight = -1; // Not Linux, don't perform os.name check anymore
-        }
-        return tree.getItemHeight();
     }
 
     // ------------------------------------------------------------------------
@@ -584,7 +556,9 @@ public class TimeGraphCombo extends Composite {
      * @param input the input of this time graph combo, or <code>null</code> if none
      */
     public void setInput(ITimeGraphEntry[] input) {
+        fInhibitTreeSelection = true;
         fTreeViewer.setInput(input);
+        fInhibitTreeSelection = true;
         fTreeViewer.expandAll();
         fTreeViewer.getTree().getVerticalBar().setEnabled(false);
         fTreeViewer.getTree().getVerticalBar().setVisible(false);
@@ -622,4 +596,90 @@ public class TimeGraphCombo extends Composite {
         fTreeViewer.removeSelectionChangedListener(listenerWrapper);
         fTimeGraphViewer.removeSelectionListener(listenerWrapper);
     }
+
+    /**
+     * Sets the current selection for this time graph combo.
+     *
+     * @param selection the new selection
+     */
+    public void setSelection(ITimeGraphEntry selection) {
+        fTimeGraphViewer.setSelection(selection);
+        fInhibitTreeSelection = true; // block the tree selection changed listener
+        if (selection != null) {
+            StructuredSelection structuredSelection = new StructuredSelection(selection);
+            fTreeViewer.setSelection(structuredSelection);
+        } else {
+            fTreeViewer.setSelection(new StructuredSelection());
+        }
+        fInhibitTreeSelection = false;
+        ArrayList<TreeItem> treeItems = getVisibleExpandedItems(fTreeViewer.getTree());
+        if (treeItems.size() == 0) {
+            return;
+        }
+        TreeItem treeItem = treeItems.get(fTimeGraphViewer.getTopIndex());
+        fTreeViewer.getTree().setTopItem(treeItem);
+    }
+
+    // ------------------------------------------------------------------------
+    // Internal
+    // ------------------------------------------------------------------------
+
+    private ArrayList<TreeItem> getVisibleExpandedItems(Tree tree) {
+        ArrayList<TreeItem> items = new ArrayList<TreeItem>();
+        for (TreeItem item : tree.getItems()) {
+            if (item.getData() == FILLER) {
+                break;
+            }
+            items.add(item);
+            if (item.getExpanded()) {
+                items.addAll(getVisibleExpandedItems(item));
+            }
+        }
+        return items;
+    }
+
+    private ArrayList<TreeItem> getVisibleExpandedItems(TreeItem treeItem) {
+        ArrayList<TreeItem> items = new ArrayList<TreeItem>();
+        for (TreeItem item : treeItem.getItems()) {
+            items.add(item);
+            if (item.getExpanded()) {
+                items.addAll(getVisibleExpandedItems(item));
+            }
+        }
+        return items;
+    }
+
+    private int getItemHeight(final Tree tree) {
+        /*
+         * Bug in Linux.  The method getItemHeight doesn't always return the correct value.
+         */
+        if (fLinuxItemHeight >= 0 && System.getProperty("os.name").contains("Linux")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (fLinuxItemHeight != 0) {
+                return fLinuxItemHeight;
+            }
+            ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
+            if (treeItems.size() > 1) {
+                final TreeItem treeItem0 = treeItems.get(0);
+                final TreeItem treeItem1 = treeItems.get(1);
+                PaintListener paintListener = new PaintListener() {
+                    @Override
+                    public void paintControl(PaintEvent e) {
+                        tree.removePaintListener(this);
+                        int y0 = treeItem0.getBounds().y;
+                        int y1 = treeItem1.getBounds().y;
+                        int itemHeight = y1 - y0;
+                        if (itemHeight > 0) {
+                            fLinuxItemHeight = itemHeight;
+                            fTimeGraphViewer.setItemHeight(itemHeight);
+                        }
+                    }
+                };
+                tree.addPaintListener(paintListener);
+            }
+        } else {
+            fLinuxItemHeight = -1; // Not Linux, don't perform os.name check anymore
+        }
+        return tree.getItemHeight();
+    }
+
 }

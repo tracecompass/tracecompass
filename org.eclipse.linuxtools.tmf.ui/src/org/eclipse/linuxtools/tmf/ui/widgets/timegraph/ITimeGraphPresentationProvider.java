@@ -58,43 +58,44 @@ public interface ITimeGraphPresentationProvider {
 
 
     /**
-     * Returns table of states with state name to state color relationship
+     * Returns table of states with state name to state color relationship.
      * 
-     * @return table of states with state name to state color relationship
+     * @return table of states with color and name
+     * 
+     * @see #getStateTableIndex
      */
     public StateItem[] getStateTable();
     
     /**
-     * Returns the index in the event color table and event name table corresponding to this time event.
-     * The index should correspond to a RGB value in the event color table,
+     * Returns the index in the state table corresponding to this time event.
+     * The index should correspond to a state in the state table,
      * otherwise the color SWT.COLOR_BLACK will be used.
+     * If the index returned is negative, the event will not be drawn.
      * 
      * @param event the time event
-     * @return the corresponding event table index
+     * @return the corresponding state table index
      * 
-     * @see #getEventColorTable
-     * @see #getEventNameTable
+     * @see #getStateTable
      */
-    public int getEventTableIndex(ITimeEvent event);
+    public int getStateTableIndex(ITimeEvent event);
 
     /**
      * Returns the height of this item. This value is ignored if the time graph has a fixed item height.
      * 
-     * @return the entry height
+     * @param entry the entry
+     * @return the item height
      * 
      * @see TimeGraphViewer#setItemHeight
      */
     public int getItemHeight(ITimeGraphEntry entry);
 
     /**
-     * This values is appended between braces to the right of Trace Name e.g.
-     * Trace And Error Log [Board 17] or for a Thread trace e.g. State Server
-     * [java.lang.Thread]
+     * Provides the image icon for a given entry.
      * 
-     * @param trace
-     * @return the trace class name
+     * @param entry the entry
+     * @return the image icon
      */
-    public String getTraceClassName(ITimeGraphEntry trace);
+    public Image getItemImage(ITimeGraphEntry entry);
 
     /**
      * Returns the name of this event.
@@ -103,19 +104,13 @@ public interface ITimeGraphPresentationProvider {
      */
     public String getEventName(ITimeEvent event);
 
-    public String composeTraceName(ITimeGraphEntry trace, boolean inclState);
-
-    public String composeEventName(ITimeEvent event);
-
-    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event);
-
     /**
-     * Provides the image icon for a given Event or Trace e.g. customize to use
-     * different icons according to specific event /state combination
+     * Returns a map of name and value providing additional information
+     * to display in the tool tip for this event.
      * 
-     * @param obj
-     * @return the image icon
+     * @param event the time event
+     * @return a map of tool tip information
      */
-    public Image getItemImage(Object obj);
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event);
 
 }

@@ -399,7 +399,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
             }
             int timeSpace = _timeProvider.getTimeSpace();
             int leftSpace = _timeProvider.getNameSpace();
-            int x = e.x - leftSpace;
+            int x = Math.max(0, e.x - leftSpace);
             if (timeSpace > 0) {
                 _dragX = x;
                 if (_dragX0 > _dragX) { // drag right to left

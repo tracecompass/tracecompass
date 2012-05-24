@@ -508,14 +508,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         long time0 = _time0;
         long time1 = _time1;
         if (ensureVisible) {
-            double timeSpace = (_time1 - _time0) * .02;
-            double timeMid = (_time1 - _time0) * .1;
+            long timeSpace = (long) ((_time1 - _time0) * .02);
+            long timeMid = (long) ((_time1 - _time0) * .5);
             if (time < _time0 + timeSpace) {
-                long dt = (long) (_time0 - time + timeMid);
+                long dt = _time0 - time + timeMid;
                 _time0 -= dt;
                 _time1 -= dt;
             } else if (time > _time1 - timeSpace) {
-                long dt = (long) (time - _time1 + timeMid);
+                long dt = time - _time1 + timeMid;
                 _time0 += dt;
                 _time1 += dt;
             }
@@ -835,6 +835,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
         _stateCtrl.setExpandedState(entry, expanded);
         adjustVerticalScrollBar();
+    }
+
+    public int getExpandedElementCount() {
+        return _stateCtrl.getExpandedElementCount();
+    }
+
+    public ITimeGraphEntry[] getExpandedElements() {
+        return _stateCtrl.getExpandedElements();
     }
 
     public void addTreeListener(ITimeGraphTreeListener listener) {

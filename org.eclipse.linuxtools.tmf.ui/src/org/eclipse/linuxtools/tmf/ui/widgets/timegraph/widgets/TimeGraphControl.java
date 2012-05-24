@@ -760,6 +760,14 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return _data._expandedItems.length;
     }
 
+    public ITimeGraphEntry[] getExpandedElements() {
+        ArrayList<ITimeGraphEntry> elements = new ArrayList<ITimeGraphEntry>();
+        for (TimeGraphItem item : _data._expandedItems) {
+            elements.add(item._trace);
+        }
+        return elements.toArray(new ITimeGraphEntry[0]);
+    }
+
     Point getCtrlSize() {
         Point size = getSize();
         if (getHorizontalBar().isVisible()) {
@@ -1025,7 +1033,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     protected void drawState(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc, boolean selected, boolean timeSelected) {
 
-        int colorIdx = fTimeGraphProvider.getEventTableIndex(event);
+        int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
         if (colorIdx < 0) {
             return;
         }
