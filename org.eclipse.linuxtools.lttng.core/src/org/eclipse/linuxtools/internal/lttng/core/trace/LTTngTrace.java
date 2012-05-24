@@ -44,6 +44,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -114,10 +115,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         return false;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public synchronized void initTrace(final IResource resource, final String path, final Class<LttngEvent> eventType)
             throws TmfTraceException {
         super.initialize(resource, path, eventType);
+        setIndexer(new TmfCheckpointIndexer(this, getCacheSize()));
         initialize(resource, path, eventType);
     }
 
