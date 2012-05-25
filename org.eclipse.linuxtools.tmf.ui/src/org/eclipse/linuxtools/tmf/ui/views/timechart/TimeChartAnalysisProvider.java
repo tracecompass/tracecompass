@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.timechart;
 
-import java.util.Map;
-
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -67,16 +65,6 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
         }
         lastPriority = priority;
         return ColorSettingsManager.getColorSetting(priority).getTickColorIndex();
-    }
-
-    @Override
-    public String getEventName(ITimeEvent event) {
-        return null;
-    }
-
-    @Override
-    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-        return null;
     }
 
     @Override

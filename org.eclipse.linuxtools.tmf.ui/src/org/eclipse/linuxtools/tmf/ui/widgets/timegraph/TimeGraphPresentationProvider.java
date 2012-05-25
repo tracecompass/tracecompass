@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 
-public abstract class TimeGraphPresentationProvider implements ITimeGraphPresentationProvider {
+public class TimeGraphPresentationProvider implements ITimeGraphPresentationProvider {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -40,6 +40,24 @@ public abstract class TimeGraphPresentationProvider implements ITimeGraphPresent
     @Override
     public String getStateTypeName() {
         return Messages.TmfTimeLegend_TRACE_STATES;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTable()
+     */
+    @Override
+    public StateItem[] getStateTable() {
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventTableIndex(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent)
+     */
+    @Override
+    public int getStateTableIndex(ITimeEvent event) {
+        return 0;
     }
 
     /*
@@ -67,24 +85,6 @@ public abstract class TimeGraphPresentationProvider implements ITimeGraphPresent
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         // Override to add own drawing code
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTable()
-     */
-    @Override
-    public StateItem[] getStateTable() {
-        return null;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventTableIndex(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent)
-     */
-    @Override
-    public int getStateTableIndex(ITimeEvent event) {
-        return 0;
     }
 
     /*

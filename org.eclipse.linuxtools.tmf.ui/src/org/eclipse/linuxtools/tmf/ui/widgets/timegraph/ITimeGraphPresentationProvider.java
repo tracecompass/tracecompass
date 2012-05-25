@@ -22,14 +22,35 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public interface ITimeGraphPresentationProvider {
 
-    
     /**
      * Returns the name of state types.
      * 
      * @return the name of state types
      */
     public String getStateTypeName();
-    
+
+    /**
+     * Returns table of states with state name to state color relationship.
+     * 
+     * @return table of states with color and name
+     * 
+     * @see #getStateTableIndex
+     */
+    public StateItem[] getStateTable();
+
+    /**
+     * Returns the index in the state table corresponding to this time event.
+     * The index should correspond to a state in the state table,
+     * otherwise the color SWT.COLOR_BLACK will be used.
+     * If the index returned is negative, the event will not be drawn.
+     * 
+     * @param event the time event
+     * @return the corresponding state table index
+     * 
+     * @see #getStateTable
+     */
+    public int getStateTableIndex(ITimeEvent event);
+
     /**
      * Called after drawing the control
      * 
@@ -55,29 +76,6 @@ public interface ITimeGraphPresentationProvider {
      * @param gc the graphics context
      */
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc);
-
-
-    /**
-     * Returns table of states with state name to state color relationship.
-     * 
-     * @return table of states with color and name
-     * 
-     * @see #getStateTableIndex
-     */
-    public StateItem[] getStateTable();
-    
-    /**
-     * Returns the index in the state table corresponding to this time event.
-     * The index should correspond to a state in the state table,
-     * otherwise the color SWT.COLOR_BLACK will be used.
-     * If the index returned is negative, the event will not be drawn.
-     * 
-     * @param event the time event
-     * @return the corresponding state table index
-     * 
-     * @see #getStateTable
-     */
-    public int getStateTableIndex(ITimeEvent event);
 
     /**
      * Returns the height of this item. This value is ignored if the time graph has a fixed item height.
