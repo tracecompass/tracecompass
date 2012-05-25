@@ -17,13 +17,12 @@ import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.Resource
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
+import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
 /**
- * <b><u>PerspectiveFactory</u></b>
- * <p>
  * The default LTTng perspective.
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
@@ -37,6 +36,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     private static final String CONTROL_VIEW_ID = ControlView.ID;
     private static final String CONTROLFLOW_VIEW_ID = ControlFlowView.ID;
     private static final String RESOURCES_VIEW_ID = ResourcesView.ID;
+    private static final String STATISTICS_VIEW_ID = TmfStatisticsView.ID;
 
     // Standard Eclipse views
     private static final String PROJECT_VIEW_ID = IPageLayout.ID_PROJECT_EXPLORER;
@@ -61,7 +61,11 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         IFolderLayout topLeftFolder = layout.createFolder(
                 "topLeftFolder", IPageLayout.LEFT, 0.15f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topLeftFolder.addView(PROJECT_VIEW_ID);
-        topLeftFolder.addView(CONTROL_VIEW_ID);
+
+        // Create the bottom left folder
+        IFolderLayout bottomLeftFolder = layout.createFolder(
+                "topLeftFolder", IPageLayout.BOTTOM, 0.70f, "topLeftFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+        bottomLeftFolder.addView(CONTROL_VIEW_ID);
 
         // Create the top right folder
         IFolderLayout topRightFolder = layout.createFolder(
@@ -78,6 +82,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         IFolderLayout bottomRightFolder = layout.createFolder(
                 "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
+        bottomRightFolder.addView(STATISTICS_VIEW_ID);
         bottomRightFolder.addView(PROPERTIES_VIEW_ID);
         bottomRightFolder.addView(BOOKMARKS_VIEW_ID);
     }
@@ -88,7 +93,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
      * @param layout
      */
     private void addFastViews(IPageLayout layout) {
-        // TODO Auto-generated method stub
     }
 
     /**
@@ -97,7 +101,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
      * @param layout
      */
     private void addViewShortcuts(IPageLayout layout) {
-        // TODO Auto-generated method stub
     }
 
     /**
@@ -106,7 +109,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
      * @param layout
      */
     private void addPerspectiveShortcuts(IPageLayout layout) {
-        // TODO Auto-generated method stub
     }
 
 }

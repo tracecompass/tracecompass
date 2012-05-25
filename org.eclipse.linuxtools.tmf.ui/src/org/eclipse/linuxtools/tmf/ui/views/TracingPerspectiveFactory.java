@@ -13,6 +13,8 @@
 package org.eclipse.linuxtools.tmf.ui.views;
 
 import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
+import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -33,10 +35,13 @@ public class TracingPerspectiveFactory implements IPerspectiveFactory {
 
     // Standard TMF views
     private static final String EVENTS_VIEW_ID = TmfEventsView.ID;
+    private static final String HISTOGRAM_VIEW_ID = HistogramView.ID;
 
     // Standard Eclipse views
     private static final String PROJECT_VIEW_ID = IPageLayout.ID_PROJECT_EXPLORER;
+    private static final String STATISTICS_VIEW_ID = TmfStatisticsView.ID;
     private static final String PROPERTIES_VIEW_ID = IPageLayout.ID_PROP_SHEET;
+    private static final String BOOKMARKS_VIEW_ID = IPageLayout.ID_BOOKMARKS;
 
     // ------------------------------------------------------------------------
     // IPerspectiveFactory
@@ -65,19 +70,20 @@ public class TracingPerspectiveFactory implements IPerspectiveFactory {
 
         // Create the top right folder
         IFolderLayout topRightFolder = layout.createFolder(
-                "topRightFolder", IPageLayout.TOP, 0.50f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+                "topRightFolder", IPageLayout.TOP, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topRightFolder.addView(EVENTS_VIEW_ID);
 
         // Create the middle right folder
-        @SuppressWarnings("unused")
         IFolderLayout middleRightFolder = layout.createFolder(
-                "middleRightFolder", IPageLayout.BOTTOM, 0.50f, "topRightFolder"); //$NON-NLS-1$//$NON-NLS-2$
+                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, "topRightFolder"); //$NON-NLS-1$//$NON-NLS-2$
+        middleRightFolder.addView(STATISTICS_VIEW_ID);
 
         // Create the bottom right folder
         IFolderLayout bottomRightFolder = layout.createFolder(
-                "bottomRightFolder", IPageLayout.BOTTOM, 0.65f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+                "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+        bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
         bottomRightFolder.addView(PROPERTIES_VIEW_ID);
-
+        bottomRightFolder.addView(BOOKMARKS_VIEW_ID);
     }
 
     // ------------------------------------------------------------------------
