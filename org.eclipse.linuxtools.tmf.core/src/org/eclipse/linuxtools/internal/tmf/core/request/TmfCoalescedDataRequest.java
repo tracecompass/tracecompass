@@ -10,15 +10,19 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.request;
+package org.eclipse.linuxtools.internal.tmf.core.request;
 
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 
 /**
- * <b><u>TmfCoalescedDataRequest</u></b>
- * <p>
+ * The TMF coalesced data request
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest<T> {
 

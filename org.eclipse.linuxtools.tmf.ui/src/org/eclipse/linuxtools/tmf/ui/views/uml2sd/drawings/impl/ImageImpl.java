@@ -16,10 +16,8 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IImage;
 import org.eclipse.swt.graphics.Image;
 
@@ -108,7 +106,7 @@ public class ImageImpl implements IImage {
             ImageDescriptor img = ImageDescriptor.createFromURL(url);
             return img.createImage();
         } catch (MalformedURLException e) {
-            TmfUiPlugin.getDefault().logError("Error opening image file", e);  //$NON-NLS-1$
+            Activator.getDefault().logError("Error opening image file", e);  //$NON-NLS-1$
         }
         return null;
     }

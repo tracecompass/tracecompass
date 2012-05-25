@@ -24,7 +24,7 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle.
  */
-public class TmfUiPlugin extends AbstractUIPlugin {
+public class Activator extends AbstractUIPlugin {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -38,7 +38,7 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 	/**
 	 * The shared instance
 	 */
-	private static TmfUiPlugin plugin;
+	private static Activator plugin;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -47,7 +47,7 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 	/**
 	 * Constructor
 	 */
-	public TmfUiPlugin() {
+	public Activator() {
 	}
 
     // ------------------------------------------------------------------------
@@ -59,7 +59,7 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 	 *
 	 * @return the TMF UI plug-in instance.
 	 */
-	public static TmfUiPlugin getDefault() {
+	public static Activator getDefault() {
 		return plugin;
 	}
 

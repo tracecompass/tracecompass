@@ -44,7 +44,7 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
@@ -656,7 +656,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
 
         IContainer container = getSpecifiedContainer();
         if (container != null && container.isVirtual()) {
-            if (Platform.getPreferencesService().getBoolean(TmfUiPlugin.PLUGIN_ID, ResourcesPlugin.PREF_DISABLE_LINKING, false, null)) {
+            if (Platform.getPreferencesService().getBoolean(Activator.PLUGIN_ID, ResourcesPlugin.PREF_DISABLE_LINKING, false, null)) {
                 setMessage(null);
                 setErrorMessage(Messages.ImportTraceWizard_CannotImportFilesUnderAVirtualFolder);
                 return false;
@@ -775,7 +775,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                 for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
                     if (traceType.equals(CUSTOM_TXT_CATEGORY + " : " + def.definitionName)) { //$NON-NLS-1$
                         traceTypeOK = true;
-                        traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
+                        traceBundle = Activator.getDefault().getBundle().getSymbolicName();
                         traceTypeId = CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
                         traceIcon = DEFAULT_TRACE_ICON_PATH;
                         break;
@@ -785,7 +785,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                 for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
                     if (traceType.equals(CUSTOM_XML_CATEGORY + " : " + def.definitionName)) { //$NON-NLS-1$
                         traceTypeOK = true;
-                        traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
+                        traceBundle = Activator.getDefault().getBundle().getSymbolicName();
                         traceTypeId = CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
                         traceIcon = DEFAULT_TRACE_ICON_PATH;
                         break;
@@ -825,7 +825,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                                     }
                                 }
                             } catch (CoreException e) {
-                                TmfUiPlugin.getDefault().logError("Error importing trace resource " + resource.getName(), e); //$NON-NLS-1$
+                                Activator.getDefault().logError("Error importing trace resource " + resource.getName(), e); //$NON-NLS-1$
                             }
                         }
                     }

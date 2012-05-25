@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
@@ -157,23 +157,23 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
                 }
             }
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (InvalidRegistryObjectException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (SecurityException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (IllegalArgumentException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (ClassNotFoundException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (NoSuchMethodException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (InstantiationException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (IllegalAccessException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         } catch (InvocationTargetException e) {
-            TmfUiPlugin.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating events table", e); //$NON-NLS-1$
         }
         return new TmfEventsTable(parent, cacheSize);
     }
@@ -240,7 +240,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
 		if (experiment.equals(fExperiment)) {
 			fEventsTable.setTrace(null, false);
 
-            TmfUiPlugin.getDefault().getWorkbench().getWorkbenchWindows()[0].getShell().getDisplay().syncExec(new Runnable() {
+            Activator.getDefault().getWorkbench().getWorkbenchWindows()[0].getShell().getDisplay().syncExec(new Runnable() {
                 @Override
                 public void run() {
                     setPartName(fTitlePrefix);

@@ -90,6 +90,10 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 	    case TRAP_MODE:
 		retColor = trapStateToColor.get(stateMode);
 		break;
+
+	    case PROPERTY:
+        case UNKNOWN:
+        break;
 	    }
 	}
 

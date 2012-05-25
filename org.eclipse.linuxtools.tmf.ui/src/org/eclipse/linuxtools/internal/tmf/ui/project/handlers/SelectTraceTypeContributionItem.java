@@ -26,7 +26,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
@@ -43,7 +43,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 public class SelectTraceTypeContributionItem extends CompoundContributionItem {
 
     //private static final ImageDescriptor SELECTED_ICON = ImageDescriptor.createFromImage(TmfUiPlugin.getDefault().getImageFromPath("icons/elcl16/bullet.gif")); //$NON-NLS-1$
-    private static final ImageDescriptor SELECTED_ICON = TmfUiPlugin.getDefault().getImageDescripterFromPath(
+    private static final ImageDescriptor SELECTED_ICON = Activator.getDefault().getImageDescripterFromPath(
             "icons/elcl16/bullet.gif"); //$NON-NLS-1$
     private static final String BUNDLE_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.select_trace_type.bundle"; //$NON-NLS-1$
     private static final String TYPE_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.select_trace_type.type"; //$NON-NLS-1$
@@ -106,7 +106,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
 
         // add the custom trace types
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-            String traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
+            String traceBundle = Activator.getDefault().getBundle().getSymbolicName();
             String traceTypeId = CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;
@@ -116,7 +116,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
             addContributionItem(list, traceBundle, traceTypeId, traceIcon, label, selected, subMenu);
         }
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-            String traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
+            String traceBundle = Activator.getDefault().getBundle().getSymbolicName();
             String traceTypeId = CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;

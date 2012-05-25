@@ -15,11 +15,14 @@ package org.eclipse.linuxtools.tmf.core.component;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 
 /**
- * <b><u>ITmfComponent</u></b>
- * <p>
  * This is the basic interface of all the TMF components.
  * <p>
- *  Currently, it only addresses the inter-component signaling.
+ * Currently, it only addresses the inter-component signalling.
+ *
+ * @version 1.0
+ * @author Francois Chouinard
+ * 
+ * @see TmfComponent
  */
 public interface ITmfComponent {
 

@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
@@ -144,9 +144,9 @@ public class DeleteTraceHandler extends AbstractHandler {
                     trace.getProject().refresh();
 
                 } catch (IOException e) {
-                    TmfUiPlugin.getDefault().logError("Error deleting trace: " + trace.getName(), e); //$NON-NLS-1$
+                    Activator.getDefault().logError("Error deleting trace: " + trace.getName(), e); //$NON-NLS-1$
                 } catch (CoreException e) {
-                    TmfUiPlugin.getDefault().logError("Error deleting trace: " + trace.getName(), e); //$NON-NLS-1$
+                    Activator.getDefault().logError("Error deleting trace: " + trace.getName(), e); //$NON-NLS-1$
                 }
             }
         }

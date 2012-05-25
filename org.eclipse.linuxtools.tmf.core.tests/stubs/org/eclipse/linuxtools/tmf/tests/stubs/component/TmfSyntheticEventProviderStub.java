@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.tmf.tests.stubs.component;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
-import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
  * <p>
  * TODO: Implement me. Please.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSyntheticEventStub> {
 
     public static final int BLOCK_SIZE = 100;

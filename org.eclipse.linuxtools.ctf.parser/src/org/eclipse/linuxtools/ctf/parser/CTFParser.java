@@ -28,7 +28,7 @@ import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
 import org.antlr.runtime.tree.RewriteRuleTokenStream;
 import org.antlr.runtime.tree.TreeAdaptor;
 
-@SuppressWarnings({ "nls", "unused", "unchecked", "rawtypes", "null" })
+@SuppressWarnings({ "nls", "unused", "unchecked", "rawtypes" })
 public class CTFParser extends Parser {
     public static final String[] tokenNames = new String[] { "<invalid>",
             "<EOR>", "<DOWN>", "<UP>", "ALIGNTOK", "CONSTTOK", "CHARTOK",

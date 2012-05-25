@@ -16,16 +16,16 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 
 /**
  * Test suite for org.eclipse.linuxtools.tmf.core.trace
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".trace"); //$NON-NLS-1$);
+		TestSuite suite = new TestSuite("Test suite for " + Activator.PLUGIN_ID + ".trace"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TmfLocationTest.class);
         suite.addTestSuite(TmfContextTest.class);

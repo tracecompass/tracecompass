@@ -21,7 +21,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -75,7 +75,7 @@ public class DeleteExperimentHandler extends AbstractHandler {
                         resource.delete(true, null);
                         experiment.getProject().refresh();
                     } catch (CoreException e) {
-                        TmfUiPlugin.getDefault().logError("Error deleting experiment: " + experiment.getName(), e); //$NON-NLS-1$
+                        Activator.getDefault().logError("Error deleting experiment: " + experiment.getName(), e); //$NON-NLS-1$
                     }
                 }
             }

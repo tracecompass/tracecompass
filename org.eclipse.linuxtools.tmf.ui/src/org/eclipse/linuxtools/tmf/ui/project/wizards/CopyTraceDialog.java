@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -139,7 +139,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
         IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
 
         if ("".equals(name)) { //$NON-NLS-1$
-            updateStatus(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, IStatus.ERROR,
+            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR,
                     Messages.Dialog_EmptyNameError, null));
             return;
         }
@@ -151,12 +151,12 @@ public class CopyTraceDialog extends SelectionStatusDialog {
 
         IPath path = new Path(name);
         if (fTraceFolder.getFolder(path).exists() || fTraceFolder.getFile(path).exists()) {
-            updateStatus(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, IStatus.ERROR,
+            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR,
                     Messages.Dialog_ExistingNameError, null));
             return;
         }
 
-        updateStatus(new Status(IStatus.OK, TmfUiPlugin.PLUGIN_ID, "")); //$NON-NLS-1$
+        updateStatus(new Status(IStatus.OK, Activator.PLUGIN_ID, "")); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------

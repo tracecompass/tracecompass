@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.load;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
@@ -170,7 +170,7 @@ public class LoadersManagerTest extends TestCase {
     }
 
     private String getSavedLoader(String viewId) {
-        IPreferenceStore p = TmfUiPlugin.getDefault().getPreferenceStore();
+        IPreferenceStore p = Activator.getDefault().getPreferenceStore();
         return p.getString(LOADER_PREFIX + viewId);
     }
 }

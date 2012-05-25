@@ -16,11 +16,12 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 
 /**
- * <b><u>TmfComponent</u></b>
- * <p>
  * This is the base class of the TMF components.
  * <p>
- *  Currently, it only addresses the inter-component signaling.
+ * Currently, it only addresses the inter-component signaling.
+ *
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class TmfComponent implements ITmfComponent {
 
@@ -34,27 +35,57 @@ public abstract class TmfComponent implements ITmfComponent {
 	// Constructor
 	// ------------------------------------------------------------------------
 
+    /**
+     * Default constructor. To be used in conjunction with init()
+     */
     public TmfComponent() {
 	    this(""); //$NON-NLS-1$
     }
 
+    /**
+     * Perform component initialization and register it as a signal listener.
+     * Need to be called when the default constructor was used.
+     * 
+     * @param name the component name
+     */
     public void init(String name) {
         fName = name;
         TmfSignalManager.register(this);
     }
 
+	/**
+	 * The standard constructor
+	 * 
+	 * @param name the component name
+	 */
 	public TmfComponent(String name) {
 		init(name);
 	}
 	
+	/**
+	 * The copy constructor
+	 * 
+	 * @param other the other component
+	 */
 	public TmfComponent(TmfComponent other) {
         init(other.fName);
 	}
 	
     // ------------------------------------------------------------------------
-    // Accessors
+    // Getters/setters
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#getName()
+     */
+    @Override
+    public String getName() {
+        return fName;
+    }
+
+	/**
+	 * @param name the new component name
+	 */
 	protected void setName(String name) {
 		fName = name;
 	}
@@ -63,17 +94,18 @@ public abstract class TmfComponent implements ITmfComponent {
 	// ITmfComponent
 	// ------------------------------------------------------------------------
 
-	@Override
-	public String getName() {
-		return fName;
-	}
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#dispose()
+	 */
 	@Override
 	public void dispose() {
 		TmfSignalManager.deregister(this);
 //		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "terminated");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#broadcast(org.eclipse.linuxtools.tmf.core.signal.TmfSignal)
+	 */
 	@Override
 	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);

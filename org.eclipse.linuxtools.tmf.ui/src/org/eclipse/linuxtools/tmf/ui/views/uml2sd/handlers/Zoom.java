@@ -19,7 +19,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
@@ -105,33 +105,33 @@ public class Zoom extends Action {
 
         // Pre-create zooming cursors
         fZoomInCursor = new Cursor(Display.getCurrent(), 
-                TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_IN).getImageData(), 
-                TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
+                Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_IN).getImageData(), 
+                Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
 
         fZoomOutCursor = new Cursor(Display.getCurrent(), 
-                TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_OUT).getImageData(),
-                TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
+                Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_OUT).getImageData(),
+                Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
 
         switch (type) {
         case ZOOM_IN:
             setText(SDMessages._47);
             setToolTipText(SDMessages._48);
             setId(ZOOM_IN_ID);
-            setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_IN_MENU));
+            setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_IN_MENU));
             break;
 
         case ZOOM_OUT:
             setText(SDMessages._51);
             setToolTipText(SDMessages._52);
             setId(ZOOM_OUT_ID);
-            setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_OUT_MENU));
+            setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_OUT_MENU));
             break;
 
         case ZOOM_RESET:
             setText(SDMessages._49);
             setToolTipText(SDMessages._50);
             setId(RESET_ZOOM_ID);
-            setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_HOME_MENU));
+            setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_HOME_MENU));
             break;
 
         default:
@@ -139,7 +139,7 @@ public class Zoom extends Action {
             setText(SDMessages._53);
             setToolTipText(SDMessages._54);
             setId(NO_ZOOM_ID); 
-            setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SELECT_MENU));
+            setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SELECT_MENU));
             break;
         }
     }

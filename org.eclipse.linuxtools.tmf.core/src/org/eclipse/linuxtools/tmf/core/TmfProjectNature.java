@@ -17,20 +17,42 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * <b><u>TmfProjectNature</u></b>
- * <p>
- * This is really a marker for the tracing projects.
+ * The TMF basic tracing project nature.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfProjectNature implements IProjectNature {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
+	/**
+	 * The nature ID
+	 */
 	public static final String ID = "org.eclipse.linuxtools.tmf.project.nature"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
 
 	private IProject fProject;
 	
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.IProjectNature#configure()
+	 */
 	@Override
 	public void configure() throws CoreException {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
+	 */
 	@Override
 	public void deconfigure() throws CoreException {
 	}
@@ -40,6 +62,9 @@ public class TmfProjectNature implements IProjectNature {
 		return fProject;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
+	 */
 	@Override
 	public void setProject(IProject project) {
 		fProject = project;

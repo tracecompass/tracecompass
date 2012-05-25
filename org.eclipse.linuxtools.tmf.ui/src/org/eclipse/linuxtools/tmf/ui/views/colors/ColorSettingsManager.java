@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.swt.SWT;
@@ -26,7 +26,7 @@ public class ColorSettingsManager {
 
 	private static final String COLOR_SETTINGS_FILE_NAME = "color_settings.xml"; //$NON-NLS-1$
 	private static final String COLOR_SETTINGS_PATH_NAME =
-        TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append(COLOR_SETTINGS_FILE_NAME).toString();
+        Activator.getDefault().getStateLocation().addTrailingSeparator().append(COLOR_SETTINGS_FILE_NAME).toString();
 	private static final ColorSetting DEFAULT_COLOR_SETTING = new ColorSetting(
 			Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
 			Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(),

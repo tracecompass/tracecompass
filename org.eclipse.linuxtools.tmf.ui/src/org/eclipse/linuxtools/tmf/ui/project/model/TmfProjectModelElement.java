@@ -25,7 +25,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 
 /**
@@ -178,7 +178,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
             try {
                 supplFolderParent.create(true, true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error creating project specific supplementary folder " + supplFolderParent, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error creating project specific supplementary folder " + supplFolderParent, e); //$NON-NLS-1$
             }
         }
         return supplFolderParent;

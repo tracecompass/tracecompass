@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtEvent;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
@@ -137,7 +137,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         try {
             fTraceTypeId = getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error refreshing trace type pesistent property for trace " + getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error refreshing trace type pesistent property for trace " + getName(), e); //$NON-NLS-1$
         }
     }
 
@@ -167,7 +167,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
                 return trace;
             }
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error instantiating ITmfTrace object for trace " + getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error instantiating ITmfTrace object for trace " + getName(), e); //$NON-NLS-1$
         }
         return null;
     }
@@ -194,7 +194,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
                 return event;
             }
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error instantiating ITmfEvent object for trace " + getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error instantiating ITmfEvent object for trace " + getName(), e); //$NON-NLS-1$
         }
         return null;
     }
@@ -245,7 +245,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 supplFolder.delete(true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error deleting supplementary folder " + supplFolder, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error deleting supplementary folder " + supplFolder, e); //$NON-NLS-1$
             }
         }
     }
@@ -264,7 +264,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 oldSupplFolder.move(newSupplFolder.getFullPath(), true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
             }
         }
     }
@@ -283,7 +283,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 oldSupplFolder.copy(newSupplFolder.getFullPath(), true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
             }
         }
     }
@@ -301,7 +301,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 oldSupplFolder.copy(destination.getFullPath(), true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error copying supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error copying supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
             }
         }
     }
@@ -336,7 +336,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 return supplFolder.members();
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error deleting supplementary folder " + supplFolder, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error deleting supplementary folder " + supplFolder, e); //$NON-NLS-1$
             }
         }
         return new IResource[0];
@@ -353,7 +353,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 resources[i].delete(true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error deleting supplementary resource " + resources[i], e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error deleting supplementary resource " + resources[i], e); //$NON-NLS-1$
             }
         }
     }
@@ -364,14 +364,14 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             try {
                 supplFolder.create(true, true, new NullProgressMonitor());
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error creating resource supplementary file " + supplFolder, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error creating resource supplementary file " + supplFolder, e); //$NON-NLS-1$
             }
         }
 
         try {
             fResource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder.getLocationURI().getPath());
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error setting persistant property " + TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error setting persistant property " + TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, e); //$NON-NLS-1$
         }
         
     }

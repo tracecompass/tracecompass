@@ -20,7 +20,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
@@ -80,13 +80,13 @@ public class OpenAction extends Action {
                 handlerService.executeCommand(OPEN_EXPERIMENT_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {
-            TmfUiPlugin.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
         } catch (NotDefinedException e) {
-            TmfUiPlugin.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
         } catch (NotEnabledException e) {
-            TmfUiPlugin.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
         } catch (NotHandledException e) {
-            TmfUiPlugin.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$
         }
     }
 

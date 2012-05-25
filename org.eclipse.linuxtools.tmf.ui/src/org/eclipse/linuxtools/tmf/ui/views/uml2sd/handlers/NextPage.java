@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 
@@ -58,7 +58,7 @@ public class NextPage extends Action {
         setText(SDMessages._36);
         setToolTipText(SDMessages._38);
         setId(ID); 
-        setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_PAGE));
+        setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_PAGE));
     }
 
     // ------------------------------------------------------------------------

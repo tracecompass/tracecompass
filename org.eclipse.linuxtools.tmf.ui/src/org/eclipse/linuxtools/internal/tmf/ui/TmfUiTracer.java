@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.Platform;
 @SuppressWarnings("nls")
 public class TmfUiTracer {
 
-	private static String pluginID = TmfUiPlugin.PLUGIN_ID;
+	private static String pluginID = Activator.PLUGIN_ID;
 
 	static Boolean ERROR     = Boolean.FALSE;
 	static Boolean WARNING   = Boolean.FALSE;
@@ -27,7 +27,7 @@ public class TmfUiTracer {
 		try {
 			outfile = new BufferedWriter(new FileWriter(filename));
 		} catch (IOException e) {
-		    TmfUiPlugin.getDefault().logError("Error creating log file " + LOGNAME, e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error creating log file " + LOGNAME, e); //$NON-NLS-1$
 		}
 		return outfile;
 	}
@@ -87,7 +87,7 @@ public class TmfUiTracer {
 			fTraceLog.close();
 			fTraceLog = null;
 		} catch (IOException e) {
-	          TmfUiPlugin.getDefault().logError("Error closing log file " + LOGNAME, e); //$NON-NLS-1$
+	          Activator.getDefault().logError("Error closing log file " + LOGNAME, e); //$NON-NLS-1$
 		}
 	}
 
@@ -124,7 +124,7 @@ public class TmfUiTracer {
 				fTraceLog.newLine();
 				fTraceLog.flush();
 			} catch (IOException e) {
-		         TmfUiPlugin.getDefault().logError("Error writing to log file " + LOGNAME, e); //$NON-NLS-1$
+		         Activator.getDefault().logError("Error writing to log file " + LOGNAME, e); //$NON-NLS-1$
 			}
 		}
 	}

@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
@@ -184,7 +184,7 @@ public class TmfEventsCache {
 			request.waitForCompletion();
 			return ((DataRequest<ITmfEvent>) request).getFilteredIndex();
 		} catch (InterruptedException e) {
-		    TmfUiPlugin.getDefault().logError("Filter request interrupted!", e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Filter request interrupted!", e); //$NON-NLS-1$
 		}
     	return 0;
     }
@@ -275,7 +275,7 @@ public class TmfEventsCache {
                 try {
                     request.waitForCompletion();
                 } catch (InterruptedException e) {
-                    TmfUiPlugin.getDefault().logError("Wait for completion interrupted for populateCache ", e); //$NON-NLS-1$
+                    Activator.getDefault().logError("Wait for completion interrupted for populateCache ", e); //$NON-NLS-1$
                 }
 
                 fTable.cacheUpdated(true);

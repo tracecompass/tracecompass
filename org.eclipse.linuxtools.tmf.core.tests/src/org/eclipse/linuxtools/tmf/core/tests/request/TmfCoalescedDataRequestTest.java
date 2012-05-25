@@ -15,8 +15,8 @@ package org.eclipse.linuxtools.tmf.core.tests.request;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
 
@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
  * <p>
  * Test suite for the TmfCoalescedDataRequest class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfCoalescedDataRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 		super(name);
 	}
 
-	@Override
+    @Override
 	public void setUp() throws Exception {
 		super.setUp();
 		TmfDataRequest.reset();

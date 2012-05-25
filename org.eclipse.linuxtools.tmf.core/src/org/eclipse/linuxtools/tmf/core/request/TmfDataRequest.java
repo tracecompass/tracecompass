@@ -18,8 +18,6 @@ import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
- * <b><u>TmfDataRequest</u></b>
- * <p>
  * TmfDataRequests are used to obtain blocks of contiguous data from a data provider. Open ranges can be used,
  * especially for continuous streaming.
  * <p>
@@ -68,6 +66,9 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
  * it would prepare us well for the coming generation of analysis tools.
  * 
  * TODO: Implement request failures (codes, etc...)
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataRequest<T> {
 

@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputAttribute;
@@ -76,15 +76,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
     private static final String SIMPLE_DATE_FORMAT_URL = "http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
-    private static final Image elementImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/element_icon.gif"); //$NON-NLS-1$
-    private static final Image addImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
-    private static final Image addNextImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
-    private static final Image addChildImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/addchild_button.gif"); //$NON-NLS-1$
-    private static final Image addManyImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/addmany_button.gif"); //$NON-NLS-1$
-    private static final Image deleteImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
-    private static final Image moveUpImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
-    private static final Image moveDownImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
-    private static final Image helpImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
+    private static final Image elementImage = Activator.getDefault().getImageFromPath("/icons/elcl16/element_icon.gif"); //$NON-NLS-1$
+    private static final Image addImage = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
+    private static final Image addNextImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
+    private static final Image addChildImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addchild_button.gif"); //$NON-NLS-1$
+    private static final Image addManyImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addmany_button.gif"); //$NON-NLS-1$
+    private static final Image deleteImage = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
+    private static final Image moveUpImage = Activator.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
+    private static final Image moveDownImage = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
+    private static final Image helpImage = Activator.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
     private static final Color COLOR_LIGHT_RED = new Color(Display.getDefault(), 255, 192, 192);
     private static final Color COLOR_TEXT_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
     private static final Color COLOR_WIDGET_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
@@ -726,12 +726,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             doc = db.parse(new ByteArrayInputStream(string.getBytes()));
             documentElement = doc.getDocumentElement();
         } catch (ParserConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
             documentElement = null;
         } catch (SAXException e) {
             documentElement = null;
         } catch (IOException e) {
-            TmfUiPlugin.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
             documentElement = null;
         }
     }

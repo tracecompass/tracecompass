@@ -15,9 +15,10 @@ package org.eclipse.linuxtools.tmf.core.request;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
- * <b><u>ITmfDataRequest</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * The TMF data request
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public interface ITmfDataRequest<T extends ITmfEvent> {
 

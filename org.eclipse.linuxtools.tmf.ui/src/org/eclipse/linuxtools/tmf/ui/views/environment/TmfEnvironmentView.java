@@ -21,12 +21,12 @@ public class TmfEnvironmentView extends TmfView {
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.environment"; //$NON-NLS-1$
     private TmfExperiment<?> fExperiment;
     private Table fTable;
-    final private String fTitlePrefix;
+//    final private String fTitlePrefix;
     private Composite fParent;
 
     public TmfEnvironmentView() {
         super("EnvironmentVariables"); //$NON-NLS-1$
-        fTitlePrefix = getTitle();
+//        fTitlePrefix = getTitle();
     }
 
     // ------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public class TmfEnvironmentView extends TmfView {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void createPartControl(Composite parent) {
         fParent = parent;
         TableItem ti[];

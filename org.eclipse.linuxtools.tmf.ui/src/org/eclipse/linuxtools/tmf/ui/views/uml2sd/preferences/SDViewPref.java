@@ -21,7 +21,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IFont;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.impl.ColorImpl;
@@ -128,7 +128,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      * preferences setting
      */
     protected SDViewPref() {
-        fPrefStore = TmfUiPlugin.getDefault().getPreferenceStore();
+        fPrefStore = Activator.getDefault().getPreferenceStore();
 
         fPrefStore.setDefault(PREF_LINK_FONT, true);
         fPrefStore.setDefault(PREF_EXCLUDE_EXTERNAL_TIME, true);

@@ -27,7 +27,7 @@ public class CtfTmfEventTypeTest {
      */
     @Test
     public void testCtfTmfEventType_1() {
-        String contextId = ""; //$NON-NLS-1$
+//        String contextId = ""; //$NON-NLS-1$
         String eventName = ""; //$NON-NLS-1$
         ITmfEventField content = new TmfEventField("", new ITmfEventField[] {}); //$NON-NLS-1$
 

@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.request;
+package org.eclipse.linuxtools.internal.tmf.core.request;
 
 import java.util.Comparator;
 import java.util.concurrent.Executor;
@@ -19,13 +19,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.eclipse.linuxtools.internal.tmf.core.Tracer;
-import org.eclipse.linuxtools.tmf.core.component.TmfThread;
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfThread;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 
 /**
- * <b><u>TmfRequestExecutor</u></b>
- *
  * A simple, straightforward request executor.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfRequestExecutor implements Executor {
 

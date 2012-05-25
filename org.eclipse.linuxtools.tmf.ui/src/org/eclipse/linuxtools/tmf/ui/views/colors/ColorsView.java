@@ -23,7 +23,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.views.filter.FilterDialog;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
@@ -58,12 +58,12 @@ public class ColorsView extends TmfView {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.colors"; //$NON-NLS-1$
 
-    private static final Image ADD_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
-    private static final Image DELETE_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
-    private static final Image MOVE_UP_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
-    private static final Image MOVE_DOWN_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
-    private static final Image IMPORT_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/import_button.gif"); //$NON-NLS-1$
-    private static final Image EXPORT_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/export_button.gif"); //$NON-NLS-1$
+    private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
+    private static final Image DELETE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
+    private static final Image MOVE_UP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
+    private static final Image MOVE_DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
+    private static final Image IMPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/import_button.gif"); //$NON-NLS-1$
+    private static final Image EXPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/export_button.gif"); //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Main data structures

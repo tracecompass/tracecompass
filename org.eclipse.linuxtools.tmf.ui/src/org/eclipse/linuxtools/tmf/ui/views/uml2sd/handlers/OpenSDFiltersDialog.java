@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.FilterListDialog;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
@@ -60,7 +60,7 @@ public class OpenSDFiltersDialog extends Action {
      */
     public OpenSDFiltersDialog(SDView view, ISDFilterProvider provider) {
         super(SDMessages._43);
-        setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
+        setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
         setId(ID);
         setToolTipText(SDMessages._43);
         fView = view;

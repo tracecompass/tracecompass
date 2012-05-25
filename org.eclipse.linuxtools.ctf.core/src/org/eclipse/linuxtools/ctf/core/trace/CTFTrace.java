@@ -661,6 +661,8 @@ class MetadataFileFilter implements FileFilter {
 
 class MetadataComparator implements Comparator<File>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int compare(File o1, File o2) {
         return o1.getName().compareTo(o2.getName());

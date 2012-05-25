@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -88,10 +88,10 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
             }
             return context;
         } catch (final FileNotFoundException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return context;
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return context;
         }
 
@@ -115,10 +115,10 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         } catch (final FileNotFoundException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } finally {
             if (raFile != null) {
@@ -139,9 +139,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
                 return (double) ((Long) location.getLocation()) / raFile.length();
             }
         } catch (final FileNotFoundException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
         } finally {
             if (raFile != null) {
                 try {
@@ -297,7 +297,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
                     rawPos = context.raFile.getFilePointer();
                 }
             } catch (final IOException e) {
-                TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             }
         }
         for(final Entry<InputLine, Integer> entry : countMap.entrySet())

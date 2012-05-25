@@ -203,7 +203,6 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      * @return String
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFieldName(int)
      */
-    @SuppressWarnings("unused")
     @Override
     public String getFieldName(int index) {
         return null;
@@ -225,7 +224,6 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      * @return ITmfEventField
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(String)
      */
-    @SuppressWarnings("unused")
     @Override
     public ITmfEventField getField(String fieldName) {
         return null;
@@ -237,7 +235,6 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      * @return ITmfEventField
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(int)
      */
-    @SuppressWarnings("unused")
     @Override
     public ITmfEventField getField(int index) {
         return null;

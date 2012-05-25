@@ -61,16 +61,16 @@ public class VariantDefinitionTest {
 
     private static final String TAG_ID = "a"; //$NON-NLS-1$
 
-    private static final String INT_ID = "_id"; //$NON-NLS-1$
-
-    private static final String STRING_ID = "_args"; //$NON-NLS-1$
-
-    private static final String ENUM_ID = "_enumArgs"; //$NON-NLS-1$
-
-    private static final String SEQUENCE_ID = "_seq"; //$NON-NLS-1$
+//    private static final String INT_ID = "_id"; //$NON-NLS-1$
+//
+//    private static final String STRING_ID = "_args"; //$NON-NLS-1$
+//
+//    private static final String ENUM_ID = "_enumArgs"; //$NON-NLS-1$
+//
+//    private static final String SEQUENCE_ID = "_seq"; //$NON-NLS-1$
 
     private static final String LENGTH_SEQ = "_len"; //$NON-NLS-1$
-    private static final String VAR_FIELD_NAME = "var";
+    private static final String VAR_FIELD_NAME = "var"; //$NON-NLS-1$
     private static final String ENUM_8 = null;
     /**
      * Perform pre-test initialization.

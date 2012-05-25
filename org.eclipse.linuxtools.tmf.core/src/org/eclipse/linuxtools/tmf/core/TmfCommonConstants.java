@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.QualifiedName;
 /**
  *  This class provides a common container for TMF constants.
  *  
+ * @version 1.0
  *  @author Bernd Hufmann
  */
 public class TmfCommonConstants {

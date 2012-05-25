@@ -20,7 +20,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
@@ -62,7 +62,7 @@ public class ShowNodeStart extends Action {
         if (view instanceof SDView) {
             fView = (SDView)view;
         }
-        setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NODE_START));
+        setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NODE_START));
     }
 
     // ------------------------------------------------------------------------

@@ -126,7 +126,6 @@ public class FloatDefinitionTest {
     /**
      * Run the long getValue() method test.
      */
-    @SuppressWarnings("deprecation")
     @Test
     public void testGetValue() {
         singleFixture.setValue(2.0);

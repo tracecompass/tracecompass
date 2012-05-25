@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
@@ -439,7 +439,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     setProperties(folder, bundleName, traceType, iconUrl, supplFolder);
 
                 } else {
-                    TmfUiPlugin.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
+                    Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
             } else {
                 IFile file = parentFolder.getFile(resource.getName());
@@ -448,7 +448,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     file.createLink(location, IResource.REPLACE, null);
                     setProperties(file, bundleName, traceType, iconUrl, supplFolder);
                 } else {
-                    TmfUiPlugin.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
+                    Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
             }
         } catch (CoreException e) {

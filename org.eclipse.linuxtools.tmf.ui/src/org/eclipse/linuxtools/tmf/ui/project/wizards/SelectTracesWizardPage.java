@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
@@ -153,7 +153,7 @@ public class SelectTracesWizardPage extends WizardPage {
             try {
                 resource.delete(true, null);
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error selecting traces for experiment " + experiment.getName(), e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error selecting traces for experiment " + experiment.getName(), e); //$NON-NLS-1$
             }
         }
         fProject.refresh();
@@ -179,7 +179,7 @@ public class SelectTracesWizardPage extends WizardPage {
                     setProperties(folder, bundleName, traceType, iconUrl);
 
                 } else {
-                    TmfUiPlugin.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
+                    Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
                 }
             } else {
                 IFile file = experiment.getFile(trace.getName());
@@ -187,11 +187,11 @@ public class SelectTracesWizardPage extends WizardPage {
                     file.createLink(location, IResource.REPLACE, null);
                     setProperties(file, bundleName, traceType, iconUrl);
                 } else {
-                    TmfUiPlugin.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
+                    Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
                 }
             }
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error creating link to location " + location, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating link to location " + location, e); //$NON-NLS-1$
         }
     }
 

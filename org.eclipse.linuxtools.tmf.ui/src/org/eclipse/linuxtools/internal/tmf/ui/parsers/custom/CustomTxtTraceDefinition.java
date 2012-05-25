@@ -36,7 +36,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,7 +51,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME = "custom_txt_parsers.xml"; //$NON-NLS-1$
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME =
-        TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
+        Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
 
     private static final String CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomTxtTraceDefinition_definitionRootElement;
     private static final String DEFINITION_ELEMENT = Messages.CustomTxtTraceDefinition_definition;
@@ -365,17 +365,17 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             writer.write(xmlString);
             writer.close();
         } catch (ParserConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerFactoryConfigurationError e) {
-            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerException e) {
-            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (IOException e) {
-            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            TmfUiPlugin.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
     }
 
@@ -467,11 +467,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
             return defList.toArray(new CustomTxtTraceDefinition[0]);
         } catch (ParserConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            TmfUiPlugin.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (IOException e) {
-            TmfUiPlugin.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error loading all in CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
         return new CustomTxtTraceDefinition[0];
     }
@@ -521,11 +521,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 }
             }
         } catch (ParserConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            TmfUiPlugin.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (IOException e) {
-            TmfUiPlugin.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
         return null;
     }
@@ -652,17 +652,17 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             writer.write(xmlString);
             writer.close();
         } catch (ParserConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (IOException e) {
-            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (TransformerConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (TransformerFactoryConfigurationError e) {
-            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         } catch (TransformerException e) {
-            TmfUiPlugin.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         }
     }
 }

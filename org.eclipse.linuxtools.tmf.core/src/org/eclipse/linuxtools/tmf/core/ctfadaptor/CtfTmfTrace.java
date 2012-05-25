@@ -525,7 +525,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * sub-classes.
      * @throws TmfTraceException
      */
-    @SuppressWarnings({ "static-method", "unused" })
+    @SuppressWarnings("static-method")
     protected void buildStateSystem() throws TmfTraceException {
         /*
          * Nothing is done in the basic implementation, please specify

@@ -18,29 +18,32 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfThread;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedDataRequest;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
-import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 
 /**
- * <b><u>TmfProvider</u></b>
+ * An abstract base class that implements ITmfDataProvider.
  * <p>
- * The TmfProvider<T> is a provider for a data of type <T>.
+ * This abstract class implements the housekeeping methods to register/
+ * de-register the event provider and to handle generically the event requests.
  * <p>
- * This abstract class implements the housekeeking methods to register/ deregister the event provider and to handle
- * generically the event requests.
- * <p>
- * The concrete class can either re-implement processRequest() entirely or just implement the hooks (initializeContext()
- * and getNext()).
+ * The concrete class can either re-implement processRequest() entirely or just
+ * implement the hooks (initializeContext() and getNext()).
  * <p>
  * TODO: Add support for providing multiple data types.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent implements ITmfDataProvider<T> {
 

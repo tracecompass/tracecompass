@@ -18,9 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
@@ -391,7 +389,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         try {
             dbuffer = new Image(getDisplay(), getClientArea().width, getClientArea().height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().logError("Error creating image", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating image", e); //$NON-NLS-1$
         }
         gcim = new GC(dbuffer);
         for (int i = 0; i < fNodeList.size() - 1; i++) {
@@ -475,7 +473,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         try {
             gc.drawImage(dbuffer, 0, 0, getClientArea().width, getClientArea().height, 0, 0, getClientArea().width, getClientArea().height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().logError("Error drawing image", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error drawing image", e); //$NON-NLS-1$
         }
         gcim.dispose();
         if (dbuffer != null) {

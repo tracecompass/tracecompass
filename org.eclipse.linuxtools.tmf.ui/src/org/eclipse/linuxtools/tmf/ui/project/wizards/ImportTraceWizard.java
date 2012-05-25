@@ -18,7 +18,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.ide.IDE;
@@ -33,7 +33,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
     // Constants
     // ------------------------------------------------------------------------
 
-    static private final String PLUGIN_ID = TmfUiPlugin.PLUGIN_ID;
+    static private final String PLUGIN_ID = Activator.PLUGIN_ID;
     static private final String IMPORT_WIZARD = "ImportTraceWizard"; //$NON-NLS-1$
     static private final String ICON_PATH = "icons/wizban/trace_import_wiz.png"; //$NON-NLS-1$
 
@@ -50,7 +50,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
     // ------------------------------------------------------------------------
 
     public ImportTraceWizard() {
-        IDialogSettings workbenchSettings = TmfUiPlugin.getDefault().getDialogSettings();
+        IDialogSettings workbenchSettings = Activator.getDefault().getDialogSettings();
         IDialogSettings section = workbenchSettings.getSection(IMPORT_WIZARD);
         if (section == null) {
             section = workbenchSettings.addNewSection(IMPORT_WIZARD);
@@ -73,7 +73,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         }
 
         setWindowTitle(Messages.ImportTraceWizard_DialogTitle);
-        setDefaultPageImageDescriptor(TmfUiPlugin.imageDescriptorFromPlugin(PLUGIN_ID, ICON_PATH));
+        setDefaultPageImageDescriptor(Activator.imageDescriptorFromPlugin(PLUGIN_ID, ICON_PATH));
         setNeedsProgressMonitor(true);
     }
 

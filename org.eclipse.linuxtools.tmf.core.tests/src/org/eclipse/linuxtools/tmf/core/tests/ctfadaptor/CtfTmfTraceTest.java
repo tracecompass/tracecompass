@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
@@ -17,7 +18,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
@@ -33,6 +33,7 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
+@SuppressWarnings("restriction")
 public class CtfTmfTraceTest {
     private static final String PATH = TestParams.getPath();
 
@@ -72,6 +73,7 @@ public class CtfTmfTraceTest {
     public void testArmRequest_1()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
 
         ITmfContext result = fixture.armRequest(request);
@@ -105,6 +107,7 @@ public class CtfTmfTraceTest {
     public void testArmRequest_2()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
 
         ITmfContext result = fixture.armRequest(request);
@@ -127,6 +130,7 @@ public class CtfTmfTraceTest {
     public void testArmRequest_3()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
 
         ITmfContext result = fixture.armRequest(request);
@@ -149,6 +153,7 @@ public class CtfTmfTraceTest {
     public void testArmRequest_4()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         ITmfDataRequest<CtfTmfEvent> request = new TmfCoalescedEventRequest(ITmfEvent.class);
 
         ITmfContext result = fixture.armRequest(request);

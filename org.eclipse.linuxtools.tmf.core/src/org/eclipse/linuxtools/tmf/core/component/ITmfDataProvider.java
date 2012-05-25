@@ -17,20 +17,24 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 
 /**
- * <b><u>ITmfDataRequest</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * This is the interface of the data providers in TMF. Data providers have the
+ * capability of handling data requests.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
+ * 
+ * @see TmfDataProvider
+ * @see TmfEventProvider
  */
 public interface ITmfDataProvider<T extends ITmfEvent> extends ITmfComponent {
 
     /**
-     * Queues the request for processing.
-     * 
-     * If the request can't be serviced, it will fail (i.e. isFailed() will be set).
+     * Queue the request for processing.
      * 
      * @param request The request to process
      */
     public void sendRequest(ITmfDataRequest<T> request);
+
     public void fireRequest();
     public void notifyPendingRequest(boolean isIncrement);
 

@@ -126,6 +126,7 @@ public class HistoryBuilder extends TmfComponent {
      * @param signal The signal that triggered the build
      */
     @TmfSignalHandler
+    @SuppressWarnings("unchecked")
     public void startBuilding(final TmfExperimentRangeUpdatedSignal signal) {
         /* Start the construction of the history if it's not started yet */
         if (!this.isRunning) {
@@ -188,6 +189,7 @@ class StateSystemBuildRequest extends TmfEventRequest<CtfTmfEvent> {
     private final HistoryBuilder builder;
     private final IStateChangeInput sci;
 
+    @SuppressWarnings("unchecked")
     StateSystemBuildRequest(HistoryBuilder builder) {
         super((Class<CtfTmfEvent>) builder.getInputPlugin().getExpectedEventType().getClass(),
                 TmfTimeRange.ETERNITY, TmfDataRequest.ALL_DATA, chunkSize,

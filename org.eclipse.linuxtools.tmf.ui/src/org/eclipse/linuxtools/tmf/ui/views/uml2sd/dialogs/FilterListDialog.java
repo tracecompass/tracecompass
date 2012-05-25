@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogSettings;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
@@ -387,7 +387,7 @@ public class FilterListDialog extends Dialog {
      * @return the saved global filters
      */
     public static List<FilterCriteria> getGlobalFilters() {
-        DialogSettings settings = (DialogSettings) TmfUiPlugin.getDefault().getDialogSettings().getSection(FILTERS_LIST_CRITERIA);
+        DialogSettings settings = (DialogSettings) Activator.getDefault().getDialogSettings().getSection(FILTERS_LIST_CRITERIA);
         int i = 0;
         DialogSettings section = null;
         int size = 0;
@@ -420,7 +420,7 @@ public class FilterListDialog extends Dialog {
      * @param globalFilters A list of filters to save.
      */
     public static void saveFiltersCriteria(List<FilterCriteria> globalFilters) {
-        DialogSettings settings = (DialogSettings) TmfUiPlugin.getDefault().getDialogSettings();
+        DialogSettings settings = (DialogSettings) Activator.getDefault().getDialogSettings();
         DialogSettings section = (DialogSettings) settings.getSection(FILTERS_LIST_CRITERIA);
         if (section == null) {
             section = (DialogSettings) settings.addNewSection(FILTERS_LIST_CRITERIA);

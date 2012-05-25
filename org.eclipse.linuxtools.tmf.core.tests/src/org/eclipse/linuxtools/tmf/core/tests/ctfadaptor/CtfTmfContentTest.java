@@ -1,9 +1,13 @@
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfContent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * The class <code>CtfTmfContentTest</code> contains tests for the class <code>{@link CtfTmfContent}</code>.
@@ -23,15 +27,15 @@ public class CtfTmfContentTest {
     @Test
     public void testCtfTmfContent_1()
         throws Exception {
-        String name = "";
+        String name = ""; //$NON-NLS-1$
         ITmfEventField[] fields = new ITmfEventField[] {};
 
         CtfTmfContent result = new CtfTmfContent(name, fields);
 
         // add additional test code here
         assertNotNull(result);
-        assertEquals("", result.toString());
-        assertEquals("", result.getName());
+        assertEquals("", result.toString()); //$NON-NLS-1$
+        assertEquals("", result.getName()); //$NON-NLS-1$
         assertEquals(null, result.getValue());
     }
 
@@ -45,12 +49,12 @@ public class CtfTmfContentTest {
     @Test
     public void testToString_1()
         throws Exception {
-        CtfTmfContent fixture = new CtfTmfContent("", new ITmfEventField[] {});
+        CtfTmfContent fixture = new CtfTmfContent("", new ITmfEventField[] {}); //$NON-NLS-1$
 
         String result = fixture.toString();
 
         // add additional test code here
-        assertEquals("", result);
+        assertEquals("", result); //$NON-NLS-1$
     }
 
     /**
@@ -63,12 +67,12 @@ public class CtfTmfContentTest {
     @Test
     public void testToString_2()
         throws Exception {
-        CtfTmfContent fixture = new CtfTmfContent("", new ITmfEventField[] {});
+        CtfTmfContent fixture = new CtfTmfContent("", new ITmfEventField[] {}); //$NON-NLS-1$
 
         String result = fixture.toString();
 
         // add additional test code here
-        assertEquals("", result);
+        assertEquals("", result); //$NON-NLS-1$
     }
 
     /**

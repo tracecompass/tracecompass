@@ -9,7 +9,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
@@ -47,8 +46,8 @@ public class IntegerDefinitionTest {
     @Before
     public void setUp() throws CTFReaderException {
 
-        StructDefinition structDef = null;
-        boolean found = false;
+//        StructDefinition structDef = null;
+//        boolean found = false;
         IntegerDeclaration id = new IntegerDeclaration( 1, true, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
         fixture = id.createDefinition(null, name);
     }

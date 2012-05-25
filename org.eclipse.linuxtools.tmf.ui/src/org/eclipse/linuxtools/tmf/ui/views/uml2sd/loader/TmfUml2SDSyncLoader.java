@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
@@ -1278,7 +1278,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             try {
                 fSearchRequest.waitForCompletion();
             } catch (InterruptedException e) {
-                TmfUiPlugin.getDefault().logError("Search request interrupted!", e); //$NON-NLS-1$
+                Activator.getDefault().logError("Search request interrupted!", e); //$NON-NLS-1$
             }
 
             IStatus status = Status.OK_STATUS;
@@ -1304,7 +1304,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 }
                 else {
                     // String was not found
-                    status = new Status(Status.WARNING, TmfUiPlugin.PLUGIN_ID, Messages.TmfUml2SDSyncLoader_SearchNotFound);
+                    status = new Status(Status.WARNING, Activator.PLUGIN_ID, Messages.TmfUml2SDSyncLoader_SearchNotFound);
                 }
                 setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             }

@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterRootNode;
@@ -53,11 +53,11 @@ public class FilterView extends TmfView {
 
 	public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.filter"; //$NON-NLS-1$
 
-	private static final Image SAVE_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/save_button.gif"); //$NON-NLS-1$
-    private static final Image ADD_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
-    private static final Image DELETE_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
-    private static final Image IMPORT_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/import_button.gif"); //$NON-NLS-1$
-    private static final Image EXPORT_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/export_button.gif"); //$NON-NLS-1$
+	private static final Image SAVE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/save_button.gif"); //$NON-NLS-1$
+    private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
+    private static final Image DELETE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
+    private static final Image IMPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/import_button.gif"); //$NON-NLS-1$
+    private static final Image EXPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/export_button.gif"); //$NON-NLS-1$
     
     // ------------------------------------------------------------------------
     // Main data structures
@@ -98,7 +98,7 @@ public class FilterView extends TmfView {
 		try {
             fWorkspace.getRoot().refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error refreshing workspace", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error refreshing workspace", e); //$NON-NLS-1$
         }
         
         fRoot = new TmfFilterRootNode();
@@ -261,9 +261,9 @@ public class FilterView extends TmfView {
 		        }
 				
 			} catch (ParserConfigurationException e) {
-			    TmfUiPlugin.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
+			    Activator.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
 			} catch (IOException e) {
-			    TmfUiPlugin.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
+			    Activator.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
 			}
 		}
 	}
@@ -286,9 +286,9 @@ public class FilterView extends TmfView {
 			        }
 					
 				} catch (SAXException e) {
-				    TmfUiPlugin.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
+				    Activator.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
 				} catch (IOException e) {
-				    TmfUiPlugin.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
+				    Activator.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
 				}
 
 				if (root != null) {

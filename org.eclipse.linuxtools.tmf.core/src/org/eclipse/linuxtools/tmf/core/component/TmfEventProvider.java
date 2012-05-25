@@ -13,17 +13,19 @@
 package org.eclipse.linuxtools.tmf.core.component;
 
 import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 
 /**
- * <b><u>TmfEventProvider</u></b>
- * <p>
+ * An extension of TmfDataProvider timestamped events providers.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvider<T> {
 

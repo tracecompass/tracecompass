@@ -15,7 +15,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 @SuppressWarnings("nls")
 public class Tracer {
 
-    private static String pluginID = TmfCorePlugin.PLUGIN_ID;
+    private static String pluginID = Activator.PLUGIN_ID;
 
     static Boolean ERROR = Boolean.FALSE;
     static Boolean WARNING = Boolean.FALSE;
@@ -34,7 +34,7 @@ public class Tracer {
         try {
             outfile = new BufferedWriter(new FileWriter(filename));
         } catch (IOException e) {
-            TmfCorePlugin.getDefault().logError("Error opening log file " + filename, e);
+            Activator.getDefault().logError("Error opening log file " + filename, e);
         }
         return outfile;
     }
@@ -101,7 +101,7 @@ public class Tracer {
             fTraceLog.close();
             fTraceLog = null;
         } catch (IOException e) {
-            TmfCorePlugin.getDefault().logError("Error closing log file", e);
+            Activator.getDefault().logError("Error closing log file", e);
         }
     }
 
@@ -147,7 +147,7 @@ public class Tracer {
                 fTraceLog.newLine();
                 fTraceLog.flush();
             } catch (IOException e) {
-                TmfCorePlugin.getDefault().logError("Error writing to log file", e);
+                Activator.getDefault().logError("Error writing to log file", e);
             }
         }
     }

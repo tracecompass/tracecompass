@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
@@ -91,16 +88,16 @@ public class Benchmark {
 
     }
 
-    /**
-     * @param timestamp
-     *            the timestamp in UTC to convert to nanoseconds.
-     * @return formatted string.
-     */
-    private static String formatDate(final long timestamp) {
-        final Date d = new Date(timestamp / 1000000);
-        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss."); //$NON-NLS-1$
-        final String output = df.format(d) + (timestamp % 1000000000);
-        return output;
-    }
+//    /**
+//     * @param timestamp
+//     *            the timestamp in UTC to convert to nanoseconds.
+//     * @return formatted string.
+//     */
+//    private static String formatDate(final long timestamp) {
+//        final Date d = new Date(timestamp / 1000000);
+//        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss."); //$NON-NLS-1$
+//        final String output = df.format(d) + (timestamp % 1000000000);
+//        return output;
+//    }
 
 }

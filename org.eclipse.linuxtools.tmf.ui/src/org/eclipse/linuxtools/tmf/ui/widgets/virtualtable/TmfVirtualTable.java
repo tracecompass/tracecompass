@@ -15,7 +15,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.widgets.virtualtable;
 
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.ControlAdapter;
@@ -778,7 +778,7 @@ public class TmfVirtualTable extends Composite {
 		try {
 			return (Control) control.getConstructor(Composite.class, int.class).newInstance(new Object[] {fTable, SWT.NONE});
 		} catch (Exception e) {
-		    TmfUiPlugin.getDefault().logError("Error creating table editor control", e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error creating table editor control", e); //$NON-NLS-1$
 		}
 		return null;
 	}

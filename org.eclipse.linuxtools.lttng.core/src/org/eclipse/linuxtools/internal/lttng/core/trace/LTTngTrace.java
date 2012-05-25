@@ -197,7 +197,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
             LttngTimestamp safeTimestamp = null;
             TmfTimeRange timeRange = null;
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "unchecked", "restriction" })
             @Override
             public void run() {
                 while (!fExecutor.isShutdown()) {

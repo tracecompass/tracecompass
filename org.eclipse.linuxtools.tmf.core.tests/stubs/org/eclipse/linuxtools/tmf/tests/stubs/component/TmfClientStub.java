@@ -12,9 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.component;
 
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
-import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
 
 /**
@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
  * <p>
  * TODO: Implement me. Please.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfClientStub extends TmfComponent {
 
     private TmfDataProvider<TmfSyntheticEventStub>[] fProviders;

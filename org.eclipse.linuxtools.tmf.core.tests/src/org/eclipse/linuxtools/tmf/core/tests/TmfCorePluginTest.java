@@ -12,16 +12,16 @@
 
 package org.eclipse.linuxtools.tmf.core.tests;
 
-import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
-
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 
 /**
  * <b><u>TmfCorePluginTest</u></b>
  * <p>
  * Test the TMF core plug-in activator
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfCorePluginTest extends TestCase {
 
 	// ------------------------------------------------------------------------
@@ -29,7 +29,7 @@ public class TmfCorePluginTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	// Plug-in instantiation
-	static final TmfCorePlugin fPlugin = new TmfCorePlugin();
+	static final Activator fPlugin = new Activator();
 	
 	// ------------------------------------------------------------------------
     // Housekeping
@@ -57,11 +57,11 @@ public class TmfCorePluginTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testTmfCorePluginId() throws Exception {
-		assertEquals("Plugin ID", "org.eclipse.linuxtools.tmf.core", TmfCorePlugin.PLUGIN_ID);
+		assertEquals("Plugin ID", "org.eclipse.linuxtools.tmf.core", Activator.PLUGIN_ID);
 	}
 
 	public void testGetDefault() throws Exception {
-		TmfCorePlugin plugin = TmfCorePlugin.getDefault();
+		Activator plugin = Activator.getDefault();
 		assertEquals("getDefault()", plugin, fPlugin);
 	}
 

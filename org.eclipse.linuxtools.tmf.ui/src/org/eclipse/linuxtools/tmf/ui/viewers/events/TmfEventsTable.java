@@ -45,7 +45,7 @@ import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -117,16 +117,16 @@ import org.eclipse.ui.themes.ColorUtil;
 public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorSettingsListener,
 ITmfEventsFilterProvider {
 
-    private static final Image BOOKMARK_IMAGE = TmfUiPlugin.getDefault().getImageFromPath(
+    private static final Image BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/bookmark_obj.gif"); //$NON-NLS-1$
-    private static final Image SEARCH_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("icons/elcl16/search.gif"); //$NON-NLS-1$
-    private static final Image SEARCH_MATCH_IMAGE = TmfUiPlugin.getDefault().getImageFromPath(
+    private static final Image SEARCH_IMAGE = Activator.getDefault().getImageFromPath("icons/elcl16/search.gif"); //$NON-NLS-1$
+    private static final Image SEARCH_MATCH_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/search_match.gif"); //$NON-NLS-1$
-    private static final Image SEARCH_MATCH_BOOKMARK_IMAGE = TmfUiPlugin.getDefault().getImageFromPath(
+    private static final Image SEARCH_MATCH_BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/search_match_bookmark.gif"); //$NON-NLS-1$
-    private static final Image FILTER_IMAGE = TmfUiPlugin.getDefault()
+    private static final Image FILTER_IMAGE = Activator.getDefault()
             .getImageFromPath("icons/elcl16/filter_items.gif"); //$NON-NLS-1$
-    private static final Image STOP_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("icons/elcl16/stop.gif"); //$NON-NLS-1$
+    private static final Image STOP_IMAGE = Activator.getDefault().getImageFromPath("icons/elcl16/stop.gif"); //$NON-NLS-1$
     private static final String SEARCH_HINT = Messages.TmfEventsTable_SearchHint;
     private static final String FILTER_HINT = Messages.TmfEventsTable_FilterHint;
     private static final int MAX_CACHE_SIZE = 1000;

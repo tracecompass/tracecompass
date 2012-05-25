@@ -17,9 +17,10 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
- * <b><u>TmfEventRequest</u></b>
- * <p>
- * Implement me. Please.
+ * An extension of TmfDataRequest for timestamped events.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataRequest<T> implements ITmfEventRequest<T> {
 

@@ -28,7 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.xml.TmfFilterContentHandler;
 import org.eclipse.linuxtools.tmf.core.filter.xml.TmfFilterXMLWriter;
@@ -99,11 +99,11 @@ public class ColorSettingsXML {
 	        StreamResult result =  new StreamResult(new File(pathName));
 			transformer.transform(source, result);
 		} catch (ParserConfigurationException e) {
-		    TmfUiPlugin.getDefault().logError("Error saving color xml file: " + pathName, e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error saving color xml file: " + pathName, e); //$NON-NLS-1$
 		} catch (TransformerConfigurationException e) {
-		    TmfUiPlugin.getDefault().logError("Error saving color xml file: " + pathName, e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error saving color xml file: " + pathName, e); //$NON-NLS-1$
 		} catch (TransformerException e) {
-		    TmfUiPlugin.getDefault().logError("Error saving color xml file: " + pathName, e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error saving color xml file: " + pathName, e); //$NON-NLS-1$
 		}
 	}
 	
@@ -121,11 +121,11 @@ public class ColorSettingsXML {
 	        saxReader.parse(pathName);
 	        return handler.colorSettings.toArray(new ColorSetting[0]);
 		} catch (ParserConfigurationException e) {
-		    TmfUiPlugin.getDefault().logError("Error loading color xml file: " + pathName, e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error loading color xml file: " + pathName, e); //$NON-NLS-1$
 		} catch (SAXException e) {
-		    TmfUiPlugin.getDefault().logError("Error loading color xml file: " + pathName, e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error loading color xml file: " + pathName, e); //$NON-NLS-1$
 		} catch (IOException e) {
-		    TmfUiPlugin.getDefault().logError("Error loading color xml file: " + pathName, e); //$NON-NLS-1$
+		    Activator.getDefault().logError("Error loading color xml file: " + pathName, e); //$NON-NLS-1$
 		}
 		// In case of error, dispose the partial list of color settings
 		for (ColorSetting colorSetting : handler.colorSettings) {

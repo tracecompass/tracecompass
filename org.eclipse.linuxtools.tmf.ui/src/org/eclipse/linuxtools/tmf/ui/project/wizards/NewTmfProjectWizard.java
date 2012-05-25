@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
@@ -65,7 +65,7 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
      */
     public NewTmfProjectWizard(String title, String desc) {
         super();
-        setDialogSettings(TmfUiPlugin.getDefault().getDialogSettings());
+        setDialogSettings(Activator.getDefault().getDialogSettings());
         setNeedsProgressMonitor(true);
         setForcePreviousAndNextButtons(true);
         setWindowTitle(title);
@@ -153,7 +153,7 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
 
             return project;
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error creating TMF project " + project.getName(), e); //$NON-NLS-1$            
+            Activator.getDefault().logError("Error creating TMF project " + project.getName(), e); //$NON-NLS-1$            
         }
         return null;
     }

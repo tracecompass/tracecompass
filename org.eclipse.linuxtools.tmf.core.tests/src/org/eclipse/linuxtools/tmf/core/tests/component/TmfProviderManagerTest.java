@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.tmf.core.tests.component;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
-import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * <p>
  * Test suite for the TmfProviderManager class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfProviderManagerTest extends TestCase {
 
 	public TmfProviderManagerTest(String name) {

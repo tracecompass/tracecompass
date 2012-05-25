@@ -23,7 +23,7 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle. No more than one such
  * plug-in can exist at any time.
  */
-public class TmfCorePlugin extends Plugin {
+public class Activator extends Plugin {
 
 	// ------------------------------------------------------------------------
     // Attributes
@@ -37,7 +37,7 @@ public class TmfCorePlugin extends Plugin {
 	/**
      * The shared instance
      */
-	private static TmfCorePlugin fPlugin;
+	private static Activator fPlugin;
 	
 	// ------------------------------------------------------------------------
     // Constructors
@@ -46,7 +46,7 @@ public class TmfCorePlugin extends Plugin {
 	/**
      * Constructor
      */
-	public TmfCorePlugin() {
+	public Activator() {
 		setDefault(this);
 	}
 
@@ -59,12 +59,12 @@ public class TmfCorePlugin extends Plugin {
      *
      * @return the TMF UI plug-in instance.
      */
-    public static TmfCorePlugin getDefault() {
+    public static Activator getDefault() {
         return fPlugin;
     }
 
     // Sets plug-in instance
-	private static void setDefault(TmfCorePlugin plugin) {
+	private static void setDefault(Activator plugin) {
 		fPlugin = plugin;
 	}
 

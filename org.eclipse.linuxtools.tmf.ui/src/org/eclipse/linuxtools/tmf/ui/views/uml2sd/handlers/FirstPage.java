@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 
@@ -55,7 +55,7 @@ public class FirstPage extends Action {
         setText(SDMessages._139);
         setToolTipText(SDMessages._140);
         setId(ID);
-        setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FIRST_PAGE));
+        setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FIRST_PAGE));
     }
 
     // ------------------------------------------------------------------------

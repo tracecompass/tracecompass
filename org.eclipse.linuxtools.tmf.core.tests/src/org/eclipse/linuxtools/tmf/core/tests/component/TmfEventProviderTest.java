@@ -17,8 +17,8 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
-import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
  * <p>
  * Test suite for the TmfEventProvider class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfEventProviderTest extends TestCase {
 
     TmfEventProviderStub fEventProvider;

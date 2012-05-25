@@ -16,14 +16,14 @@ import java.util.concurrent.Executors;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor;
 
 /**
  * <b><u>TmfRequestExecutorTest</u></b>
  *
  * Test suite for the TmfRequestExecutor class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfRequestExecutorTest extends TestCase {
 
 	// ------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public class TmfRequestExecutorTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor#TmfRequestExecutor()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor#TmfRequestExecutor()}.
 	 */
 	public void testTmfRequestExecutor() {
 		TmfRequestExecutor executor = new TmfRequestExecutor();
@@ -66,7 +66,7 @@ public class TmfRequestExecutorTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor#TmfRequestExecutor(java.util.concurrent.ExecutorService)}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor#TmfRequestExecutor(java.util.concurrent.ExecutorService)}.
 	 */
 	public void testTmfRequestExecutorExecutorService() {
 		TmfRequestExecutor executor = new TmfRequestExecutor(Executors.newCachedThreadPool());
@@ -76,7 +76,7 @@ public class TmfRequestExecutorTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor#stop()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor#stop()}.
 	 */
 	public void testStop() {
 		TmfRequestExecutor executor = new TmfRequestExecutor();
@@ -91,7 +91,7 @@ public class TmfRequestExecutorTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor#execute(java.lang.Runnable)}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor#execute(java.lang.Runnable)}.
 	 */
 	public void testExecute() {
 //		fail("Not yet implemented");
@@ -102,7 +102,7 @@ public class TmfRequestExecutorTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor#toString()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor#toString()}.
 	 */
 	public void testToString() {
 //		TmfRequestExecutor executor1 = new TmfRequestExecutor();

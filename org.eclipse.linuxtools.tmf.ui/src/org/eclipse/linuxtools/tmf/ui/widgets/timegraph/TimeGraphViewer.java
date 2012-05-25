@@ -22,7 +22,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -864,7 +864,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             };
             resetScale.setText(Messages.TmfTimeGraphViewer_ResetScaleActionNameText);
             resetScale.setToolTipText(Messages.TmfTimeGraphViewer_ResetScaleActionToolTipText);
-            resetScale.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_HOME_MENU));
+            resetScale.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_HOME_MENU));
         } 
         return resetScale;
     }
@@ -880,7 +880,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             };
             showLegendAction.setText(Messages.TmfTimeGraphViewer_LegendActionNameText);
             showLegendAction.setToolTipText(Messages.TmfTimeGraphViewer_LegendActionToolTipText);
-            showLegendAction.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SHOW_LEGEND));
+            showLegendAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SHOW_LEGEND));
         }
 
         return showLegendAction;
@@ -897,7 +897,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
             nextEventAction.setText(Messages.TmfTimeGraphViewer_NextEventActionNameText);
             nextEventAction.setToolTipText(Messages.TmfTimeGraphViewer_NextEventActionToolTipText);
-            nextEventAction.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_EVENT));
+            nextEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_EVENT));
         } 
 
         return nextEventAction;
@@ -914,7 +914,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
             prevEventAction.setText(Messages.TmfTimeGraphViewer_PreviousEventActionNameText);
             prevEventAction.setToolTipText(Messages.TmfTimeGraphViewer_PreviousEventActionToolTipText);
-            prevEventAction.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREV_EVENT));
+            prevEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREV_EVENT));
         } 
 
         return prevEventAction;
@@ -931,7 +931,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             };
             nextItemAction.setText(Messages.TmfTimeGraphViewer_NextItemActionNameText);
             nextItemAction.setToolTipText(Messages.TmfTimeGraphViewer_NextItemActionToolTipText);
-            nextItemAction.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_ITEM));
+            nextItemAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_ITEM));
         }
         return nextItemAction;
     }
@@ -947,7 +947,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             };
             previousItemAction.setText(Messages.TmfTimeGraphViewer_PreviousItemActionNameText);
             previousItemAction.setToolTipText(Messages.TmfTimeGraphViewer_PreviousItemActionToolTipText);
-            previousItemAction.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREV_ITEM));
+            previousItemAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREV_ITEM));
         }
         return previousItemAction;
     }
@@ -962,7 +962,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             };
             zoomInAction.setText(Messages.TmfTimeGraphViewer_ZoomInActionNameText);
             zoomInAction.setToolTipText(Messages.TmfTimeGraphViewer_ZoomInActionToolTipText);
-            zoomInAction.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_IN_MENU));
+            zoomInAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_IN_MENU));
         }
         return zoomInAction;
     }
@@ -977,7 +977,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             };
             zoomOutAction.setText(Messages.TmfTimeGraphViewer_ZoomOutActionNameText);
             zoomOutAction.setToolTipText(Messages.TmfTimeGraphViewer_ZoomOutActionToolTipText);
-            zoomOutAction.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_OUT_MENU));
+            zoomOutAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_OUT_MENU));
         }
         return zoomOutAction;
     }

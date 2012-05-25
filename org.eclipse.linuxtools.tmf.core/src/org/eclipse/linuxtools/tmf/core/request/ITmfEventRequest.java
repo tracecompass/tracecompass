@@ -16,9 +16,10 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
- * <b><u>ITmfEventRequest</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * The TMF event request
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public interface ITmfEventRequest<T extends ITmfEvent> extends ITmfDataRequest<T> {
 

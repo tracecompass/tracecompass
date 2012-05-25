@@ -19,15 +19,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.contexts.IContextIds;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage;
@@ -379,8 +377,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         fInsertionCartet = new Caret((Canvas) getViewControl(), SWT.NONE);
         fInsertionCartet.setVisible(false);
 
-        fCollapaseCaretImg = TmfUiPlugin.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_COLLAPSE_OBJ);
-        fArrowUpCaretImg = TmfUiPlugin.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_UP_OBJ);
+        fCollapaseCaretImg = Activator.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_COLLAPSE_OBJ);
+        fArrowUpCaretImg = Activator.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_UP_OBJ);
 
         fReorderList = new ArrayList<Lifeline[]>();
         getViewControl().addTraverseListener(new LocalTraverseListener());
@@ -1081,7 +1079,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                 return;
             }
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().logError("Error creating image", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating image", e); //$NON-NLS-1$
             return;
         }
         printUI(sdPrinter.getDialogUI());
@@ -1296,7 +1294,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         try {
             dbuffer = new Image(getDisplay(), area.width, area.height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().logError("Error creating image", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating image", e); //$NON-NLS-1$
         }
 
         gcim = new GC(dbuffer);
@@ -1884,7 +1882,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         try {
             gc.drawImage(dbuffer, 0, 0, area.width, area.height, 0, 0, area.width, area.height);
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().logError("Error drawin content", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error drawin content", e); //$NON-NLS-1$
         }
         dbuffer.dispose();
         setHScrollBarIncrement(Math.round(SDViewPref.getInstance().getLifelineWidth() / (float) 2 * fZoomValue));

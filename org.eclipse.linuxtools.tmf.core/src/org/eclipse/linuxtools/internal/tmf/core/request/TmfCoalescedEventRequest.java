@@ -10,16 +10,22 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.request;
+package org.eclipse.linuxtools.internal.tmf.core.request;
 
 import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 
 /**
- * <b><u>TmfCoalescedEventRequest</u></b>
- * <p>
+ * The TMF coalesced event request
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedDataRequest<T> implements ITmfEventRequest<T> {
 

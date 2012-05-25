@@ -22,15 +22,15 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedDataRequest;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
-import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
-import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -44,7 +44,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
  * <p>
  * Test suite for the TmfCoalescedEventRequest class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfCoalescedEventRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------

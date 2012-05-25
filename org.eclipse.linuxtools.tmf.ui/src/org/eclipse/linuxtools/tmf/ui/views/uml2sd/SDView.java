@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
@@ -606,7 +606,7 @@ public class SDView extends ViewPart {
                 if (action.getId() == null)
                     action.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.extendedFilter"); //$NON-NLS-1$
                 if (action.getImageDescriptor() == null)
-                    action.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
+                    action.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
                 if (action.getText() == null || action.getText().length() == 0)
                     action.setText(SDMessages._42);
                 bar.getMenuManager().prependToGroup("UML2SD_FILTERING", action); //$NON-NLS-1$
@@ -636,7 +636,7 @@ public class SDView extends ViewPart {
                     action.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.extendedFind"); //$NON-NLS-1$
                 }
                 if (action.getImageDescriptor() == null) {
-                    action.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
+                    action.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
                 }
                 if (action.getText() == null) {
                     action.setText(SDMessages._41);

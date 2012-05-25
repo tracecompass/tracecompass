@@ -14,6 +14,9 @@ package org.eclipse.linuxtools.tmf.core.exceptions;
 
 /**
  * TMF trace related exception
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfTraceException extends Exception {
 

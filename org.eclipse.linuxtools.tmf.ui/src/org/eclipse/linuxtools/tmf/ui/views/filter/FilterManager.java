@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.linuxtools.tmf.core.filter.xml.TmfFilterXMLParser;
@@ -28,7 +28,7 @@ public class FilterManager {
 
 	private static final String SAVED_FILTERS_FILE_NAME = "saved_filters.xml"; //$NON-NLS-1$
 	private static final String SAVED_FILTERS_PATH_NAME =
-        TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append(SAVED_FILTERS_FILE_NAME).toString();
+        Activator.getDefault().getStateLocation().addTrailingSeparator().append(SAVED_FILTERS_FILE_NAME).toString();
 	
     private static ITmfFilterTreeNode fRoot = new TmfFilterRootNode();
     static {
@@ -36,9 +36,9 @@ public class FilterManager {
 	        fRoot = new TmfFilterXMLParser(SAVED_FILTERS_PATH_NAME).getTree();
         } catch (FileNotFoundException e) {
         } catch (SAXException e) {
-            TmfUiPlugin.getDefault().logError("Error parsing saved filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error parsing saved filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         } catch (IOException e) {
-            TmfUiPlugin.getDefault().logError("Error parsing saved filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error parsing saved filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         }
     }
     
@@ -55,9 +55,9 @@ public class FilterManager {
 	        TmfFilterXMLWriter writerXML = new TmfFilterXMLWriter(fRoot);
 	        writerXML.saveTree(SAVED_FILTERS_PATH_NAME);
         } catch (IOException e) {
-            TmfUiPlugin.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         } catch (ParserConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         }
     }
 }

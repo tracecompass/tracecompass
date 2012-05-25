@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
@@ -30,8 +30,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class CustomTxtParserOutputWizardPage extends WizardPage {
 
-    private static final Image upImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/up_button.gif"); //$NON-NLS-1$
-    private static final Image downImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
+    private static final Image upImage = Activator.getDefault().getImageFromPath("/icons/elcl16/up_button.gif"); //$NON-NLS-1$
+    private static final Image downImage = Activator.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
     private final CustomTxtParserWizard wizard;
     private CustomTxtTraceDefinition definition;
     List<Output> outputs = new ArrayList<Output>();
@@ -193,7 +193,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         definition.outputs = extractOutputs();
 
         try {
-            tmpFile = TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append("customwizard.tmp").toFile(); //$NON-NLS-1$
+            tmpFile = Activator.getDefault().getStateLocation().addTrailingSeparator().append("customwizard.tmp").toFile(); //$NON-NLS-1$
             final FileWriter writer = new FileWriter(tmpFile);
             writer.write(wizard.inputPage.getInputText());
             writer.close();
@@ -204,9 +204,9 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
         } catch (final TmfTraceException e) {
-            TmfUiPlugin.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
         }
 
         tableContainer.layout();

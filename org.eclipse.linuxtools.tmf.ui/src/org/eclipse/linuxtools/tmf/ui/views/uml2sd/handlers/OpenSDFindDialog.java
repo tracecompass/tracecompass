@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.SearchFilterDialog;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
@@ -67,7 +67,7 @@ public class OpenSDFindDialog extends Action {
      */
     public OpenSDFindDialog(SDView view) {
         super(SDMessages._41);
-        setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
+        setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
         setId(ID);
         setActionDefinitionId(ACTION_DEFINITION_ID);
         setToolTipText(SDMessages._41);

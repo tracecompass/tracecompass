@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 
@@ -54,7 +54,7 @@ public class TimeChartDecorationProvider {
 	        	}
 	        }
         } catch (CoreException e) {
-            TmfUiPlugin.getDefault().logError("Error refreshing bookmarks", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error refreshing bookmarks", e); //$NON-NLS-1$
         }
     }
 

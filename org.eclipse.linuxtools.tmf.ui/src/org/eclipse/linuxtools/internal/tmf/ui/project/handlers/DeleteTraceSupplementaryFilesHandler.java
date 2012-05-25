@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.dialogs.SelectSupplementaryResourcesDialog;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
@@ -87,7 +87,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
                             resource.refreshLocal(IResource.DEPTH_INFINITE, null);
                         }
                     } catch (CoreException e) {
-                        TmfUiPlugin.getDefault().logError("Error refreshing resource " + resource, e); //$NON-NLS-1$
+                        Activator.getDefault().logError("Error refreshing resource " + resource, e); //$NON-NLS-1$
                     }
                 }
             }

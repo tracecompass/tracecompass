@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -72,7 +72,7 @@ public class RefreshHandler extends AbstractHandler {
                     resource.refreshLocal(IResource.DEPTH_INFINITE, null);
                 }
             } catch (CoreException e) {
-                TmfUiPlugin.getDefault().logError("Error refreshing projects", e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error refreshing projects", e); //$NON-NLS-1$
             }
         }
 

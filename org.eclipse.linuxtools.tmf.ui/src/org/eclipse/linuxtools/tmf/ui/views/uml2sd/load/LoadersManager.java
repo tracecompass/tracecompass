@@ -23,11 +23,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -163,7 +161,7 @@ public class LoadersManager {
             return null;
         }
 
-        IWorkbenchPage persp = TmfUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IWorkbenchPage persp = Activator.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
         SDView sdView = view;
 
@@ -190,7 +188,7 @@ public class LoadersManager {
 
             return loader;
         } catch (Exception e) {
-            TmfUiPlugin.getDefault().logError("Error getting loader class", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error getting loader class", e); //$NON-NLS-1$
         }
         return null;
     }
@@ -202,7 +200,7 @@ public class LoadersManager {
      * @return the class name of the saved loader
      */
     public String getSavedLoader(String viewId) {
-        IPreferenceStore p = TmfUiPlugin.getDefault().getPreferenceStore();
+        IPreferenceStore p = Activator.getDefault().getPreferenceStore();
         return p.getString(LOADER_PREFIX + viewId);
     }
 
@@ -210,7 +208,7 @@ public class LoadersManager {
      * Saves the last loader in order to reload it on next session.
      */
     public void saveLastLoader(String id, String id2) {
-        IPreferenceStore p = TmfUiPlugin.getDefault().getPreferenceStore();
+        IPreferenceStore p = Activator.getDefault().getPreferenceStore();
         p.setValue(LOADER_PREFIX + id2, id);
     }
 
@@ -230,7 +228,7 @@ public class LoadersManager {
 
         if ((currentLoader != null) && (currentLoader != loader)) {
             if (loader != null) {
-                IWorkbenchPage persp = TmfUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                IWorkbenchPage persp = Activator.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
                 try {
                     // Search view corresponding to the viewId
                     SDView sdview = null;
@@ -245,7 +243,7 @@ public class LoadersManager {
                     }
 
                 } catch (Exception e) {
-                    TmfUiPlugin.getDefault().logError("Error setting current loader class", e); //$NON-NLS-1$
+                    Activator.getDefault().logError("Error setting current loader class", e); //$NON-NLS-1$
                 }
             }
             // The old loader is going to be kicked
@@ -296,7 +294,7 @@ public class LoadersManager {
         }
 
         ArrayList<IConfigurationElement> ret = new ArrayList<IConfigurationElement>();
-        IExtensionPoint iep = Platform.getExtensionRegistry().getExtensionPoint(TmfUiPlugin.PLUGIN_ID, LOADER_TAG);
+        IExtensionPoint iep = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, LOADER_TAG);
         if (iep == null) {
             return ret;
         }
@@ -372,9 +370,9 @@ public class LoadersManager {
                 setCurrentLoader(l, viewId);
             }
         } catch (CoreException e4) {
-            TmfUiPlugin.getDefault().logError("Error 'uml2SDLoader' Extension point", e4); //$NON-NLS-1$
+            Activator.getDefault().logError("Error 'uml2SDLoader' Extension point", e4); //$NON-NLS-1$
         } catch (Exception e5) {
-            TmfUiPlugin.getDefault().logError("Error 'uml2SDLoader' Extension point", e5); //$NON-NLS-1$
+            Activator.getDefault().logError("Error 'uml2SDLoader' Extension point", e5); //$NON-NLS-1$
         }
     }
 }

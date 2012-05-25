@@ -24,7 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputAttribute;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputElement;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -98,10 +98,10 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             }
             return context;
         } catch (final FileNotFoundException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return context;
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return context;
         }
 
@@ -125,10 +125,10 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         } catch (final FileNotFoundException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } finally {
             if (raFile != null) {
@@ -149,9 +149,9 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                 return (double) ((Long) location.getLocation()) / raFile.length();
             }
         } catch (final FileNotFoundException e) {
-            TmfUiPlugin.getDefault().logError("Error getting location ration. File not found: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error getting location ration. File not found: " + getPath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error getting location ration. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error getting location ration. File: " + getPath(), e); //$NON-NLS-1$
         } finally {
             if (raFile != null) {
                 try {
@@ -216,7 +216,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                     rawPos = context.raFile.getFilePointer();
                 }
             } catch (final IOException e) {
-                TmfUiPlugin.getDefault().logError("Error pasing event. File: " + getPath(), e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error pasing event. File: " + getPath(), e); //$NON-NLS-1$
                 
             }
             context.setLocation(NULL_LOCATION);
@@ -254,11 +254,11 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             final Document doc = db.parse(new ByteArrayInputStream(elementBuffer.toString().getBytes()));
             return doc.getDocumentElement();
         } catch (final ParserConfigurationException e) {
-            TmfUiPlugin.getDefault().logError("Error parsing element buffer. File:" + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error parsing element buffer. File:" + getPath(), e); //$NON-NLS-1$
         } catch (final SAXException e) {
-            TmfUiPlugin.getDefault().logError("Error parsing element buffer. File:" + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error parsing element buffer. File:" + getPath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
-            TmfUiPlugin.getDefault().logError("Error parsing element buffer. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error parsing element buffer. File: " + getPath(), e); //$NON-NLS-1$
         }
         return null;
     }

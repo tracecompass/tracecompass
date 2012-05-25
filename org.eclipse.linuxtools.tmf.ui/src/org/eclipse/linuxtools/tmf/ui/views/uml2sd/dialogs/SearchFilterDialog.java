@@ -19,7 +19,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessageReturn;
@@ -144,9 +144,9 @@ public class SearchFilterDialog extends Dialog {
     @Override
     public Control createDialogArea(Composite arg0) {
         if (fIsFind) {
-            fExpressionList = TmfUiPlugin.getDefault().getDialogSettings().getArray(FIND_EXPRESSION_LIST);
+            fExpressionList = Activator.getDefault().getDialogSettings().getArray(FIND_EXPRESSION_LIST);
         } else {
-            fExpressionList = TmfUiPlugin.getDefault().getDialogSettings().getArray(FILTER_EXPRESSION_LIST);
+            fExpressionList = Activator.getDefault().getDialogSettings().getArray(FILTER_EXPRESSION_LIST);
         }
         if (fExpressionList == null) {
             fExpressionList = new String[0];
@@ -217,7 +217,7 @@ public class SearchFilterDialog extends Dialog {
             CRITERIA = FILTER_CRITERIA;
         }
 
-        DialogSettings section = (DialogSettings) TmfUiPlugin.getDefault().getDialogSettings().getSection(CRITERIA);
+        DialogSettings section = (DialogSettings) Activator.getDefault().getDialogSettings().getSection(CRITERIA);
         List selection = fSdView.getSDWidget().getSelection();
         if ((selection == null || selection.size() != 1) || (!fIsFind)) {
             if (section != null) {
@@ -291,7 +291,7 @@ public class SearchFilterDialog extends Dialog {
             CRITERIA = FILTER_CRITERIA;
             EXPRESSION_LIST = FILTER_EXPRESSION_LIST;
         }
-        DialogSettings settings = (DialogSettings) TmfUiPlugin.getDefault().getDialogSettings();
+        DialogSettings settings = (DialogSettings) Activator.getDefault().getDialogSettings();
         DialogSettings section = (DialogSettings) settings.getSection(CRITERIA);
         if (section == null) {
             section = (DialogSettings) settings.addNewSection(CRITERIA);

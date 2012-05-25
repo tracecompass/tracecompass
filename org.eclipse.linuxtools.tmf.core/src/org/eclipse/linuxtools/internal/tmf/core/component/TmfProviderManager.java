@@ -10,19 +10,21 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.component;
+package org.eclipse.linuxtools.internal.tmf.core.component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
- * <b><u>TmfProviderManager.java</u></b>
- * <p>
  * Singleton that keeps track of the event providers.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfProviderManager {
 
