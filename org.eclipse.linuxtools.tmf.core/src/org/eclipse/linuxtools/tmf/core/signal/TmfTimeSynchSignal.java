@@ -15,10 +15,11 @@ package org.eclipse.linuxtools.tmf.core.signal;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * <b><u>TmfTimeSynchSignal</u></b>
- * <p>
- * TODO: Implement me. Please.
- */
+ * A new current time is selected (for component synchronization)
+  * 
+ * @version 1.0
+ * @author Francois Chouinard
+*/
 public class TmfTimeSynchSignal extends TmfSignal {
 
 	private final ITmfTimestamp fCurrentTime;

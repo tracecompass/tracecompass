@@ -13,9 +13,10 @@
 package org.eclipse.linuxtools.tmf.core.signal;
 
 /**
- * <b><u>TmfSignalTracer</u></b>
- * <p>
  * This object (singleton) traces all TmfSignals in the application.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfSignalTracer {
 

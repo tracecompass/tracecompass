@@ -16,9 +16,10 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * <b><u>TmfTraceUpdatedSignal</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * A trace was updated (typically its time range)
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfTraceUpdatedSignal extends TmfSignal {
 

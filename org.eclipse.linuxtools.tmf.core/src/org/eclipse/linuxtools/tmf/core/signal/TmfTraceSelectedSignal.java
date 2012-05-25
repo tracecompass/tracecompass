@@ -15,7 +15,10 @@ package org.eclipse.linuxtools.tmf.core.signal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * <b><u>TmfTraceSelectedSignal</u></b>
+ * A trace was selected
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
  */
 public class TmfTraceSelectedSignal extends TmfSignal {
 

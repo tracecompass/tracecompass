@@ -37,6 +37,9 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 /**
  * TmfExperiment presents a time-ordered, unified view of a set of ITmfTrace:s
  * that are part of a tracing experiment.
+ *
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements ITmfEventParser<T> {
 

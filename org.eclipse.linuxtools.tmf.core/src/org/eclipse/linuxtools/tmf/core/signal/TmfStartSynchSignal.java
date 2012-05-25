@@ -13,9 +13,10 @@
 package org.eclipse.linuxtools.tmf.core.signal;
 
 /**
- * <b><u>TmfStartSynchSignal</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * Start of signal synchronization
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfStartSynchSignal extends TmfSignal {
 

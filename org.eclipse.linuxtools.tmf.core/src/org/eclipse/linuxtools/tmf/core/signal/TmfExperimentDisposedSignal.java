@@ -16,9 +16,10 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
- * <b><u>TmfExperimentDisposedSignal</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * Experiemnt has been disposed
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfExperimentDisposedSignal<T extends ITmfEvent> extends TmfSignal {
 

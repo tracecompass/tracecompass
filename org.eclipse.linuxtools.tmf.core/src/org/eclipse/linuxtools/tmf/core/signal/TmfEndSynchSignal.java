@@ -13,9 +13,10 @@
 package org.eclipse.linuxtools.tmf.core.signal;
 
 /**
- * <b><u>TmfEndSynchSignal</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * End of signal synchronization
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfEndSynchSignal extends TmfSignal {
 

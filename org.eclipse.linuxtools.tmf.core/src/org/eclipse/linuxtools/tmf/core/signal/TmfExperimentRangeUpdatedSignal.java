@@ -17,8 +17,10 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
- * <b><u>TmfExperimentRangeUpdatedSignal</u></b>
- * <p>
+ * Experiment time range update
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfExperimentRangeUpdatedSignal extends TmfSignal {
 

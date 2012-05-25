@@ -16,8 +16,10 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
- * <b><u>TmfRangeSynchSignal</u></b>
- * <p>
+ * A new active time range has been selected
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfRangeSynchSignal extends TmfSignal {
 

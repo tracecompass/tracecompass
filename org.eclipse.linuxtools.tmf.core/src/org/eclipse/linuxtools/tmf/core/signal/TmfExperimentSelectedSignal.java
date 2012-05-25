@@ -16,9 +16,10 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
- * <b><u>TmfExperimentSelectedSignal</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * New experiment has been selected
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfExperimentSelectedSignal<T extends ITmfEvent> extends TmfSignal {
 

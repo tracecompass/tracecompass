@@ -22,13 +22,13 @@ import java.util.Map;
 import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 
 /**
- * <b><u>TmfSignalHandler</u></b>
- * <p>
  * This class manages the set of signal listeners and the signals they are
  * interested in. When a signal is broadcasted, the appropriate listeners
  * signal handlers are invoked.
- * <p>
- */
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
++ */
 public class TmfSignalManager {
 
 	// The set of event listeners and their corresponding handler methods.

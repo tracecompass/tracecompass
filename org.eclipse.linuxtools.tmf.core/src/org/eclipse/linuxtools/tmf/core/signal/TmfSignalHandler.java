@@ -18,9 +18,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <b><u>TmfSignalHandler</u></b>
- * <p>
  * Marker for TMF signal handlers.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

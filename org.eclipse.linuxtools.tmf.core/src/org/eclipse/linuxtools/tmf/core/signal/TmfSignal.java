@@ -13,9 +13,10 @@
 package org.eclipse.linuxtools.tmf.core.signal;
 
 /**
- * <b><u>TmfSignal</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * Base class for TMF signals
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class TmfSignal {
 
