@@ -14,10 +14,8 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -47,8 +45,6 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphViewer;
@@ -56,7 +52,6 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
@@ -243,98 +238,7 @@ public class ResourcesView extends TmfView {
     public void createPartControl(Composite parent) {
         fTimeGraphViewer = new TimeGraphViewer(parent, SWT.NONE);
 
-        fTimeGraphViewer.setTimeGraphProvider(new TimeGraphPresentationProvider() {
-            private static final String UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
-            private static final String IDLE = "IDLE"; //$NON-NLS-1$
-            private static final String BUSY = "BUSY"; //$NON-NLS-1$
-            private static final String INTERRUPTED = "INTERRUPTED"; //$NON-NLS-1$
-            private static final String RAISED = "RAISED"; //$NON-NLS-1$
-            private static final String ACTIVE = "ACTIVE"; //$NON-NLS-1$
-
-            @Override 
-            public String getStateTypeName() {
-                return Messages.ResourcesView_stateTypeName;
-            }
-
-            @Override
-            public String getEventName(ITimeEvent event) {
-                if (event instanceof ResourcesEvent) {
-                    ResourcesEvent resourcesEvent = (ResourcesEvent) event;
-                    if (resourcesEvent.getType() == Type.CPU) {
-                        int currentThread = resourcesEvent.getValue();
-                        if (currentThread == 0) {
-                            return IDLE;
-                        } else {
-                            return BUSY;
-                        }
-                    } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
-                        int cpu = resourcesEvent.getValue();
-                        if (cpu == Attributes.SOFT_IRQ_RAISED) {
-                            return RAISED;
-                        }
-                        return ACTIVE;
-                    } else {
-                        return null;
-                    }
-                }
-                return UNKNOWN;
-            }
-
-            @Override
-            public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-                
-                Map<String, String> retMap = new HashMap<String, String>();
-                if (event instanceof ResourcesEvent) {
-
-                    ResourcesEvent resourcesEvent = (ResourcesEvent) event;
-
-                    if (resourcesEvent.getType().equals(Type.IRQ) || resourcesEvent.getType().equals(Type.SOFT_IRQ)) {
-                        int cpu = resourcesEvent.getValue();
-                        if (cpu >= 0) {
-                            retMap.put(Messages.ResourcesView_attributeCpuName, String.valueOf(cpu));
-                        }
-                    }
-                }
-
-                return retMap;
-            }
-
-            @Override
-            public StateItem[] getStateTable() {
-                return new StateItem[] {
-                        new StateItem(new RGB(100, 100, 100), UNKNOWN),
-                        new StateItem(new RGB(200, 200, 200), IDLE),
-                        new StateItem(new RGB(0, 200, 0), BUSY),
-                        new StateItem(new RGB(200, 100, 100), INTERRUPTED),
-                        new StateItem(new RGB(200, 200, 0), RAISED),
-                        new StateItem(new RGB(200, 150, 100), ACTIVE)
-                };
-            }
-
-            @Override
-            public int getStateTableIndex(ITimeEvent event) {
-                if (event instanceof ResourcesEvent) {
-                    ResourcesEvent resourcesEvent = (ResourcesEvent) event;
-                    if (resourcesEvent.getType() == Type.CPU) {
-                        int currentThread = resourcesEvent.getValue();
-                        if (currentThread == 0) {
-                            return 1; // IDLE
-                        } else {
-                            return 2; // BUSY
-                        }
-                    } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
-                        int cpu = resourcesEvent.getValue();
-                        if (cpu == Attributes.SOFT_IRQ_RAISED) {
-                            return 4; // RAISED
-                        }
-                        return 5; // ACTIVE
-                    } else {
-                        return -1; // NULL
-                    }
-                }
-                return 0; // UNKNOWN
-            }
-        });
+        fTimeGraphViewer.setTimeGraphProvider(new ResourcesPresentationProvider());
 
         fTimeGraphViewer.setTimeCalendarFormat(true);
 
@@ -511,23 +415,27 @@ public class ResourcesView extends TmfView {
         int quark = entry.getQuark();
         try {
             if (entry.getType().equals(Type.CPU)) {
-                int currentThreadQuark = ssq.getQuarkRelative(quark, Attributes.CURRENT_THREAD);
-                List<ITmfStateInterval> currentThreadIntervals = ssq.queryHistoryRange(currentThreadQuark, startTime, endTime - 1, resolution);
-                eventList = new ArrayList<ITimeEvent>(currentThreadIntervals.size());
+                int statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
+                List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution);
+                eventList = new ArrayList<ITimeEvent>(statusIntervals.size());
                 long lastEndTime = -1;
-                for (ITmfStateInterval currentThreadInterval : currentThreadIntervals) {
+                for (ITmfStateInterval statusInterval : statusIntervals) {
                     if (monitor.isCanceled()) {
                         return null;
                     }
-                    if (!currentThreadInterval.getStateValue().isNull()) {
-                        int currentThread = currentThreadInterval.getStateValue().unboxInt();
-                        long time = currentThreadInterval.getStartTime();
-                        long duration = currentThreadInterval.getEndTime() - time + 1;
+                    int status = statusInterval.getStateValue().unboxInt();
+                    long time = statusInterval.getStartTime();
+                    long duration = statusInterval.getEndTime() - time + 1;
+                    if (!statusInterval.getStateValue().isNull()) {
                         if (lastEndTime != time && lastEndTime != -1) {
                             eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
                         }
-                        eventList.add(new ResourcesEvent(entry, time, duration, currentThread));
+                        eventList.add(new ResourcesEvent(entry, time, duration, status));
                         lastEndTime = time + duration;
+                    } else {
+                        if (includeNull) {
+                            eventList.add(new ResourcesEvent(entry, time, duration));
+                        }
                     }
                 }
             } else if (entry.getType().equals(Type.IRQ)) {

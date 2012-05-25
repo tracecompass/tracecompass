@@ -14,9 +14,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -43,16 +41,13 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphCombo;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
@@ -64,7 +59,6 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -286,90 +280,7 @@ public class ControlFlowView extends TmfView {
 
         fTimeGraphCombo.setTreeLabelProvider(new TreeLabelProvider());
 
-        fTimeGraphCombo.setTimeGraphProvider(new TimeGraphPresentationProvider() {
-            private static final String UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
-            private static final String WAIT = "WAIT"; //$NON-NLS-1$
-            private static final String USERMODE = "USERMODE"; //$NON-NLS-1$
-            private static final String SYSCALL = "SYSCALL"; //$NON-NLS-1$
-            private static final String INTERRUPTED = "INTERRUPTED"; //$NON-NLS-1$
-
-            @Override 
-            public String getStateTypeName() {
-                return Messages.ControlFlowView_stateTypeName;
-            }
-
-            @Override
-            public StateItem[] getStateTable() {
-                return new StateItem[] {
-                        new StateItem(new RGB(100, 100, 100), UNKNOWN),
-                        new StateItem(new RGB(200, 200, 0), WAIT),
-                        new StateItem(new RGB(0, 200, 0), USERMODE),
-                        new StateItem(new RGB(0, 0, 200), SYSCALL),
-                        new StateItem(new RGB(200, 100, 100), INTERRUPTED)
-                };
-            }
-
-            @Override
-            public int getStateTableIndex(ITimeEvent event) {
-                if (event instanceof ControlFlowEvent) {
-                    int status = ((ControlFlowEvent) event).getStatus();
-                    if (status == Attributes.STATUS_WAIT) {
-                        return 1;
-                    } else if (status == Attributes.STATUS_RUN_USERMODE) {
-                        return 2;
-                    } else if (status == Attributes.STATUS_RUN_SYSCALL) {
-                        return 3;
-                    } else if (status == Attributes.STATUS_INTERRUPTED) {
-                        return 4;
-                    }
-                }
-                return 0;
-            }
-
-            @Override
-            public String getEventName(ITimeEvent event) {
-                if (event instanceof ControlFlowEvent) {
-                    int status = ((ControlFlowEvent) event).getStatus();
-                    if (status == Attributes.STATUS_WAIT) {
-                        return WAIT;
-                    } else if (status == Attributes.STATUS_RUN_USERMODE) {
-                        return USERMODE;
-                    } else if (status == Attributes.STATUS_RUN_SYSCALL) {
-                        return SYSCALL;
-                    } else if (status == Attributes.STATUS_INTERRUPTED) {
-                        return INTERRUPTED;
-                    }
-                }
-                return UNKNOWN;
-            }
-
-            @Override
-            public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-                Map<String, String> retMap = new HashMap<String, String>();
-                if (event instanceof ControlFlowEvent) {
-                    int status = ((ControlFlowEvent) event).getStatus();
-                    if (status == Attributes.STATUS_RUN_SYSCALL) {
-                        ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-                        IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
-                        try {
-                            int syscallQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
-                            ITmfStateInterval value = ssq.querySingleState(event.getTime(), syscallQuark);
-                            if (!value.getStateValue().isNull()) {
-                                ITmfStateValue state = value.getStateValue();
-                                retMap.put(Messages.ControlFlowView_attributeSyscallName, state.toString());
-                            }
-
-                        } catch (AttributeNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (TimeRangeException e) {
-                            e.printStackTrace();
-                        }
-                    } 
-                }
-
-                return retMap;
-            }
-        });
+        fTimeGraphCombo.setTimeGraphProvider(new ControlFlowPresentationProvider());
 
         fTimeGraphCombo.setTreeColumns(COLUMN_NAMES);
 
