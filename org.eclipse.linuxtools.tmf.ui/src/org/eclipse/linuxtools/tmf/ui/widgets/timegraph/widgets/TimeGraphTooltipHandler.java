@@ -118,7 +118,7 @@ public class TimeGraphTooltipHandler {
                 if (item == null) {
                     return;
                 }
-                if (item._trace.getTimeEventsIterator() == null) {
+                if (! item._trace.hasTimeEvents()) {
                     addItem(Messages.TmfTimeTipHandler_TRACE_GROUP_NAME, item.toString());
                     addItem(Messages.TmfTimeTipHandler_NUMBER_OF_TRACES, "" + item.children.size()); //$NON-NLS-1$
                 } else {

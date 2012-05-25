@@ -66,6 +66,11 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
     }
 
     @Override
+    public boolean hasTimeEvents() {
+        return true;
+    }
+
+    @Override
     public Iterator<ITimeEvent> getTimeEventsIterator() {
         return new EntryIterator(0, Long.MAX_VALUE, 0);
     }

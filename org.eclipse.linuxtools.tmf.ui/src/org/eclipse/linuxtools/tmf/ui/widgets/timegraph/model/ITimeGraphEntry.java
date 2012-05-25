@@ -61,7 +61,18 @@ public interface ITimeGraphEntry {
     public long getEndTime();
 
     /**
-     * Get an iterator which returns all timeevents
+     * Returns whether this entry has time events.
+     * If true, the time events iterator should not be null.
+     *
+     * @return true if the entry has time events
+     * 
+     * @see #getTimeEventsIterator
+     * @see #getTimeEventsIterator(long, long, long)
+     */
+    public boolean hasTimeEvents();
+
+    /**
+     * Get an iterator which returns all time events.
      *
      * @return the iterator
      */

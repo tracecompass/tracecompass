@@ -263,10 +263,11 @@ public class Utils {
         // TraceUIPlugin.getDefault().getPreferenceStore().setValue(opt, val);
     }
 
-    static ITimeEvent getFirstEvent(ITimeGraphEntry thread) {
-        if (null == thread)
+    static ITimeEvent getFirstEvent(ITimeGraphEntry entry) {
+        if (null == entry || ! entry.hasTimeEvents()) {
             return null;
-        Iterator<ITimeEvent> iterator = thread.getTimeEventsIterator();
+        }
+        Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator();
         if (iterator != null && iterator.hasNext()) {
             return iterator.next();
         } else {
@@ -279,15 +280,16 @@ public class Utils {
      * 1: Next Event</li> <li>2: Previous Event when located in a non Event Area
      * </list>
      * 
-     * @param thread
+     * @param entry
      * @param time
      * @param n
      * @return
      */
-    static ITimeEvent findEvent(ITimeGraphEntry thread, long time, int n) {
-        if (null == thread)
+    static ITimeEvent findEvent(ITimeGraphEntry entry, long time, int n) {
+        if (null == entry || ! entry.hasTimeEvents()) {
             return null;
-        Iterator<ITimeEvent> iterator = thread.getTimeEventsIterator();
+        }
+        Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator();
         if (iterator == null) {
             return null;
         }

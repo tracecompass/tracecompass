@@ -875,7 +875,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             return;
         }
 
-        if (item._trace.getTimeEventsIterator() == null) {
+        if (! item._trace.hasTimeEvents()) {
             Rectangle statesRect = getStatesRect(bounds, i, nameSpace);
             nameRect.width += statesRect.width;
             drawName(item, nameRect, gc);
@@ -884,13 +884,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
         Rectangle rect = getStatesRect(bounds, i, nameSpace);
         if (rect.isEmpty()) {
-            fTimeGraphProvider.postDrawEntry(entry, bounds, gc);
+            fTimeGraphProvider.postDrawEntry(entry, rect, gc);
             return;
         }
         if (time1 <= time0) {
             gc.setBackground(_colors.getBkColor(false, false, false));
             gc.fillRectangle(rect);
-            fTimeGraphProvider.postDrawEntry(entry, bounds, gc);
+            fTimeGraphProvider.postDrawEntry(entry, rect, gc);
             return;
         }
 
@@ -900,9 +900,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         // K pixels per second
         double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0 : (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
 
-        boolean group = item._trace.getTimeEventsIterator() == null;
-
-        if (!group) {
+        if (item._trace.hasTimeEvents()) {
             fillSpace(rect, gc, selected);
             // Drawing rectangle is smaller than reserved space
             stateRect.y += 3;
@@ -937,12 +935,12 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 drawState(_colors, event, stateRect, gc, selected, timeSelected);
             }
         }
-        fTimeGraphProvider.postDrawEntry(entry, bounds, gc);
+        fTimeGraphProvider.postDrawEntry(entry, rect, gc);
     }
 
     protected void drawName(TimeGraphItem item, Rectangle bounds, GC gc) {
-        boolean group = item._trace.getTimeEventsIterator() == null;
-        if (group) {
+        boolean hasTimeEvents = item._trace.hasTimeEvents();
+        if (! hasTimeEvents) {
             gc.setBackground(_colors.getBkColorGroup(item._selected, _isInFocus));
             gc.fillRectangle(bounds);
             if (item._selected && _isInFocus) {
@@ -995,7 +993,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         if (_idealNameSpace < leftMargin + size.x + MARGIN) {
             _idealNameSpace = leftMargin + size.x + MARGIN;
         }
-        if (!group) {
+        if (hasTimeEvents) {
             // cut long string with "..."
             int width = bounds.width - leftMargin;
             int cuts = 0;
@@ -1019,7 +1017,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             leftMargin += textWidth + MARGIN;
             rect.y -= 2;
 
-            if (!group) {
+            if (hasTimeEvents) {
                 // draw middle line
                 int x = bounds.x + leftMargin;
                 int width = bounds.width - x;

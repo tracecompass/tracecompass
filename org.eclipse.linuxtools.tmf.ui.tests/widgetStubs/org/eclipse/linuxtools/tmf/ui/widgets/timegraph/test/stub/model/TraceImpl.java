@@ -19,64 +19,69 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
 @SuppressWarnings("nls")
 public class TraceImpl implements ITimeGraphEntry {
-	// ========================================================================
-	// Data
-	// ========================================================================
-	private String name = "traceDefaultName";
-	private long startTime = 0;
-	private long stopTime = 1;
-	private String className = "defaultClassName";
-	private Vector<ITimeEvent> traceEvents = new Vector<ITimeEvent>();
-	
-	// ========================================================================
-	// Constructor
-	// ========================================================================
+    // ========================================================================
+    // Data
+    // ========================================================================
+    private String name = "traceDefaultName";
+    private long startTime = 0;
+    private long stopTime = 1;
+    private String className = "defaultClassName";
+    private Vector<ITimeEvent> traceEvents = new Vector<ITimeEvent>();
 
-	public TraceImpl(String name, long sTime, long stopTime, String className) {
-		this.name = name;
-		this.startTime = sTime;
-		this.stopTime = stopTime;
-		this.className = className;
-	}
+    // ========================================================================
+    // Constructor
+    // ========================================================================
 
-	// ========================================================================
-	// Methods
-	// ========================================================================
+    public TraceImpl(String name, long sTime, long stopTime, String className) {
+        this.name = name;
+        this.startTime = sTime;
+        this.stopTime = stopTime;
+        this.className = className;
+    }
 
-	public String getClassName() {
-		return className;
-	}
+    // ========================================================================
+    // Methods
+    // ========================================================================
 
-	public void setClassName(String className) {
-		this.className = className;
-	}
+    public String getClassName() {
+        return className;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setStopTime(long stopTime) {
-		this.stopTime = stopTime;
-	}
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    public void setStopTime(long stopTime) {
+        this.stopTime = stopTime;
+    }
 
-	@Override
-	public long getStartTime() {
-		return startTime;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public long getEndTime() {
-		return stopTime;
-	}
+    @Override
+    public long getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public long getEndTime() {
+        return stopTime;
+    }
+
+    @Override
+    public boolean hasTimeEvents() {
+        return traceEvents != null;
+    }
 
     @Override
     public Iterator<ITimeEvent> getTimeEventsIterator() {
