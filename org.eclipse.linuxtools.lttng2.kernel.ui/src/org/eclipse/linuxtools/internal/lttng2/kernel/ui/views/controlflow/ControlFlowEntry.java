@@ -77,6 +77,11 @@ public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlow
     }
 
     @Override
+    public boolean hasTimeEvents() {
+        return true;
+    }
+
+    @Override
     public Iterator<ITimeEvent> getTimeEventsIterator() {
         return new EventIterator(fEventList, fZoomedEventList);
     }

@@ -225,10 +225,11 @@ public class ControlFlowView extends TmfView {
 
         @Override
         public void run() {
-            if (fEntryList == null) {
+            ArrayList<ControlFlowEntry> entryList = fEntryList;
+            if (entryList == null) {
                 return;
             }
-            for (ControlFlowEntry entry : fEntryList) {
+            for (ControlFlowEntry entry : entryList) {
                 if (fMonitor.isCanceled()) {
                     return;
                 }
@@ -453,7 +454,7 @@ public class ControlFlowView extends TmfView {
         fStartTime = Long.MAX_VALUE;
         fEndTime = Long.MIN_VALUE;
         fSelectedExperiment = (TmfExperiment<ITmfEvent>) experiment;
-        fEntryList = new ArrayList<ControlFlowEntry>();
+        ArrayList<ControlFlowEntry> entryList = new ArrayList<ControlFlowEntry>();
         for (ITmfTrace<?> trace : experiment.getTraces()) {
             if (trace instanceof CtfKernelTrace) {
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) trace;
@@ -498,7 +499,7 @@ public class ControlFlowView extends TmfView {
                                     ppid = ppidInterval.getStateValue().unboxInt();
                                 }
                                 ControlFlowEntry entry = new ControlFlowEntry(threadQuark, ctfKernelTrace, execName, threadId, ppid, birthTime, startTime, endTime);
-                                fEntryList.add(entry);
+                                entryList.add(entry);
                                 entry.addEvent(new TimeEvent(entry, startTime, endTime - startTime));
                             } else {
                                 birthTime = -1;
@@ -513,7 +514,7 @@ public class ControlFlowView extends TmfView {
                     }
                 }
             }
-            buildTree();
+            buildTree(entryList);
             refresh(INITIAL_WINDOW_OFFSET);
             ControlFlowEntry[] entries = fEntryList.toArray(new ControlFlowEntry[0]);
             Arrays.sort(entries);
@@ -523,12 +524,12 @@ public class ControlFlowView extends TmfView {
         }
     }
 
-    private void buildTree() {
+    private void buildTree(ArrayList<ControlFlowEntry> entryList) {
         ArrayList<ControlFlowEntry> rootList = new ArrayList<ControlFlowEntry>();
-        for (ControlFlowEntry entry : fEntryList) {
+        for (ControlFlowEntry entry : entryList) {
             boolean root = true;
             if (entry.getPPID() > 0) {
-                for (ControlFlowEntry parent : fEntryList) {
+                for (ControlFlowEntry parent : entryList) {
                     if (parent.getThreadId() == entry.getPPID() &&
                             entry.getStartTime() >= parent.getStartTime() &&
                             entry.getStartTime() <= parent.getEndTime()) {

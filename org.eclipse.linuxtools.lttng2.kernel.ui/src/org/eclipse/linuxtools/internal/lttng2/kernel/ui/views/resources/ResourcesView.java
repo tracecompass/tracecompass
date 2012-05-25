@@ -149,6 +149,11 @@ public class ResourcesView extends TmfView {
         }
 
         @Override
+        public boolean hasTimeEvents() {
+            return false;
+        }
+
+        @Override
         public Iterator<ITimeEvent> getTimeEventsIterator() {
             return null;
         }
@@ -193,11 +198,12 @@ public class ResourcesView extends TmfView {
 
         @Override
         public void run() {
-            if (fEntryList == null) {
+            ArrayList<TraceEntry> entryList = fEntryList;
+            if (entryList == null) {
                 return;
             }
             long resolution = Math.max(1, (fZoomEndTime - fZoomStartTime) / fDisplayWidth);
-            for (TraceEntry traceEntry : fEntryList) {
+            for (TraceEntry traceEntry : entryList) {
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
                     ResourcesEntry entry = (ResourcesEntry) child;
                     if (fMonitor.isCanceled()) {
@@ -336,7 +342,7 @@ public class ResourcesView extends TmfView {
                     return;
                 }
                 fTimeGraphViewer.setStartFinishTime(startTime, endTime);
-                fTimeGraphViewer.setSelectedTime(time, true);
+                fTimeGraphViewer.setSelectedTime(time, false);
                 startZoomThread(startTime, endTime);
             }
         });
@@ -351,12 +357,12 @@ public class ResourcesView extends TmfView {
         fStartTime = Long.MAX_VALUE;
         fEndTime = Long.MIN_VALUE;
         fSelectedExperiment = (TmfExperiment<ITmfEvent>) experiment;
-        fEntryList = new ArrayList<TraceEntry>();
+        ArrayList<TraceEntry> entryList = new ArrayList<TraceEntry>();
         for (ITmfTrace<?> trace : experiment.getTraces()) {
             if (trace instanceof CtfKernelTrace) {
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) trace;
                 TraceEntry groupEntry = new TraceEntry(ctfKernelTrace, trace.getName());
-                fEntryList.add(groupEntry);
+                entryList.add(groupEntry);
                 IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
                 long startTime = ssq.getStartTime();
                 long endTime = ssq.getCurrentEndTime() + 1;
@@ -391,6 +397,7 @@ public class ResourcesView extends TmfView {
                 }
             }
         }
+        fEntryList = entryList;
         refresh(INITIAL_WINDOW_OFFSET);
         for (TraceEntry traceEntry : fEntryList) {
             CtfKernelTrace ctfKernelTrace = ((TraceEntry) traceEntry).getTrace();
