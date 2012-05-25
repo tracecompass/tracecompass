@@ -42,10 +42,10 @@ public class RequestBenchmark extends TmfEventRequest<CtfTmfEvent> {
     public final boolean PARSE_EVENTS = true;
 
     // Work variables
-    public static int nbEvent = 0;
-    public static int nbPassDone = 0;
-    public static TmfExperiment<CtfTmfEvent> fExperiment = null;
-    public static Vector<Double> benchs = new Vector<Double>();
+    static int nbEvent = 0;
+    static int nbPassDone = 0;
+    static TmfExperiment<CtfTmfEvent> fExperiment = null;
+    static Vector<Double> benchs = new Vector<Double>();
 
     public static void main(final String[] args) {
 

@@ -28,8 +28,8 @@ public abstract class TestParams {
         return testTracePath1;
     }
 
-    public static CtfTmfTrace createTrace() throws TmfTraceException {
-        if ( testTrace1 == null ) {
+    public synchronized static CtfTmfTrace createTrace() throws TmfTraceException {
+        if (testTrace1 == null) {
             testTrace1 = new CtfTmfTrace();
             testTrace1.initTrace(null, testTracePath1, CtfTmfEvent.class);
         }

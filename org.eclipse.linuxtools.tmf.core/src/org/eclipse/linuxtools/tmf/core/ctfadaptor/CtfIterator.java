@@ -20,8 +20,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  * it does not have a file handle, so many iterators can be used without worries
  * of io errors.
  */
-public class CtfIterator extends CTFTraceReader implements ITmfContext,
-        Comparable<CtfIterator> {
+public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparable<CtfIterator>, Cloneable {
 
     private final CtfTmfTrace ctfTmfTrace;
 

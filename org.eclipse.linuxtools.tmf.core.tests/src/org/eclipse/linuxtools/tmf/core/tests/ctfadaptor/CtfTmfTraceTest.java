@@ -348,8 +348,8 @@ public class CtfTmfTraceTest {
     public void testGetLocationRatio_1()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
-        CtfLocation location = new CtfLocation(new Long(1L));
-        location.setLocation(new Long(1L));
+        CtfLocation location = new CtfLocation(Long.valueOf(1));
+        location.setLocation(Long.valueOf(1));
 
         double result = fixture.getLocationRatio(location);
 

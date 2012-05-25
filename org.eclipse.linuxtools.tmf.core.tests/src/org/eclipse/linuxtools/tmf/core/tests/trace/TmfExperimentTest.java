@@ -43,7 +43,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 /**
  * Test suite for the TmfExperiment class (single trace).
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls", "restriction" })
 public class TmfExperimentTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -57,8 +57,7 @@ public class TmfExperimentTest extends TestCase {
     private static int          BLOCK_SIZE  = 1000;
 
     private ITmfTrace<TmfEvent>[] fTestTraces;
-    @SuppressWarnings("rawtypes")
-    private TmfExperimentStub fExperiment;
+    private TmfExperimentStub<ITmfEvent> fExperiment;
 
     private static byte SCALE = (byte) -3;
 
@@ -175,7 +174,6 @@ public class TmfExperimentTest extends TestCase {
 
     public void testBookmarks() throws Exception {
         assertNull("GetBookmarksFile", fExperiment.getBookmarksFile());
-
         IFile bookmarks = (IFile) fTestTraces[0].getResource();
         fExperiment.setBookmarksFile(bookmarks);
         assertEquals("GetBookmarksFile", bookmarks, fExperiment.getBookmarksFile());
@@ -185,7 +183,6 @@ public class TmfExperimentTest extends TestCase {
     // seekEvent by location
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
     public void testSeekBadLocation() throws Exception {
         ITmfContext context = fExperiment.seekEvent((ITmfLocation<?>) new TmfLocation<Long>(0L));
         assertNull("seekEvent", context);
@@ -193,7 +190,6 @@ public class TmfExperimentTest extends TestCase {
 
     public void testSeekNoTrace() throws Exception {
         TmfExperiment<TmfEvent> experiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, null);
-        @SuppressWarnings("restriction")
         ITmfContext context = experiment.seekEvent((TmfExperimentLocation) null);
         assertNull("seekEvent", context);
         experiment.dispose();
@@ -242,7 +238,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Context rank", 0, context.getRank());
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("rawtypes")
     public void testGetLocationRatio() throws Exception {
 
         // First event

@@ -400,7 +400,6 @@ public class TmfTraceTest extends TestCase {
             fail("indexing");
         }
 
-        assertFalse ("Open trace", trace == null);
         assertEquals("getType",  TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());

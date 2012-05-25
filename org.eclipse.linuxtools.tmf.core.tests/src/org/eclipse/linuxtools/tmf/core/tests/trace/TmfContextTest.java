@@ -167,7 +167,7 @@ public class TmfContextTest extends TestCase {
         assertFalse("equals", fContext2.equals(null));
     }
 
-    public class MyContext extends TmfContext {
+    private static class MyContext extends TmfContext {
     }
 
     public void testNonEquals() throws Exception {

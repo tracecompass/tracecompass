@@ -192,7 +192,7 @@ public class CtfTmfEventTest {
     }
 
     @Test
-    public void TestToString() {
+    public void testToString() {
         String s = fixture.getContent().toString();
         assertEquals("ret=4132", s); //$NON-NLS-1$
     }

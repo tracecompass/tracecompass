@@ -55,7 +55,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     private static int          BLOCK_SIZE   = 1000;
 
     private static ITmfTrace<TmfEvent>[] fTestTraces;
-    private static TmfExperimentStub fExperiment;
+    private static TmfExperimentStub<TmfEvent> fExperiment;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -66,11 +66,11 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     }
 
     @Override
-    protected void setUp() throws Exception {
+    protected synchronized void setUp() throws Exception {
         super.setUp();
         setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
         if (fExperiment == null) {
-            fExperiment = new TmfExperimentStub(EXPERIMENT, fTestTraces, BLOCK_SIZE);
+            fExperiment = new TmfExperimentStub<TmfEvent>(EXPERIMENT, fTestTraces, BLOCK_SIZE);
             fExperiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
         }
     }
@@ -83,7 +83,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
-    private static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
+    private synchronized static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
         if (fTestTraces == null) {
             fTestTraces = new ITmfTrace[2];
             try {

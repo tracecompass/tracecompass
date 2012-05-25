@@ -49,7 +49,7 @@ public class CtfIteratorTest {
     public void testCtfIterator_2()
         throws Exception {
         CtfTmfTrace trace = createTrace();
-        trace.init("test");
+        trace.init("test"); //$NON-NLS-1$
 
         CtfIterator result = new CtfIterator(trace);
 
@@ -87,8 +87,8 @@ public class CtfIteratorTest {
     public void testAdvance_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -107,8 +107,8 @@ public class CtfIteratorTest {
     public void testAdvance_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -128,8 +128,8 @@ public class CtfIteratorTest {
     public void testClone_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -149,8 +149,8 @@ public class CtfIteratorTest {
     public void testCompareTo_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         CtfIterator o = new CtfIterator(createTrace());
@@ -179,8 +179,8 @@ public class CtfIteratorTest {
     public void testCompareTo_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         CtfIterator o = new CtfIterator(createTrace());
@@ -201,8 +201,8 @@ public class CtfIteratorTest {
     public void testCompareTo_3()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         CtfIterator o = new CtfIterator(createTrace());
@@ -222,8 +222,8 @@ public class CtfIteratorTest {
     public void testDispose_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -241,13 +241,13 @@ public class CtfIteratorTest {
     public void testEquals_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         CtfIterator obj = new CtfIterator(createTrace());
-        CtfLocation ctfLocation1 = new CtfLocation(new Long(1L));
-        ctfLocation1.setLocation(new Long(1L));
+        CtfLocation ctfLocation1 = new CtfLocation(Long.valueOf(1));
+        ctfLocation1.setLocation(Long.valueOf(1));
         obj.setLocation(ctfLocation1);
         obj.increaseRank();
 
@@ -267,8 +267,8 @@ public class CtfIteratorTest {
     public void testEquals_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         Object obj = new Object();
@@ -289,8 +289,8 @@ public class CtfIteratorTest {
     public void testEquals_3()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         Object obj = new Object();
@@ -311,8 +311,8 @@ public class CtfIteratorTest {
     public void testGetCtfTmfTrace_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -338,8 +338,8 @@ public class CtfIteratorTest {
     public void testGetCurrentEvent_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -365,8 +365,8 @@ public class CtfIteratorTest {
     public void testGetCurrentEvent_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -392,8 +392,8 @@ public class CtfIteratorTest {
     public void testGetLocation_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -419,8 +419,8 @@ public class CtfIteratorTest {
     public void testGetRank_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -446,8 +446,8 @@ public class CtfIteratorTest {
     public void testHasValidRank_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -473,8 +473,8 @@ public class CtfIteratorTest {
     public void testHasValidRank_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -500,8 +500,8 @@ public class CtfIteratorTest {
     public void testHashCode_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -521,8 +521,8 @@ public class CtfIteratorTest {
     public void testIncreaseRank_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
 
@@ -547,8 +547,8 @@ public class CtfIteratorTest {
     public void testSeek_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         long timestamp = 1L;
@@ -575,8 +575,8 @@ public class CtfIteratorTest {
     public void testSeek_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         long timestamp = 1L;
@@ -603,8 +603,8 @@ public class CtfIteratorTest {
     public void testSeekRank_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         long rank = 1L;
@@ -631,8 +631,8 @@ public class CtfIteratorTest {
     public void testSeekRank_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         long rank = 1L;
@@ -659,12 +659,12 @@ public class CtfIteratorTest {
     public void testSetLocation_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
-        CtfLocation location = new CtfLocation(new Long(1L));
-        location.setLocation(new Long(1L));
+        CtfLocation location = new CtfLocation(Long.valueOf(1));
+        location.setLocation(Long.valueOf(1));
 
         fixture.setLocation(location);
 
@@ -687,8 +687,8 @@ public class CtfIteratorTest {
     public void testSetRank_1()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         long rank = 1L;
@@ -714,8 +714,8 @@ public class CtfIteratorTest {
     public void testSetRank_2()
         throws Exception {
         CtfIterator fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
-        ctfLocation.setLocation(new Long(1L));
+        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
+        ctfLocation.setLocation(Long.valueOf(1));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
         long rank = 1L;

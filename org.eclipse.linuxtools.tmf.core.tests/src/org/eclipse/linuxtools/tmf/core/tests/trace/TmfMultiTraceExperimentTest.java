@@ -53,8 +53,8 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     private static int          NB_EVENTS    = 20000;
     private static int          BLOCK_SIZE   = 1000;
 
-    private static ITmfTrace<?>[] fTraces;
-    private static TmfExperimentStub fExperiment;
+    private static ITmfTrace<TmfEvent>[] fTraces;
+    private static TmfExperimentStub<TmfEvent> fExperiment;
 
     private static byte SCALE = (byte) -3;
 
@@ -62,6 +62,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
+    @SuppressWarnings("unchecked")
     private synchronized static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
         if (fTraces == null) {
             fTraces = new ITmfTrace[2];
@@ -89,13 +90,12 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         super(name);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected void setUp() throws Exception {
+    protected synchronized void setUp() throws Exception {
         super.setUp();
         setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
         if (fExperiment == null) {
-            fExperiment = new TmfExperimentStub(EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, BLOCK_SIZE);
+            fExperiment = new TmfExperimentStub<TmfEvent>(EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, BLOCK_SIZE);
             fExperiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
         }
     }

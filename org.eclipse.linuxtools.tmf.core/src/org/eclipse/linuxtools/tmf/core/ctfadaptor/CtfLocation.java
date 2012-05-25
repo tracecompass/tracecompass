@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  * The ctflocation is the nugget of information that is unique to a location in a trace.
  * it can be copied and used to restore a position in a given trace.
  */
-public class CtfLocation implements ITmfLocation<Long> {
+public class CtfLocation implements ITmfLocation<Long>, Cloneable {
 
     public static final Long INVALID_LOCATION = -1L;
 

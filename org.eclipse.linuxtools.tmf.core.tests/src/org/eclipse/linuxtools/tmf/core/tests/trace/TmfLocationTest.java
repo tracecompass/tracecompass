@@ -140,13 +140,33 @@ public class TmfLocationTest extends TestCase {
         }
 
         @Override
-        public boolean equals(Object o) {
-            return fName.compareTo(((MyCloneableClass) o).fName) == 0;
+        public int compareTo(MyCloneableClass o) {
+            return fName.compareTo(o.fName);
         }
 
         @Override
-        public int compareTo(MyCloneableClass o) {
-            return fName.compareTo(o.fName);
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (!(obj instanceof MyCloneableClass))
+                return false;
+            MyCloneableClass other = (MyCloneableClass) obj;
+            if (fName == null) {
+                if (other.fName != null)
+                    return false;
+            } else if (!fName.equals(other.fName))
+                return false;
+            return true;
         }
     }
 
@@ -182,13 +202,33 @@ public class TmfLocationTest extends TestCase {
         }
 
         @Override
-        public boolean equals(Object o) {
-            return fName.compareTo(((MyUnCloneableClass) o).fName) == 0;
+        public int compareTo(MyUnCloneableClass o) {
+            return fName.compareTo(o.fName);
         }
 
         @Override
-        public int compareTo(MyUnCloneableClass o) {
-            return fName.compareTo(o.fName);
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (!(obj instanceof MyUnCloneableClass))
+                return false;
+            MyUnCloneableClass other = (MyUnCloneableClass) obj;
+            if (fName == null) {
+                if (other.fName != null)
+                    return false;
+            } else if (!fName.equals(other.fName))
+                return false;
+            return true;
         }
     }
 

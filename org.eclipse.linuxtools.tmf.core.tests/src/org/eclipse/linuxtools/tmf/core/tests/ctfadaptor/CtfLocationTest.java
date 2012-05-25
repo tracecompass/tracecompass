@@ -26,13 +26,13 @@ public class CtfLocationTest {
     @SuppressWarnings("static-method")
     @Test
     public void testCtfLocation_1() {
-        Long location = new Long(1L);
+        Long location = Long.valueOf(1);
 
         CtfLocation result = new CtfLocation(location);
 
         // add additional test code here
         assertNotNull(result);
-        assertEquals(new Long(1L), result.getLocation());
+        assertEquals(Long.valueOf(1), result.getLocation());
     }
 
     /**
@@ -60,14 +60,14 @@ public class CtfLocationTest {
     @SuppressWarnings("static-method")
     @Test
     public void testClone_1() {
-        CtfLocation fixture = new CtfLocation(new Long(1L));
-        fixture.setLocation(new Long(1L));
+        CtfLocation fixture = new CtfLocation(Long.valueOf(1));
+        fixture.setLocation(Long.valueOf(1));
 
         CtfLocation result = fixture.clone();
 
         // add additional test code here
         assertNotNull(result);
-        assertEquals(new Long(1L), result.getLocation());
+        assertEquals(Long.valueOf(1), result.getLocation());
     }
 
     /**
@@ -78,8 +78,8 @@ public class CtfLocationTest {
     @SuppressWarnings("static-method")
     @Test
     public void testGetLocation_1() {
-        CtfLocation fixture = new CtfLocation(new Long(1L));
-        fixture.setLocation(new Long(1L));
+        CtfLocation fixture = new CtfLocation(Long.valueOf(1));
+        fixture.setLocation(Long.valueOf(1));
 
         Long result = fixture.getLocation();
 
@@ -102,9 +102,9 @@ public class CtfLocationTest {
     @SuppressWarnings("static-method")
     @Test
     public void testSetLocation_1() {
-        CtfLocation fixture = new CtfLocation(new Long(1L));
-        fixture.setLocation(new Long(1L));
-        Long location = new Long(1L);
+        CtfLocation fixture = new CtfLocation(Long.valueOf(1));
+        fixture.setLocation(Long.valueOf(1));
+        Long location = Long.valueOf(1);
 
         fixture.setLocation(location);
 

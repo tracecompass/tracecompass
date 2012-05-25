@@ -3,7 +3,7 @@ package org.eclipse.linuxtools.internal.lttng.core.event;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 
-public class LttngLocation implements ITmfLocation<LttngTimestamp>, Comparable<LttngLocation> {
+public class LttngLocation implements ITmfLocation<LttngTimestamp>, Comparable<LttngLocation>, Cloneable {
 
     private final static long DEFAULT_CURR_TIME =  0L;
 
