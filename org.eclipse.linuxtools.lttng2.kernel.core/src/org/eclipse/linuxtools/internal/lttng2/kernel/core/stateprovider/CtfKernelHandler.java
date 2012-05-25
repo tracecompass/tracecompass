@@ -175,6 +175,11 @@ class CtfKernelHandler implements Runnable {
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
                 value = TmfStateValue.newValueInt(Attributes.STATUS_INTERRUPTED);
                 ss.modifyAttribute(ts, value, quark);
+
+                /* Change the status of the CPU to interrupted */
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_INTERRUPTED);
+                ss.modifyAttribute(ts, value, quark);
             }
                 break;
 
@@ -190,6 +195,9 @@ class CtfKernelHandler implements Runnable {
 
                 /* Set the previous process back to running */
                 setProcessToRunning(ts, currentThreadNode);
+
+                /* Set the CPU status back to "busy" or "idle" */
+                cpuExitInterrupt(ts, currentCPUNode);
             }
                 break;
 
@@ -208,6 +216,11 @@ class CtfKernelHandler implements Runnable {
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
                 value = TmfStateValue.newValueInt(Attributes.STATUS_INTERRUPTED);
                 ss.modifyAttribute(ts, value, quark);
+
+                /* Change the status of the CPU to interrupted */
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_INTERRUPTED);
+                ss.modifyAttribute(ts, value, quark);
             }
                 break;
 
@@ -223,6 +236,9 @@ class CtfKernelHandler implements Runnable {
 
                 /* Set the previous process back to running */
                 setProcessToRunning(ts, currentThreadNode);
+
+                /* Set the CPU status back to "busy" or "idle" */
+                cpuExitInterrupt(ts, currentCPUNode);
             }
                 break;
 
@@ -294,6 +310,15 @@ class CtfKernelHandler implements Runnable {
                 /* Set the current scheduled process on the relevant CPU */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
                 value = TmfStateValue.newValueInt(nextTid);
+                ss.modifyAttribute(ts, value, quark);
+
+                /* Set the status of the CPU itself */
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+                if (nextTid > 0) {
+                    value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_BUSY);
+                } else {
+                    value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_IDLE);
+                }
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -491,6 +516,31 @@ class CtfKernelHandler implements Runnable {
             value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_SYSCALL);
         }
         quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+        ss.modifyAttribute(ts, value, quark);
+    }
+
+    /**
+     * Similar logic as above, but to set the CPU's status when it's coming out
+     * of an interruption.
+     * @throws AttributeNotFoundException 
+     * @throws StateValueTypeException 
+     * @throws TimeRangeException 
+     */
+    private void cpuExitInterrupt(long ts, int currentCpuNode)
+            throws StateValueTypeException, AttributeNotFoundException,
+            TimeRangeException {
+        int quark;
+        ITmfStateValue value;
+
+        quark = ss.getQuarkRelativeAndAdd(currentCpuNode, Attributes.CURRENT_THREAD);
+        if (ss.queryOngoingState(quark).unboxInt() > 0) {
+            /* There was a process on the CPU */
+            value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_BUSY);
+        } else {
+            /* There was no real process scheduled, CPU was idle */
+            value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_IDLE);
+        }
+        quark = ss.getQuarkRelativeAndAdd(currentCpuNode, Attributes.STATUS);
         ss.modifyAttribute(ts, value, quark);
     }
 }

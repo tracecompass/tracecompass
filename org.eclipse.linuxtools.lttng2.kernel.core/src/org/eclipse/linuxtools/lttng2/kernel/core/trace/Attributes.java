@@ -34,10 +34,11 @@ public abstract class Attributes {
 
     /* Sub-attributes of the CPU nodes */
     public static final String CURRENT_THREAD = "Current_thread";
+    public static final String STATUS = "Status";
 
     /* Sub-attributes of the Thread nodes */
     public static final String PPID = "PPID";
-    public static final String STATUS = "Status";
+    //public static final String STATUS = "Status"
     public static final String EXEC_NAME = "Exec_name";
     public static final String SYSTEM_CALL = "System_call";
 
@@ -52,7 +53,12 @@ public abstract class Attributes {
     public static final String STATISTICS = "Stats";
     public static final String EVENT_TYPES = "Event_types";
 
-    /* Process status (note these are *values*, not attribute names) */
+    /* CPU Status (note these are *values*, not attribute names) */
+    public static final int CPU_STATUS_IDLE = 0;
+    public static final int CPU_STATUS_BUSY = 1;
+    public static final int CPU_STATUS_INTERRUPTED = 2;
+
+    /* Process status */
     public static final int STATUS_WAIT = 1;
     public static final int STATUS_RUN_USERMODE = 2;
     public static final int STATUS_RUN_SYSCALL = 3;
