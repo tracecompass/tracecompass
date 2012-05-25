@@ -282,7 +282,21 @@ public class ResourcesView extends TmfView {
 
             @Override
             public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-                return new HashMap<String, String>();
+                
+                Map<String, String> retMap = new HashMap<String, String>();
+                if (event instanceof ResourcesEvent) {
+
+                    ResourcesEvent resourcesEvent = (ResourcesEvent) event;
+
+                    if (resourcesEvent.getType().equals(Type.IRQ) || resourcesEvent.getType().equals(Type.SOFT_IRQ)) {
+                        int cpu = resourcesEvent.getValue();
+                        if (cpu >= 0) {
+                            retMap.put(Messages.ResourcesView_attributeCpuName, String.valueOf(cpu));
+                        }
+                    }
+                }
+
+                return retMap;
             }
 
             @Override
