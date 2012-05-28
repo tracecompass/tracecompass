@@ -471,8 +471,6 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	    _time0_ = beginTime;
 	    _time1_ = endTime;
 	    _stateCtrl.adjustScrolls();
-	    _stateCtrl.redraw();
-	    _timeScaleCtrl.redraw();
 	}
 
 	@Override
