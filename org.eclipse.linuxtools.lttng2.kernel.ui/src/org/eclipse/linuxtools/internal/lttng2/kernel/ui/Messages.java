@@ -25,6 +25,8 @@ public class Messages extends NLS {
     public static String ResourcesView_previousResourceActionNameText;
     public static String ResourcesView_previousResourceActionToolTipText;
     public static String ResourcesView_attributeCpuName;
+    public static String ResourcesView_attributeIrqName;
+    public static String ResourcesView_attributeSoftIrqName;
     
     static {
         // initialize resource bundle

@@ -13,11 +13,17 @@
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.Attributes;
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -115,10 +121,70 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
             ResourcesEvent resourcesEvent = (ResourcesEvent) event;
 
+            // Check for IRQ or Soft_IRQ type
             if (resourcesEvent.getType().equals(Type.IRQ) || resourcesEvent.getType().equals(Type.SOFT_IRQ)) {
+                
+                // Get CPU of IRQ or SoftIRQ and provide it for the tooltip display
                 int cpu = resourcesEvent.getValue();
                 if (cpu >= 0) {
                     retMap.put(Messages.ResourcesView_attributeCpuName, String.valueOf(cpu));
+                }
+            } 
+            
+            // Check for type CPU
+            if (resourcesEvent.getType().equals(Type.CPU)) {
+                int status = resourcesEvent.getValue();
+
+                if (status == Attributes.CPU_STATUS_INTERRUPTED) {
+                    // In interrupted state get the IRQ or SOFT_IRQ that caused the interruption
+                    ResourcesEntry entry = (ResourcesEntry) event.getEntry();
+                    IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+                    int cpu = entry.getId();
+                    
+                    IStateSystemQuerier ss = entry.getTrace().getStateSystem();
+                    try {
+                        int resultQuark = 0;
+                        String attributeName = null;
+                        
+                        // First check for IRQ
+                        List<ITmfStateInterval> fullState = ss.queryFullState(event.getTime());
+                        List<Integer> irqQuarks = ss.getQuarks(Attributes.RESOURCES, Attributes.IRQS, "*"); //$NON-NLS-1$
+
+                        for (int curQuark : irqQuarks) {
+                            if (fullState.get(curQuark).getStateValue().unboxInt() == cpu) {
+                                resultQuark = curQuark;
+                                attributeName = Messages.ResourcesView_attributeIrqName;
+                                break;
+                            }
+                        }
+                        
+                        // If not found check for SOFT_IRQ
+                        if (attributeName == null) {
+                            List<Integer> softIrqQuarks = ssq.getQuarks(Attributes.RESOURCES, Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
+                            for (int curQuark : softIrqQuarks) {
+                                if (fullState.get(curQuark).getStateValue().unboxInt() == cpu) {
+                                    resultQuark = curQuark;
+                                    attributeName = Messages.ResourcesView_attributeSoftIrqName;
+                                    break;
+                                }
+                            }   
+                        }
+
+                        if (attributeName != null) {
+                            // A IRQ or SOFT_IRQ was found
+                            ITmfStateInterval value = ssq.querySingleState(event.getTime(), resultQuark);
+                            if (!value.getStateValue().isNull()) {
+                                int irq = Integer.parseInt(ssq.getAttributeName(resultQuark));
+                                retMap.put(attributeName, String.valueOf(irq));
+                            }
+                        }
+                    } catch (AttributeNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (TimeRangeException e) {
+                        e.printStackTrace();
+                    } catch (StateValueTypeException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
