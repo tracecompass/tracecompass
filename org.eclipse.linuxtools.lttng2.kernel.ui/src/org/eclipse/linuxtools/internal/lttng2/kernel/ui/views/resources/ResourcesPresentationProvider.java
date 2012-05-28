@@ -70,9 +70,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 int status = resourcesEvent.getValue();
                 if (status == StateValues.CPU_STATUS_IDLE) {
                     return State.IDLE.ordinal();
-                } else if (status == StateValues.CPU_STATUS_BUSY) {
+                } else if (status == StateValues.CPU_STATUS_RUN_USERMODE) {
                     return State.BUSY.ordinal();
-                } else if (status == StateValues.CPU_STATUS_INTERRUPTED) {
+                } else if (status == StateValues.CPU_STATUS_IRQ) {
                     return State.INTERRUPTED.ordinal();
                 }
             } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
@@ -96,9 +96,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 int status = resourcesEvent.getValue();
                 if (status == StateValues.CPU_STATUS_IDLE) {
                     return State.IDLE.toString();
-                } else if (status == StateValues.CPU_STATUS_BUSY) {
+                } else if (status == StateValues.CPU_STATUS_RUN_USERMODE) {
                     return State.BUSY.toString();
-                } else if (status == StateValues.CPU_STATUS_INTERRUPTED) {
+                } else if (status == StateValues.CPU_STATUS_IRQ) {
                     return State.INTERRUPTED.toString();
                 }
             } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
@@ -136,7 +136,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             if (resourcesEvent.getType().equals(Type.CPU)) {
                 int status = resourcesEvent.getValue();
 
-                if (status == StateValues.CPU_STATUS_INTERRUPTED) {
+                if (status == StateValues.CPU_STATUS_IRQ) {
                     // In interrupted state get the IRQ or SOFT_IRQ that caused the interruption
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
                     IStateSystemQuerier ssq = entry.getTrace().getStateSystem();

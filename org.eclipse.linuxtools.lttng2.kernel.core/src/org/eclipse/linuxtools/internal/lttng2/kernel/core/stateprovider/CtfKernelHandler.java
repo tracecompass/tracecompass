@@ -179,7 +179,7 @@ class CtfKernelHandler implements Runnable {
 
                 /* Change the status of the CPU to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_INTERRUPTED);
+                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IRQ);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -197,8 +197,8 @@ class CtfKernelHandler implements Runnable {
                 /* Set the previous process back to running */
                 setProcessToRunning(ts, currentThreadNode);
 
-                /* Set the CPU status back to "busy" or "idle" */
-                cpuExitInterrupt(ts, currentCPUNode);
+                /* Set the CPU status back to running or "idle" */
+                cpuExitInterrupt(ts, currentCPUNode, currentThreadNode);
             }
                 break;
 
@@ -220,7 +220,7 @@ class CtfKernelHandler implements Runnable {
 
                 /* Change the status of the CPU to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_INTERRUPTED);
+                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_SOFTIRQ);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -239,7 +239,7 @@ class CtfKernelHandler implements Runnable {
                 setProcessToRunning(ts, currentThreadNode);
 
                 /* Set the CPU status back to "busy" or "idle" */
-                cpuExitInterrupt(ts, currentCPUNode);
+                cpuExitInterrupt(ts, currentCPUNode, currentThreadNode);
             }
                 break;
 
@@ -314,12 +314,18 @@ class CtfKernelHandler implements Runnable {
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the status of the CPU itself */
-                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
                 if (nextTid > 0) {
-                    value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_BUSY);
+                    /* Check if the entering process is in kernel or user mode */
+                    quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
+                    if (ss.queryOngoingState(quark).isNull()) {
+                        value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_USERMODE);
+                    } else {
+                        value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_SYSCALL);
+                    }
                 } else {
                     value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IDLE);
                 }
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -527,7 +533,7 @@ class CtfKernelHandler implements Runnable {
      * @throws StateValueTypeException 
      * @throws TimeRangeException 
      */
-    private void cpuExitInterrupt(long ts, int currentCpuNode)
+    private void cpuExitInterrupt(long ts, int currentCpuNode, int currentThreadNode)
             throws StateValueTypeException, AttributeNotFoundException,
             TimeRangeException {
         int quark;
@@ -536,7 +542,14 @@ class CtfKernelHandler implements Runnable {
         quark = ss.getQuarkRelativeAndAdd(currentCpuNode, Attributes.CURRENT_THREAD);
         if (ss.queryOngoingState(quark).unboxInt() > 0) {
             /* There was a process on the CPU */
-            value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_BUSY);
+            quark = ss.getQuarkRelative(currentThreadNode, Attributes.SYSTEM_CALL);
+            if (ss.queryOngoingState(quark).isNull()) {
+                /* That process was in user mode */
+                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_USERMODE);
+            } else {
+                /* That process was in a system call */
+                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_SYSCALL);
+            }
         } else {
             /* There was no real process scheduled, CPU was idle */
             value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IDLE);

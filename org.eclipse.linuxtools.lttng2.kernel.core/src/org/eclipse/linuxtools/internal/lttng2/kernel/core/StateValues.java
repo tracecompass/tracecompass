@@ -16,8 +16,10 @@ public class StateValues {
 
     /* CPU Status */
     public static final int CPU_STATUS_IDLE = 0;
-    public static final int CPU_STATUS_BUSY = 1;
-    public static final int CPU_STATUS_INTERRUPTED = 2;
+    public static final int CPU_STATUS_RUN_USERMODE = 1;
+    public static final int CPU_STATUS_RUN_SYSCALL = 2;
+    public static final int CPU_STATUS_IRQ = 3;
+    public static final int CPU_STATUS_SOFTIRQ = 4;
 
     /* Process status */
     public static final int PROCESS_STATUS_WAIT = 1;
