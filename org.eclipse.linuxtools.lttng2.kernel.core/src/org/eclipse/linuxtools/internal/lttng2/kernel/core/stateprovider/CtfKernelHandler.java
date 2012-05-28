@@ -16,7 +16,8 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.Attributes;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngStrings;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
@@ -155,7 +156,7 @@ class CtfKernelHandler implements Runnable {
 
                 /* Put the process' status back to user mode */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_USERMODE);
+                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_USERMODE);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -173,12 +174,12 @@ class CtfKernelHandler implements Runnable {
 
                 /* Change the status of the running process to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_INTERRUPTED);
+                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_INTERRUPTED);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Change the status of the CPU to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_INTERRUPTED);
+                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_INTERRUPTED);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -214,12 +215,12 @@ class CtfKernelHandler implements Runnable {
 
                 /* Change the status of the running process to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_INTERRUPTED);
+                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_INTERRUPTED);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Change the status of the CPU to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_INTERRUPTED);
+                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_INTERRUPTED);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -250,7 +251,7 @@ class CtfKernelHandler implements Runnable {
                 /* Mark this SoftIRQ as *raised* in the resource tree.
                  * State value = -2 */
                 quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
-                value = TmfStateValue.newValueInt(Attributes.SOFT_IRQ_RAISED);
+                value = TmfStateValue.newValueInt(StateValues.SOFT_IRQ_RAISED);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -280,7 +281,7 @@ class CtfKernelHandler implements Runnable {
                 value = ss.queryOngoingState(quark);
                 if (!value.isNull()) {
                     quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
-                    value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT);
+                    value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT);
                     ss.modifyAttribute(ts, value, quark);
                 }
 
@@ -315,9 +316,9 @@ class CtfKernelHandler implements Runnable {
                 /* Set the status of the CPU itself */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
                 if (nextTid > 0) {
-                    value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_BUSY);
+                    value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_BUSY);
                 } else {
-                    value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_IDLE);
+                    value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IDLE);
                 }
                 ss.modifyAttribute(ts, value, quark);
             }
@@ -350,7 +351,7 @@ class CtfKernelHandler implements Runnable {
 
                 /* Set the new process' status */
                 quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT);
+                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the process' syscall state */
@@ -411,7 +412,7 @@ class CtfKernelHandler implements Runnable {
 
                     /* Put the process in system call mode */
                     quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                    value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_SYSCALL);
+                    value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_SYSCALL);
                     ss.modifyAttribute(ts, value, quark);
                 }
             }
@@ -510,10 +511,10 @@ class CtfKernelHandler implements Runnable {
         quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
         if (ss.queryOngoingState(quark).isNull()) {
             /* We were in user mode before the interruption */
-            value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_USERMODE);
+            value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_USERMODE);
         } else {
             /* We were previously in kernel mode */
-            value = TmfStateValue.newValueInt(Attributes.STATUS_RUN_SYSCALL);
+            value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_SYSCALL);
         }
         quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
         ss.modifyAttribute(ts, value, quark);
@@ -535,10 +536,10 @@ class CtfKernelHandler implements Runnable {
         quark = ss.getQuarkRelativeAndAdd(currentCpuNode, Attributes.CURRENT_THREAD);
         if (ss.queryOngoingState(quark).unboxInt() > 0) {
             /* There was a process on the CPU */
-            value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_BUSY);
+            value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_BUSY);
         } else {
             /* There was no real process scheduled, CPU was idle */
-            value = TmfStateValue.newValueInt(Attributes.CPU_STATUS_IDLE);
+            value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IDLE);
         }
         quark = ss.getQuarkRelativeAndAdd(currentCpuNode, Attributes.STATUS);
         ss.modifyAttribute(ts, value, quark);

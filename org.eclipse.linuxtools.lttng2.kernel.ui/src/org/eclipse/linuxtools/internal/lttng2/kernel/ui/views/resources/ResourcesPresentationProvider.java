@@ -16,9 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.Attributes;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
@@ -67,16 +68,16 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             ResourcesEvent resourcesEvent = (ResourcesEvent) event;
             if (resourcesEvent.getType() == Type.CPU) {
                 int status = resourcesEvent.getValue();
-                if (status == Attributes.CPU_STATUS_IDLE) {
+                if (status == StateValues.CPU_STATUS_IDLE) {
                     return State.IDLE.ordinal();
-                } else if (status == Attributes.CPU_STATUS_BUSY) {
+                } else if (status == StateValues.CPU_STATUS_BUSY) {
                     return State.BUSY.ordinal();
-                } else if (status == Attributes.CPU_STATUS_INTERRUPTED) {
+                } else if (status == StateValues.CPU_STATUS_INTERRUPTED) {
                     return State.INTERRUPTED.ordinal();
                 }
             } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
                 int cpu = resourcesEvent.getValue();
-                if (cpu == Attributes.SOFT_IRQ_RAISED) {
+                if (cpu == StateValues.SOFT_IRQ_RAISED) {
                     return State.RAISED.ordinal();
                 }
                 return State.ACTIVE.ordinal();
@@ -93,16 +94,16 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             ResourcesEvent resourcesEvent = (ResourcesEvent) event;
             if (resourcesEvent.getType() == Type.CPU) {
                 int status = resourcesEvent.getValue();
-                if (status == Attributes.CPU_STATUS_IDLE) {
+                if (status == StateValues.CPU_STATUS_IDLE) {
                     return State.IDLE.toString();
-                } else if (status == Attributes.CPU_STATUS_BUSY) {
+                } else if (status == StateValues.CPU_STATUS_BUSY) {
                     return State.BUSY.toString();
-                } else if (status == Attributes.CPU_STATUS_INTERRUPTED) {
+                } else if (status == StateValues.CPU_STATUS_INTERRUPTED) {
                     return State.INTERRUPTED.toString();
                 }
             } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
                 int cpu = resourcesEvent.getValue();
-                if (cpu == Attributes.SOFT_IRQ_RAISED) {
+                if (cpu == StateValues.SOFT_IRQ_RAISED) {
                     return State.RAISED.toString();
                 }
                 return State.ACTIVE.toString();
@@ -135,7 +136,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             if (resourcesEvent.getType().equals(Type.CPU)) {
                 int status = resourcesEvent.getValue();
 
-                if (status == Attributes.CPU_STATUS_INTERRUPTED) {
+                if (status == StateValues.CPU_STATUS_INTERRUPTED) {
                     // In interrupted state get the IRQ or SOFT_IRQ that caused the interruption
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
                     IStateSystemQuerier ssq = entry.getTrace().getStateSystem();

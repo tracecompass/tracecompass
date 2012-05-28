@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.HistoryTreeBackend;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.Attributes;
 import org.junit.*;
 
 /**

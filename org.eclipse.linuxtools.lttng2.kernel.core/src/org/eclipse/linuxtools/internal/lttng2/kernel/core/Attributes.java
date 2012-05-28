@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.kernel.core.trace;
+package org.eclipse.linuxtools.internal.lttng2.kernel.core;
 
 /**
  * This file defines all the attribute names used in the handler. Both the
@@ -52,20 +52,6 @@ public abstract class Attributes {
      */
     public static final String STATISTICS = "Stats";
     public static final String EVENT_TYPES = "Event_types";
-
-    /* CPU Status (note these are *values*, not attribute names) */
-    public static final int CPU_STATUS_IDLE = 0;
-    public static final int CPU_STATUS_BUSY = 1;
-    public static final int CPU_STATUS_INTERRUPTED = 2;
-
-    /* Process status */
-    public static final int STATUS_WAIT = 1;
-    public static final int STATUS_RUN_USERMODE = 2;
-    public static final int STATUS_RUN_SYSCALL = 3;
-    public static final int STATUS_INTERRUPTED = 4;
-
-    /* SoftIRQ-specific stuff. -1: null/disabled, >= 0: running on that CPU */
-    public static final int SOFT_IRQ_RAISED = -2;
 
     /* Misc stuff */
     public static final String UNKNOWN = "Unknown";

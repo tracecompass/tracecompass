@@ -15,8 +15,9 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.Attributes;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
@@ -62,13 +63,13 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof ControlFlowEvent) {
             int status = ((ControlFlowEvent) event).getStatus();
-            if (status == Attributes.STATUS_WAIT) {
+            if (status == StateValues.PROCESS_STATUS_WAIT) {
                 return State.WAIT.ordinal();
-            } else if (status == Attributes.STATUS_RUN_USERMODE) {
+            } else if (status == StateValues.PROCESS_STATUS_RUN_USERMODE) {
                 return State.USERMODE.ordinal();
-            } else if (status == Attributes.STATUS_RUN_SYSCALL) {
+            } else if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
                 return State.SYSCALL.ordinal();
-            } else if (status == Attributes.STATUS_INTERRUPTED) {
+            } else if (status == StateValues.PROCESS_STATUS_INTERRUPTED) {
                 return State.INTERRUPTED.ordinal();
             }
         }
@@ -79,13 +80,13 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     public String getEventName(ITimeEvent event) {
         if (event instanceof ControlFlowEvent) {
             int status = ((ControlFlowEvent) event).getStatus();
-            if (status == Attributes.STATUS_WAIT) {
+            if (status == StateValues.PROCESS_STATUS_WAIT) {
                 return State.WAIT.toString();
-            } else if (status == Attributes.STATUS_RUN_USERMODE) {
+            } else if (status == StateValues.PROCESS_STATUS_RUN_USERMODE) {
                 return State.USERMODE.toString();
-            } else if (status == Attributes.STATUS_RUN_SYSCALL) {
+            } else if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
                 return State.SYSCALL.toString();
-            } else if (status == Attributes.STATUS_INTERRUPTED) {
+            } else if (status == StateValues.PROCESS_STATUS_INTERRUPTED) {
                 return State.INTERRUPTED.toString();
             }
         }
@@ -97,7 +98,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         Map<String, String> retMap = new HashMap<String, String>();
         if (event instanceof ControlFlowEvent) {
             int status = ((ControlFlowEvent) event).getStatus();
-            if (status == Attributes.STATUS_RUN_SYSCALL) {
+            if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
                 ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
                 IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
                 try {
