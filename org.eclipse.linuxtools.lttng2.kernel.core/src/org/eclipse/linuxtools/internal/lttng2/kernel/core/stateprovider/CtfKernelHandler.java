@@ -12,8 +12,9 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
@@ -45,8 +46,8 @@ class CtfKernelHandler implements Runnable {
      * We can keep handles to some Attribute Nodes so these don't need to be
      * re-found (re-hashed Strings etc.) every new event
      */
-    Vector<Integer> currentCPUNodes;
-    Vector<Integer> currentThreadNodes;
+    List<Integer> currentCPUNodes;
+    List<Integer> currentThreadNodes;
 
     /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
     private final HashMap<String, Integer> knownEventNames;
@@ -60,8 +61,8 @@ class CtfKernelHandler implements Runnable {
     CtfKernelHandler(BlockingQueue<CtfTmfEvent> eventsQueue) {
         assert (eventsQueue != null);
         this.inQueue = eventsQueue;
-        currentCPUNodes = new Vector<Integer>();
-        currentThreadNodes = new Vector<Integer>();
+        currentCPUNodes = new ArrayList<Integer>();
+        currentThreadNodes = new ArrayList<Integer>();
 
         knownEventNames = fillEventNames();
     }
@@ -157,6 +158,11 @@ class CtfKernelHandler implements Runnable {
                 /* Put the process' status back to user mode */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
                 value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_USERMODE);
+                ss.modifyAttribute(ts, value, quark);
+
+                /* Put the CPU's status back to user mode */
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_USERMODE);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -419,6 +425,11 @@ class CtfKernelHandler implements Runnable {
                     /* Put the process in system call mode */
                     quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
                     value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_SYSCALL);
+                    ss.modifyAttribute(ts, value, quark);
+
+                    /* Put the CPU in system call (kernel) mode */
+                    quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+                    value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_SYSCALL);
                     ss.modifyAttribute(ts, value, quark);
                 }
             }
