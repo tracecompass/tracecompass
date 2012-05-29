@@ -5,11 +5,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 public class CustomEventContent extends TmfEventField {
 
-//    CustomEvent fParent;
-    
     public CustomEventContent(CustomEvent parent, String content) {
         super(ITmfEventField.ROOT_FIELD_ID, content);
-//        fParent = parent;
     }
 
     /* (non-Javadoc)
@@ -37,15 +34,8 @@ public class CustomEventContent extends TmfEventField {
         return true;
     }
 
-//    @Override
-//    protected void parseContent() {
-//        CustomEvent event = (CustomEvent) fParentEvent;
-//        fFields = event.extractItemFields();
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return Arrays.toString(getFields());
-//    }
+    public void setFields(ITmfEventField[] fields) {
+        super.setValue(getValue(), fields);
+    }
 
 }
