@@ -72,6 +72,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
                 "topRightFolder", IPageLayout.TOP, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topRightFolder.addView(CONTROLFLOW_VIEW_ID);
         topRightFolder.addView(RESOURCES_VIEW_ID);
+        topRightFolder.addView(STATISTICS_VIEW_ID);
 
         // Create the middle right folder
         IFolderLayout middleRightFolder = layout.createFolder(
@@ -82,7 +83,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         IFolderLayout bottomRightFolder = layout.createFolder(
                 "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
-        bottomRightFolder.addView(STATISTICS_VIEW_ID);
         bottomRightFolder.addView(PROPERTIES_VIEW_ID);
         bottomRightFolder.addView(BOOKMARKS_VIEW_ID);
     }
