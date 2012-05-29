@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.internal.tmf.core.Activator;
 /**
  * Test suite for org.eclipse.linuxtools.tmf.core.event
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class AllTests {
 
     public static Test suite() {

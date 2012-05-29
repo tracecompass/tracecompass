@@ -43,7 +43,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 /**
  * Test suite for the TmfExperiment class (single trace).
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class TmfExperimentTest extends TestCase {
 
     // ------------------------------------------------------------------------

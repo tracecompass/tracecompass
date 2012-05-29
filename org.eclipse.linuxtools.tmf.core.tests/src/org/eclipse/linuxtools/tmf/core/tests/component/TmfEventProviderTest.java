@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
  * <p>
  * Test suite for the TmfEventProvider class.
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class TmfEventProviderTest extends TestCase {
 
     TmfEventProviderStub fEventProvider;

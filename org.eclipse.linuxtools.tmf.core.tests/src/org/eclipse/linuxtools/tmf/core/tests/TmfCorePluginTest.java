@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.internal.tmf.core.Activator;
  * <p>
  * Test the TMF core plug-in activator
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class TmfCorePluginTest extends TestCase {
 
 	// ------------------------------------------------------------------------

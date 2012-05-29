@@ -51,7 +51,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
 
     private int cpuNumber = -1;
 
-    private final  boolean showDebug = false;
+//    private final  boolean showDebug = false;
 
     public LTTngTextTrace(final IResource resource, final String path) throws Exception {
         this(resource, path, true); // false);
@@ -136,11 +136,11 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
             if ( skipPosition < 0 )
                 skipPosition = 0L;
 
-            if ( showDebug == true ) {
-                System.out.println("skipToPosition(Long skipPosition)"); //$NON-NLS-1$
-                System.out.println("\tSkipping to : " + skipPosition); //$NON-NLS-1$
-                System.out.println();
-            }
+//            if ( showDebug == true ) {
+//                System.out.println("skipToPosition(Long skipPosition)"); //$NON-NLS-1$
+//                System.out.println("\tSkipping to : " + skipPosition); //$NON-NLS-1$
+//                System.out.println();
+//            }
             positionToFirstEvent();
             final long nbSkipped = br.skip(skipPosition);
             if ( nbSkipped != skipPosition)
@@ -222,10 +222,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
                 // We should check in a better way (string comparison and such) but it make the whole process to weight a lot more
                 // Conclusion : this is ugly but fast.
                 if ( tmpCurIndex < 0 ) {
-                    if ( showDebug == true ) {
-                        System.out.println("END OF FILE."); //$NON-NLS-1$
-                        System.out.println();
-                    }
+//                    if ( showDebug == true ) {
+//                        System.out.println("END OF FILE."); //$NON-NLS-1$
+//                        System.out.println();
+//                    }
                     return null;
                 }
 
@@ -376,11 +376,11 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
 
                 returnedEvent = currentLttngEvent;
             }
-            else if ( showDebug == true ) {
-                System.out.println("NULL READING"); //$NON-NLS-1$
-                System.out.println();
-                returnedEvent = null;
-            }
+//            else if ( showDebug == true ) {
+//                System.out.println("NULL READING"); //$NON-NLS-1$
+//                System.out.println();
+//                returnedEvent = null;
+//            }
         }
         catch (final Exception e) {
             System.out.println("Pos is :" + nbCharRead); //$NON-NLS-1$

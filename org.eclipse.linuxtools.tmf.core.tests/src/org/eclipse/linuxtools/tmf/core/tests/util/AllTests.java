@@ -5,7 +5,7 @@ import junit.framework.TestSuite;
 
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class AllTests {
 
 	public static Test suite() {

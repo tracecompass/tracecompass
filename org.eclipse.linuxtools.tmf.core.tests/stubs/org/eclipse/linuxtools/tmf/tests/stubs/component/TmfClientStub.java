@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
  * <p>
  * TODO: Implement me. Please.
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class TmfClientStub extends TmfComponent {
 
     private TmfDataProvider<TmfSyntheticEventStub>[] fProviders;

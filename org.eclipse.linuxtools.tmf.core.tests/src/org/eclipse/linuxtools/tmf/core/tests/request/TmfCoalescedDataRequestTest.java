@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
  * <p>
  * Test suite for the TmfCoalescedDataRequest class.
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class TmfCoalescedDataRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------

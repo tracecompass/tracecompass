@@ -30,7 +30,6 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
-@SuppressWarnings("restriction")
 public class CtfTmfTraceTest {
     private static final String PATH = TestParams.getPath();
 

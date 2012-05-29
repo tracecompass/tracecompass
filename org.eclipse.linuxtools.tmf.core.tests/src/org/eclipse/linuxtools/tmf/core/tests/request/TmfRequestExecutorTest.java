@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor;
  *
  * Test suite for the TmfRequestExecutor class.
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class TmfRequestExecutorTest extends TestCase {
 
 	// ------------------------------------------------------------------------

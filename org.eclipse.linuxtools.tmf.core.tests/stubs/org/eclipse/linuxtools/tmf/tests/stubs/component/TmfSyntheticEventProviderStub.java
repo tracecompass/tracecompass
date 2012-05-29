@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
  * <p>
  * TODO: Implement me. Please.
  */
-@SuppressWarnings({ "nls", "restriction" })
+@SuppressWarnings({ "nls" })
 public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSyntheticEventStub> {
 
     public static final int BLOCK_SIZE = 100;
