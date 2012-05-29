@@ -402,6 +402,11 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                                 fTopLineIndex++;
                                 fLastTopLineIndex++;
                             }
+                        } else {
+                            LineData lineData = new LineData(rank, location, ""); //$NON-NLS-1$
+                            fLines.add(index++, lineData);
+                            fTopLineIndex++;
+                            fLastTopLineIndex++;
                         }
                         rank++;
                     }
@@ -450,6 +455,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                     LineData lineData = new LineData(rank, location, line); 
                     fLines.add(lineData);
                 }
+            } else {
+                LineData lineData = new LineData(rank, location, ""); //$NON-NLS-1$
+                fLines.add(lineData);
             }
 	    }
 	    fTopLineIndex = Math.max(0, Math.min(fTopLineIndex, fLines.size() - 1));
