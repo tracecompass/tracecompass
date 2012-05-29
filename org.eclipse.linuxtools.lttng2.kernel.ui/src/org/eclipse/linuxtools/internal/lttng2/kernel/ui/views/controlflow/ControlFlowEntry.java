@@ -28,19 +28,19 @@ public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlow
     private ArrayList<ControlFlowEntry> fChildren = new ArrayList<ControlFlowEntry>();
     private String fName;
     private int fThreadId;
-    private int fPpid;
+    private int fParentThreadId;
     private long fBirthTime = -1;
     private long fStartTime = -1;
     private long fEndTime = -1;
     private List<ITimeEvent> fEventList = new ArrayList<ITimeEvent>();
     private List<ITimeEvent> fZoomedEventList = null;
 
-    public ControlFlowEntry(int threadQuark, CtfKernelTrace trace, String execName, int threadId, int ppid, long birthTime, long startTime, long endTime) {
+    public ControlFlowEntry(int threadQuark, CtfKernelTrace trace, String execName, int threadId, int parentThreadId, long birthTime, long startTime, long endTime) {
         fThreadQuark = threadQuark;
         fTrace = trace;
         fName = execName;
         fThreadId = threadId;
-        fPpid = ppid;
+        fParentThreadId = parentThreadId;
         fBirthTime = birthTime;
         fStartTime = startTime;
         fEndTime = endTime;
@@ -112,8 +112,8 @@ public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlow
         return fThreadId;
     }
 
-    public int getPPID() {
-        return fPpid;
+    public int getParentThreadId() {
+        return fParentThreadId;
     }
 
     public long getBirthTime() {

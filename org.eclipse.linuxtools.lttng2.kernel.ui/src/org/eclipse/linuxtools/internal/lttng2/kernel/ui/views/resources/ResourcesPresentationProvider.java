@@ -33,12 +33,15 @@ import org.eclipse.swt.graphics.RGB;
 public class ResourcesPresentationProvider extends TimeGraphPresentationProvider {
 
     private enum State {
-        UNKNOWN     (new RGB(100, 100, 100)),
-        IDLE        (new RGB(200, 200, 200)),
-        BUSY        (new RGB(0, 200, 0)),
-        INTERRUPTED (new RGB(200, 100, 100)),
-        RAISED      (new RGB(200, 200, 0)),
-        ACTIVE      (new RGB(200, 150, 100));
+        UNKNOWN         (new RGB(100, 100, 100)),
+        IDLE            (new RGB(200, 200, 200)),
+        USERMODE        (new RGB(0, 200, 0)),
+        SYSCALL         (new RGB(0, 0, 200)),
+        IRQ             (new RGB(200, 100, 100)),
+        SOFT_IRQ        (new RGB(200, 150, 100)),
+        IRQ_ACTIVE      (new RGB(200, 100, 100)),
+        SOFT_IRQ_RAISED (new RGB(200, 200, 0)),
+        SOFT_IRQ_ACTIVE (new RGB(200, 150, 100));
 
         public final RGB rgb;
 
@@ -71,16 +74,22 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 if (status == StateValues.CPU_STATUS_IDLE) {
                     return State.IDLE.ordinal();
                 } else if (status == StateValues.CPU_STATUS_RUN_USERMODE) {
-                    return State.BUSY.ordinal();
+                    return State.USERMODE.ordinal();
+                } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
+                    return State.SYSCALL.ordinal();
                 } else if (status == StateValues.CPU_STATUS_IRQ) {
-                    return State.INTERRUPTED.ordinal();
+                    return State.IRQ.ordinal();
+                } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
+                    return State.SOFT_IRQ.ordinal();
                 }
-            } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
+            } else if (resourcesEvent.getType() == Type.IRQ) {
+                return State.IRQ_ACTIVE.ordinal();
+            } else if (resourcesEvent.getType() == Type.SOFT_IRQ) {
                 int cpu = resourcesEvent.getValue();
                 if (cpu == StateValues.SOFT_IRQ_RAISED) {
-                    return State.RAISED.ordinal();
+                    return State.SOFT_IRQ_RAISED.ordinal();
                 }
-                return State.ACTIVE.ordinal();
+                return State.SOFT_IRQ_ACTIVE.ordinal();
             } else {
                 return -1; // NULL
             }
@@ -97,16 +106,22 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 if (status == StateValues.CPU_STATUS_IDLE) {
                     return State.IDLE.toString();
                 } else if (status == StateValues.CPU_STATUS_RUN_USERMODE) {
-                    return State.BUSY.toString();
+                    return State.USERMODE.toString();
+                } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
+                    return State.SYSCALL.toString();
                 } else if (status == StateValues.CPU_STATUS_IRQ) {
-                    return State.INTERRUPTED.toString();
+                    return State.IRQ.toString();
+                } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
+                    return State.SOFT_IRQ.toString();
                 }
-            } else if (resourcesEvent.getType() == Type.IRQ || resourcesEvent.getType() == Type.SOFT_IRQ) {
+            } else if (resourcesEvent.getType() == Type.IRQ) {
+                return State.IRQ_ACTIVE.toString();
+            } else if (resourcesEvent.getType() == Type.SOFT_IRQ) {
                 int cpu = resourcesEvent.getValue();
                 if (cpu == StateValues.SOFT_IRQ_RAISED) {
-                    return State.RAISED.toString();
+                    return State.SOFT_IRQ_RAISED.toString();
                 }
-                return State.ACTIVE.toString();
+                return State.SOFT_IRQ_ACTIVE.toString();
             } else {
                 return null;
             }
@@ -137,46 +152,52 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 int status = resourcesEvent.getValue();
 
                 if (status == StateValues.CPU_STATUS_IRQ) {
-                    // In interrupted state get the IRQ or SOFT_IRQ that caused the interruption
+                    // In IRQ state get the IRQ that caused the interruption
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
                     IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
                     int cpu = entry.getId();
-                    
+
                     IStateSystemQuerier ss = entry.getTrace().getStateSystem();
                     try {
-                        int resultQuark = 0;
-                        String attributeName = null;
-                        
-                        // First check for IRQ
                         List<ITmfStateInterval> fullState = ss.queryFullState(event.getTime());
                         List<Integer> irqQuarks = ss.getQuarks(Attributes.RESOURCES, Attributes.IRQS, "*"); //$NON-NLS-1$
 
-                        for (int curQuark : irqQuarks) {
-                            if (fullState.get(curQuark).getStateValue().unboxInt() == cpu) {
-                                resultQuark = curQuark;
-                                attributeName = Messages.ResourcesView_attributeIrqName;
+                        for (int irqQuark : irqQuarks) {
+                            if (fullState.get(irqQuark).getStateValue().unboxInt() == cpu) {
+                                ITmfStateInterval value = ssq.querySingleState(event.getTime(), irqQuark);
+                                if (!value.getStateValue().isNull()) {
+                                    int irq = Integer.parseInt(ssq.getAttributeName(irqQuark));
+                                    retMap.put(Messages.ResourcesView_attributeIrqName, String.valueOf(irq));
+                                }
                                 break;
                             }
                         }
-                        
-                        // If not found check for SOFT_IRQ
-                        if (attributeName == null) {
-                            List<Integer> softIrqQuarks = ssq.getQuarks(Attributes.RESOURCES, Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
-                            for (int curQuark : softIrqQuarks) {
-                                if (fullState.get(curQuark).getStateValue().unboxInt() == cpu) {
-                                    resultQuark = curQuark;
-                                    attributeName = Messages.ResourcesView_attributeSoftIrqName;
-                                    break;
-                                }
-                            }   
-                        }
+                    } catch (AttributeNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (TimeRangeException e) {
+                        e.printStackTrace();
+                    } catch (StateValueTypeException e) {
+                        e.printStackTrace();
+                    }
+                } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
+                    // In SOFT_IRQ state get the SOFT_IRQ that caused the interruption
+                    ResourcesEntry entry = (ResourcesEntry) event.getEntry();
+                    IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+                    int cpu = entry.getId();
 
-                        if (attributeName != null) {
-                            // A IRQ or SOFT_IRQ was found
-                            ITmfStateInterval value = ssq.querySingleState(event.getTime(), resultQuark);
-                            if (!value.getStateValue().isNull()) {
-                                int irq = Integer.parseInt(ssq.getAttributeName(resultQuark));
-                                retMap.put(attributeName, String.valueOf(irq));
+                    IStateSystemQuerier ss = entry.getTrace().getStateSystem();
+                    try {
+                        List<ITmfStateInterval> fullState = ss.queryFullState(event.getTime());
+                        List<Integer> softIrqQuarks = ss.getQuarks(Attributes.RESOURCES, Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
+
+                        for (int softIrqQuark : softIrqQuarks) {
+                            if (fullState.get(softIrqQuark).getStateValue().unboxInt() == cpu) {
+                                ITmfStateInterval value = ssq.querySingleState(event.getTime(), softIrqQuark);
+                                if (!value.getStateValue().isNull()) {
+                                    int softIrq = Integer.parseInt(ssq.getAttributeName(softIrqQuark));
+                                    retMap.put(Messages.ResourcesView_attributeSoftIrqName, String.valueOf(softIrq));
+                                }
+                                break;
                             }
                         }
                     } catch (AttributeNotFoundException e) {

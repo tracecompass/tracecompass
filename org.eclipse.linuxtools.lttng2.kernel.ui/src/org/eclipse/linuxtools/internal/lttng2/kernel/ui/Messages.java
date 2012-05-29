@@ -7,7 +7,7 @@ public class Messages extends NLS {
 
     public static String ControlFlowView_birthTimeColumn;
     public static String ControlFlowView_tidColumn;
-    public static String ControlFlowView_ppidColumn;
+    public static String ControlFlowView_ptidColumn;
     public static String ControlFlowView_processColumn;
     public static String ControlFlowView_traceColumn;
     

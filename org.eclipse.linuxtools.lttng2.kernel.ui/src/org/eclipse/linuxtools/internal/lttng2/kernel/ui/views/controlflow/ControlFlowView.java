@@ -82,14 +82,14 @@ public class ControlFlowView extends TmfView {
 
     private static final String PROCESS_COLUMN    = Messages.ControlFlowView_processColumn;
     private static final String TID_COLUMN        = Messages.ControlFlowView_tidColumn;
-    private static final String PPID_COLUMN       = Messages.ControlFlowView_ppidColumn;
+    private static final String PTID_COLUMN       = Messages.ControlFlowView_ptidColumn;
     private static final String BIRTH_TIME_COLUMN = Messages.ControlFlowView_birthTimeColumn;
     private static final String TRACE_COLUMN      = Messages.ControlFlowView_traceColumn;
 
     private final String[] COLUMN_NAMES = new String[] {
             PROCESS_COLUMN,
             TID_COLUMN,
-            PPID_COLUMN,
+            PTID_COLUMN,
             BIRTH_TIME_COLUMN,
             TRACE_COLUMN
     };
@@ -196,8 +196,8 @@ public class ControlFlowView extends TmfView {
             } else if (columnIndex == 1) {
                 return Integer.toString(entry.getThreadId());
             } else if (columnIndex == 2) {
-                if (entry.getPPID() > 0) {
-                    return Integer.toString(entry.getPPID());
+                if (entry.getParentThreadId() > 0) {
+                    return Integer.toString(entry.getParentThreadId());
                 }
             } else if (columnIndex == 3) {
                 return Utils.formatTime(entry.getBirthTime(), TimeFormat.ABSOLUTE, Resolution.NANOSEC);
@@ -528,9 +528,9 @@ public class ControlFlowView extends TmfView {
         ArrayList<ControlFlowEntry> rootList = new ArrayList<ControlFlowEntry>();
         for (ControlFlowEntry entry : entryList) {
             boolean root = true;
-            if (entry.getPPID() > 0) {
+            if (entry.getParentThreadId() > 0) {
                 for (ControlFlowEntry parent : entryList) {
-                    if (parent.getThreadId() == entry.getPPID() &&
+                    if (parent.getThreadId() == entry.getParentThreadId() &&
                             entry.getStartTime() >= parent.getStartTime() &&
                             entry.getStartTime() <= parent.getEndTime()) {
                         parent.addChild(entry);
