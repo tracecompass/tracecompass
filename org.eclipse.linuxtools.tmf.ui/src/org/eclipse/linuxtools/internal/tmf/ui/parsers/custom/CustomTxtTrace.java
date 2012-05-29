@@ -57,6 +57,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CustomTxtEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
+        indexTrace(false);
     }
 
     @Override
