@@ -66,12 +66,8 @@
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
-      <category
-            id="org.eclipse.linuxtools.lttng.ui.wizards.new"
-            name="%wizard.category.name">
-      </category>
       <wizard
-            category="org.eclipse.linuxtools.lttng.ui.wizards.new"
+            category="org.eclipse.linuxtools.tmf.ui.wizards.new"
             class="org.eclipse.linuxtools.internal.lttng.ui.project.dialogs.NewLTTngProjectWizard"
             descriptionImage="icons/obj16/garland16.png"
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"

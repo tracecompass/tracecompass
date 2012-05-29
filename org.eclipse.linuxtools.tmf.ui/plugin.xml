@@ -117,7 +117,7 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            name="%wizard.category.name">
+            name="%project.new.category.name">
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
