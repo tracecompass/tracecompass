@@ -219,15 +219,15 @@ public class LttngEventContent extends TmfEventField {
 
         // Check for generic table header fields
         if (name.equals(LttngEventType.CONTENT_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_CONTENT)) {
-            return new LttngEventField(toString());
+            return new LttngEventField(LttngEventType.CONTENT_LABEL, toString());
         } else if (name.equals(LttngEventType.MARKER_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_TYPE)) {
-            return new LttngEventField(fParentEvent.getType().getName());
+            return new LttngEventField(LttngEventType.MARKER_LABEL, fParentEvent.getType().getName());
         } else if (name.equals(LttngEventType.TRACE_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_REFERENCE)) {
-            return new LttngEventField(fParentEvent.getReference());
+            return new LttngEventField(LttngEventType.TRACE_LABEL, fParentEvent.getReference());
         } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_TIMESTAMP)) {
-            return new LttngEventField(fParentEvent.getTimestamp().toString());
+            return new LttngEventField(LttngEventType.TIMESTAMP_LABEL, fParentEvent.getTimestamp().toString());
         } else if (name.equals(ITmfEvent.EVENT_FIELD_SOURCE)) {
-            return new LttngEventField(fParentEvent.getSource());
+            return new LttngEventField(ITmfEvent.EVENT_FIELD_SOURCE, fParentEvent.getSource());
         }
 
     	// *** VERIFY ***
