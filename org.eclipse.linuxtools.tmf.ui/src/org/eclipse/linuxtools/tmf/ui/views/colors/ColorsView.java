@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Ericsson
+ * Copyright (c) 2010, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Bernd Hufmann - Updated to use RGB for the tick color
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.colors;
@@ -22,8 +23,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.views.filter.FilterDialog;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
@@ -54,6 +55,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 
+/**
+ * Color view implementation. This view provides support for managing color settings for filters. 
+ *  
+ * @version 1.0
+ * @author Patrick Tasse
+ *
+ */
 public class ColorsView extends TmfView {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.colors"; //$NON-NLS-1$
@@ -68,23 +76,58 @@ public class ColorsView extends TmfView {
     // ------------------------------------------------------------------------
     // Main data structures
     // ------------------------------------------------------------------------
-
+    
+    /**
+     * The composite shell.
+     */
     protected Shell fShell;
+    /**
+     * The main composite (scrolled composite)
+     */
     protected ScrolledComposite fScrolledComposite;
+    /**
+     * The list composite. 
+     */
     protected Composite fListComposite;
+    /**
+     * The filler composite.
+     */
     protected Composite fFillerComposite;
-
-    private ColorSettingRow fSelectedRow = null;
-
-    private TimeGraphColorScheme traceColorScheme = new TimeGraphColorScheme();
-
-    Action fAddAction;
-    Action fDeleteAction;
-    Action fMoveUpAction;
-    Action fMoveDownAction;
-    Action fImportAction;
-    Action fExportAction;
-
+    /**
+     *  The selected color settings row
+     */
+    protected ColorSettingRow fSelectedRow = null;
+    /**
+     *  The color scheme instance for managing colors
+     */
+    protected TimeGraphColorScheme traceColorScheme = new TimeGraphColorScheme();
+    /**
+     * An action to add a color settings row
+     */
+    protected Action fAddAction;
+    /**
+     * An action to delete a color settings row
+     */
+    protected Action fDeleteAction;
+    /**
+     * An action to move up a color settings row in the list.
+     */
+    protected Action fMoveUpAction;
+    /**
+     * An action to move down a color settings row in the list.
+     */
+    protected Action fMoveDownAction;
+    /**
+     * An action to import color settings from file.
+     */
+    protected Action fImportAction;
+    /**
+     * An action to export color settings from file.
+     */
+    protected Action fExportAction;
+    /**
+     * The list of existing color settings
+     */
     protected List<ColorSetting> fColorSettings;
 
     // ------------------------------------------------------------------------
@@ -169,6 +212,9 @@ public class ColorsView extends TmfView {
         fScrolledComposite.setFocus();
     }
 
+    /**
+     * Refreshes the view display and updates the view actions enablements.
+     */
     public void refresh() {
         fListComposite.layout();
         fScrolledComposite.setMinSize(fListComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -230,7 +276,7 @@ public class ColorsView extends TmfView {
             ColorSetting colorSetting = new ColorSetting(
                     Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
                     Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(),
-                    TimeGraphColorScheme.BLACK_STATE,
+                    Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
                     null);
             ColorSettingRow row = new ColorSettingRow(fListComposite, colorSetting);
             if (fSelectedRow == null) {
@@ -247,6 +293,7 @@ public class ColorsView extends TmfView {
     }
 
     private class DeleteAction extends Action {
+        
         @Override
         public void run() {
             if (fSelectedRow != null) {
@@ -287,6 +334,7 @@ public class ColorsView extends TmfView {
                 int index = fColorSettings.indexOf(fSelectedRow.getColorSetting());
                 if (index < fColorSettings.size() - 1) {
                     fColorSettings.add(index + 1, fColorSettings.remove(index));
+                    
                     fSelectedRow.moveBelow(fListComposite.getChildren()[index + 1]);
                     refresh();
                     ColorSettingsManager.setColorSettings(fColorSettings.toArray(new ColorSetting[0]));
@@ -443,7 +491,7 @@ public class ColorsView extends TmfView {
                     for (int i = 1; i <= 3; i++) {
                         rect.x += i;
                         rect.width = i;
-                        e.gc.setBackground(traceColorScheme.getColor(fColorSetting.getTickColorIndex()));
+                        e.gc.setBackground(fColorSetting.getTickColor());
                         e.gc.fillRectangle(rect);
                     }
                 }});
@@ -452,17 +500,13 @@ public class ColorsView extends TmfView {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     fSelectedRow = ColorSettingRow.this;
-                    refresh();
-                    TickColorDialog dialog = new TickColorDialog(fShell);
-                    dialog.setColorIndex(colorSetting.getTickColorIndex());
+                    ColorDialog dialog = new ColorDialog(fShell);
+                    dialog.setRGB(colorSetting.getTickColorRGB());
+                    dialog.setText(Messages.TickColorDialog_TickColorDialogTitle);
                     dialog.open();
-                    if (dialog.getReturnCode() == Dialog.OK) {
-                        if (dialog.getColorIndex() != colorSetting.getTickColorIndex()) {
-                            colorSetting.setTickColorIndex(dialog.getColorIndex());
-                            ColorSettingsManager.setColorSettings(fColorSettings.toArray(new ColorSetting[0]));
-                            refresh();
-                        }
-                    }
+                    colorSetting.setTickColorRGB(dialog.getRGB());
+                    ColorSettingsManager.setColorSettings(fColorSettings.toArray(new ColorSetting[0]));
+                    refresh();
                 }});
 
             final Button filterButton = new Button(this, SWT.PUSH);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Ericsson
+ * Copyright (c) 2010, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Bernd Hufmann - Updated to use RGB for the tick color
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.colors;
@@ -40,8 +41,16 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Class for saving and loading of color settings to/from file.
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ *
+ */
 public class ColorSettingsXML {
 
+    // XML Tags and attributes
 	private static final String COLOR_SETTINGS_TAG = "COLOR_SETTINGS"; //$NON-NLS-1$
 	private static final String COLOR_SETTING_TAG = "COLOR_SETTING"; //$NON-NLS-1$
 	private static final String FG_TAG = "FG"; //$NON-NLS-1$
@@ -49,10 +58,15 @@ public class ColorSettingsXML {
 	private static final String R_ATTR = "R"; //$NON-NLS-1$
 	private static final String G_ATTR = "G"; //$NON-NLS-1$
 	private static final String B_ATTR = "B"; //$NON-NLS-1$
-	private static final String TICK_COLOR_TAG = "TICK_COLOR"; //$NON-NLS-1$
-	private static final String INDEX_ATTR = "INDEX"; //$NON-NLS-1$
+	private static final String TICK_TAG = "TICK"; //$NON-NLS-1$
 	private static final String FILTER_TAG = "FILTER"; //$NON-NLS-1$
 
+	/**
+	 * Saves the given color settings to file.
+	 * 
+	 * @param pathName A file name with path 
+	 * @param colorSettings -An array of color settings to save.
+	 */
 	public static void save(String pathName, ColorSetting[] colorSettings) {
 		try {
 			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -80,11 +94,13 @@ public class ColorSettingsXML {
 				bgElement.setAttribute(G_ATTR, Integer.toString(background.green));
 				bgElement.setAttribute(B_ATTR, Integer.toString(background.blue));
 				
-				Element tickColorElement = document.createElement(TICK_COLOR_TAG);
+				Element tickColorElement = document.createElement(TICK_TAG);
 				colorSettingElement.appendChild(tickColorElement);
-				int index = colorSetting.getTickColorIndex();
-				tickColorElement.setAttribute(INDEX_ATTR, Integer.toString(index));
-				
+                RGB tickColor = colorSetting.getTickColorRGB();
+                tickColorElement.setAttribute(R_ATTR, Integer.toString(tickColor.red));
+                tickColorElement.setAttribute(G_ATTR, Integer.toString(tickColor.green));
+                tickColorElement.setAttribute(B_ATTR, Integer.toString(tickColor.blue));
+
 				if (colorSetting.getFilter() != null) {
 					Element filterElement = document.createElement(FILTER_TAG);
 					colorSettingElement.appendChild(filterElement);
@@ -107,6 +123,13 @@ public class ColorSettingsXML {
 		}
 	}
 	
+	/**
+	 * Loads color settings from file and returns it in an array.
+	 * 
+	 * @param pathName A file name with path
+	 * 
+	 * @return the color settings array loaded from file
+	 */
 	public static ColorSetting[] load(String pathName) {
 		if (! new File(pathName).canRead()) {
 			return new ColorSetting[0];
@@ -134,12 +157,13 @@ public class ColorSettingsXML {
 		return new ColorSetting[0];
 	}
 	
+	// Helper class
 	private static class ColorSettingsContentHandler extends DefaultHandler {
 
 		private List<ColorSetting> colorSettings = new ArrayList<ColorSetting>(0);
-		private RGB fg;
-		private RGB bg;
-		private int tickColorIndex;
+		private RGB fg = new RGB(0, 0, 0);
+		private RGB bg = new RGB(255, 255, 255);
+		private RGB tickColor = new RGB(0, 0, 0);
 		private ITmfFilterTreeNode filter;
 		private TmfFilterContentHandler filterContentHandler;
 		
@@ -165,16 +189,18 @@ public class ColorSettingsXML {
 				int g = Integer.valueOf(attributes.getValue(G_ATTR));
 				int b = Integer.valueOf(attributes.getValue(B_ATTR));
 				bg = new RGB(r, g, b);
-			} else if (localName.equals(TICK_COLOR_TAG)) {
-				int index = Integer.valueOf(attributes.getValue(INDEX_ATTR));
-				tickColorIndex = index;
+            } else if (localName.equals(TICK_TAG)) {
+                int r = Integer.valueOf(attributes.getValue(R_ATTR));
+                int g = Integer.valueOf(attributes.getValue(G_ATTR));
+                int b = Integer.valueOf(attributes.getValue(B_ATTR));
+                tickColor = new RGB(r, g, b);
 			} else if (localName.equals(FILTER_TAG)) {
 				filterContentHandler = new TmfFilterContentHandler();
 			} else if (filterContentHandler != null) {
 				filterContentHandler.startElement(uri, localName, qName, attributes);
 			}
 		}
-		
+
 		/* (non-Javadoc)
 		 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 		 */
@@ -182,8 +208,9 @@ public class ColorSettingsXML {
 		public void endElement(String uri, String localName, String qName)
 				throws SAXException {
 			if (localName.equals(COLOR_SETTINGS_TAG)) {
+			    // Nothing to do
 			} else if (localName.equals(COLOR_SETTING_TAG)) {
-				ColorSetting colorSetting = new ColorSetting(fg, bg, tickColorIndex, filter);
+				ColorSetting colorSetting = new ColorSetting(fg, bg, tickColor, filter);
 				colorSettings.add(colorSetting);
 			} else if (localName.equals(FILTER_TAG)) {
 				filter = filterContentHandler.getTree();

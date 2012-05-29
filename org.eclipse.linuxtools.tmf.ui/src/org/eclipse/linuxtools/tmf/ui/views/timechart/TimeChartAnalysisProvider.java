@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.timechart;
 
+import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -37,24 +38,13 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
 
     @Override
     public StateItem[] getStateTable() {
-        return new StateItem[] {
-                new StateItem(new RGB(100, 100, 100)), 
-                new StateItem(new RGB(174, 200, 124)),
-                new StateItem(ColorUtil.blend(Display.getDefault().getSystemColor(SWT.COLOR_BLUE).getRGB(), Display.getDefault().getSystemColor(SWT.COLOR_GRAY).getRGB())),
-                new StateItem(new RGB(210, 150, 60)),
-                new StateItem(new RGB(242, 225, 168)),
-                new StateItem(ColorUtil.blend(Display.getDefault().getSystemColor(SWT.COLOR_RED).getRGB(), Display.getDefault().getSystemColor(SWT.COLOR_GRAY).getRGB())),
-                new StateItem(new RGB(200, 200, 200)),
-                new StateItem(new RGB(35, 107, 42)),
-                new StateItem(new RGB(205,205,0)),
-                new StateItem(new RGB(205, 0, 205)),
-                new StateItem(new RGB(171, 130, 255)),
-                new StateItem(new RGB(255, 181, 197)),
-                new StateItem(new RGB(112, 219, 147)),
-                new StateItem(new RGB(198, 226, 255)),
-                new StateItem(new RGB(95, 158, 160)),
-                new StateItem(new RGB(107, 142, 35))
-        };
+        
+        ColorSetting[] settings = ColorSettingsManager.getColorSettings();
+        StateItem[] stateItems = new StateItem[settings.length];
+        for (int i = 0; i < settings.length; i++) {
+            stateItems[i] = new StateItem(settings[i].getTickColorRGB());
+        }
+        return stateItems;
     }
 
     @Override
@@ -64,7 +54,7 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
             priority = Math.min(priority, lastPriority);
         }
         lastPriority = priority;
-        return ColorSettingsManager.getColorSetting(priority).getTickColorIndex();
+        return priority;
     }
 
     @Override

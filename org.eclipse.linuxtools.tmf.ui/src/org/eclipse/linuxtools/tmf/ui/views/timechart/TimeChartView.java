@@ -43,6 +43,7 @@ import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.views.colors.IColorSettingsListener;
 import org.eclipse.linuxtools.tmf.ui.views.timechart.TimeChartEvent.RankRange;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -75,6 +76,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     private boolean fRefreshBusy = false;
     private boolean fRefreshPending = false;
     private final Object fSyncObj = new Object();
+    private ITimeGraphPresentationProvider fPresentationProvider;
 
     public TimeChartView() {
         super("Time Chart"); //$NON-NLS-1$
@@ -84,7 +86,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     @Override
     public void createPartControl(Composite parent) {
         fViewer = new TimeGraphViewer(parent, SWT.NONE);
-        fViewer.setTimeGraphProvider(new TimeChartAnalysisProvider());
+        fPresentationProvider = new TimeChartAnalysisProvider();
+        fViewer.setTimeGraphProvider(fPresentationProvider);
         fViewer.setTimeCalendarFormat(true);
         fViewer.addRangeListener(this);
         fViewer.addSelectionListener(this);
@@ -494,6 +497,9 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     @Override
     public void colorSettingsChanged(ColorSetting[] colorSettings) {
+        // Set presentation provider again to trigger re-creation of new color settings which are stored
+        // in the TimeGraphControl class
+        fViewer.setTimeGraphProvider(fPresentationProvider);
         redecorate();
     }
 
