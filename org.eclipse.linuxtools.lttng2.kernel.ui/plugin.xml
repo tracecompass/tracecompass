@@ -12,12 +12,8 @@
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.ui.tracetype">
-      <category
-            id="org.eclipse.linuxtools.lttng2.kernel.ui.category"
-            name="%tracetype.category.lttng">
-      </category>
       <type
-            category="org.eclipse.linuxtools.lttng2.kernel.ui.category"
+            category="org.eclipse.linuxtools.tmf.ui.category.ctf"
             event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
             icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng2.kernel.tracetype"
