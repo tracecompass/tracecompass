@@ -237,6 +237,8 @@ public class Messages extends NLS {
     public static String FilterView_FileDialogFilterName;
     public static String FilterView_ImportActionToolTipText;
     public static String FilterView_SaveActionToolTipText;
+    public static String FilterViewer_EmptyTreeHintText;
+    public static String FilterViewer_CommonCategory;
     public static String FilterViewer_AlphaButtonText;
     public static String FilterViewer_DeleteActionText;
     public static String FilterViewer_FieldLabel;

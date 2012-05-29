@@ -49,6 +49,7 @@ import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterRootNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -56,6 +57,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -115,6 +118,17 @@ class FilterViewer extends Composite {
                     highlightTreeItems(fViewer.getTree().getSelection()[0].getItems());
                 } else {
                     updateFilterNodeComposite(null);
+                }
+            }
+        });
+
+        fViewer.getTree().addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e) {
+                TmfFilterTreeNode root = (TmfFilterTreeNode) fViewer.getInput();
+                if (root == null || root.getChildrenCount() == 0) {
+                    e.gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+                    e.gc.drawText(Messages.FilterViewer_EmptyTreeHintText, 5, 0);
                 }
             }
         });
@@ -347,10 +361,17 @@ class FilterViewer extends Composite {
                                 }
                             } catch (CoreException e) {
                             }
+                            if (fieldsList.size() == 0) {
+                                fieldsList.add(ITmfEvent.EVENT_FIELD_TIMESTAMP);
+                                fieldsList.add(ITmfEvent.EVENT_FIELD_SOURCE);
+                                fieldsList.add(ITmfEvent.EVENT_FIELD_TYPE);
+                                fieldsList.add(ITmfEvent.EVENT_FIELD_REFERENCE);
+                                fieldsList.add(ITmfEvent.EVENT_FIELD_CONTENT);
+                            }
                             return fieldsList.toArray(new String[0]);
                         }
                     }
-                    if (eventTypeNode.getEventType().startsWith(CustomTxtEvent.class.getCanonicalName())) {
+                    if (eventTypeNode.getEventType() != null && eventTypeNode.getEventType().startsWith(CustomTxtEvent.class.getCanonicalName())) {
                         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
                             if (eventTypeNode.getEventType().equals(CustomTxtEvent.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
                                 for (OutputColumn output : def.outputs) {
@@ -360,7 +381,7 @@ class FilterViewer extends Composite {
                             }
                         }
                     }
-                    if (eventTypeNode.getEventType().startsWith(CustomXmlEvent.class.getCanonicalName())) {
+                    if (eventTypeNode.getEventType() != null && eventTypeNode.getEventType().startsWith(CustomXmlEvent.class.getCanonicalName())) {
                         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
                             if (eventTypeNode.getEventType().equals(CustomXmlEvent.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
                                 for (OutputColumn output : def.outputs) {
@@ -373,11 +394,20 @@ class FilterViewer extends Composite {
                 }
                 node = node.getParent();
             }
+
+            fieldsList.add(Messages.FilterViewer_CommonCategory);
+            fieldsList.add(ITmfEvent.EVENT_FIELD_TIMESTAMP);
+            fieldsList.add(ITmfEvent.EVENT_FIELD_SOURCE);
+            fieldsList.add(ITmfEvent.EVENT_FIELD_TYPE);
+            fieldsList.add(ITmfEvent.EVENT_FIELD_REFERENCE);
+            fieldsList.add(ITmfEvent.EVENT_FIELD_CONTENT);
+            fieldsList.add(""); //$NON-NLS-1$
+
             for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                 try {
                     ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                     ITmfEventType eventType = event.getType();
-                    if (eventType != null) {
+                    if (eventType != null && eventType.getFieldNames().length > 0) {
                         fieldsList.add("[" + TmfTraceType.getCategoryName(ce.getAttribute(TmfTraceType.CATEGORY_ATTR)) + //$NON-NLS-1$
                                 " : " + ce.getAttribute(TmfTraceType.NAME_ATTR) + "]"); //$NON-NLS-1$ //$NON-NLS-2$
                         for (String field : eventType.getFieldNames()) {
@@ -389,20 +419,24 @@ class FilterViewer extends Composite {
                 }
             }
             for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                fieldsList.add("[" + CUSTOM_TXT_CATEGORY + //$NON-NLS-1$
-                        " : " + def.definitionName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-                for (OutputColumn output : def.outputs) {
-                    fieldsList.add(output.name);
+                if (def.outputs.size() > 0) {
+                    fieldsList.add("[" + CUSTOM_TXT_CATEGORY + //$NON-NLS-1$
+                            " : " + def.definitionName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                    for (OutputColumn output : def.outputs) {
+                        fieldsList.add(output.name);
+                    }
+                    fieldsList.add(""); //$NON-NLS-1$
                 }
-                fieldsList.add(""); //$NON-NLS-1$
             }
             for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                fieldsList.add("[" + CUSTOM_XML_CATEGORY + //$NON-NLS-1$
-                        " : " + def.definitionName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-                for (OutputColumn output : def.outputs) {
-                    fieldsList.add(output.name);
+                if (def.outputs.size() > 0) {
+                    fieldsList.add("[" + CUSTOM_XML_CATEGORY + //$NON-NLS-1$
+                            " : " + def.definitionName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                    for (OutputColumn output : def.outputs) {
+                        fieldsList.add(output.name);
+                    }
+                    fieldsList.add(""); //$NON-NLS-1$
                 }
-                fieldsList.add(""); //$NON-NLS-1$
             }
             return fieldsList.toArray(new String[0]);
         }
