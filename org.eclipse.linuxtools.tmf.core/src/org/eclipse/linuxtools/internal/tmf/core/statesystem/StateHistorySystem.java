@@ -144,7 +144,7 @@ public class StateHistorySystem extends StateSystem implements
          */
         for (int i = 0; i < stateInfo.size(); i++) {
             if (stateInfo.get(i) == null) {
-                logMissingInterval(i, t);
+                //logMissingInterval(i, t);
                 stateInfo.set(i, new TmfStateInterval(t, t, i, TmfStateValue.nullValue()));
             }
         }
@@ -167,7 +167,7 @@ public class StateHistorySystem extends StateSystem implements
          * We do NOT want to return 'null' here.
          */
         if (ret == null) {
-            logMissingInterval(attributeQuark, t);
+            //logMissingInterval(attributeQuark, t);
             return new TmfStateInterval(t, this.getCurrentEndTime(),
                     attributeQuark, TmfStateValue.nullValue());
         }
@@ -256,7 +256,7 @@ public class StateHistorySystem extends StateSystem implements
         return intervals;
     }
 
-    private static void logMissingInterval(int attribute, long timestamp) {
+    static void logMissingInterval(int attribute, long timestamp) {
         Tracer.traceInfo("No data found in history for attribute " + //$NON-NLS-1$
                 attribute + " at time " + timestamp + //$NON-NLS-1$
                 ", returning dummy interval"); //$NON-NLS-1$
