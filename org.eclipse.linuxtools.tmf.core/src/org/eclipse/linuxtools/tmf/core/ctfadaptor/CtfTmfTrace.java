@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
@@ -33,10 +32,18 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParser<CtfTmfEvent>{
 
     //-------------------------------------------
+    //        Constants
+    //-------------------------------------------
+    /**
+     * Default cache size for CTF traces
+     */
+    protected static final int DEFAULT_CACHE_SIZE = 50000;
+    
+    //-------------------------------------------
     //        Fields
     //-------------------------------------------
 
-    /* Reference to the state system assigned to this trace */
+    /** Reference to the state system assigned to this trace */
     protected IStateSystemQuerier ss = null;
 
     /* Reference to the CTF Trace */
@@ -59,6 +66,10 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
         super.initTrace(resource, path, eventType);
         EventDeclaration ed;
         ITmfEventField eventField;
+
+        // Set the cache size
+        setCacheSize();
+
         @SuppressWarnings("unused")
         CtfTmfEventType type;
 
@@ -99,7 +110,6 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
             throw new TmfTraceException(e.getMessage(), e);
         }
 
-        TmfSignalManager.register(this);
         //FIXME This should be called via the ExperimentUpdated signal
         buildStateSystem();
 
@@ -198,6 +208,9 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
             CtfIterator ctfIterator = (CtfIterator) context;
             event = ctfIterator.getCurrentEvent();
             ctfIterator.advance();
+            if (event != null) {
+                updateAttributes(context, event.getTimestamp());
+            }
         }
         return event;
     }
@@ -301,6 +314,13 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
             event = itt.getCurrentEvent();
         }
         return event;
+    }
+    
+    /**
+     * Sets the cache size for a CtfTmfTrace. 
+     */
+    protected void setCacheSize() {
+        setCacheSize(DEFAULT_CACHE_SIZE);
     }
 
 }
