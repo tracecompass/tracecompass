@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -124,6 +125,9 @@ public class ControlFlowView extends TmfView {
 
     // The previous resource action
     private Action fPreviousResourceAction;
+    
+    // A comparator class
+    private ControlFlowEntryComparator fControlFlowEntryComparator = new ControlFlowEntryComparator();
 
     // ------------------------------------------------------------------------
     // Classes
@@ -209,6 +213,30 @@ public class ControlFlowView extends TmfView {
 
     }
 
+    private static class ControlFlowEntryComparator implements Comparator<ITimeGraphEntry> {
+
+        @Override
+        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
+            int result = 0;
+
+            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
+                ControlFlowEntry entry1 = (ControlFlowEntry) o1;
+                ControlFlowEntry entry2 = (ControlFlowEntry) o2;
+                result = entry1.getTrace().getStartTime().compareTo(entry2.getTrace().getStartTime());
+                if (result == 0) {
+                    result = entry1.getThreadId() < entry2.getThreadId() ? -1 : entry1.getThreadId() > entry2.getThreadId() ? 1 : 0;
+                }
+            }
+
+            if (result == 0) {
+                result = o1.getStartTime() < o2.getStartTime() ? -1 : o1.getStartTime() > o2.getStartTime() ? 1 : 0;
+            }
+
+            return result;
+        }
+    }
+
+    
     private class ZoomThread extends Thread {
         private long fZoomStartTime;
         private long fZoomEndTime;
@@ -517,7 +545,7 @@ public class ControlFlowView extends TmfView {
             buildTree(entryList);
             refresh(INITIAL_WINDOW_OFFSET);
             ControlFlowEntry[] entries = fEntryList.toArray(new ControlFlowEntry[0]);
-            Arrays.sort(entries);
+            Arrays.sort(entries, fControlFlowEntryComparator);
             for (ControlFlowEntry entry : entries) {
                 buildStatusEvents(entry);
             }
@@ -606,7 +634,7 @@ public class ControlFlowView extends TmfView {
                     return;
                 }
                 ITimeGraphEntry[] entries = fEntryList.toArray(new ITimeGraphEntry[0]);
-                Arrays.sort(entries);
+                Arrays.sort(entries, fControlFlowEntryComparator);
                 fTimeGraphCombo.setInput(entries);
                 fTimeGraphCombo.getTimeGraphViewer().setTimeBounds(fStartTime, fEndTime);
 

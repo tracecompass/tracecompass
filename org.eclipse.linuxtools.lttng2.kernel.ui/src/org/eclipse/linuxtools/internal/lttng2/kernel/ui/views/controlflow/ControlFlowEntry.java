@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
-public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlowEntry> {
+public class ControlFlowEntry implements ITimeGraphEntry {
     private int fThreadQuark;
     private CtfKernelTrace fTrace;
     private ControlFlowEntry fParent = null;
@@ -89,15 +89,6 @@ public class ControlFlowEntry implements ITimeGraphEntry, Comparable<ControlFlow
     @Override
     public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration) {
         return new EventIterator(fEventList, fZoomedEventList, startTime, stopTime);
-    }
-
-    @Override
-    public int compareTo(ControlFlowEntry other) {
-        int result = this.fThreadId < other.fThreadId ? -1 : this.fThreadId > other.fThreadId ? 1 : 0;
-        if (result == 0) {
-            result = this.fStartTime < other.fStartTime ? -1 : this.fStartTime > other.fStartTime ? 1 : 0;
-        }
-        return result;
     }
 
     public int getThreadQuark() {

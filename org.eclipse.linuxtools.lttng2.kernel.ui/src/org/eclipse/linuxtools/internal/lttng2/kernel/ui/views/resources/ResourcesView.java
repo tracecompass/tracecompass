@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -108,14 +109,23 @@ public class ResourcesView extends TmfView {
     // ------------------------------------------------------------------------
 
     private class TraceEntry implements ITimeGraphEntry {
+        // The Trace
         private CtfKernelTrace fTrace;
-        public ArrayList<ResourcesEntry> fChildren;
-        public String fName;
+        // The start time
+        private long fTraceStartTime;
+        // The end time
+        private long fTraceEndTime;        
+        // The children of the entry
+        private ArrayList<ResourcesEntry> fChildren;
+        // The name of entry
+        private String fName;
 
-        public TraceEntry(CtfKernelTrace trace, String name) {
+        public TraceEntry(CtfKernelTrace trace, String name, long startTime, long endTime) {
             fTrace = trace;
             fChildren = new ArrayList<ResourcesEntry>();
             fName = name;
+            fTraceStartTime = startTime;
+            fTraceEndTime = endTime;
         }
 
         @Override
@@ -140,12 +150,12 @@ public class ResourcesView extends TmfView {
 
         @Override
         public long getStartTime() {
-            return -1;
+            return fTraceStartTime;
         }
 
         @Override
         public long getEndTime() {
-            return -1;
+            return fTraceEndTime;
         }
 
         @Override
@@ -181,6 +191,17 @@ public class ResourcesView extends TmfView {
             }
             entry.setParent(this);
             fChildren.add(index, entry);
+        }
+    }
+    
+    private static class TraceEntryComparator implements Comparator<ITimeGraphEntry> {
+        @Override
+        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
+            int result = o1.getStartTime() < o2.getStartTime() ? -1 : o1.getStartTime() > o2.getStartTime() ? 1 : 0;
+            if (result == 0) {
+                result = o1.getName().compareTo(o2.getName());
+            }
+            return result;
         }
     }
 
@@ -361,11 +382,11 @@ public class ResourcesView extends TmfView {
         for (ITmfTrace<?> trace : experiment.getTraces()) {
             if (trace instanceof CtfKernelTrace) {
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) trace;
-                TraceEntry groupEntry = new TraceEntry(ctfKernelTrace, trace.getName());
-                entryList.add(groupEntry);
                 IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
                 long startTime = ssq.getStartTime();
                 long endTime = ssq.getCurrentEndTime() + 1;
+                TraceEntry groupEntry = new TraceEntry(ctfKernelTrace, trace.getName(), startTime, endTime);
+                entryList.add(groupEntry);
                 fStartTime = Math.min(fStartTime, startTime);
                 fEndTime = Math.max(fEndTime, endTime);
                 List<Integer> cpuQuarks = ssq.getQuarks(Attributes.CPUS, "*"); //$NON-NLS-1$
@@ -515,7 +536,7 @@ public class ResourcesView extends TmfView {
                     return;
                 }
                 ITimeGraphEntry[] entries = fEntryList.toArray(new ITimeGraphEntry[0]);
-                Arrays.sort(entries);
+                Arrays.sort(entries, new TraceEntryComparator());
                 fTimeGraphViewer.setInput(entries);
                 fTimeGraphViewer.setTimeBounds(fStartTime, fEndTime);
 
