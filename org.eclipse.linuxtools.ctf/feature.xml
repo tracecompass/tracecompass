@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.linuxtools.ctf"
       label="%featureName"
-      version="0.1.0.qualifier"
+      version="1.0.0.qualifier"
       provider-name="%featureProvider">
 
    <description url="http://www.example.com/description">
@@ -24,8 +24,7 @@
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.antlr.runtime" version="3.2.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.ctf.parser" version="0.1.0" match="greaterOrEqual"/>
-      <import plugin="org.antlr.runtime" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.ctf.parser" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

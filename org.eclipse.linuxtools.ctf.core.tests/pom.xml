@@ -22,7 +22,7 @@
   <name>Linux Tools LTTng CTF Core Unit Test Suite</name>
   <groupId>org.eclipse.linuxtools.ctf</groupId>
   <artifactId>org.eclipse.linuxtools.ctf.core.tests</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
  <build>

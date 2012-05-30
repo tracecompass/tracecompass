@@ -3,7 +3,7 @@
 <feature
       id="org.eclipse.linuxtools.lttng2.kernel"
       label="%featureName"
-      version="0.1.0.qualifier"
+      version="1.0.0.qualifier"
       provider-name="%featureProvider">
 
    <description>
@@ -27,25 +27,36 @@
          version="0.0.0"
          name="Tracing and Monitoring Framework (TMF) (Incubation)"/>
 
+   <includes
+         id="org.eclipse.linuxtools.lttng2"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.linuxtools.ctf"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help" version="3.5.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.lttng2.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.lttng2.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.lttng2.kernel.core" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng.core"
-         os="linux"
-         ws="*"
-         arch="*"
+         id="org.eclipse.linuxtools.lttng2.kernel.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng.ui"
-         os="linux"
-         ws="*"
-         arch="*"
+         id="org.eclipse.linuxtools.lttng2.kernel.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -56,12 +67,5 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.linuxtools.lttng.jni"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
 </feature>
