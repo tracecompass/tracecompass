@@ -69,6 +69,11 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
      */
     private final List<TmfCheckpoint> fTraceIndex;
 
+    /**
+     * The indexing request 
+     */
+    private ITmfEventRequest<ITmfEvent> fIndexingRequest = null;
+    
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
@@ -94,6 +99,17 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         fCheckpointInterval = interval;
         fTraceIndex = new ArrayList<TmfCheckpoint>();
         fIsIndexing = false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#dispose()
+     */
+    @Override
+    public void dispose() {
+        if ((fIndexingRequest != null) && !fIndexingRequest.isCompleted()) {
+            fIndexingRequest.cancel();
+            fTraceIndex.clear();
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -155,7 +171,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
 
         // Build a background request for all the trace data. The index is
         // updated as we go by readNextEvent().
-        final ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class,
+        fIndexingRequest = new TmfEventRequest<ITmfEvent>(ITmfEvent.class,
                 range, offset, TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
         {
             private ITmfTimestamp startTime = null;
@@ -198,10 +214,10 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         };
 
         // Submit the request and wait for completion if required
-        fTrace.sendRequest(request);
+        fTrace.sendRequest(fIndexingRequest);
         if (waitForCompletion) {
             try {
-                request.waitForCompletion();
+                fIndexingRequest.waitForCompletion();
             } catch (final InterruptedException e) {
             }
         }

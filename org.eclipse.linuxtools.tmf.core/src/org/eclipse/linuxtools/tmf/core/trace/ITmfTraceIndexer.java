@@ -91,4 +91,9 @@ public interface ITmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> {
      */
     public ITmfContext seekIndex(long rank);
 
+    /**
+     * Perform cleanup when the indexer is no longer required.
+     */
+    public void dispose();
+
 }

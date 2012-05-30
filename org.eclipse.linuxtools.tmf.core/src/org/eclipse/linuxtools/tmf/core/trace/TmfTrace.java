@@ -246,6 +246,16 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, waitForCompletion);
     }
 
+    /**
+     * Clears the trace
+     */
+    @Override
+    public synchronized void dispose() {
+        // Clean up the index
+        getIndexer().dispose();
+        super.dispose();
+    }
+
     // ------------------------------------------------------------------------
     // ITmfTrace - Basic getters
     // ------------------------------------------------------------------------
