@@ -33,6 +33,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -460,6 +461,34 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
+        // ensure the tree has focus control when mouse is over it if the time graph had control
+        fTreeViewer.getControl().addMouseTrackListener(new MouseTrackAdapter() {
+            @Override
+            public void mouseEnter(MouseEvent e) {
+                if (fTimeGraphViewer.getTimeGraphControl().isFocusControl()) {
+                    fTreeViewer.getControl().setFocus();
+                }
+            }
+        });
+
+        // ensure the time graph has focus control when mouse is over it if the tree had control
+        fTimeGraphViewer.getTimeGraphControl().addMouseTrackListener(new MouseTrackAdapter() {
+            @Override
+            public void mouseEnter(MouseEvent e) {
+                if (fTreeViewer.getControl().isFocusControl()) {
+                    fTimeGraphViewer.getTimeGraphControl().setFocus();
+                }
+            }
+        });
+        fTimeGraphViewer.getTimeGraphScale().addMouseTrackListener(new MouseTrackAdapter() {
+            @Override
+            public void mouseEnter(MouseEvent e) {
+                if (fTreeViewer.getControl().isFocusControl()) {
+                    fTimeGraphViewer.getTimeGraphControl().setFocus();
+                }
+            }
+        });
+
         // The filler rows are required to ensure alignment when the tree does not have a
         // visible horizontal scroll bar. The tree does not allow its top item to be set
         // to a value that would cause blank space to be drawn at the bottom of the tree.
@@ -558,7 +587,7 @@ public class TimeGraphCombo extends Composite {
     public void setInput(ITimeGraphEntry[] input) {
         fInhibitTreeSelection = true;
         fTreeViewer.setInput(input);
-        fInhibitTreeSelection = true;
+        fInhibitTreeSelection = false;
         fTreeViewer.expandAll();
         fTreeViewer.getTree().getVerticalBar().setEnabled(false);
         fTreeViewer.getTree().getVerticalBar().setVisible(false);

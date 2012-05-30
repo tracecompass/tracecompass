@@ -34,8 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 public class TimeGraphScale extends TimeGraphBaseControl implements MouseListener, MouseMoveListener {
 
     public TimeGraphScale(Composite parent, TimeGraphColorScheme colors) {
-        super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS
-                | SWT.DOUBLE_BUFFERED);
+        super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED);
         addMouseListener(this);
         addMouseMoveListener(this);
     }

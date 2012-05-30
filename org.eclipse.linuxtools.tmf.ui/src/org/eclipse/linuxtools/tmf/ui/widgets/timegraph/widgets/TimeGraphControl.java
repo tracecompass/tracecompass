@@ -146,16 +146,12 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     public void setTimeGraphProvider(ITimeGraphPresentationProvider timeGraphProvider) {
         fTimeGraphProvider = timeGraphProvider;
         _data.provider = timeGraphProvider;
-//        RGB[] eventColorTable = fTimeGraphProvider.getEventColorTable();
-//        if (eventColorTable != null) {
-//            fEventColorMap = new Color[eventColorTable.length];
-//            for (int i = 0; i < eventColorTable.length; i++) {
-//                fEventColorMap[i] = fResourceManager.createColor(eventColorTable[i]);
-//            }
-//        } else {
-//            fEventColorMap = new Color[] { };
-//        }
 
+        if (fEventColorMap != null) {
+            for (Color color : fEventColorMap) {
+                fResourceManager.destroyColor(color.getRGB());
+            }
+        }
         StateItem[] stateItems = fTimeGraphProvider.getStateTable();
         if (stateItems != null) {
             fEventColorMap = new Color[stateItems.length];
@@ -165,8 +161,6 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         } else {
             fEventColorMap = new Color[] { };
         }
-        
-        
     }
 
     public void setTimeProvider(ITimeDataProvider timeProvider) {
@@ -518,9 +512,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     /**
-     * Zooming based on mouse cursor location with mouse scrolling
+     * Zoom based on mouse cursor location with mouse scrolling
      * 
-     * @param zoomIn
+     * @param zoomIn true to zoom in, false to zoom out
      */
     public void zoom(boolean zoomIn) {
         int globalX = getDisplay().getCursorLocation().x;
@@ -1173,12 +1167,27 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     @Override
     public void focusGained(FocusEvent e) {
         _isInFocus = true;
+        if (mouseScrollFilterListener == null) {
+            mouseScrollFilterListener = new Listener() {
+                // This filter is used to prevent horizontal scrolling of the view
+                // when the mouse wheel is used to zoom
+                @Override
+                public void handleEvent(Event event) {
+                    event.doit = false;
+                }
+            };
+            getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
+        }
         redraw();
     }
 
     @Override
     public void focusLost(FocusEvent e) {
         _isInFocus = false;
+        if (mouseScrollFilterListener != null) {
+            getDisplay().removeFilter(SWT.MouseWheel, mouseScrollFilterListener);
+            mouseScrollFilterListener = null;
+        }
         if (DRAG_NONE != _dragState) {
             setCapture(false);
             _dragState = DRAG_NONE;
@@ -1363,25 +1372,10 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     @Override
     public void mouseEnter(MouseEvent e) {
-        if (mouseScrollFilterListener == null) {
-            mouseScrollFilterListener = new Listener() {
-                // This filter is used to prevent scrolling of the view when the
-                // mouse wheel is used to zoom
-                @Override
-                public void handleEvent(Event event) {
-                    event.doit = false;
-                }
-            };
-            getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
-        }
     }
 
     @Override
     public void mouseExit(MouseEvent e) {
-        if (mouseScrollFilterListener != null) {
-            getDisplay().removeFilter(SWT.MouseWheel, mouseScrollFilterListener);
-            mouseScrollFilterListener = null;
-        }
         if (_mouseOverSplitLine) {
             _mouseOverSplitLine = false;
             redraw();
@@ -1397,14 +1391,29 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         if ((mouseScrollFilterListener == null) || _dragState != DRAG_NONE) {
             return;
         }
-        if (e.x < _timeProvider.getNameSpace() || e.x > getSize().x) {
-            setTopIndex(getTopIndex() - e.count);
-        } else if (_timeProvider.getTime0() != _timeProvider.getTime1()) {
+        boolean zoomScroll = false;
+        Point p = getParent().toControl(getDisplay().getCursorLocation());
+        Point parentSize = getParent().getSize();
+        if (p.x >= 0 && p.x < parentSize.x && p.y >= 0 && p.y < parentSize.y) {
+            // over the parent control
+            if (e.x > getCtrlSize().x) {
+                // over the horizontal scroll bar
+                zoomScroll = false;
+            } else if (e.y >= 0 && e.y < getCtrlSize().y && e.x < _timeProvider.getNameSpace()) {
+                // over the name space
+                zoomScroll = false;
+            } else {
+                zoomScroll = true;
+            }
+        }
+        if (zoomScroll && _timeProvider.getTime0() != _timeProvider.getTime1()) {
             if (e.count > 0) {
                 zoom(true);
             } else if (e.count < 0) {
                 zoom(false);
             }
+        } else {
+            setTopIndex(getTopIndex() - e.count);
         }
     }
 

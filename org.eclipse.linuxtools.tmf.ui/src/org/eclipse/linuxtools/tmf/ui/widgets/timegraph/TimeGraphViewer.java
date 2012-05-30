@@ -20,9 +20,9 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -85,7 +85,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     // Calender Time format, using Epoch reference or Relative time
     // format(default
     private boolean calendarTimeFormat = false;
-    private int borderWidth = 4;
+    private int borderWidth = 0;
     private int timeScaleHeight = 22;
 
     private Action resetScale;
@@ -796,6 +796,15 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
+     * Returns the time graph scale associated with this viewer.
+     *
+     * @return the time graph scale
+     */
+    TimeGraphScale getTimeGraphScale() {
+        return _timeScaleCtrl;
+    }
+
+    /**
      * Get the selection provider
      * 
      * @return the selection provider
@@ -852,7 +861,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     public void removeTreeListener(ITimeGraphTreeListener listener) {
         _stateCtrl.removeTreeListener(listener);
     }
-    
+
     public Action getResetScaleAction() {
         if (resetScale == null) {
             // resetScale
