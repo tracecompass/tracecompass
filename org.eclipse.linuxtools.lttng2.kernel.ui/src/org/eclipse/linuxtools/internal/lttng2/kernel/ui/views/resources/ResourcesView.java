@@ -344,6 +344,7 @@ public class ResourcesView extends TmfView {
                     return;
                 }
                 fTimeGraphViewer.setSelectedTime(time, true);
+                startZoomThread(fTimeGraphViewer.getTime0(), fTimeGraphViewer.getTime1());
             }
         });
     }
@@ -435,10 +436,12 @@ public class ResourcesView extends TmfView {
     }
 
     private List<ITimeEvent> getEventList(ResourcesEntry entry, long startTime, long endTime, long resolution, boolean includeNull, IProgressMonitor monitor) {
+        IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+        startTime = Math.max(startTime, ssq.getStartTime());
+        endTime = Math.min(endTime, ssq.getCurrentEndTime() + 1);
         if (endTime <= startTime) {
             return null;
         }
-        IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
         List<ITimeEvent> eventList = null;
         int quark = entry.getQuark();
         try {
