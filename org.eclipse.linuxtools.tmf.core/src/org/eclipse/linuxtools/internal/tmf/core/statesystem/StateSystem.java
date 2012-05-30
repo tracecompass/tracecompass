@@ -180,7 +180,10 @@ public class StateSystem {
             throws StateValueTypeException, TimeRangeException,
             AttributeNotFoundException {
         int prevValue = queryOngoingState(attributeQuark).unboxInt();
-        /* prevValue should be == 0 if the attribute wasn't existing before */
+        if (prevValue == -1) {
+            /* if the attribute was previously null, start counting at 0 */
+            prevValue = 0;
+        }
         modifyAttribute(t, TmfStateValue.newValueInt(prevValue + 1),
                 attributeQuark);
     }
