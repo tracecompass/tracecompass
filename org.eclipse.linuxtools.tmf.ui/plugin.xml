@@ -150,7 +150,7 @@
          point="org.eclipse.ui.importWizards">
       <category
             id="org.eclipse.linuxtools.tmf.import.category"
-            name="%wizard.category.name">
+            name="%project.new.category.name">
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.import.category"

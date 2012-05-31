@@ -809,7 +809,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                 for (int i = 0; i < files.size(); i++) {
                     File file = fileSystemObjects.get(files.get(i));
                     String name = file.getAbsolutePath();
-                    if (prefix == null || !name.startsWith(prefix)) {
+                    if (fTargetFolder != null && (prefix == null || !name.startsWith(prefix))) {
                         prefix = name; // new prefix
                         IResource resource = fTargetFolder.findMember(file.getName());
                         if (resource != null) {
