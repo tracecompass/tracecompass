@@ -121,7 +121,7 @@ class CtfKernelHandler implements Runnable {
         int quark;
         ITmfStateValue value;
         Integer eventCpu = event.getCPU();
-        Integer currentCPUNode, currentThreadNode, tidNode;
+        Integer currentCPUNode, currentThreadNode;
 
         /* Adjust the current nodes Vectors if we see a new CPU in an event */
         if (eventCpu >= currentCPUNodes.size()) {
@@ -340,26 +340,28 @@ class CtfKernelHandler implements Runnable {
                 Integer parentTid = ((Long) content.getField(LttngStrings.PARENT_TID).getValue()).intValue();
                 Integer childTid = ((Long) content.getField(LttngStrings.CHILD_TID).getValue()).intValue();
 
-                tidNode = ss.getQuarkRelativeAndAdd(threadsNode, childTid.toString());
+                Integer parentTidNode = ss.getQuarkRelativeAndAdd(threadsNode, parentTid.toString());
+                Integer childTidNode = ss.getQuarkRelativeAndAdd(threadsNode, childTid.toString());
 
                 /* Assign the PPID to the new process */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.PPID);
+                quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.PPID);
                 value = TmfStateValue.newValueInt(parentTid);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the new process' exec_name */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.EXEC_NAME);
+                quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(childProcessName);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the new process' status */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.STATUS);
+                quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.STATUS);
                 value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT);
                 ss.modifyAttribute(ts, value, quark);
 
-                /* Set the process' syscall state */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.SYSTEM_CALL);
-                value = TmfStateValue.nullValue();
+                /* Set the process' syscall name, to be the same as the parent's */
+                quark = ss.getQuarkRelativeAndAdd(parentTidNode, Attributes.SYSTEM_CALL);
+                value = ss.queryOngoingState(quark);
+                quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.SYSTEM_CALL);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
