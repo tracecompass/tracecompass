@@ -63,12 +63,14 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
             throws TmfTraceException {
+        /*
+         * Set the cache size. This has to be done before the call to super()
+         * because the super needs to know the cache size.
+         */
+        setCacheSize();
         super.initTrace(resource, path, eventType);
         EventDeclaration ed;
         ITmfEventField eventField;
-
-        // Set the cache size
-        setCacheSize();
 
         @SuppressWarnings("unused")
         CtfTmfEventType type;
@@ -92,12 +94,6 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
                 this.setStartTime(TmfTimestamp.BIG_BANG);
             } else {
                 this.setStartTime(iterator.getCurrentEvent().getTimestamp());
-                /*
-                 * is the trace empty
-                 */
-                if( iterator.hasMoreEvents()){
-                    iterator.goToLastEvent();
-                }
                 this.setEndTime(iterator.getCurrentEvent().getTimestamp());
             }
 
@@ -172,16 +168,22 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
     @Override
     public ITmfContext seekEvent(final ITmfLocation<?> location) {
         CtfLocation currentLocation = (CtfLocation) location;
+        CtfIterator context = new CtfIterator(this);
+        /*
+         * The rank is set to 0 if the iterator seeks the beginning. If not, it
+         * will be set to UNKNOWN_RANK, since CTF traces don't support seeking
+         * by rank for now.
+         */
         if (currentLocation == null) {
             currentLocation = new CtfLocation(0L);
+            context.setRank(0);
         }
-        CtfIterator context = new CtfIterator(this);
-
         if (currentLocation.getLocation() == CtfLocation.INVALID_LOCATION) {
             ((CtfTmfTimestamp) getEndTime()).setType(TimestampType.NANOS);
             currentLocation.setLocation(getEndTime().getValue() + 1);
         }
         context.setLocation(currentLocation);
+        if(context.getRank() != 0)
         context.setRank(ITmfContext.UNKNOWN_RANK);
         return context;
     }
@@ -207,11 +209,14 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
         if (context instanceof CtfIterator) {
             CtfIterator ctfIterator = (CtfIterator) context;
             event = ctfIterator.getCurrentEvent();
-            ctfIterator.advance();
+
             if (event != null) {
                 updateAttributes(context, event.getTimestamp());
+                ctfIterator.advance();
+                ctfIterator.increaseRank();
             }
         }
+
         return event;
     }
 

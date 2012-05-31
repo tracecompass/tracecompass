@@ -245,9 +245,6 @@ public class CTFTraceReader {
             final long topEnd = top.getCurrentEvent().getTimestamp() + this.getTrace().getOffset();
             this.setEndTime( Math.max(topEnd, this.getEndTime()));
             this.eventCountPerTraceFile[top.getName()]++;
-            /*
-             * increment the index
-             */
 
             if (top.getCurrentEvent() != null) {
                 this.endTime = Math.max(top.getCurrentEvent().getTimestamp(),

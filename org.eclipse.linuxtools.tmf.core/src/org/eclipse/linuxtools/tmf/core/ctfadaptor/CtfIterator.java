@@ -195,7 +195,10 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
      */
     @Override
     public void increaseRank() {
-        curRank++;
+        /* Only increase the rank if it's valid */
+        if(hasValidRank()) {
+            curRank++;
+        }
     }
 
     /**

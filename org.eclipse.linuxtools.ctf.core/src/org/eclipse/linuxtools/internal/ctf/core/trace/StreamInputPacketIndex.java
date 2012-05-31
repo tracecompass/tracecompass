@@ -102,6 +102,13 @@ public class StreamInputPacketIndex {
         int guessI;
         StreamInputPacketIndexEntry guessEntry = null;
 
+        /*
+         * If the index is empty, return the iterator at the very beginning.
+         */
+        if( this.getEntries().isEmpty()) {
+            return this.getEntries().listIterator();
+        }
+
         if (timestamp < 0) {
             throw new IllegalArgumentException("timestamp is negative"); //$NON-NLS-1$
         }
