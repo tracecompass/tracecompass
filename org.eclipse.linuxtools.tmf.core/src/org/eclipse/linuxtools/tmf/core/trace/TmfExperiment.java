@@ -131,8 +131,10 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
             fCurrentExperiment = null;
         }
 
-        // Clean up the index
-        getIndexer().dispose();
+        // Clean up the index if applicable
+        if (getIndexer() != null) {
+            getIndexer().dispose();
+        }
 
         if (fTraces != null) {
             for (final ITmfTrace trace : fTraces)

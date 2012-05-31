@@ -251,8 +251,10 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     @Override
     public synchronized void dispose() {
-        // Clean up the index
-        getIndexer().dispose();
+        // Clean up the index if applicable
+        if (getIndexer() != null) {
+            getIndexer().dispose();
+        }
         super.dispose();
     }
 
