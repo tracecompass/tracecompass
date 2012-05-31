@@ -270,26 +270,19 @@ class CtfKernelHandler implements Runnable {
             {
                 Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
                 //Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
-
                 String nextProcessName = (String) content.getField(LttngStrings.NEXT_COMM).getValue();
                 Integer nextTid = ((Long) content.getField(LttngStrings.NEXT_TID).getValue()).intValue();
 
-                /* Update the currentThreadNodes pointer */
+                Integer formerThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString());
                 Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, nextTid.toString());
+
+                /* Update the currentThreadNodes pointer */
                 currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
-                /*
-                 * Set the status of the process that got scheduled out, but
-                 * only in the case where that process is currently active.
-                 */
-                Integer formerThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString());
-                quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.EXEC_NAME);
-                value = ss.queryOngoingState(quark);
-                if (!value.isNull()) {
-                    quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
-                    value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT);
-                    ss.modifyAttribute(ts, value, quark);
-                }
+                /* Set the status of the process that got scheduled out. */
+                quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT);
+                ss.modifyAttribute(ts, value, quark);
 
                 /* Set the status of the new scheduled process */
                 setProcessToRunning(ts, newCurrentThreadNode);
@@ -340,10 +333,8 @@ class CtfKernelHandler implements Runnable {
             /* Fields: string parent_comm, int32 parent_tid,
              *         string child_comm, int32 child_tid */
             {
-                // String parentProcessName = (String)
-                // event.getFieldValue("parent_comm");
-                String childProcessName;
-                childProcessName = (String) content.getField(LttngStrings.CHILD_COMM).getValue();
+                // String parentProcessName = (String) event.getFieldValue("parent_comm");
+                String childProcessName = (String) content.getField(LttngStrings.CHILD_COMM).getValue();
                 // assert ( parentProcessName.equals(childProcessName) );
 
                 Integer parentTid = ((Long) content.getField(LttngStrings.PARENT_TID).getValue()).intValue();
@@ -375,15 +366,17 @@ class CtfKernelHandler implements Runnable {
 
             case 9: // "sched_process_exit":
             /* Fields: string comm, int32 tid, int32 prio */
+                break;
+
+            case 10: // "sched_process_free":
+            /* Fields: string comm, int32 tid, int32 prio */
+            /*
+             * A sched_process_free will always happen after the sched_switch
+             * that will remove the process from the cpu for the last time. So
+             * this is when we should delete everything wrt to the process.
+             */
             {
-                String processName = (String) content.getField(LttngStrings.COMM).getValue();
                 Integer tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
-
-                /* Update the process' name, if we don't have it */
-                quark = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString(), Attributes.EXEC_NAME);
-                value = TmfStateValue.newValueString(processName);
-                ss.updateOngoingState(value, quark);
-
                 /*
                  * Remove the process and all its sub-attributes from the
                  * current state
@@ -391,10 +384,6 @@ class CtfKernelHandler implements Runnable {
                 quark = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString());
                 ss.removeAttribute(ts, quark);
             }
-                break;
-
-            case 10: // "sched_process_free":
-            /* Fields: string comm, int32 tid, int32 prio */
                 break;
 
             // FIXME In CTF it's as "syscall_exec". Will have to be adapted.
