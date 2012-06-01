@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Ericsson
+ * Copyright (c) 2010, 2011, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -44,8 +44,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -314,8 +314,9 @@ ITmfEventsFilterProvider {
         fTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(final MouseEvent event) {
-                if (event.button != 1)
+                if (event.button != 1) {
                     return;
+                }
                 // Identify the selected row
                 final Point point = new Point(event.x, event.y);
                 final TableItem item = fTable.getItem(point);
@@ -324,47 +325,57 @@ ITmfEventsFilterProvider {
                     imageBounds.width = BOOKMARK_IMAGE.getBounds().width;
                     if (imageBounds.contains(point)) {
                         final Long rank = (Long) item.getData(Key.RANK);
-                        if (rank != null)
+                        if (rank != null) {
                             toggleBookmark(rank);
+                        }
                     }
                 }
             }
         });
 
-        final Listener bookmarkListener = new Listener () {
+        final Listener tooltipListener = new Listener () {
             Shell tooltipShell = null;
             @Override
             public void handleEvent(final Event event) {
                 switch (event.type) {
                     case SWT.MouseHover:
                         final TableItem item = fTable.getItem(new Point(event.x, event.y));
-                        if (item == null)
+                        if (item == null) {
                             return;
+                        }
+                        final Long rank = (Long) item.getData(Key.RANK);
+                        if (rank == null) {
+                            return;
+                        }
                         final String tooltipText = (String) item.getData(Key.BOOKMARK);
-                        if (tooltipText == null)
-                            return;;
-                            final Rectangle bounds = item.getImageBounds(0);
-                            if (!bounds.contains(event.x,event.y))
-                                return;
-                            if ((tooltipShell != null) && !tooltipShell.isDisposed())
-                                tooltipShell.dispose();
-                            tooltipShell = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
-                            tooltipShell.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                            final FillLayout layout = new FillLayout();
-                            layout.marginWidth = 2;
-                            tooltipShell.setLayout(layout);
-                            final Label label = new Label(tooltipShell, SWT.WRAP);
-                            label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-                            label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                            label.setText(tooltipText);
-                            label.addListener(SWT.MouseExit, this);
-                            label.addListener(SWT.MouseDown, this);
-                            label.addListener(SWT.MouseWheel, this);
-                            final Point size = tooltipShell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-                            final Point pt = fTable.toDisplay(event.x, event.y);
-                            tooltipShell.setBounds(pt.x, pt.y, size.x, size.y);
-                            tooltipShell.setVisible(true);
-                            break;
+                        final Rectangle bounds = item.getImageBounds(0);
+                        bounds.width = BOOKMARK_IMAGE.getBounds().width;
+                        if (!bounds.contains(event.x,event.y)) {
+                            return;
+                        }
+                        if ((tooltipShell != null) && !tooltipShell.isDisposed()) {
+                            tooltipShell.dispose();
+                        }
+                        tooltipShell = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+                        tooltipShell.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                        final FillLayout layout = new FillLayout();
+                        layout.marginWidth = 2;
+                        tooltipShell.setLayout(layout);
+                        final Label label = new Label(tooltipShell, SWT.WRAP);
+                        String text = rank.toString() + (tooltipText != null ? ": " + tooltipText : ""); //$NON-NLS-1$ //$NON-NLS-2$
+                        label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+                        label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                        label.setText(text);
+                        label.addListener(SWT.MouseExit, this);
+                        label.addListener(SWT.MouseDown, this);
+                        label.addListener(SWT.MouseWheel, this);
+                        final Point size = tooltipShell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                        Point pt = fTable.toDisplay(event.x, event.y);
+                        pt.x += BOOKMARK_IMAGE.getBounds().width;
+                        pt.y += size.y;
+                        tooltipShell.setBounds(pt.x, pt.y, size.x, size.y);
+                        tooltipShell.setVisible(true);
+                        break;
                     case SWT.Dispose:
                     case SWT.KeyDown:
                     case SWT.MouseMove:
@@ -380,13 +391,13 @@ ITmfEventsFilterProvider {
             }
         };
 
-        fTable.addListener(SWT.MouseHover, bookmarkListener);
-        fTable.addListener(SWT.Dispose, bookmarkListener);
-        fTable.addListener(SWT.KeyDown, bookmarkListener);
-        fTable.addListener(SWT.MouseMove, bookmarkListener);
-        fTable.addListener(SWT.MouseExit, bookmarkListener);
-        fTable.addListener(SWT.MouseDown, bookmarkListener);
-        fTable.addListener(SWT.MouseWheel, bookmarkListener);
+        fTable.addListener(SWT.MouseHover, tooltipListener);
+        fTable.addListener(SWT.Dispose, tooltipListener);
+        fTable.addListener(SWT.KeyDown, tooltipListener);
+        fTable.addListener(SWT.MouseMove, tooltipListener);
+        fTable.addListener(SWT.MouseExit, tooltipListener);
+        fTable.addListener(SWT.MouseDown, tooltipListener);
+        fTable.addListener(SWT.MouseWheel, tooltipListener);
 
         // Create resources
         createResources();
@@ -403,23 +414,26 @@ ITmfEventsFilterProvider {
                 if (e.data instanceof Long) {
                     final long rank = (Long) e.data;
                     int index = (int) rank;
-                    if (fTable.getData(Key.FILTER_OBJ) != null)
+                    if (fTable.getData(Key.FILTER_OBJ) != null) {
                         index = fCache.getFilteredEventIndex(rank) + 1; // +1 for top filter status row
+                    }
                     fTable.setSelection(index + 1); // +1 for header row
                     fSelectedRank = rank;
-                } else if (e.data instanceof ITmfLocation<?>)
+                } else if (e.data instanceof ITmfLocation<?>) {
                     // DOES NOT WORK: rank undefined in context from seekLocation()
-                    //                    ITmfLocation<?> location = (ITmfLocation<?>) e.data;
-                    //                    TmfContext context = fTrace.seekLocation(location);
-                    //                    fTable.setSelection((int) context.getRank());
+                    // ITmfLocation<?> location = (ITmfLocation<?>) e.data;
+                    // TmfContext context = fTrace.seekLocation(location);
+                    // fTable.setSelection((int) context.getRank());
                     return;
-                else
+                } else {
                     return;
+                }
                 final TableItem[] selection = fTable.getSelection();
                 if ((selection != null) && (selection.length > 0)) {
                     final TmfTimestamp ts = (TmfTimestamp) fTable.getSelection()[0].getData(Key.TIMESTAMP);
-                    if (ts != null)
+                    if (ts != null) {
                         broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, ts));
+                    }
                 }
             }
         });
@@ -453,8 +467,9 @@ ITmfEventsFilterProvider {
                 fRawViewer.setVisible(true);
                 fSashForm.layout();
                 final int index = fTable.getSelectionIndex();
-                if (index >= +1)
+                if (index >= +1) {
                     fRawViewer.selectAndReveal(index - 1);
+                }
             }
         };
 
@@ -512,10 +527,11 @@ ITmfEventsFilterProvider {
             public void menuAboutToShow(final IMenuManager manager) {
                 if (fTable.getSelectionIndex() == 0) {
                     // Right-click on header row
-                    if (fHeaderState == HeaderState.FILTER)
+                    if (fHeaderState == HeaderState.FILTER) {
                         tablePopupMenu.add(showSearchBarAction);
-                    else
+                    } else {
                         tablePopupMenu.add(showFilterBarAction);
+                    }
                     return;
                 }
                 final Point point = fTable.toControl(Display.getDefault().getCursorLocation());
@@ -526,13 +542,15 @@ ITmfEventsFilterProvider {
                     if (point.x <= (imageBounds.x + imageBounds.width)) {
                         // Right-click on left margin
                         final Long rank = (Long) item.getData(Key.RANK);
-                        if ((rank != null) && (fBookmarksFile != null))
-                            if (fBookmarksMap.containsKey(rank))
+                        if ((rank != null) && (fBookmarksFile != null)) {
+                            if (fBookmarksMap.containsKey(rank)) {
                                 tablePopupMenu.add(new ToggleBookmarkAction(
                                         Messages.TmfEventsTable_RemoveBookmarkActionText, rank));
-                            else
+                            } else {
                                 tablePopupMenu.add(new ToggleBookmarkAction(
                                         Messages.TmfEventsTable_AddBookmarkActionText, rank));
+                            }
+                        }
                         return;
                     }
                 }
@@ -540,16 +558,17 @@ ITmfEventsFilterProvider {
                 if (fTable.isVisible() && fRawViewer.isVisible()) {
                     tablePopupMenu.add(hideTableAction);
                     tablePopupMenu.add(hideRawAction);
-                } else if (!fTable.isVisible())
+                } else if (!fTable.isVisible()) {
                     tablePopupMenu.add(showTableAction);
-                else if (!fRawViewer.isVisible())
+                } else if (!fRawViewer.isVisible()) {
                     tablePopupMenu.add(showRawAction);
+                }
                 tablePopupMenu.add(new Separator());
                 tablePopupMenu.add(clearFiltersAction);
                 final ITmfFilterTreeNode[] savedFilters = FilterManager.getSavedFilters();
                 if (savedFilters.length > 0) {
                     final MenuManager subMenu = new MenuManager(Messages.TmfEventsTable_ApplyPresetFilterMenuName);
-                    for (final ITmfFilterTreeNode node : savedFilters)
+                    for (final ITmfFilterTreeNode node : savedFilters) {
                         if (node instanceof TmfFilterNode) {
                             final TmfFilterNode filter = (TmfFilterNode) node;
                             subMenu.add(new Action(filter.getFilterName()) {
@@ -561,13 +580,13 @@ ITmfEventsFilterProvider {
                                     fCache.applyFilter(filter);
                                     fTable.clearAll();
                                     fTable.setData(Key.FILTER_OBJ, filter);
-                                    fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status
-                                    // rows
+                                    fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status rows
                                     startFilterThread();
                                     fireFilterApplied(filter);
                                 }
                             });
                         }
+                    }
                     tablePopupMenu.add(subMenu);
                 }
                 appendToTablePopupMenu(tablePopupMenu, item);
@@ -582,10 +601,11 @@ ITmfEventsFilterProvider {
                 if (fTable.isVisible() && fRawViewer.isVisible()) {
                     rawViewerPopupMenu.add(hideTableAction);
                     rawViewerPopupMenu.add(hideRawAction);
-                } else if (!fTable.isVisible())
+                } else if (!fTable.isVisible()) {
                     rawViewerPopupMenu.add(showTableAction);
-                else if (!fRawViewer.isVisible())
+                } else if (!fRawViewer.isVisible()) {
                     rawViewerPopupMenu.add(showRawAction);
+                }
                 appendToRawPopupMenu(tablePopupMenu);
             }
         });
@@ -611,8 +631,9 @@ ITmfEventsFilterProvider {
         stopFilterThread();
         ColorSettingsManager.removeColorSettingsListener(this);
         fComposite.dispose();
-        if ((fTrace != null) && fDisposeOnClose)
+        if ((fTrace != null) && fDisposeOnClose) {
             fTrace.dispose();
+        }
         fResourceManager.dispose();
         super.dispose();
     }
@@ -637,52 +658,58 @@ ITmfEventsFilterProvider {
     protected void setItemData(final TableItem item, final ITmfEvent event, final long rank) {
         final ITmfEventField[] fields = extractItemFields(event);
         final String[] content = new String[fields.length];
-        for (int i = 0; i < fields.length; i++)
+        for (int i = 0; i < fields.length; i++) {
             content[i] = fields[i].getValue() != null ? fields[i].getValue().toString() : ""; //$NON-NLS-1$
-            item.setText(content);
-            item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
-            item.setData(Key.RANK, rank);
+        }
+        item.setText(content);
+        item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
+        item.setData(Key.RANK, rank);
 
-            boolean bookmark = false;
-            final Long markerId = fBookmarksMap.get(rank);
-            if (markerId != null) {
-                bookmark = true;
-                try {
-                    final IMarker marker = fBookmarksFile.findMarker(markerId);
-                    item.setData(Key.BOOKMARK, marker.getAttribute(IMarker.MESSAGE));
-                } catch (final CoreException e) {
-                    displayException(e);
-                }
-            } else
-                item.setData(Key.BOOKMARK, null);
-
-            boolean searchMatch = false;
-            boolean searchNoMatch = false;
-            final ITmfFilter searchFilter = (ITmfFilter) fTable.getData(Key.SEARCH_OBJ);
-            if (searchFilter != null)
-                if (searchFilter.matches(event))
-                    searchMatch = true;
-                else
-                    searchNoMatch = true;
-
-            final ColorSetting colorSetting = ColorSettingsManager.getColorSetting(event);
-            if (searchNoMatch) {
-                item.setForeground(colorSetting.getDimmedForegroundColor());
-                item.setBackground(colorSetting.getDimmedBackgroundColor());
-            } else {
-                item.setForeground(colorSetting.getForegroundColor());
-                item.setBackground(colorSetting.getBackgroundColor());
+        boolean bookmark = false;
+        final Long markerId = fBookmarksMap.get(rank);
+        if (markerId != null) {
+            bookmark = true;
+            try {
+                final IMarker marker = fBookmarksFile.findMarker(markerId);
+                item.setData(Key.BOOKMARK, marker.getAttribute(IMarker.MESSAGE));
+            } catch (final CoreException e) {
+                displayException(e);
             }
+        } else {
+            item.setData(Key.BOOKMARK, null);
+        }
 
-            if (searchMatch) {
-                if (bookmark)
-                    item.setImage(SEARCH_MATCH_BOOKMARK_IMAGE);
-                else
-                    item.setImage(SEARCH_MATCH_IMAGE);
-            } else if (bookmark)
-                item.setImage(BOOKMARK_IMAGE);
-            else
-                item.setImage((Image) null);
+        boolean searchMatch = false;
+        boolean searchNoMatch = false;
+        final ITmfFilter searchFilter = (ITmfFilter) fTable.getData(Key.SEARCH_OBJ);
+        if (searchFilter != null) {
+            if (searchFilter.matches(event)) {
+                searchMatch = true;
+            } else {
+                searchNoMatch = true;
+            }
+        }
+
+        final ColorSetting colorSetting = ColorSettingsManager.getColorSetting(event);
+        if (searchNoMatch) {
+            item.setForeground(colorSetting.getDimmedForegroundColor());
+            item.setBackground(colorSetting.getDimmedBackgroundColor());
+        } else {
+            item.setForeground(colorSetting.getForegroundColor());
+            item.setBackground(colorSetting.getBackgroundColor());
+        }
+
+        if (searchMatch) {
+            if (bookmark) {
+                item.setImage(SEARCH_MATCH_BOOKMARK_IMAGE);
+            } else {
+                item.setImage(SEARCH_MATCH_IMAGE);
+            }
+        } else if (bookmark) {
+            item.setImage(BOOKMARK_IMAGE);
+        } else {
+            item.setImage((Image) null);
+        }
     }
 
     protected void setHeaderRowItemData(final TableItem item) {
@@ -699,10 +726,11 @@ ITmfEventsFilterProvider {
             final TableColumn column = fTable.getColumns()[i];
             final String filter = (String) column.getData(txtKey);
             if (filter == null) {
-                if (fHeaderState == HeaderState.SEARCH)
+                if (fHeaderState == HeaderState.SEARCH) {
                     item.setText(i, SEARCH_HINT);
-                else if (fHeaderState == HeaderState.FILTER)
+                } else if (fHeaderState == HeaderState.FILTER) {
                     item.setText(i, FILTER_HINT);
+                }
                 item.setForeground(i, fGrayColor);
                 item.setFont(i, fTable.getFont());
             } else {
@@ -714,15 +742,18 @@ ITmfEventsFilterProvider {
     }
 
     protected void setFilterStatusRowItemData(final TableItem item) {
-        for (int i = 0; i < fTable.getColumns().length; i++)
+        for (int i = 0; i < fTable.getColumns().length; i++) {
             if (i == 0) {
-                if ((fTrace == null) || (fFilterCheckCount == fTrace.getNbEvents()))
+                if ((fTrace == null) || (fFilterCheckCount == fTrace.getNbEvents())) {
                     item.setImage(FILTER_IMAGE);
-                else
+                } else {
                     item.setImage(STOP_IMAGE);
+                }
                 item.setText(0, fFilterMatchCount + "/" + fFilterCheckCount); //$NON-NLS-1$
-            } else
+            } else {
                 item.setText(i, ""); //$NON-NLS-1$
+            }
+        }
         item.setData(Key.TIMESTAMP, null);
         item.setData(Key.RANK, null);
         item.setForeground(null);
@@ -744,8 +775,9 @@ ITmfEventsFilterProvider {
 
             @Override
             public void mouseDown(final MouseEvent event) {
-                if (event.button != 1)
+                if (event.button != 1) {
                     return;
+                }
                 // Identify the selected row
                 final Point point = new Point(event.x, event.y);
                 item = fTable.getItem(point);
@@ -755,10 +787,11 @@ ITmfEventsFilterProvider {
 
                     // Icon selected
                     if (item.getImageBounds(0).contains(point)) {
-                        if (fHeaderState == HeaderState.SEARCH)
+                        if (fHeaderState == HeaderState.SEARCH) {
                             fHeaderState = HeaderState.FILTER;
-                        else if (fHeaderState == HeaderState.FILTER)
+                        } else if (fHeaderState == HeaderState.FILTER) {
                             fHeaderState = HeaderState.SEARCH;
+                        }
                         fTable.refresh();
                         return;
                     }
@@ -773,28 +806,32 @@ ITmfEventsFilterProvider {
                         }
                     }
 
-                    if (columnIndex == -1)
+                    if (columnIndex == -1) {
                         return;
+                    }
 
                     column = fTable.getColumns()[columnIndex];
 
                     String txtKey = null;
-                    if (fHeaderState == HeaderState.SEARCH)
+                    if (fHeaderState == HeaderState.SEARCH) {
                         txtKey = Key.SEARCH_TXT;
-                    else if (fHeaderState == HeaderState.FILTER)
+                    } else if (fHeaderState == HeaderState.FILTER) {
                         txtKey = Key.FILTER_TXT;
+                    }
 
                     // The control that will be the editor must be a child of the Table
                     final Text newEditor = (Text) fTable.createTableEditorControl(Text.class);
                     final String headerString = (String) column.getData(txtKey);
-                    if (headerString != null)
+                    if (headerString != null) {
                         newEditor.setText(headerString);
+                    }
                     newEditor.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusLost(final FocusEvent e) {
                             final boolean changed = updateHeader(newEditor.getText());
-                            if (changed)
+                            if (changed) {
                                 applyHeader();
+                            }
                         }
                     });
                     newEditor.addKeyListener(new KeyAdapter() {
@@ -803,8 +840,9 @@ ITmfEventsFilterProvider {
                             if (e.character == SWT.CR) {
                                 updateHeader(newEditor.getText());
                                 applyHeader();
-                            } else if (e.character == SWT.ESC)
+                            } else if (e.character == SWT.ESC) {
                                 tableEditor.getEditor().dispose();
+                            }
                         }
                     });
                     newEditor.selectAll();
@@ -826,7 +864,7 @@ ITmfEventsFilterProvider {
                     objKey = Key.FILTER_OBJ;
                     txtKey = Key.FILTER_TXT;
                 }
-                if (text.trim().length() > 0)
+                if (text.trim().length() > 0) {
                     try {
                         final String regex = TmfFilterMatchesNode.regexFix(text);
                         Pattern.compile(regex);
@@ -836,8 +874,9 @@ ITmfEventsFilterProvider {
                         }
                         final TmfFilterMatchesNode filter = new TmfFilterMatchesNode(null);
                         String fieldId = (String) column.getData(Key.FIELD_ID);
-                        if (fieldId == null)
+                        if (fieldId == null) {
                             fieldId = column.getText();
+                        }
                         filter.setField(fieldId);
                         filter.setRegex(regex);
                         column.setData(objKey, filter);
@@ -848,7 +887,7 @@ ITmfEventsFilterProvider {
                                 ex.getDescription(), ex.getMessage());
                         return false;
                     }
-                else {
+                } else {
                     if (column.getData(txtKey) == null) {
                         tableEditor.getEditor().dispose();
                         return false;
@@ -865,8 +904,9 @@ ITmfEventsFilterProvider {
                     final TmfFilterAndNode filter = new TmfFilterAndNode(null);
                     for (final TableColumn column : fTable.getColumns()) {
                         final Object filterObj = column.getData(Key.SEARCH_OBJ);
-                        if (filterObj instanceof ITmfFilterTreeNode)
+                        if (filterObj instanceof ITmfFilterTreeNode) {
                             filter.addChild((ITmfFilterTreeNode) filterObj);
+                        }
                     }
                     if (filter.getChildrenCount() > 0) {
                         fTable.setData(Key.SEARCH_OBJ, filter);
@@ -885,8 +925,9 @@ ITmfEventsFilterProvider {
                     final TmfFilterAndNode filter = new TmfFilterAndNode(null);
                     for (final TableColumn column : fTable.getColumns()) {
                         final Object filterObj = column.getData(Key.FILTER_OBJ);
-                        if (filterObj instanceof ITmfFilterTreeNode)
+                        if (filterObj instanceof ITmfFilterTreeNode) {
                             filter.addChild((ITmfFilterTreeNode) filterObj);
+                        }
                     }
                     if (filter.getChildrenCount() > 0) {
                         fCache.applyFilter(filter);
@@ -900,10 +941,11 @@ ITmfEventsFilterProvider {
                         stopFilterThread();
                         fTable.clearAll();
                         fTable.setData(Key.FILTER_OBJ, null);
-                        if (fTrace != null)
+                        if (fTrace != null) {
                             fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-                        else
+                        } else {
                             fTable.setItemCount(1); // +1 for header row
+                        }
                         fireFilterApplied(null);
                     }
                 }
@@ -931,31 +973,37 @@ ITmfEventsFilterProvider {
                         fTable.setData(Key.SEARCH_OBJ, null);
                         fTable.refresh();
                         fireSearchApplied(null);
-                    } else if (fHeaderState == HeaderState.FILTER)
+                    } else if (fHeaderState == HeaderState.FILTER) {
                         clearFilters();
-                } else if (e.character == SWT.CR)
-                    if ((e.stateMask & SWT.SHIFT) == 0)
+                    }
+                } else if (e.character == SWT.CR) {
+                    if ((e.stateMask & SWT.SHIFT) == 0) {
                         searchNext();
-                    else
+                    } else {
                         searchPrevious();
+                    }
+                }
             }
         });
     }
 
     protected void fireFilterApplied(final ITmfFilter filter) {
-        for (final ITmfEventsFilterListener listener : fEventsFilterListeners)
+        for (final ITmfEventsFilterListener listener : fEventsFilterListeners) {
             listener.filterApplied(filter, fTrace);
+        }
     }
 
     protected void fireSearchApplied(final ITmfFilter filter) {
-        for (final ITmfEventsFilterListener listener : fEventsFilterListeners)
+        for (final ITmfEventsFilterListener listener : fEventsFilterListeners) {
             listener.searchApplied(filter, fTrace);
+        }
     }
 
     protected void startFilterThread() {
         synchronized (fFilterSyncObj) {
-            if (fFilterThread != null)
+            if (fFilterThread != null) {
                 fFilterThread.cancel();
+            }
             final ITmfFilterTreeNode filter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
             fFilterThread = new FilterThread(filter);
             fFilterThread.start();
@@ -964,14 +1012,16 @@ ITmfEventsFilterProvider {
 
     protected void stopFilterThread() {
         synchronized (fFilterSyncObj) {
-            if (fFilterThread != null)
+            if (fFilterThread != null) {
                 fFilterThread.cancel();
+            }
         }
     }
 
     protected void clearFilters() {
-        if (fTable.getData(Key.FILTER_OBJ) == null)
+        if (fTable.getData(Key.FILTER_OBJ) == null) {
             return;
+        }
         fCache.clearFilter();
         fTable.clearAll();
         for (final TableColumn column : fTable.getColumns()) {
@@ -979,16 +1029,18 @@ ITmfEventsFilterProvider {
             column.setData(Key.FILTER_TXT, null);
         }
         fTable.setData(Key.FILTER_OBJ, null);
-        if (fTrace != null)
+        if (fTrace != null) {
             fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-        else
+        } else {
             fTable.setItemCount(1); // +1 for header row
+        }
         fFilterMatchCount = 0;
         fFilterCheckCount = 0;
-        if (fSelectedRank >= 0)
+        if (fSelectedRank >= 0) {
             fTable.setSelection((int) fSelectedRank + 1); // +1 for header row
-        else
+        } else {
             fTable.setSelection(0);
+        }
         fireFilterApplied(null);
     }
 
@@ -1007,26 +1059,30 @@ ITmfEventsFilterProvider {
         @SuppressWarnings("unchecked")
         @Override
         public void run() {
-            if (fTrace == null)
+            if (fTrace == null) {
                 return;
+            }
             final int nbRequested = (int) (fTrace.getNbEvents() - fFilterCheckCount);
-            if (nbRequested <= 0)
+            if (nbRequested <= 0) {
                 return;
+            }
             request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
                     nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
                 @Override
                 public void handleData(final ITmfEvent event) {
                     super.handleData(event);
-                    if (request.isCancelled())
+                    if (request.isCancelled()) {
                         return;
+                    }
                     if (filter.matches(event)) {
                         final long rank = fFilterCheckCount;
                         final int index = (int) fFilterMatchCount;
                         fFilterMatchCount++;
                         fCache.storeEvent(event.clone(), rank, index);
                         refreshTable();
-                    } else if ((fFilterCheckCount % 100) == 0)
+                    } else if ((fFilterCheckCount % 100) == 0) {
                         refreshTable();
+                    }
                     fFilterCheckCount++;
                 }
             };
@@ -1043,18 +1099,20 @@ ITmfEventsFilterProvider {
                 if (refreshBusy) {
                     refreshPending = true;
                     return;
-                } else
+                } else {
                     refreshBusy = true;
+                }
             }
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    if (request.isCancelled())
+                    if (request.isCancelled()) {
                         return;
-                    if (fTable.isDisposed())
+                    }
+                    if (fTable.isDisposed()) {
                         return;
-                    fTable.setItemCount((int) fFilterMatchCount + 3); // +1 for header row, +2 for top and bottom filter
-                    // status rows
+                    }
+                    fTable.setItemCount((int) fFilterMatchCount + 3); // +1 for header row, +2 for top and bottom filter status rows
                     fTable.refresh();
                     synchronized (syncObj) {
                         refreshBusy = false;
@@ -1068,28 +1126,34 @@ ITmfEventsFilterProvider {
         }
 
         public void cancel() {
-            if (request != null)
+            if (request != null) {
                 request.cancel();
+            }
         }
     }
 
     protected void searchNext() {
         synchronized (fSearchSyncObj) {
-            if (fSearchThread != null)
+            if (fSearchThread != null) {
                 return;
+            }
             final ITmfFilterTreeNode searchFilter = (ITmfFilterTreeNode) fTable.getData(Key.SEARCH_OBJ);
-            if (searchFilter == null)
+            if (searchFilter == null) {
                 return;
+            }
             final int selectionIndex = fTable.getSelectionIndex();
             int startIndex;
-            if (selectionIndex > 0)
+            if (selectionIndex > 0) {
                 startIndex = selectionIndex; // -1 for header row, +1 for next event
-            else
+            } else {
                 // header row is selected, start at top event
                 startIndex = Math.max(0, fTable.getTopIndex() - 1); // -1 for header row
+            }
             final ITmfFilterTreeNode eventFilter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
             if (eventFilter != null)
+             {
                 startIndex = Math.max(0, startIndex - 1); // -1 for top filter status row
+            }
             fSearchThread = new SearchThread(searchFilter, eventFilter, startIndex, fSelectedRank, Direction.FORWARD);
             fSearchThread.schedule();
         }
@@ -1097,21 +1161,26 @@ ITmfEventsFilterProvider {
 
     protected void searchPrevious() {
         synchronized (fSearchSyncObj) {
-            if (fSearchThread != null)
+            if (fSearchThread != null) {
                 return;
+            }
             final ITmfFilterTreeNode searchFilter = (ITmfFilterTreeNode) fTable.getData(Key.SEARCH_OBJ);
-            if (searchFilter == null)
+            if (searchFilter == null) {
                 return;
+            }
             final int selectionIndex = fTable.getSelectionIndex();
             int startIndex;
-            if (selectionIndex > 0)
+            if (selectionIndex > 0) {
                 startIndex = selectionIndex - 2; // -1 for header row, -1 for previous event
-            else
+            } else {
                 // header row is selected, start at precedent of top event
                 startIndex = fTable.getTopIndex() - 2; // -1 for header row, -1 for previous event
+            }
             final ITmfFilterTreeNode eventFilter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
             if (eventFilter != null)
+             {
                 startIndex = startIndex - 1; // -1 for top filter status row
+            }
             fSearchThread = new SearchThread(searchFilter, eventFilter, startIndex, fSelectedRank, Direction.BACKWARD);
             fSearchThread.schedule();
         }
@@ -1149,41 +1218,47 @@ ITmfEventsFilterProvider {
         @SuppressWarnings("unchecked")
         @Override
         protected IStatus run(final IProgressMonitor monitor) {
-            if (fTrace == null)
+            if (fTrace == null) {
                 return Status.OK_STATUS;
+            }
             final Display display = Display.getDefault();
-            if (startIndex < 0)
+            if (startIndex < 0) {
                 rank = (int) fTrace.getNbEvents() - 1;
-            else if (startIndex >= (fTable.getItemCount() - (eventFilter == null ? 1 : 3)))
+            } else if (startIndex >= (fTable.getItemCount() - (eventFilter == null ? 1 : 3))) {
                 // for top and bottom
                 // filter status rows
                 rank = 0;
-            else {
+            } else {
                 int idx = startIndex;
                 while (foundRank == -1) {
                     final CachedEvent event = fCache.peekEvent(idx);
-                    if (event == null)
+                    if (event == null) {
                         break;
+                    }
                     rank = event.rank;
                     if (searchFilter.matches(event.event) && ((eventFilter == null) || eventFilter.matches(event.event))) {
                         foundRank = event.rank;
                         break;
                     }
-                    if (direction == Direction.FORWARD)
+                    if (direction == Direction.FORWARD) {
                         idx++;
-                    else
+                    } else {
                         idx--;
+                    }
                 }
-                if (foundRank == -1)
+                if (foundRank == -1) {
                     if (direction == Direction.FORWARD) {
                         rank++;
-                        if (rank > (fTrace.getNbEvents() - 1))
+                        if (rank > (fTrace.getNbEvents() - 1)) {
                             rank = 0;
+                        }
                     } else {
                         rank--;
-                        if (rank < 0)
+                        if (rank < 0) {
                             rank = (int) fTrace.getNbEvents() - 1;
+                        }
                     }
+                }
             }
             final int startRank = (int) rank;
             boolean wrapped = false;
@@ -1211,15 +1286,16 @@ ITmfEventsFilterProvider {
                 ((ITmfDataProvider<ITmfEvent>) fTrace).sendRequest(request);
                 try {
                     request.waitForCompletion();
-                    if (request.isCancelled())
+                    if (request.isCancelled()) {
                         return Status.OK_STATUS;
+                    }
                 } catch (final InterruptedException e) {
                     synchronized (fSearchSyncObj) {
                         fSearchThread = null;
                     }
                     return Status.OK_STATUS;
                 }
-                if (foundRank == -1)
+                if (foundRank == -1) {
                     if (direction == Direction.FORWARD) {
                         if (rank == 0) {
                             synchronized (fSearchSyncObj) {
@@ -1244,20 +1320,23 @@ ITmfEventsFilterProvider {
                             return Status.OK_STATUS;
                         }
                     }
+                }
             }
             int index = (int) foundRank;
-            if (eventFilter != null)
+            if (eventFilter != null) {
                 index = fCache.getFilteredEventIndex(foundRank);
-            final int selection = index + 1 + (eventFilter != null ? +1 : 0); // +1 for header row, +1 for top filter
-            // status row
+            }
+            final int selection = index + 1 + (eventFilter != null ? +1 : 0); // +1 for header row, +1 for top filter status row
 
             display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    if (monitor.isCanceled())
+                    if (monitor.isCanceled()) {
                         return;
-                    if (fTable.isDisposed())
+                    }
+                    if (fTable.isDisposed()) {
                         return;
+                    }
                     fTable.setSelection(selection);
                     fSelectedRank = foundRank;
                     synchronized (fSearchSyncObj) {
@@ -1285,13 +1364,15 @@ ITmfEventsFilterProvider {
     }
 
     protected void packColumns() {
-        if (fPackDone)
+        if (fPackDone) {
             return;
+        }
         for (final TableColumn column : fTable.getColumns()) {
             final int headerWidth = column.getWidth();
             column.pack();
-            if (column.getWidth() < headerWidth)
+            if (column.getWidth() < headerWidth) {
                 column.setWidth(headerWidth);
+            }
         }
         fPackDone = true;
     }
@@ -1332,8 +1413,9 @@ ITmfEventsFilterProvider {
      *            true if the trace should be disposed when the table is disposed
      */
     public void setTrace(final ITmfTrace<?> trace, final boolean disposeOnClose) {
-        if ((fTrace != null) && fDisposeOnClose)
+        if ((fTrace != null) && fDisposeOnClose) {
             fTrace.dispose();
+        }
         fTrace = trace;
         fPackDone = false;
         fSelectedRank = 0;
@@ -1346,16 +1428,17 @@ ITmfEventsFilterProvider {
                 fTable.removeAll();
                 fCache.setTrace(fTrace); // Clear the cache
                 if (fTrace != null) {
-                    if (!fTable.isDisposed() && (fTrace != null))
-                        if (fTable.getData(Key.FILTER_OBJ) == null)
+                    if (!fTable.isDisposed() && (fTrace != null)) {
+                        if (fTable.getData(Key.FILTER_OBJ) == null) {
                             fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-                        else {
+                        } else {
                             stopFilterThread();
                             fFilterMatchCount = 0;
                             fFilterCheckCount = 0;
                             fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status rows
                             startFilterThread();
                         }
+                    }
                     fRawViewer.setTrace(fTrace);
                 }
             }
@@ -1372,11 +1455,12 @@ ITmfEventsFilterProvider {
                 fCacheUpdatePending = true;
                 fCacheUpdateCompleted = completed;
                 return;
-            } else
+            } else {
                 fCacheUpdateBusy = true;
+            }
         }
         // Event cache is now updated. Perform update on the UI thread
-        if (!fTable.isDisposed())
+        if (!fTable.isDisposed()) {
             fTable.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -1384,8 +1468,9 @@ ITmfEventsFilterProvider {
                         fTable.refresh();
                         packColumns();
                     }
-                    if (completed)
+                    if (completed) {
                         populateCompleted();
+                    }
                     synchronized (fCacheUpdateSyncObj) {
                         fCacheUpdateBusy = false;
                         if (fCacheUpdatePending) {
@@ -1395,6 +1480,7 @@ ITmfEventsFilterProvider {
                     }
                 }
             });
+        }
     }
 
     protected void populateCompleted() {
@@ -1414,7 +1500,9 @@ ITmfEventsFilterProvider {
                 final StringBuffer defaultMessage = new StringBuffer();
                 for (int i = 0; i < fTable.getColumns().length; i++) {
                     if (i > 0)
+                     {
                         defaultMessage.append(", "); //$NON-NLS-1$
+                    }
                     defaultMessage.append(tableItem.getText(i));
                 }
                 final InputDialog dialog = new InputDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -1442,29 +1530,33 @@ ITmfEventsFilterProvider {
     }
 
     public void removeBookmark(final IMarker bookmark) {
-        for (final Entry<Long, Long> entry : fBookmarksMap.entrySet())
+        for (final Entry<Long, Long> entry : fBookmarksMap.entrySet()) {
             if (entry.getValue().equals(bookmark.getId())) {
                 fBookmarksMap.remove(entry.getKey());
                 fTable.refresh();
                 return;
             }
+        }
     }
 
     private void toggleBookmark(final long rank) {
-        if (fBookmarksFile == null)
+        if (fBookmarksFile == null) {
             return;
+        }
         if (fBookmarksMap.containsKey(rank)) {
             final Long markerId = fBookmarksMap.remove(rank);
             fTable.refresh();
             try {
                 final IMarker bookmark = fBookmarksFile.findMarker(markerId);
-                if (bookmark != null)
+                if (bookmark != null) {
                     bookmark.delete();
+                }
             } catch (final CoreException e) {
                 displayException(e);
             }
-        } else
+        } else {
             addBookmark(fBookmarksFile);
+        }
     }
 
     public void refreshBookmarks(final IFile bookmarksFile) {
@@ -1494,10 +1586,11 @@ ITmfEventsFilterProvider {
         final int rank = marker.getAttribute(IMarker.LOCATION, -1);
         if (rank != -1) {
             int index = rank;
-            if (fTable.getData(Key.FILTER_OBJ) != null)
+            if (fTable.getData(Key.FILTER_OBJ) != null) {
                 index = fCache.getFilteredEventIndex(rank) + 1; // +1 for top filter status row
-            else if (rank >= fTable.getItemCount())
+            } else if (rank >= fTable.getItemCount()) {
                 fPendingGotoRank = rank;
+            }
             fTable.setSelection(index + 1); // +1 for header row
         }
     }
@@ -1509,9 +1602,7 @@ ITmfEventsFilterProvider {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * org.eclipse.linuxtools.tmf.ui.views.colors.IColorSettingsListener#colorSettingsChanged(org.eclipse.linuxtools
-     * .tmf.ui.views.colors.ColorSetting[])
+     * @see org.eclipse.linuxtools.tmf.ui.views.colors.IColorSettingsListener#colorSettingsChanged(org.eclipse.linuxtools.tmf.ui.views.colors.ColorSetting[])
      */
     @Override
     public void colorSettingsChanged(final ColorSetting[] colorSettings) {
@@ -1520,8 +1611,9 @@ ITmfEventsFilterProvider {
 
     @Override
     public void addEventsFilterListener(final ITmfEventsFilterListener listener) {
-        if (!fEventsFilterListeners.contains(listener))
+        if (!fEventsFilterListeners.contains(listener)) {
             fEventsFilterListeners.add(listener);
+        }
     }
 
     @Override
@@ -1535,46 +1627,54 @@ ITmfEventsFilterProvider {
 
     @TmfSignalHandler
     public void experimentUpdated(final TmfExperimentUpdatedSignal signal) {
-        if ((signal.getExperiment() != fTrace) || fTable.isDisposed())
+        if ((signal.getExperiment() != fTrace) || fTable.isDisposed()) {
             return;
+        }
         // Perform the refresh on the UI thread
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (!fTable.isDisposed() && (fTrace != null))
+                if (!fTable.isDisposed() && (fTrace != null)) {
                     if (fTable.getData(Key.FILTER_OBJ) == null) {
                         fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
                         if ((fPendingGotoRank != -1) && ((fPendingGotoRank + 1) < fTable.getItemCount())) { // +1 for header row
                             fTable.setSelection((int) fPendingGotoRank + 1); // +1 for header row
                             fPendingGotoRank = -1;
                         }
-                    } else
+                    } else {
                         startFilterThread();
-                if (!fRawViewer.isDisposed() && (fTrace != null))
+                    }
+                }
+                if (!fRawViewer.isDisposed() && (fTrace != null)) {
                     fRawViewer.refreshEventCount();
+                }
             }
         });
     }
 
     @TmfSignalHandler
     public void traceUpdated(final TmfTraceUpdatedSignal signal) {
-        if ((signal.getTrace() != fTrace) || fTable.isDisposed())
+        if ((signal.getTrace() != fTrace) || fTable.isDisposed()) {
             return;
+        }
         // Perform the refresh on the UI thread
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (!fTable.isDisposed() && (fTrace != null))
+                if (!fTable.isDisposed() && (fTrace != null)) {
                     if (fTable.getData(Key.FILTER_OBJ) == null) {
                         fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
                         if ((fPendingGotoRank != -1) && ((fPendingGotoRank + 1) < fTable.getItemCount())) { // +1 for header row
                             fTable.setSelection((int) fPendingGotoRank + 1); // +1 for header row
                             fPendingGotoRank = -1;
                         }
-                    } else
+                    } else {
                         startFilterThread();
-                if (!fRawViewer.isDisposed() && (fTrace != null))
+                    }
+                }
+                if (!fRawViewer.isDisposed() && (fTrace != null)) {
                     fRawViewer.refreshEventCount();
+                }
             }
         });
     }
@@ -1584,13 +1684,10 @@ ITmfEventsFilterProvider {
     public void currentTimeUpdated(final TmfTimeSynchSignal signal) {
         if ((signal.getSource() != this) && (fTrace != null) && (!fTable.isDisposed())) {
 
-            // Create a request for one event that will be queued after other ongoing requests. When this request is
-            // completed
-            // do the work to select the actual event with the timestamp specified in the signal. This procedure
-            // prevents
+            // Create a request for one event that will be queued after other ongoing requests. When this request is completed
+            // do the work to select the actual event with the timestamp specified in the signal. This procedure prevents
             // the method fTrace.getRank() from interfering and delaying ongoing requests.
-            final TmfDataRequest<ITmfEvent> subRequest = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, 0, 1,
-                    ExecutionType.FOREGROUND) {
+            final TmfDataRequest<ITmfEvent> subRequest = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, 0, 1, ExecutionType.FOREGROUND) {
 
                 TmfTimestamp ts = new TmfTimestamp(signal.getCurrentTime());
 
@@ -1602,15 +1699,18 @@ ITmfEventsFilterProvider {
                 @Override
                 public void handleCompleted() {
                     super.handleCompleted();
-                    if (fTrace == null)
+                    if (fTrace == null) {
                         return;
+                    }
 
                     // Verify if the event is within the trace range and adjust if necessary
                     ITmfTimestamp timestamp = ts;
-                    if (timestamp.compareTo(fTrace.getStartTime(), true) == -1)
+                    if (timestamp.compareTo(fTrace.getStartTime(), true) == -1) {
                         timestamp = fTrace.getStartTime();
-                    if (timestamp.compareTo(fTrace.getEndTime(), true) == 1)
+                    }
+                    if (timestamp.compareTo(fTrace.getEndTime(), true) == 1) {
                         timestamp = fTrace.getEndTime();
+                    }
 
                     // Get the rank of the selected event in the table
                     final ITmfContext context = fTrace.seekEvent(timestamp);
@@ -1621,14 +1721,18 @@ ITmfEventsFilterProvider {
                         @Override
                         public void run() {
                             // Return if table is disposed
-                            if (fTable.isDisposed())
+                            if (fTable.isDisposed()) {
                                 return;
+                            }
 
                             int index = (int) rank;
-                            if (fTable.isDisposed())
+                            if (fTable.isDisposed()) {
                                 return;
+                            }
                             if (fTable.getData(Key.FILTER_OBJ) != null)
+                             {
                                 index = fCache.getFilteredEventIndex(rank) + 1; // +1 for top filter status row
+                            }
                             fTable.setSelection(index + 1); // +1 for header row
                             fRawViewer.selectAndReveal(rank);
                         }
