@@ -217,9 +217,8 @@ public class TimeGraphTooltipHandler {
                 TimeGraphItem item = threadStates.getItem(pt);
                 _tipTable.remove(0, _tipTable.getItemCount() - 1);
                 fillValues(pt, threadStates, item);
-                _tipTable.getColumn(0).setWidth(200);
+                _tipTable.getColumn(0).pack();
                 _tipTable.getColumn(1).pack();
-                _tipTable.setSize(_tipTable.computeSize(SWT.DEFAULT, 200));
                 _tipShell.pack();
                 _tipPosition = control.toDisplay(pt);
                 _tipShell.pack();

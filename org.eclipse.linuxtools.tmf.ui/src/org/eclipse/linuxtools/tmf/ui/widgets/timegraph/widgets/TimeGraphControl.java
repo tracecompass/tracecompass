@@ -106,6 +106,43 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     protected LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
     protected Color[] fEventColorMap = null;
 
+    private MouseScrollNotifier fMouseScrollNotifier;
+    private Object fMouseScrollNotifierLock = new Object();
+    private class MouseScrollNotifier extends Thread {
+        private final static long DELAY = 400L;
+        private final static long POLLING_INTERVAL = 10L;
+        private long fLastScrollTime = Long.MAX_VALUE;
+
+        @Override
+        public void run() {
+            while ((System.currentTimeMillis() - fLastScrollTime) < DELAY) {
+                try {
+                    Thread.sleep(POLLING_INTERVAL);
+                } catch (Exception e) {
+                    return;
+                }
+            }
+            if (!isInterrupted()) {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isDisposed()) {
+                            return;
+                        }
+                        _timeProvider.notifyStartFinishTime();
+                    }
+                });
+            }
+            synchronized (fMouseScrollNotifierLock) {
+                fMouseScrollNotifier = null;
+            }
+        }
+
+        public void mouseScrolled() {
+            fLastScrollTime = System.currentTimeMillis();
+        }
+    }
+
     public TimeGraphControl(Composite parent, TimeGraphColorScheme colors) {
 
         super(parent, colors, SWT.NO_BACKGROUND | SWT.H_SCROLL | SWT.DOUBLE_BUFFERED);
@@ -538,6 +575,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         long newTime0 = center - Math.round((double) newInterval * (center - time0) / interval);
         long newTime1 = newTime0 + newInterval;
         _timeProvider.setStartFinishTime(newTime0, newTime1);
+        synchronized (fMouseScrollNotifierLock) {
+            if (fMouseScrollNotifier == null) {
+                fMouseScrollNotifier = new MouseScrollNotifier();
+                fMouseScrollNotifier.start();
+            }
+            fMouseScrollNotifier.mouseScrolled();
+        }
     }
 
     /**
@@ -1277,10 +1321,6 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 redraw();
             }
             _mouseOverSplitLine = mouseOverSplitLine;
-            // Make sure any time changes are notified to the application e.g.
-            // getting back from the horizontal scroll bar or zoomed using the
-            // mouse wheel
-            _timeProvider.notifyStartFinishTime();
         }
         updateCursor(e.x, e.y);
     }
