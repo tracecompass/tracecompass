@@ -66,6 +66,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
         fDefinition = definition;
         fEventType = new CustomXmlEventType(fDefinition);
         fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);
+        indexTrace(false);
     }
 
     @Override

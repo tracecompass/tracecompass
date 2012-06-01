@@ -52,6 +52,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
         super(resource, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
+        indexTrace(false);
     }
 
     @Override
