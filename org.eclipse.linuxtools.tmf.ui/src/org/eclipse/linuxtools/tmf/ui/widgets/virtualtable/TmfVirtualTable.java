@@ -607,6 +607,10 @@ public class TmfVirtualTable extends Composite {
         return fTable.getItemHeight();
     }
 
+    public int getHeaderHeight() {
+        return fTable.getHeaderHeight();
+    }
+
     public int getTopIndex() {
         return fTableTopEventRank + fFrozenRowCount;
     }

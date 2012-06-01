@@ -370,7 +370,15 @@ ITmfEventsFilterProvider {
                         label.addListener(SWT.MouseDown, this);
                         label.addListener(SWT.MouseWheel, this);
                         final Point size = tooltipShell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-                        Point pt = fTable.toDisplay(event.x, event.y);
+                        /*
+                         * Bug in Linux.  The coordinates of the event have an origin that excludes the table header but
+                         * the method toDisplay() expects coordinates relative to an origin that includes the table header.
+                         */
+                        int y = event.y;
+                        if (System.getProperty("os.name").contains("Linux")) { //$NON-NLS-1$ //$NON-NLS-2$
+                            y += fTable.getHeaderHeight();
+                        }
+                        Point pt = fTable.toDisplay(event.x, y);
                         pt.x += BOOKMARK_IMAGE.getBounds().width;
                         pt.y += size.y;
                         tooltipShell.setBounds(pt.x, pt.y, size.x, size.y);
