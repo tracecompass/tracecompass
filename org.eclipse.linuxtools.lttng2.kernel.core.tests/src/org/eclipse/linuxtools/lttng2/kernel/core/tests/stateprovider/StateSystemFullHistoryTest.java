@@ -63,7 +63,7 @@ public class StateSystemFullHistoryTest {
         stateFileBenchmark = new File(getTestFileName() + ".benchmark"); //$NON-NLS-1$
         try {
             input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-            ssq = StateSystemManager.loadStateHistory(stateFile, input);
+            ssq = StateSystemManager.loadStateHistory(stateFile, input, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,23 +88,23 @@ public class StateSystemFullHistoryTest {
      * @throws TmfTraceException 
      */
     @Test
-    public void testBuild() throws IOException, TmfTraceException {
+    public void testBuild() throws TmfTraceException {
         IStateChangeInput input2;
         IStateSystemQuerier ssb2;
         
         input2 = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-        ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2);
+        ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2, true);
 
         assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());
         assertEquals(CtfTestFiles.endTime, ssb2.getCurrentEndTime());
     }
 
     @Test
-    public void testOpenExistingStateFile() throws IOException, TmfTraceException {
+    public void testOpenExistingStateFile() throws TmfTraceException {
         IStateSystemQuerier ssb2;
 
         /* 'newStateFile' should have already been created */
-        ssb2 = StateSystemManager.loadStateHistory(stateFile, null);
+        ssb2 = StateSystemManager.loadStateHistory(stateFile, null, true);
 
         assertNotNull(ssb2);
         assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());

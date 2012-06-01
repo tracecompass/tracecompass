@@ -15,12 +15,17 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.HistoryBuilder;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryTreeBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * This abstract manager class handles loading or creating state history files
@@ -56,10 +61,11 @@ public abstract class StateSystemManager extends TmfComponent {
      * @throws TmfTraceException
      */
     public static IStateSystemQuerier loadStateHistory(File htFile,
-            IStateChangeInput htInput) throws TmfTraceException {
+            IStateChangeInput htInput, boolean waitForCompletion)
+            throws TmfTraceException {
         IStateSystemQuerier ss;
         IStateHistoryBackend htBackend;
-        
+
         /* If the target file already exists, do not rebuild it uselessly */
         // TODO for now we assume it's complete. Might be a good idea to check
         // at least if its range matches the trace's range.
@@ -80,6 +86,7 @@ public abstract class StateSystemManager extends TmfComponent {
 
         /* Create a new state history from scratch */
         HistoryBuilder builder;
+
         if (htInput == null) {
             return null;
         }
@@ -87,14 +94,38 @@ public abstract class StateSystemManager extends TmfComponent {
             htBackend = new ThreadedHistoryTreeBackend(htFile,
                     htInput.getStartTime(), QUEUE_SIZE);
             builder = new HistoryBuilder(htInput, htBackend);
-            builder.run(); //FIXME
         } catch (IOException e) {
-            /* 
-             * If it fails here however, it means there was a problem writing
-             * to the disk, so throw a real exception this time.
+            /*
+             * If it fails here however, it means there was a problem writing to
+             * the disk, so throw a real exception this time.
              */
             throw new TmfTraceException(e.toString(), e);
         }
+        startBuilderJob(builder, htInput.getTrace(), waitForCompletion);
         return builder.getStateSystemQuerier();
+    }
+
+    private static void startBuilderJob(final HistoryBuilder builder,
+            ITmfTrace<?> trace, boolean waitForCompletion) {
+
+        final Job job = new Job("Building state history for " +
+                trace.getName() + "...") { //$NON-NLS-1$
+            @Override
+            protected IStatus run(final IProgressMonitor monitor) {
+                builder.run();
+                monitor.done();
+                // send signal here?
+                return Status.OK_STATUS;
+            }
+        };
+
+        job.schedule();
+        if (waitForCompletion) {
+            try {
+                job.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -67,6 +67,6 @@ public class CtfKernelTrace extends CtfTmfTrace {
         final File htFile = new File(supplDirectory + File.separator + HISTORY_TREE_FILE_NAME);
         final IStateChangeInput htInput = new CtfKernelStateInput(this);
 
-        this.ss = StateSystemManager.loadStateHistory(htFile, htInput);
+        this.ss = StateSystemManager.loadStateHistory(htFile, htInput, false);
     }
 }
