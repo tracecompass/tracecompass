@@ -25,6 +25,8 @@ import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryT
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -106,7 +108,7 @@ public abstract class StateSystemManager extends TmfComponent {
     }
 
     private static void startBuilderJob(final HistoryBuilder builder,
-            ITmfTrace<?> trace, boolean waitForCompletion) {
+            final ITmfTrace<?> trace, boolean waitForCompletion) {
 
         final Job job = new Job("Building state history for " +
                 trace.getName() + "...") { //$NON-NLS-1$
@@ -114,7 +116,11 @@ public abstract class StateSystemManager extends TmfComponent {
             protected IStatus run(final IProgressMonitor monitor) {
                 builder.run();
                 monitor.done();
-                // send signal here?
+
+                /* Broadcast the signal saying the history is done building */
+                TmfSignalManager.dispatchSignal(new TmfStateSystemBuildCompleted(
+                        this, trace));
+
                 return Status.OK_STATUS;
             }
         };
