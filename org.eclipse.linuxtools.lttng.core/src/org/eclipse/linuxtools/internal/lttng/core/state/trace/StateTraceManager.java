@@ -19,8 +19,8 @@ import org.eclipse.linuxtools.internal.lttng.core.Activator;
 import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent.SequenceInd;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.internal.lttng.core.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.internal.lttng.core.request.IRequestStatusListener;
@@ -40,6 +40,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
@@ -166,8 +167,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 				stateCheckpointsList.put(eventCounter, stateCheckPoint);
 				// Save correlation between timestamp and checkpoint index
 
-				timestampCheckpointsList.add(new TmfCheckpoint(new TmfTimestamp(eventTime), new TmfLocation<Long>(
-						eventCounter)));
+				timestampCheckpointsList.add(new TmfCheckpoint(new TmfTimestamp(eventTime), new TmfContext(new TmfLocation<Long>(eventCounter), eventCounter)));
 			}
 		}
 	}
@@ -198,7 +198,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	@SuppressWarnings("unchecked")
 	public TmfCheckpoint restoreCheckPointByTimestamp(ITmfTimestamp eventTime) {
 		TmfTimeRange experimentRange = fExperiment.getTimeRange();
-		TmfCheckpoint checkpoint = new TmfCheckpoint(fTrace.getStartTime(), new TmfLocation<Long>(0L));
+		TmfCheckpoint checkpoint = new TmfCheckpoint(fTrace.getStartTime(), new TmfContext(new TmfLocation<Long>(0L), 0));
 
 		// The GUI can have time limits higher than this log, since GUI can
 		// handle multiple logs. Ignore special null value of experiment time range.
@@ -218,8 +218,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		    Collections.sort(timestampCheckpointsList);
 		    // Initiate the compare with a checkpoint containing the target time
 		    // stamp to find
-		    int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime,
-		            new TmfLocation<Long>(0L)));
+		    int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime, new TmfContext(new TmfLocation<Long>(0L), 0)));
 		    // adjust index to round down to earlier checkpoint when exact match
 		    // not
 		    // found
@@ -254,15 +253,14 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 */
 	@Override
 	public TmfCheckpoint restoreCheckPointByIndex(long eventIndex) {
-		TmfCheckpoint checkpoint = new TmfCheckpoint(fTrace.getStartTime(), new TmfLocation<Long>(0L));
+		TmfCheckpoint checkpoint = new TmfCheckpoint(fTrace.getStartTime(), new TmfContext(new TmfLocation<Long>(0L), 0));
 
 	    LttngTraceState traceState;
 		synchronized (fCheckPointsLock) {
 		    Collections.sort(timestampCheckpointsList);
 		    // Initiate the compare with a checkpoint containing the target time
 		    // stamp to find
-		    int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(null,
-		            new TmfLocation<Long>(eventIndex)));
+		    int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(null, new TmfContext(new TmfLocation<Long>(eventIndex), eventIndex)));
 		    // adjust index to round down to earlier checkpoint when exact match not found
 		    index = getPrevIndex(index);
 

@@ -245,8 +245,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             final long position = rank / fCheckpointInterval;
             // Add new entry at proper location (if empty)
             if (fTraceIndex.size() == position) {
-                final ITmfLocation<?> location = context.getLocation().clone();
-                fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), location));
+                fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), context.clone()));
             }
         }
     }
