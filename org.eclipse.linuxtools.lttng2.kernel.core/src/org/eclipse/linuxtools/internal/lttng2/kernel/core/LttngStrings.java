@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.kernel.core.trace;
+package org.eclipse.linuxtools.internal.lttng2.kernel.core;
 
 /**
  * This file defines all the known event and field names for LTTng 2.0 kernel

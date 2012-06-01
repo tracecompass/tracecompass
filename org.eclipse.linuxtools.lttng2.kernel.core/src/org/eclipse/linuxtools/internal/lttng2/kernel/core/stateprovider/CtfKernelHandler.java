@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.LttngStrings;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngStrings;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
