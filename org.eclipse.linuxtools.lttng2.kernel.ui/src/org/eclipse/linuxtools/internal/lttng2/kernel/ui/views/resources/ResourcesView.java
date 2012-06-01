@@ -39,6 +39,7 @@ import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -227,6 +228,10 @@ public class ResourcesView extends TmfView {
             for (TraceEntry traceEntry : entryList) {
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
                     ResourcesEntry entry = (ResourcesEntry) child;
+                    if (fZoomStartTime <= entry.getStartTime() && fZoomEndTime >= entry.getEndTime()) {
+                        entry.setZoomedEventList(null);
+                        return;
+                    }
                     if (fMonitor.isCanceled()) {
                         break;
                     }
@@ -368,6 +373,26 @@ public class ResourcesView extends TmfView {
                 startZoomThread(startTime, endTime);
             }
         });
+    }
+
+    @TmfSignalHandler
+    public void stateSystemBuildCompleted (final TmfStateSystemBuildCompleted signal) {
+        final TmfExperiment<?> selectedExperiment = fSelectedExperiment;
+        if (selectedExperiment == null) {
+            return;
+        }
+        for (ITmfTrace<?> trace : selectedExperiment.getTraces()) {
+            if (trace == signal.getTrace() && trace instanceof CtfKernelTrace) {
+                final Thread thread = new Thread("ResourcesView build") { //$NON-NLS-1$
+                    @Override
+                    public void run() {
+                        // rebuild the model
+                        selectExperiment(selectedExperiment);
+                    }
+                };
+                thread.start();
+            }
+        }
     }
 
     // ------------------------------------------------------------------------

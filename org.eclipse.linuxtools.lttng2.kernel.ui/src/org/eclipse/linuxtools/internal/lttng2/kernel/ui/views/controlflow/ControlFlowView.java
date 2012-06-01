@@ -40,6 +40,7 @@ import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -267,6 +268,10 @@ public class ControlFlowView extends TmfView {
         }
 
         private void zoom(ControlFlowEntry entry, IProgressMonitor monitor) {
+            if (fZoomStartTime <= entry.getStartTime() && fZoomEndTime >= entry.getEndTime()) {
+                entry.setZoomedEventList(null);
+                return;
+            }
             List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, fResolution, monitor);
             if (fMonitor.isCanceled()) {
                 return;
@@ -474,6 +479,26 @@ public class ControlFlowView extends TmfView {
         });
     }
 
+    @TmfSignalHandler
+    public void stateSystemBuildCompleted (final TmfStateSystemBuildCompleted signal) {
+        final TmfExperiment<?> selectedExperiment = fSelectedExperiment;
+        if (selectedExperiment == null) {
+            return;
+        }
+        for (ITmfTrace<?> trace : selectedExperiment.getTraces()) {
+            if (trace == signal.getTrace() && trace instanceof CtfKernelTrace) {
+                final Thread thread = new Thread("ControlFlowView build") { //$NON-NLS-1$
+                    @Override
+                    public void run() {
+                        // rebuild the model
+                        selectExperiment(selectedExperiment);
+                    }
+                };
+                thread.start();
+            }
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------------
@@ -489,7 +514,7 @@ public class ControlFlowView extends TmfView {
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) trace;
                 IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
                 long start = ssq.getStartTime();
-                long end = ssq.getCurrentEndTime();
+                long end = ssq.getCurrentEndTime() + 1;
                 fStartTime = Math.min(fStartTime, start);
                 fEndTime = Math.max(fEndTime, end);
                 List<Integer> threadQuarks = ssq.getQuarks(Attributes.THREADS, "*"); //$NON-NLS-1$
@@ -512,7 +537,7 @@ public class ControlFlowView extends TmfView {
                             continue;
                         }
                         int ppidQuark = ssq.getQuarkRelative(threadQuark, Attributes.PPID);
-                        List<ITmfStateInterval> execNameIntervals = ssq.queryHistoryRange(execNameQuark, start, end);
+                        List<ITmfStateInterval> execNameIntervals = ssq.queryHistoryRange(execNameQuark, start, end - 1);
                         long birthTime = -1;
                         for (ITmfStateInterval execNameInterval : execNameIntervals) {
                             if (!execNameInterval.getStateValue().isNull() && execNameInterval.getStateValue().getType() == 1) {
@@ -578,7 +603,7 @@ public class ControlFlowView extends TmfView {
     private void buildStatusEvents(ControlFlowEntry entry) {
         IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
         long start = ssq.getStartTime();
-        long end = ssq.getCurrentEndTime();
+        long end = ssq.getCurrentEndTime() + 1;
         long resolution = Math.max(1, (end - start) / fDisplayWidth);
         List<ITimeEvent> eventList = getEventList(entry, entry.getStartTime(), entry.getEndTime(), resolution, new NullProgressMonitor());
         entry.setEventList(eventList);
