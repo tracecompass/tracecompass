@@ -27,8 +27,8 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfEmptyTraceStub;
@@ -87,7 +87,7 @@ public class TmfCheckpointIndexTest extends TestCase {
         public TestIndexer(EmptyTestTrace testTrace) {
             super((ITmfTrace) testTrace, BLOCK_SIZE);
         }
-        public List<TmfCheckpoint> getCheckpoints() {
+        public List<ITmfCheckpoint> getCheckpoints() {
             return getTraceIndex();
         }
     }
@@ -152,14 +152,14 @@ public class TmfCheckpointIndexTest extends TestCase {
         assertEquals("getStartTime",   1,          fTrace.getStartTime().getValue());
         assertEquals("getEndTime",     NB_EVENTS,  fTrace.getEndTime().getValue());
 
-        List<TmfCheckpoint> checkpoints = fTrace.getIndexer().getCheckpoints();
+        List<ITmfCheckpoint> checkpoints = fTrace.getIndexer().getCheckpoints();
         int pageSize = fTrace.getCacheSize();
         assertTrue("Checkpoints exist",  checkpoints != null);
         assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE, checkpoints.size());
 
         // Validate that each checkpoint points to the right event
         for (int i = 0; i < checkpoints.size(); i++) {
-            TmfCheckpoint checkpoint = checkpoints.get(i);
+            ITmfCheckpoint checkpoint = checkpoints.get(i);
             TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
             ITmfEvent event = fTrace.parseEvent(context);
             assertTrue(context.getRank() == i * pageSize);
@@ -175,14 +175,14 @@ public class TmfCheckpointIndexTest extends TestCase {
         assertEquals("getStartTime",   TmfTimestamp.BIG_CRUNCH, fEmptyTrace.getStartTime());
         assertEquals("getEndTime",     TmfTimestamp.BIG_BANG, fEmptyTrace.getEndTime());
 
-        List<TmfCheckpoint> checkpoints = fEmptyTrace.getIndexer().getCheckpoints();
+        List<ITmfCheckpoint> checkpoints = fEmptyTrace.getIndexer().getCheckpoints();
         int pageSize = fEmptyTrace.getCacheSize();
         assertTrue("Checkpoints exist",  checkpoints != null);
         assertEquals("Checkpoints size", 0, checkpoints.size());
 
         // Validate that each checkpoint points to the right event
         for (int i = 0; i < checkpoints.size(); i++) {
-            TmfCheckpoint checkpoint = checkpoints.get(i);
+            ITmfCheckpoint checkpoint = checkpoints.get(i);
             TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
             ITmfEvent event = fEmptyTrace.parseEvent(context);
             assertTrue(context.getRank() == i * pageSize);

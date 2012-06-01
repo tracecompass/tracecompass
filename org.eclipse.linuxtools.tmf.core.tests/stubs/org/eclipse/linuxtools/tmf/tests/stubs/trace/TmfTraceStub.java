@@ -234,17 +234,19 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
                     }
                     final TmfContext context = new TmfContext(getCurrentLocation(), rank);
                     return context;
+                } else {
+                    
                 }
             } catch (final IOException e) {
                 e.printStackTrace();
             } catch (final NullPointerException e) {
                 e.printStackTrace();
             }
+            finally{
+                fLock.unlock();
+            }
         } catch (final NullPointerException e) {
             e.printStackTrace();
-        }
-        finally{
-            fLock.unlock();
         }
         return null;
     }

@@ -67,7 +67,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
      * The trace index. It is composed of checkpoints taken at intervals of
      * fCheckpointInterval events.
      */
-    private final List<TmfCheckpoint> fTraceIndex;
+    private final List<ITmfCheckpoint> fTraceIndex;
 
     /**
      * The indexing request 
@@ -97,7 +97,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     public TmfCheckpointIndexer(final ITmfTrace<ITmfEvent> trace, final int interval) {
         fTrace = trace;
         fCheckpointInterval = interval;
-        fTraceIndex = new ArrayList<TmfCheckpoint>();
+        fTraceIndex = new ArrayList<ITmfCheckpoint>();
         fIsIndexing = false;
     }
 
@@ -165,9 +165,6 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             }
         };
         job.schedule();
-
-        // Clear the checkpoints
-        fTraceIndex.clear();
 
         // Build a background request for all the trace data. The index is
         // updated as we go by readNextEvent().
@@ -308,9 +305,10 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
      */
     private ITmfContext seekCheckpoint(final int checkpoint) {
         ITmfLocation<?> location = null;
-        int index = checkpoint;
+        int index = 0;
         synchronized (fTraceIndex) {
             if (!fTraceIndex.isEmpty()) {
+                index = checkpoint;
                 if (index >= fTraceIndex.size()) {
                     index = fTraceIndex.size() - 1;
                 }
@@ -329,7 +327,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     /**
      * @return the trace index
      */
-    protected List<TmfCheckpoint> getTraceIndex() {
+    protected List<ITmfCheckpoint> getTraceIndex() {
         return fTraceIndex;
     }
 }
