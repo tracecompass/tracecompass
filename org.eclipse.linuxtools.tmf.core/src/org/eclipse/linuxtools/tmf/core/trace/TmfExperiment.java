@@ -330,35 +330,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         return new TmfExperimentLocation(new TmfLocationArray(locations));
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(long)
-     */
-    @Override
-    public synchronized ITmfContext seekEvent(final long rank) {
-
-        TmfExperimentContext context = (TmfExperimentContext) super.seekEvent(rank);
-
-//        // A rank <= 0 indicates to seek the first event
-//        if (rank <= 0) {
-//            ITmfContext context = seekEvent((ITmfLocation<?>) null);
-//            context.setRank(0);
-//            return context;
-//        }
-//
-//        // Position the trace at the checkpoint
-//        final ITmfContext context = fIndexer.seekIndex(rank);
-//
-//        // And locate the requested event context
-//        long pos = context.getRank();
-//        if (pos < rank) {
-//            ITmfEvent event = getNext(context);
-//            while (event != null && ++pos < rank) {
-//                event = getNext(context);
-//            }
-//        }
-        return context;
-    }
-    
     // ------------------------------------------------------------------------
     // ITmfTrace trace positioning
     // ------------------------------------------------------------------------
@@ -368,7 +339,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     @Override
     public synchronized T getNext(final ITmfContext context) {
-        final ITmfContext previousContext = (TmfExperimentContext) context.clone();
+        final ITmfContext previousContext = context.clone();
         final T event = parseEvent(context);
         if (event != null) {
             updateAttributes(previousContext, event.getTimestamp());

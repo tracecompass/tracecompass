@@ -157,6 +157,14 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
         return clone;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#clone2()
+     */
+    @Override
+    public CtfIterator clone2() {
+        return clone();
+    }
+
     /**
      * Method dispose.
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#dispose()
