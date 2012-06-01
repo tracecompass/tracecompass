@@ -13,21 +13,13 @@
 package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
 
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateHistorySystem;
-import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 
 /**
  * This is the high-level wrapper around the State History and its input and
@@ -40,12 +32,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
  * @author alexmont
  * 
  */
-public class HistoryBuilder extends TmfComponent {
-
-    private static final Semaphore hbSem = new Semaphore(1);
-
-    private ITmfEventRequest<CtfTmfEvent> currentRequest = null;
-    private boolean isRunning = false;
+public class HistoryBuilder implements Runnable {
 
     private final IStateChangeInput sci;
     private final StateHistorySystem shs;
@@ -112,50 +99,18 @@ public class HistoryBuilder extends TmfComponent {
         return shs;
     }
 
-    // ------------------------------------------------------------------------
-    // Signal handlers
-    // ------------------------------------------------------------------------
-
-    /**
-     * Signal handler to start building the configured state history.
-     * 
-     * This could also be called by anyone to trigger the building of the
-     * history without using any TMF signals. Simply pass 'null' as a parameter
-     * then.
-     * 
-     * @param signal The signal that triggered the build
-     */
-    @TmfSignalHandler
     @SuppressWarnings("unchecked")
-    public void startBuilding(final TmfExperimentRangeUpdatedSignal signal) {
-        /* Start the construction of the history if it's not started yet */
-        if (!this.isRunning) {
-            hbSem.acquireUninterruptibly();
-            currentRequest = new StateSystemBuildRequest(this);
-            isRunning = true;
-            sci.getTrace().sendRequest(currentRequest);
+    @Override
+    public void run() {
+        StateSystemBuildRequest request = new StateSystemBuildRequest(this);
+        sci.getTrace().sendRequest(request);
+        try {
+            request.waitForCompletion();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        sci.dispose();
     }
-
-    /**
-     * Signal handler to cancel any currently running requests. It will delete
-     * any incomplete file that might have been created.
-     * 
-     * This could also be called by anyone to cancel the current request without
-     * using any TMF signals. Simply pass 'null' as a parameter then.
-     * 
-     * @param signal
-     */
-    @TmfSignalHandler
-    public void cancelCurrentBuild(final TmfExperimentSelectedSignal<? extends ITmfEvent> signal) {
-        /*
-         * We've switched experiments (or re-opened the current one), so stop
-         * whatever request is currently running.
-         */
-        if (this.isRunning && currentRequest != null) {
-            currentRequest.cancel();
-        }
-    } 
 
     
     // ------------------------------------------------------------------------
@@ -166,27 +121,13 @@ public class HistoryBuilder extends TmfComponent {
     IStateChangeInput getInputPlugin() {
         return sci;
     }
-
-    /** Shutdown this builder object when the request is over */
-    void finish(boolean deleteFile) {
-        sci.dispose();
-        if (deleteFile) {
-            hb.removeFiles();
-        }
-        currentRequest = null;
-        isRunning = false;
-        TmfSignalManager.deregister(this);
-        hbSem.release();
-    }
 }
-
 
 class StateSystemBuildRequest extends TmfEventRequest<CtfTmfEvent> {
 
     /** The amount of events queried at a time through the requests */
     private final static int chunkSize = 50000;
 
-    private final HistoryBuilder builder;
     private final IStateChangeInput sci;
 
     @SuppressWarnings("unchecked")
@@ -194,7 +135,6 @@ class StateSystemBuildRequest extends TmfEventRequest<CtfTmfEvent> {
         super((Class<CtfTmfEvent>) builder.getInputPlugin().getExpectedEventType().getClass(),
                 TmfTimeRange.ETERNITY, TmfDataRequest.ALL_DATA, chunkSize,
                 ITmfDataRequest.ExecutionType.BACKGROUND);
-        this.builder = builder;
         this.sci = builder.getInputPlugin();
     }
 
@@ -209,18 +149,15 @@ class StateSystemBuildRequest extends TmfEventRequest<CtfTmfEvent> {
     @Override
     public void handleSuccess() {
         super.handleSuccess();
-        builder.finish(false);
     }
 
     @Override
     public void handleCancel() {
         super.handleCancel();
-        builder.finish(true);
     }
 
     @Override
     public void handleFailure() {
         super.handleFailure();
-        builder.finish(true);
     }
 }

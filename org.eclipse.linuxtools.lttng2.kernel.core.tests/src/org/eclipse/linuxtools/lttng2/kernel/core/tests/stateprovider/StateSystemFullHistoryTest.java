@@ -12,25 +12,27 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.HistoryBuilder;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateHistoryBackend;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
-import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.HistoryTreeBackend;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
-import org.junit.*;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Unit tests for the StateHistorySystem, which uses a full (non-partial)
@@ -45,10 +47,8 @@ public class StateSystemFullHistoryTest {
     static File stateFile;
     static File stateFileBenchmark;
 
-    static HistoryBuilder builder;
     static IStateChangeInput input;
-    static IStateHistoryBackend hp;
-    static IStateSystemBuilder ssb;
+    static IStateSystemQuerier ssq;
 
     /* Offset in the trace + start time of the trace */
     private final static long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
@@ -63,13 +63,10 @@ public class StateSystemFullHistoryTest {
         stateFileBenchmark = new File(getTestFileName() + ".benchmark"); //$NON-NLS-1$
         try {
             input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-            hp = new HistoryTreeBackend(stateFile, input.getStartTime());
-            builder = new HistoryBuilder(input, hp);
+            ssq = StateSystemManager.loadStateHistory(stateFile, input);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        builder.startBuilding(null);
-        ssb = builder.getStateSystemBuilder();
     }
 
     @AfterClass
@@ -92,31 +89,26 @@ public class StateSystemFullHistoryTest {
      */
     @Test
     public void testBuild() throws IOException, TmfTraceException {
-        HistoryBuilder zebuilder;
-        IStateChangeInput zeinput;
-        IStateHistoryBackend zehp = null;
+        IStateChangeInput input2;
+        IStateSystemQuerier ssb2;
+        
+        input2 = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
+        ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2);
 
-        zeinput = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-        zehp = new HistoryTreeBackend(stateFileBenchmark, zeinput.getStartTime());
-        zebuilder = new HistoryBuilder(zeinput, zehp);
-        zebuilder.startBuilding(null);
-
-        assertEquals(CtfTestFiles.startTime, zehp.getStartTime());
-        assertEquals(CtfTestFiles.endTime, zehp.getEndTime());
+        assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());
+        assertEquals(CtfTestFiles.endTime, ssb2.getCurrentEndTime());
     }
 
     @Test
-    public void testOpenExistingStateFile() throws IOException {
-        IStateHistoryBackend hp2 = null;
-        IStateSystemBuilder ssb2 = null;
+    public void testOpenExistingStateFile() throws IOException, TmfTraceException {
+        IStateSystemQuerier ssb2;
 
         /* 'newStateFile' should have already been created */
-        hp2 = new HistoryTreeBackend(stateFile);
-        ssb2 = HistoryBuilder.openExistingHistory(hp2);
+        ssb2 = StateSystemManager.loadStateHistory(stateFile, null);
 
         assertNotNull(ssb2);
-        assertEquals(CtfTestFiles.startTime, hp2.getStartTime());
-        assertEquals(CtfTestFiles.endTime, hp2.getEndTime());
+        assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());
+        assertEquals(CtfTestFiles.endTime, ssb2.getCurrentEndTime());
     }
 
     @Test
@@ -128,19 +120,19 @@ public class StateSystemFullHistoryTest {
         int quark, valueInt;
         String valueStr;
 
-        list = ssb.queryFullState(interestingTimestamp1);
+        list = ssq.queryFullState(interestingTimestamp1);
 
-        quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         interval = list.get(quark);
         valueInt = interval.getStateValue().unboxInt();
         assertEquals(1397, valueInt);
 
-        quark = ssb.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
+        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
         interval = list.get(quark);
         valueStr = interval.getStateValue().unboxStr();
         assertEquals("gdbus", valueStr);
 
-        quark = ssb.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.SYSTEM_CALL);
+        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.SYSTEM_CALL);
         interval = list.get(quark);
         valueStr = interval.getStateValue().unboxStr();
         assertTrue(valueStr.equals("sys_poll"));
@@ -165,8 +157,8 @@ public class StateSystemFullHistoryTest {
         ITmfStateInterval interval;
         String valueStr;
 
-        quark = ssb.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
-        interval = ssb.querySingleState(timestamp, quark);
+        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
+        interval = ssq.querySingleState(timestamp, quark);
         valueStr = interval.getStateValue().unboxStr();
         assertEquals("gdbus", valueStr);
     }
@@ -193,8 +185,8 @@ public class StateSystemFullHistoryTest {
         int quark;
         List<ITmfStateInterval> intervals;
 
-        quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        intervals = ssb.queryHistoryRange(quark, time1, time2);
+        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        intervals = ssq.queryHistoryRange(quark, time1, time2);
         assertEquals(487, intervals.size()); /* Number of context switches! */
         assertEquals(1685, intervals.get(100).getStateValue().unboxInt());
         assertEquals(1331668248427681372L, intervals.get(205).getEndTime());
@@ -210,11 +202,11 @@ public class StateSystemFullHistoryTest {
 
         List<ITmfStateInterval> intervals;
         
-        int quark = ssb.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
-        long ts1 = ssb.getStartTime(); /* start of the trace */
+        int quark = ssq.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
+        long ts1 = ssq.getStartTime(); /* start of the trace */
         long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid, but ignored */
 
-        intervals = ssb.queryHistoryRange(quark, ts1, ts2);
+        intervals = ssq.queryHistoryRange(quark, ts1, ts2);
 
         /* Activity of IRQ 1 over the whole trace */
         assertEquals(65, intervals.size());
@@ -233,8 +225,8 @@ public class StateSystemFullHistoryTest {
         int quark;
         List<ITmfStateInterval> intervals;
 
-        quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        intervals = ssb.queryHistoryRange(quark, time1, time2, resolution);
+        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        intervals = ssq.queryHistoryRange(quark, time1, time2, resolution);
         assertEquals(126, intervals.size()); /* Number of context switches! */
         assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
         assertEquals(1331668248815698779L, intervals.get(100).getEndTime());
@@ -248,14 +240,14 @@ public class StateSystemFullHistoryTest {
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime1() throws TimeRangeException {
         long ts = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC;
-        ssb.queryFullState(ts);
+        ssq.queryFullState(ts);
 
     }
 
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime2() throws TimeRangeException {
         long ts = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC;
-        ssb.queryFullState(ts);
+        ssq.queryFullState(ts);
 
     }
 
@@ -263,40 +255,40 @@ public class StateSystemFullHistoryTest {
     public void testSingleQueryInvalidTime1()
             throws AttributeNotFoundException, TimeRangeException {
 
-        int quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         long ts = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC;
-        ssb.querySingleState(ts, quark);
+        ssq.querySingleState(ts, quark);
     }
 
     @Test(expected = TimeRangeException.class)
     public void testSingleQueryInvalidTime2()
             throws AttributeNotFoundException, TimeRangeException {
 
-        int quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         long ts = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC;
-        ssb.querySingleState(ts, quark);
+        ssq.querySingleState(ts, quark);
     }
 
     @Test(expected = TimeRangeException.class)
     public void testRangeQueryInvalidTime1() throws AttributeNotFoundException,
             TimeRangeException {
 
-        int quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         long ts1 = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
         long ts2 = CtfTestFiles.startTime + 1L * CtfTestFiles.NANOSECS_PER_SEC; /* valid */
 
-        ssb.queryHistoryRange(quark, ts1, ts2);
+        ssq.queryHistoryRange(quark, ts1, ts2);
     }
 
     @Test(expected = TimeRangeException.class)
     public void testRangeQueryInvalidTime2() throws TimeRangeException,
             AttributeNotFoundException {
 
-        int quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         long ts1 = CtfTestFiles.startTime - 1L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
         long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
 
-        ssb.queryHistoryRange(quark, ts1, ts2);
+        ssq.queryHistoryRange(quark, ts1, ts2);
     }
 
     /**
@@ -307,7 +299,7 @@ public class StateSystemFullHistoryTest {
     @Test(expected = AttributeNotFoundException.class)
     public void testQueryInvalidAttribute() throws AttributeNotFoundException {
 
-        ssb.getQuarkAbsolute("There", "is", "no", "cow", "level");
+        ssq.getQuarkAbsolute("There", "is", "no", "cow", "level");
     }
 
     /**
@@ -324,8 +316,8 @@ public class StateSystemFullHistoryTest {
         ITmfStateInterval interval;
         int quark;
 
-        list = ssb.queryFullState(interestingTimestamp1);
-        quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        list = ssq.queryFullState(interestingTimestamp1);
+        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
         interval = list.get(quark);
 
         /* This is supposed to be an int value */
@@ -339,8 +331,8 @@ public class StateSystemFullHistoryTest {
         ITmfStateInterval interval;
         int quark;
 
-        list = ssb.queryFullState(interestingTimestamp1);
-        quark = ssb.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
+        list = ssq.queryFullState(interestingTimestamp1);
+        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
         interval = list.get(quark);
 
         /* This is supposed to be a String value */
@@ -349,21 +341,21 @@ public class StateSystemFullHistoryTest {
 
     @Test
     public void testFullAttributeName() throws AttributeNotFoundException {
-        int quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        String name = ssb.getFullAttributePath(quark);
+        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+        String name = ssq.getFullAttributePath(quark);
         assertEquals(name, "CPUs/0/Current_thread");
     }
 
     @Test
     public void testGetQuarks_begin() {
-        List<Integer> list = ssb.getQuarks("*", "1577", Attributes.EXEC_NAME);
+        List<Integer> list = ssq.getQuarks("*", "1577", Attributes.EXEC_NAME);
 
         assertEquals(1, list.size());
     }
 
     @Test
     public void testGetQuarks_middle() {
-        List<Integer> list = ssb.getQuarks(Attributes.THREADS, "*", Attributes.EXEC_NAME);
+        List<Integer> list = ssq.getQuarks(Attributes.THREADS, "*", Attributes.EXEC_NAME);
 
         /* Number of different kernel threads in the trace */
         assertEquals(168, list.size());
@@ -371,7 +363,7 @@ public class StateSystemFullHistoryTest {
 
     @Test
     public void testGetQuarks_end() {
-        List<Integer> list = ssb.getQuarks(Attributes.THREADS, "1577", "*");
+        List<Integer> list = ssq.getQuarks(Attributes.THREADS, "1577", "*");
 
         /* There should be 4 sub-attributes for each Thread node */
         assertEquals(4, list.size());

@@ -26,8 +26,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ CtfKernelStateInputTest.class,
-    StateSystemFullHistoryTest.class,
-    StateSystemFullThreadedHistoryTest.class})
+    StateSystemFullHistoryTest.class})
 public class TestAll {
 
     /**
