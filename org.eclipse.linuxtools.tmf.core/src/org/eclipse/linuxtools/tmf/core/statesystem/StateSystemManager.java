@@ -15,10 +15,12 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.HistoryBuilder;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryTreeBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.HistoryTreeBackend;
-import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.ThreadedHistoryTreeBackend;
 
 /**
  * This abstract manager class handles loading or creating state history files

@@ -10,16 +10,18 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem;
+package org.eclipse.linuxtools.internal.tmf.core.statesystem;
 
 import java.io.IOException;
 
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateHistorySystem;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
 
 /**
  * This is the high-level wrapper around the State History and its input and
