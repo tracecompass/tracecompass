@@ -228,9 +228,9 @@ public class ResourcesView extends TmfView {
             for (TraceEntry traceEntry : entryList) {
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
                     ResourcesEntry entry = (ResourcesEntry) child;
-                    if (fZoomStartTime <= entry.getStartTime() && fZoomEndTime >= entry.getEndTime()) {
+                    if (fZoomStartTime <= fStartTime && fZoomEndTime >= fEndTime) {
                         entry.setZoomedEventList(null);
-                        return;
+                        continue;
                     }
                     if (fMonitor.isCanceled()) {
                         break;
@@ -240,9 +240,9 @@ public class ResourcesView extends TmfView {
                         break;
                     }
                     entry.setZoomedEventList(zoomedEventList);
-                    redraw();
                 }
             }
+            redraw();
         }
 
         public void cancel() {

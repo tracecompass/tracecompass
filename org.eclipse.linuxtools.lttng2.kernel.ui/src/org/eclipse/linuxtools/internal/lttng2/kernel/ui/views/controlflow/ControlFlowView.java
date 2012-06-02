@@ -268,7 +268,7 @@ public class ControlFlowView extends TmfView {
         }
 
         private void zoom(ControlFlowEntry entry, IProgressMonitor monitor) {
-            if (fZoomStartTime <= entry.getStartTime() && fZoomEndTime >= entry.getEndTime()) {
+            if (fZoomStartTime <= fStartTime && fZoomEndTime >= fEndTime) {
                 entry.setZoomedEventList(null);
                 return;
             }
