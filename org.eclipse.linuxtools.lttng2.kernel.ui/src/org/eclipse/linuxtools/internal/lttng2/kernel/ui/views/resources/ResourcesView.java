@@ -227,19 +227,18 @@ public class ResourcesView extends TmfView {
             long resolution = Math.max(1, (fZoomEndTime - fZoomStartTime) / fDisplayWidth);
             for (TraceEntry traceEntry : entryList) {
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
+                    if (fMonitor.isCanceled()) {
+                        break;
+                    }
                     ResourcesEntry entry = (ResourcesEntry) child;
                     if (fZoomStartTime <= fStartTime && fZoomEndTime >= fEndTime) {
                         entry.setZoomedEventList(null);
-                        continue;
+                    } else {
+                        List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, resolution, true, fMonitor);
+                        if (zoomedEventList != null) { 
+                            entry.setZoomedEventList(zoomedEventList);
+                        }
                     }
-                    if (fMonitor.isCanceled()) {
-                        break;
-                    }
-                    List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, resolution, true, fMonitor);
-                    if (fMonitor.isCanceled()) {
-                        break;
-                    }
-                    entry.setZoomedEventList(zoomedEventList);
                 }
             }
             redraw();

@@ -260,7 +260,7 @@ public class ControlFlowView extends TmfView {
             }
             for (ControlFlowEntry entry : entryList) {
                 if (fMonitor.isCanceled()) {
-                    return;
+                    break;
                 }
                 zoom(entry, fMonitor);
             }
@@ -270,13 +270,12 @@ public class ControlFlowView extends TmfView {
         private void zoom(ControlFlowEntry entry, IProgressMonitor monitor) {
             if (fZoomStartTime <= fStartTime && fZoomEndTime >= fEndTime) {
                 entry.setZoomedEventList(null);
-                return;
+            } else {
+                List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, fResolution, monitor);
+                if (zoomedEventList != null) {
+                    entry.setZoomedEventList(zoomedEventList);
+                }
             }
-            List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, fResolution, monitor);
-            if (fMonitor.isCanceled()) {
-                return;
-            }
-            entry.setZoomedEventList(zoomedEventList);
             for (ControlFlowEntry child : entry.getChildren()) {
                 if (fMonitor.isCanceled()) {
                     return;
