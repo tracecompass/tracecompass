@@ -57,8 +57,6 @@ public class StreamInputReader {
 
     private final long prevIndex;
 
-    private final boolean isthisthefirsttimewerereadingthisgivenstream;
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -72,7 +70,6 @@ public class StreamInputReader {
     public StreamInputReader(StreamInput streamInput) {
         this.streamInput = streamInput;
         this.packetReader = new StreamInputPacketReader(this);
-        this.isthisthefirsttimewerereadingthisgivenstream = true;
         /*
          * Get the iterator on the packet index.
          */
@@ -134,7 +131,6 @@ public class StreamInputReader {
      */
     public boolean readNextEvent() {
 
-
         /*
          * Change packet if needed
          */
@@ -163,8 +159,6 @@ public class StreamInputReader {
             }
             return true;
         }
-        final StreamInputPacketIndexEntry currentPacket = this
-                .getPacketReader().getCurrentPacket();
         this.setCurrentEvent(null);
         return false;
     }
@@ -218,6 +212,19 @@ public class StreamInputReader {
          * Switch to this packet.
          */
         goToNextPacket();
+
+        /*
+         * index up to the desired timestamp.
+         */
+        while ((this.packetReader.getCurrentPacket() != null)
+                && (this.packetReader.getCurrentPacket().getTimestampEnd() < timestamp)) {
+            try {
+                this.streamInput.addPacketHeaderIndex();
+                goToNextPacket();
+            } catch (CTFReaderException e) {
+                // do nothing here
+            }
+        }
 
         /*
          * Advance until A. we reached the end of the trace file (which means
