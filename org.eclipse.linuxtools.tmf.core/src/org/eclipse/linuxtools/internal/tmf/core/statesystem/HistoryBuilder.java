@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -149,7 +149,7 @@ public class HistoryBuilder extends TmfComponent {
      */
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void experimentSelected(final TmfExperimentSelectedSignal<?> signal) {
+    public void experimentRangeUpdated(final TmfExperimentRangeUpdatedSignal signal) {
         StateSystemBuildRequest request;
         TmfExperiment<ITmfEvent> exp;
 
