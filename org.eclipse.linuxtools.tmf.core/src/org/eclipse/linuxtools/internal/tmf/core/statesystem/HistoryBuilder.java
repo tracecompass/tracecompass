@@ -62,7 +62,8 @@ public class HistoryBuilder extends TmfComponent {
      *             backend)
      */
     public HistoryBuilder(IStateChangeInput stateChangeInput,
-            IStateHistoryBackend backend) throws IOException {
+            IStateHistoryBackend backend, boolean buildManually)
+            throws IOException {
         if (stateChangeInput == null || backend == null) {
             throw new IllegalArgumentException();
         }
@@ -71,7 +72,14 @@ public class HistoryBuilder extends TmfComponent {
         shs = new StateHistorySystem(hb, true);
 
         sci.assignTargetStateSystem(shs);
-        started = false;
+
+        if (buildManually) {
+            TmfSignalManager.deregister(this);
+            this.buildManually();
+        } else {
+            started = false;
+            /* We'll now wait for the signal to start building */
+        }
     }
 
     /**
@@ -109,6 +117,23 @@ public class HistoryBuilder extends TmfComponent {
      */
     public IStateSystemQuerier getStateSystemQuerier() {
         return shs;
+    }
+
+    /**
+     * Build the state history without waiting for signals or anything
+     */
+    @SuppressWarnings("unchecked")
+    private void buildManually() {
+        StateSystemBuildRequest request = new StateSystemBuildRequest(this);
+
+        /* Send the request to the trace here, since there is probably no
+         * experiment. */
+        sci.getTrace().sendRequest(request);
+        try {
+            request.waitForCompletion();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

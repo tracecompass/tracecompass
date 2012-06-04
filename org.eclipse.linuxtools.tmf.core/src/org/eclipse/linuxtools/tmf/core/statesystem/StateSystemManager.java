@@ -48,15 +48,16 @@ public abstract class StateSystemManager extends TmfComponent {
      *            The IStateChangeInput to use for building the history file. It
      *            may be required even if we are opening an already-existing
      *            history (ie, for partial histories).
-     * @param waitForCompletion
-     *            Should we block the calling thread until the construction is
-     *            complete? It has no effect if the file already exists.
+     * @param buildManually
+     *            If false, the construction will wait for a signal before
+     *            starting. If true, it will build everything right now and
+     *            block the caller. It has no effect if the file already exists.
      * @return A IStateSystemQuerier handler to the state system, with which you
      *         can then run queries on the history.
      * @throws TmfTraceException
      */
     public static IStateSystemQuerier loadStateHistory(File htFile,
-            IStateChangeInput htInput, boolean waitForCompletion)
+            IStateChangeInput htInput, boolean buildManually)
             throws TmfTraceException {
         IStateSystemQuerier ss;
         IStateHistoryBackend htBackend;
@@ -88,7 +89,7 @@ public abstract class StateSystemManager extends TmfComponent {
         try {
             htBackend = new ThreadedHistoryTreeBackend(htFile,
                     htInput.getStartTime(), QUEUE_SIZE);
-            builder = new HistoryBuilder(htInput, htBackend);
+            builder = new HistoryBuilder(htInput, htBackend, buildManually);
         } catch (IOException e) {
             /*
              * If it fails here however, it means there was a problem writing to
