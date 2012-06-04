@@ -11,17 +11,6 @@
       </perspective>
    </extension>
    <extension
-         point="org.eclipse.linuxtools.tmf.ui.tracetype">
-      <type
-            category="org.eclipse.linuxtools.tmf.ui.category.ctf"
-            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
-            icon="icons/obj16/garland16.png"
-            id="org.eclipse.linuxtools.lttng2.kernel.tracetype"
-            name="%tracetype.type.kernel"
-            trace_type="org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace">
-      </type>
-   </extension>
-   <extension
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
@@ -41,5 +30,19 @@
             name="%resources.view.name"
             restorable="true">
       </view>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetype">
+      <type
+            category="org.eclipse.linuxtools.tmf.ui.category.ctf"
+            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
+            icon="icons/obj16/garland16.png"
+            id="org.eclipse.linuxtools.lttng2.kernel.tracetype"
+            name="%tracetype.type.kernel"
+            trace_type="org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace">
+         <eventsTableType
+               class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events.LTTng2EventsTable">
+         </eventsTableType>
+      </type>
    </extension>
 </plugin>
