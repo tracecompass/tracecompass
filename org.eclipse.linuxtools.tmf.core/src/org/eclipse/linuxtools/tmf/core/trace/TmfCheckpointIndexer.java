@@ -245,7 +245,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             final long position = rank / fCheckpointInterval;
             // Add new entry at proper location (if empty)
             if (fTraceIndex.size() == position) {
-                fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), context.clone2()));
+                fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), context.clone()));
             }
         }
     }
@@ -275,7 +275,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         }
 
         // Position the trace at the checkpoint
-        return seekCheckpoint(index);
+        return restoreCheckpoint(index);
     }
 
     /* (non-Javadoc)
@@ -293,7 +293,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         final int index = (int) rank / fCheckpointInterval;
 
         // Position the trace at the checkpoint
-        return seekCheckpoint(index);
+        return restoreCheckpoint(index);
     }
 
     /**
@@ -302,7 +302,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
      * @param checkpoint the checkpoint index
      * @return the corresponding context
      */
-    private ITmfContext seekCheckpoint(final int checkpoint) {
+    private ITmfContext restoreCheckpoint(final int checkpoint) {
         ITmfLocation<?> location = null;
         int index = 0;
         synchronized (fTraceIndex) {
@@ -311,9 +311,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
                 if (index >= fTraceIndex.size()) {
                     index = fTraceIndex.size() - 1;
                 }
-                final ITmfContext context = fTraceIndex.get(index).getContext().clone2();
-//                fTrace.seekEvent(context.getLocation());
-                return context;
+                return fTraceIndex.get(index).getContext().clone();
             }
         }
         final ITmfContext context = fTrace.seekEvent(location);

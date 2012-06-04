@@ -113,8 +113,8 @@ public class TmfCheckpointTest extends TestCase {
             checkpoint1 = new TmfCheckpoint(fTimestamp1, null);
             checkpoint2 = checkpoint1.clone();
             assertEquals("clone", checkpoint1, checkpoint2);
-            assertNull(checkpoint1.getLocation());
-            assertNull(checkpoint2.getLocation());
+            assertNull(checkpoint1.getContext());
+            assertNull(checkpoint2.getContext());
 
             checkpoint1 = new TmfCheckpoint(null, new TmfContext(fLocation1));
             checkpoint3 = checkpoint1.clone();

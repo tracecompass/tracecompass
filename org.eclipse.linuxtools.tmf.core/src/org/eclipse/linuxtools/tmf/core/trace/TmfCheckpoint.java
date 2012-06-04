@@ -107,16 +107,15 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint#getLocation()
      */
     @Override
-    public ITmfLocation<?> getLocation() {
-        return (fContext != null) ? fContext.getLocation() : null;
+    public ITmfContext getContext() {
+        return fContext;
     }
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint#getContext()
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint#getLocation()
      */
-    @Override
-    public ITmfContext getContext() {
-        return fContext;
+    public ITmfLocation<? extends Comparable<?>> getLocation() {
+        return fContext.getLocation();
     }
 
     // ------------------------------------------------------------------------
@@ -133,7 +132,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(final ITmfCheckpoint other) {
         if (fTimestamp == null || other.getTimestamp() == null) {
-            final Comparable location1 = fContext.getLocation().getLocation();
+            final Comparable location1 = getLocation().getLocation();
             final Comparable location2 = other.getLocation().getLocation();
             return location1.compareTo(location2);
         }

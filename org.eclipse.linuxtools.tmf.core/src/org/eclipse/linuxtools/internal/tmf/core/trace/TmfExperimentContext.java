@@ -55,6 +55,9 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * @param contexts
+     */
     public TmfExperimentContext(final ITmfContext[] contexts) {
         super();
         fContexts = contexts;
@@ -74,6 +77,9 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
         fLastTraceRead = NO_TRACE;
     }
 
+    /**
+     * @param other
+     */
     public TmfExperimentContext(final TmfExperimentContext other) {
         this(other.cloneContexts());
         fEvents = other.fEvents;
@@ -83,28 +89,31 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
         setLastTrace(other.fLastTraceRead);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfContext#clone()
+     */
+    @Override
+    public TmfExperimentContext clone() {
+        TmfExperimentContext clone = null;
+        clone = (TmfExperimentContext) super.clone();
+        clone.fContexts = cloneContexts();
+        clone.fEvents = cloneEvents();
+        clone.fLastTraceRead = fLastTraceRead;
+        return clone;
+    }
+
     private ITmfContext[] cloneContexts() {
         final ITmfContext[] contexts = new ITmfContext[fContexts.length];
         for (int i = 0; i < fContexts.length; i++)
-            contexts[i] = fContexts[i].clone();
+            contexts[i] = (fContexts[i] != null) ? fContexts[i].clone() : null;
         return contexts;
     }
 
     private ITmfEvent[] cloneEvents() {
         final ITmfEvent[] events = new ITmfEvent[fEvents.length];
         for (int i = 0; i < fEvents.length; i++)
-            events[i] = fEvents[i].clone();
+            events[i] = (fEvents[i] != null) ? fEvents[i].clone() : null;
         return events;
-    }
-
-    @Override
-    public TmfExperimentContext clone2() {
-        TmfExperimentContext clone = null;
-        clone = (TmfExperimentContext) super.clone();
-        clone.fContexts = cloneContexts();
-        clone.fEvents = cloneEvents();
-        clone.fLastTraceRead = NO_TRACE;
-        return clone;
     }
 
     // ------------------------------------------------------------------------

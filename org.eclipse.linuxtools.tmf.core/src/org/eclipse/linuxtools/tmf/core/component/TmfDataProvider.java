@@ -273,8 +273,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                     if (Tracer.isRequestTraced())
                         Tracer.traceRequest(request, "read first event"); //$NON-NLS-1$
                     while (data != null && !isCompleted(request, data, nbRead)) {
-//                        if (fLogData)
-//                            Tracer.traceEvent(provider, request, data);
+                        if (fLogData) { 
+                            Tracer.traceEvent(provider, request, data);
+                        }
                         if (request.getDataType().isInstance(data)) {
                             request.handleData(data);
                         }

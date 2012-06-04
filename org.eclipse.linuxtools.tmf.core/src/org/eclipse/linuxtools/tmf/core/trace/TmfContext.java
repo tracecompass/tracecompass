@@ -99,14 +99,6 @@ public class TmfContext implements ITmfContext, Cloneable {
         return clone;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#clone2()
-     */
-    @Override
-    public TmfContext clone2() {
-        return clone();
-    }
-
     // ------------------------------------------------------------------------
     // ITmfContext
     // ------------------------------------------------------------------------

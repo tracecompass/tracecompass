@@ -27,7 +27,7 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     // ------------------------------------------------------------------------
     
     private final TmfTimestamp fTimestamp;
-    private final TmfContext[] fContexts;
+    private final long[] fRanks;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -39,7 +39,10 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
      */
     public TmfExperimentCheckpoint(TmfTimestamp ts, TmfContext[] contexts) {
         fTimestamp = ts;
-        fContexts = contexts;
+        fRanks = new long[contexts.length];
+        for (int i = 0; i < fRanks.length; i++) {
+            fRanks[i] = contexts[i].getRank();
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -54,10 +57,10 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     }
 
     /**
-     * @return the checkpoint event stream location
+     * @return the checkpoint event rank
      */
-    public TmfContext[] getContexts() {
-        return fContexts;
+    public long[] getRanks() {
+        return fRanks;
     }
 
     // ------------------------------------------------------------------------

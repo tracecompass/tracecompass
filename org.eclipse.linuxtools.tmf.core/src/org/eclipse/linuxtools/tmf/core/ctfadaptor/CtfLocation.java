@@ -64,7 +64,7 @@ public class CtfLocation implements ITmfLocation<Long>, Cloneable {
      */
     @Override
     public CtfLocation clone() {
-        return new CtfLocation(getLocation());
+        return new CtfLocation(getLocation().longValue());
     }
 
     /* (non-Javadoc)

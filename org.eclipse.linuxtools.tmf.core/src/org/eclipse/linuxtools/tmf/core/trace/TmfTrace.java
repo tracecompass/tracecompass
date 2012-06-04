@@ -459,6 +459,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
                 event = getNext(context);
             }
         }
+//        System.out.println("seekEvent() before parseEvent() context=" + context);
+//        ITmfEvent event = fParser.parseEvent(context);
+//        System.out.println("seekEvent() after parseEvent() context=" + context + " TS=" + event.getTimestamp());
+//        event = fParser.parseEvent(context);
+//        System.out.println("seekEvent() after parseEvent() context=" + context + " TS=" + event.getTimestamp());
         return context;
     }
 
@@ -476,14 +481,13 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         }
 
         // Position the trace at the checkpoint
-        final ITmfContext context = fIndexer.seekIndex(timestamp);
+        ITmfContext context = fIndexer.seekIndex(timestamp);
 
         // And locate the requested event context
         final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
         ITmfEvent event = getNext(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
-            context.setLocation(nextEventContext.getLocation().clone());
-            context.increaseRank();
+            context = nextEventContext.clone();
             event = getNext(nextEventContext);
         }
         if (event == null) {

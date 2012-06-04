@@ -85,9 +85,9 @@ public interface ITmfContext {
      */
     public ITmfContext clone();
 
-    /**
-     * @return a clone of the context
-     */
-    public ITmfContext clone2();
+//    /**
+//     * @return a clone of the context
+//     */
+//    public ITmfContext clone2();
 
 }

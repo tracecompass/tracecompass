@@ -152,17 +152,8 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
     @Override
     public CtfIterator clone() {
         CtfIterator clone = null;
-        clone = new CtfIterator(ctfTmfTrace, this.getCurrentEvent()
-                .getTimestampValue(), curRank);
+        clone = new CtfIterator(ctfTmfTrace, this.getCurrentEvent().getTimestampValue(), curRank);
         return clone;
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#clone2()
-     */
-    @Override
-    public CtfIterator clone2() {
-        return clone();
     }
 
     /**

@@ -36,7 +36,7 @@ public interface ITmfCheckpoint extends Comparable<ITmfCheckpoint> {
     public ITmfTimestamp getTimestamp();
 
     /**
-     * @return the trace context 
+     * @return the location of the event referred to by the context
      */
     public ITmfContext getContext();
 

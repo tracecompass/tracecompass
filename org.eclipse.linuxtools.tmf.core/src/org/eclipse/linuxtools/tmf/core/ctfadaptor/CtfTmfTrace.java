@@ -315,7 +315,7 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
     public CtfTmfEvent parseEvent(ITmfContext context) {
         CtfTmfEvent event = null;
         if( context instanceof CtfIterator ){
-            CtfIterator itt = (CtfIterator) context;
+            CtfIterator itt = (CtfIterator) context.clone();
             event = itt.getCurrentEvent();
         }
         return event;

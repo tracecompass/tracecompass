@@ -231,7 +231,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     // ------------------------------------------------------------------------
 
     @Override
-    protected ITmfContext armRequest(final ITmfDataRequest<T> request) {
+    protected synchronized ITmfContext armRequest(final ITmfDataRequest<T> request) {
         if (request instanceof ITmfEventRequest<?>
             && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
             && request.getIndex() == 0)
@@ -335,40 +335,26 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser#parseEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @Override
-    public synchronized T getNext(final ITmfContext context) {
-        final ITmfContext previousContext = context.clone();
-        final T event = parseEvent(context);
-        if (event != null) {
-            updateAttributes(previousContext, event.getTimestamp());
-
-            fExperimentContext = (TmfExperimentContext) context;
-            int trace = fExperimentContext.getLastTrace();
-            if (trace != TmfExperimentContext.NO_TRACE) {
-                TmfExperimentLocation location = (TmfExperimentLocation) fExperimentContext.getLocation();
-                location.getLocation().getLocations()[trace] = fExperimentContext.getContexts()[trace].getLocation();
-            }
-            
-            context.increaseRank();
-            processEvent(event);
-        }
+    public synchronized T parseEvent(final ITmfContext context) {
+        final ITmfContext savedContext = context.clone();
+        final T event = getNext(savedContext);
         return event;
     }
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser#parseEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public T parseEvent(ITmfContext context) {
+    public synchronized T getNext(ITmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {
             return null; // Throw an exception?
         }
-
         TmfExperimentContext expContext = (TmfExperimentContext) context;
 
         // If an event was consumed previously, first get the next one from that trace
@@ -396,9 +382,17 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         T event = null;
         if (trace != TmfExperimentContext.NO_TRACE) {
             event = (T) expContext.getEvents()[trace];
+            if (event != null) {
+                updateAttributes(expContext, event.getTimestamp());
+                TmfExperimentLocation location = (TmfExperimentLocation) expContext.getLocation();
+                location.getLocation().getLocations()[trace] = expContext.getContexts()[trace].getLocation();
+                expContext.increaseRank();
+                expContext.setLastTrace(trace);
+                fExperimentContext = expContext;
+                processEvent(event);
+            }
         }
 
-        expContext.setLastTrace(trace);
         return event;
     }
 
