@@ -64,7 +64,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
         // Create the bottom left folder
         IFolderLayout bottomLeftFolder = layout.createFolder(
-                "topLeftFolder", IPageLayout.BOTTOM, 0.70f, "topLeftFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+                "bottomLeftFolder", IPageLayout.BOTTOM, 0.70f, "topLeftFolder"); //$NON-NLS-1$ //$NON-NLS-2$
         bottomLeftFolder.addView(CONTROL_VIEW_ID);
 
         // Create the top right folder
