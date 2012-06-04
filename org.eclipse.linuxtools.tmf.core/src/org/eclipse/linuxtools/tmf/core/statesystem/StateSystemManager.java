@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.statesystem;
@@ -15,26 +15,19 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.HistoryBuilder;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryTreeBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * This abstract manager class handles loading or creating state history files
  * for use in TMF's generic state system.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public abstract class StateSystemManager extends TmfComponent {
 
@@ -46,7 +39,7 @@ public abstract class StateSystemManager extends TmfComponent {
      * exists, it will be opened directly. If not, it will be created from
      * scratch. In the case the history has to be built, it's possible to block
      * the calling thread until construction is complete.
-     * 
+     *
      * @param htFile
      *            The target name of the history file we want to use. If it
      *            exists it will be opened. If it doesn't, a new file will be
@@ -103,35 +96,6 @@ public abstract class StateSystemManager extends TmfComponent {
              */
             throw new TmfTraceException(e.toString(), e);
         }
-        startBuilderJob(builder, htInput.getTrace(), waitForCompletion);
         return builder.getStateSystemQuerier();
-    }
-
-    private static void startBuilderJob(final HistoryBuilder builder,
-            final ITmfTrace<?> trace, boolean waitForCompletion) {
-
-        final Job job = new Job("Building state history for " +
-                trace.getName() + "...") { //$NON-NLS-1$
-            @Override
-            protected IStatus run(final IProgressMonitor monitor) {
-                builder.run();
-                monitor.done();
-
-                /* Broadcast the signal saying the history is done building */
-                TmfSignalManager.dispatchSignal(new TmfStateSystemBuildCompleted(
-                        this, trace));
-
-                return Status.OK_STATUS;
-            }
-        };
-
-        job.schedule();
-        if (waitForCompletion) {
-            try {
-                job.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
