@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
@@ -32,7 +33,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
  * @version 1.0
  * @author Matthew khouzam
  */
-public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParser<CtfTmfEvent>{
+public class CtfTmfTrace extends TmfTrace implements ITmfEventParser{
 
 
     //-------------------------------------------
@@ -71,7 +72,7 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
      *             If something when wrong while reading the trace
      */
     @Override
-    public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
+    public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> eventType)
             throws TmfTraceException {
         /*
          * Set the cache size. This has to be done before the call to super()

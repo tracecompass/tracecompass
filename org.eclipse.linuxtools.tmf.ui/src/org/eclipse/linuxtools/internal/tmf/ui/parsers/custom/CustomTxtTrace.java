@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
@@ -34,7 +35,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
-public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEventParser<CustomTxtEvent> {
+public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
 
     private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
@@ -56,7 +57,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     }
 
     @Override
-    public void initTrace(final IResource resource, final String path, final Class<CustomTxtEvent> eventType) throws TmfTraceException {
+    public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
         try {
             fFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$

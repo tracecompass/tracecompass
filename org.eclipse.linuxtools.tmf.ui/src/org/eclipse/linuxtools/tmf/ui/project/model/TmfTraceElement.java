@@ -87,7 +87,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         sfTypeDescriptor.setCategory(sfInfoCategory);
         sfIsLinkedDescriptor.setCategory(sfInfoCategory);
     }
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -178,7 +178,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
      *
      * @return the <code>ITmfTrace</code> or <code>null</code> for an error
      */
-    public ITmfTrace<?> instantiateTrace() {
+    public ITmfTrace instantiateTrace() {
         try {
 
             // make sure that supplementary folder exists
@@ -200,7 +200,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
                     }
                 }
                 IConfigurationElement ce = sfTraceTypeAttributes.get(fTraceTypeId);
-                ITmfTrace<?> trace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
+                ITmfTrace trace = (ITmfTrace) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                 return trace;
             }
         } catch (CoreException e) {
@@ -264,9 +264,9 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     /**
      * Returns the <code>TmfTraceElement</code> located under the <code>TmfTracesFolder</code>.
-     * 
-     * @return <code>this</code> if this element is under the <code>TmfTracesFolder</code> 
-     *         else the corresponding <code>TmfTraceElement</code> if this element is under 
+     *
+     * @return <code>this</code> if this element is under the <code>TmfTracesFolder</code>
+     *         else the corresponding <code>TmfTraceElement</code> if this element is under
      *         <code>TmfExperimentElement</code>.
      */
     public TmfTraceElement getElementUnderTraceFolder() {
@@ -281,7 +281,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         }
         return this;
     }
-    
+
     /**
      * Deletes the trace specific supplementary folder.
      */
@@ -298,8 +298,8 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     /**
      * Renames the trace specific supplementary folder according to the new trace name.
-     * 
-     * @param newTraceName The new trace name 
+     *
+     * @param newTraceName The new trace name
      */
     public void renameSupplementaryFolder(String newTraceName) {
         IFolder oldSupplFolder = getTraceSupplementaryFolder(fResource.getName());
@@ -317,8 +317,8 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     /**
      * Copies the trace specific supplementary folder to the new trace name.
-     * 
-     * @param newTraceName The new trace name 
+     *
+     * @param newTraceName The new trace name
      */
     public void copySupplementaryFolder(String newTraceName) {
         IFolder oldSupplFolder = getTraceSupplementaryFolder(fResource.getName());
@@ -336,8 +336,8 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     /**
      * Copies the trace specific supplementary folder a new folder.
-     * 
-     * @param destination The destination folder to copy to. 
+     *
+     * @param destination The destination folder to copy to.
      */
     public void copySupplementaryFolder(IFolder destination) {
         IFolder oldSupplFolder = getTraceSupplementaryFolder(fResource.getName());
@@ -352,10 +352,10 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         }
     }
 
-    
+
     /**
      * Refreshes the trace specific supplementary folder information. It creates the folder if not exists.
-     * It sets the persistence property of the trace resource  
+     * It sets the persistence property of the trace resource
      */
     public void refreshSupplementaryFolder() {
         createSupplementaryDirectory();
@@ -363,17 +363,17 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     /**
      * Checks if supplementary resource exist or not.
-     *  
+     *
      * @return <code>true</code> if one or more files are under the trace supplementary folder
      */
     public boolean hasSupplementaryResources() {
         IResource[] resources = getSupplementaryResources();
         return (resources.length > 0);
     }
-    
+
     /**
      * Returns the supplementary resources under the trace supplementary folder.
-     *  
+     *
      * @return array of resources under the trace supplementary folder.
      */
     public IResource[] getSupplementaryResources() {
@@ -389,12 +389,12 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     }
 
     /**
-     * Deletes the given resources.  
-     * 
+     * Deletes the given resources.
+     *
      * @param resources array of resources to delete.
      */
     public void deleteSupplementaryResources(IResource[] resources) {
-        
+
         for (int i = 0; i < resources.length; i++) {
             try {
                 resources[i].delete(true, new NullProgressMonitor());
@@ -419,7 +419,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         } catch (CoreException e) {
             Activator.getDefault().logError("Error setting persistant property " + TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, e); //$NON-NLS-1$
         }
-        
+
     }
 
     // ------------------------------------------------------------------------

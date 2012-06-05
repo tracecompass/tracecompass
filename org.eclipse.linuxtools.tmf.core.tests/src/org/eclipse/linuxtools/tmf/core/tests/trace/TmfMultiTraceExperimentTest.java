@@ -55,8 +55,8 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     private static int          NB_EVENTS    = 20000;
     private static int          BLOCK_SIZE   = 1000;
 
-    private static ITmfTrace<TmfEvent>[] fTraces;
-    private static TmfExperimentStub<TmfEvent> fExperiment;
+    private static ITmfTrace[] fTraces;
+    private static TmfExperimentStub fExperiment;
 
     private static byte SCALE = (byte) -3;
 
@@ -64,8 +64,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
-    private synchronized static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
+    private synchronized static ITmfTrace[] setupTrace(final String path1, final String path2) {
         if (fTraces == null) {
             fTraces = new ITmfTrace[2];
             try {
@@ -100,7 +99,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         super.setUp();
         setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
         if (fExperiment == null) {
-            fExperiment = new TmfExperimentStub<TmfEvent>(EXPERIMENT, fTraces, BLOCK_SIZE);
+            fExperiment = new TmfExperimentStub(EXPERIMENT, fTraces, BLOCK_SIZE);
             fExperiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
         }
     }
@@ -673,12 +672,12 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int blockSize = 100;
         final int nbEvents  = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
@@ -701,12 +700,12 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int blockSize = 2 * NB_EVENTS;
         final int nbEvents = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
@@ -729,13 +728,13 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int nbEvents  = TmfDataRequest.ALL_DATA;
         final int blockSize =  1;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
         final long nbExpectedEvents = NB_EVENTS;
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
@@ -762,13 +761,13 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int nbEvents  = NB_EVENTS;
         final int blockSize = BLOCK_SIZE;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             int nbRead = 0;
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
                 if (++nbRead == blockSize) {

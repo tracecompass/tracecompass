@@ -1,11 +1,11 @@
 /*******************************************************************************
 * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -31,8 +31,8 @@ public class DeleteAction extends Action {
     private static final String DELETE_TRACE_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"; //$NON-NLS-1$
     private static final String DELETE_EXPERIMENT_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"; //$NON-NLS-1$
 
-    private IWorkbenchPage page;
-    private ISelectionProvider selectionProvider;
+    private final IWorkbenchPage page;
+    private final ISelectionProvider selectionProvider;
     private boolean tracesSelected;
     private boolean experimentsSelected;
 
@@ -68,7 +68,7 @@ public class DeleteAction extends Action {
             if (tracesSelected && experimentsSelected) {
                 return false;
             }
-            return (tracesSelected || experimentsSelected); 
+            return (tracesSelected || experimentsSelected);
         }
         return false;
     }

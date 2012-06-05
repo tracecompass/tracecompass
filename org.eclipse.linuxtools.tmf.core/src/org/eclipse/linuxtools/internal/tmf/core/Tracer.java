@@ -157,7 +157,7 @@ public class Tracer {
         trace(message);
     }
 
-    public static void traceRequest(ITmfDataRequest<?> request, String msg) {
+    public static void traceRequest(ITmfDataRequest request, String msg) {
         String message = ("[REQ] Req=" + request.getRequestId() + " " + msg);
         trace(message);
     }
@@ -167,7 +167,7 @@ public class Tracer {
         trace(message);
     }
 
-    public static void traceEvent(ITmfDataProvider<?> provider, ITmfDataRequest<?> request, ITmfEvent event) {
+    public static void traceEvent(ITmfDataProvider provider, ITmfDataRequest request, ITmfEvent event) {
         String message = ("[EVT] Provider=" + provider.toString() + ", Req=" + request.getRequestId() + ", Event=" + event.getTimestamp());
         trace(message);
     }

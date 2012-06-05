@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
@@ -87,8 +87,9 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         previewTable = new CustomEventsTable(new CustomTxtTraceDefinition(), tableContainer, 0);
         previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        if (wizard.definition != null)
+        if (wizard.definition != null) {
             loadDefinition(wizard.definition);
+        }
         setControl(container);
 
     }
@@ -120,11 +121,12 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             while (iter.hasNext()) {
                 final Output output = iter.next();
                 boolean found = false;
-                for (final String name : outputNames)
+                for (final String name : outputNames) {
                     if (output.name.equals(name)) {
                         found = true;
                         break;
                     }
+                }
                 if (!found) {
                     output.dispose();
                     iter.remove();
@@ -134,25 +136,29 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             // create outputs that have been added in the input page
             for (final String name : outputNames) {
                 boolean found = false;
-                for (final Output output : outputs)
+                for (final Output output : outputs) {
                     if (output.name.equals(name)) {
                         found = true;
                         break;
                     }
-                if (!found)
+                }
+                if (!found) {
                     outputs.add(new Output(outputsContainer, name));
+                }
             }
 
             outputsContainer.layout();
             outputsScrolledComposite.setMinSize(outputsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, outputsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-5);
             updatePreviewTable();
-            if (sash.getSize().y > outputsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + previewTable.getTable().getItemHeight())
+            if (sash.getSize().y > outputsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + previewTable.getTable().getItemHeight()) {
                 sash.setWeights(new int[] {outputsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, sash.getSize().y - outputsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y});
-            else
+            } else {
                 sash.setWeights(new int[] {outputsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, previewTable.getTable().getItemHeight()});
+            }
             setPageComplete(true);
-        } else
+        } else {
             setPageComplete(false);
+        }
         super.setVisible(visible);
     }
 
@@ -198,7 +204,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             writer.write(wizard.inputPage.getInputText());
             writer.close();
 
-            final ITmfTrace<?> trace = new CustomTxtTrace(null, definition, tmpFile.getAbsolutePath(), CACHE_SIZE);
+            final ITmfTrace trace = new CustomTxtTrace(null, definition, tmpFile.getAbsolutePath(), CACHE_SIZE);
             previewTable.dispose();
             previewTable = new CustomEventsTable(definition, tableContainer, CACHE_SIZE);
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -215,9 +221,11 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
 
     public List<OutputColumn> extractOutputs() {
         int numColumns = 0;
-        for (int i = 0; i < outputs.size(); i++)
-            if (outputs.get(i).enabledButton.getSelection())
+        for (int i = 0; i < outputs.size(); i++) {
+            if (outputs.get(i).enabledButton.getSelection()) {
                 numColumns++;
+            }
+        }
         final List<OutputColumn> outputColumns = new ArrayList<OutputColumn>(numColumns);
         numColumns = 0;
         for (int i = 0; i < outputs.size(); i++) {

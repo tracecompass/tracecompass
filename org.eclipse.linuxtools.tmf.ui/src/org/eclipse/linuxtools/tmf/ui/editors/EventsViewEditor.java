@@ -65,7 +65,6 @@ public class EventsViewEditor extends TmfEditor {
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.editors.eventsView"; //$NON-NLS-1$
 
     private IFile fFile;
-    @SuppressWarnings("rawtypes")
     private ITmfTrace fTrace;
     private IMarker fGotoMarker;
     private boolean fEditorAreaVisible;
@@ -86,7 +85,6 @@ public class EventsViewEditor extends TmfEditor {
      * (non-Javadoc)
      * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void init(final IEditorSite site, IEditorInput input) throws PartInitException {
         fEditorAreaVisible = site.getPage().isEditorAreaVisible();
@@ -126,7 +124,7 @@ public class EventsViewEditor extends TmfEditor {
                             final List<TmfTraceElement> traceEntries = experimentElement.getTraces();
                             final int nbTraces = traceEntries.size();
                             int cacheSize = Integer.MAX_VALUE;
-                            final ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
+                            final ITmfTrace[] traces = new ITmfTrace[nbTraces];
                             for (int i = 0; i < nbTraces; i++) {
                                 final TmfTraceElement traceElement = traceEntries.get(i);
                                 final ITmfTrace trace = traceElement.instantiateTrace();

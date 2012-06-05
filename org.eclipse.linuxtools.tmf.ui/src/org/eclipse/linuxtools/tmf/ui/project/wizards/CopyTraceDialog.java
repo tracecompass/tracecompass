@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Copied and adapted from NewFolderDialog
  *******************************************************************************/
@@ -62,8 +62,8 @@ public class CopyTraceDialog extends SelectionStatusDialog {
 
     private final TmfTraceElement fTrace;
     private Text fNewTraceName;
-    private IFolder fTraceFolder;
-    private TmfProjectElement fProject;
+    private final IFolder fTraceFolder;
+    private final TmfProjectElement fProject;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -179,7 +179,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
     @Override
     protected void computeResult() {
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.dialogs.SelectionStatusDialog#create()

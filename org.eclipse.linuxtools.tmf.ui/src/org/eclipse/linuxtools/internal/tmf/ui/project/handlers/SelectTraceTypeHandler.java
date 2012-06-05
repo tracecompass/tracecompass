@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -66,15 +66,17 @@ public class SelectTraceTypeHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
         ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (selectionProvider == null) {
             return false;
+        }
         ISelection selection = selectionProvider.getSelection();
 
         // Make sure selection contains only traces
@@ -104,8 +106,9 @@ public class SelectTraceTypeHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return null;
+        }
 
         boolean ok = true;
         for (Object element : fSelection.toList()) {
@@ -183,13 +186,14 @@ public class SelectTraceTypeHandler extends AbstractHandler {
 
     private static boolean validateTraceType(TmfTraceElement trace) {
         IProject project = trace.getProject().getResource();
-        ITmfTrace<?> tmfTrace = null;
+        ITmfTrace tmfTrace = null;
         try {
             tmfTrace = trace.instantiateTrace();
             return (tmfTrace != null && tmfTrace.validate(project, trace.getLocation().getPath()));
         } finally {
-            if (tmfTrace != null)
+            if (tmfTrace != null) {
                 tmfTrace.dispose();
+            }
         }
     }
 

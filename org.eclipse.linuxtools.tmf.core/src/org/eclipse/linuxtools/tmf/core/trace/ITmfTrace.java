@@ -99,8 +99,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * }
  * </pre>
  *
- * @param <T> The trace event type
- *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -109,7 +107,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * @see ITmfTraceIndexer
  * @see ITmfEventParser
  */
-public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
+public interface ITmfTrace extends ITmfDataProvider {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -137,7 +135,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param type the trace event type
      * @throws TmfTraceException If we couldn't open the trace
      */
-    public void initTrace(IResource resource, String path, Class<T> type) throws TmfTraceException;
+    public void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type) throws TmfTraceException;
 
     /**
      * Validate that the trace is of the correct type.
@@ -156,7 +154,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     /**
      * @return the trace event type
      */
-    public Class<T> getEventType();
+    public Class<? extends ITmfEvent> getEventType();
 
     /**
      * @return the associated trace resource

@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -201,7 +202,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetEventType() {
-        Class<CtfTmfEvent> result = fixture.getEventType();
+        Class<ITmfEvent> result = fixture.getEventType();
         assertNotNull(result);
     }
 

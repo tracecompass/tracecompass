@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  ******************************************************************************/
@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.Slider;
 /**
  * TmfRawEventViewer allows for the display of the raw data for an arbitrarily
  * large number of TMF events.
- * 
+ *
  * It is essentially a Composite of a StyledText area and a Slider, where the number
  * of visible lines in the StyledText control is set to fill the viewer display area.
  * An underlying data model is used to store a cache of event raw text line data.
@@ -71,20 +71,20 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private static final int MAX_LINE_DATA_SIZE = 1000;
     private static final int SLIDER_MAX = 1000000;
 
-    private ITmfTrace<?> fTrace;
+    private ITmfTrace fTrace;
     private ITmfContext fBottomContext;
-    
+
     private ScrolledComposite fScrolledComposite;
     private Composite fTextArea;
     private StyledText fStyledText;
     private Font fFixedFont;
 	private Slider fSlider;
 
-	private List<LineData> fLines = new ArrayList<LineData>();
+	private final List<LineData> fLines = new ArrayList<LineData>();
 	private boolean fActualRanks = false;
 	private int fTopLineIndex;
 	private int fLastTopLineIndex;
-	private CaretPosition[] fStoredCaretPosition = new CaretPosition[]
+	private final CaretPosition[] fStoredCaretPosition = new CaretPosition[]
 	            { new CaretPosition(0, 0), new CaretPosition(0,0)};
 	private int fNumVisibleLines;
     private ITmfLocation<?> fSelectedLocation = null;
@@ -119,7 +119,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	        this.caretOffset = caretOffset;
 	    }
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
@@ -140,15 +140,15 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         gridLayout.marginWidth = 0;
         gridLayout.marginHeight = 0;
 		setLayout(gridLayout);
-		
+
 		// Create the controls
 		createTextArea(style & SWT.H_SCROLL);
 		createSlider(style & SWT.V_SCROLL);
-		
+
 		// Prevent the slider from being traversed
 		setTabList(new Control[] { fScrolledComposite });
 	}
-	
+
     @Override
 	public void dispose() {
         if (fFixedFont != null) {
@@ -189,11 +189,11 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 fFixedFont = new Font(Display.getCurrent(), new FontData("Monospace", 10, SWT.NORMAL)); //$NON-NLS-1$
             }
         }
-        
+
         fStyledText = new StyledText(fTextArea, SWT.READ_ONLY);
         fStyledText.setFont(fFixedFont);
         fStyledText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-        
+
         fStyledText.addCaretListener(this);
         fStyledText.addMouseMoveListener(this);
         fStyledText.addMouseTrackListener(this);
@@ -202,14 +202,14 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             @Override
             public void handleEvent(Event event) { event.doit = false; }});
         fStyledText.addKeyListener(this);
-        
+
         fTextArea.setBackground(fStyledText.getBackground());
         fTextArea.addMouseListener(new MouseAdapter() {
 			@Override
             public void mouseDown(MouseEvent e) {
 				fTextArea.setFocus();
             }});
-	}	
+	}
 
 	// ------------------------------------------------------------------------
 	// Slider handling
@@ -237,7 +237,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 		}
 		return isVisible;
 	}
-	
+
     @Override
     public void setMenu(Menu menu) {
         fStyledText.setMenu(menu);
@@ -247,7 +247,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
      * Sets the trace and updates the content
      * @param trace The trace to set
      */
-    public void setTrace(ITmfTrace<?> trace) {
+    public void setTrace(ITmfTrace trace) {
 	    fTrace = trace;
 	    fTopLineIndex = 0;
 	    fLines.clear();
@@ -265,8 +265,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 				fSlider.setThumb(SLIDER_MAX);
 			}
 
-			if (!isVisible()) return;
-		    
+			if (!isVisible()) {
+                return;
+            }
+
 			if (fLines.size() == 0) {
 		        setTopRank(0);
 		    } else if (fLines.size() < fNumVisibleLines) {
@@ -278,7 +280,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 		    }
 		}
 	}
-	
+
 	/**
 	 * Selects the event of given rank and makes it visible.
 	 * @param rank The rank of event
@@ -306,13 +308,16 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             refreshLineBackgrounds();
         }
     }
+
     /**
      * Add a selection listener
      * @param listener A listener to add
      */
     public void addSelectionListener(Listener listener) {
         checkWidget();
-        if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+        if (listener == null) {
+            SWT.error (SWT.ERROR_NULL_ARGUMENT);
+        }
         addListener (SWT.Selection, listener);
     }
 
@@ -322,7 +327,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
      */
     public void removeSelectionListener(Listener listener) {
         checkWidget();
-        if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+        if (listener == null) {
+            SWT.error (SWT.ERROR_NULL_ARGUMENT);
+        }
         removeListener(SWT.Selection, listener);
     }
 
@@ -335,7 +342,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         }
         notifyListeners(SWT.Selection, event);
     }
-    
+
     private void setTopRank(long rank) {
         fBottomContext = fTrace.seekEvent(rank);
         if (fBottomContext == null) {
@@ -353,7 +360,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
         }
     }
-    
+
     private void setTopPosition(double ratio) {
         fBottomContext = fTrace.seekEvent(ratio);
         if (fBottomContext == null) {
@@ -366,7 +373,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         loadLineData();
         refreshTextArea();
     }
-    
+
 	private void loadLineData() {
         if (fTopLineIndex < 0) {
             //if (fLines.size() > 0 && fLines.get(0).rank > 0) {
@@ -381,7 +388,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                     //String[] lines = event.getRawText().split("\r?\n");
                     //for (int i = 0; i < lines.length; i++) {
                         //String line = lines[i];
-                        //LineData lineData = new LineData(rank, location, line); 
+                        //LineData lineData = new LineData(rank, location, line);
                         //fLines.add(index++, lineData);
                         //fTopLineIndex++;
                         //fLastTopLineIndex++;
@@ -417,7 +424,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                             String[] lines = event.getContent().getValue().toString().split("\r?\n"); //$NON-NLS-1$
                             for (int i = 0; i < lines.length; i++) {
                                 String line = lines[i];
-                                LineData lineData = new LineData(rank, location, line); 
+                                LineData lineData = new LineData(rank, location, line);
                                 fLines.add(index++, lineData);
                                 fTopLineIndex++;
                                 fLastTopLineIndex++;
@@ -446,7 +453,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 fTopLineIndex = 0;
             }
         }
-	    
+
 	    while (fLines.size() - fTopLineIndex < fNumVisibleLines) {
 	        if (fBottomContext == null) {
 	            if (fLines.size() == 0) {
@@ -472,7 +479,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                     if ((crPos = line.indexOf('\r')) != -1) {
                     	line = line.substring(0, crPos);
                     }
-                    LineData lineData = new LineData(rank, location, line); 
+                    LineData lineData = new LineData(rank, location, line);
                     fLines.add(lineData);
                 }
             } else {
@@ -481,7 +488,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             }
 	    }
 	    fTopLineIndex = Math.max(0, Math.min(fTopLineIndex, fLines.size() - 1));
-	    
+
 	    if (fLines.size() > MAX_LINE_DATA_SIZE) {
 	        if (fTopLineIndex < MAX_LINE_DATA_SIZE / 2) {
 	            long rank = fLines.get(MAX_LINE_DATA_SIZE - 1).rank;
@@ -505,11 +512,14 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	        }
 	    }
 	}
-	
+
     private void refreshTextArea() {
         fStyledText.setText(""); //$NON-NLS-1$
         for (int i = 0; i < fLines.size() - fTopLineIndex && i < fNumVisibleLines; i++) {
-            if (i > 0) fStyledText.append("\n"); //$NON-NLS-1$
+            if (i > 0)
+             {
+                fStyledText.append("\n"); //$NON-NLS-1$
+            }
             LineData lineData = fLines.get(fTopLineIndex + i);
             fStyledText.append(lineData.string);
             setLineBackground(i, lineData);
@@ -522,7 +532,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private void fillTextArea() {
         int nextLine = fStyledText.getCharCount() == 0 ? 0 : fStyledText.getLineCount();
         for (int i = nextLine; i < fLines.size() - fTopLineIndex && i < fNumVisibleLines; i++) {
-            if (i > 0) fStyledText.append("\n"); //$NON-NLS-1$
+            if (i > 0)
+             {
+                fStyledText.append("\n"); //$NON-NLS-1$
+            }
             LineData lineData = fLines.get(fTopLineIndex + i);
             fStyledText.append(lineData.string);
             setLineBackground(i, lineData);
@@ -556,7 +569,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	        int length = 0;
 	        for (int i = 0; i < fTopLineIndex - fLastTopLineIndex && i < fNumVisibleLines; i++) {
 	            length += fLines.get(i + fLastTopLineIndex).string.length();
-	            if (i < fStyledText.getLineCount()) length += 1;
+	            if (i < fStyledText.getLineCount()) {
+                    length += 1;
+                }
 	        }
 	        fStyledText.replaceTextRange(0, length, ""); //$NON-NLS-1$
             fLastTopLineIndex = fTopLineIndex;
@@ -572,7 +587,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	    fTextArea.layout();
 	    fScrolledComposite.setMinSize(fTextArea.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
-	
+
 	private void refreshLineBackgrounds() {
         for (int i = 0; (i < fStyledText.getLineCount()) && (i < fNumVisibleLines) && (i < fLines.size() - fTopLineIndex); i++) {
             LineData lineData = fLines.get(fTopLineIndex + i);
@@ -600,7 +615,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	        fStoredCaretPosition[0] = new CaretPosition(time, caretOffset);
 	    }
 	}
-	
+
 	private int getPreviousCaretOffset(int time) {
 	    if (fStoredCaretPosition[0].time == time) {
 	        return fStoredCaretPosition[1].caretOffset;
@@ -631,11 +646,11 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             }
         }
 	}
-	
+
     // ------------------------------------------------------------------------
     // ControlListener (ScrolledComposite)
     // ------------------------------------------------------------------------
-    
+
     @Override
     public void controlResized(ControlEvent event) {
         int areaHeight = fScrolledComposite.getSize().y;
@@ -654,11 +669,11 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     @Override
     public void controlMoved(ControlEvent e) {
     }
-	
+
     // ------------------------------------------------------------------------
     // SelectionListener (Slider)
     // ------------------------------------------------------------------------
-    
+
     @Override
     public void widgetSelected(SelectionEvent e) {
     	fTextArea.setFocus();
@@ -683,7 +698,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 fLines.clear();
                 while (fLines.size() == 0) {
                     setTopPosition(ratio);
-                    if (ratio == 0.0) break;
+                    if (ratio == 0.0) {
+                        break;
+                    }
                     delta = Math.min(delta * 10, 0.1);
                     ratio = Math.max(ratio - delta, 0.0);
                 }
@@ -734,7 +751,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 fLines.clear();
                 while (fLines.size() == 0) {
                     setTopPosition(ratio);
-                    if (ratio == 0.0) break;
+                    if (ratio == 0.0) {
+                        break;
+                    }
                     delta = Math.min(delta * 10, 0.1);
                     ratio = Math.max(ratio - delta, 0.0);
                 }
@@ -747,7 +766,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         if (e.detail != SWT.NONE) {
             fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
         }
-        
+
         fHoldSelection = 0;
     }
 
@@ -758,7 +777,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     // ------------------------------------------------------------------------
     // KeyListener (StyledText)
     // ------------------------------------------------------------------------
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
         if (fLines.size() == 0) {
@@ -906,7 +925,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 fLines.clear();
                 while (fLines.size() == 0) {
                     setTopPosition(ratio);
-                    if (ratio == 0.0) break;
+                    if (ratio == 0.0) {
+                        break;
+                    }
                     delta = Math.min(delta * 10, 0.1);
                     ratio = Math.max(ratio - delta, 0.0);
                 }
@@ -933,7 +954,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     // ------------------------------------------------------------------------
     // CaretListener (StyledText)
     // ------------------------------------------------------------------------
-    
+
     @Override
     public void caretMoved(CaretEvent event) {
         if (fHoldSelection == 0) {
@@ -963,7 +984,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     // ------------------------------------------------------------------------
     // MouseMoveListener (StyledText)
     // ------------------------------------------------------------------------
-    
+
     @Override
     public void mouseMove(MouseEvent e) {
         fCursorYCoordinate = e.y;
@@ -993,7 +1014,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     // ------------------------------------------------------------------------
     // MouseTrackListener (StyledText)
     // ------------------------------------------------------------------------
-    
+
     @Override
     public void mouseExit(MouseEvent e) {
         fCursorYCoordinate = -1;
@@ -1015,7 +1036,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     // ------------------------------------------------------------------------
     // MouseWheelListener (StyledText)
     // ------------------------------------------------------------------------
-    
+
     @Override
     public void mouseScrolled(MouseEvent e) {
         if (fLines.size() == 0) {
@@ -1030,5 +1051,5 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         updateHighlightedRank();
         fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
     }
-    
+
 }

@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -68,7 +67,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
     /** Event View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.events"; //$NON-NLS-1$
 
-    private TmfExperiment<?> fExperiment;
+    private TmfExperiment fExperiment;
     private TmfEventsTable fEventsTable;
     private static final int DEFAULT_CACHE_SIZE = 100;
     private String fTitlePrefix;
@@ -98,16 +97,15 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
 	// ------------------------------------------------------------------------
 
 	@Override
-    @SuppressWarnings("unchecked")
 	public void createPartControl(Composite parent) {
         fParent = parent;
 
         fTitlePrefix = getTitle();
 
         // If an experiment is already selected, update the table
-        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) TmfExperiment.getCurrentExperiment();
+        TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
         if (experiment != null) {
-            experimentSelected(new TmfExperimentSelectedSignal<ITmfEvent>(this, experiment));
+            experimentSelected(new TmfExperimentSelectedSignal(this, experiment));
         } else {
             fEventsTable = createEventsTable(parent);
         }
@@ -135,7 +133,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
         int cacheSize = fExperiment.getCacheSize();
         String commonTraceType = null;
         try {
-            for (ITmfTrace<?> trace : fExperiment.getTraces()) {
+            for (ITmfTrace trace : fExperiment.getTraces()) {
                 IResource resource = trace.getResource();
                 if (resource == null) {
                     return new TmfEventsTable(parent, cacheSize);
@@ -234,11 +232,10 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
      * @param signal
      *            The incoming signal
      */
-    @SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal<ITmfEvent> signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal signal) {
         // Update the trace reference
-        TmfExperiment<ITmfEvent> exp = (TmfExperiment<ITmfEvent>) signal.getExperiment();
+        TmfExperiment exp = signal.getExperiment();
         if (!exp.equals(fExperiment)) {
             fExperiment = exp;
             setPartName(fTitlePrefix + " - " + fExperiment.getName()); //$NON-NLS-1$
@@ -261,11 +258,10 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
      * @param signal
      *            The incoming signal
      */
-    @SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void experimentDisposed(TmfExperimentDisposedSignal<ITmfEvent> signal) {
+    public void experimentDisposed(TmfExperimentDisposedSignal signal) {
         // Clear the trace reference
-        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) signal.getExperiment();
+        TmfExperiment experiment = signal.getExperiment();
         if (experiment.equals(fExperiment)) {
             fEventsTable.setTrace(null, false);
 

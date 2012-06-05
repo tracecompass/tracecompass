@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 /**
  * A wrapper class around CTF's Event Definition/Declaration that maps all
  * types of Declaration to native Java types.
- * 
+ *
  * @version 1.0
  * @author Alexandre Montplaisir
  */

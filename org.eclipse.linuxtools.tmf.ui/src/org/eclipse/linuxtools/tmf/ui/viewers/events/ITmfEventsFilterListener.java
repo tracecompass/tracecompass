@@ -31,7 +31,7 @@ public interface ITmfEventsFilterListener {
      * @param trace
      *            The trace on which this filter is applied
      */
-	public void filterApplied(ITmfFilter filter, ITmfTrace<?> trace);
+	public void filterApplied(ITmfFilter filter, ITmfTrace trace);
 
     /**
      * Notify this listener that a new search has been run.
@@ -41,6 +41,5 @@ public interface ITmfEventsFilterListener {
      * @param trace
      *            The trace on which this filter is applied
      */
-	public void searchApplied(ITmfFilter filter, ITmfTrace<?> trace);
-
+	public void searchApplied(ITmfFilter filter, ITmfTrace trace);
 }
