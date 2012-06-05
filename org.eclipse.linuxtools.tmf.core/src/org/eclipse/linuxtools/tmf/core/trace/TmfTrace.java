@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Trace Model 1.0
@@ -45,7 +45,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * The concrete class can either specify its own indexer or use the provided
  * TmfCheckpointIndexer (default). In this case, the trace cache size will be
  * used as checkpoint interval.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -97,8 +97,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * The standard constructor (non-live trace). Applicable when the trace
-     * implements its own parser and if at checkpoint-based index is OK. 
-     * 
+     * implements its own parser and if at checkpoint-based index is OK.
+     *
      * @param resource the resource associated to the trace
      * @param type the trace event type
      * @param path the trace path
@@ -112,7 +112,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * The standard constructor (live trace). Applicable when the trace
      * implements its own parser and if at checkpoint-based index is OK.
-     * 
+     *
      * @param resource the resource associated to the trace
      * @param type the trace event type
      * @param path the trace path
@@ -127,7 +127,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * The 'non-default indexer' constructor. Allows to provide a trace
      * specific indexer.
-     * 
+     *
      * @param resource the resource associated to the trace
      * @param type the trace event type
      * @param path the trace path
@@ -141,8 +141,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     /**
-     * The full constructor where trace specific indexer/parser are provided. 
-     * 
+     * The full constructor where trace specific indexer/parser are provided.
+     *
      * @param resource the resource associated to the trace
      * @param type the trace event type
      * @param path the trace path
@@ -164,7 +164,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Copy constructor
-     * 
+     *
      * @param trace the original trace
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -196,11 +196,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Initialize the trace common attributes and the base component.
-     * 
-     * @param resource the Eclipse resource (trace) 
+     *
+     * @param resource the Eclipse resource (trace)
      * @param path the trace path
      * @param type the trace event type
-     * 
+     *
      * @throws TmfTraceException
      */
     @SuppressWarnings("unchecked")
@@ -228,7 +228,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Indicates if the path points to an existing file/directory
-     * 
+     *
      * @param path the path to test
      * @return true if the file/directory exists
      */
@@ -239,7 +239,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Index the trace
-     * 
+     *
      * @param waitForCompletion index synchronously (true) or not (false)
      */
     protected void indexTrace(boolean waitForCompletion) {
@@ -359,7 +359,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Set the trace cache size. Must be done at initialization time.
-     * 
+     *
      * @param cacheSize The trace cache size
      */
     protected void setCacheSize(final int cacheSize) {
@@ -369,7 +369,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * Set the trace known number of events. This can be quite dynamic
      * during indexing or for live traces.
-     * 
+     *
      * @param nbEvents The number of events
      */
     protected synchronized void setNbEvents(final long nbEvents) {
@@ -378,7 +378,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Update the trace events time range
-     * 
+     *
      * @param range the new time range
      */
     protected void setTimeRange(final TmfTimeRange range) {
@@ -388,7 +388,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Update the trace chronologically first event timestamp
-     * 
+     *
      * @param startTime the new first event timestamp
      */
     protected void setStartTime(final ITmfTimestamp startTime) {
@@ -397,7 +397,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Update the trace chronologically last event timestamp
-     * 
+     *
      * @param endTime the new last event timestamp
      */
     protected void setEndTime(final ITmfTimestamp endTime) {
@@ -406,7 +406,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Set the polling interval for live traces (default = 0 = no streaming).
-     * 
+     *
      * @param interval the new trace streaming interval
      */
     protected void setStreamingInterval(final long interval) {
@@ -415,7 +415,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Set the trace indexer. Must be done at initialization time.
-     * 
+     *
      * @param indexer the trace indexer
      */
     protected void setIndexer(final ITmfTraceIndexer<ITmfTrace<ITmfEvent>> indexer) {
@@ -424,7 +424,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Set the trace parser. Must be done at initialization time.
-     * 
+     *
      * @param parser the new trace parser
      */
     protected void setParser(final ITmfEventParser<T> parser) {
@@ -455,7 +455,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         long pos = context.getRank();
         if (pos < rank) {
             ITmfEvent event = getNext(context);
-            while (event != null && ++pos < rank) {
+            while ((event != null) && (++pos < rank)) {
                 event = getNext(context);
             }
         }
@@ -515,7 +515,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * Hook for special event processing by the concrete class
      * (called by TmfTrace.getEvent())
-     * 
+     *
      * @param event the event
      */
     protected void processEvent(final ITmfEvent event) {
@@ -524,15 +524,15 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Update the trace attributes
-     * 
+     *
      * @param context the current trace context
      * @param timestamp the corresponding timestamp
      */
     protected synchronized void updateAttributes(final ITmfContext context, final ITmfTimestamp timestamp) {
-        if (fStartTime.equals(TmfTimestamp.BIG_BANG) || fStartTime.compareTo(timestamp, false) > 0) {
+        if (fStartTime.equals(TmfTimestamp.BIG_BANG) || (fStartTime.compareTo(timestamp, false) > 0)) {
             fStartTime = timestamp.clone();
         }
-        if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || fEndTime.compareTo(timestamp, false) < 0) {
+        if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || (fEndTime.compareTo(timestamp, false) < 0)) {
             fEndTime = timestamp.clone();
         }
         if (context.hasValidRank()) {
@@ -553,9 +553,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     @Override
     protected ITmfContext armRequest(final ITmfDataRequest<T> request) {
-        if (request instanceof ITmfEventRequest<?>
+        if ((request instanceof ITmfEventRequest<?>)
             && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
-            && request.getIndex() == 0)
+            && (request.getIndex() == 0))
         {
             final ITmfContext context = seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
             ((ITmfEventRequest<T>) request).setStartIndex((int) context.getRank());
