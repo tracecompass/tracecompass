@@ -202,16 +202,8 @@ public class StreamInputReader {
      */
     public long seek(long timestamp) {
         long offset = 0;
-        /*
-         * Search in the index for the packet to search in.
-         */
-        this.packetIndex = this.streamInput.getIndex().search(timestamp)
-                .previousIndex();
 
-        /*
-         * Switch to this packet.
-         */
-        goToNextPacket();
+        gotoPacket(timestamp);
 
         /*
          * index up to the desired timestamp.
@@ -224,6 +216,9 @@ public class StreamInputReader {
             } catch (CTFReaderException e) {
                 // do nothing here
             }
+        }
+        if( this.packetReader.getCurrentPacket() == null){
+            gotoPacket(timestamp);
         }
 
         /*
@@ -239,6 +234,18 @@ public class StreamInputReader {
             offset++;
         }
         return offset;
+    }
+
+    /**
+     * @param timestamp
+     */
+    private void gotoPacket(long timestamp) {
+        this.packetIndex = this.streamInput.getIndex().search(timestamp)
+                .previousIndex();
+        /*
+         * Switch to this packet.
+         */
+        goToNextPacket();
     }
 
     public void goToLastEvent() {
