@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
@@ -38,7 +39,7 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
      * Default cache size for CTF traces
      */
     protected static final int DEFAULT_CACHE_SIZE = 50000;
-    
+
     //-------------------------------------------
     //        Fields
     //-------------------------------------------
@@ -159,6 +160,19 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
                 / (iterator.getEndTime() - iterator.getStartTime());
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#seekEvent(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
+    @Override
+    public synchronized ITmfContext seekEvent(ITmfTimestamp timestamp) {
+        if( timestamp instanceof CtfTmfTimestamp){
+            CtfIterator iter = new CtfIterator(this);
+            iter.seek(timestamp.getValue());
+            return iter;
+        }
+        return super.seekEvent(timestamp);
+    }
+
     /**
      * Method seekEvent.
      * @param location ITmfLocation<?>
@@ -185,8 +199,9 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
             currentLocation.setLocation(getEndTime().getValue() + 1);
         }
         context.setLocation(currentLocation);
-        if(context.getRank() != 0)
+        if(context.getRank() != 0) {
             context.setRank(ITmfContext.UNKNOWN_RANK);
+        }
         return context;
     }
 
@@ -322,9 +337,9 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
         }
         return event;
     }
-    
+
     /**
-     * Sets the cache size for a CtfTmfTrace. 
+     * Sets the cache size for a CtfTmfTrace.
      */
     protected void setCacheSize() {
         setCacheSize(DEFAULT_CACHE_SIZE);
