@@ -139,7 +139,8 @@ public class CTFTrace implements IDefinitionScope {
 
     /** Handlers for the metadata files */
     private final static FileFilter metadataFileFilter = new MetadataFileFilter();
-    private final static Comparator<File> metadataComparator = new MetadataComparator(); // $codepro.audit.disable fieldJavadoc
+    private final static Comparator<File> metadataComparator = new MetadataComparator(); // $codepro.audit.disable
+                                                                                         // fieldJavadoc
 
     /** map of all the event types */
     private final HashMap<Long, EventDeclaration> events;
@@ -229,7 +230,7 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     @Override
-    protected void finalize() throws Throwable{
+    protected void finalize() throws Throwable {
         /* If this trace gets closed, release the descriptors to the streams */
         for (FileChannel fc : streamFileChannels) {
             if (fc != null) {
@@ -624,19 +625,25 @@ public class CTFTrace implements IDefinitionScope {
         return clocks.get(name);
     }
 
-    public CTFClock getClock() {
+    private CTFClock singleClock;
+    private long singleOffset;
+
+    public final CTFClock getClock() {
         if (clocks.size() == 1) {
-            String key = (String) clocks.keySet().toArray()[0];
-            return clocks.get(key);
+            if (singleClock == null) {
+                singleClock = clocks.get(clocks.keySet().toArray()[0]);
+                singleOffset = (Long) getClock().getProperty("offset"); //$NON-NLS-1$
+            }
+            return singleClock;
         }
         return null;
     }
 
-    public long getOffset() {
+    public final long getOffset() {
         if (getClock() == null) {
             return 0;
         }
-        return (Long) getClock().getProperty("offset"); //$NON-NLS-1$
+        return singleOffset;
     }
 
 }
