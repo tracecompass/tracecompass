@@ -13,8 +13,6 @@
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -54,6 +52,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
     private final CustomXmlTraceDefinition fDefinition;
     private final CustomXmlEventType fEventType;
     private final InputElement fRecordInputElement;
+    private BufferedRandomAccessFile fFile;
 
     public CustomXmlTrace(final CustomXmlTraceDefinition definition) {
         fDefinition = definition;
@@ -72,35 +71,51 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CustomXmlEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
+        try {
+            fFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+        } catch (IOException e) {
+            throw new TmfTraceException(e.getMessage(), e);
+        }
         indexTrace(false);
     }
 
     @Override
-    public TmfContext seekEvent(final ITmfLocation<?> location) {
-        final CustomXmlTraceContext context = new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
-        if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile())
-            return context;
-        try {
-            context.raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-            if (location != null && location.getLocation() instanceof Long) {
-                context.raFile.seek((Long)location.getLocation());
+    public synchronized void dispose() {
+        super.dispose();
+        if (fFile != null) {
+            try {
+                fFile.close();
+            } catch (IOException e) {
+            } finally {
+                fFile = null;
             }
+        }
+    }
 
+    @Override
+    public synchronized TmfContext seekEvent(final ITmfLocation<?> location) {
+        final CustomXmlTraceContext context = new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
+        if (NULL_LOCATION.equals(location) || fFile == null) {
+            return context;
+        }
+        try {
+            if (location == null) {
+                fFile.seek(0);
+            } else if (location.getLocation() instanceof Long) {
+                fFile.seek((Long) location.getLocation());
+            }
             String line;
             final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
-            long rawPos = context.raFile.getFilePointer();
+            long rawPos = fFile.getFilePointer();
 
-            while ((line = context.raFile.getNextLine()) != null) {
+            while ((line = fFile.getNextLine()) != null) {
                 final int idx = line.indexOf(recordElementStart);
                 if (idx != -1) {
                     context.setLocation(new TmfLocation<Long>(rawPos + idx));
                     return context;
                 }
-                rawPos = context.raFile.getFilePointer();
+                rawPos = fFile.getFilePointer();
             }
-            return context;
-        } catch (final FileNotFoundException e) {
-            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return context;
         } catch (final IOException e) {
             Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
@@ -110,14 +125,15 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
     }
 
     @Override
-    public TmfContext seekEvent(final double ratio) {
-        BufferedRandomAccessFile raFile = null;
+    public synchronized TmfContext seekEvent(final double ratio) {
+        if (fFile == null) {
+            return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
+        }
         try {
-            raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-            long pos = (long) (ratio * raFile.length());
+            long pos = (long) (ratio * fFile.length());
             while (pos > 0) {
-                raFile.seek(pos - 1);
-                if (raFile.read() == '\n') {
+                fFile.seek(pos - 1);
+                if (fFile.read() == '\n') {
                     break;
                 }
                 pos--;
@@ -126,41 +142,23 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             final TmfContext context = seekEvent(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
-        } catch (final FileNotFoundException e) {
-            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
-            return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } catch (final IOException e) {
             Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
-        } finally {
-            if (raFile != null) {
-                try {
-                    raFile.close();
-                } catch (final IOException e) {
-                }
-            }
         }
     }
 
     @Override
-    public double getLocationRatio(final ITmfLocation<?> location) {
-        RandomAccessFile raFile = null;
+    public synchronized double getLocationRatio(final ITmfLocation<?> location) {
+        if (fFile == null) {
+            return 0;
+        }
         try {
             if (location.getLocation() instanceof Long) {
-                raFile = new RandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-                return (double) ((Long) location.getLocation()) / raFile.length();
+                return (double) ((Long) location.getLocation()) / fFile.length();
             }
-        } catch (final FileNotFoundException e) {
-            Activator.getDefault().logError("Error getting location ration. File not found: " + getPath(), e); //$NON-NLS-1$
         } catch (final IOException e) {
             Activator.getDefault().logError("Error getting location ration. File: " + getPath(), e); //$NON-NLS-1$
-        } finally {
-            if (raFile != null) {
-                try {
-                    raFile.close();
-                } catch (final IOException e) {
-                }
-            }
         }
         return 0;
     }
@@ -172,9 +170,15 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
     }
 
     @Override
+    public synchronized CustomXmlEvent parseEvent(final ITmfContext tmfContext) {
+        ITmfContext context = seekEvent(tmfContext.getLocation());
+        return parse(context);
+    }
+
+    @Override
     public synchronized CustomXmlEvent getNext(final ITmfContext context) {
         final ITmfContext savedContext = context.clone();
-        final CustomXmlEvent event = parseEvent(context);
+        final CustomXmlEvent event = parse(context);
         if (event != null) {
             updateAttributes(savedContext, event.getTimestamp());
             context.increaseRank();
@@ -182,48 +186,50 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
         return event;
     }
 
-    @Override
-    public CustomXmlEvent parseEvent(final ITmfContext tmfContext) {
-        if (!(tmfContext instanceof CustomXmlTraceContext))
+    private synchronized CustomXmlEvent parse(final ITmfContext tmfContext) {
+        if (fFile == null) {
             return null;
+        }
+        if (!(tmfContext instanceof CustomXmlTraceContext)) {
+            return null;
+        }
 
         final CustomXmlTraceContext context = (CustomXmlTraceContext) tmfContext;
-        if (!(context.getLocation().getLocation() instanceof Long) || NULL_LOCATION.equals(context.getLocation()))
+        if (!(context.getLocation().getLocation() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
             return null;
-
-        synchronized (context.raFile) {
-            CustomXmlEvent event = null;
-            try {
-                if (context.raFile.getFilePointer() != (Long)context.getLocation().getLocation() + 1)
-                {
-                    context.raFile.seek((Long)context.getLocation().getLocation() + 1); // +1 is for the <
-                }
-                final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
-                readElement(elementBuffer, context.raFile);
-                final Element element = parseElementBuffer(elementBuffer);
-
-                event = extractEvent(element, fRecordInputElement);
-                ((StringBuffer) event.getContent().getValue()).append(elementBuffer);
-
-                String line;
-                final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
-                long rawPos = context.raFile.getFilePointer();
-
-                while ((line = context.raFile.getNextLine()) != null) {
-                    final int idx = line.indexOf(recordElementStart);
-                    if (idx != -1) {
-                        context.setLocation(new TmfLocation<Long>(rawPos + idx));
-                        return event;
-                    }
-                    rawPos = context.raFile.getFilePointer();
-                }
-            } catch (final IOException e) {
-                Activator.getDefault().logError("Error pasing event. File: " + getPath(), e); //$NON-NLS-1$
-                
-            }
-            context.setLocation(NULL_LOCATION);
-            return event;
         }
+
+        CustomXmlEvent event = null;
+        try {
+            if (fFile.getFilePointer() != (Long)context.getLocation().getLocation() + 1)
+            {
+                fFile.seek((Long)context.getLocation().getLocation() + 1); // +1 is for the <
+            }
+            final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
+            readElement(elementBuffer, fFile);
+            final Element element = parseElementBuffer(elementBuffer);
+
+            event = extractEvent(element, fRecordInputElement);
+            ((StringBuffer) event.getContent().getValue()).append(elementBuffer);
+
+            String line;
+            final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
+            long rawPos = fFile.getFilePointer();
+
+            while ((line = fFile.getNextLine()) != null) {
+                final int idx = line.indexOf(recordElementStart);
+                if (idx != -1) {
+                    context.setLocation(new TmfLocation<Long>(rawPos + idx));
+                    return event;
+                }
+                rawPos = fFile.getFilePointer();
+            }
+        } catch (final IOException e) {
+            Activator.getDefault().logError("Error parsing event. File: " + getPath(), e); //$NON-NLS-1$
+            
+        }
+        context.setLocation(NULL_LOCATION);
+        return event;
     }
 
     private Element parseElementBuffer(final StringBuffer elementBuffer) {
@@ -284,7 +290,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                     break; // found "</"
                 } else if (c == '-' && numRead == 3 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("!-")) { //$NON-NLS-1$
                     readComment(buffer, raFile); // found "<!--"
-                } else if (i == '>')
+                } else if (i == '>') {
                     if (buffer.charAt(buffer.length() - 2) == '/') {
                         break; // found "/>"
                     } else if (startTagClosed) {
@@ -293,6 +299,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                     else {
                         startTagClosed = true; // found "<...>"
                     }
+                }
             }
             return;
         } catch (final IOException e) {
@@ -358,22 +365,24 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                     parseElement(element, buffer);
                     buffer.append(" ]"); //$NON-NLS-1$
                 }
-            } else if (node.getNodeType() == Node.TEXT_NODE)
+            } else if (node.getNodeType() == Node.TEXT_NODE) {
                 if (node.getNodeValue().trim().length() != 0) {
                     buffer.append(node.getNodeValue().trim());
                 }
+            }
         }
         return buffer;
     }
 
     public InputElement getRecordInputElement(final InputElement inputElement) {
-        if (inputElement.logEntry)
+        if (inputElement.logEntry) {
             return inputElement;
-        else if (inputElement.childElements != null) {
+        } else if (inputElement.childElements != null) {
             for (final InputElement childInputElement : inputElement.childElements) {
                 final InputElement recordInputElement = getRecordInputElement(childInputElement);
-                if (recordInputElement != null)
+                if (recordInputElement != null) {
                     return recordInputElement;
+                }
             }
         }
         return null;
@@ -381,7 +390,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
 
     public CustomXmlEvent extractEvent(final Element element, final InputElement inputElement) {
         final CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.ZERO, "", fEventType,""); //$NON-NLS-1$ //$NON-NLS-2$
-        event.setContent(new CustomEventContent(event, "")); //$NON-NLS-1$
+        event.setContent(new CustomEventContent(event, new StringBuffer()));
         parseElement(element, event, inputElement);
         return event;
     }
@@ -400,11 +409,12 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             for (int i = 0; i < childNodes.getLength(); i++) {
                 final Node node = childNodes.item(i);
                 if (node instanceof Element) {
-                    for (final InputElement child : inputElement.childElements)
+                    for (final InputElement child : inputElement.childElements) {
                         if (node.getNodeName().equals(child.elementName)) {
                             parseElement((Element) node, event, child);
                             break;
                         }
+                    }
                 }
             }
         }

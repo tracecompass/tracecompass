@@ -5,7 +5,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 public class CustomEventContent extends TmfEventField {
 
-    public CustomEventContent(CustomEvent parent, String content) {
+    public CustomEventContent(CustomEvent parent, StringBuffer content) {
         super(ITmfEventField.ROOT_FIELD_ID, content);
     }
 
