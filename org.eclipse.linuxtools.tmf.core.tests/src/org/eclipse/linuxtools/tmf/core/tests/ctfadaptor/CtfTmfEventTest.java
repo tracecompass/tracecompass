@@ -113,10 +113,11 @@ public class CtfTmfEventTest {
      */
     @Test
     public void testGetFieldValue() {
-        String fieldName = "ret"; //$NON-NLS-1$
-        Object result = fixture.getContent().getField(fieldName).getValue();
+        String fieldName = "pid"; //$NON-NLS-1$
+        ITmfEventField result = fixture.getContent().getField(fieldName);
 
         assertNotNull(result);
+        assertNotNull(result.getValue());
     }
 
     /**
@@ -184,16 +185,16 @@ public class CtfTmfEventTest {
         String source = fixture.getSource();
         ITmfEventType type = fixture.getType();
         assertEquals(rank, 0);
-        assertEquals(trace.getName(), "kernel"); //$NON-NLS-1$
+        assertEquals(trace.getName(), "test"); //$NON-NLS-1$
         assertEquals(channelName, "channel0_1"); //$NON-NLS-1$
         assertEquals(reference,"channel0_1"); //$NON-NLS-1$
         assertEquals(source, "1"); //$NON-NLS-1$
-        assertEquals(type.toString(), "exit_syscall"); //$NON-NLS-1$
+        assertEquals(type.toString(), "lttng_statedump_vm_map"); //$NON-NLS-1$
     }
 
     @Test
     public void testToString() {
         String s = fixture.getContent().toString();
-        assertEquals("ret=4132", s); //$NON-NLS-1$
+        assertEquals("pid=1922, inode=917738, flags=134217845, end=3074342912, start=3074334720, pgoff=0", s); //$NON-NLS-1$
     }
 }

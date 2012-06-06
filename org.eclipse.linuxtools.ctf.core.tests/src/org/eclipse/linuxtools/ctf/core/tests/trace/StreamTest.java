@@ -42,8 +42,8 @@ public class StreamTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -66,8 +66,8 @@ public class StreamTest {
 
     /**
      * Run the Stream(CTFTrace) constructor test.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testStream() throws CTFReaderException {
@@ -85,21 +85,6 @@ public class StreamTest {
     public void testAddEvent_base() throws ParseException {
         EventDeclaration event = new EventDeclaration();
         fixture.addEvent(event);
-    }
-
-    /**
-     * Run the void addEvent(EventDeclaration) method test with an event
-     * of which we modified the id.
-     * @throws ParseException
-     *
-     * @throws ParseException
-     */
-    @Test
-    public void testAddEvent_modifiedEvent() throws ParseException {
-        EventDeclaration event = new EventDeclaration();
-        event.setId(1L);
-        fixture.addEvent(event);
-        assertNotNull(fixture);
     }
 
     /**

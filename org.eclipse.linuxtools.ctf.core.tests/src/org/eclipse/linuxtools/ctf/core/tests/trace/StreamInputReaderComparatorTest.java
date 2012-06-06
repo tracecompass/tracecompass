@@ -1,17 +1,7 @@
 package org.eclipse.linuxtools.ctf.core.tests.trace;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.nio.channels.FileChannel;
-
-import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.TestParams;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
-import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderComparator;
 import org.junit.After;
 import org.junit.Before;
@@ -60,40 +50,5 @@ public class StreamInputReaderComparatorTest {
     @Test
     public void testStreamInputReaderComparator() {
         assertNotNull(fixture);
-    }
-
-    /**
-     * Run the int compare(StreamInputReader,StreamInputReader) method test.
-     *
-     * @throws CTFReaderException
-     */
-    @Test
-    public void testCompare() throws CTFReaderException {
-        StreamInputReader sir1, sir2;
-        EventDefinition ed1, ed2;
-
-        sir1 = new StreamInputReader(new StreamInput(new Stream(
-                TestParams.createTrace()), (FileChannel) null,
-                TestParams.getEmptyFile()));
-        ed1 = new EventDefinition(new EventDeclaration(),
-                new StreamInputReader(new StreamInput(new Stream(
-                        TestParams.createTrace()), (FileChannel) null,
-                        TestParams.getEmptyFile())));
-        ed1.setTimestamp(1L);
-        sir1.setCurrentEvent(ed1);
-
-        sir2 = new StreamInputReader(new StreamInput(new Stream(
-                TestParams.createTrace()), (FileChannel) null,
-                TestParams.getEmptyFile()));
-        ed2 = new EventDefinition(new EventDeclaration(),
-                new StreamInputReader(new StreamInput(new Stream(
-                        TestParams.createTrace()), (FileChannel) null,
-                        TestParams.getEmptyFile())));
-
-        ed2.setTimestamp(1L);
-        sir2.setCurrentEvent(ed2);
-
-        int result = fixture.compare(sir1, sir2);
-        assertEquals(0, result);
     }
 }

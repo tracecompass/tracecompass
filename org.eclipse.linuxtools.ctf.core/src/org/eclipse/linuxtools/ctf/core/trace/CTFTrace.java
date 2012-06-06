@@ -34,6 +34,7 @@ import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
@@ -45,6 +46,7 @@ import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndex;
 
 /**
  * <b><u>CTFTrace</u></b>
@@ -143,7 +145,13 @@ public class CTFTrace implements IDefinitionScope {
                                                                                          // fieldJavadoc
 
     /** map of all the event types */
-    private final HashMap<Long, EventDeclaration> events;
+    private final HashMap<Long,HashMap<Long, EventDeclaration>> eventDecs;
+    /** map of all the event types */
+    private final HashMap<StreamInput,HashMap<Long, EventDefinition>> eventDefs;
+    /** map of all the indexes */
+    private final HashMap<StreamInput, StreamInputPacketIndex> indexes;
+
+
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -177,6 +185,8 @@ public class CTFTrace implements IDefinitionScope {
         environment = new HashMap<String, String>();
         clocks = new HashMap<String, CTFClock>();
         streamFileChannels = new LinkedList<FileChannel>();
+        eventDecs = new HashMap<Long, HashMap<Long, EventDeclaration>>();
+        eventDefs = new HashMap<StreamInput, HashMap<Long, EventDefinition>>();
 
         if (!this.path.isDirectory()) {
             throw new CTFReaderException("Path must be a valid directory"); //$NON-NLS-1$
@@ -199,12 +209,12 @@ public class CTFTrace implements IDefinitionScope {
         /* List files not called metadata and not hidden. */
         File[] files = path.listFiles(metadataFileFilter);
         Arrays.sort(files, metadataComparator);
-
+        indexes = new HashMap<StreamInput, StreamInputPacketIndex>();
         /* Try to open each file */
         for (File streamFile : files) {
             openStreamInput(streamFile);
         }
-        events = new HashMap<Long, EventDeclaration>();
+
         /* Create their index */
         for (Map.Entry<Long, Stream> stream : streams.entrySet()) {
             Set<StreamInput> inputs = stream.getValue().getStreamInputs();
@@ -218,7 +228,7 @@ public class CTFTrace implements IDefinitionScope {
                     Map.Entry<Long, EventDeclaration> pairs = it.next();
                     Long eventNum = pairs.getKey();
                     EventDeclaration eventDec = pairs.getValue();
-                    events.put(eventNum, eventDec);
+                    getEvents(s.getStream().getId()).put(eventNum, eventDec);
                 }
 
                 /*
@@ -250,23 +260,47 @@ public class CTFTrace implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     /**
+     * Gets an event declaration hashmap for a given streamID
+     * @param streanId
+     * @return the hashmap with the event declarations
+     */
+    public HashMap<Long, EventDeclaration> getEvents(Long streanId) {
+        return eventDecs.get(streanId);
+    }
+
+    /**
+     * Gets an index for a given StreamInput
+     * @param id the StreamInput
+     * @return The index
+     */
+    public StreamInputPacketIndex getIndex(StreamInput id){
+        if(! indexes.containsKey(id)){
+            indexes.put(id, new StreamInputPacketIndex());
+        }
+        return indexes.get(id);
+    }
+
+    /**
+     * Gets an event Declaration hashmap for a given StreamInput
+     * @param id the StreamInput
+     * @return the hashmap with the event definitions
+     */
+    public HashMap<Long, EventDefinition> getEventDefs(StreamInput id) {
+        if(! eventDefs.containsKey(id)){
+            eventDefs.put(id, new HashMap<Long, EventDefinition>());
+        }
+        return eventDefs.get(id);
+    }
+
+    /**
      * Get an event by it's ID
      *
      * @param id
      *            the ID of the event
      * @return the event declaration
      */
-    public EventDeclaration getEventType(long id) {
-        return events.get(id);
-    }
-
-    /**
-     * Get the number of events in the trace so far.
-     *
-     * @return the number of events in the trace
-     */
-    public int getNbEventTypes() {
-        return events.size();
+    public EventDeclaration getEventType(long streamId, long id) {
+        return getEvents(streamId).get(id);
     }
 
     /**
@@ -589,8 +623,7 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         /*
-         * If the stream we try to add has the null key, it must be the only
-         * one. Thus, if the streams container is not empty, it is not valid.
+         * If the stream we try to add has the null key, it must be the onl         * one. Thus, if the streams container is not empty, it is not valid.
          */
         if ((stream.getId() == null) && (streams.size() != 0)) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
@@ -603,6 +636,7 @@ public class CTFTrace implements IDefinitionScope {
 
         /* It should be ok now. */
         streams.put(stream.getId(), stream);
+        eventDecs.put(stream.getId(), new HashMap<Long,EventDeclaration>());
     }
 
     public HashMap<String, String> getEnvironment() {
@@ -644,6 +678,18 @@ public class CTFTrace implements IDefinitionScope {
             return 0;
         }
         return singleOffset;
+    }
+
+    public boolean hasEvents(Long id){
+        return eventDecs.containsKey(id);
+    }
+    public HashMap<Long, EventDeclaration> createEvents(Long id){
+        HashMap<Long, EventDeclaration> value = eventDecs.get(id);
+        if( value == null ) {
+            value = new HashMap<Long, EventDeclaration>();
+            eventDecs.put(id, value);
+        }
+        return value;
     }
 
 }

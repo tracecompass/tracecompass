@@ -58,6 +58,15 @@ public class CtfTmfTraceTest {
         assertEquals(null, result.getType());
     }
 
+    @Test
+    public void testParseEvent() throws TmfTraceException{
+        CtfTmfTrace fixture = initTrace();
+        ITmfContext ctx = fixture.seekEvent(0);
+        fixture.getNext(ctx);
+        CtfTmfEvent event = fixture.parseEvent(ctx);
+        assertNotNull(event);
+    }
+
     /**
      * @return
      * @throws TmfTraceException
@@ -263,7 +272,7 @@ public class CtfTmfTraceTest {
         // An unexpected exception was thrown in user code while executing this test:
         //    org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException: Path must be a valid directory
         //       at org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace.initTrace(CtfTmfTrace.java:98)
-        assertEquals(Double.POSITIVE_INFINITY, result, 0.1);
+        assertEquals(Double.NEGATIVE_INFINITY, result, 0.1);
     }
 
     /**
@@ -693,7 +702,7 @@ public class CtfTmfTraceTest {
     public void testSeekEvent_1()
         throws Exception {
         CtfTmfTrace fixture = initTrace();
-        double ratio = 1.0;
+        double ratio = 0.99;
 
         ITmfContext result = fixture.seekEvent(ratio);
 

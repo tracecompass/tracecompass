@@ -239,6 +239,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
         }
         return 0;
     }
+
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */

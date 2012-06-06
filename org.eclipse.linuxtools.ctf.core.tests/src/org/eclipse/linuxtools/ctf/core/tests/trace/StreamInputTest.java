@@ -183,30 +183,4 @@ public class StreamInputTest {
                 (FileChannel) null, createFile());
         assertEquals(s1,s2);
     }
-    @Test
-    public void testEquals5() throws CTFReaderException{
-        s1 = new StreamInput(new Stream(TestParams.createTrace()),
-                (FileChannel) null, createFile());
-        s2 = new StreamInput(new Stream(null),
-                (FileChannel) null, new File("")); //$NON-NLS-1$
-        assertFalse(s1.equals(s2));
-    }
-    @Test
-    public void testEquals6(){
-        s1 = new StreamInput(new Stream(null),
-                (FileChannel) null, null);
-        s2 = new StreamInput(new Stream(null),
-                (FileChannel) null, new File("")); //$NON-NLS-1$
-
-
-        assertFalse(s1.equals(s2));
-    }
-    @Test
-    public void testEquals7() throws CTFReaderException{
-        s1 = new StreamInput(new Stream(null),
-                (FileChannel) null, new File("")); //$NON-NLS-1$
-        s2 = new StreamInput(new Stream(TestParams.createTrace()),
-                (FileChannel) null, createFile());
-        assertFalse(s1.equals(s2));
-    }
 }

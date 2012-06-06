@@ -6,9 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
@@ -16,9 +13,7 @@ import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,22 +89,6 @@ public class EventDeclarationTest {
 
         boolean result = fixture.contextIsSet();
         assertFalse(result);
-    }
-
-    /**
-     * Run the EventDefinition createDefinition(StreamInputReader) method test.
-     *
-     * @throws CTFReaderException
-     * @throws FileNotFoundException
-     */
-    @Test
-    public void testCreateDefinition() throws CTFReaderException, FileNotFoundException {
-        StreamInputReader streamInputReader = new StreamInputReader(
-                new StreamInput(new Stream(TestParams.createTrace()),
-                       (new FileInputStream(TestParams.getTraceFile())).getChannel(), TestParams.getTraceFile()));
-
-        EventDefinition result = fixture.createDefinition(streamInputReader);
-        assertNotNull(result);
     }
 
     /**

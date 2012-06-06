@@ -53,7 +53,7 @@ public class Stream {
     /**
      * Maps event ids to events
      */
-    private final HashMap<Long, EventDeclaration> events = new HashMap<Long, EventDeclaration>();
+    private HashMap<Long, EventDeclaration> events;
 
     /**
      * The inputs associated to this stream
@@ -80,6 +80,7 @@ public class Stream {
 
     public void setId(long id) {
         this.id = id;
+        this.events = trace.createEvents(this.id);
     }
 
     public Long getId() {

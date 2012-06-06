@@ -149,7 +149,6 @@ public class CTFTraceReader {
              * For each trace file of the stream.
              */
             for (StreamInput streamInput : streamInputs) {
-                streamInput.getIndex().getEntries().clear();
                 /*
                  * Create a reader.
                  */
