@@ -38,8 +38,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <b><u>HistogramView</u></b>
- * <p>
  * The purpose of this view is to provide graphical time distribution statistics about the experiment/trace events.
  * <p>
  * The view is composed of two histograms and two controls:
@@ -50,6 +48,9 @@ import org.eclipse.swt.widgets.Composite;
  * <li>the window span (size of the time window of the smaller histogram).
  * </ul>
  * The histograms x-axis show their respective time range.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class HistogramView extends TmfView {
 
@@ -435,8 +436,10 @@ public class HistogramView extends TmfView {
         fCurrentEventTimeControl.setValue(fExperimentStartTime);
         fTimeSpanControl.setValue(fWindowSpan);
 
-        sendTimeRangeRequest(fExperimentStartTime, fExperimentStartTime + fWindowSpan);
-        sendFullRangeRequest(fullRange);
+        if (!fullRange.equals(TmfTimeRange.NULL_RANGE)) {
+            sendTimeRangeRequest(fExperimentStartTime, fExperimentStartTime + fWindowSpan);
+            sendFullRangeRequest(fullRange);
+        }
     }
 
     private TmfTimeRange updateExperimentTimeRange(TmfExperiment<ITmfEvent> experiment) {
@@ -472,9 +475,6 @@ public class HistogramView extends TmfView {
     private void sendFullRangeRequest(TmfTimeRange fullRange) {
         if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
-        }
-        if (fullRange.equals(TmfTimeRange.NULL_RANGE)) {
-            return;
         }
         int cacheSize = fCurrentExperiment.getCacheSize();
         fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(), fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
