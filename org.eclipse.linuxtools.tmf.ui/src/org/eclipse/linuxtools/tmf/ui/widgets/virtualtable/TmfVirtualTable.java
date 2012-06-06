@@ -190,7 +190,9 @@ public class TmfVirtualTable extends Composite {
                 case SWT.Dispose:
                 case SWT.KeyDown:
                 case SWT.MouseMove: {
-                    if (tip == null) break;
+                    if (tip == null) {
+                        break;
+                    }
                     tip.dispose ();
                     tip = null;
                     label = null;
@@ -199,15 +201,19 @@ public class TmfVirtualTable extends Composite {
                 case SWT.MouseHover: {
                     TableItem item = fTable.getItem (new Point(event.x, event.y));
                     if (item != null) {
-                        for(int i=0;i<fTable.getColumnCount();i++){
+                        for (int i=0; i < fTable.getColumnCount(); i++) {
                             Rectangle bounds = item.getBounds(i);
                             if (bounds.contains(event.x,event.y)){
-                                if (tip != null  && !tip.isDisposed()) tip.dispose();
+                                if (tip != null && !tip.isDisposed()) {
+                                    tip.dispose();
+                                }
                                 if (tooltipProvider == null) {
                                     return;
                                 } else {
                                     String tooltipText = tooltipProvider.getTooltip(i, item.getData());
-                                    if (tooltipText == null) return;
+                                    if (tooltipText == null) {
+                                        return;
+                                    }
                                     tip = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
                                     tip.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
                                     FillLayout layout = new FillLayout();
@@ -243,6 +249,9 @@ public class TmfVirtualTable extends Composite {
             @Override
             public void controlResized(ControlEvent event) {
                 resize();
+                if (fTableItemCount > 0) {
+                    fSlider.setThumb(Math.max(1, Math.min(fTableRows, fFullyVisibleRows)));
+                }
             }
         });
 
@@ -330,7 +339,9 @@ public class TmfVirtualTable extends Composite {
                     display.asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            if (fTable.isDisposed()) return;
+                            if (fTable.isDisposed()) {
+                                return;
+                            }
                             int topIndex = fTable.getTopIndex();
                             if (topIndex != 0) {
                                 fTableTopEventRank += topIndex;
@@ -462,7 +473,7 @@ public class TmfVirtualTable extends Composite {
             fSlider.setSelection(fTableTopEventRank);
         }
 
-        if (fSelectedEventRank != previousSelectedEventRank && fTable.getSelection().length > 0) {
+        if (fSelectedEventRank != previousSelectedEventRank && fSelectedEventRank < fTableItemCount) {
             if (done) {
                 Event e = new Event();
                 e.item = fTable.getSelection()[0];
@@ -782,7 +793,7 @@ public class TmfVirtualTable extends Composite {
 
     public Control createTableEditorControl(Class<? extends Control> control) {
         try {
-            return (Control) control.getConstructor(Composite.class, int.class).newInstance(new Object[] {fTable, SWT.NONE});
+            return control.getConstructor(Composite.class, int.class).newInstance(new Object[] {fTable, SWT.NONE});
         } catch (Exception e) {
             Activator.getDefault().logError("Error creating table editor control", e); //$NON-NLS-1$
         }
