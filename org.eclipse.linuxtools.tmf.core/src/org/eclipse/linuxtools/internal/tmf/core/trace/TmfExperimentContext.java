@@ -8,7 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- * Francois Chouinard - Put in shape for 1.0
+ *   Francois Chouinard - Put in shape for 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.trace;
@@ -63,6 +63,9 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
         fContexts = contexts;
         fEvents = new ITmfEvent[fContexts.length];
         final ITmfLocation<?>[] locations = new ITmfLocation[fContexts.length];
+
+        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations.clone())));
+        
         final long[] ranks = new long[fContexts.length];
         long rank = 0;
         for (int i = 0; i < fContexts.length; i++)
@@ -72,7 +75,7 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
                 rank += contexts[i].getRank();
             }
 
-        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations)));
+//        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations)));
         setRank(rank);
         fLastTraceRead = NO_TRACE;
     }
@@ -165,6 +168,25 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
             i++;
         }
         return isEqual;
+    }
+
+    @Override
+    @SuppressWarnings("nls")
+    public String toString() {
+        StringBuilder sb = new StringBuilder("TmfExperimentContext [\n");
+        sb.append("\tfLocation=" + getLocation() + ", fRank=" + getRank() + "\n");
+        sb.append("\tfContexts=[");
+        for (int i = 0; i < fContexts.length; i++) {
+            sb.append("(" + fContexts[i].getLocation() + "," + fContexts[i].getRank() + ((i < fContexts.length - 1) ? ")," : ")]\n"));
+        }
+        sb.append("\tfEvents=[");
+        for (int i = 0; i < fEvents.length; i++) {
+            ITmfEvent event = fEvents[i];
+            sb.append(((event != null) ? fEvents[i].getTimestamp() : "(null)")  + ((i < fEvents.length - 1) ? "," : "]\n"));
+        }
+        sb.append("\tfLastTraceRead=" + fLastTraceRead + "\n");
+        sb.append("]");
+        return sb.toString();
     }
 
 }

@@ -83,7 +83,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> impleme
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
         ITmfLocation<? extends Comparable<?>>[] locations = ((TmfLocationArray) getLocation()).getLocations();
         for (ITmfLocation<?> location : locations) {
-            result.append("[" + location.toString() + "]");
+            result.append("[" + location + "]");
         }
         result.append("]");
         return result.toString();

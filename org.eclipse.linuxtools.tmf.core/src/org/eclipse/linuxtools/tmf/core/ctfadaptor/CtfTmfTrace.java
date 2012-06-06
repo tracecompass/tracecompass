@@ -127,7 +127,7 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(IProject, String)
      */
     @Override
-    public boolean validate(@SuppressWarnings("unused") final IProject project, final String path) {
+    public boolean validate(final IProject project, final String path) {
         try {
             final CTFTrace temp = new CTFTrace(path);
             return temp.majortIsSet(); // random test
@@ -169,6 +169,8 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
     public ITmfContext seekEvent(final ITmfLocation<?> location) {
         CtfLocation currentLocation = (CtfLocation) location;
         CtfIterator context = new CtfIterator(this);
+        context.setRank(ITmfContext.UNKNOWN_RANK);
+
         /*
          * The rank is set to 0 if the iterator seeks the beginning. If not, it
          * will be set to UNKNOWN_RANK, since CTF traces don't support seeking
@@ -184,7 +186,7 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
         }
         context.setLocation(currentLocation);
         if(context.getRank() != 0)
-        context.setRank(ITmfContext.UNKNOWN_RANK);
+            context.setRank(ITmfContext.UNKNOWN_RANK);
         return context;
     }
 
@@ -225,7 +227,7 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
      * sub-classes.
      * @throws TmfTraceException
      */
-    @SuppressWarnings({ "static-method", "unused" })
+    @SuppressWarnings({ "static-method" })
     protected void buildStateSystem() throws TmfTraceException {
         /*
          * Nothing is done in the basic implementation, please specify
