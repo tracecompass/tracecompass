@@ -252,7 +252,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
             time = (long) (Math.ceil((double) time0 / _timeDelta) * _timeDelta);
         }
 
-        // long t = (long) (time * 1000000000);
         int y = _rect0.y + _rect0.height;
 
         if (_timeProvider != null && _timeProvider.isCalendarFormat()) {
@@ -261,11 +260,11 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
 
         while (true) {
             x = rect.x + leftSpace + (int) (Math.floor((time - time0) * pixelsPerNanoSec));
-            gc.drawLine(x, y, x, y + 4);
             if (x >= rect.x + leftSpace + rect.width - _rect0.width) {
                 break;
             }
             if (x >= rect.x + leftSpace) {
+                gc.drawLine(x, y, x, y + 4);
                 _rect0.x = x;
                 if (x + _rect0.width <= rect.x + rect.width)
                     timeDraw.draw(gc, time, _rect0);
@@ -273,18 +272,30 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
             if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - _timeDelta || _timeDelta == 0) {
                 break;
             }
-            time += _timeDelta;
             if (_timeProvider != null && _timeProvider.isCalendarFormat()) {
                 if (_timeDelta >= YEAR_IN_NS) {
-                    GREGORIAN_CALENDAR.setTime(new Date(time / 1000000));
-                    GREGORIAN_CALENDAR.set(Calendar.MONTH, 0); // January 1st of year
-                    GREGORIAN_CALENDAR.set(Calendar.DAY_OF_MONTH, 1);
-                    time = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
+                    long millis = time / 1000000L;
+                    GREGORIAN_CALENDAR.setTime(new Date(millis));
+                    GREGORIAN_CALENDAR.add(Calendar.YEAR, (int) (_timeDelta / YEAR_IN_NS));
+                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
+                    time = millis * 1000000L;
                 } else if (_timeDelta >= MONTH_IN_NS) {
-                    GREGORIAN_CALENDAR.setTime(new Date(time / 1000000));
-                    GREGORIAN_CALENDAR.set(Calendar.DAY_OF_MONTH, 1); // 1st of month
-                    time = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
+                    long millis = time / 1000000L;
+                    GREGORIAN_CALENDAR.setTime(new Date(millis));
+                    GREGORIAN_CALENDAR.add(Calendar.MONTH, (int) (_timeDelta / MONTH_IN_NS));
+                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
+                    time = millis * 1000000L;
+                } else if (_timeDelta >= DAY_IN_NS) {
+                    long millis = time / 1000000L;
+                    GREGORIAN_CALENDAR.setTime(new Date(millis));
+                    GREGORIAN_CALENDAR.add(Calendar.DAY_OF_MONTH, (int) (_timeDelta / DAY_IN_NS));
+                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
+                    time = millis * 1000000L;
+                } else {
+                    time += _timeDelta;
                 }
+            } else {
+                time += _timeDelta;
             }
         }
     }
@@ -316,7 +327,10 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
             GREGORIAN_CALENDAR.set(Calendar.MILLISECOND, 0);
             time = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
         } else {
+            long offset = GREGORIAN_CALENDAR.getTimeZone().getOffset(time / 1000000L) * 1000000L;
+            time += offset;
             time = (time / timeDelta) * timeDelta;
+            time -= offset;
         }
         return time;
     }
@@ -430,8 +444,13 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
                 if (_timeProvider.getTime0() == _timeProvider.getTime1()) {
                     return;
                 }
-                long time1 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX0 / _dragX));
-                _timeProvider.setStartFinishTime(_time0bak, time1);
+                long interval = (long) ((_time1bak - _time0bak) * ((double) _dragX0 / _dragX));
+                if (interval == Long.MAX_VALUE) {
+                    _timeProvider.setStartFinishTime(_time0bak, Long.MAX_VALUE);
+                } else {
+                    long time1 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX0 / _dragX));
+                    _timeProvider.setStartFinishTime(_time0bak, time1);
+                }
             }
         } else if (3 == _dragState) {
             if (x < 0) {

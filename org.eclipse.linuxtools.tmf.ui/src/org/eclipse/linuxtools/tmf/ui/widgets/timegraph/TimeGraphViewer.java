@@ -190,6 +190,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _dataViewer = new Composite(parent, style) {
             @Override
             public void redraw() {
+                _timeScaleCtrl.redraw();
                 _stateCtrl.redraw();
                 super.redraw();
             }
@@ -473,7 +474,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (_time1 > _time1_)
             _time1 = _time1_;
         if (_time1 - _time0 < _minTimeInterval)
-            _time1 = _time0 + _minTimeInterval;
+            _time1 = Math.min(_time1_, _time0 + _minTimeInterval);
         _timeRangeFixed = true;
         _stateCtrl.adjustScrolls();
         _stateCtrl.redraw();

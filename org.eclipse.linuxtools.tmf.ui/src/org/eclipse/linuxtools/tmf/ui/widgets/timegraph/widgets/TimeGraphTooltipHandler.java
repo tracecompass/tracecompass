@@ -118,10 +118,7 @@ public class TimeGraphTooltipHandler {
                 if (item == null) {
                     return;
                 }
-                if (! item._trace.hasTimeEvents()) {
-                    addItem(Messages.TmfTimeTipHandler_TRACE_GROUP_NAME, item.toString());
-                    addItem(Messages.TmfTimeTipHandler_NUMBER_OF_TRACES, "" + item.children.size()); //$NON-NLS-1$
-                } else {
+                if (item._trace.hasTimeEvents()) {
                     ITimeGraphEntry thrd = item._trace;
                     ITimeEvent threadEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 2);
                     ITimeEvent nextEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 1);
@@ -217,6 +214,9 @@ public class TimeGraphTooltipHandler {
                 TimeGraphItem item = threadStates.getItem(pt);
                 _tipTable.remove(0, _tipTable.getItemCount() - 1);
                 fillValues(pt, threadStates, item);
+                if (_tipTable.getItemCount() == 0) {
+                    return;
+                }
                 _tipTable.getColumn(0).pack();
                 _tipTable.getColumn(1).pack();
                 _tipShell.pack();
