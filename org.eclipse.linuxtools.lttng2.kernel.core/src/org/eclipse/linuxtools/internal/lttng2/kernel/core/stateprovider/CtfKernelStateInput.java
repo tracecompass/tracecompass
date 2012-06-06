@@ -2,17 +2,16 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider;
 
-import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -25,11 +24,11 @@ import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
 /**
  * This is the state change input plugin for TMF's state system which handles
  * the LTTng 2.0 kernel traces in CTF format.
- * 
+ *
  * It uses the reference handler defined in CTFKernelHandler.java.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public class CtfKernelStateInput implements IStateChangeInput {
 
@@ -46,12 +45,9 @@ public class CtfKernelStateInput implements IStateChangeInput {
 
     /**
      * Instantiate a new state provider plugin.
-     * 
-     * @param traceFile
+     *
+     * @param trace
      *            The LTTng 2.0 kernel trace directory
-     * @throws IOException
-     *             If the directory was not found, or not recognized as a CTF
-     *             trace.
      */
     public CtfKernelStateInput(CtfTmfTrace trace) {
         eventsQueue = new ArrayBlockingQueue<CtfTmfEvent>(EVENTS_QUEUE_SIZE);
@@ -92,7 +88,7 @@ public class CtfKernelStateInput implements IStateChangeInput {
             System.err.println("Cannot process event without a target state system"); //$NON-NLS-1$
             return;
         }
-        
+
         /* Insert the event we're received into the events queue */
         CtfTmfEvent currentEvent = (CtfTmfEvent) event;
         try {

@@ -34,6 +34,10 @@ import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
  */
 public class BasicStateSystemExample {
 
+    /**
+     * Run the program
+     * @param args Arguments on the command-line
+     */
     public static void main(String[] args) {
         /* Read a trace and build the state system */
         try {

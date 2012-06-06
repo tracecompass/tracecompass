@@ -15,16 +15,16 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.core;
 /**
  * This file defines all the attribute names used in the handler. Both the
  * construction and query steps should use them.
- * 
+ *
  * These should not be externalized! The values here are used as-is in the
  * history file on disk, so they should be kept the same to keep the file format
  * compatible. If a view shows attribute names directly, the localization should
  * be done on the viewer side.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public abstract class Attributes {
 
     /* First-level attributes */
@@ -46,7 +46,7 @@ public abstract class Attributes {
     public static final String IRQS = "IRQs";
     public static final String SOFT_IRQS = "Soft_IRQs";
 
-    /* 
+    /*
      * Statistics sub-nodes
      * (Written all out, because "Stats" is easy to confuse with "Status")
      */

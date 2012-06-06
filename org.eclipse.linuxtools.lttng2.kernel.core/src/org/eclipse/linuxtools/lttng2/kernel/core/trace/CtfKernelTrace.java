@@ -27,9 +27,9 @@ import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
 /**
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel
  * traces. It uses the CtfKernelStateInput to generate the state history.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public class CtfKernelTrace extends CtfTmfTrace {
 
@@ -38,6 +38,9 @@ public class CtfKernelTrace extends CtfTmfTrace {
      */
     public final static String HISTORY_TREE_FILE_NAME = "stateHistory.ht"; //$NON-NLS-1$
 
+    /**
+     * Default constructor
+     */
     public CtfKernelTrace() {
         super();
     }
@@ -55,7 +58,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
     protected void buildStateSystem() throws TmfTraceException {
         /* Set up the path to the history tree file we'll use */
         IResource resource = this.getResource();
-        String supplDirectory = null; 
+        String supplDirectory = null;
 
         try {
             // get the directory where the history file will be stored.

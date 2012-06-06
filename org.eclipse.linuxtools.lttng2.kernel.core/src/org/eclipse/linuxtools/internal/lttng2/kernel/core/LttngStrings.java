@@ -15,15 +15,15 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.core;
 /**
  * This file defines all the known event and field names for LTTng 2.0 kernel
  * traces.
- * 
+ *
  * Once again, these should not be externalized, since they need to match
  * exactly what the tracer outputs. If you want to localize them in a view, you
  * should do a mapping in the viewer itself.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"javadoc", "nls"})
 public abstract class LttngStrings {
 
     /* Event names */

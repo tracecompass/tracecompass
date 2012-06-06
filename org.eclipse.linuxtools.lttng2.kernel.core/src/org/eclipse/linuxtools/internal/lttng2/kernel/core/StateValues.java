@@ -12,6 +12,15 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.core;
 
+/**
+ * State values that are used in the kernel event handler. It's much better to
+ * use integer values whenever possible, since those take much less space in the
+ * history file.
+ *
+ * @author alexmont
+ *
+ */
+@SuppressWarnings("javadoc")
 public class StateValues {
 
     /* CPU Status */
