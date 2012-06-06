@@ -35,7 +35,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
 @SuppressWarnings("nls")
 public class VerifyHistoryFile {
 
-    public final static String pathToHistoryFile = "/home/alexandre/bin/eclipse-4.2/runtime-EclipseApplication/myproject/.tracing/trace2/stateHistory.ht";
+    // Enter the .ht file name to test here
+    public final static String pathToHistoryFile = "";
 
     private static File htFile;
     private static IStateHistoryBackend htBackend;
