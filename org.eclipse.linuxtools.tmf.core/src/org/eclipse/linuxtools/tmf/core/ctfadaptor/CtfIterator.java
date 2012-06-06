@@ -24,6 +24,9 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
 
     private final CtfTmfTrace ctfTmfTrace;
 
+    /**
+     * An invalid location
+     */
     final public static CtfLocation NULL_LOCATION = new CtfLocation(
             CtfLocation.INVALID_LOCATION);
     private CtfLocation curLocation;
@@ -169,7 +172,6 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
     /**
      * Method setLocation.
      * @param location ITmfLocation<?>
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#setLocation(ITmfLocation<?>)
      */
     @Override
     public void setLocation(final ITmfLocation<?> location) {

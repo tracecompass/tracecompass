@@ -15,7 +15,14 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
- * <b><u>Definition</u></b>
+ * <b><u>Definition</u></b><br>
+ * A definition is like an object of a declaration class. It fills the declaration with values. <br>
+ * An example: <br>
+ * int i = 0; <br>
+ * <b>int</b> is the declaration.<br>
+ * <b>i</b> is the definition.<br>
+ * <b>0</b> is the value assigned to the definition, not the declaration.<br>
+ *
  */
 public abstract class Definition {
 
@@ -41,6 +48,15 @@ public abstract class Definition {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     *
+     * @param definitionScope
+     *            the definition is in a scope, (normally a struct) what is it?
+     * @param fieldName
+     *            the name of the definition. (it is a field in the parent
+     *            scope)
+     */
     public Definition(IDefinitionScope definitionScope, String fieldName) {
         this.definitionScope = definitionScope;
         this.fieldName = fieldName;
@@ -65,6 +81,19 @@ public abstract class Definition {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     *
+     * @return gets the declaration of a datatype
+     *
+     */
+    public abstract IDeclaration getDeclaration();
+
+    /**
+     * Read the definition from a bitbuffer
+     *
+     * @param input
+     *            the bitbuffer containing the data to read.
+     */
     public abstract void read(BitBuffer input);
 
     @Override

@@ -34,6 +34,16 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param fieldName
+     *            the field name
+     */
     public StructDefinition(StructDeclaration declaration,
             IDefinitionScope definitionScope, String structFieldName) {
         super(definitionScope, structFieldName);
@@ -58,10 +68,14 @@ public class StructDefinition extends Definition implements IDefinitionScope {
         return path;
     }
 
+    /**
+     * @return The definitions of all the fields
+     */
     public HashMap<String, Definition> getDefinitions() {
         return definitions;
     }
 
+    @Override
     public StructDeclaration getDeclaration() {
         return declaration;
     }
@@ -73,7 +87,8 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     @Override
     public void read(BitBuffer input) {
         final int align = (int) declaration.getAlignment();
-        int pos = input.position() + ((align-(input.position() % align))%align);
+        int pos = input.position()
+                + ((align - (input.position() % align)) % align);
         input.position(pos);
         final List<String> fieldList = declaration.getFieldsList();
         for (String fName : fieldList) {
@@ -97,40 +112,96 @@ public class StructDefinition extends Definition implements IDefinitionScope {
         return retVal;
     }
 
+    /**
+     * Lookup an array in a struct. if the name returns a non-array (like an
+     * int) than the method returns null
+     *
+     * @param name
+     *            the name of the array
+     * @return the array or null.
+     */
     public ArrayDefinition lookupArray(String name) {
         Definition def = lookupDefinition(name);
         return (ArrayDefinition) ((def instanceof ArrayDefinition) ? def : null);
     }
 
+    /**
+     * Lookup an enum in a struct. if the name returns a non-enum (like an int)
+     * than the method returns null
+     *
+     * @param name
+     *            the name of the enum
+     * @return the enum or null.
+     */
     public EnumDefinition lookupEnum(String name) {
         Definition def = lookupDefinition(name);
         return (EnumDefinition) ((def instanceof EnumDefinition) ? def : null);
     }
 
+    /**
+     * Lookup an integer in a struct. if the name returns a non-integer (like an
+     * float) than the method returns null
+     *
+     * @param name
+     *            the name of the integer
+     * @return the integer or null.
+     */
     public IntegerDefinition lookupInteger(String name) {
         Definition def = lookupDefinition(name);
         return (IntegerDefinition) ((def instanceof IntegerDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a sequence in a struct. if the name returns a non-sequence (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the sequence
+     * @return the sequence or null.
+     */
     public SequenceDefinition lookupSequence(String name) {
         Definition def = lookupDefinition(name);
         return (SequenceDefinition) ((def instanceof SequenceDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a string in a struct. if the name returns a non-string (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the string
+     * @return the string or null.
+     */
     public StringDefinition lookupString(String name) {
         Definition def = lookupDefinition(name);
         return (StringDefinition) ((def instanceof StringDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a struct in a struct. if the name returns a non-struct (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the struct
+     * @return the struct or null.
+     */
     public StructDefinition lookupStruct(String name) {
         Definition def = lookupDefinition(name);
         return (StructDefinition) ((def instanceof StructDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a variant in a struct. if the name returns a non-variant (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the variant
+     * @return the variant or null.
+     */
     public VariantDefinition lookupVariant(String name) {
         Definition def = lookupDefinition(name);
         return (VariantDefinition) ((def instanceof VariantDefinition) ? def
@@ -148,7 +219,8 @@ public class StructDefinition extends Definition implements IDefinitionScope {
             builder.append("{ "); //$NON-NLS-1$
         }
 
-        ListIterator<String> listIterator = this.declaration.getFieldsList().listIterator();
+        ListIterator<String> listIterator = this.declaration.getFieldsList()
+                .listIterator();
 
         while (listIterator.hasNext()) {
             String field = listIterator.next();

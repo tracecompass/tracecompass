@@ -33,6 +33,14 @@ public class StructDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * The struct declaration, add fields later
+     *
+     * @param align
+     *            the minimum alignment of the struct. (if a struct is 8bit
+     *            aligned and has a 32 bit aligned field, the struct becomes 32
+     *            bit aligned.
+     */
     public StructDeclaration(long align) {
         this.maxAlign = Math.max(align, 1);
     }
@@ -41,18 +49,35 @@ public class StructDeclaration implements IDeclaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Get current alignment
+     * @return the alignment of the struct and all its fields
+     */
     public long getMaxAlign() {
         return maxAlign;
     }
 
+    /**
+     * Query if the struct has a given field
+     * @param name the name of the field, scopeless please
+     * @return does the field exist?
+     */
     public boolean hasField(String name) {
         return this.fields.containsKey(name);
     }
 
+    /**
+     * get the fields of the struct in a map. Faster access time than a list.
+     * @return a HashMap of the fields (key is the name)
+     */
     public HashMap<String, IDeclaration> getFields() {
         return this.fields;
     }
 
+    /**
+     * Gets the field list. Very important since the map of fields does not retain the order of the fields.
+     * @return the field list.
+     */
     public List<String> getFieldsList() {
         return this.fieldsList;
     }
@@ -61,6 +86,7 @@ public class StructDeclaration implements IDeclaration {
     public long getAlignment() {
         return this.maxAlign;
     }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -71,13 +97,17 @@ public class StructDeclaration implements IDeclaration {
         return new StructDefinition(this, definitionScope, fieldName);
     }
 
+    /**
+     * Add a field to the struct
+     * @param name the name of the field, scopeless
+     * @param declaration the declaration of the field
+     */
     public void addField(String name, IDeclaration declaration) {
         this.fields.put(name, declaration);
         this.fieldsList.add(name);
         maxAlign = Math.max(maxAlign, declaration.getAlignment());
-        if( maxAlign == 1 )
-        {
-            maxAlign =1;
+        if (maxAlign == 1) {
+            maxAlign = 1;
         }
     }
 
@@ -87,7 +117,9 @@ public class StructDeclaration implements IDeclaration {
         return "[declaration] struct[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -100,7 +132,9 @@ public class StructDeclaration implements IDeclaration {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

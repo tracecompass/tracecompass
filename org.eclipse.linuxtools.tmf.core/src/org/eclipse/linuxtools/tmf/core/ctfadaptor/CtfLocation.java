@@ -19,6 +19,9 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  */
 public class CtfLocation implements ITmfLocation<Long>, Cloneable {
 
+    /**
+     * An invalid location
+     */
     public static final Long INVALID_LOCATION = -1L;
 
     /**

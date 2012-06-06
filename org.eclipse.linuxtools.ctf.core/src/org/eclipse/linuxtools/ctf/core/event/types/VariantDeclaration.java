@@ -31,6 +31,9 @@ public class VariantDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * constructor
+     */
     public VariantDeclaration() {
 
     }
@@ -39,22 +42,42 @@ public class VariantDeclaration implements IDeclaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * @return Does the variant have a tag
+     */
     public boolean isTagged() {
         return tag != null;
     }
 
+    /**
+     * Lookup if a field exists in the variant
+     * @param fieldTag the field tag name
+     * @return true = field tag exists
+     */
     public boolean hasField(String fieldTag) {
         return fields.containsKey(fieldTag);
     }
 
+    /**
+     * Sets the tag in a variant
+     * @param tag the tag
+     */
     public void setTag(String tag) {
         this.tag = tag;
     }
 
+    /**
+     * gets current variant tag
+     * @return the variant tag.
+     */
     public String getTag() {
         return this.tag;
     }
 
+    /**
+     * Gets the fields of the variant
+     * @return the fields of the variant
+     */
     public HashMap<String, IDeclaration> getFields() {
         return this.fields;
     }
@@ -73,6 +96,11 @@ public class VariantDeclaration implements IDeclaration {
         return new VariantDefinition(this, definitionScope, fieldName);
     }
 
+    /**
+     *
+     * @param fieldTag
+     * @param declaration
+     */
     public void addField(String fieldTag, IDeclaration declaration) {
         fields.put(fieldTag, declaration);
     }

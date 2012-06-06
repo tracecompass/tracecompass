@@ -25,7 +25,22 @@ public class CtfTmfTimestamp extends TmfTimestamp {
     /**
      */
     public enum TimestampType {
-        FULL_DATE, DAY, NANOS, SECONDS
+        /**
+         * yyyy/mm/dd hh:mm:ss.nnnnnnnnnn
+         */
+        FULL_DATE,
+        /**
+         * hh:mm:ss.nnnnnnnnnn
+         */
+        DAY,
+        /**
+         * nnnnnnnnnnnnnnnnnnnnn ns
+         */
+        NANOS,
+        /**
+         * ssssssssss.nnnnnnnnnn s
+         */
+        SECONDS
     }
 
     private TimestampType type;

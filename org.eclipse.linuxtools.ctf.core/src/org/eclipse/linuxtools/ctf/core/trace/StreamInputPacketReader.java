@@ -138,16 +138,29 @@ public class StreamInputPacketReader implements IDefinitionScope {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    /* Getters, setters and stuff. */
-
+    /**
+     * Gets the current packet
+     *
+     * @return the current packet
+     */
     public StreamInputPacketIndexEntry getCurrentPacket() {
         return this.currentPacket;
     }
 
+    /**
+     * Gets the steamPacketContext Definition
+     *
+     * @return steamPacketContext Definition
+     */
     public StructDefinition getStreamPacketContextDef() {
         return this.streamPacketContextDef;
     }
 
+    /**
+     * Gets the CPU (core) number
+     *
+     * @return the CPU (core) number
+     */
     public int getCPU() {
         return this.currentCpu;
     }
@@ -485,39 +498,86 @@ public class StreamInputPacketReader implements IDefinitionScope {
         return null;
     }
 
+    /**
+     * Gets the stream event context definition (see CTF specs)
+     *
+     * @return the definition of the stream event context (the form not the
+     *         content)
+     */
     public StructDefinition getStreamEventContextDef() {
         return this.streamEventContextDef;
     }
 
+    /**
+     * Sets the stream event context definition
+     *
+     * @param streamEventContextDef
+     *            The stream event context definition
+     */
     public void setStreamEventContextDef(StructDefinition streamEventContextDef) {
         this.streamEventContextDef = streamEventContextDef;
     }
 
+    /**
+     * Gets the stream event header definition
+     *
+     * @return the stream event header definition
+     */
     public StructDefinition getStreamEventHeaderDef() {
         return this.streamEventHeaderDef;
     }
 
+    /**
+     * Sets the stream event header definition
+     *
+     * @param streamEventHeaderDef
+     *            the stream event header definition
+     */
     public void setStreamEventHeaderDef(StructDefinition streamEventHeaderDef) {
         this.streamEventHeaderDef = streamEventHeaderDef;
     }
 
+    /**
+     * Sets the stream packet context definition
+     *
+     * @param streamPacketContextDef
+     *            the stream packet context definition
+     */
     public void setStreamPacketContextDef(
             StructDefinition streamPacketContextDef) {
         this.streamPacketContextDef = streamPacketContextDef;
     }
 
+    /**
+     * Gets the trace packet header definition
+     *
+     * @return the trace packet header definition
+     */
     public StructDefinition getTracePacketHeaderDef() {
         return this.tracePacketHeaderDef;
     }
 
+    /**
+     * Sets the trace packet header definition
+     *
+     * @param tracePacketHeaderDef
+     *            the trace packet header definition
+     */
     public void setTracePacketHeaderDef(StructDefinition tracePacketHeaderDef) {
         this.tracePacketHeaderDef = tracePacketHeaderDef;
     }
 
+    /**
+     * @return the parent stream input reader
+     */
     public StreamInputReader getStreamInputReader() {
         return this.streamInputReader;
     }
 
+    /**
+     *
+     * @return THe bit buffer that reads the file.
+     */
     public BitBuffer getBitBuffer() {
         return bitBuffer;
     }

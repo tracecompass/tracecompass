@@ -92,7 +92,7 @@ public class StreamTest {
      */
     @Test
     public void testEventContextIsSet() {
-        assertTrue(fixture.eventContextIsSet());
+        assertTrue(fixture.isEventContextSet());
     }
     /**
      * Run the boolean eventContextIsSet() method test.
@@ -107,7 +107,7 @@ public class StreamTest {
      */
     @Test
     public void testEventHeaderIsSet() {
-        assertTrue(fixture.eventHeaderIsSet());
+        assertTrue(fixture.isEventHeaderSet());
     }
 
     /**
@@ -176,7 +176,7 @@ public class StreamTest {
      */
     @Test
     public void testIdIsSet() {
-        boolean result = fixture.idIsSet();
+        boolean result = fixture.isIdSet();
         assertTrue(result);
     }
 
@@ -185,7 +185,7 @@ public class StreamTest {
      */
     @Test
     public void testPacketContextIsSet() {
-        boolean result = fixture.packetContextIsSet();
+        boolean result = fixture.isPacketContextSet();
         assertTrue(result);
     }
 

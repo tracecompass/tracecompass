@@ -17,8 +17,24 @@ package org.eclipse.linuxtools.ctf.core.event.types;
  */
 public interface IDeclaration {
 
+    /**
+     * Create a definition from this declaration
+     *
+     * @param definitionScope
+     *            the definition scope, the parent where the definition will be
+     *            placed
+     * @param fieldName
+     *            the name of the definition
+     * @return a reference to the definition
+     */
     public Definition createDefinition(IDefinitionScope definitionScope,
             String fieldName);
 
+    /**
+     * The minimum alignment. if the field is 32 bits, the definition will pad
+     * all the data up to (position%32==0)
+     *
+     * @return the alignment in bits
+     */
     public long getAlignment();
 }

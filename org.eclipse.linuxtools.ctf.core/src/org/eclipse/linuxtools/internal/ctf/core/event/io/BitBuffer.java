@@ -19,7 +19,7 @@ import java.nio.ByteOrder;
 /**
  * <b><u>BitBuffer</u></b>
  * <p>
- * TODO Implement me. Please.
+ * A bitwise buffer capable of accessing fields with bit offsets.
  */
 public class BitBuffer {
 
@@ -28,10 +28,15 @@ public class BitBuffer {
     // ------------------------------------------------------------------------
 
     /* default bit width */
+    /** 8 bits to a char */
     public static final int BIT_CHAR = 8;
+    /** 16 bits to a short */
     public static final int BIT_SHORT = 16;
+    /** 32 bits to an int */
     public static final int BIT_INT = 32;
+    /** 32 bits to a float */
     public static final int BIT_FLOAT = 32;
+    /** 64 bits to a long */
     public static final int BIT_LONG = 64;
 
     // ------------------------------------------------------------------------
@@ -45,15 +50,31 @@ public class BitBuffer {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-
+    /**
+     * Default constructor, makes a bigendian buffer
+     */
     public BitBuffer() {
         this(null, ByteOrder.BIG_ENDIAN);
     }
 
+    /**
+     * Constructor, makes a bigendian buffer
+     *
+     * @param buf
+     *            the bytebuffer to read
+     */
     public BitBuffer(ByteBuffer buf) {
         this(buf, ByteOrder.BIG_ENDIAN);
     }
 
+    /**
+     * Constructor that is fully parametrisable
+     *
+     * @param buf
+     *            the buffer to read
+     * @param order
+     *            the byte order (big endian, little endian, network?)
+     */
     public BitBuffer(ByteBuffer buf, ByteOrder order) {
         setByteBuffer(buf);
         order(order);
@@ -444,10 +465,26 @@ public class BitBuffer {
     // Buffer attributes handling
     // ------------------------------------------------------------------------
 
+    /**
+     * Can this buffer be read for thus amount of bits?
+     *
+     * @param length
+     *            the length in bits to read
+     * @return does the buffer have enough room to read the next "length"
+     */
     public boolean canRead(int length) {
         return canRead(pos, length);
     }
 
+    /**
+     * Can this buffer be read for thus amount of bits?
+     *
+     * @param index
+     *            the position in the buffer to read
+     * @param length
+     *            the length in bits to read
+     * @return does the buffer have enough room to read the next "length"
+     */
     public boolean canRead(int index, int length) {
         if (buf == null) {
             return false;
@@ -459,6 +496,12 @@ public class BitBuffer {
         return true;
     }
 
+    /**
+     * Sets the order of the buffer.
+     *
+     * @param order
+     *            The order of the buffer.
+     */
     public void order(ByteOrder order) {
         this.byteOrder = order;
         if (buf != null) {
@@ -466,18 +509,41 @@ public class BitBuffer {
         }
     }
 
+    /**
+     * Sets the order of the buffer.
+     *
+     * @return The order of the buffer.
+     */
     public ByteOrder order() {
         return byteOrder;
     }
 
+    /**
+     * Sets the position in the buffer.
+     *
+     * @param order
+     *            The position of the buffer.
+     */
     public void position(int newPosition) {
         this.pos = newPosition;
     }
 
+    /**
+     *
+     * Sets the position in the buffer.
+     *
+     * @return order The position of the buffer.
+     */
     public int position() {
         return pos;
     }
 
+    /**
+     * Sets the byte buffer
+     *
+     * @param buf
+     *            the byte buffer
+     */
     public void setByteBuffer(ByteBuffer buf) {
         this.buf = buf;
         if (buf != null) {
@@ -486,18 +552,37 @@ public class BitBuffer {
         clear();
     }
 
+    /**
+     * Gets the byte buffer
+     *
+     * @return The byte buffer
+     */
     public ByteBuffer getByteBuffer() {
         return buf;
     }
 
+    /**
+     * Sets the byte order
+     *
+     * @param byteOrder
+     *            The byte order
+     */
     public void setByteOrder(ByteOrder byteOrder) {
         this.byteOrder = byteOrder;
     }
 
+    /**
+     * Gets the byte order
+     *
+     * @return The byte order
+     */
     public ByteOrder getByteOrder() {
         return byteOrder;
     }
 
+    /**
+     * resets the bitbuffer.
+     */
     public void clear() {
         position(0);
 

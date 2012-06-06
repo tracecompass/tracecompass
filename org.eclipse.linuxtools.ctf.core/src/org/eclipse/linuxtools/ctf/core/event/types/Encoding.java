@@ -18,5 +18,10 @@ package org.eclipse.linuxtools.ctf.core.event.types;
  * Encoding types
  */
 public enum Encoding {
-    UTF8, ASCII, NONE
+    /** UTF-8 encoding */
+    UTF8,
+    /** Ascii encoding */
+    ASCII,
+    /** No encoding, maybe not even text */
+    NONE
 }

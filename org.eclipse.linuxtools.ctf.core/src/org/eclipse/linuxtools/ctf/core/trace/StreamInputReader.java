@@ -86,30 +86,67 @@ public class StreamInputReader {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Gets the current event in this stream
+     *
+     * @return the current event in the stream, null if the stream is
+     *         finished/empty/malformed
+     */
     public EventDefinition getCurrentEvent() {
         return this.currentEvent;
     }
 
+    /**
+     * gets the current packet context
+     *
+     * @return the current packet context (size, lost events and such)
+     */
     public StructDefinition getCurrentPacketContext() {
         return this.packetReader.getStreamPacketContextDef();
     }
 
+    /**
+     * Gets the byte order for a trace
+     *
+     * @return the trace byte order
+     */
     public ByteOrder getByteOrder() {
         return streamInput.getStream().getTrace().getByteOrder();
     }
 
+    /**
+     * Gets the name of the stream (it's an id and a number)
+     *
+     * @return gets the stream name (it's a number)
+     */
     public int getName() {
         return this.name;
     }
 
+    /**
+     * Sets the name of the stream
+     *
+     * @param name
+     *            the name of the stream, (it's a number)
+     */
     public void setName(int name) {
         this.name = name;
     }
 
+    /**
+     * Gets the CPU of a stream. It's the same as the one in /proc or running
+     * the asm CPUID instruction
+     *
+     * @return The CPU id (a number)
+     */
     public int getCPU() {
         return this.packetReader.getCPU();
     }
 
+    /**
+     * Gets the filename of the stream being read
+     * @return The filename of the stream being read
+     */
     public String getFilename() {
         return streamInput.getFilename();
     }
@@ -144,7 +181,7 @@ public class StreamInputReader {
             }
         }
 
-        /*
+        /*autogenerate javadoc getter setter
          * If an event is available, read it.
          */
         if (this.packetReader.hasMoreEvents()) {
@@ -217,7 +254,7 @@ public class StreamInputReader {
                 // do nothing here
             }
         }
-        if( this.packetReader.getCurrentPacket() == null){
+        if (this.packetReader.getCurrentPacket() == null) {
             gotoPacket(timestamp);
         }
 
@@ -248,6 +285,9 @@ public class StreamInputReader {
         goToNextPacket();
     }
 
+    /**
+     * Seeks the last event of a stream and returns it.
+     */
     public void goToLastEvent() {
         /*
          * Search in the index for the packet to search in.
@@ -308,6 +348,10 @@ public class StreamInputReader {
         this.parent = parent;
     }
 
+    /**
+     * Sets the current event in a stream input reader
+     * @param currentEvent the event to set
+     */
     public void setCurrentEvent(EventDefinition currentEvent) {
         this.currentEvent = currentEvent;
     }

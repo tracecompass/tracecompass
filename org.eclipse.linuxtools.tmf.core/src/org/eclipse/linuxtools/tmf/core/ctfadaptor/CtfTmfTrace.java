@@ -30,6 +30,10 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
+/**
+ * @author Matthew Khouzam
+ * A trace type that reads CTF.
+ */
 public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParser<CtfTmfEvent>{
 
 
@@ -71,7 +75,6 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
      * @param path String
      * @param eventType Class<CtfTmfEvent>
      * @throws TmfTraceException
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(IResource, String, Class<CtfTmfEvent>)
      */
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
@@ -195,7 +198,6 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
      * Method seekEvent.
      * @param location ITmfLocation<?>
      * @return ITmfContext
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(ITmfLocation<?>)
      */
     @Override
     public ITmfContext seekEvent(final ITmfLocation<?> location) {
@@ -322,6 +324,10 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
     //        Clocks
     //-------------------------------------------
 
+    /**
+     * gets the clock offset
+     * @return the clock offset in ns
+     */
     public long getOffset(){
         if( fTrace != null ) {
             return fTrace.getOffset();

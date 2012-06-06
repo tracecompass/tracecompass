@@ -79,11 +79,20 @@ public class IOStructGen {
     // Constructor
     // ------------------------------------------------------------------------
 
+    /**
+     * Constuctor
+     * @param tree the tree (antlr generated) with the parsed TSDL data.
+     * @param trace the trace containing the places to put all the read metadata
+     */
     public IOStructGen(CommonTree tree, CTFTrace trace) {
         this.trace = trace;
         this.tree = tree;
     }
 
+    /**
+     * Parse the tree and populate the trace defined in the constructor.
+     * @throws ParseException
+     */
     public void generate() throws ParseException {
         parseRoot(tree);
     }
@@ -445,7 +454,7 @@ public class IOStructGen {
             }
         }
 
-        if (stream.idIsSet()) {
+        if (stream.isIdSet()) {
             if (!trace.packetHeaderIsSet()
                     || !trace.getPacketHeader().hasField(CTFStrings.STREAM_ID)) {
                 throw new ParseException(
@@ -482,7 +491,7 @@ public class IOStructGen {
         String left = concatenateUnaryStrings(leftStrings);
 
         if (left.equals(CTFStrings.ID)) {
-            if (stream.idIsSet()) {
+            if (stream.isIdSet()) {
                 throw new ParseException("stream id already defined"); //$NON-NLS-1$
             }
 
@@ -490,7 +499,7 @@ public class IOStructGen {
 
             stream.setId(streamID);
         } else if (left.equals(CTFStrings.EVENT_HEADER)) {
-            if (stream.eventHeaderIsSet()) {
+            if (stream.isEventHeaderSet()) {
                 throw new ParseException("event.header already defined"); //$NON-NLS-1$
             }
 
@@ -510,7 +519,7 @@ public class IOStructGen {
 
             stream.setEventHeader((StructDeclaration) eventHeaderDecl);
         } else if (left.equals(CTFStrings.EVENT_CONTEXT)) {
-            if (stream.eventContextIsSet()) {
+            if (stream.isEventContextSet()) {
                 throw new ParseException("event.context already defined"); //$NON-NLS-1$
             }
 
@@ -530,7 +539,7 @@ public class IOStructGen {
 
             stream.setEventContext((StructDeclaration) eventContextDecl);
         } else if (left.equals(CTFStrings.PACKET_CONTEXT)) {
-            if (stream.packetContextIsSet()) {
+            if (stream.isPacketContextSet()) {
                 throw new ParseException("packet.context already defined"); //$NON-NLS-1$
             }
 

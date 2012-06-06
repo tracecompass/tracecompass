@@ -78,63 +78,123 @@ public class Stream {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Sets the id of a stream
+     * @param id the id of a stream
+     */
     public void setId(long id) {
         this.id = id;
         this.events = trace.createEvents(this.id);
     }
 
+    /**
+     * Gets the id of a stream
+     * @return id the id of a stream
+     */
     public Long getId() {
         return id;
     }
 
-    public boolean idIsSet() {
+    /**
+     * Is the id of a stream set
+     * @param Is id the id of a stream set
+     */
+    public boolean isIdSet() {
         return id != null;
     }
 
-    public boolean eventHeaderIsSet() {
+    /**
+     *
+     * @return is the event header set (timestamp and stuff) (see Ctf Spec)
+     */
+    public boolean isEventHeaderSet() {
         return eventHeaderDecl != null;
     }
 
-    public boolean eventContextIsSet() {
+    /**
+    *
+    * @return is the event context set (pid and stuff) (see Ctf Spec)
+    */
+    public boolean isEventContextSet() {
         return eventContextDecl != null;
     }
 
-    public boolean packetContextIsSet() {
+    /**
+     *
+     * @return Is the packet context set (see Ctf Spec)
+     */
+    public boolean isPacketContextSet() {
         return packetContextDecl != null;
     }
 
+    /**
+     *
+     * @param eventHeader the current event header for all events in this stream
+     */
     public void setEventHeader(StructDeclaration eventHeader) {
         this.eventHeaderDecl = eventHeader;
     }
 
+    /**
+     *
+     * @param eventContext the context for all events in this stream
+     */
     public void setEventContext(StructDeclaration eventContext) {
         this.eventContextDecl = eventContext;
     }
 
+    /**
+     *
+     * @param packetContext the packet context for all packets in this stream
+     */
     public void setPacketContext(StructDeclaration packetContext) {
         this.packetContextDecl = packetContext;
     }
 
+    /**
+     *
+     * @return the event header declaration in structdeclaration form
+     */
     public StructDeclaration getEventHeaderDecl() {
         return eventHeaderDecl;
     }
 
+    /**
+     *
+     * @return the event context declaration in structdeclaration form
+     */
     public StructDeclaration getEventContextDecl() {
         return eventContextDecl;
     }
 
+    /**
+     *
+     * @return the packet context declaration in structdeclaration form
+     */
     public StructDeclaration getPacketContextDecl() {
         return packetContextDecl;
     }
 
+    /**
+     *
+     * @return the set of all stream inputs for this stream
+     */
     public Set<StreamInput> getStreamInputs() {
         return inputs;
     }
 
+    /**
+     *
+     * @return the parent trace
+     */
     public CTFTrace getTrace() {
         return trace;
     }
 
+    /**
+     *
+     * @return all the event declarations for this stream, using the id as a key for the hashmap.
+     */
     public HashMap<Long, EventDeclaration> getEvents() {
         return events;
     }

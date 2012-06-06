@@ -13,7 +13,12 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 
 import java.nio.ByteOrder;
 
-
+/**
+ * Float declaration
+ *
+ * @author Matthew Khouzam
+ *
+ */
 public class FloatDeclaration implements IDeclaration {
 
     // ------------------------------------------------------------------------
@@ -29,6 +34,13 @@ public class FloatDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param exponent the exponent size in bits
+     * @param mantissa the mantissa size in bits (+1 for sign) (see ctf spec)
+     * @param byteOrder the byte order
+     * @param alignment the alignment
+     */
     public FloatDeclaration(int exponent, int mantissa, ByteOrder byteOrder,
             long alignment) {
         mant = mantissa;

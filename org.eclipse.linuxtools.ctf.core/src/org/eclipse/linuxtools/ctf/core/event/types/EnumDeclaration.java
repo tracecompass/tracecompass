@@ -31,6 +31,15 @@ public class EnumDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * constructor
+     *
+     * @param containerType
+     *            the enum is an int, this is the type that the data is
+     *            contained in. If you have 1000 possible values, you need at
+     *            least a 10 bit enum. If you store 2 values in a 128 bit int,
+     *            you are wasting space.
+     */
     public EnumDeclaration(IntegerDeclaration containerType) {
         this.containerType = containerType;
     }
@@ -39,6 +48,10 @@ public class EnumDeclaration implements IDeclaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     *
+     * @return The container type
+     */
     public IntegerDeclaration getContainerType() {
         return containerType;
     }
@@ -47,6 +60,7 @@ public class EnumDeclaration implements IDeclaration {
     public long getAlignment() {
         return this.getContainerType().getAlignment();
     }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -57,16 +71,24 @@ public class EnumDeclaration implements IDeclaration {
         return new EnumDefinition(this, definitionScope, fieldName);
     }
 
+    /**
+     * Add a value. Do not overlap, this is <i><u><b>not</i></u></b> an interval tree.
+     * @param low lowest value that this int can be to have label as a return string
+     * @param high highest value that this int can be to have label as a return string
+     * @param label the name of the value.
+     * @return was the value be added? true == success
+     */
     public boolean add(long low, long high, String label) {
         return table.add(low, high, label);
     }
 
+    /**
+     * check if the label for a value (enum a{day=0,night=1} would return "day" for query(0)
+     * @param value the value to lookup
+     * @return the label of that value, can be null
+     */
     public String query(long value) {
         return table.query(value);
-    }
-
-    public String getLabel(long i) {
-        return table.getLabel(i);
     }
 
     /*
@@ -78,15 +100,6 @@ public class EnumDeclaration implements IDeclaration {
         List<Range> ranges = new LinkedList<Range>();
 
         public EnumTable() {
-        }
-
-        public String getLabel(long i) {
-            for (Range r : ranges) {
-                if (r.intersects(i)) {
-                    return r.str;
-                }
-            }
-            return null;
         }
 
         public boolean add(long low, long high, String label) {
@@ -103,13 +116,17 @@ public class EnumDeclaration implements IDeclaration {
             return true;
         }
 
+        /**
+         * return the first label that matches a value
+         * @param value the value to query
+         * @return the label corresponding to that value
+         */
         public String query(long value) {
             for (Range r : ranges) {
                 if (r.intersects(value)) {
                     return r.str;
                 }
             }
-
             return null;
         }
 
@@ -140,6 +157,5 @@ public class EnumDeclaration implements IDeclaration {
         /* Only used for debugging */
         return "[declaration] enum[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
     }
-
 
 }

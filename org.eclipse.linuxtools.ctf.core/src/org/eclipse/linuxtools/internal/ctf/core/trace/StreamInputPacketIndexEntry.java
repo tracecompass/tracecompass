@@ -23,7 +23,6 @@ public class StreamInputPacketIndexEntry {
     // Attributes
     // ------------------------------------------------------------------------
 
-    public static final long INVALID_INDEX = Long.MAX_VALUE;
 
     /**
      * Offset of the packet in the file, in bytes

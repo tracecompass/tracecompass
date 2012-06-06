@@ -33,6 +33,12 @@ public class IntegerDefinition extends Definition {
     // Contructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param declaration the parent declaration
+     * @param definitionScope the parent scope
+     * @param fieldName the field name
+     */
     public IntegerDefinition(IntegerDeclaration declaration,
             IDefinitionScope definitionScope, String fieldName) {
         super(definitionScope, fieldName);
@@ -43,14 +49,23 @@ public class IntegerDefinition extends Definition {
     // Gettters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Gets the value of the integer
+     * @return the value of the integer (in long)
+     */
     public long getValue() {
         return value;
     }
 
+    /**
+     * Sets the value of an integer
+     * @param val the value
+     */
     public void setValue(long val) {
         value = val;
     }
 
+    @Override
     public IntegerDeclaration getDeclaration() {
         return declaration;
     }

@@ -36,6 +36,12 @@ public class VariantDefinition extends Definition implements IDefinitionScope {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param declaration the parent declaration
+     * @param definitionScope the parent scope
+     * @param fieldName the field name
+     */
     public VariantDefinition(VariantDeclaration declaration,
             IDefinitionScope definitionScope, String fieldName) {
         super(definitionScope, fieldName);
@@ -63,30 +69,55 @@ public class VariantDefinition extends Definition implements IDefinitionScope {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    @Override
     public VariantDeclaration getDeclaration() {
         return declaration;
     }
 
+    /**
+     * Sets the variant declaration
+     * @param declaration the variant declaration
+     */
     public void setDeclaration(VariantDeclaration declaration) {
         this.declaration = declaration;
     }
 
+    /**
+     * Gets the tag
+     * @return the tag definition
+     */
     public EnumDefinition getTagDefinition() {
         return tagDefinition;
     }
 
+    /**
+     * Sets the tag
+     * @param tagDefinition the tag
+     */
     public void setTagDefinition(EnumDefinition tagDefinition) {
         this.tagDefinition = tagDefinition;
     }
 
+    /**
+     * Get the definitions in the variant
+     * @return the definitions
+     */
     public HashMap<String, Definition> getDefinitions() {
         return definitions;
     }
 
+    /**
+     * Set the definitions in a variant
+     * @param definitions the definitions
+     */
     public void setDefinitions(HashMap<String, Definition> definitions) {
         this.definitions = definitions;
     }
 
+    /**
+     * Set the current field
+     * @param currentField the current field
+     */
     public void setCurrentField(String currentField) {
         this.currentField = currentField;
     }
@@ -95,6 +126,23 @@ public class VariantDefinition extends Definition implements IDefinitionScope {
     public String getPath() {
         return path;
     }
+
+    /**
+     * Get the current field name
+     * @return the current field name
+     */
+    public String getCurrentFieldName() {
+        return currentField;
+    }
+
+    /**
+     * Get the current field
+     * @return the current field
+     */
+    public Definition getCurrentField() {
+        return definitions.get(currentField);
+    }
+
 
     // ------------------------------------------------------------------------
     // Operations
@@ -114,50 +162,99 @@ public class VariantDefinition extends Definition implements IDefinitionScope {
         return definitions.get(lookupPath);
     }
 
-    public String getCurrentFieldName() {
-        return currentField;
-    }
 
-    public Definition getCurrentField() {
-        return definitions.get(currentField);
-    }
-
+    /**
+     * Lookup an array in a struct. if the name returns a non-array (like an
+     * int) than the method returns null
+     *
+     * @param name
+     *            the name of the array
+     * @return the array or null.
+     */
     public ArrayDefinition lookupArray(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (ArrayDefinition) ((def instanceof ArrayDefinition) ? def : null);
     }
 
+    /**
+     * Lookup an enum in a struct. if the name returns a non-enum (like an int)
+     * than the method returns null
+     *
+     * @param name
+     *            the name of the enum
+     * @return the enum or null.
+     */
     public EnumDefinition lookupEnum(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (EnumDefinition) ((def instanceof EnumDefinition) ? def : null);
     }
 
+    /**
+     * Lookup an integer in a struct. if the name returns a non-integer (like an
+     * float) than the method returns null
+     *
+     * @param name
+     *            the name of the integer
+     * @return the integer or null.
+     */
     public IntegerDefinition lookupInteger(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (IntegerDefinition) ((def instanceof IntegerDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a sequence in a struct. if the name returns a non-sequence (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the sequence
+     * @return the sequence or null.
+     */
     public SequenceDefinition lookupSequence(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (SequenceDefinition) ((def instanceof SequenceDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a string in a struct. if the name returns a non-string (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the string
+     * @return the string or null.
+     */
     public StringDefinition lookupString(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (StringDefinition) ((def instanceof StringDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a struct in a struct. if the name returns a non-struct (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the struct
+     * @return the struct or null.
+     */
     public StructDefinition lookupStruct(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (StructDefinition) ((def instanceof StructDefinition) ? def
                 : null);
     }
 
+    /**
+     * Lookup a variant in a struct. if the name returns a non-variant (like
+     * an int) than the method returns null
+     *
+     * @param name
+     *            the name of the variant
+     * @return the variant or null.
+     */
     public VariantDefinition lookupVariant(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (VariantDefinition) ((def instanceof VariantDefinition) ? def
                 : null);
     }

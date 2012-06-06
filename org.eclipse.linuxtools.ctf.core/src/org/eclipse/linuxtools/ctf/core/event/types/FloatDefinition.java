@@ -13,6 +13,11 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
+/**
+ * Float definition
+ * @author Matthew Khouzam
+ *
+ */
 public class FloatDefinition extends Definition {
     // ------------------------------------------------------------------------
     // Attributes
@@ -25,6 +30,16 @@ public class FloatDefinition extends Definition {
     // Contructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param fieldName
+     *            the field name
+     */
     public FloatDefinition(FloatDeclaration declaration,
             IDefinitionScope definitionScope, String fieldName) {
         super(definitionScope, fieldName);
@@ -35,14 +50,27 @@ public class FloatDefinition extends Definition {
     // Gettters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * THe value of a float stored, fit into a double. This should be extended
+     * for exotic floats if this is necessary.
+     *
+     * @return the value of the float field fit into a double.
+     */
     public double getValue() {
         return value;
     }
 
+    /**
+     * Sets the value of the float
+     *
+     * @param val
+     *            the value of the float
+     */
     public void setValue(double val) {
         value = val;
     }
 
+    @Override
     public FloatDeclaration getDeclaration() {
         return declaration;
     }

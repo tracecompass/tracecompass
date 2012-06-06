@@ -33,26 +33,38 @@ public class SequenceDefinition extends Definition {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param fieldName
+     *            the field name
+     */
     public SequenceDefinition(SequenceDeclaration declaration,
-            IDefinitionScope definitionScope, String fieldName) throws CTFReaderException {
+            IDefinitionScope definitionScope, String fieldName)
+            throws CTFReaderException {
         super(definitionScope, fieldName);
         Definition lenDef = null;
 
         this.declaration = declaration;
 
         if (definitionScope != null) {
-            lenDef = definitionScope.lookupDefinition(declaration.getLengthName());
+            lenDef = definitionScope.lookupDefinition(declaration
+                    .getLengthName());
         }
 
-         if (lenDef == null) {
-             throw new CTFReaderException("Sequence length field not found"); //$NON-NLS-1$
-         }
+        if (lenDef == null) {
+            throw new CTFReaderException("Sequence length field not found"); //$NON-NLS-1$
+        }
 
-         if (!(lenDef instanceof IntegerDefinition)) {
-             throw new CTFReaderException("Sequence length field not integer"); //$NON-NLS-1$
-         }
+        if (!(lenDef instanceof IntegerDefinition)) {
+            throw new CTFReaderException("Sequence length field not integer"); //$NON-NLS-1$
+        }
 
-         lengthDefinition = (IntegerDefinition) lenDef;
+        lengthDefinition = (IntegerDefinition) lenDef;
 
         if (this.lengthDefinition.getDeclaration().isSigned()) {
             throw new CTFReaderException("Sequence length must not be signed"); //$NON-NLS-1$
@@ -63,14 +75,29 @@ public class SequenceDefinition extends Definition {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    @Override
     public SequenceDeclaration getDeclaration() {
         return declaration;
     }
 
+    /**
+     * The length of the sequence in number of elements so a sequence of 5
+     * GIANT_rediculous_long_ints is the same as a sequence of 5 bits. (5)
+     *
+     * @return the length of the sequence
+     */
     public int getLength() {
         return currentLength;
     }
 
+    /**
+     * Get the element at i
+     *
+     * @param i
+     *            the index (cannot be negative)
+     * @return The element at I, if I > length, null, if I < 0, the method
+     *         throws an out of bounds exception
+     */
     public Definition getElem(int i) {
         if (i > definitions.length) {
             return null;
@@ -79,6 +106,10 @@ public class SequenceDefinition extends Definition {
         return definitions[i];
     }
 
+    /**
+     * Is the sequence a null terminated string?
+     * @return true == is a string, false == is not a string
+     */
     public boolean isString() {
         IntegerDeclaration elemInt;
 
@@ -111,8 +142,9 @@ public class SequenceDefinition extends Definition {
             }
 
             for (; i < currentLength; i++) {
-                newDefinitions[i] = declaration.getElementType().createDefinition(
-                        definitionScope, fieldName + "[" + i + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                newDefinitions[i] = declaration.getElementType()
+                        .createDefinition(definitionScope,
+                                fieldName + "[" + i + "]"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             definitions = newDefinitions;

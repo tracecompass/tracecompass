@@ -30,6 +30,12 @@ public class ArrayDefinition extends Definition {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param declaration the parent declaration
+     * @param definitionScope the parent scope
+     * @param fieldName the field name
+     */
     public ArrayDefinition(ArrayDeclaration declaration,
             IDefinitionScope definitionScope, String fieldName) {
         super(definitionScope, fieldName);
@@ -63,6 +69,11 @@ public class ArrayDefinition extends Definition {
         this.definitions = definitions;
     }
 
+    /**
+     * Get the element at i
+     * @param i the index (cannot be negative)
+     * @return The element at I, if I > length, null, if I < 0, the method throws an out of bounds exception
+     */
     public Definition getElem(int i) {
         if (i > definitions.length) {
             return null;
@@ -71,6 +82,7 @@ public class ArrayDefinition extends Definition {
         return definitions[i];
     }
 
+    @Override
     public ArrayDeclaration getDeclaration() {
         return declaration;
     }

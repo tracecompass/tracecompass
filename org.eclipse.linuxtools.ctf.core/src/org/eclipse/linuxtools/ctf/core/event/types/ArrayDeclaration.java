@@ -28,6 +28,11 @@ public class ArrayDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param length how many elements in the array
+     * @param elemType what type of element is in the array
+     */
     public ArrayDeclaration(int length, IDeclaration elemType) {
         this.length = length;
         this.elemType = elemType;
@@ -37,10 +42,18 @@ public class ArrayDeclaration implements IDeclaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     *
+     * @return the type of element in the array
+     */
     public IDeclaration getElementType() {
         return elemType;
     }
 
+    /**
+     *
+     * @return how many elements in the array
+     */
     public int getLength() {
         return length;
     }

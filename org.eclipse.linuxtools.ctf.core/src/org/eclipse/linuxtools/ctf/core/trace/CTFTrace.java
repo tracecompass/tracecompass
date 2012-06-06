@@ -639,22 +639,46 @@ public class CTFTrace implements IDefinitionScope {
         eventDecs.put(stream.getId(), new HashMap<Long,EventDeclaration>());
     }
 
+    /**
+     * gets the Environment variables from the trace metadata (See CTF spec)
+     * @return the environment variables in a hashmap form (key value)
+     */
     public HashMap<String, String> getEnvironment() {
         return environment;
     }
 
+    /**
+     * Look up a specific environment variable
+     * @param key the key to look for
+     * @return the value of the variable, can be null.
+     */
     public String lookupEnvironment(String key) {
         return environment.get(key);
     }
 
+    /**
+     * Add a variable to the environment variables
+     * @param varName the name of the variable
+     * @param varValue the value of the variable
+     */
     public void addEnvironmentVar(String varName, String varValue) {
         environment.put(varName, varValue);
     }
 
+    /**
+     * Add a clock to the clock list
+     * @param nameValue the name of the clock (full name with scope)
+     * @param ctfClock the clock
+     */
     public void addClock(String nameValue, CTFClock ctfClock) {
         clocks.put(nameValue, ctfClock);
     }
 
+    /**
+     * gets the clock with a specific name
+     * @param name the name of the clock.
+     * @return the clock
+     */
     public CTFClock getClock(String name) {
         return clocks.get(name);
     }
@@ -662,6 +686,10 @@ public class CTFTrace implements IDefinitionScope {
     private CTFClock singleClock;
     private long singleOffset;
 
+    /**
+     * gets the clock if there is only one. (this is 100% of the use cases as of June 2012)
+     * @return the clock
+     */
     public final CTFClock getClock() {
         if (clocks.size() == 1) {
             if (singleClock == null) {
@@ -673,6 +701,10 @@ public class CTFTrace implements IDefinitionScope {
         return null;
     }
 
+    /**
+     * gets the time offset of a clock with respect to UTC in nanoseconds
+     * @return the time offset of a clock with respect to UTC in nanoseconds
+     */
     public final long getOffset() {
         if (getClock() == null) {
             return 0;
@@ -680,9 +712,20 @@ public class CTFTrace implements IDefinitionScope {
         return singleOffset;
     }
 
+    /**
+     * Does a given stream contain any events?
+     * @param id the stream ID
+     * @return true if the stream has events.
+     */
     public boolean hasEvents(Long id){
         return eventDecs.containsKey(id);
     }
+
+    /**
+     * Add an event declaration map to the events map.
+     * @param id the id of a stream
+     * @return the hashmap containing events.
+     */
     public HashMap<Long, EventDeclaration> createEvents(Long id){
         HashMap<Long, EventDeclaration> value = eventDecs.get(id);
         if( value == null ) {

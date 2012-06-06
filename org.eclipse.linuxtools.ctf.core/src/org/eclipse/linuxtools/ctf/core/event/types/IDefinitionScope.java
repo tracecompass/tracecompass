@@ -17,6 +17,10 @@ package org.eclipse.linuxtools.ctf.core.event.types;
  */
 public interface IDefinitionScope {
 
+    /**
+     * Gets the path in a C style for the scope.
+     * @return the path
+     */
     public String getPath();
 
     /**

@@ -63,7 +63,6 @@ public class CTFTraceReader {
      */
     private long endTime;
 
-
     protected void setEndTime(long endTime) {
         this.endTime = endTime;
     }
@@ -241,8 +240,9 @@ public class CTFTraceReader {
              * Add it back in the queue.
              */
             this.prio.add(top);
-            final long topEnd = top.getCurrentEvent().getTimestamp() + this.getTrace().getOffset();
-            this.setEndTime( Math.max(topEnd, this.getEndTime()));
+            final long topEnd = top.getCurrentEvent().getTimestamp()
+                    + this.getTrace().getOffset();
+            this.setEndTime(Math.max(topEnd, this.getEndTime()));
             this.eventCountPerTraceFile[top.getName()]++;
 
             if (top.getCurrentEvent() != null) {
@@ -322,6 +322,11 @@ public class CTFTraceReader {
         return tempIndex;
     }
 
+    /**
+     * gets the stream with the oldest event
+     *
+     * @return the stream with the oldest event
+     */
     public StreamInputReader getTopStream() {
         return this.prio.peek();
     }
@@ -379,6 +384,12 @@ public class CTFTraceReader {
         }
     }
 
+    /**
+     * gets the last event timestamp that was read. This is NOT necessarily the
+     * last event in a trace, just the last one read so far.
+     *
+     * @return the last event
+     */
     public long getEndTime() {
         return this.endTime;
     }
@@ -435,6 +446,11 @@ public class CTFTraceReader {
         return "CTFTraceReader [trace=" + trace + ']'; //$NON-NLS-1$
     }
 
+    /**
+     * Gets the parent trace
+     *
+     * @return the parent trace
+     */
     public CTFTrace getTrace() {
         return trace;
     }

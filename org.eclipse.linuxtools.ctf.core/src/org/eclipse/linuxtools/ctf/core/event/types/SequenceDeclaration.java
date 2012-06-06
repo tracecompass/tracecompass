@@ -15,7 +15,9 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
- * <b><u>SequenceDeclaration</u></b>
+ * <b><u>SequenceDeclaration</u></b> <br>
+ * An array where the size is fixed but declared in the trace, unlike array
+ * where it is declared with a literal
  */
 public class SequenceDeclaration implements IDeclaration {
 
@@ -30,6 +32,13 @@ public class SequenceDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constuctor
+     *
+     * @param lengthName
+     *            the name of the field describing the lenght
+     * @param elemType
+     */
     public SequenceDeclaration(String lengthName, IDeclaration elemType) {
         this.elemType = elemType;
         this.lengthName = lengthName;
@@ -39,10 +48,18 @@ public class SequenceDeclaration implements IDeclaration {
     // Gettters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Gets the element type
+     * @return the element type
+     */
     public IDeclaration getElementType() {
         return elemType;
     }
 
+    /**
+     * Gets the name of the length field
+     * @return the name of the length field
+     */
     public String getLengthName() {
         return lengthName;
     }
@@ -51,6 +68,7 @@ public class SequenceDeclaration implements IDeclaration {
     public long getAlignment() {
         return getElementType().getAlignment();
     }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

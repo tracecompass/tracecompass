@@ -33,6 +33,12 @@ public class EnumDefinition extends Definition {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param declaration the parent declaration
+     * @param definitionScope the parent scope
+     * @param fieldName the field name
+     */
     public EnumDefinition(EnumDeclaration declaration,
             IDefinitionScope definitionScope, String fieldName) {
         super(definitionScope, fieldName);
@@ -48,17 +54,34 @@ public class EnumDefinition extends Definition {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Gets the value of the enum in string format so "Enum a{DAY="0", NIGHT="1"}; will return "DAY"
+     * @return the value of the enum.
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Gets the value of the enum in string format so "Enum a{DAY="0", NIGHT="1"}; will return 0
+     * @return the value of the enum.
+     */
     public long getIntegerValue() {
         return integerValue.getValue();
     }
 
+    /**
+     * Sets the value of the enum in string format so "Enum a{DAY="0", NIGHT="1"}; will set 0
+     * @param Value The value of the enum.
+     */
     public void setIntegerValue(long Value) {
         integerValue.setValue(Value);
         value = ((Long) integerValue.getValue()).toString();
+    }
+
+    @Override
+    public EnumDeclaration getDeclaration() {
+        return declaration;
     }
 
     // ------------------------------------------------------------------------

@@ -99,17 +99,6 @@ public class EnumDeclarationTest {
     }
 
     /**
-     * Run the String getLabel(long) method test.
-     */
-    @Test
-    public void testGetLabel() {
-        long i = 0;
-        String result = fixture.getLabel(i);
-
-        assertNull(result);
-    }
-
-    /**
      * Run the String query(long) method test.
      */
     @Test

@@ -26,12 +26,12 @@ public class Utils {
     // ------------------------------------------------------------------------
 
     /**
-     * CTF magic number.
+     * CTF magic number. (sort of looks like CTF CTF CT)
      */
     public final static int CTF_MAGIC = 0xC1FC1FC1;
 
     /**
-     * TSDL magic number.
+     * TSDL magic number. (sort of looks like TSDL LSDT)
      */
     public final static int TSDL_MAGIC = 0x75D11D57;
 

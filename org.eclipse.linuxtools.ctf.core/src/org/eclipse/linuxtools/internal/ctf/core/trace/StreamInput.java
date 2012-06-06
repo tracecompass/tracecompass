@@ -96,30 +96,57 @@ public class StreamInput implements IDefinitionScope {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Gets the stream the streamInput wrapper is wrapping
+     * @return the stream the streamInput wrapper is wrapping
+     */
     public Stream getStream() {
         return stream;
     }
 
+    /**
+     * the common streamInput Index
+     * @return the stream input Index
+     */
     public StreamInputPacketIndex getIndex() {
         return index;
     }
 
+    /**
+     * Gets the filechannel of the streamInput. This is a limited Java ressource.
+     * @return the filechannel
+     */
     public FileChannel getFileChannel() {
         return fileChannel;
     }
 
+    /**
+     * Gets the filename of the streamInput file.
+     * @return the filename of the streaminput file.
+     */
     public String getFilename() {
         return file.getName();
     }
 
+    /**
+     * gets the last read timestamp of a stream. (this is not necessarily the last time in the stream.)
+     * @return the last read timestamp
+     */
     public long getTimestampEnd() {
         return timestampEnd;
     }
 
+    /**
+     * Sets the last read timestamp of a stream. (this is not necessarily the last time in the stream.)
+     * @param timestampEnd the last read timestamp
+     */
     public void setTimestampEnd(long timestampEnd) {
         this.timestampEnd = timestampEnd;
     }
 
+    /**
+     * useless for streaminputs
+     */
     @Override
     public String getPath() {
         return ""; //$NON-NLS-1$
@@ -162,6 +189,13 @@ public class StreamInput implements IDefinitionScope {
 
     }
 
+    /**
+     * Adds the next packet header index entry to the index of a stream input.
+     * @warning slow
+     * @warning can corrupt data if not used properly
+     * @return true if there are more packets to add
+     * @throws CTFReaderException
+     */
     public boolean addPacketHeaderIndex() throws CTFReaderException {
         long currentPos = 0L;
         if (!index.getEntries().isEmpty()) {

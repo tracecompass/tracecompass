@@ -27,17 +27,16 @@ public class StringDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
-    public Encoding getEncoding() {
-        return encoding;
-    }
-
-    // ------------------------------------------------------------------------
-    // Constructors
-    // ------------------------------------------------------------------------
-
+    /**
+     * Generate a UTF8 string declaration
+     */
     public StringDeclaration() {
     }
 
+    /**
+     * generate an encoded string declaration
+     * @param encoding the encoding, utf8 or ascii
+     */
     public StringDeclaration(Encoding encoding) {
         this.encoding = encoding;
     }
@@ -46,6 +45,18 @@ public class StringDeclaration implements IDeclaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     *
+     * @return the character encoding.
+     */
+    public Encoding getEncoding() {
+        return encoding;
+    }
+
+    /**
+     *
+     * @param encoding the character encoding to set
+     */
     public void setEncoding(Encoding encoding) {
         this.encoding = encoding;
     }

@@ -35,6 +35,16 @@ public class IntegerDeclaration implements IDeclaration {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Contructor
+     * @param len the length in bits
+     * @param signed is the integer signed? false == unsigned
+     * @param base the base (10-16 are most common)
+     * @param byteOrder Big endian little endian or other
+     * @param encoding ascii, utf8 or none.
+     * @param clock the clock path, can be null
+     * @param alignment the minimum alignment
+     */
     public IntegerDeclaration(int len, boolean signed, int base,
             ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
         this.length = len;
@@ -50,26 +60,50 @@ public class IntegerDeclaration implements IDeclaration {
     // Gettters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Is the integer signed?
+     * @return the is the integer signed
+     */
     public boolean isSigned() {
         return signed;
     }
 
+    /**
+     * get the integer base commonly decimal or hex
+     * @return the integer base
+     */
     public int getBase() {
         return base;
     }
 
+    /**
+     * gets the byte order
+     * @return the byte order
+     */
     public ByteOrder getByteOrder() {
         return byteOrder;
     }
 
+    /**
+     * get encoding, chars are 8 bit ints
+     * @return the encoding
+     */
     public Encoding getEncoding() {
         return encoding;
     }
 
+    /**
+     * is the integer a character (8 bits and encoded?)
+     * @return is the integer a char
+     */
    public boolean isCharacter() {
         return (length == 8) && (encoding != Encoding.NONE);
     }
 
+   /**
+    * How many bits is this int
+    * @return the length of the int
+    */
     public int getLength() {
         return length;
     }
@@ -79,6 +113,10 @@ public class IntegerDeclaration implements IDeclaration {
         return alignment;
     }
 
+    /**
+     * The integer's clock, since timestamps are stored in ints
+     * @return the integer's clock, can be null. (most often it is)
+     */
     public String getClock(){
         return clock;
     }

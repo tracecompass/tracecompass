@@ -38,14 +38,27 @@ public class StreamInputPacketIndex {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Gets the entries
+     * @return the entries
+     */
     public Vector<StreamInputPacketIndexEntry> getEntries() {
         return this.entries;
     }
 
+    /**
+     * Gets an iterator to the entries
+     * @return an iterator to the entries
+     */
     public ListIterator<StreamInputPacketIndexEntry> listIterator() {
         return this.entries.listIterator();
     }
 
+    /**
+     * Gets an iterator to the entries at a given position
+     * @param n the position to get
+     * @return the iterator
+     */
     public ListIterator<StreamInputPacketIndexEntry> listIterator(int n) {
         return this.entries.listIterator(n);
     }

@@ -39,6 +39,11 @@ public class CtfTmfEventType extends TmfEventType {
         return this.getName();
     }
 
+    /**
+     * gets the event type for an event name
+     * @param eventName the event name
+     * @return the event type
+     */
     public static CtfTmfEventType get(String eventName){
         return (CtfTmfEventType) TmfEventTypeManager.getInstance().getType(CONTEXT_ID, eventName);
     }

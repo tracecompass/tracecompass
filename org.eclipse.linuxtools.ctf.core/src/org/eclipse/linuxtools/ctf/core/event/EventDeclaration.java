@@ -85,7 +85,7 @@ public class EventDeclaration {
     /**
      * Creates a "lost" event. This is a synthetic event that is there to show
      * that there should be something there.
-     * @return
+     * @return the lost event
      */
     public synchronized static EventDeclaration getLostEventDeclaration(){
         EventDeclaration lostEvent = new EventDeclaration();
@@ -99,70 +99,138 @@ public class EventDeclaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * Sets a name for an event Declaration
+     * @param name the name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets the name of en event declaration
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the context for an event declaration (see CTF specification)
+     * @param context the context in structdeclaration format
+     */
     public void setContext(StructDeclaration context) {
         this.context = context;
     }
 
+    /**
+     * Sets the fields of an event declaration
+     * @param fields the fields in structdeclaration format
+     */
     public void setFields(StructDeclaration fields) {
         this.fields = fields;
     }
 
+    /**
+     * Gets the fields of an event declaration
+     * @return fields the fields in structdeclaration format
+     */
     public StructDeclaration getFields() {
         return fields;
     }
 
+    /**
+     * Gets the context of an event declaration
+     * @return context the fields in structdeclaration format
+     */
     public StructDeclaration getContext() {
         return context;
     }
 
+    /**
+     * Sets the id of am event declaration
+     * @param id the id
+     */
     public void setId(long id) {
         this.id = id;
     }
 
+    /**
+     * Gets the id of am event declaration
+     * return id the id
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Sets the stream of am event declaration
+     * @param stream the stream
+     */
     public void setStream(Stream stream) {
         this.stream = stream;
     }
 
+    /**
+     * Gets the stream of am event declaration
+     * @return stream the stream
+     */
     public Stream getStream() {
         return stream;
     }
 
+    /**
+     * Is the name of the event declaration set
+     * @return is the name set?
+     */
     public boolean nameIsSet() {
         return name != null;
     }
 
+    /**
+     * Is the context set
+     * @return is the context set
+     */
     public boolean contextIsSet() {
         return context != null;
     }
 
+    /**
+     * Is a field set?
+     * @return Is the field set?
+     */
     public boolean fieldsIsSet() {
         return fields != null;
     }
 
+    /**
+     * Is the id set?
+     * @return is the id set?
+     */
     public boolean idIsSet() {
         return id != null;
     }
 
+    /**
+     * Is the stream set?
+     * @return is the stream set?
+     */
     public boolean streamIsSet() {
         return stream != null;
     }
 
+    /**
+     * What is the log level of this event
+     * @return the log level.
+     */
     public long getLogLevel() {
         return logLevel;
     }
 
+    /**
+     * Sets the log level
+     * @param level the log level
+     */
     public void setLogLevel( long level){
         logLevel = level;
     }

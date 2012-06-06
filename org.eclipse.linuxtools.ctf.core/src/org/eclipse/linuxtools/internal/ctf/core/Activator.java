@@ -28,16 +28,23 @@ public class Activator extends Plugin {
     // Attributes
     // ------------------------------------------------------------------------
 
-    // The plug-in ID
+    /**
+     * The plug-in ID
+     */
     public static final String PLUGIN_ID = "org.eclipse.linuxtools.ctf"; //$NON-NLS-1$
 
-    // The shared instance
+    /**
+     *  The shared instance
+     */
     private static Activator fPlugin;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     */
     public Activator() {
         setDefault(this);
     }
@@ -46,10 +53,19 @@ public class Activator extends Plugin {
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * Get the default activator
+     * @return the default activator
+     */
     public static Activator getDefault() {
         return fPlugin;
     }
 
+    /**
+     * Sets the default activator
+     *
+     * @param plugin the default activator
+     */
     private static void setDefault(Activator plugin) {
         fPlugin = plugin;
     }
@@ -74,10 +90,19 @@ public class Activator extends Plugin {
     // Logging
     // ------------------------------------------------------------------------
 
+    /**
+     * Log a message
+     * @param msg the message to log
+     */
     public void log(String msg) {
         log(msg, null);
     }
 
+    /**
+     * Log a message with an exception
+     * @param msg the message
+     * @param e the exception
+     */
     public void log(String msg, Exception e) {
         getLog().log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
     }
