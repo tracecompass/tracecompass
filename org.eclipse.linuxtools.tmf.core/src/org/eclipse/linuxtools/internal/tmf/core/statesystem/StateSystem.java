@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem;
@@ -25,16 +25,17 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 /**
  * This is the base class for the StateHistorySystem. It contains all the
  * current-state-updating methods.
- * 
+ *
  * It's not abstract, as it can be used by itself: in this case, no History tree
  * will be built underneath (no information will be saved to disk) and it will
  * only be able to respond to queries to the current, latest time.
- * 
+ *
  * (See IStateSystemQuerier and IStateSystemBuilder for the Javadoc.)
- * 
+ *
  * @author alexmont
- * 
+ *
  */
+@SuppressWarnings("javadoc") // the javadoc is in the IStateSystem* interfaces
 public class StateSystem {
 
     /* References to the inner structures */
@@ -325,7 +326,7 @@ public class StateSystem {
 
     /**
      * Print out the contents of the inner structures.
-     * 
+     *
      * @param writer
      *            The PrintWriter in which to print the output
      */

@@ -55,6 +55,8 @@ public abstract class StateSystemManager extends TmfComponent {
      * @return A IStateSystemQuerier handler to the state system, with which you
      *         can then run queries on the history.
      * @throws TmfTraceException
+     *             If there was a problem reading or writing one of the files.
+     *             See the contents of this exception for more info.
      */
     public static IStateSystemQuerier loadStateHistory(File htFile,
             IStateChangeInput htInput, boolean buildManually)

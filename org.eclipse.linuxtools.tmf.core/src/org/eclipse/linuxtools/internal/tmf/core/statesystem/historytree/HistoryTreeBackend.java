@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
@@ -27,9 +27,9 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 /**
  * History Tree backend for storing a state history. This is the basic version
  * that runs in the same thread as the class creating it.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public class HistoryTreeBackend implements IStateHistoryBackend {
 
@@ -39,7 +39,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * Construtor for new history files. Use this when creating a new history
      * from scratch.
-     * 
+     *
      * @param newStateFile
      *            The filename/location where to store the state history (Should
      *            end in .ht)
@@ -63,7 +63,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * Construtor for new history files. Use this when creating a new history
      * from scratch. This version supplies sane defaults for the configuration
      * parameters.
-     * 
+     *
      * @param newStateFile
      *            The filename/location where to store the state history (Should
      *            end in .ht)
@@ -79,7 +79,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     /**
      * Existing history constructor. Use this to open an existing state-file.
-     * 
+     *
      * @param existingStateFile
      *            Filename/location of the history we want to load
      * @throws IOException
@@ -177,7 +177,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * Inner method to find the interval in the tree containing the requested
      * key/timestamp pair, wherever in which node it is.
-     * 
+     *
      * @param t
      * @param key
      * @return The node containing the information we want
@@ -207,7 +207,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     /**
      * Return the size of the tree history file
-     * 
+     *
      * @return The current size of the history file in bytes
      */
     public long getFileSize() {
@@ -216,7 +216,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     /**
      * Return the current depth of the tree, ie the number of node levels.
-     * 
+     *
      * @return The tree depth
      */
     public int getTreeDepth() {
@@ -225,7 +225,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     /**
      * Return the average node usage as a percentage (between 0 and 100)
-     * 
+     *
      * @return Average node usage %
      */
     public int getAverageNodeUsage() {
@@ -252,11 +252,13 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * The basic debugPrint method will print the tree structure, but not their
      * contents.
-     * 
+     *
      * This method here print the contents (the intervals) as well.
-     * 
+     *
      * @param writer
+     *            The PrintWriter to which the debug info will be written
      * @param printIntervals
+     *            Should we also print every contained interval individually?
      */
     public void debugPrint(PrintWriter writer, boolean printIntervals) {
         /* Only used for debugging, shouldn't be externalized */

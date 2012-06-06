@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  ******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.statevalue;
@@ -18,27 +18,27 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 /**
  * This is the wrapper class that exposes the different types of 'state values'
  * available to use in the State System.
- * 
+ *
  * This also defines how these values are to be stored in the History Tree. For
  * example, we can save numerical values as integers instead of arrays of
  * 1-digit characters.
- * 
+ *
  * For now the two available types are either int or String.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public abstract class TmfStateValue implements ITmfStateValue {
 
     /**
      * Retrieve directly the value object contained within. Implementing
      * subclasses may limit the return type here.
-     * 
+     *
      * It's protected, since we do not want to expose this directly in the
      * public API (and require all its users to manually cast to the right
      * types). All accesses to the values should go through the "unbox-"
      * methods.
-     * 
+     *
      * @return The underneath object assigned to this state value.
      */
     protected abstract Object getValue();
@@ -48,6 +48,8 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * Alternatively you can return "null" here if you do not need a byte-array
      * indirection (the getValue will get written as-in instead of the offset in
      * the file block)
+     *
+     * @return The state value in byte array form
      */
     public abstract byte[] toByteArray();
 
@@ -88,7 +90,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
     /**
      * Return the max size that a variable-length state value can have when
      * serialized.
-     * 
+     *
      * @return The maximum size in bytes
      */
     public static int getStateValueMaxSize() {
@@ -103,7 +105,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
 
     /**
      * Return an instance of a "null" value. Only one copy exists in memory.
-     * 
+     *
      * @return A null value
      */
     public final static TmfStateValue nullValue() {
@@ -112,7 +114,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
 
     /**
      * Factory constructor for Integer state values
-     * 
+     *
      * @param intValue The integer value to contain
      * @return The newly-created TmfStateValue object
      */
@@ -125,7 +127,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
 
     /**
      * Factory constructor for String state values
-     * 
+     *
      * @param strValue The string value to contain
      * @return The newly-create TmfStateValue object
      */

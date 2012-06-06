@@ -22,31 +22,31 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 /**
  * This is the read-only interface to the generic state system. It contains all
  * the read-only quark-getting methods, as well as the history-querying ones.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public interface IStateSystemQuerier {
 
     /**
      * Return the start time of this history. It usually matches the start time
      * of the original trace.
-     * 
+     *
      * @return The history's registered start time
      */
     public long getStartTime();
 
     /**
      * Return the current end time of the history.
-     * 
-     * @return
+     *
+     * @return The current end time of this state history
      */
     public long getCurrentEndTime();
 
     /**
      * Return the current total amount of attributes in the system.
-     * 
-     * @return
+     *
+     * @return The current number of attributes in the system
      */
     public int getNbAttributes();
 
@@ -57,10 +57,10 @@ public interface IStateSystemQuerier {
     /**
      * Basic quark-retrieving method. Pass an attribute in parameter as an array
      * of strings, the matching quark will be returned.
-     * 
+     *
      * This version will NOT create any new attributes. If an invalid attribute
      * is requested, an exception will be thrown.
-     * 
+     *
      * @param attribute
      *            Attribute given as its full path in the Attribute Tree
      * @return The quark of the requested attribute, if it existed.
@@ -75,27 +75,28 @@ public interface IStateSystemQuerier {
      * "Relative path" quark-getting method. Instead of specifying a full path,
      * if you know the path is relative to another attribute for which you
      * already have the quark, use this for better performance.
-     * 
+     *
      * This is useful for cases where a lot of modifications or queries will
      * originate from the same branch of the attribute tree : the common part of
      * the path won't have to be re-hashed for every access.
-     * 
+     *
      * This version will NOT create any new attributes. If an invalid attribute
      * is requested, an exception will be thrown.
-     * 
+     *
      * @param startingNodeQuark
      *            The quark of the attribute from which 'subPath' originates.
      * @param subPath
      *            "Rest" of the path to get to the final attribute
      * @return The matching quark, if it existed
      * @throws AttributeNotFoundException
+     *             If the quark is invalid
      */
     public int getQuarkRelative(int startingNodeQuark, String... subPath)
             throws AttributeNotFoundException;
 
     /**
      * Return the sub-attributes of the target attribute, as a List of quarks.
-     * 
+     *
      * @param quark
      *            The attribute of which you want to sub-attributes. You can use
      *            "-1" here to specify the root node.
@@ -114,18 +115,18 @@ public interface IStateSystemQuerier {
      * pattern which includes a wildcard "*" somewhere. It will check all the
      * existing attributes in the attribute tree and return those who match the
      * pattern.
-     * 
+     *
      * For example, passing ("Threads", "*", "Exec_mode") will return the list
      * of quarks for attributes "Threads/1000/Exec_mode",
      * "Threads/1500/Exec_mode", and so on, depending on what exists at this
      * time in the attribute tree.
-     * 
+     *
      * If no wildcard is specified, the behavior is the same as
      * getQuarkAbsolute() (except it will return a List with one entry). This
      * method will never create new attributes.
-     * 
+     *
      * Only one wildcard "*" is supported at this time.
-     * 
+     *
      * @param pattern
      *            The array of strings representing the pattern to look for. It
      *            should ideally contain one entry that is only a "*".
@@ -138,7 +139,7 @@ public interface IStateSystemQuerier {
     /**
      * Return the name assigned to this quark. This returns only the "basename",
      * not the complete path to this attribute.
-     * 
+     *
      * @param attributeQuark
      *            The quark for which we want the name
      * @return The name of the quark
@@ -148,7 +149,7 @@ public interface IStateSystemQuerier {
     /**
      * This returns the slash-separated path of an attribute by providing its
      * quark
-     * 
+     *
      * @param attributeQuark
      *            The quark of the attribute we want
      * @return One single string separated with '/', like a filesystem path
@@ -162,11 +163,11 @@ public interface IStateSystemQuerier {
     /**
      * Returns the current state value we have (in the Transient State) for the
      * given attribute.
-     * 
+     *
      * This is useful even for a StateHistorySystem, as we are guaranteed it
      * will only do a memory access and not go look on disk (and we don't even
      * have to provide a timestamp!)
-     * 
+     *
      * @param attributeQuark
      *            For which attribute we want the current state
      * @return The State value that's "current" for this attribute
@@ -180,15 +181,16 @@ public interface IStateSystemQuerier {
      * Load the complete state information at time 't' into the returned List.
      * You can then get the intervals for single attributes by using
      * List.get(n), where 'n' is the quark of the attribute.
-     * 
+     *
      * On average if you need around 10 or more queries for the same timestamps,
      * use this method. If you need less than 10 (for example, running many
      * queries for the same attributes but at different timestamps), you might
      * be better using the querySingleState() methods instead.
-     * 
+     *
      * @param t
      *            We will recreate the state information to what it was at time
      *            t.
+     * @return The List of intervals, where the offset = the quark
      * @throws TimeRangeException
      *             If the 't' parameter is outside of the range of the state
      *             history.
@@ -200,12 +202,12 @@ public interface IStateSystemQuerier {
      * Singular query method. This one does not update the whole stateInfo
      * vector, like queryFullState() does. It only searches for one specific
      * entry in the state history.
-     * 
+     *
      * It should be used when you only want very few entries, instead of the
      * whole state (or many entries, but all at different timestamps). If you do
      * request many entries all at the same time, you should use the
      * conventional queryFullState() + List.get() method.
-     * 
+     *
      * @param t
      *            The timestamp at which we want the state
      * @param attributeQuark
@@ -223,11 +225,11 @@ public interface IStateSystemQuerier {
      * Return a list of state intervals, containing the "history" of a given
      * attribute between timestamps t1 and t2. The list will be ordered by
      * ascending time.
-     * 
+     *
      * Note that contrary to queryFullState(), the returned list here is in the
      * "direction" of time (and not in the direction of attributes, as is the
      * case with queryFullState()).
-     * 
+     *
      * @param attributeQuark
      *            Which attribute this query is interested in
      * @param t1
@@ -250,7 +252,7 @@ public interface IStateSystemQuerier {
      * Return the state history of a given attribute, but with at most one
      * update per "resolution". This can be useful for populating views (where
      * it's useless to have more than one query per pixel, for example).
-     * 
+     *
      * @param attributeQuark
      *            Which attribute this query is interested in
      * @param t1

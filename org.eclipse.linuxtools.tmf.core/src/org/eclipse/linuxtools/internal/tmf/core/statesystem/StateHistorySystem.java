@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem;
@@ -30,15 +30,15 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  * This is the extension of the StateSystem, which will save the state intervals
  * that are created from the transient state (instead of discarding them, like a
  * simple StateSystem would do).
- * 
+ *
  * This allows the user to then run queries at past timestamps.
- * 
+ *
  * DON'T FORGET to call .closeHistory() when you are done inserting intervals,
  * or the storage backend will have no way of knowing it can close and write
  * itself to disk, and its thread will keep running.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public class StateHistorySystem extends StateSystem implements
         IStateSystemBuilder {
@@ -51,13 +51,14 @@ public class StateHistorySystem extends StateSystem implements
 
     /**
      * General constructor
-     * 
+     *
      * @param backend
      *            The "state history storage" backend to use.
      * @param newFile
      *            Put true if this is a new history started from scratch. It is
      *            used to tell the state system where to get its attribute tree.
      * @throws IOException
+     *             If there was a problem creating the new history file
      */
     public StateHistorySystem(IStateHistoryBackend backend, boolean newFile)
             throws IOException {
@@ -251,7 +252,7 @@ public class StateHistorySystem extends StateSystem implements
         if (currentInterval.getEndTime() < tEnd) {
             currentInterval = querySingleState(tEnd, attributeQuark);
             intervals.add(currentInterval);
-        } 
+        }
         return intervals;
     }
 

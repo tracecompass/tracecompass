@@ -55,8 +55,13 @@ public class HistoryBuilder extends TmfComponent {
      * @param stateChangeInput
      *            The input plugin to use. This is required.
      * @param backend
-     *            The backend storage to use. Use "null" here if you want a
-     *            state system with no history.
+     *            The backend storage to use.
+     * @param buildManually
+     *            Should we build this history in-band or not. True means we
+     *            will start the building ourselves and block the caller until
+     *            construction is done. False (out-of-band) means we will
+     *            start listening for the signal and return immediately. Another
+     *            signal will be sent when finished.
      * @throws IOException
      *             Is thrown if anything went wrong (usually with the storage
      *             backend)
@@ -146,6 +151,9 @@ public class HistoryBuilder extends TmfComponent {
      * construction.
      *
      * @param signal
+     *            The "experiment range updated" signal. Listening to this
+     *            signal will coalesce this request with the one from the
+     *            indexer and histogram.
      */
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
