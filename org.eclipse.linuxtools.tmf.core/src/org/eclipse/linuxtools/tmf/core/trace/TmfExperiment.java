@@ -392,6 +392,12 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         if (!(context instanceof TmfExperimentContext)) {
             return null; // Throw an exception?
         }
+
+        // Make sure that we have something to read from
+        if (fTraces == null) {
+            return null;
+        }
+
         TmfExperimentContext expContext = (TmfExperimentContext) context;
 
         // If an event was consumed previously, first get the next one from that trace
