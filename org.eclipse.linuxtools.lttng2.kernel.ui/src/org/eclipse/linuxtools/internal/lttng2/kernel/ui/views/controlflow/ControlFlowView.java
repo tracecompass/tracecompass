@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -224,6 +225,9 @@ public class ControlFlowView extends TmfView {
                 ControlFlowEntry entry1 = (ControlFlowEntry) o1;
                 ControlFlowEntry entry2 = (ControlFlowEntry) o2;
                 result = entry1.getTrace().getStartTime().compareTo(entry2.getTrace().getStartTime());
+                if (result == 0) {
+                    result = entry1.getTrace().getName().compareTo(entry2.getTrace().getName());
+                }
                 if (result == 0) {
                     result = entry1.getThreadId() < entry2.getThreadId() ? -1 : entry1.getThreadId() > entry2.getThreadId() ? 1 : 0;
                 }
@@ -507,9 +511,10 @@ public class ControlFlowView extends TmfView {
         fStartTime = Long.MAX_VALUE;
         fEndTime = Long.MIN_VALUE;
         fSelectedExperiment = (TmfExperiment<ITmfEvent>) experiment;
-        ArrayList<ControlFlowEntry> entryList = new ArrayList<ControlFlowEntry>();
+        ArrayList<ControlFlowEntry> rootList = new ArrayList<ControlFlowEntry>();
         for (ITmfTrace<?> trace : experiment.getTraces()) {
             if (trace instanceof CtfKernelTrace) {
+                ArrayList<ControlFlowEntry> entryList = new ArrayList<ControlFlowEntry>();
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) trace;
                 IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
                 long start = ssq.getStartTime();
@@ -566,19 +571,18 @@ public class ControlFlowView extends TmfView {
                         e.printStackTrace();
                     }
                 }
+                buildTree(entryList, rootList);
             }
-            buildTree(entryList);
+            Collections.sort(rootList, fControlFlowEntryComparator);
+            fEntryList = rootList;
             refresh(INITIAL_WINDOW_OFFSET);
-            ControlFlowEntry[] entries = fEntryList.toArray(new ControlFlowEntry[0]);
-            Arrays.sort(entries, fControlFlowEntryComparator);
-            for (ControlFlowEntry entry : entries) {
-                buildStatusEvents(entry);
-            }
+        }
+        for (ControlFlowEntry entry : rootList) {
+            buildStatusEvents(entry);
         }
     }
 
-    private void buildTree(ArrayList<ControlFlowEntry> entryList) {
-        ArrayList<ControlFlowEntry> rootList = new ArrayList<ControlFlowEntry>();
+    private void buildTree(ArrayList<ControlFlowEntry> entryList, ArrayList<ControlFlowEntry> rootList) {
         for (ControlFlowEntry entry : entryList) {
             boolean root = true;
             if (entry.getParentThreadId() > 0) {
@@ -596,7 +600,6 @@ public class ControlFlowView extends TmfView {
                 rootList.add(entry);
             }
         }
-        fEntryList = rootList;
     }
 
     private void buildStatusEvents(ControlFlowEntry entry) {
