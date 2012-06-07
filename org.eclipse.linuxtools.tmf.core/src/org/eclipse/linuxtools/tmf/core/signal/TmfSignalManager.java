@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 
 /**
@@ -142,8 +143,11 @@ public class TmfSignalManager {
                         Tracer.traceSignal(signal, target);                     
                     }
                 } catch (IllegalArgumentException e) {
+                    Activator.getDefault().logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (IllegalAccessException e) {
+                    Activator.getDefault().logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (InvocationTargetException e) {
+                    Activator.getDefault().logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
         }
