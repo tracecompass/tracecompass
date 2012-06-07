@@ -272,10 +272,16 @@ public class TimeGraphCombo extends Composite {
         // Bug in Linux. The tree header height is 0 in constructor,
         // so we need to reset it later when the control is resized.
         tree.addControlListener(new ControlAdapter() {
+            int depth = 0;
             @Override
             public void controlResized(ControlEvent e) {
-                fTreeViewer.getTree().getVerticalBar().setEnabled(false);
-                fTreeViewer.getTree().getVerticalBar().setVisible(false);
+                if (depth == 0) {
+                    depth++;
+                    tree.getVerticalBar().setEnabled(false);
+                    // this can trigger controlResized recursively
+                    tree.getVerticalBar().setVisible(false);
+                    depth--;
+                }
                 fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
             }
         });

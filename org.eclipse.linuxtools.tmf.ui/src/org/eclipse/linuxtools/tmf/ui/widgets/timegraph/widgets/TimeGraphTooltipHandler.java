@@ -114,16 +114,15 @@ public class TimeGraphTooltipHandler {
                 line.setText(1, value);
             }
 
-            private void fillValues(Point pt, TimeGraphControl threadStates, TimeGraphItem item) {
-                if (item == null) {
+            private void fillValues(Point pt, TimeGraphControl threadStates, ITimeGraphEntry entry) {
+                if (entry == null) {
                     return;
                 }
-                if (item._trace.hasTimeEvents()) {
-                    ITimeGraphEntry thrd = item._trace;
-                    ITimeEvent threadEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 2);
-                    ITimeEvent nextEvent = Utils.findEvent(thrd, threadStates.getTimeAtX(pt.x), 1);
+                if (entry.hasTimeEvents()) {
+                    ITimeEvent threadEvent = Utils.findEvent(entry, threadStates.getTimeAtX(pt.x), 2);
+                    ITimeEvent nextEvent = Utils.findEvent(entry, threadStates.getTimeAtX(pt.x), 1);
                     // state name
-                    addItem(_utilImp.getStateTypeName(), thrd.getName());
+                    addItem(_utilImp.getStateTypeName(), entry.getName());
                     if (threadEvent == null) {
                         return;
                     }
@@ -211,9 +210,9 @@ public class TimeGraphTooltipHandler {
             public void mouseHover(MouseEvent event) {
                 Point pt = new Point(event.x, event.y);
                 TimeGraphControl threadStates = (TimeGraphControl) event.widget;
-                TimeGraphItem item = threadStates.getItem(pt);
+                ITimeGraphEntry entry = threadStates.getEntry(pt);
                 _tipTable.remove(0, _tipTable.getItemCount() - 1);
-                fillValues(pt, threadStates, item);
+                fillValues(pt, threadStates, entry);
                 if (_tipTable.getItemCount() == 0) {
                     return;
                 }

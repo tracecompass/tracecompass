@@ -253,7 +253,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         redraw();
     }
 
-    public void refreshData(ITimeGraphEntry traces[]) {
+    public void refreshData(ITimeGraphEntry[] traces) {
         _data.refreshData(traces);
         adjustScrolls();
         redraw();
@@ -294,7 +294,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         boolean changed = false;
         if (idx < 0) {
             for (idx = 0; idx < _data._expandedItems.length; idx++) {
-                if (((TimeGraphItem) _data._expandedItems[idx])._selected)
+                if (((Item) _data._expandedItems[idx])._selected)
                     break;
             }
         }
@@ -327,7 +327,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
-        TimeGraphItem item = _data.findItem(entry);
+        Item item = _data.findItem(entry);
         if (item != null && item._expanded != expanded) {
             item._expanded = expanded;
             _data.updateExpandedItems();
@@ -462,17 +462,17 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         boolean changed = false;
         int lastSelection = -1;
         for (int i = 0; i < _data._expandedItems.length; i++) {
-            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[i];
+            Item item = (Item) _data._expandedItems[i];
             if (item._selected) {
                 lastSelection = i;
                 if ((1 == n) && (i < _data._expandedItems.length - 1)) {
                     item._selected = false;
-                    item = (TimeGraphItem) _data._expandedItems[i + 1];
+                    item = (Item) _data._expandedItems[i + 1];
                     item._selected = true;
                     changed = true;
                 } else if ((-1 == n) && (i > 0)) {
                     item._selected = false;
-                    item = (TimeGraphItem) _data._expandedItems[i - 1];
+                    item = (Item) _data._expandedItems[i - 1];
                     item._selected = true;
                     changed = true;
                 }
@@ -481,7 +481,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
 
         if (lastSelection < 0 && _data._expandedItems.length > 0) {
-            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[0];
+            Item item = (Item) _data._expandedItems[0];
             item._selected = true;
             changed = true;
         }
@@ -650,7 +650,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     public int getSelectedIndex() {
         int idx = -1;
         for (int i = 0; i < _data._expandedItems.length; i++) {
-            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[i];
+            Item item = (Item) _data._expandedItems[i];
             if (item._selected) {
                 idx = i;
                 break;
@@ -662,7 +662,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     boolean toggle(int idx) {
         boolean toggled = false;
         if (idx >= 0 && idx < _data._expandedItems.length) {
-            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[idx];
+            Item item = (Item) _data._expandedItems[idx];
             if (item._hasChildren) {
                 item._expanded = !item._expanded;
                 _data.updateExpandedItems();
@@ -709,9 +709,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
-    TimeGraphItem getItem(Point pt) {
+    ITimeGraphEntry getEntry(Point pt) {
         int idx = getItemIndexAtY(pt.y);
-        return idx >= 0 ? (TimeGraphItem) _data._expandedItems[idx] : null;
+        return idx >= 0 ? _data._expandedItems[idx]._trace : null;
     }
 
     long getTimeAtX(int x) {
@@ -740,13 +740,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         boolean changed = false;
         if (addSelection) {
             if (idx >= 0 && idx < _data._expandedItems.length) {
-                TimeGraphItem item = (TimeGraphItem) _data._expandedItems[idx];
+                Item item = (Item) _data._expandedItems[idx];
                 changed = (item._selected == false);
                 item._selected = true;
             }
         } else {
             for (int i = 0; i < _data._expandedItems.length; i++) {
-                TimeGraphItem item = (TimeGraphItem) _data._expandedItems[i];
+                Item item = (Item) _data._expandedItems[i];
                 if ((i == idx && !item._selected) || (idx == -1 && item._selected)) {
                     changed = true;
                 }
@@ -800,7 +800,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     public ITimeGraphEntry[] getExpandedElements() {
         ArrayList<ITimeGraphEntry> elements = new ArrayList<ITimeGraphEntry>();
-        for (TimeGraphItem item : _data._expandedItems) {
+        for (Item item : _data._expandedItems) {
             elements.add(item._trace);
         }
         return elements.toArray(new ITimeGraphEntry[0]);
@@ -885,9 +885,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
-    public void drawItems(Rectangle bounds, ITimeDataProvider timeProvider, TimeGraphItem[] items, int topIndex, int nameSpace, GC gc) {
+    public void drawItems(Rectangle bounds, ITimeDataProvider timeProvider, Item[] items, int topIndex, int nameSpace, GC gc) {
         for (int i = topIndex; i < items.length; i++) {
-            TimeGraphItem item = (TimeGraphItem) items[i];
+            Item item = (Item) items[i];
             drawItem(item, bounds, timeProvider, i, nameSpace, gc);
         }
         fTimeGraphProvider.postDrawControl(bounds, gc);
@@ -902,7 +902,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      * @param nameSpace the name space
      * @param gc
      */
-    protected void drawItem(TimeGraphItem item, Rectangle bounds, ITimeDataProvider timeProvider, int i, int nameSpace, GC gc) {
+    protected void drawItem(Item item, Rectangle bounds, ITimeDataProvider timeProvider, int i, int nameSpace, GC gc) {
         ITimeGraphEntry entry = item._trace;
         long time0 = timeProvider.getTime0();
         long time1 = timeProvider.getTime1();
@@ -976,7 +976,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         fTimeGraphProvider.postDrawEntry(entry, rect, gc);
     }
 
-    protected void drawName(TimeGraphItem item, Rectangle bounds, GC gc) {
+    protected void drawName(Item item, Rectangle bounds, GC gc) {
         boolean hasTimeEvents = item._trace.hasTimeEvents();
         if (! hasTimeEvents) {
             gc.setBackground(_colors.getBkColorGroup(item._selected, _isInFocus));
@@ -1367,7 +1367,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
             idx = getItemIndexAtY(e.y);
             if (idx >= 0) {
-                TimeGraphItem item = _data._expandedItems[idx];
+                Item item = _data._expandedItems[idx];
                 if (item._hasChildren && e.x < nameSpace && e.x < MARGIN + (item.level + 1) * EXPAND_SIZE) {
                     toggle(idx);
                 } else {
@@ -1571,124 +1571,148 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     }
 
-}
+    private class ItemData {
+        public Item[] _expandedItems = new Item[0];
+        public Item[] _items = new Item[0];
+        private ITimeGraphEntry _traces[] = new ITimeGraphEntry[0];
+        private boolean traceFilter[] = new boolean[0];
+        private Vector<ITimeGraphEntry> filteredOut = new Vector<ITimeGraphEntry>();
+        public ITimeGraphPresentationProvider provider;
 
-class ItemData {
-    public TimeGraphItem[] _expandedItems = new TimeGraphItem[0];
-    public TimeGraphItem[] _items = new TimeGraphItem[0];
-    private ITimeGraphEntry _traces[] = new ITimeGraphEntry[0];
-    private boolean traceFilter[] = new boolean[0];
-    private Vector<ITimeGraphEntry> filteredOut = new Vector<ITimeGraphEntry>();
-    public ITimeGraphPresentationProvider provider;
+        public ItemData() {
+        }
 
-    public ItemData() {
-    }
+        Item findItem(ITimeGraphEntry entry) {
+            if (entry == null)
+                return null;
 
-    TimeGraphItem findItem(ITimeGraphEntry entry) {
-        if (entry == null)
+            for (int i = 0; i < _items.length; i++) {
+                Item item = _items[i];
+                if (item._trace == entry) {
+                    return item;
+                }
+            }
+
             return null;
-
-        for (int i = 0; i < _items.length; i++) {
-            TimeGraphItem item = _items[i];
-            if (item._trace == entry) {
-                return item;
-            }
         }
 
-        return null;
-    }
+        int findItemIndex(ITimeGraphEntry trace) {
+            if (trace == null)
+                return -1;
 
-    int findItemIndex(ITimeGraphEntry trace) {
-        if (trace == null)
+            for (int i = 0; i < _expandedItems.length; i++) {
+                Item item = _expandedItems[i];
+                if (item._trace == trace) {
+                    return i;
+                }
+            }
+
             return -1;
+        }
 
-        for (int i = 0; i < _expandedItems.length; i++) {
-            TimeGraphItem item = _expandedItems[i];
-            if (item._trace == trace) {
-                return i;
+        public void refreshData() {
+            List<Item> itemList = new ArrayList<Item>();
+            filteredOut.clear();
+            for (int i = 0; i < _traces.length; i++) {
+                ITimeGraphEntry entry = _traces[i];
+                refreshData(itemList, null, 0, entry);
             }
-        }
-
-        return -1;
-    }
-
-    public void refreshData() {
-        List<TimeGraphItem> itemList = new ArrayList<TimeGraphItem>();
-        filteredOut.clear();
-        for (int i = 0; i < _traces.length; i++) {
-            ITimeGraphEntry entry = _traces[i];
-            refreshData(itemList, null, 0, entry);
-        }
-        _items = itemList.toArray(new TimeGraphItem[0]);
-        updateExpandedItems();
-    }
-
-    private void refreshData(List<TimeGraphItem> itemList, TimeGraphItem parent, int level, ITimeGraphEntry entry) {
-        TimeGraphItem item = new TimeGraphItem(entry, entry.getName(), level);
-        if (parent != null) {
-            parent.children.add(item);
-        }
-        item.itemHeight = provider.getItemHeight(entry);
-        itemList.add(item);
-        if (entry.hasChildren()) {
-            item._expanded = true;
-            item._hasChildren = true;
-            for (ITimeGraphEntry child : entry.getChildren()) {
-                refreshData(itemList, item, level + 1, child);
-            }
-        }
-    }
-
-    public void updateExpandedItems() {
-        List<TimeGraphItem> expandedItemList = new ArrayList<TimeGraphItem>();
-        for (int i = 0; i < _traces.length; i++) {
-            ITimeGraphEntry entry = _traces[i];
-            TimeGraphItem item = findItem(entry);
-            refreshExpanded(expandedItemList, item);
-        }
-        _expandedItems = expandedItemList.toArray(new TimeGraphItem[0]);
-    }
-
-    private void refreshExpanded(List<TimeGraphItem> expandedItemList, TimeGraphItem item) {
-        expandedItemList.add(item);
-        if (item._hasChildren && item._expanded) {
-            for (TimeGraphItem child : item.children) {
-                refreshExpanded(expandedItemList, child);
-            }
-        }
-    }
-
-    public void expandItem(int idx) {
-        if (idx < 0 || idx >= _expandedItems.length)
-            return;
-        TimeGraphItem item = (TimeGraphItem) _expandedItems[idx];
-        if (item._hasChildren && !item._expanded) {
-            item._expanded = true;
+            _items = itemList.toArray(new Item[0]);
             updateExpandedItems();
         }
-    }
 
-    public void refreshData(ITimeGraphEntry traces[]) {
-        if (traces == null || traces.length == 0) {
-            traceFilter = null;
-        } else if (traceFilter == null || traces.length != traceFilter.length) {
-            traceFilter = new boolean[traces.length];
-            java.util.Arrays.fill(traceFilter, true);
+        private void refreshData(List<Item> itemList, Item parent, int level, ITimeGraphEntry entry) {
+            Item item = new Item(entry, entry.getName(), level);
+            if (parent != null) {
+                parent.children.add(item);
+            }
+            item.itemHeight = provider.getItemHeight(entry);
+            itemList.add(item);
+            if (entry.hasChildren()) {
+                item._expanded = true;
+                item._hasChildren = true;
+                for (ITimeGraphEntry child : entry.getChildren()) {
+                    refreshData(itemList, item, level + 1, child);
+                }
+            }
         }
 
-        _traces = traces;
-        refreshData();
+        public void updateExpandedItems() {
+            List<Item> expandedItemList = new ArrayList<Item>();
+            for (int i = 0; i < _traces.length; i++) {
+                ITimeGraphEntry entry = _traces[i];
+                Item item = findItem(entry);
+                refreshExpanded(expandedItemList, item);
+            }
+            _expandedItems = expandedItemList.toArray(new Item[0]);
+        }
+
+        private void refreshExpanded(List<Item> expandedItemList, Item item) {
+            expandedItemList.add(item);
+            if (item._hasChildren && item._expanded) {
+                for (Item child : item.children) {
+                    refreshExpanded(expandedItemList, child);
+                }
+            }
+        }
+
+        public void expandItem(int idx) {
+            if (idx < 0 || idx >= _expandedItems.length)
+                return;
+            Item item = (Item) _expandedItems[idx];
+            if (item._hasChildren && !item._expanded) {
+                item._expanded = true;
+                updateExpandedItems();
+            }
+        }
+
+        public void refreshData(ITimeGraphEntry traces[]) {
+            if (traces == null || traces.length == 0) {
+                traceFilter = null;
+            } else if (traceFilter == null || traces.length != traceFilter.length) {
+                traceFilter = new boolean[traces.length];
+                java.util.Arrays.fill(traceFilter, true);
+            }
+
+            _traces = traces;
+            refreshData();
+        }
+
+        public ITimeGraphEntry[] getTraces() {
+            return _traces;
+        }
+
+        public boolean[] getTraceFilter() {
+            return traceFilter;
+        }
+
+        public Vector<ITimeGraphEntry> getFilteredOut() {
+            return filteredOut;
+        }
     }
 
-    public ITimeGraphEntry[] getTraces() {
-        return _traces;
+    private class Item {
+        public boolean _expanded;
+        public boolean _selected;
+        public boolean _hasChildren;
+        public int itemHeight;
+        public int level;
+        public List<Item> children;
+        public String _name;
+        public ITimeGraphEntry _trace;
+
+        public Item(ITimeGraphEntry trace, String name, int level) {
+            this._trace = trace;
+            this._name = name;
+            this.level = level;
+            this.children = new ArrayList<Item>();
+        }
+
+        @Override
+        public String toString() {
+            return _name;
+        }
     }
 
-    public boolean[] getTraceFilter() {
-        return traceFilter;
-    }
-
-    public Vector<ITimeGraphEntry> getFilteredOut() {
-        return filteredOut;
-    }
 }
+
