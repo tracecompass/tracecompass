@@ -648,8 +648,13 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
-        long time = signal.getCurrentTime().normalize(0, TIMESTAMP_SCALE).getValue();
-        fViewer.setSelectedTime(time, true, this);
+        final long time = signal.getCurrentTime().normalize(0, TIMESTAMP_SCALE).getValue();
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                fViewer.setSelectedTime(time, true, this);
+            }
+        });
     }
 
 }
