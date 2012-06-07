@@ -133,7 +133,10 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
             }
         } else if (fType == Type.ALPHA) {
             String valueString = value.toString();
-            return (valueString.compareTo(fValue.toString()) == fResult) ^ fNot;
+            int comp = valueString.compareTo(fValue.toString());
+            if (comp < -1) comp = -1;
+            else if (comp > 1) comp = 1;
+            return (comp == fResult) ^ fNot;
         } else if (fType == Type.TIMESTAMP) {
             if (fValueTimestamp != null) {
                 if (value instanceof TmfTimestamp) {
