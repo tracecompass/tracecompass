@@ -41,7 +41,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.internal.ctf.core.Activator;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
@@ -196,10 +195,6 @@ public class CTFTrace implements IDefinitionScope {
 
         /* Open and parse the metadata file */
         metadata.parse();
-
-        if (Activator.getDefault() != null) {
-            Activator.getDefault().log(metadata.toString());
-        }
 
         /* Open all the trace files */
         /* Create the definitions needed to read things from the files */
