@@ -52,7 +52,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
@@ -61,7 +60,6 @@ import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
@@ -168,6 +166,7 @@ ITmfEventsFilterProvider {
     protected long fFilterMatchCount;
     protected long fFilterCheckCount;
     protected FilterThread fFilterThread;
+    protected boolean fFilterThreadResume = false;
     protected final Object fFilterSyncObj = new Object();
     protected SearchThread fSearchThread;
     protected final Object fSearchSyncObj = new Object();
@@ -1009,12 +1008,17 @@ ITmfEventsFilterProvider {
 
     protected void startFilterThread() {
         synchronized (fFilterSyncObj) {
-            if (fFilterThread != null) {
-                fFilterThread.cancel();
-            }
             final ITmfFilterTreeNode filter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
-            fFilterThread = new FilterThread(filter);
-            fFilterThread.start();
+            if (fFilterThread == null || fFilterThread.filter != filter) {
+                if (fFilterThread != null) {
+                    fFilterThread.cancel();
+                    fFilterThreadResume = false;
+                }
+                fFilterThread = new FilterThread(filter);
+                fFilterThread.start();
+            } else {
+                fFilterThreadResume = true;
+            }
         }
     }
 
@@ -1022,6 +1026,8 @@ ITmfEventsFilterProvider {
         synchronized (fFilterSyncObj) {
             if (fFilterThread != null) {
                 fFilterThread.cancel();
+                fFilterThread = null;
+                fFilterThreadResume = false;
             }
         }
     }
@@ -1054,7 +1060,7 @@ ITmfEventsFilterProvider {
 
     protected class FilterThread extends Thread {
         private final ITmfFilterTreeNode filter;
-        private TmfEventRequest<ITmfEvent> request;
+        private TmfDataRequest<ITmfEvent> request;
         private boolean refreshBusy = false;
         private boolean refreshPending = false;
         private final Object syncObj = new Object();
@@ -1074,7 +1080,7 @@ ITmfEventsFilterProvider {
             if (nbRequested <= 0) {
                 return;
             }
-            request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
+            request = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, (int) fFilterCheckCount,
                     nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
                 @Override
                 public void handleData(final ITmfEvent event) {
@@ -1100,6 +1106,14 @@ ITmfEventsFilterProvider {
             } catch (final InterruptedException e) {
             }
             refreshTable();
+            synchronized (fFilterSyncObj) {
+                fFilterThread = null;
+                if (fFilterThreadResume) {
+                    fFilterThreadResume = false;
+                    fFilterThread = new FilterThread(filter);
+                    fFilterThread.start();
+                }
+            }
         }
 
         public void refreshTable() {
@@ -1232,9 +1246,7 @@ ITmfEventsFilterProvider {
             final Display display = Display.getDefault();
             if (startIndex < 0) {
                 rank = (int) fTrace.getNbEvents() - 1;
-            } else if (startIndex >= (fTable.getItemCount() - (eventFilter == null ? 1 : 3))) {
-                // for top and bottom
-                // filter status rows
+            } else if (startIndex >= (fTable.getItemCount() - (eventFilter == null ? 1 : 3))) { // -1 for header row, -2 for top and bottom filter status rows
                 rank = 0;
             } else {
                 int idx = startIndex;
@@ -1275,7 +1287,7 @@ ITmfEventsFilterProvider {
                 if (direction == Direction.BACKWARD) {
                     rank = Math.max(0, rank - fTrace.getCacheSize() + 1);
                 }
-                request = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, (int) rank, nbRequested) {
+                request = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, (int) rank, nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
                     long currentRank = rank;
 
                     @Override
