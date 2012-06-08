@@ -94,33 +94,33 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
 
     @Override
     public void mouseDown(MouseEvent event) {
-        // Check if we are outside the time range; if so, just set the current
-        // event
-        long timestamp = getTimestamp(event.x);
-        if ((timestamp < fZoom.getStartTime()) || (timestamp > fZoom.getEndTime())) {
-            super.mouseDown(event);
-            return;
-        }
-
-        // Otherwise start moving the range window
         fMouseDown = true;
         fStartPosition = event.x;
     }
-
+ 
     @Override
     public void mouseUp(MouseEvent event) {
         if (fMouseDown) {
             fMouseDown = false;
+            // Check if mouse click without move; if so, just set the current event time
+            if (event.x == fStartPosition) {
+                super.mouseDown(event);
+                return;
+            }
+ 
             ((HistogramView) fParentView).updateTimeRange(fRangeStartTime, fRangeStartTime + fZoom.getDuration());
+
         }
     }
-
+ 
+    
     // ------------------------------------------------------------------------
     // MouseMoveListener
     // ------------------------------------------------------------------------
 
     @Override
     public void mouseMove(MouseEvent event) {
+
         if (fMouseDown) {
             int nbBuckets = event.x - fStartPosition;
             long delta = nbBuckets * fScaledData.fBucketDuration;
