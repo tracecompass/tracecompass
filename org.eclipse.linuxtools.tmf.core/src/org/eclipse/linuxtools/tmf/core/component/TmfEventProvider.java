@@ -85,87 +85,95 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
         }
     }
 
-	@Override
-	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
+    @Override
+    protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
 
-		if (! (request instanceof ITmfEventRequest)) {
-			super.queueBackgroundRequest(request, blockSize, indexing);
-			return;
-		}
+        if (! (request instanceof ITmfEventRequest)) {
+            super.queueBackgroundRequest(request, blockSize, indexing);
+            return;
+        }
 
         final TmfDataProvider<T> provider = this;
 
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
 
                 if (Tracer.isRequestTraced()) {
                     Tracer.traceRequest(request, "is being serviced by " + provider.getName()); //$NON-NLS-1$
                 }
 
-			    request.start();
+                request.start();
 
-				final Integer[] CHUNK_SIZE = new Integer[1];
-				CHUNK_SIZE[0] = Math.min(request.getNbRequested(), blockSize + ((indexing) ? 1 : 0));
-				
-				final Integer[] nbRead = new Integer[1];
-				nbRead[0] = 0;
+                final Integer[] CHUNK_SIZE = new Integer[1];
+                CHUNK_SIZE[0] = Math.min(request.getNbRequested(), blockSize + ((indexing) ? 1 : 0));
 
-				final Boolean[] isFinished = new Boolean[1];
-				isFinished[0] = Boolean.FALSE;
+                final Integer[] nbRead = new Integer[1];
+                nbRead[0] = 0;
 
-				long startIndex = request.getIndex();
-				
-				while (!isFinished[0]) {
+                final Boolean[] isFinished = new Boolean[1];
+                isFinished[0] = Boolean.FALSE;
 
-					TmfEventRequest<T> subRequest= new TmfEventRequest<T>(request.getDataType(), ((ITmfEventRequest<?>) request).getRange(), startIndex + nbRead[0], CHUNK_SIZE[0], blockSize, ExecutionType.BACKGROUND)
-					{
-						@Override
-						public void handleData(T data) {
-							super.handleData(data);
-							if (request.getDataType().isInstance(data)) {
-							    request.handleData(data);
-							}
-							if (this.getNbRead() > CHUNK_SIZE[0]) {
-								System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
-							}
-						}
+                long startIndex = request.getIndex();
 
-						@Override
-						public void handleCompleted() {
-							nbRead[0] += this.getNbRead();
-							if (nbRead[0] >= request.getNbRequested() || (this.getNbRead() < CHUNK_SIZE[0])) {
-								if (this.isCancelled()) { 
-									request.cancel();
-								} else if (this.isFailed()) {
-								    request.fail();  
-								} else {
-									request.done();
-								}
-								isFinished[0] = Boolean.TRUE;
-							}
-							super.handleCompleted();
-						}
-					};
+                while (!isFinished[0]) {
 
-					if (!isFinished[0]) {
-						queueRequest(subRequest);
+                    TmfEventRequest<T> subRequest= new TmfEventRequest<T>(request.getDataType(), ((ITmfEventRequest<?>) request).getRange(), startIndex + nbRead[0], CHUNK_SIZE[0], blockSize, ExecutionType.BACKGROUND) {
 
-						try {
-							subRequest.waitForCompletion();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+                        @Override
+                        public synchronized boolean isCompleted() {
+                            return super.isCompleted() || request.isCompleted();
+                        }
 
-						if (startIndex == 0 && nbRead[0].equals(CHUNK_SIZE[0])) { // do this only once if the event request index is unknown
-							startIndex = subRequest.getIndex(); // update the start index with the index of the first subrequest's
-						}                                       // start time event which was set during the arm request
-						CHUNK_SIZE[0] = Math.min(request.getNbRequested() - nbRead[0], blockSize);
-					}
-				}
-			}
-		};
+                        @Override
+                        public void handleData(T data) {
+                            super.handleData(data);
+                            if (request.getDataType().isInstance(data)) {
+                                request.handleData(data);
+                            }
+                            if (this.getNbRead() > CHUNK_SIZE[0]) {
+                                System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
+                            }
+                        }
 
-		thread.start();
-	}
+                        @Override
+                        public void handleCompleted() {
+                            nbRead[0] += this.getNbRead();
+                            if (nbRead[0] >= request.getNbRequested() || (this.getNbRead() < CHUNK_SIZE[0])) {
+                                if (this.isCancelled()) { 
+                                    request.cancel();
+                                } else if (this.isFailed()) {
+                                    request.fail();  
+                                } else {
+                                    request.done();
+                                }
+                                isFinished[0] = Boolean.TRUE;
+                            }
+                            super.handleCompleted();
+                        }
+                    };
+
+                    if (!isFinished[0]) {
+                        queueRequest(subRequest);
+
+                        try {
+                            subRequest.waitForCompletion();
+                            if (request.isCompleted()) {
+                                isFinished[0] = Boolean.TRUE;
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (startIndex == 0 && nbRead[0].equals(CHUNK_SIZE[0])) { // do this only once if the event request index is unknown
+                            startIndex = subRequest.getIndex(); // update the start index with the index of the first subrequest's
+                        }                                       // start time event which was set during the arm request
+                        CHUNK_SIZE[0] = Math.min(request.getNbRequested() - nbRead[0], blockSize);
+                    }
+                }
+            }
+        };
+
+        thread.start();
+    }
 }
