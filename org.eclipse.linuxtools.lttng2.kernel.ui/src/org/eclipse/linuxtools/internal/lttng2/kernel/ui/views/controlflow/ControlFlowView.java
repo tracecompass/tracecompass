@@ -397,7 +397,7 @@ public class ControlFlowView extends TmfView {
 
     @TmfSignalHandler
     public void synchToTime(final TmfTimeSynchSignal signal) {
-        if (signal.getSource() == this) {
+        if (signal.getSource() == this || fSelectedExperiment == null) {
             return;
         }
         final long time = signal.getCurrentTime().normalize(0, -9).getValue();
@@ -463,7 +463,7 @@ public class ControlFlowView extends TmfView {
 
     @TmfSignalHandler
     public void synchToRange(final TmfRangeSynchSignal signal) {
-        if (signal.getSource() == this) {
+        if (signal.getSource() == this || fSelectedExperiment == null) {
             return;
         }
         final long startTime = signal.getCurrentRange().getStartTime().normalize(0, -9).getValue();
