@@ -128,8 +128,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
     protected synchronized void initialize(final IResource resource, final String path, final Class<LttngEvent> eventType)
             throws TmfTraceException {
         try {
-            IProject project = resource.getProject();
-            traceLibPath = (project != null) ? TraceHelper.getTraceLibDirFromProject(project) : null;
+            if (resource != null) {
+                IProject project = resource.getProject();
+                traceLibPath = (project != null) ? TraceHelper.getTraceLibDirFromProject(project) : null;
+            }
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
         } catch (final Exception e) {
             throw new TmfTraceException(e.getMessage());
