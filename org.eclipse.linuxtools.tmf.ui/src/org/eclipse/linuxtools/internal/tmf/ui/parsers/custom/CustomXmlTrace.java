@@ -58,14 +58,13 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
         fDefinition = definition;
         fEventType = new CustomXmlEventType(fDefinition);
         fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);
+        setCacheSize(DEFAULT_CACHE_SIZE);
     }
 
     public CustomXmlTrace(final IResource resource, final CustomXmlTraceDefinition definition, final String path, final int pageSize) throws TmfTraceException {
-        super(null, CustomXmlEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
-        fDefinition = definition;
-        fEventType = new CustomXmlEventType(fDefinition);
-        fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);
-        indexTrace(false);
+        this(definition);
+        setCacheSize((pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
+        initTrace(resource, path, CustomXmlEvent.class);
     }
 
     @Override

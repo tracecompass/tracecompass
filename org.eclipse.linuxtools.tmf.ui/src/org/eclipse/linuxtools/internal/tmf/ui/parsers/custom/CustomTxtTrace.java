@@ -46,13 +46,13 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     public CustomTxtTrace(final CustomTxtTraceDefinition definition) {
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
+        setCacheSize(DEFAULT_CACHE_SIZE);
     }
 
-    public CustomTxtTrace(final IResource resource, final CustomTxtTraceDefinition definition, final String path, final int pageSize) throws TmfTraceException {
-        super(resource, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
-        fDefinition = definition;
-        fEventType = new CustomTxtEventType(fDefinition);
-        indexTrace(false);
+    public CustomTxtTrace(final IResource resource, final CustomTxtTraceDefinition definition, final String path, final int cacheSize) throws TmfTraceException {
+        this(definition);
+        setCacheSize((cacheSize > 0) ? cacheSize : DEFAULT_CACHE_SIZE);
+        initTrace(resource, path, CustomTxtEvent.class);
     }
 
     @Override
