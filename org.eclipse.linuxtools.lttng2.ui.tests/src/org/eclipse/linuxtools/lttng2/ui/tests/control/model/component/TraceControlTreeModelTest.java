@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
@@ -54,7 +54,7 @@ import org.osgi.framework.FrameworkUtil;
  */
 @SuppressWarnings("nls")
 public class TraceControlTreeModelTest extends TestCase {
- 
+
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
@@ -62,21 +62,21 @@ public class TraceControlTreeModelTest extends TestCase {
     private static final String TEST_STREAM = "ListInfoTest.cfg";
     private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
     private static final String TARGET_NODE_NAME = "myNode";
-    
+
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
-    
+
     private TestRemoteSystemProxy fProxy;
-    private String fTestFile; 
-    
+    private String fTestFile;
+
     // ------------------------------------------------------------------------
     // Static methods
     // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new ModelImplTestSetup(new TestSuite(TraceControlTreeModelTest.class));
@@ -114,16 +114,18 @@ public class TraceControlTreeModelTest extends TestCase {
     public void tearDown()  throws Exception {
         TraceControlTestFacility.getInstance().waitForJobs();
     }
-    
+
     /**
      * Run the TraceControlComponent.
+     *
+     * @throws Exception
+     *             This will fail the test
      */
-    public void testTraceControlComponents()
-        throws Exception {
-        
+    public void testTraceControlComponents() throws Exception {
+
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(SCEN_LIST_INFO_TEST);
-        
+
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
@@ -159,10 +161,10 @@ public class TraceControlTreeModelTest extends TestCase {
         ITraceControlComponent[] groups = node.getChildren();
         assertNotNull(groups);
         assertEquals(2, groups.length);
-        
+
         assertTrue(groups[0] instanceof TraceProviderGroup);
         assertTrue(groups[1] instanceof TraceSessionGroup);
-        
+
         assertEquals("Provider", groups[0].getName());
         assertEquals("Sessions", groups[1].getName());
 
@@ -233,7 +235,7 @@ public class TraceControlTreeModelTest extends TestCase {
         ustProvider = (UstProviderComponent) providers[2];
         assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello [PID=4852]", ustProvider.getName());
         assertEquals(4852, ustProvider.getPid());
-        
+
         // verify getters and setter
         verifyUstProviderGettersSetters(ustProvider);
 
@@ -254,10 +256,10 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals("ust_tests_hello:tptest", baseEventInfo.getName());
         assertEquals(TraceLogLevel.TRACE_DEBUG_FUNCTION, baseEventInfo.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, baseEventInfo.getEventType());
-        
+
         // verify getters and setters
         verifyBaseEventGettersSetters(baseEventInfo);
-        
+
         // ------------------------------------------------------------------------
         // Verify TraceSessionGroup
         // ------------------------------------------------------------------------
@@ -280,11 +282,11 @@ public class TraceControlTreeModelTest extends TestCase {
 
         // Verify setters and setters
         verifySessionGetterSetters(session);
-        
+
         ITraceControlComponent[] domains = session.getChildren();
         assertNotNull(domains);
         assertEquals(2, domains.length);
-        
+
         // ------------------------------------------------------------------------
         // Verify Kernel domain
         // ------------------------------------------------------------------------
@@ -295,12 +297,12 @@ public class TraceControlTreeModelTest extends TestCase {
 
         // Verify setters and setters
         verifyDomainGettersSetters((TraceDomainComponent) domains[0]);
-        
+
         // ------------------------------------------------------------------------
         // Verify Kernel's channel0
         // ------------------------------------------------------------------------
         assertTrue(channels[0] instanceof TraceChannelComponent);
-        TraceChannelComponent channel = (TraceChannelComponent) channels[0]; 
+        TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("channel0", channel.getName());
         assertEquals(4, channel.getNumberOfSubBuffers());
         assertEquals("splice()", channel.getOutputType());
@@ -321,13 +323,13 @@ public class TraceControlTreeModelTest extends TestCase {
         assertTrue(channel0Events[2] instanceof TraceProbeEventComponent);
         assertTrue(channel0Events[3] instanceof TraceProbeEventComponent);
         assertTrue(channel0Events[4] instanceof TraceEventComponent);
-        
+
         TraceEventComponent event = (TraceEventComponent) channel0Events[0];
         assertEquals("block_rq_remap", event.getName());
         assertEquals(TraceLogLevel.TRACE_EMERG, event.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.ENABLED, event.getState());
-        
+
         event = (TraceEventComponent) channel0Events[1];
         assertEquals("block_bio_remap", event.getName());
         assertEquals(TraceLogLevel.TRACE_EMERG, event.getLogLevel());
@@ -354,18 +356,18 @@ public class TraceControlTreeModelTest extends TestCase {
         assertNull(probeEvent.getAddress());
         assertEquals("0x0", probeEvent.getOffset());
         assertEquals("init_post", probeEvent.getSymbol());
-        
+
         event = (TraceEventComponent) channel0Events[4];
         assertEquals("syscalls", event.getName());
         assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
         assertEquals(TraceEventType.SYSCALL, event.getEventType());
         assertEquals(TraceEnablement.ENABLED, event.getState());
-        
+
         // ------------------------------------------------------------------------
         // Verify Kernel's channel1
         // ------------------------------------------------------------------------
         assertEquals("channel1", channels[1].getName());
-        channel = (TraceChannelComponent) channels[1]; 
+        channel = (TraceChannelComponent) channels[1];
         assertEquals(4, channel.getNumberOfSubBuffers());
         assertEquals("splice()", channel.getOutputType());
         assertEquals(true, channel.isOverwriteMode());
@@ -384,9 +386,9 @@ public class TraceControlTreeModelTest extends TestCase {
         // Verify domain UST global
         // ------------------------------------------------------------------------
         assertEquals("UST global", domains[1].getName());
-        
+
         ITraceControlComponent[] ustChannels = domains[1].getChildren();
-        
+
         for (int i = 0; i < ustChannels.length; i++) {
             assertTrue(ustChannels[i] instanceof TraceChannelComponent);
         }
@@ -394,7 +396,7 @@ public class TraceControlTreeModelTest extends TestCase {
         // ------------------------------------------------------------------------
         // Verify UST global's mychannel1
         // ------------------------------------------------------------------------
-        channel = (TraceChannelComponent) ustChannels[0]; 
+        channel = (TraceChannelComponent) ustChannels[0];
         assertEquals("mychannel1", channel.getName());
         assertEquals(8, channel.getNumberOfSubBuffers());
         assertEquals("mmap()", channel.getOutputType());
@@ -403,8 +405,8 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals(TraceEnablement.DISABLED, channel.getState());
         assertEquals(8192, channel.getSubBufferSize());
         assertEquals(200, channel.getSwitchTimer());
-        
-        // verify getters and setters 
+
+        // verify getters and setters
         verifyChannelGettersSetters(channel);
 
         // ------------------------------------------------------------------------
@@ -431,31 +433,31 @@ public class TraceControlTreeModelTest extends TestCase {
         // ------------------------------------------------------------------------
         ustEvents = channel.getChildren();
         assertEquals(2, ustEvents.length);
-        
+
         event = (TraceEventComponent) ustEvents[0];
         assertEquals("ust_tests_hello:tptest_sighandler", event.getName());
         assertEquals(TraceLogLevel.TRACE_DEBUG_LINE, event.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.DISABLED, event.getState());
-        
+
         event = (TraceEventComponent) ustEvents[1];
         assertEquals("*", ustEvents[1].getName());
         assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.ENABLED, event.getState());
-        
+
         // verify getters and setters
         verifyEventGettersSetters(event);
-        
+
         // disconnect
         node.disconnect();
         assertEquals(TargetNodeState.DISCONNECTED, node.getTargetNodeState());
         assertNotNull(node.getImage());
         assertNotSame(connectedImage, node.getImage());
-        
+
         node.getParent().removeChild(node);
     }
-    
+
     private void verifySessionGetterSetters(TraceSessionComponent session) {
         // save original values
         String name = session.getName();
@@ -465,7 +467,7 @@ public class TraceControlTreeModelTest extends TestCase {
         // test cases
         session.setName("newName");
         assertEquals("newName", session.getName());
-        
+
         session.setSessionPath("/home/user/tmp");
         assertEquals("/home/user/tmp", session.getSessionPath());
 
@@ -473,7 +475,7 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
         Image inactiveImage = session.getImage();
         assertNotNull(inactiveImage);
-        
+
         session.setSessionState("active");
         assertEquals(TraceSessionState.ACTIVE, session.getSessionState());
 
@@ -489,13 +491,13 @@ public class TraceControlTreeModelTest extends TestCase {
         for (int i = 0; i < domains.length; i++) {
             assertEquals(domains[i].getName(), children[i].getName());
         }
-        
-        // restore original values      
+
+        // restore original values
         session.setName(name);
         session.setSessionPath(origPath);
         session.setSessionState(origState);
     }
-    
+
     private void verifyDomainGettersSetters(TraceDomainComponent domain) {
         // save original values
         boolean isKernel = domain.isKernel();
@@ -526,11 +528,11 @@ public class TraceControlTreeModelTest extends TestCase {
         String name =  event.getName();
         TraceLogLevel level = event.getLogLevel();
         TraceEventType type = event.getEventType();
-        
+
         // test cases
         event.setName("newName");
         assertEquals("newName", event.getName());
-        
+
         event.setLogLevel(TraceLogLevel.TRACE_INFO);
         assertEquals(TraceLogLevel.TRACE_INFO, event.getLogLevel());
         event.setLogLevel("TRACE_ALERT");
@@ -540,24 +542,24 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals(TraceEventType.UNKNOWN, event.getEventType());
         event.setEventType("tracepoint");
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
-        
+
         // restore original values
         event.setName(name);
         event.setLogLevel(level);
         event.setEventType(type);
     }
-    
+
     private void verifyEventGettersSetters(TraceEventComponent event) {
         // save original values
         String name =  event.getName();
         TraceLogLevel level = event.getLogLevel();
         TraceEventType type = event.getEventType();
         TraceEnablement state = event.getState();
-        
+
         // test cases
         event.setName("newName");
         assertEquals("newName", event.getName());
-        
+
         event.setLogLevel(TraceLogLevel.TRACE_INFO);
         assertEquals(TraceLogLevel.TRACE_INFO, event.getLogLevel());
         event.setLogLevel("TRACE_ALERT");
@@ -567,10 +569,10 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals(TraceEventType.UNKNOWN, event.getEventType());
         event.setEventType("tracepoint");
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
-        
+
         event.setState("disabled");
         assertEquals(TraceEnablement.DISABLED, event.getState());
-        
+
         Image disabledImage = event.getImage();
         assertNotNull(disabledImage);
 
@@ -587,29 +589,29 @@ public class TraceControlTreeModelTest extends TestCase {
         event.setEventType(type);
         event.setState(state);
     }
-    
+
     private void verifyProbeEventGettersSetters(TraceProbeEventComponent event) {
         // save original values
         String address = event.getAddress();
         String offset = event.getOffset();
         String symbol = event.getSymbol();
-        
+
         // test cases
         event.setAddress("0xffff1234");
         assertEquals("0xffff1234", event.getAddress());
-        
+
         event.setOffset("0x1234");
         assertEquals("0x1234", event.getOffset());
-        
+
         event.setSymbol("init");
         assertEquals("init", event.getSymbol());
-        
+
         // restore original values
         event.setAddress(address);
         event.setOffset(offset);
         event.setSymbol(symbol);
     }
-    
+
     private void verifyChannelGettersSetters(TraceChannelComponent channel) {
         // save original values
         String name = channel.getName();
@@ -620,26 +622,26 @@ public class TraceControlTreeModelTest extends TestCase {
         TraceEnablement state =  channel.getState();
         long subBufferSize = channel.getSubBufferSize();
         long switchTimer = channel.getSwitchTimer();
-        
+
         // test cases
         channel.setName("newName");
         assertEquals("newName", channel.getName());
-        
+
         channel.setNumberOfSubBuffers(2);
         assertEquals(2, channel.getNumberOfSubBuffers());
-        
+
         channel.setOutputType("splice()");
         assertEquals("splice()", channel.getOutputType());
-        
+
         channel.setOverwriteMode(false);
         assertEquals(false, channel.isOverwriteMode());
-        
+
         channel.setReadTimer(250);
         assertEquals(250, channel.getReadTimer());
-        
+
         channel.setState("enabled");
         assertEquals(TraceEnablement.ENABLED, channel.getState());
-        
+
         Image enabledImage = channel.getImage();
         assertNotNull(enabledImage);
         channel.setState(TraceEnablement.DISABLED);
@@ -648,10 +650,10 @@ public class TraceControlTreeModelTest extends TestCase {
         Image disabledImage = channel.getImage();
         assertNotNull(disabledImage);
         assertNotSame(enabledImage, disabledImage);
-        
+
         channel.setSubBufferSize(1024);
         assertEquals(1024, channel.getSubBufferSize());
-        
+
         channel.setSwitchTimer(1000);
         assertEquals(1000, channel.getSwitchTimer());
 
@@ -665,19 +667,19 @@ public class TraceControlTreeModelTest extends TestCase {
         channel.setSubBufferSize(subBufferSize);
         channel.setSwitchTimer(switchTimer);
     }
-    
+
     private void verifyUstProviderGettersSetters(UstProviderComponent ustProvider) {
         // save original values
         String name = ustProvider.getName();
         int pid = ustProvider.getPid();
-        
+
         // test cases
         ustProvider.setName("newName");
         assertEquals("newName", ustProvider.getName());
 
         ustProvider.setPid(9876);
         assertEquals(9876, ustProvider.getPid());
-        
+
         // restore original values
         ustProvider.setName(name);
         ustProvider.setPid(pid);

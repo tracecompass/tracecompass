@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -27,10 +27,10 @@ import org.eclipse.ui.IWorkbenchPage;
 
 /**
  * <p>
- * Command handler implementation to enable a trace channel for unknown domain 
+ * Command handler implementation to enable a trace channel for unknown domain
  * (on session level).
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableChannelOnSessionHandler extends BaseEnableChannelHandler {
@@ -46,7 +46,7 @@ public class EnableChannelOnSessionHandler extends BaseEnableChannelHandler {
     public void enableChannel(CommandParameter param, List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
         param.getSession().enableChannels(channelNames, info, isKernel, monitor);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseCreateChannelHandler#getDomain(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter)
@@ -78,7 +78,7 @@ public class EnableChannelOnSessionHandler extends BaseEnableChannelHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceSessionComponent) {
                     // Add only TraceSessionComponents that are inactive and not destroyed
                     TraceSessionComponent tmpSession = (TraceSessionComponent) element;
@@ -89,7 +89,7 @@ public class EnableChannelOnSessionHandler extends BaseEnableChannelHandler {
             }
         }
         boolean isEnabled = session != null;
-        
+
         fLock.lock();
         try {
             fParam = null;
@@ -99,7 +99,7 @@ public class EnableChannelOnSessionHandler extends BaseEnableChannelHandler {
         } finally {
             fLock.unlock();
         }
-        
+
         return isEnabled;
     }
 }

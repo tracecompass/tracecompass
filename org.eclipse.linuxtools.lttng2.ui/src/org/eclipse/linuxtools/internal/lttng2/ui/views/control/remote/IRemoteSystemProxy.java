@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote;
@@ -23,7 +23,7 @@ import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSys
  * <p>
  * Remote System Proxy interface.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public interface IRemoteSystemProxy {
@@ -33,77 +33,81 @@ public interface IRemoteSystemProxy {
     // ------------------------------------------------------------------------
     /**
      * Find the first shell service.
-     * 
+     *
      * @return shell service object, or <code>null</code> if not found.
      */
     public IShellService getShellService();
 
     /**
      * Find the first terminal service.
-     * 
+     *
      * @return shell service object, or <code>null</code> if not found.
      */
     public ITerminalService getTerminalService();
 
     /**
      * Find the first IShellServiceSubSystem service.
-     * 
+     *
      * @return shell service subsystem, or <code>null</code> if not found.
      */
     public ISubSystem getShellServiceSubSystem();
 
     /**
      * Find the first ITerminalServiceSubSystem service.
-     * 
-     * @param host the connection 
+     *
      * @return shell service subsystem, or <code>null</code> if not found.
      */
     public ISubSystem getTerminalServiceSubSystem();
-    
+
     /**
      * Finds the File Service Subsystem.
-     * @return file service subsystem, or <code>null</code> if not found. 
+     *
+     * @return file service subsystem, or <code>null</code> if not found.
      */
     public IFileServiceSubSystem getFileServiceSubSystem();
-    
+
     /**
-     * Connects the shell service sub system. 
-     * 
-     * @param callback - call-back method being called when connection was finished
-     * @throws Exception
+     * Connects the shell service sub system.
+     *
+     * @param callback
+     *            - call-back method being called when connection was finished
+     * @throws ExecutionException
+     *             If the connection fails
      */
     public void connect(IRSECallback callback) throws ExecutionException;
 
     /**
-     * Disconnects from the shell service sub system. 
-     * 
-     * @throws Exception
+     * Disconnects from the shell service sub system.
+     *
+     * @throws ExecutionException
+     *             If the disconnect command fails
      */
     public void disconnect() throws ExecutionException;
 
     /**
-     * Creates a command shell. 
-     * 
+     * Creates a command shell.
+     *
      * @return the command shell implementation
-     * @throws Exception
+     * @throws ExecutionException
+     *             If the command fails
      */
     public ICommandShell createCommandShell() throws ExecutionException;
 
     /**
-     * Method to add a communication listener to the connector service defined for 
-     * the given connection. 
-     * 
-     * @param listener - listener to add
-     * @throws Exception
+     * Method to add a communication listener to the connector service defined
+     * for the given connection.
+     *
+     * @param listener
+     *            - listener to add
      */
     public void addCommunicationListener(ICommunicationsListener listener);
 
     /**
-     * Method to remove a communication listener from the connector service defined for 
-     * the given connection. 
-     * 
-     * @param listener - listener to remove
-     * @throws Exception
+     * Method to remove a communication listener from the connector service
+     * defined for the given connection.
+     *
+     * @param listener
+     *            - listener to remove
      */
     public void removeCommunicationListener(ICommunicationsListener listener);
 

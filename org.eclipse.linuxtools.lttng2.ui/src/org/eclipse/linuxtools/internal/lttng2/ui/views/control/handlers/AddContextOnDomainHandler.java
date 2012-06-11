@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -28,7 +28,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * <p>
  * Command handler implementation to add contexts to all channels and all events.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class AddContextOnDomainHandler extends BaseAddContextHandler {
@@ -36,7 +36,7 @@ public class AddContextOnDomainHandler extends BaseAddContextHandler {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -58,26 +58,26 @@ public class AddContextOnDomainHandler extends BaseAddContextHandler {
      */
     @Override
     public boolean isEnabled() {
-        
+
         // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
             return false;
         }
-        
+
         TraceDomainComponent domain = null;
         TraceSessionComponent session = null;
-        
+
         // Check if one domain is selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceDomainComponent) {
                     TraceDomainComponent tmpDomain = (TraceDomainComponent) element;
                     session = (TraceSessionComponent) tmpDomain.getParent();
-                    
+
                     // Add only TraceDomainComponent whose TraceSessionComponent parent is inactive and not destroyed
                     if ((session.getSessionState() == TraceSessionState.INACTIVE) && (!session.isDestroyed())) {
                         domain = tmpDomain;
@@ -85,9 +85,9 @@ public class AddContextOnDomainHandler extends BaseAddContextHandler {
                 }
             }
         }
-        
+
         boolean isEnabled = domain != null;
-        
+
         fLock.lock();
         try {
             fParam = null;

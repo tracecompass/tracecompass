@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -39,7 +39,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Command handler implementation to destroy one or more trace sessions.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class DestroySessionHandler extends BaseControlViewHandler {
@@ -48,10 +48,10 @@ public class DestroySessionHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The list of session components the command is to be executed on. 
+     * The list of session components the command is to be executed on.
      */
-    private List<TraceSessionComponent> fSessions = new ArrayList<TraceSessionComponent>();
-    
+    private final List<TraceSessionComponent> fSessions = new ArrayList<TraceSessionComponent>();
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -69,8 +69,8 @@ public class DestroySessionHandler extends BaseControlViewHandler {
         }
         // Get user confirmation
         IConfirmDialog dialog = TraceControlDialogFactory.getInstance().getConfirmDialog();
-        if (!dialog.openConfirm(window.getShell(), 
-                Messages.TraceControl_DestroyConfirmationTitle, 
+        if (!dialog.openConfirm(window.getShell(),
+                Messages.TraceControl_DestroyConfirmationTitle,
                 Messages.TraceControl_DestroyConfirmationMessage)) {
 
             return null;
@@ -80,10 +80,10 @@ public class DestroySessionHandler extends BaseControlViewHandler {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    // Make a copy of the list of sessions to avoid ConcurrentModificationException when iterating 
-                    // over fSessions, since fSessions is modified in another thread triggered by the tree viewer refresh 
+                    // Make a copy of the list of sessions to avoid ConcurrentModificationException when iterating
+                    // over fSessions, since fSessions is modified in another thread triggered by the tree viewer refresh
                     // after removing a session.
-                    TraceSessionComponent[] sessions = (TraceSessionComponent[])fSessions.toArray(new TraceSessionComponent[fSessions.size()]);
+                    TraceSessionComponent[] sessions = fSessions.toArray(new TraceSessionComponent[fSessions.size()]);
 
                     for (int i = 0; i < sessions.length; i++) {
                         // Destroy all selected sessions
@@ -92,8 +92,8 @@ public class DestroySessionHandler extends BaseControlViewHandler {
                         sessionGroup.destroySession(session, monitor);
                     }
                 } catch (ExecutionException e) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_DestroySessionFailure, e);
-                }  
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_DestroySessionFailure, e);
+                }
                 return Status.OK_STATUS;
             }
         };
@@ -121,7 +121,7 @@ public class DestroySessionHandler extends BaseControlViewHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceSessionComponent) {
                     // Add only TraceSessionComponents that are inactive and not destroyed
                     TraceSessionComponent session = (TraceSessionComponent) element;

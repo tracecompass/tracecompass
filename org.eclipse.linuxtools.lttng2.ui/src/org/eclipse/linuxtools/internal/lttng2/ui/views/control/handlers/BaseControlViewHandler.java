@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -31,7 +31,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Abstract Command handler implementation for all control view handlers.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract public class BaseControlViewHandler extends AbstractHandler {
@@ -43,7 +43,7 @@ abstract public class BaseControlViewHandler extends AbstractHandler {
      * The synchronization lock.
      */
     final protected ReentrantLock fLock = new ReentrantLock();
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -76,14 +76,14 @@ abstract public class BaseControlViewHandler extends AbstractHandler {
      */
     protected void refresh(final CommandParameter param) {
         Job job = new Job(Messages.TraceControl_RetrieveNodeConfigurationJob) {
-            
+
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
                     param.getSession().getConfigurationFromNode(monitor);
                 } catch (ExecutionException e) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure, e);
-                } 
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure, e);
+                }
                 return Status.OK_STATUS;
             }
         };

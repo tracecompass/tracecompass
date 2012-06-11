@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences;
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCo
  * <p>
  * Singleton class to access LTTng tracer control preferences.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class ControlPreferences {
@@ -105,7 +105,7 @@ public class ControlPreferences {
     // ------------------------------------------------------------------------
     /**
      * Returns the trace control preferences singleton instance
-     * 
+     *
      * @return the trace control preferences singleton instance
      */
     public synchronized static ControlPreferences getInstance() {
@@ -130,21 +130,21 @@ public class ControlPreferences {
     }
 
     /**
-     * @return value of tracing group preference 
+     * @return value of tracing group preference
      */
     public String getTracingGroup() {
         return fPreferenceStore.getString(TRACE_CONTROL_TRACING_GROUP_PREF);
     }
 
     /**
-     * @return whether is logging is enabled 
+     * @return whether is logging is enabled
      */
     public boolean isLoggingEnabled() {
         return fPreferenceStore.getBoolean(TRACE_CONTROL_LOG_COMMANDS_PREF);
     }
 
     /**
-     * @return whether an existing log file will appended or not  
+     * @return whether an existing log file will appended or not
      */
     public boolean isAppend() {
         return fPreferenceStore.getBoolean(ControlPreferences.TRACE_CONTROL_LOG_APPEND_PREF);
@@ -156,30 +156,34 @@ public class ControlPreferences {
     public String getVerboseLevel() {
         return fPreferenceStore.getString(TRACE_CONTROL_VERBOSE_LEVEL_PREF);
     }
-    
+
     /**
      * @return absolute log file path
      */
     public String getLogfilePath() {
         return fPreferenceStore.getString(TRACE_CONTROL_LOG_FILE_PATH_PREF);
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     /**
      * Initializes the control preferences (e.g. enable open log file)
+     *
+     * @param preferenceStore
+     *            The preference store to assign
      */
     public void init(IPreferenceStore preferenceStore) {
         fPreferenceStore = preferenceStore;
 
         if (fPreferenceStore.getBoolean(ControlPreferences.TRACE_CONTROL_LOG_COMMANDS_PREF)) {
             ControlCommandLogger.init(getLogfilePath(), isAppend());
-        } 
+        }
     }
 
     /**
-     * Disposes any resource (e.g. close log file). 
+     * Disposes any resource (e.g. close log file).
      */
     public void dispose() {
         ControlCommandLogger.close();

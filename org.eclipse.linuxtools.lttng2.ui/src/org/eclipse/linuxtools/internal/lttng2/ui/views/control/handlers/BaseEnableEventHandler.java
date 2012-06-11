@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -37,7 +37,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Base command handler implementation to enable events.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
@@ -53,48 +53,74 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     /**
      * Enables a list of events for given parameters.
-     * @param - a parameter instance with data for the command execution
-     * @param eventNames - list of event names
-     * @param isKernel - true if kernel domain else false
-     * @param monitor - a progress monitor
+     *
+     * @param param
+     *            - a parameter instance with data for the command execution
+     * @param eventNames
+     *            - list of event names
+     * @param isKernel
+     *            - true if kernel domain else false
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails for some reason
      */
     abstract public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Enables all syscall events.
-     * @param - a parameter instance with data for the command execution
-     * @param monitor - a progress monitor
+     *
+     * @param param
+     *            - a parameter instance with data for the command execution
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails for some reason
      */
     abstract public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException;
-    
+
     /**
      * Enables a dynamic probe.
-     * @param - a parameter instance with data for the command execution
-     * @param eventName - a event name
-     * @param isFunction - true for dynamic function entry/return probe else false
-     * @param probe - a dynamic probe information
-     * @param monitor - a progress monitor
+     *
+     * @param param
+     *            - a parameter instance with data for the command execution
+     * @param eventName
+     *            - a event name
+     * @param isFunction
+     *            - true for dynamic function entry/return probe else false
+     * @param probe
+     *            - a dynamic probe information
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails for some reason
      */
     abstract public void enableProbe(CommandParameter param, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException;
-    
+
     /**
      * Enables events using log level
-     * @param - a parameter instance with data for the command execution
-     * @param eventName - a event name
-     * @param logLevelType - a log level type 
-     * @param level - a log level 
-     * @param monitor - a progress monitor  
+     *
+     * @param param
+     *            - a parameter instance with data for the command execution
+     * @param eventName
+     *            - a event name
+     * @param logLevelType
+     *            - a log level type
+     * @param level
+     *            - a log level
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
-     */    
+     *             If the command fails for some reason
+     */
     abstract public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException;
-    
+
     /**
-     * @param - a parameter instance with data for the command execution
+     * @param param
+     *            - a parameter instance with data for the command execution
      * @return returns the relevant domain (null if domain is not known)
      */
     abstract TraceDomainComponent getDomain(CommandParameter param);
@@ -183,7 +209,7 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
                     refresh(param);
 
                     if (error != null) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
                     }
                     return Status.OK_STATUS;
                 }

@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.service;
@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandSh
  * Factory to create LTTngControlService instances depending on the version of the LTTng Trace Control
  * installed on the remote host.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class LTTngControlServiceFactory {
@@ -36,7 +36,7 @@ public class LTTngControlServiceFactory {
      * The singleton instance.
      */
     private static LTTngControlServiceFactory fInstance = null;
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -63,17 +63,17 @@ public class LTTngControlServiceFactory {
     // Factory method
     // ------------------------------------------------------------------------
     /**
-     * Gets the LTTng Control Service implementation based on the version of the 
+     * Gets the LTTng Control Service implementation based on the version of the
      * remote LTTng Tools.
-     * 
+     *
      * @param shell - the shell implementation to pass to the service
      * @return - LTTng Control Service implementation
-     * @throws ExecutionException
+     * @throws ExecutionException If the command fails
      */
     public ILttngControlService getLttngControlService(ICommandShell shell) throws ExecutionException {
         // get the version
         ICommandResult result = shell.executeCommand(LTTngControlServiceConstants.CONTROL_COMMAND + LTTngControlServiceConstants.COMMAND_VERSION, new NullProgressMonitor());
-        
+
         if ((result != null) && (result.getResult() == 0) && (result.getOutput().length >= 1) && (!LTTngControlServiceConstants.ERROR_PATTERN.matcher(result.getOutput()[0]).matches())) {
             int index = 0;
             while (index < result.getOutput().length) {

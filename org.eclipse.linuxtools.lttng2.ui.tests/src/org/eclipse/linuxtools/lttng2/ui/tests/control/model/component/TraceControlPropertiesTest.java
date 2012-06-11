@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
@@ -70,18 +70,18 @@ public class TraceControlPropertiesTest extends TestCase {
     private static final String TEST_STREAM = "ListInfoTest.cfg";
     private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
 
-    
+
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Static methods
     // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new ModelImplTestSetup(new TestSuite(TraceControlPropertiesTest.class));
@@ -115,19 +115,22 @@ public class TraceControlPropertiesTest extends TestCase {
     public void tearDown() throws Exception {
         TraceControlTestFacility.getInstance().waitForJobs();
     }
-    
+
     /**
      * Run the TraceControlComponent.
+     *
+     * @throws Exception
+     *             This will fail the test
      */
     public void testComponentProperties() throws Exception {
-        
+
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
 
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         proxy.setTestFile(testfile.getAbsolutePath());
         proxy.setScenario(SCEN_LIST_INFO_TEST);
-            
+
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
@@ -161,11 +164,11 @@ public class TraceControlPropertiesTest extends TestCase {
 
         adapter = node.getAdapter(IChannelInfo.class);
         assertNull(adapter);
-        
+
         ITraceControlComponent[] groups = node.getChildren();
         assertNotNull(groups);
         assertEquals(2, groups.length);
-        
+
         ITraceControlComponent[] providers = groups[0].getChildren();
 
         assertNotNull(providers);
@@ -175,7 +178,7 @@ public class TraceControlPropertiesTest extends TestCase {
         // Verify Kernel Provider Properties (adapter)
         // ------------------------------------------------------------------------
         KernelProviderComponent kernelProvider = (KernelProviderComponent) providers[0];
-        
+
         adapter = kernelProvider.getAdapter(IPropertySource.class);
         assertNotNull(adapter);
         assertTrue(adapter instanceof KernelProviderPropertySource);
@@ -189,7 +192,7 @@ public class TraceControlPropertiesTest extends TestCase {
         // Verify UST Provider Properties (adapter)
         // ------------------------------------------------------------------------
         UstProviderComponent ustProvider = (UstProviderComponent) providers[1];
-        
+
         adapter = ustProvider.getAdapter(IPropertySource.class);
         assertNotNull(adapter);
         assertTrue(adapter instanceof UstProviderPropertySource);
@@ -209,7 +212,7 @@ public class TraceControlPropertiesTest extends TestCase {
 
         BaseEventComponent baseEventInfo = (BaseEventComponent) events[0];
         assertNotNull(baseEventInfo);
-        
+
         adapter = baseEventInfo.getAdapter(IPropertySource.class);
         assertNotNull(adapter);
         assertTrue(adapter instanceof BaseEventPropertySource);
@@ -257,7 +260,7 @@ public class TraceControlPropertiesTest extends TestCase {
         assertNotNull(domainSource.getPropertyDescriptors());
 
         assertEquals("Kernel", domainSource.getPropertyValue(TraceDomainPropertySource.TRACE_DOMAIN_NAME_PROPERTY_ID));
-        
+
         ITraceControlComponent[] channels =  domains[0].getChildren();
         assertNotNull(channels);
         assertEquals(2, channels.length);
@@ -267,7 +270,7 @@ public class TraceControlPropertiesTest extends TestCase {
         // ------------------------------------------------------------------------
         assertTrue(channels[0] instanceof TraceChannelComponent);
         TraceChannelComponent channel = (TraceChannelComponent) channels[0];
-        
+
         adapter = channel.getAdapter(IPropertySource.class);
         assertNotNull(adapter);
         assertTrue(adapter instanceof TraceChannelPropertySource);
@@ -283,7 +286,7 @@ public class TraceControlPropertiesTest extends TestCase {
         assertEquals(String.valueOf(200), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_READ_TIMER_PROPERTY_ID));
         assertEquals(String.valueOf(262144), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_SUBBUFFER_SIZE_PROPERTY_ID));
         assertEquals(String.valueOf(0), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_SWITCH_TIMER_PROPERTY_ID));
-        
+
         // ------------------------------------------------------------------------
         // Verify Event Properties (adapter)
         // ------------------------------------------------------------------------
@@ -291,28 +294,28 @@ public class TraceControlPropertiesTest extends TestCase {
         assertNotNull(channel0Events);
         assertEquals(5, channel0Events.length);
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
-        
+
         TraceEventComponent event = (TraceEventComponent) channel0Events[0];
-        
+
         adapter = event.getAdapter(IPropertySource.class);
         assertNotNull(adapter);
         assertTrue(adapter instanceof TraceEventPropertySource);
 
         TraceEventPropertySource eventSource = (TraceEventPropertySource)adapter;
         assertNotNull(eventSource.getPropertyDescriptors());
-        
+
         assertEquals("block_rq_remap", eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_NAME_PROPERTY_ID));
         assertEquals(TraceLogLevel.TRACE_EMERG.name(), eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_LOGLEVEL_PROPERTY_ID));
         assertEquals(TraceEventType.TRACEPOINT.name(), eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_TYPE_PROPERTY_ID));
         assertEquals(TraceEnablement.ENABLED.name(), eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_STATE_PROPERTY_ID));
-        
+
         // ------------------------------------------------------------------------
         // Verify Probe Event Properties (adapter)
         // ------------------------------------------------------------------------
         assertTrue(channel0Events[2] instanceof TraceProbeEventComponent);
-        
+
         TraceProbeEventComponent probeEvent = (TraceProbeEventComponent) channel0Events[2];
-        
+
         adapter = probeEvent.getAdapter(IPropertySource.class);
         assertNotNull(adapter);
         assertTrue(adapter instanceof TraceProbeEventPropertySource);
@@ -320,16 +323,16 @@ public class TraceControlPropertiesTest extends TestCase {
         TraceProbeEventPropertySource probeEventSource = (TraceProbeEventPropertySource)adapter;
         assertNotNull(probeEventSource.getPropertyDescriptors());
         assertEquals(4, probeEventSource.getPropertyDescriptors().length);
-        
+
         assertEquals("myevent2", probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_NAME_PROPERTY_ID));
         assertEquals(TraceEventType.PROBE.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_TYPE_PROPERTY_ID));
         assertEquals(TraceEnablement.ENABLED.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_STATE_PROPERTY_ID));
         assertEquals("0xc0101340", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_ADDRESS_PROPERTY_ID));
-        
+
         assertTrue(channel0Events[3] instanceof TraceProbeEventComponent);
-        
+
         probeEvent = (TraceProbeEventComponent) channel0Events[3];
-        
+
         adapter = probeEvent.getAdapter(IPropertySource.class);
         assertNotNull(adapter);
         assertTrue(adapter instanceof TraceProbeEventPropertySource);
@@ -337,13 +340,13 @@ public class TraceControlPropertiesTest extends TestCase {
         probeEventSource = (TraceProbeEventPropertySource)adapter;
         assertNotNull(probeEventSource.getPropertyDescriptors());
         assertEquals(5, probeEventSource.getPropertyDescriptors().length);
-        
+
         assertEquals("myevent0", probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_NAME_PROPERTY_ID));
         assertEquals(TraceEventType.PROBE.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_TYPE_PROPERTY_ID));
         assertEquals(TraceEnablement.ENABLED.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_STATE_PROPERTY_ID));
         assertEquals("0x0", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_OFFSET_PROPERTY_ID));
         assertEquals("init_post", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_SYMBOL_PROPERTY_ID));
-        
+
         //-------------------------------------------------------------------------
         // Delete node
         //-------------------------------------------------------------------------

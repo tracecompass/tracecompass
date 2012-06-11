@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -38,7 +38,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Base Command handler implementation to enable or disabling a trace channel.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
@@ -50,14 +50,14 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
      * The command execution parameter.
      */
     protected Parameter fParam;
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
     /**
      * @return the new state to set
      */
-    abstract protected TraceEnablement getNewState(); 
+    abstract protected TraceEnablement getNewState();
 
     // ------------------------------------------------------------------------
     // Operations
@@ -65,11 +65,11 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
     /**
      * Change the state
      * @param channel - channel of events to be enabled
-     * @param eventNames - list event names  
+     * @param eventNames - list event names
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    abstract protected void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException; 
+    abstract protected void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException;
 
     /*
      * (non-Javadoc)
@@ -86,7 +86,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
 
         fLock.lock();
         try {
-            
+
             final Parameter param = new Parameter(fParam);
 
             Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
@@ -102,15 +102,15 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
                             session = param.getChannel().getSession();
                             List<String> eventNames = new ArrayList<String>();
                             List<TraceEventComponent> events = param.getEvents();
-                            
+
                             for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
                                 // Enable/disable all selected channels which are disabled
-                                TraceEventComponent event = (TraceEventComponent) iterator.next();
+                                TraceEventComponent event = iterator.next();
 
                                 // Workaround for wildcard handling in lttng-tools
                                 if ("*".equals(event.getName())) { //$NON-NLS-1$
                                     isAll = true;
-                                } else { 
+                                } else {
                                     eventNames.add(event.getName());
                                 }
                             }
@@ -124,7 +124,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
 
                             for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
                                 // Enable all selected channels which are disabled
-                                TraceEventComponent ev = (TraceEventComponent) iterator.next();
+                                TraceEventComponent ev = iterator.next();
                                 ev.setState(getNewState());
                             }
                         }
@@ -133,12 +133,12 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
                     }
 
                     if (session != null) {
-                        // In all cases notify listeners  
+                        // In all cases notify listeners
                         session.fireComponentChanged(session);
                     }
 
                     if (error != null) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
                     }
 
                     return Status.OK_STATUS;
@@ -166,7 +166,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
 
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
-        
+
         TraceChannelComponent channel = null;
         List<TraceEventComponent> events = new ArrayList<TraceEventComponent>();
 
@@ -174,17 +174,17 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
             StructuredSelection structered = ((StructuredSelection) selection);
             String sessionName = null;
             String channelName = null;
-            
+
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
-                 
+                Object element = iterator.next();
+
                 if (element instanceof TraceEventComponent) {
-                    
+
                     TraceEventComponent event = (TraceEventComponent) element;
                     if (sessionName == null) {
                         sessionName = String.valueOf(event.getSessionName());
                     }
-                    
+
                     if (channel == null) {
                         channel = (TraceChannelComponent)event.getParent();
                     }
@@ -222,7 +222,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
     }
 
     /**
-     *  Class containing parameter for the command execution. 
+     *  Class containing parameter for the command execution.
      */
     static protected class Parameter {
         /**
@@ -230,10 +230,10 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
          */
         final private TraceChannelComponent fChannel;
         /**
-         * The list of kernel channel components the command is to be executed on. 
+         * The list of kernel channel components the command is to be executed on.
          */
         final private List<TraceEventComponent> fEvents = new ArrayList<TraceEventComponent>();
-        
+
         /**
          * Constructor
          * @param channel - a channel component
@@ -243,7 +243,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
             fChannel = channel;
             fEvents.addAll(events);
         }
-        
+
         /**
          * Copy constructor
          * @param other - a parameter to copy
@@ -251,14 +251,14 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
         public Parameter(Parameter other) {
             this(other.fChannel, other.fEvents);
         }
-        
+
         /**
          * @return the trace channel component.
          */
         public TraceChannelComponent getChannel() {
             return fChannel;
         }
-        
+
         /**
          * @return a list of trace event components.
          */

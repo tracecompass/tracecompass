@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -31,7 +31,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * Command handler implementation to enable events for a known domain and default channel 'channel0'
  * (which will be created if doesn't exist).
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
@@ -117,10 +117,10 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceDomainComponent) {
                     // Add only if corresponding TraceSessionComponents is inactive and not destroyed
-                    TraceDomainComponent tmpDomain = (TraceDomainComponent) element; 
+                    TraceDomainComponent tmpDomain = (TraceDomainComponent) element;
                     session = tmpDomain.getSession();
                     if(session.getSessionState() == TraceSessionState.INACTIVE && !session.isDestroyed()) {
                         domain = tmpDomain;
@@ -128,7 +128,7 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
                 }
             }
         }
-        
+
         boolean isEnabled = (domain != null);
         fLock.lock();
         try {

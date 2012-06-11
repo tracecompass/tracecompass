@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated using Executor Framework
  **********************************************************************/
@@ -34,9 +34,9 @@ import org.eclipse.rse.services.shells.IShellService;
 
 /**
  * <p>
- * Implementation of remote command execution using RSE's shell service. 
+ * Implementation of remote command execution using RSE's shell service.
  * </p>
- * 
+ *
  * @author Patrick Tasse
  * @author Bernd Hufmann
  */
@@ -46,15 +46,17 @@ public class CommandShell implements ICommandShell {
     // Constants
     // ------------------------------------------------------------------------
 
-    // string to be echo'ed when running command in shell, used to indicate that the command has finished running
+    /** String to be echo'ed when running command in shell, used to indicate that the command has finished running */
     public final static String DONE_MARKUP_STRING = "--RSE:donedonedone:--"; //$NON-NLS-1$
-    
-    //command delimiter for shell
+
+    /** Command delimiter for shell */
     public final static String CMD_DELIMITER = "\n"; //$NON-NLS-1$
 
+    /** Shell "echo" command */
     public final static String SHELL_ECHO_CMD = " echo "; //$NON-NLS-1$
 
-    private final static int DEFAULT_TIMEOUT_VALUE = 15000; // in milliseconds
+    /** Default timeout, in milliseconds */
+    private final static int DEFAULT_TIMEOUT_VALUE = 15000;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -62,12 +64,19 @@ public class CommandShell implements ICommandShell {
     private IRemoteSystemProxy fProxy = null;
     private IHostShell fHostShell = null;
     private BufferedReader fBufferReader = null;
-    private ExecutorService fExecutor = Executors.newFixedThreadPool(1);
+    private final ExecutorService fExecutor = Executors.newFixedThreadPool(1);
     private boolean fIsConnected = false;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     *
+     * @param proxy
+     *            The Remote System proxy
+     */
     public CommandShell(IRemoteSystemProxy proxy) {
         fProxy = proxy;
     }
@@ -139,7 +148,7 @@ public class CommandShell implements ICommandShell {
 
                             if (monitor.isCanceled()) {
                                 flushInput();
-                                throw new CancellationException(); 
+                                throw new CancellationException();
                             }
 
                             if (nextLine.contains(DONE_MARKUP_STRING) && nextLine.contains(SHELL_ECHO_CMD)) {
@@ -151,7 +160,7 @@ public class CommandShell implements ICommandShell {
                             // check if job was cancelled
                             if (monitor.isCanceled()) {
                                 flushInput();
-                                throw new CancellationException(); 
+                                throw new CancellationException();
                             }
 
                             if (!nextLine.contains(DONE_MARKUP_STRING)) {
@@ -184,12 +193,12 @@ public class CommandShell implements ICommandShell {
         }
         throw new ExecutionException(Messages.TraceControl_ShellNotConnected, null);
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
     /**
-     * Flushes the buffer reader 
+     * Flushes the buffer reader
      * @throws IOException
      */
     private void flushInput() throws IOException {
@@ -200,22 +209,25 @@ public class CommandShell implements ICommandShell {
             }
         }
     }
-    
+
     /**
-     * format the command to be sent into the shell command with the done markup string.
-     * The done markup string is needed so we can tell that end of output has been reached.
-     * 
+     * Format the command to be sent into the shell command with the done markup
+     * string. The done markup string is needed so we can tell that end of
+     * output has been reached.
+     *
      * @param cmd
+     *            The original command
      * @return formatted command string
      */
     private String formatShellCommand(String cmd) {
-        if (cmd == null || cmd.equals("")) //$NON-NLS-1$
+        if (cmd == null || cmd.equals("")) { //$NON-NLS-1$
             return cmd;
+        }
         StringBuffer formattedCommand = new StringBuffer();
         // Make a multi line command by using \ and \r. This is needed for matching
-        // the DONE_MARKUP_STRING in echoed command when having a long command 
+        // the DONE_MARKUP_STRING in echoed command when having a long command
         // (bigger than max SSH line)
-        formattedCommand.append(cmd).append("\\\r;"); //$NON-NLS-1$ 
+        formattedCommand.append(cmd).append("\\\r;"); //$NON-NLS-1$
         formattedCommand.append(SHELL_ECHO_CMD).append(DONE_MARKUP_STRING);
         formattedCommand.append(" $?"); //$NON-NLS-1$
         formattedCommand.append(CMD_DELIMITER);

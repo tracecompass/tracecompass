@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
@@ -65,15 +65,15 @@ public class TraceControlUstProviderTests extends TestCase {
     // ------------------------------------------------------------------------
     private TraceControlTestFacility fFacility;
     private TestRemoteSystemProxy fProxy;
-    private String fTestFile; 
-    
+    private String fTestFile;
+
     // ------------------------------------------------------------------------
     // Static methods
     // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new ModelImplTestSetup(new TestSuite(TraceControlUstProviderTests.class));
@@ -112,15 +112,18 @@ public class TraceControlUstProviderTests extends TestCase {
     public void tearDown() throws Exception {
         fFacility.waitForJobs();
     }
-    
+
     /**
      * Run the TraceControlComponent.
+     *
+     * @throws Exception
+     *             This will fail the test
      */
     public void testUstProviderTree() throws Exception {
-        
+
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(TraceControlTestFacility.SCEN_INIT_TEST);
-        
+
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
@@ -129,9 +132,9 @@ public class TraceControlUstProviderTests extends TestCase {
 
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
         root.addChild(node);
-        
+
         fFacility.waitForJobs();
-        
+
         fFacility.executeCommand(node, "connect");
 
         int i = 0;
@@ -139,7 +142,7 @@ public class TraceControlUstProviderTests extends TestCase {
             i++;
             fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
         }
-        
+
         // Verify that node is connected
         assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());
 
@@ -152,7 +155,7 @@ public class TraceControlUstProviderTests extends TestCase {
         ITraceControlComponent[] providers = groups[0].getChildren();
         KernelProviderComponent kernelProvider = (KernelProviderComponent) providers[0];
 
-        // Get kernel provider events and select 2 events 
+        // Get kernel provider events and select 2 events
         ITraceControlComponent[] events = kernelProvider.getChildren();
         assertNotNull(events);
         assertEquals(3, events.length);
@@ -176,13 +179,13 @@ public class TraceControlUstProviderTests extends TestCase {
         TraceControlDialogFactory.getInstance().setCreateSessionDialog(sessionDialogStub);
 
         TraceSessionComponent session = fFacility.createSession(groups[1]);
-        
+
         // Verify that session was created
         assertNotNull(session);
         assertEquals("mysession", session.getName());
         assertEquals("/home/user/temp", session.getSessionPath());
         assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
-        
+
         // ------------------------------------------------------------------------
         // Enable Channel on UST global domain
         // ------------------------------------------------------------------------
@@ -196,21 +199,21 @@ public class TraceControlUstProviderTests extends TestCase {
         TraceControlDialogFactory.getInstance().setEnableChannelDialog(channelDialogStub);
 
         fFacility.executeCommand(session, "enableChannelOnSession");
-        
+
         // Verify that UST domain was created
         ITraceControlComponent[] domains = session.getChildren();
         assertNotNull(domains);
         assertEquals(1, domains.length);
 
         assertEquals("UST global", domains[0].getName());
-        
+
         // Verify that channel was created with correct data
         ITraceControlComponent[]channels =  domains[0].getChildren();
         assertNotNull(channels);
         assertEquals(1, channels.length);
 
         assertTrue(channels[0] instanceof TraceChannelComponent);
-        TraceChannelComponent channel = (TraceChannelComponent) channels[0]; 
+        TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("mychannel", channel.getName());
         assertEquals(2, channel.getNumberOfSubBuffers());
         assertEquals("mmap()", channel.getOutputType());
@@ -239,7 +242,7 @@ public class TraceControlUstProviderTests extends TestCase {
         ITraceControlComponent[] ustSelection =  { baseEventInfo0, baseEventInfo1 };
 
         fFacility.executeCommand(ustSelection, "assign.event");
-        
+
         // verify that events were created under the channel
         // Note that domain and channel has to be re-read because the tree is re-created
 
@@ -264,29 +267,29 @@ public class TraceControlUstProviderTests extends TestCase {
         assertEquals(TraceEnablement.ENABLED, event.getState());
 
         // ------------------------------------------------------------------------
-        // Disable event components 
+        // Disable event components
         // ------------------------------------------------------------------------
         fFacility.executeCommand(event, "disableEvent");
-        
+
         assertEquals(TraceEnablement.DISABLED, event.getState());
 
         // ------------------------------------------------------------------------
-        // Enable event component 
+        // Enable event component
         // ------------------------------------------------------------------------
         fFacility.executeCommand(event, "enableEvent");
 
         // Verify event state
         assertEquals(TraceEnablement.ENABLED, event.getState());
-        
+
         // ------------------------------------------------------------------------
-        // Destroy session 
+        // Destroy session
         // ------------------------------------------------------------------------
 
         // Initialize session handling scenario
         fProxy.setScenario(TraceControlTestFacility.SCEN_SCENARIO_SESSION_HANDLING);
 
         fFacility.destroySession(session);
-        
+
         // Verify that no more session components exist
         assertEquals(0, groups[1].getChildren().length);
 

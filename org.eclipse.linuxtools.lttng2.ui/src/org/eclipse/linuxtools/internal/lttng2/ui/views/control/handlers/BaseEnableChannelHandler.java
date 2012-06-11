@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -30,9 +30,9 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceD
 
 /**
  * <p>
- * Base implementation of a command handler to enable a trace channel.  
+ * Base implementation of a command handler to enable a trace channel.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
@@ -45,21 +45,32 @@ abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     /**
-     * Enables channels with given names which are part of this domain. If a given channel 
-     * doesn't exists it creates a new channel with the given parameters (or default values 
-     * if given parameter is null). 
-     * @param - a parameter instance with data for the command execution
-     * @param channelNames - a list of channel names to enable on this domain
-     * @param info - channel information to set for the channel (use null for default)
-     * @param isKernel -  a flag for indicating kernel or UST.
-     * @param monitor - a progress monitor
+     * Enables channels with given names which are part of this domain. If a
+     * given channel doesn't exists it creates a new channel with the given
+     * parameters (or default values if given parameter is null).
+     *
+     * @param param
+     *            - a parameter instance with data for the command execution
+     * @param channelNames
+     *            - a list of channel names to enable on this domain
+     * @param info
+     *            - channel information to set for the channel (use null for
+     *            default)
+     * @param isKernel
+     *            - a flag for indicating kernel or UST.
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If something goes wrong when enabling the channel
      */
-    abstract public void enableChannel(CommandParameter param, List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException; 
-    
+    abstract public void enableChannel(CommandParameter param,
+            List<String> channelNames, IChannelInfo info, boolean isKernel,
+            IProgressMonitor monitor) throws ExecutionException;
+
     /**
-     * @param - a parameter instance with data for the command execution
+     * @param param - a parameter instance with data for the command execution
      * @return returns the relevant domain (null if domain is not known)
      */
     abstract public TraceDomainComponent getDomain(CommandParameter param);
@@ -86,7 +97,7 @@ abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
                 protected IStatus run(IProgressMonitor monitor) {
                     Exception error = null;
 
-                    List<String> channelNames = new ArrayList<String>();                    
+                    List<String> channelNames = new ArrayList<String>();
                     channelNames.add(dialog.getChannelInfo().getName());
 
                     try {
@@ -99,7 +110,7 @@ abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
                     refresh(param);
 
                     if (error != null) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateChannelStateFailure, error);
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateChannelStateFailure, error);
                     }
                     return Status.OK_STATUS;
                 }

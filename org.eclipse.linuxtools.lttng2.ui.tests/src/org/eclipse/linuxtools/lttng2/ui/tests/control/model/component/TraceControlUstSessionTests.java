@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
@@ -67,15 +67,15 @@ public class TraceControlUstSessionTests extends TestCase {
     // ------------------------------------------------------------------------
     private TraceControlTestFacility fFacility;
     private TestRemoteSystemProxy fProxy;
-    private String fTestFile; 
-    
+    private String fTestFile;
+
     // ------------------------------------------------------------------------
     // Static methods
     // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new ModelImplTestSetup(new TestSuite(TraceControlUstSessionTests.class));
@@ -114,15 +114,18 @@ public class TraceControlUstSessionTests extends TestCase {
     public void tearDown()  throws Exception {
         fFacility.waitForJobs();
     }
-    
+
     /**
      * Run the TraceControlComponent.
+     *
+     * @throws Exception
+     *             This will fail the test
      */
     public void testTraceSessionTree() throws Exception {
-        
+
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(TraceControlTestFacility.SCEN_INIT_TEST);
-        
+
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
@@ -153,12 +156,12 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Initialize session handling scenario
         fProxy.setScenario(TraceControlTestFacility.SCEN_SCENARIO_SESSION_HANDLING);
- 
+
         // ------------------------------------------------------------------------
         // Create session
         // ------------------------------------------------------------------------
         TraceSessionComponent session = fFacility.createSession(groups[1]);
-        
+
         // Verify that session was created
         assertNotNull(session);
         assertEquals("mysession", session.getName());
@@ -167,7 +170,7 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Initialize scenario
         fProxy.setScenario(SCEN_SCENARIO4_TEST);
-        
+
         // ------------------------------------------------------------------------
         // Enable default channel on created session above
         // ------------------------------------------------------------------------
@@ -176,21 +179,21 @@ public class TraceControlUstSessionTests extends TestCase {
         TraceControlDialogFactory.getInstance().setEnableChannelDialog(channelStub);
 
         fFacility.executeCommand(session, "enableChannelOnSession");
-        
+
         // Verify that Kernel domain was created
         ITraceControlComponent[] domains = session.getChildren();
         assertNotNull(domains);
         assertEquals(1, domains.length);
 
         assertEquals("UST global", domains[0].getName());
-        
+
         // Verify that channel was created with correct data
         ITraceControlComponent[] channels =  domains[0].getChildren();
         assertNotNull(channels);
         assertEquals(1, channels.length);
 
         assertTrue(channels[0] instanceof TraceChannelComponent);
-        TraceChannelComponent channel = (TraceChannelComponent) channels[0]; 
+        TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("mychannel", channel.getName());
         assertEquals(4, channel.getNumberOfSubBuffers());
         assertEquals("mmap()", channel.getOutputType());
@@ -211,7 +214,7 @@ public class TraceControlUstSessionTests extends TestCase {
         info.setSwitchTimer(100);
         info.setReadTimer(200);
         channelStub.setChannelInfo(info);
-        
+
         fFacility.executeCommand(domains[0], "enableChannelOnDomain");
 
         // Get Kernel domain component instance
@@ -225,7 +228,7 @@ public class TraceControlUstSessionTests extends TestCase {
         assertEquals(2, channels.length);
 
         assertTrue(channels[1] instanceof TraceChannelComponent);
-        channel = (TraceChannelComponent) channels[1]; 
+        channel = (TraceChannelComponent) channels[1];
         assertEquals("mychannel2", channel.getName());
         assertEquals(2, channel.getNumberOfSubBuffers());
         assertEquals("mmap()", channel.getOutputType());
@@ -245,9 +248,9 @@ public class TraceControlUstSessionTests extends TestCase {
         eventsDialogStub.setNames(events);
         eventsDialogStub.setIsKernel(false);
         TraceControlDialogFactory.getInstance().setEnableEventsDialog(eventsDialogStub);
-        
+
         fFacility.executeCommand(session, "enableEventOnSession");
-        
+
         // Get Kernel domain component instance
         domains = session.getChildren();
         assertNotNull(domains);
@@ -259,13 +262,13 @@ public class TraceControlUstSessionTests extends TestCase {
         assertEquals(3, channels.length);
 
         assertTrue(channels[2] instanceof TraceChannelComponent);
-        channel = (TraceChannelComponent) channels[2]; 
+        channel = (TraceChannelComponent) channels[2];
         assertEquals("channel0", channel.getName());
         // No need to check parameters of default channel because that has been done in other tests
 
         ITraceControlComponent[] channel0Events = channel.getChildren();
         assertEquals(1, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
 
         TraceEventComponent event = (TraceEventComponent) channel0Events[0];
@@ -280,9 +283,9 @@ public class TraceControlUstSessionTests extends TestCase {
         events.clear();
         events.add("ust_tests_hello:tptest");
         eventsDialogStub.setNames(events);
-        
+
         fFacility.executeCommand(domains[0], "enableEventOnDomain");
-        
+
         // Get Kernel domain component instance
         domains = session.getChildren();
         assertNotNull(domains);
@@ -290,12 +293,12 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[2]; 
+        channel = (TraceChannelComponent) channels[2];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel0Events = channel.getChildren();
         assertEquals(2, channel0Events.length);
-        
+
         assertTrue(channel0Events[1] instanceof TraceEventComponent);
 
         event = (TraceEventComponent) channel0Events[1];
@@ -320,14 +323,14 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[1]; 
+        channel = (TraceChannelComponent) channels[1];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel = (TraceChannelComponent) channels[1];
-        
+
         channel0Events = channel.getChildren();
         assertEquals(1, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
 
         event = (TraceEventComponent) channel0Events[0];
@@ -340,7 +343,7 @@ public class TraceControlUstSessionTests extends TestCase {
         // Enable event (wildcard) on specific channel
         // ------------------------------------------------------------------------
         events.clear();
-        eventsDialogStub.setIsTracePoints(false);        
+        eventsDialogStub.setIsTracePoints(false);
         eventsDialogStub.setIsAllTracePoints(false);
         eventsDialogStub.setIsWildcard(true);
         eventsDialogStub.setWildcard("ust*");
@@ -354,14 +357,14 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[0]; 
+        channel = (TraceChannelComponent) channels[0];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel0Events = channel.getChildren();
         assertEquals(1, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
-        
+
         event = (TraceEventComponent) channel0Events[0];
         assertEquals("ust*", event.getName());
         assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
@@ -372,7 +375,7 @@ public class TraceControlUstSessionTests extends TestCase {
         // Enable event (wildcard) on domain
         // ------------------------------------------------------------------------
         events.clear();
-        eventsDialogStub.setIsTracePoints(false);        
+        eventsDialogStub.setIsTracePoints(false);
         eventsDialogStub.setIsAllTracePoints(false);
         eventsDialogStub.setIsWildcard(true);
         eventsDialogStub.setWildcard("ust*");
@@ -386,14 +389,14 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[0]; 
+        channel = (TraceChannelComponent) channels[0];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel0Events = channel.getChildren();
         assertEquals(1, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
-        
+
         event = (TraceEventComponent) channel0Events[0];
         assertEquals("ust*", event.getName());
         assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
@@ -404,7 +407,7 @@ public class TraceControlUstSessionTests extends TestCase {
         // Enable event (wildcard) on session
         // ------------------------------------------------------------------------
         events.clear();
-        eventsDialogStub.setIsTracePoints(false);        
+        eventsDialogStub.setIsTracePoints(false);
         eventsDialogStub.setIsAllTracePoints(false);
         eventsDialogStub.setIsWildcard(true);
         eventsDialogStub.setWildcard("ust*");
@@ -418,14 +421,14 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[2]; 
+        channel = (TraceChannelComponent) channels[2];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel0Events = channel.getChildren();
         assertEquals(4, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
-        
+
         event = (TraceEventComponent) channel0Events[0];
         assertEquals("u*", event.getName());
         assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
@@ -441,7 +444,7 @@ public class TraceControlUstSessionTests extends TestCase {
         eventsDialogStub.setLogLevelEventName("myevent1");
         eventsDialogStub.setLogLevelType(LogLevelType.LOGLEVEL);
         eventsDialogStub.setLogLevel(TraceLogLevel.TRACE_WARNING);
-        
+
         fFacility.executeCommand(domains[0], "enableEventOnDomain");
 
         // Get Kernel domain component instance
@@ -451,14 +454,14 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[2]; 
+        channel = (TraceChannelComponent) channels[2];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel0Events = channel.getChildren();
         assertEquals(5, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
-        
+
         event = (TraceEventComponent) channel0Events[0];
         assertEquals("myevent1", event.getName());
         assertEquals(TraceLogLevel.TRACE_WARNING, event.getLogLevel());
@@ -471,9 +474,9 @@ public class TraceControlUstSessionTests extends TestCase {
         eventsDialogStub.setLogLevelEventName("myevent2");
         eventsDialogStub.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
         eventsDialogStub.setLogLevel(TraceLogLevel.TRACE_DEBUG_FUNCTION);
-        
+
         fFacility.executeCommand(session, "enableEventOnSession");
-        
+
         // Get Kernel domain component instance
         domains = session.getChildren();
         assertNotNull(domains);
@@ -481,14 +484,14 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[2]; 
+        channel = (TraceChannelComponent) channels[2];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel0Events = channel.getChildren();
         assertEquals(6, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
-        
+
         event = (TraceEventComponent) channel0Events[0];
         assertEquals("myevent2", event.getName());
         assertEquals(TraceLogLevel.TRACE_DEBUG_FUNCTION, event.getLogLevel());
@@ -501,9 +504,9 @@ public class TraceControlUstSessionTests extends TestCase {
         eventsDialogStub.setLogLevelEventName("myevent0");
         eventsDialogStub.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
         eventsDialogStub.setLogLevel(TraceLogLevel.TRACE_DEBUG_FUNCTION);
-        
+
         fFacility.executeCommand(channels[0], "enableEventOnChannel");
-        
+
         // Get Kernel domain component instance
         domains = session.getChildren();
         assertNotNull(domains);
@@ -511,28 +514,28 @@ public class TraceControlUstSessionTests extends TestCase {
 
         // Verify that channel was created with correct data
         channels =  domains[0].getChildren();
-        channel = (TraceChannelComponent) channels[0]; 
+        channel = (TraceChannelComponent) channels[0];
         // No need to check parameters of default channel because that has been done in other tests
 
         channel0Events = channel.getChildren();
         assertEquals(2, channel0Events.length);
-        
+
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
-        
+
         event = (TraceEventComponent) channel0Events[0];
         assertEquals("myevent0", event.getName());
         assertEquals(TraceLogLevel.TRACE_DEBUG_FUNCTION, event.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.ENABLED, event.getState());
-        
+
         // ------------------------------------------------------------------------
-        // Destroy session 
+        // Destroy session
         // ------------------------------------------------------------------------
         // Initialize session handling scenario
         fProxy.setScenario(TraceControlTestFacility.SCEN_SCENARIO_SESSION_HANDLING);
 
         fFacility.destroySession(session);
-        
+
         // Verify that no more session components exist
         assertEquals(0, groups[1].getChildren().length);
 
@@ -545,7 +548,7 @@ public class TraceControlUstSessionTests extends TestCase {
         //-------------------------------------------------------------------------
         // Delete node
         //-------------------------------------------------------------------------
-        
+
         fFacility.executeCommand(node, "delete");
 
         assertEquals(0,fFacility.getControlView().getTraceControlRoot().getChildren().length);

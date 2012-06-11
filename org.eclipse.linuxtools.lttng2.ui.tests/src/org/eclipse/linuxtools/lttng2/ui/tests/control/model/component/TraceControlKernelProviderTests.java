@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
@@ -49,7 +49,7 @@ import org.osgi.framework.FrameworkUtil;
  * The class <code>TraceControlKernelProviderTests</code> contains UST provider handling
  * test cases.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class TraceControlKernelProviderTests extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -63,15 +63,15 @@ public class TraceControlKernelProviderTests extends TestCase {
     // ------------------------------------------------------------------------
     private TraceControlTestFacility fFacility;
     private TestRemoteSystemProxy fProxy;
-    private String fTestFile; 
-    
+    private String fTestFile;
+
     // ------------------------------------------------------------------------
     // Static methods
     // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new ModelImplTestSetup(new TestSuite(TraceControlKernelProviderTests.class));
@@ -110,22 +110,22 @@ public class TraceControlKernelProviderTests extends TestCase {
     public void tearDown() throws Exception {
         fFacility.waitForJobs();
     }
-    
+
     /**
      * Run the TraceControlComponent.
      */
     public void testKernelProviderTree() throws Exception {
-        
-        
+
+
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(TraceControlTestFacility.SCEN_INIT_TEST);
-        
+
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
         ISystemProfile profile =  registry.createSystemProfile("myProfile", true);
         IHost host = registry.createLocalHost(profile, "myProfile", "user");
-        
+
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
 
         root.addChild(node);
@@ -151,7 +151,7 @@ public class TraceControlKernelProviderTests extends TestCase {
         ITraceControlComponent[] providers = groups[0].getChildren();
         KernelProviderComponent kernelProvider = (KernelProviderComponent) providers[0];
 
-        // Get kernel provider events and select 2 events 
+        // Get kernel provider events and select 2 events
         ITraceControlComponent[] events = kernelProvider.getChildren();
         assertNotNull(events);
         assertEquals(3, events.length);
@@ -166,12 +166,12 @@ public class TraceControlKernelProviderTests extends TestCase {
 
         // Initialize session handling scenario
         fProxy.setScenario(TraceControlTestFacility.SCEN_SCENARIO_SESSION_HANDLING);
- 
+
         // ------------------------------------------------------------------------
         // Create session
         // ------------------------------------------------------------------------
         TraceSessionComponent session = fFacility.createSession(groups[1]);
-        
+
         // Verify that session was created
         assertNotNull(session);
         assertEquals("mysession", session.getName());
@@ -187,21 +187,21 @@ public class TraceControlKernelProviderTests extends TestCase {
         ITraceControlComponent[] components =  { baseEventInfo0, baseEventInfo1 };
 
         fFacility.executeCommand(components, "assign.event");
-        
+
         // Verify that kernel domain was created
         ITraceControlComponent[] domains = session.getChildren();
         assertNotNull(domains);
         assertEquals(1, domains.length);
 
         assertEquals("Kernel", domains[0].getName());
-        
+
         // Verify that channel0 was created with default values
         ITraceControlComponent[] channels =  domains[0].getChildren();
         assertNotNull(channels);
         assertEquals(1, channels.length);
 
         assertTrue(channels[0] instanceof TraceChannelComponent);
-        TraceChannelComponent channel = (TraceChannelComponent) channels[0]; 
+        TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("channel0", channel.getName());
         assertEquals(4, channel.getNumberOfSubBuffers());
         assertEquals("splice()", channel.getOutputType());
@@ -231,30 +231,30 @@ public class TraceControlKernelProviderTests extends TestCase {
         assertEquals(TraceEnablement.ENABLED, event1.getState());
 
         // ------------------------------------------------------------------------
-        // Disable event components 
+        // Disable event components
         // ------------------------------------------------------------------------
         ITraceControlComponent[] selection = { event, event1 };
         fFacility.executeCommand(selection, "disableEvent");
-        
+
         assertEquals(TraceEnablement.DISABLED, event.getState());
         assertEquals(TraceEnablement.DISABLED, event1.getState());
 
         // ------------------------------------------------------------------------
-        // Enable event component 
+        // Enable event component
         // ------------------------------------------------------------------------
         fFacility.executeCommand(event1, "enableEvent");
-        
+
         // Verify event state
         assertEquals(TraceEnablement.ENABLED, event1.getState());
-        
+
         // ------------------------------------------------------------------------
-        // Destroy session 
+        // Destroy session
         // ------------------------------------------------------------------------
         // Initialize session handling scenario
         fProxy.setScenario(TraceControlTestFacility.SCEN_SCENARIO_SESSION_HANDLING);
-        
+
         fFacility.destroySession(session);
-        
+
         // Verify that no more session components exist
         assertEquals(0, groups[1].getChildren().length);
 
@@ -263,7 +263,7 @@ public class TraceControlKernelProviderTests extends TestCase {
         //-------------------------------------------------------------------------
         fFacility.executeCommand(node, "disconnect");
         assertEquals(TargetNodeState.DISCONNECTED, node.getTargetNodeState());
-        
+
         //-------------------------------------------------------------------------
         // Delete node
         //-------------------------------------------------------------------------

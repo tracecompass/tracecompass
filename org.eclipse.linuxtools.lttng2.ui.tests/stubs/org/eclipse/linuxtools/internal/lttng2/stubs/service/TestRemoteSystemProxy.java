@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.service;
@@ -23,9 +23,9 @@ import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.services.terminals.ITerminalService;
 import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
 
-
+@SuppressWarnings("javadoc")
 public class TestRemoteSystemProxy implements IRemoteSystemProxy {
-    
+
     private LTTngToolsFileShell fShell = null;
     private String fTestFile = null;
     private String fScenario = null;
@@ -69,7 +69,7 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
 
     @Override
     public ICommandShell createCommandShell() throws ExecutionException {
-        if (fShell == null) { 
+        if (fShell == null) {
             fShell = CommandShellFactory.getInstance().getFileShell();
             if ((fTestFile != null) && (fScenario != null)) {
                 try {
@@ -90,11 +90,11 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
     @Override
     public void removeCommunicationListener(ICommunicationsListener listener) {
     }
-    
+
     public void setTestFile(String testFile) {
         fTestFile = testFile;
     }
-    
+
     public void setScenario(String scenario) {
         fScenario = scenario;
         if (fShell != null) {

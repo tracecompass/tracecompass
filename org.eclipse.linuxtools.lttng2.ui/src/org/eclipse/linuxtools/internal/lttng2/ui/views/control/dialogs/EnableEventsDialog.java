@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Shell;
  * <p>
  * Dialog box for collecting information events to be enabled.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
@@ -45,11 +45,11 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    
+
     /**
      * The icon file for this dialog box.
      */
-    public static final String ENABLE_EVENT_ICON_FILE = "icons/elcl16/enable_event.gif"; //$NON-NLS-1$ 
+    public static final String ENABLE_EVENT_ICON_FILE = "icons/elcl16/enable_event.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -63,7 +63,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      */
     private EnableKernelEventComposite fKernelComposite;
     /**
-     * The composite with widgets for collecting information about UST events. 
+     * The composite with widgets for collecting information about UST events.
      */
     private EnableUstEventsComposite fUstComposite;
     /**
@@ -75,17 +75,17 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      */
     private Button fUstButton;
     /**
-     * The referenced trace provider group containing the kernel provider and UST 
+     * The referenced trace provider group containing the kernel provider and UST
      * provider component which contains a list of available tracepoints.
      */
     private TraceProviderGroup fProviderGroup;
     /**
-     * The parent domain component where the channel node should be added. 
+     * The parent domain component where the channel node should be added.
      * Null in case the domain is not known (i.e. on session level).
      */
     private TraceDomainComponent fDomain;
     /**
-     * Output domain information. True in case of Kernel domain. False for UST.     
+     * Output domain information. True in case of Kernel domain. False for UST.
      */
     private boolean fIsKernel;
 
@@ -95,17 +95,16 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     /**
      * Constructor
      * @param shell - a shell for the display of the dialog
-     * @param providerGroup - the trace provider group
      */
     public EnableEventsDialog(Shell shell) {
         super(shell);
         setShellStyle(SWT.RESIZE);
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isTracpoints()
@@ -117,7 +116,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return fUstComposite.isTracepoints();
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isAllTracePoints()
      */
@@ -128,7 +127,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return fUstComposite.isAllTracePoints();
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isSysCalls()
@@ -140,7 +139,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return false;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isAllSysCalls()
      */
@@ -151,7 +150,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return false;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getEventNames()
      */
@@ -173,7 +172,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return false;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getProbeName()
      */
@@ -184,7 +183,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return null;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getProbeEventName()
      */
@@ -195,7 +194,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return null;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isDynamicFunctionProbe()
@@ -207,7 +206,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return false;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getFunctionEventName()
      */
@@ -218,7 +217,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return null;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getFunction()
@@ -230,7 +229,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return null;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#isWildcard()
@@ -253,7 +252,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             return fUstComposite.getWildcard();
         }
         return null;
-        
+
     }
 
     /*
@@ -266,7 +265,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             return fUstComposite.isLogLevel();
         }
         return false;
-        
+
     }
 
     /*
@@ -279,9 +278,9 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             return fUstComposite.getLogLevelType();
         }
         return null;
-        
+
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getLogLevel()
@@ -292,7 +291,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             return fUstComposite.getLogLevel();
         }
         return null;
-        
+
     }
 
     /*
@@ -306,7 +305,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return null;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog#isKernel()
@@ -315,7 +314,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     public boolean isKernel() {
         return fIsKernel;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog#setTraceProviderGroup(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup)
@@ -359,7 +358,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      */
     @Override
     protected Control createDialogArea(Composite parent) {
-        
+
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
@@ -367,13 +366,13 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         // ------------------------------------------------------------------------
-        // Domain Group 
+        // Domain Group
         // ------------------------------------------------------------------------
         Group domainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         domainGroup.setText(Messages.TraceControl_DomainDisplayName);
         layout = new GridLayout(2, true);
-        domainGroup.setLayout(layout); 
-        
+        domainGroup.setLayout(layout);
+
         fKernelButton = new Button(domainGroup, SWT.RADIO);
         fKernelButton.setText(Messages.TraceControl_KernelDomainDisplayName);
         fKernelButton.setSelection(fIsKernel);
@@ -396,7 +395,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         fUstButton.setLayoutData(data);
 
         // ------------------------------------------------------------------------
-        // Kernel or UST event data group 
+        // Kernel or UST event data group
         // ------------------------------------------------------------------------
         fUstComposite = null;
         fKernelComposite = null;
@@ -406,7 +405,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         } else {
             createUstComposite();
         }
-        
+
         fKernelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -428,14 +427,14 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
                 }
             }
         });
-        
+
         fDialogComposite.layout();
-        
+
         getShell().setMinimumSize(new Point(500, 650));
-        
+
         return fDialogComposite;
     }
-    
+
 
     /*
      * (non-Javadoc)
@@ -459,16 +458,16 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         if (fKernelComposite != null && !fKernelComposite.isValid()) {
             return;
         }
-        
+
      // Validate UST composite in case of UST domain
         if (fUstComposite != null && !fUstComposite.isValid()) {
             return;
         }
-        
+
         // validation successful -> call super.okPressed()
         super.okPressed();
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
@@ -500,7 +499,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      * Creates the UST composite (if not existing)
      */
     private void createUstComposite() {
-        if (fUstComposite == null) { 
+        if (fUstComposite == null) {
             fUstComposite = new EnableUstEventsComposite(fDialogComposite, SWT.NONE, fProviderGroup);
             GridLayout layout = new GridLayout(1, true);
             fUstComposite.setLayout(layout);

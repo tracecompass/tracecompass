@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -27,29 +27,30 @@ import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  *  Singleton class to facilitate the test cases. Creates UML2SD view and loader objects as well as provides
- *  utility methods for interacting with the loader/view.  
+ *  utility methods for interacting with the loader/view.
  */
+@SuppressWarnings("javadoc")
 public class TraceControlTestFacility {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    public final static int WAIT_FOR_JOBS_DELAY = 1000; 
+    public final static int WAIT_FOR_JOBS_DELAY = 1000;
     public final static int GUI_REFESH_DELAY = 500;
-           
+
     public final static String DIRECTORY = "testfiles"; //$NON-NLS-1$
     public final static String COMMAND_CATEGORY_PREFIX = "org.eclipse.linuxtools.internal.lttng2.ui.commands.control."; //$NON-NLS-1$
     public final static String SCEN_INIT_TEST = "Initialize"; //$NON-NLS-1$
     public final static String SCEN_SCENARIO_SESSION_HANDLING = "SessionHandling"; //$NON-NLS-1$
     public final static String SCEN_SCENARIO_SESSION_HANDLING_WITH_PATH = "SessionHandlingWithPath"; //$NON-NLS-1$
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     private static TraceControlTestFacility fInstance = null;
     private ControlView fControlView = null;
     private boolean fIsInitialized = false;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -70,28 +71,28 @@ public class TraceControlTestFacility {
      * Initial the test facility.
      */
     public void init() {
-        
+
         if (!fIsInitialized) {
 
             IViewPart view;
             try {
-                
+
                 view = PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow()
                         .getActivePage()
                         .findView("org.eclipse.ui.internal.introview"); //$NON-NLS-1$
-                
+
                 if (view != null) {
                     PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow()
-                    .getActivePage().hideView(view); 
+                    .getActivePage().hideView(view);
                 }
 
                 view = PlatformUI.getWorkbench()
                                  .getActiveWorkbenchWindow()
                                  .getActivePage()
-                                 .showView(ControlView.ID); 
-                
+                                 .showView(ControlView.ID);
+
             } catch (PartInitException e) {
                 throw new RuntimeException(e);
             }
@@ -103,7 +104,7 @@ public class TraceControlTestFacility {
         }
     }
 
-    
+
     /**
      * Disposes the facility (and GUI)
      */
@@ -168,7 +169,7 @@ public class TraceControlTestFacility {
         setSelection(component);
         executeCommand(commandId);
     }
-    
+
     /**
      * Executes an Eclipse command with command ID after selecting passed components
      * @param components - array of components to select in the tree
@@ -208,7 +209,7 @@ public class TraceControlTestFacility {
         waitForJobs();
     }
 
-    
+
     /**
      * Selects passed components
      * @param components - array of component to select in the tree
@@ -220,7 +221,7 @@ public class TraceControlTestFacility {
         // Selection is done in own job
         waitForJobs();
     }
-    
+
     /**
      * Creates session on passed session group.
      * @param group - session group
@@ -233,14 +234,14 @@ public class TraceControlTestFacility {
     @SuppressWarnings("nls")
     public TraceSessionComponent createSession(ITraceControlComponent group) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
         executeCommand(group, "createSession");
-        
+
         ITraceControlComponent[] sessions = group.getChildren();
         if ((sessions == null) || (sessions.length == 0)) {
             return null;
         }
         return (TraceSessionComponent)sessions[0];
     }
-    
+
     /**
      * Destroys a given session.
      * @param session - session to destroy
@@ -253,7 +254,7 @@ public class TraceControlTestFacility {
     public void destroySession(TraceSessionComponent session) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
         executeCommand(session, "destroySession");
     }
-    
+
     /**
      * Starts a given session
      * @param session - session to start
@@ -266,7 +267,7 @@ public class TraceControlTestFacility {
     public void startSession(TraceSessionComponent session) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
         executeCommand(session, "start");
     }
-    
+
     /**
      * Stops a given session
      * @param session - session to stop

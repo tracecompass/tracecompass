@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Text;
  * <p>
  * A composite for collecting information about kernel events to be enabled.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableKernelEventComposite extends Composite implements IEnableKernelEvents {
@@ -49,7 +49,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    private enum KernelGroupEnum { TRACEPOINTS, SYSCALLS, PROBE, FUNCTION };
+    private enum KernelGroupEnum { TRACEPOINTS, SYSCALLS, PROBE, FUNCTION }
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -72,7 +72,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      */
     private Button fProbeActivateButton;
     /**
-     * The text field for the event name for the dynamic probe. 
+     * The text field for the event name for the dynamic probe.
      */
     private Text fProbeEventNameText;
     /**
@@ -84,7 +84,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      */
     private Button fFunctionActivateButton;
     /**
-     * The text field for the event name for the dynamic probe. 
+     * The text field for the event name for the dynamic probe.
      */
     private Text fFunctionEventNameText;
     /**
@@ -92,10 +92,10 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      */
     private Text fFunctionText;
     /**
-     * The referenced trace provider group containing the kernel provider 
+     * The referenced trace provider group containing the kernel provider
      * component which contains a list of available tracepoints.
      */
-    private TraceProviderGroup fProviderGroup;
+    private final TraceProviderGroup fProviderGroup;
     /**
      * The flag indicating that tracepoints are selected.
      */
@@ -117,7 +117,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      */
     private boolean fIsDynamicProbe;
     /**
-     *  The event name of the dynamic probe. 
+     *  The event name of the dynamic probe.
      */
     private String fProbeEventName;
     /**
@@ -141,6 +141,16 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            The parent composite
+     * @param style
+     *            The index of the style for this event composite
+     * @param providerGroup
+     *            The trace provider group
+     */
     public EnableKernelEventComposite(Composite parent, int style, TraceProviderGroup providerGroup) {
         super(parent, style);
         fProviderGroup = providerGroup;
@@ -157,7 +167,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public boolean isTracepoints() {
         return fIsTracepoints;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isAllTracePoints()
      */
@@ -165,7 +175,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public boolean isAllTracePoints() {
         return fIsAllTracepoints;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isSysCalls()
@@ -174,7 +184,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public boolean isSysCalls() {
         return fIsSysCalls;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isAllSysCalls()
      */
@@ -182,7 +192,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public boolean isAllSysCalls() {
         return fIsSysCalls;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getEventNames()
      */
@@ -198,7 +208,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public boolean isDynamicProbe() {
         return fIsDynamicProbe;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getProbeName()
      */
@@ -206,7 +216,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public String getProbeName() {
         return fProbeString;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getProbeEventName()
      */
@@ -214,7 +224,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public String getProbeEventName() {
         return fProbeEventName;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isDynamicFunctionProbe()
@@ -223,7 +233,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public boolean isDynamicFunctionProbe() {
         return fIsDynamicFunctionProbe;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getFunctionEventName()
      */
@@ -231,7 +241,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public String getFunctionEventName() {
         return fFunctionEventName;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getFunction()
      */
@@ -247,23 +257,23 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * Creates the composite content
      */
     public void createContent() {
-        
-        // Tracepoints Group 
+
+        // Tracepoints Group
         createTracepointsGroup();
 
-        // Syscalls Group 
+        // Syscalls Group
         createSysCallsGroup();
-        
-        // Dynamic Probe Group 
+
+        // Dynamic Probe Group
         createDynamicProbeGroup();
 
-        // Dynamic Function Probe Group 
+        // Dynamic Function Probe Group
         createDynamicFunctionPropeGroup();
-        
+
         // Set default enablements
         setKernelEnablements(KernelGroupEnum.TRACEPOINTS);
     }
-    
+
     /**
      * Validates the kernel composite input data.
      * @return true if configured data is valid and can be retrieved.
@@ -305,7 +315,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
                 fProbeEventName = temp;
                 // fProbeString will be validated by lttng-tools
                 fProbeString = fProbeText.getText();
-            } 
+            }
         }
 
         // initialize function string
@@ -330,7 +340,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
 
         return true;
     }
-    
+
     /**
      * Creates tracepoints group.
      */
@@ -559,14 +569,14 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     // Local classes
     // ------------------------------------------------------------------------
     /**
-     * Content provider for the tracepoints tree. 
+     * Content provider for the tracepoints tree.
      */
     final static public class KernelContentProvider extends TraceControlContentProvider {
         @Override
         public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof TraceProviderGroup) {
                 List<ITraceControlComponent> children = ((ITraceControlComponent)parentElement).getChildren(KernelProviderComponent.class);
-                return (ITraceControlComponent[]) children.toArray(new ITraceControlComponent[children.size()]);
+                return children.toArray(new ITraceControlComponent[children.size()]);
             }
             if (parentElement instanceof ITraceControlComponent) {
                 return ((ITraceControlComponent)parentElement).getChildren();
@@ -574,9 +584,9 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
             return new Object[0];
         }
     }
-    
+
     /**
-     * Content label for the tracepoints tree. 
+     * Content label for the tracepoints tree.
      */
     final static public class KernelLabelProvider extends TraceControlLabelProvider {
         @Override
@@ -591,9 +601,9 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
             return super.getText(element);
         }
     }
-    
+
     /**
-     * Check state listener for the tracepoints tree. 
+     * Check state listener for the tracepoints tree.
      */
     final public class KernelCheckListener implements ICheckStateListener {
         @Override
@@ -601,8 +611,8 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
           if (event.getChecked()) {
               if (event.getElement() instanceof KernelProviderComponent) {
                   fTracepointsViewer.setSubtreeChecked(event.getElement(), true);
-              } 
-          } else { 
+              }
+          } else {
               if (event.getElement() instanceof KernelProviderComponent) {
                   fTracepointsViewer.setSubtreeChecked(event.getElement(), false);
               } else {

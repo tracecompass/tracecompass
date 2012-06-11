@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
@@ -34,7 +34,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
  * <p>
  * Implementation of the trace session component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceSessionComponent extends TraceControlComponent {
@@ -79,10 +79,10 @@ public class TraceSessionComponent extends TraceControlComponent {
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * Constructor 
+     * Constructor
      * @param name - the name of the component.
      * @param parent - the parent of this component.
-     */    
+     */
     public TraceSessionComponent(String name, ITraceControlComponent parent) {
         super(name, parent);
         setImage(TRACE_SESSION_ICON_FILE_INACTIVE);
@@ -108,7 +108,7 @@ public class TraceSessionComponent extends TraceControlComponent {
         if (fSessionInfo.getSessionState() == TraceSessionState.INACTIVE) {
             return super.getImage();
         }
-        
+
         return fActiveImage;
     }
 
@@ -159,7 +159,7 @@ public class TraceSessionComponent extends TraceControlComponent {
 
     /**
      * Sets the path string (where session is located) to the given value.
-     * @param path - session path to set.
+     * @param sessionPath - session path to set.
      */
     public void setSessionPath(String sessionPath) {
         fSessionInfo.setSessionPath(sessionPath);
@@ -176,135 +176,185 @@ public class TraceSessionComponent extends TraceControlComponent {
             return new TraceSessionPropertySource(this);
         }
         return null;
-    } 
+    }
 
     /**
      * @return all available domains of this session.
      */
     public TraceDomainComponent[] getDomains() {
         List<ITraceControlComponent> sessions = getChildren(TraceDomainComponent.class);
-        return (TraceDomainComponent[])sessions.toArray(new TraceDomainComponent[sessions.size()]);
+        return sessions.toArray(new TraceDomainComponent[sessions.size()]);
     }
-    
+
     /**
      * @return the parent target node
      */
     public TargetNodeComponent getTargetNode() {
         return ((TraceSessionGroup)getParent()).getTargetNode();
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     /**
-     * Retrieves the session configuration from the node. 
+     * Retrieves the session configuration from the node.
+     *
      * @throws ExecutionException
+     *             If the command fails
      */
     public void getConfigurationFromNode() throws ExecutionException {
         getConfigurationFromNode(new NullProgressMonitor());
     }
 
     /**
-     * Retrieves the session configuration from the node. 
-     * @param monitor - a progress monitor
+     * Retrieves the session configuration from the node.
+     *
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void getConfigurationFromNode(IProgressMonitor monitor) throws ExecutionException {
+    public void getConfigurationFromNode(IProgressMonitor monitor)
+            throws ExecutionException {
         removeAllChildren();
         fSessionInfo = getControlService().getSession(getName(), monitor);
         IDomainInfo[] domains = fSessionInfo.getDomains();
         for (int i = 0; i < domains.length; i++) {
-            TraceDomainComponent domainComponent = new TraceDomainComponent(domains[i].getName(), this);
+            TraceDomainComponent domainComponent = new TraceDomainComponent(
+                    domains[i].getName(), this);
             addChild(domainComponent);
             domainComponent.setDomainInfo(domains[i]);
         }
     }
-    
+
     /**
-     * Starts the session. 
-     * throws ExecutionExecption
+     * Starts the session.
+     *
+     * @throws ExecutionException
+     *             If the command fails
      */
     public void startSession() throws ExecutionException {
         startSession(new NullProgressMonitor());
     }
-    
+
     /**
      * Starts the session.
-     * @param monitor - a progress monitor
-     * throws ExecutionExecption
+     *
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
      */
-    public void startSession(IProgressMonitor monitor) throws ExecutionException {
+    public void startSession(IProgressMonitor monitor)
+            throws ExecutionException {
         getControlService().startSession(getName(), monitor);
     }
-    
+
     /**
-     * Starts the session. 
-     * throws ExecutionExecption
+     * Starts the session.
+     *
+     * @throws ExecutionException
+     *             If the command fails
      */
     public void stopSession() throws ExecutionException {
         startSession(new NullProgressMonitor());
     }
-    
+
     /**
      * Starts the session.
-     * @param monitor - a progress monitor
-     * throws ExecutionExecption
+     *
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
      */
     public void stopSession(IProgressMonitor monitor) throws ExecutionException {
         getControlService().stopSession(getName(), monitor);
     }
 
     /**
-     * Enables channels with given names which are part of this domain. If a given channel 
-     * doesn't exists it creates a new channel with the given parameters (or default values 
-     * if given parameter is null). 
-     * @param channelNames - a list of channel names to enable on this domain
-     * @param info - channel information to set for the channel (use null for default)
-     * @param isKernel -  a flag for indicating kernel or UST.
+     * Enables channels with given names which are part of this domain. If a
+     * given channel doesn't exists it creates a new channel with the given
+     * parameters (or default values if given parameter is null).
+     *
+     * @param channelNames
+     *            - a list of channel names to enable on this domain
+     * @param info
+     *            - channel information to set for the channel (use null for
+     *            default)
+     * @param isKernel
+     *            - a flag for indicating kernel or UST.
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void enableChannels(List<String> channelNames, IChannelInfo info, boolean isKernel) throws ExecutionException {
+    public void enableChannels(List<String> channelNames, IChannelInfo info,
+            boolean isKernel) throws ExecutionException {
         enableChannels(channelNames, info, isKernel, new NullProgressMonitor());
     }
 
     /**
-     * Enables channels with given names which are part of this domain. If a given channel 
-     * doesn't exists it creates a new channel with the given parameters (or default values 
-     * if given parameter is null). 
-     * @param channelNames - a list of channel names to enable on this domain
-     * @param info - channel information to set for the channel (use null for default)
-     * @param isKernel -  a flag for indicating kernel or UST.
-     * @param monitor - a progress monitor
+     * Enables channels with given names which are part of this domain. If a
+     * given channel doesn't exists it creates a new channel with the given
+     * parameters (or default values if given parameter is null).
+     *
+     * @param channelNames
+     *            - a list of channel names to enable on this domain
+     * @param info
+     *            - channel information to set for the channel (use null for
+     *            default)
+     * @param isKernel
+     *            - a flag for indicating kernel or UST.
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void enableChannels(List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableChannels(getName(), channelNames, isKernel, info, monitor);
+    public void enableChannels(List<String> channelNames, IChannelInfo info,
+            boolean isKernel, IProgressMonitor monitor)
+            throws ExecutionException {
+        getControlService().enableChannels(getName(), channelNames, isKernel,
+                info, monitor);
     }
-    
+
     /**
      * Enables a list of events with no additional parameters.
-     * @param eventNames - a list of event names to enabled.
-     * @param isKernel -  a flag for indicating kernel or UST.
+     *
+     * @param eventNames
+     *            - a list of event names to enabled.
+     * @param isKernel
+     *            - a flag for indicating kernel or UST.
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void enableEvent(List<String> eventNames, boolean isKernel) throws ExecutionException {
+    public void enableEvent(List<String> eventNames, boolean isKernel)
+            throws ExecutionException {
         enableEvents(eventNames, isKernel, new NullProgressMonitor());
     }
 
     /**
      * Enables a list of events with no additional parameters.
-     * @param eventNames - a list of event names to enabled.
-     * @param isKernel -  a flag for indicating kernel or UST.
-     * @param monitor - a progress monitor
+     *
+     * @param eventNames
+     *            - a list of event names to enabled.
+     * @param isKernel
+     *            - a flag for indicating kernel or UST.
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void enableEvents(List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableEvents(getName(), null, eventNames, isKernel, monitor);
+    public void enableEvents(List<String> eventNames, boolean isKernel,
+            IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableEvents(getName(), null, eventNames, isKernel,
+                monitor);
     }
 
     /**
      * Enables all syscalls (for kernel domain)
+     *
      * @throws ExecutionException
+     *             If the command fails
      */
     public void enableSyscalls() throws ExecutionException {
         enableSyscalls(new NullProgressMonitor());
@@ -312,62 +362,99 @@ public class TraceSessionComponent extends TraceControlComponent {
 
     /**
      * Enables all syscalls (for kernel domain)
-     * @param monitor - a progress monitor
+     *
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException {
+    public void enableSyscalls(IProgressMonitor monitor)
+            throws ExecutionException {
         getControlService().enableSyscalls(getName(), null, monitor);
     }
 
     /**
      * Enables a dynamic probe (for kernel domain)
-     * @param eventName - event name for probe
-     * @param isFunction - true for dynamic function entry/return probe else false
-     * @param probe - the actual probe
+     *
+     * @param eventName
+     *            - event name for probe
+     * @param isFunction
+     *            - true for dynamic function entry/return probe else false
+     * @param probe
+     *            - the actual probe
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void enableProbe(String eventName, boolean isFunction, String probe) throws ExecutionException {
+    public void enableProbe(String eventName, boolean isFunction, String probe)
+            throws ExecutionException {
         enableProbe(eventName, isFunction, probe, new NullProgressMonitor());
     }
-    
+
     /**
      * Enables a dynamic probe (for kernel domain)
-     * @param eventName - event name for probe
-     * @param isFunction - true for dynamic function entry/return probe else false
-     * @param probe - the actual probe
-     * @param monitor - a progress monitor
+     *
+     * @param eventName
+     *            - event name for probe
+     * @param isFunction
+     *            - true for dynamic function entry/return probe else false
+     * @param probe
+     *            - the actual probe
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If the command fails
      */
-   public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableProbe(getName(), null, eventName, isFunction, probe, monitor);
-    }
-    
-    /**
-     * Enables events using log level.
-     * @param eventName - a event name
-     * @param logLevelType - a log level type 
-     * @param level - a log level 
-     * @throws ExecutionException
-     */
-    public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level) throws ExecutionException {
-        enableLogLevel(eventName, logLevelType, level, new NullProgressMonitor());
+    public void enableProbe(String eventName, boolean isFunction, String probe,
+            IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableProbe(getName(), null, eventName, isFunction,
+                probe, monitor);
     }
 
     /**
      * Enables events using log level.
-     * @param eventName - a event name
-     * @param logLevelType - a log level type 
-     * @param level - a log level 
-     * @param monitor - a progress monitor  
+     *
+     * @param eventName
+     *            - a event name
+     * @param logLevelType
+     *            - a log level type
+     * @param level
+     *            - a log level
      * @throws ExecutionException
+     *             If the command fails
      */
-    public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableLogLevel(getName(), null, eventName, logLevelType, level, monitor);
+    public void enableLogLevel(String eventName, LogLevelType logLevelType,
+            TraceLogLevel level) throws ExecutionException {
+        enableLogLevel(eventName, logLevelType, level,
+                new NullProgressMonitor());
     }
-    
+
+    /**
+     * Enables events using log level.
+     *
+     * @param eventName
+     *            - a event name
+     * @param logLevelType
+     *            - a log level type
+     * @param level
+     *            - a log level
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
+     */
+    public void enableLogLevel(String eventName, LogLevelType logLevelType,
+            TraceLogLevel level, IProgressMonitor monitor)
+            throws ExecutionException {
+        getControlService().enableLogLevel(getName(), null, eventName,
+                logLevelType, level, monitor);
+    }
+
     /**
      * Gets all available contexts to be added to channels/events.
+     *
      * @return the list of available contexts
+     * @throws ExecutionException
+     *             If the command fails
      */
     public List<String> getContextList() throws ExecutionException {
         return getContextList(new NullProgressMonitor());
@@ -375,10 +462,15 @@ public class TraceSessionComponent extends TraceControlComponent {
 
     /**
      * Gets all available contexts to be added to channels/events.
+     *
      * @param monitor
+     *            The monitor that will indicate the progress
      * @return the list of available contexts
+     * @throws ExecutionException
+     *             If the command fails
      */
-    public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
+    public List<String> getContextList(IProgressMonitor monitor)
+            throws ExecutionException {
         return getControlService().getContextList(monitor);
     }
 }

@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote;
@@ -17,11 +17,11 @@ import java.util.Arrays;
  * <p>
  * Class containing command result of remote command execution.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class CommandResult implements ICommandResult {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -38,6 +38,15 @@ public class CommandResult implements ICommandResult {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     *
+     * @param result
+     *            The result of the command
+     * @param output
+     *            The output, as an array of strings
+     */
     public CommandResult(int result, String[] output) {
         fResult = result;
         if (output != null) {
@@ -46,7 +55,7 @@ public class CommandResult implements ICommandResult {
     }
 
     // ------------------------------------------------------------------------
-    // Accessor
+    // Accessors
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)

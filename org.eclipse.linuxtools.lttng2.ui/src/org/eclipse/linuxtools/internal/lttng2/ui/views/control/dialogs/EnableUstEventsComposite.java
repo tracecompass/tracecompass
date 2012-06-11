@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Text;
  * <p>
  * A composite for collecting information about UST events to be enabled.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableUstEventsComposite extends Composite implements IEnableUstEvents  {
@@ -55,13 +55,13 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    
-    private enum GroupEnum { TRACEPOINTS, WILDCARD, LOGLEVEL };
-    
+
+    private enum GroupEnum { TRACEPOINTS, WILDCARD, LOGLEVEL }
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     /**
      * A button to enable/disable the tracepoints group
      */
@@ -99,10 +99,10 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
      */
     private Button fLogLevelOnlyButton;
     /**
-     * The referenced trace provider group containing the UST providers 
+     * The referenced trace provider group containing the UST providers
      * component which contains a list of available tracepoints.
      */
-    private TraceProviderGroup fProviderGroup;
+    private final TraceProviderGroup fProviderGroup;
     /**
      * The flag indicating that tracepoints are selected.
      */
@@ -116,15 +116,15 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
      */
     private List<String> fSelectedEvents;
     /**
-     * The flag indicating that all wildcard are selected.. 
+     * The flag indicating that all wildcard are selected..
      */
     private boolean fIsWildcard;
     /**
-     * The wildcard if wildcard is selected. 
+     * The wildcard if wildcard is selected.
      */
     private String fWildcard;
     /**
-     *The flag indicating that all log level are selected. 
+     *The flag indicating that all log level are selected.
      */
     private boolean fIsLogLevel;
     /**
@@ -146,7 +146,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     /**
      * Constructor
      * @param parent - a parent composite
-     * @Param style - a compsite style
+     * @param style - a composite style
      * @param providerGroup - the trace provider group
      */
     public EnableUstEventsComposite(Composite parent, int style, TraceProviderGroup providerGroup) {
@@ -166,7 +166,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     public boolean isTracepoints() {
         return fIsTracepoints;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#isAllTracePoints()
@@ -175,7 +175,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     public boolean isAllTracePoints() {
         return fIsAllTracepoints;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getEventNames()
@@ -238,22 +238,25 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     public String getLogLevelEventName() {
         return fLogLevelEventName;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Create the contents of this event composite
+     */
     public void createContent() {
-        
-        // Tracepoints Group 
+
+        // Tracepoints Group
         createTracepointsGroup();
 
-        // Wildcard Group 
+        // Wildcard Group
         createWildCardGroup();
 
-        // Log Level Group 
+        // Log Level Group
         createLogLevelGroup();
-        
+
         // Set default enablements
         setEnablements(GroupEnum.TRACEPOINTS);
     }
@@ -263,11 +266,11 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     * @return true if configured data is valid and can be retrieved.
     */
     public boolean isValid() {
-        
+
         fIsTracepoints = fTracepointsActivateButton.getSelection();
         fIsWildcard = fWildcardActivateButton.getSelection();
         fIsLogLevel = fLogLevelActivateButton.getSelection();
-        
+
         // initialize tracepoint fields
         fIsAllTracepoints = false;
         fSelectedEvents = new ArrayList<String>();
@@ -317,9 +320,8 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
                         Messages.TraceControl_InvalidLogLevel + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
 
                 return false;
-            } else {
-                fLogLevel = levels[id];
             }
+            fLogLevel = levels[id];
         }
 
         // initialize wildcard with the event name string
@@ -342,11 +344,11 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         // validation successful -> call super.okPressed()
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
-    
+
     /**
      * Creates tracepoints group.
      */
@@ -357,7 +359,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         tpMainGroup.setLayout(layout);
         GridData data = new GridData(GridData.FILL_BOTH);
         tpMainGroup.setLayoutData(data);
-        
+
         Composite buttonComposite = new Composite(tpMainGroup, SWT.NONE);
         layout = new GridLayout(1, true);
         buttonComposite.setLayout(layout);
@@ -374,13 +376,13 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
                 setEnablements(GroupEnum.TRACEPOINTS);
             }
         });
-        
+
         Group tpGroup = new Group(tpMainGroup, SWT.SHADOW_NONE);
         layout = new GridLayout(1, true);
         tpGroup.setLayout(layout);
         data = new GridData(GridData.FILL_BOTH);
         tpGroup.setLayoutData(data);
-        
+
         fTracepointsViewer = new CheckboxTreeViewer(tpGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         fTracepointsViewer.getTree().setToolTipText(Messages.TraceControl_EnableEventsTracepointTreeTooltip);
         fTracepointsViewer.setContentProvider(new UstContentProvider());
@@ -391,7 +393,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         fTracepointsViewer.setInput(fProviderGroup.getParent());
         fTracepointsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
     }
-    
+
     /**
      * Creates wildcard group.
      */
@@ -402,7 +404,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         wildcardMainGroup.setLayout(layout);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         wildcardMainGroup.setLayoutData(data);
-        
+
         Composite buttonComposite = new Composite(wildcardMainGroup, SWT.NONE);
         layout = new GridLayout(1, false);
         buttonComposite.setLayout(layout);
@@ -420,26 +422,26 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
                 setEnablements(GroupEnum.WILDCARD);
             }
         });
-        
+
         Group wildcardGroup = new Group(wildcardMainGroup, SWT.SHADOW_NONE);
         layout = new GridLayout(3, true);
         wildcardGroup.setLayout(layout);
         data = new GridData(GridData.FILL_HORIZONTAL);
         wildcardGroup.setLayoutData(data);
-        
+
         Label wildcardLabel = new Label(wildcardGroup, SWT.LEFT);
         wildcardLabel.setText(Messages.TraceControl_EnableEventsWildcardLabel);
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 1;
         wildcardLabel.setLayoutData(data);
-        
+
         fWildcardText = new Text(wildcardGroup, SWT.LEFT);
         fWildcardText.setToolTipText(Messages.TraceControl_EnableEventsWildcardTooltip);
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 2;
         fWildcardText.setLayoutData(data);
     }
-    
+
     /**
      * Creates log level group.
      */
@@ -450,7 +452,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         logLevelMainGroup.setLayout(layout);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         logLevelMainGroup.setLayoutData(data);
-        
+
         Composite buttonComposite = new Composite(logLevelMainGroup, SWT.NONE);
         layout = new GridLayout(1, false);
         buttonComposite.setLayout(layout);
@@ -488,7 +490,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         fLogLevelEventNameText.setLayoutData(data);
 
         TraceLogLevel[] levels = TraceLogLevel.values();
-        
+
         String[] levelNames = new String[levels.length - 1];
         int k = 0;
         for (int i = 0; i < levels.length; i++) {
@@ -516,17 +518,17 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         data = new GridData(GridData.FILL_BOTH);
         fLogLevelButton.setLayoutData(data);
     }
-    
+
     /**
      * Enable/selects widgets depending on the group specified.
      * @param group - group to enable.
      */
     private void setEnablements(GroupEnum group) {
-        
+
         // Enable/disable trace point items
         fTracepointsActivateButton.setSelection(group == GroupEnum.TRACEPOINTS);
         fTracepointsViewer.getTree().setEnabled(group == GroupEnum.TRACEPOINTS);
-        
+
         // Enable/disable wildcard items
         fWildcardActivateButton.setSelection(group == GroupEnum.WILDCARD);
         fWildcardText.setEnabled(group == GroupEnum.WILDCARD);
@@ -543,18 +545,18 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     // Local classes
     // ------------------------------------------------------------------------
     /**
-     * Content provider for the tracepoints tree. 
+     * Content provider for the tracepoints tree.
      */
     final static public class UstContentProvider extends TraceControlContentProvider {
         @Override
         public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof TargetNodeComponent) {
                 List<ITraceControlComponent> children = ((ITraceControlComponent)parentElement).getChildren(TraceProviderGroup.class);
-                return (ITraceControlComponent[]) children.toArray(new ITraceControlComponent[children.size()]);
+                return children.toArray(new ITraceControlComponent[children.size()]);
             }
             if (parentElement instanceof TraceProviderGroup) {
                 List<ITraceControlComponent> children = ((ITraceControlComponent)parentElement).getChildren(UstProviderComponent.class);
-                return (ITraceControlComponent[]) children.toArray(new ITraceControlComponent[children.size()]);
+                return children.toArray(new ITraceControlComponent[children.size()]);
             }
             if (parentElement instanceof ITraceControlComponent) {
                 return ((ITraceControlComponent)parentElement).getChildren();
@@ -562,9 +564,9 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
             return new Object[0];
         }
     }
-    
+
     /**
-     * Content label for the tracepoints tree. 
+     * Content label for the tracepoints tree.
      */
      final static public class UstLabelProvider extends TraceControlLabelProvider {
         @Override
@@ -585,7 +587,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     }
 
     /**
-     * Check state listener for the tracepoints tree. 
+     * Check state listener for the tracepoints tree.
      */
     final public class UstCheckStateListener implements ICheckStateListener {
         @Override
@@ -596,7 +598,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
                 }
                 if (event.getElement() instanceof UstProviderComponent) {
                     fTracepointsViewer.setSubtreeChecked(event.getElement(), true);
-                } 
+                }
             } else {
                 if (event.getElement() instanceof TraceProviderGroup) {
                     fTracepointsViewer.setSubtreeChecked(event.getElement(), true);

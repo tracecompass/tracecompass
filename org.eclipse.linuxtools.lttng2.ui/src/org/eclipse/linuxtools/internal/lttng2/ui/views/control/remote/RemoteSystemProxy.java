@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote;
@@ -27,19 +27,26 @@ import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSys
  * <p>
  * RemoteSystemProxy implementation.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class RemoteSystemProxy implements IRemoteSystemProxy {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    private IHost fHost;
+    private final IHost fHost;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     *
+     * @param host
+     *            The host of this proxy
+     */
     public RemoteSystemProxy(IHost host) {
         fHost = host;
     }
@@ -86,8 +93,8 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
             if (svc!=null) {
                 ssvc = (IShellService)svc.getAdapter(IShellService.class);
                 if (ssvc != null) {
-                    return subSystems[i];   
-                }   
+                    return subSystems[i];
+                }
             }
         }
         return null;
@@ -108,8 +115,8 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
             if (svc!=null) {
                 ssvc = (ITerminalService)svc.getAdapter(ITerminalService.class);
                 if (ssvc != null) {
-                    return subSystems[i];   
-                }   
+                    return subSystems[i];
+                }
             }
         }
         return null;
@@ -132,7 +139,7 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
         }
         return null;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.util.IRemoteSystemProxy#connect(org.eclipse.rse.core.model.IRSECallback)
      */
@@ -176,7 +183,7 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
         shell.connect();
         return shell;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.util.IRemoteSystemProxy#addCommunicationListener(org.eclipse.rse.core.subsystems.ICommunicationsListener)
      */

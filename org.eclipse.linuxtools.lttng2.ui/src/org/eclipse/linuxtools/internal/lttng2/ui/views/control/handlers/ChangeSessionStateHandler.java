@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -36,7 +36,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Abstract command handler implementation to start or stop one or more trace sessions.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
@@ -45,10 +45,10 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The list of session components the command is to be executed on. 
+     * The list of session components the command is to be executed on.
      */
     protected List<TraceSessionComponent> fSessions = new ArrayList<TraceSessionComponent>();
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -57,15 +57,20 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
      * @return new required state.
      */
     abstract TraceSessionState getNewState();
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
     /**
-     * Performs the state change on given session. 
-     * @param session - a session which state is to be changed
-     * @param monitor - a progress monitor
+     * Performs the state change on given session.
+     *
+     * @param session
+     *            - a session which state is to be changed
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
      */
     abstract public void changeState(TraceSessionComponent session, IProgressMonitor monitor) throws ExecutionException;
 
@@ -84,7 +89,7 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
 
         fLock.lock();
         try {
-            
+
             final List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>();
             sessions.addAll(fSessions);
 
@@ -95,7 +100,7 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
                         for (Iterator<TraceSessionComponent> iterator = sessions.iterator(); iterator.hasNext();) {
 
                             // Start all selected sessions
-                            TraceSessionComponent session = (TraceSessionComponent) iterator.next();
+                            TraceSessionComponent session = iterator.next();
                             changeState(session, monitor);
 
                             // Set Session state
@@ -103,8 +108,8 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
                             session.fireComponentChanged(session);
                         }
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeSessionStateFailure, e);
-                    }  
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeSessionStateFailure, e);
+                    }
                     return Status.OK_STATUS;
                 }
             };
@@ -135,7 +140,7 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceSessionComponent) {
                     // Add only TraceSessionComponents that are inactive and not destroyed
                     TraceSessionComponent session = (TraceSessionComponent) element;

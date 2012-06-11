@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
@@ -41,7 +41,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
  * <p>
  * Implementation of the trace node component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TargetNodeComponent extends TraceControlComponent implements ICommunicationsListener {
@@ -90,7 +90,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * Constructor 
+     * Constructor
      * @param name - the name of the component
      * @param parent - the parent of the component
      * @param host - the host connection implementation
@@ -106,7 +106,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     }
 
     /**
-     * Constructor (using default proxy) 
+     * Constructor (using default proxy)
      * @param name - the name of the component
      * @param parent - the parent of the component
      * @param host - the host connection implementation
@@ -129,7 +129,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         }
         return fDisconnectedImage;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getTargetNodeState()
@@ -138,7 +138,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     public TargetNodeState getTargetNodeState() {
         return fState;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#setTargetNodeState(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent.TargetNodeState)
@@ -148,7 +148,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         fState = state;
         fireComponentChanged(TargetNodeComponent.this);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getControlService()
@@ -164,7 +164,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
      */
     @Override
     public void setControlService(ILttngControlService service) {
-        fService = (ILttngControlService)service;
+        fService = service;
     }
 
     /*
@@ -178,8 +178,8 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
             return new TargetNodePropertySource(this);
         }
         return null;
-    } 
-    
+    }
+
     /**
      * @return remote host name
      */
@@ -200,17 +200,17 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     public TraceSessionComponent[] getSessions() {
         List<ITraceControlComponent> compenents = getChildren(TraceSessionGroup.class);
         if (compenents.size() > 0) {
-            TraceSessionGroup group = (TraceSessionGroup)compenents.get(0); 
+            TraceSessionGroup group = (TraceSessionGroup)compenents.get(0);
             List<ITraceControlComponent> sessions = group.getChildren(TraceSessionComponent.class);
-            return (TraceSessionComponent[])sessions.toArray(new TraceSessionComponent[sessions.size()]);
+            return sessions.toArray(new TraceSessionComponent[sessions.size()]);
         }
         return new TraceSessionComponent[0];
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
    /*
     * @see org.eclipse.rse.core.subsystems.ICommunicationsListener#communicationsStateChange(org.eclipse.rse.core.subsystems.CommunicationsEvent)
     */
@@ -277,16 +277,14 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
             } catch (Exception e) {
                 Activator.getDefault().logError(Messages.TraceControl_DisconnectionFailure + " (" + getName() + "). \n", e); //$NON-NLS-1$ //$NON-NLS-2$
             } finally {
-                handleDisconnected();                    
+                handleDisconnected();
             }
         }
     }
 
     /**
-     * Retrieves the trace configuration from the target node and populates the information
-     * in the tree model. The execution is done in a own job.
-     * 
-     * @throws ExecutionException
+     * Retrieves the trace configuration from the target node and populates the
+     * information in the tree model. The execution is done in a own job.
      */
     public void getConfigurationFromNode() {
         Job job = new Job(Messages.TraceControl_RetrieveNodeConfigurationJob) {
@@ -298,15 +296,15 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
                     TraceProviderGroup providerGroup = new TraceProviderGroup(Messages.TraceControl_ProviderDisplayName, TargetNodeComponent.this);
                     addChild(providerGroup);
                     providerGroup.getProviderFromNode(monitor);
-                    
+
                     // Get session information from node
                     TraceSessionGroup sessionGroup = new TraceSessionGroup(Messages.TraceControl_AllSessionsDisplayName, TargetNodeComponent.this);
                     addChild(sessionGroup);
                     sessionGroup.getSessionsFromNode(monitor);
                 } catch (ExecutionException e) {
                     removeAllChildren();
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure, e);
-                } 
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure, e);
+                }
 
                 return Status.OK_STATUS;
             }
@@ -322,7 +320,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         removeAllChildren();
         getConfigurationFromNode();
     }
-    
+
     /**
      * Deregisters host from registry.
      */
@@ -348,7 +346,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     }
 
     /**
-     * Handles the connected event. 
+     * Handles the connected event.
      */
     private void handleConnected() {
         setTargetNodeState(TargetNodeState.CONNECTED);
@@ -361,7 +359,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     }
 
     /**
-     * Handles the disconnected event. 
+     * Handles the disconnected event.
      */
     private void handleDisconnected() {
         removeAllChildren();

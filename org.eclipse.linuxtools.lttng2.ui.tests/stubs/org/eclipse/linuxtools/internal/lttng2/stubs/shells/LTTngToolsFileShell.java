@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.shells;
@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.CommandResult;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandResult;
 
+@SuppressWarnings("javadoc")
 public class LTTngToolsFileShell extends TestCommandShell {
 
     // ------------------------------------------------------------------------
@@ -44,7 +45,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private final static String OUTPUT_KEY = "<COMMAND_OUTPUT>"; //$NON-NLS-1$
     private final static String OUTPUT_END_KEY = "</COMMAND_OUTPUT>"; //$NON-NLS-1$
     private final static String COMMENT_KEY = "#.*"; //$NON-NLS-1$
-    
+
     private final static Pattern LTTNG_LIST_SESSION_PATTERN =  Pattern.compile("lttng\\s+list\\s+(.+)"); //$NON-NLS-1$
     private final static String LTTNG_LIST_PROVIDER_PATTERN = "lttng\\s+list\\s+(-u|-k)"; //$NON-NLS-1$
 
@@ -54,64 +55,64 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private String fScenariofile;
     private String fScenario;
 
-    private Map<String, Map<String, ICommandResult>> fScenarioMap = new HashMap<String, Map<String, ICommandResult>>();
-    private Map<String, Integer> fSessionNameMap = new HashMap<String, Integer>();
+    private final Map<String, Map<String, ICommandResult>> fScenarioMap = new HashMap<String, Map<String, ICommandResult>>();
+    private final Map<String, Integer> fSessionNameMap = new HashMap<String, Integer>();
 
     /**
      * Parse a scenario file with the format:
      * <SCENARIO>
      * ScenarioName
-     * 
+     *
      * <COMMAND_INPUT>
      * Command
      * </COMAND_INPUT>
-     * 
+     *
      * <COMMAND_RESULT>
      * CommandResult
      * </COMMAND_RESULT>
-     * 
+     *
      * <COMMAND_OUTPUT>
      * CommandOutput
      * </COMMAND_OUTPUT>
-     * 
+     *
      * </SCENARIO>
-     * 
+     *
      * Where: ScenarioName - is the scenario name
      *        Command - the command line string
      *        CommandResult - the result integer of the command (0 for success, 1 for failure)
      *        ComandOutput - the command output string (multi-line possible)
-     *        
+     *
      * Note: 1) There can be many scenarios per file
      *       2) There can be many (Command-CommandResult-CommandOutput) triples per scenario
      *       3) Lines starting with # will be ignored (comments)
-     *                 
+     *
      * @param scenariofile - path to scenario file
      * @throws Exception
      */
     public synchronized void loadScenarioFile(String scenariofile) throws Exception {
         fScenariofile = scenariofile;
-        
+
         // clean up map
         Collection<Map<String, ICommandResult>> values = fScenarioMap.values();
         for (Iterator<Map<String, ICommandResult>> iterator = values.iterator(); iterator.hasNext();) {
-            Map<String, ICommandResult> map = (Map<String, ICommandResult>) iterator.next();
+            Map<String, ICommandResult> map = iterator.next();
             map.clear();
         }
         fScenarioMap.clear();
-        
+
         // load from file
-        
+
         // Open the file
         FileInputStream fstream = new FileInputStream(fScenariofile);
-        
+
         // Get the object of DataInputStream
         DataInputStream in = new DataInputStream(fstream);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String strLine;
-        
+
         // Read File Line by Line
-        
-        // Temporary map for generating instance numbers for lttng list <session> commands. 
+
+        // Temporary map for generating instance numbers for lttng list <session> commands.
         // The numbers are per scenario.
         Map<String, Integer> tmpSessionNameMap = new HashMap<String, Integer>();
         while ((strLine = br.readLine()) != null) {
@@ -139,7 +140,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
                 int result = 0;
                 tmpSessionNameMap.clear();
                 while ((strLine = br.readLine()) != null) {
-                    // Ignore comments 
+                    // Ignore comments
                     if(isComment(strLine)) {
                         continue;
                     }
@@ -147,7 +148,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
                     if (SCENARIO_END_KEY.equals(strLine)) {
                         // Scenario is finished
                         break;
-                    } 
+                    }
                     if (INPUT_KEY.equals(strLine)) {
                         strLine = br.readLine();
                         // Ignore comments
@@ -156,7 +157,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
                         }
                         // Read command
                         input = strLine;
-                        
+
                         // Handle instances of 'lttng list <session"-comamand
                         Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(strLine);
                         if (matcher.matches() && !input.matches(LTTNG_LIST_PROVIDER_PATTERN)) {
@@ -198,8 +199,8 @@ public class LTTngToolsFileShell extends TestCommandShell {
                     } else if (inOutput) {
                         // subsequent lines of output
                         output.add(strLine);
-                    } 
-//                    else { 
+                    }
+//                    else {
 //                        if (RESULT_END_KEY.equals(strLine)) {
                         // nothing to do
 //                    }
@@ -243,7 +244,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
 
         if (commands.containsKey(command)) {
             return commands.get(command);
-        } 
+        }
 
         String[] output = new String[1];
         output[0] = String.valueOf("Command not found");
@@ -253,7 +254,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
         result.setResult(1);
         return result;
    }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------

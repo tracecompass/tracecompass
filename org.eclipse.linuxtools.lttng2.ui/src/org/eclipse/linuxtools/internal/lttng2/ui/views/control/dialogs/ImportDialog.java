@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -54,7 +54,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * <p>
  * Dialog box for collecting trace import information.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class ImportDialog extends Dialog implements IImportDialog {
@@ -62,11 +62,10 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    /**
-     * The icon file for this dialog box.
-     */
+    /** The icon file for this dialog box. */
     public static final String IMPORT_ICON_FILE = "icons/elcl16/import_trace.gif"; //$NON-NLS-1$
-    
+
+    /** Parent directory for UST traces */
     public static final String UST_PARENT_DIRECTORY = "ust"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
@@ -85,7 +84,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
      */
     private CCombo fCombo;
     /**
-     * The overwrite button 
+     * The overwrite button
      */
     private Button fOverwriteButton;
     /**
@@ -97,18 +96,18 @@ public class ImportDialog extends Dialog implements IImportDialog {
      */
     private TraceSessionComponent fSession = null;
     /**
-     * List of traces to import  
+     * List of traces to import
      */
-    private List<ImportFileInfo> fTraces = new ArrayList<ImportFileInfo>();
+    private final List<ImportFileInfo> fTraces = new ArrayList<ImportFileInfo>();
     /**
-     * Selection index in project combo box. 
+     * Selection index in project combo box.
      */
     private int fProjectIndex;
     /**
      * Flag to indicate that something went wrong when creating the dialog box.
      */
     private boolean fIsError = false;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -143,7 +142,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
     public IProject getProject() {
         return fProjects.get(fProjectIndex);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IImportDialog#setSession(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent)
@@ -173,7 +172,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
      */
     @Override
     protected Control createDialogArea(Composite parent) {
-        
+
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
@@ -185,9 +184,9 @@ public class ImportDialog extends Dialog implements IImportDialog {
         layout = new GridLayout(1, true);
         contextGroup.setLayout(layout);
         contextGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
-        
+
         IRemoteSystemProxy proxy = fSession.getTargetNode().getRemoteSystemProxy();
-        
+
         IFileServiceSubSystem fsss = proxy.getFileServiceSubSystem();
 
         try {
@@ -199,10 +198,10 @@ public class ImportDialog extends Dialog implements IImportDialog {
             tree.setLayoutData(data);
             tree.setFont(parent.getFont());
             tree.setToolTipText(Messages.TraceControl_ImportDialogTracesTooltip);
-            
+
             fFolderViewer.setContentProvider(new FolderContentProvider());
             fFolderViewer.setLabelProvider(new WorkbenchLabelProvider());
-            
+
             fFolderViewer.addCheckStateListener(new ICheckStateListener() {
                 @Override
                 public void checkStateChanged(CheckStateChangedEvent event) {
@@ -216,7 +215,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
                             return;
                         }
                         fFolderViewer.setSubtreeChecked(event.getElement(), event.getChecked());
-                        if (!event.getChecked()) { 
+                        if (!event.getChecked()) {
                             fFolderViewer.setChecked(element.getParentRemoteFile(), false);
                         }
                     }
@@ -248,7 +247,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
             fCombo.setToolTipText(Messages.TraceControl_ImportDialogProjectsTooltip);
             fCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 1, 1));
             fCombo.setItems(projectNames.toArray(new String[projectNames.size()]));
-            
+
             Group overrideGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
             layout = new GridLayout(1, true);
             overrideGroup.setLayout(layout);
@@ -259,12 +258,12 @@ public class ImportDialog extends Dialog implements IImportDialog {
 
             getShell().setMinimumSize(new Point(500, 400));
 
-            
+
         } catch (SystemMessageException e) {
             createErrorComposite(parent, e.fillInStackTrace());
             return fDialogComposite;
         }
-        
+
         return fDialogComposite;
     }
 
@@ -313,15 +312,15 @@ public class ImportDialog extends Dialog implements IImportDialog {
             Object[] checked = fFolderViewer.getCheckedElements();
             for (int i = 0; i < checked.length; i++) {
                 IRemoteFile file = (IRemoteFile) checked[i];
-                
-                // Only add actual trace directories  
+
+                // Only add actual trace directories
                 if (file.isDirectory() && !UST_PARENT_DIRECTORY.equals(file.getName())) {
-                    
+
                     ImportFileInfo info = new ImportFileInfo(file, file.getName(), overwriteAll);
                     String traceName = info.getLocalTraceName();
                     IFolder folder = traceFolder.getFolder(traceName);
 
-                    // Verify if trace directory already exists (and not overwrite) 
+                    // Verify if trace directory already exists (and not overwrite)
                     if (folder.exists() && !overwriteAll) {
 
                         // Ask user for overwrite or new name
@@ -336,7 +335,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
                             }
                             fTraces.add(info);
                         }
-                    } else { 
+                    } else {
                         fTraces.add(info);
                     }
                 }
@@ -357,6 +356,11 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // ------------------------------------------------------------------------
     // Helper methods and classes
     // ------------------------------------------------------------------------
+    /**
+     * Helper class for the contents of a folder in a tracing project
+     *
+     * @author Bernd Hufmann
+     */
     public static class FolderContentProvider extends WorkbenchContentProvider {
         @Override
         public Object[] getChildren(Object o) {
@@ -370,22 +374,22 @@ public class ImportDialog extends Dialog implements IImportDialog {
             return super.getChildren(o);
         }
     }
-    
+
     /**
      * Creates a dialog composite with an error message which can be used
      * when an exception occurred during creation time of the dialog box.
      * @param parent - a parent composite
-     * @param e - a error causing exception 
+     * @param e - a error causing exception
      */
     private void createErrorComposite(Composite parent, Throwable e) {
         fIsError = true;
         fDialogComposite.dispose();
-        
+
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
         fDialogComposite.setLayout(layout);
         fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        
+
         Text errorText = new Text(fDialogComposite, SWT.MULTI);
         StringBuffer error = new StringBuffer();
         error.append(Messages.TraceControl_ImportDialogCreationError);
@@ -396,5 +400,5 @@ public class ImportDialog extends Dialog implements IImportDialog {
         errorText.setLayoutData(new GridData(GridData.FILL_BOTH));
     }
 
-    
+
  }

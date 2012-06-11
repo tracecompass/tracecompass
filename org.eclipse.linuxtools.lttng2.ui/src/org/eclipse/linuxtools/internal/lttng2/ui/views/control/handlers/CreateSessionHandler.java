@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -32,7 +32,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * <p>
  * Command handler implementation to create a trace session.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class CreateSessionHandler extends BaseControlViewHandler {
@@ -41,10 +41,10 @@ public class CreateSessionHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The trace session group the command is to be executed on. 
+     * The trace session group the command is to be executed on.
      */
     private TraceSessionGroup fSessionGroup = null;
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -57,8 +57,8 @@ public class CreateSessionHandler extends BaseControlViewHandler {
 
         fLock.lock();
         try {
-            final TraceSessionGroup sessionGroup = fSessionGroup; 
-                    
+            final TraceSessionGroup sessionGroup = fSessionGroup;
+
             // Open dialog box for the node name and address
             ICreateSessionDialog dialog = TraceControlDialogFactory.getInstance().getCreateSessionDialog();
             dialog.setTraceSessionGroup(sessionGroup);
@@ -76,8 +76,8 @@ public class CreateSessionHandler extends BaseControlViewHandler {
                     try {
                         sessionGroup.createSession(sessionName, sessionPath, monitor);
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
-                    } 
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
+                    }
                     return Status.OK_STATUS;
                 }
             };
@@ -95,7 +95,7 @@ public class CreateSessionHandler extends BaseControlViewHandler {
      */
     @Override
     public boolean isEnabled() {
-        
+
         // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {

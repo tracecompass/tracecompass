@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -32,7 +32,7 @@ import org.eclipse.ui.progress.UIJob;
  * <p>
  * Base command handler implementation to add contexts.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract public class BaseAddContextHandler extends BaseControlViewHandler {
@@ -48,16 +48,21 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
     /**
-     * Adds contexts to channel(s) and/or event(s) 
-     * @param param - a parameter instance with data for the command execution
-     * @param contextNames - list contexts to add
-     * @param monitor - a progress monitor
+     * Adds contexts to channel(s) and/or event(s)
+     *
+     * @param param
+     *            - a parameter instance with data for the command execution
+     * @param contextNames
+     *            - list contexts to add
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
+     *             If something goes wrong
      */
     abstract public void addContexts(CommandParameter param, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException;
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -82,7 +87,7 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
                     try {
                         final List<String> availableContexts = param.getSession().getContextList(monitor);
                         final IAddContextDialog dialog = TraceControlDialogFactory.getInstance().getAddContextDialog();
-                        dialog.setAvalibleContexts(availableContexts); 
+                        dialog.setAvalibleContexts(availableContexts);
 
                         if ((dialog.open() != Window.OK) || (dialog.getContexts().isEmpty())) {
                             return Status.OK_STATUS;
@@ -103,9 +108,9 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
 
                                 // get session configuration in all cases
                                 refresh(param);
-                                
+
                                 if (error != null) {
-                                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_AddContextFailure, error);
+                                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_AddContextFailure, error);
                                 }
                                 return Status.OK_STATUS;
                             }
@@ -113,7 +118,7 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
                         addJob.setUser(true);
                         addJob.schedule();
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_GetContextFailure, e);
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_GetContextFailure, e);
                     }
 
                     return Status.OK_STATUS;

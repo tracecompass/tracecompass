@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
@@ -16,8 +16,8 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceContr
 
 /**
  * The class can be used to validate the listener interface.
- *
  */
+@SuppressWarnings("javadoc")
 public class ListenerValidator implements ITraceControlComponentChangedListener {
 
     // ------------------------------------------------------------------------
@@ -26,11 +26,11 @@ public class ListenerValidator implements ITraceControlComponentChangedListener 
     private boolean fisAddedCalled = false;
     private boolean fisRemoveCalled = false;
     private boolean fisChangedCalled = false;
-    
+
     private ITraceControlComponent fParent = null;
     private ITraceControlComponent fChild = null;
     private ITraceControlComponent fChangedComponent = null;
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -49,11 +49,11 @@ public class ListenerValidator implements ITraceControlComponentChangedListener 
     public ITraceControlComponent getSavedParent() {
         return fParent;
     }
-    
+
     public ITraceControlComponent getSavedChild() {
         return fChild;
     }
-    
+
     public ITraceControlComponent getSavedComponent() {
         return fChangedComponent;
     }

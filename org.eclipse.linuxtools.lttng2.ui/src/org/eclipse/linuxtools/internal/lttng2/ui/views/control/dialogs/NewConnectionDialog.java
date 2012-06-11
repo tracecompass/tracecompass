@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
  * <p>
  * Dialog box for connection information.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class NewConnectionDialog extends Dialog implements INewConnectionDialog {
@@ -50,7 +50,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     /**
      * The icon file for this dialog box.
      */
-    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/target_add.gif"; //$NON-NLS-1$ 
+    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/target_add.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -95,7 +95,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
      * The node address (IP or DNS name) string.
      */
     private String fHostName = null;
-    
+
     /**
      * Input list of existing RSE hosts available for selection.
      */
@@ -104,6 +104,12 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     *
+     * @param shell
+     *            The shell
+     */
     public NewConnectionDialog(Shell shell) {
         super(shell);
         setShellStyle(SWT.RESIZE);
@@ -129,7 +135,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     public String getHostName() {
         return fHostName;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.INewConnectionDialog#setTraceControlParent(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent)
@@ -138,7 +144,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     public void setTraceControlParent(ITraceControlComponent parent) {
         fParent = parent;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.INewConnectionDialog#setHosts(org.eclipse.rse.core.model.IHost[])
@@ -170,7 +176,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
      */
     @Override
     protected Control createDialogArea(Composite parent) {
-        
+
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
@@ -181,10 +187,10 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fComboGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fComboGroup.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
         layout = new GridLayout(2, true);
-        fComboGroup.setLayout(layout); 
+        fComboGroup.setLayout(layout);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         fComboGroup.setLayoutData(data);
-        
+
         fExistingHostsCombo = new CCombo(fComboGroup, SWT.READ_ONLY);
         fExistingHostsCombo.setToolTipText(Messages.TraceControl_NewNodeComboToolTip);
         fExistingHostsCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 2, 1));
@@ -203,18 +209,18 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fTextGroup.setLayout(layout);
         data = new GridData(GridData.FILL_HORIZONTAL);
         fTextGroup.setLayoutData(data);
-        
+
         fButton = new Button(fTextGroup, SWT.CHECK);
         fButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 3, 1));
         fButton.setText(Messages.TraceControl_NewNodeEditButtonName);
         fButton.setEnabled(fExistingHosts.length > 0);
-        
+
         Label connectionNameLabel = new Label(fTextGroup, SWT.RIGHT);
         connectionNameLabel.setText(Messages.TraceControl_NewNodeConnectionNameLabel);
         fConnectionNameText = new Text(fTextGroup, SWT.NONE);
         fConnectionNameText.setToolTipText(Messages.TraceControl_NewNodeConnectionNameTooltip);
         fConnectionNameText.setEnabled(fExistingHosts.length == 0);
-        
+
         Label hostNameLabel = new Label(fTextGroup, SWT.RIGHT);
         hostNameLabel.setText(Messages.TraceControl_NewNodeHostNameLabel);
         fHostNameText = new Text(fTextGroup, SWT.NONE);
@@ -233,7 +239,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
                     fExistingHostsCombo.setEnabled(true);
                     fConnectionNameText.setEnabled(false);
                     fHostNameText.setEnabled(false);
-                }             
+                }
             }
 
             @Override
@@ -253,19 +259,19 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        
+
         // layout widgets
         data = new GridData(GridData.FILL_HORIZONTAL);
         fHostNameText.setText("666.666.666.666"); //$NON-NLS-1$
         Point minSize = fHostNameText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
         data.widthHint = minSize.x + 5;
         data.horizontalSpan = 2;
-        
+
         fConnectionNameText.setLayoutData(data);
         fHostNameText.setLayoutData(data);
-        
+
         fHostNameText.setText(""); //$NON-NLS-1$
-        
+
         return fDialogComposite;
     }
 

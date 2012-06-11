@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -38,7 +38,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Abstract command handler implementation to enable or disabling a trace channel.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
@@ -57,7 +57,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
     /**
      * @return the new state to set
      */
-    abstract protected TraceEnablement getNewState(); 
+    abstract protected TraceEnablement getNewState();
 
     // ------------------------------------------------------------------------
     // Operations
@@ -65,11 +65,11 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
     /**
      * Changes the state of the given channels.
      * @param domain - the domain of the channels.
-     * @param channelNames - a list of channel names 
+     * @param channelNames - a list of channel names
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    abstract protected void changeState(TraceDomainComponent domain, List<String> channelNames, IProgressMonitor monitor) throws ExecutionException; 
+    abstract protected void changeState(TraceDomainComponent domain, List<String> channelNames, IProgressMonitor monitor) throws ExecutionException;
 
     /*
      * (non-Javadoc)
@@ -104,7 +104,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
                             List<String> channelNames = new ArrayList<String>();
                             for (Iterator<TraceChannelComponent> iterator = kernelChannels.iterator(); iterator.hasNext();) {
                                 // Enable all selected channels which are disabled
-                                TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
+                                TraceChannelComponent channel = iterator.next();
                                 channelNames.add(channel.getName());
                             }
 
@@ -112,7 +112,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
 
                             for (Iterator<TraceChannelComponent> iterator = kernelChannels.iterator(); iterator.hasNext();) {
                                 // Enable all selected channels which are disabled
-                                TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
+                                TraceChannelComponent channel = iterator.next();
                                 channel.setState(getNewState());
                             }
                         }
@@ -127,7 +127,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
                             List<String> channelNames = new ArrayList<String>();
                             for (Iterator<TraceChannelComponent> iterator = ustChannels.iterator(); iterator.hasNext();) {
                                 // Enable all selected channels which are disabled
-                                TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
+                                TraceChannelComponent channel = iterator.next();
                                 channelNames.add(channel.getName());
                             }
 
@@ -135,7 +135,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
 
                             for (Iterator<TraceChannelComponent> iterator = ustChannels.iterator(); iterator.hasNext();) {
                                 // Enable all selected channels which are disabled
-                                TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
+                                TraceChannelComponent channel = iterator.next();
                                 channel.setState(getNewState());
                             }
                         }
@@ -143,11 +143,11 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
                         error = e;
                     }
 
-                    // In all cases notify listeners  
+                    // In all cases notify listeners
                     session.fireComponentChanged(session);
 
                     if (error != null) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeChannelStateFailure, error);
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeChannelStateFailure, error);
                     }
 
                     return Status.OK_STATUS;
@@ -179,17 +179,17 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
         TraceDomainComponent ustDomain = null;
         List<TraceChannelComponent> kernelChannels = new ArrayList<TraceChannelComponent>();
         List<TraceChannelComponent> ustChannels = new ArrayList<TraceChannelComponent>();
-        
+
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             String sessionName = null;
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
-                 
+                Object element = iterator.next();
+
                 if (element instanceof TraceChannelComponent) {
-                    
+
                     // Add only TraceChannelComponents that are disabled
                     TraceChannelComponent channel = (TraceChannelComponent) element;
                     if (sessionName == null) {
@@ -219,7 +219,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
                 }
             }
         }
-        
+
         boolean isEnabled = (!kernelChannels.isEmpty() || !ustChannels.isEmpty());
         fLock.lock();
         try {
@@ -229,12 +229,12 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
         } finally {
             fLock.unlock();
         }
-        
+
         return isEnabled;
     }
-    
+
     /**
-     *  Class containing parameter for the command execution. 
+     *  Class containing parameter for the command execution.
      */
     static protected class Parameter {
         /**
@@ -246,14 +246,14 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
          */
         final protected TraceDomainComponent fUstDomain;
         /**
-         * The list of kernel channel components the command is to be executed on. 
+         * The list of kernel channel components the command is to be executed on.
          */
         final protected List<TraceChannelComponent> fKernelChannels;
         /**
-         * The list of UST channel components the command is to be executed on. 
+         * The list of UST channel components the command is to be executed on.
          */
         final protected List<TraceChannelComponent> fUstChannels;
-        
+
         /**
          * Constructor
          * @param kernelDomain - a kernel domain component
@@ -269,7 +269,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
             fUstChannels = new ArrayList<TraceChannelComponent>();
             fUstChannels.addAll(ustChannels);
         }
-        
+
         /**
          * Copy constructor
          * @param other a parameter to copy
@@ -277,28 +277,28 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
         public Parameter(Parameter other) {
             this(other.fKernelDomain, other.fUstDomain, other.fKernelChannels, other.fUstChannels);
         }
-        
+
         /**
          * @return the kernel domain component.
          */
         public TraceDomainComponent getKernelDomain() {
             return fKernelDomain;
         }
-        
+
         /**
          * @return the UST domain component.
          */
         public TraceDomainComponent getUstDomain() {
             return fUstDomain;
-        }   
-        
+        }
+
         /**
          * @return the list of kernel channel components.
          */
         public List<TraceChannelComponent> getKernelChannels() {
             return fKernelChannels;
         }
-        
+
         /**
          * @return the list of UST channel components.
          */

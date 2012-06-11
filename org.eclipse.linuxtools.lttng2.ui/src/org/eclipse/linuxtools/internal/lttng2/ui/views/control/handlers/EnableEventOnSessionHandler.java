@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -31,7 +31,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * Command handler implementation to enable events for a known session and default channel 'channel0'
  * (which will be created if doesn't exist).
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
@@ -39,7 +39,7 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     //-------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -79,7 +79,7 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
         param.getSession().enableLogLevel(eventName, logLevelType, level, monitor);
     }
 
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#getDomain(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter)
@@ -107,10 +107,10 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceSessionComponent) {
                     // Add only if corresponding TraceSessionComponents is inactive and not destroyed
-                    TraceSessionComponent tmpSession = (TraceSessionComponent) element; 
+                    TraceSessionComponent tmpSession = (TraceSessionComponent) element;
                     if(tmpSession.getSessionState() == TraceSessionState.INACTIVE && !tmpSession.isDestroyed()) {
                         session = tmpSession;
                     }

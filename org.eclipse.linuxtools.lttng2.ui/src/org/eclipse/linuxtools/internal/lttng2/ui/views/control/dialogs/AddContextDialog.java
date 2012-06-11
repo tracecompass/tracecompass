@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Shell;
  * <p>
  * Dialog box for collecting information about contexts to be added to channels/events.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class AddContextDialog extends Dialog implements IAddContextDialog  {
@@ -46,11 +46,11 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    
+
     /**
      * The icon file for this dialog box.
      */
-    public static final String ADD_CONTEXT_ICON_FILE = "icons/elcl16/add-context.gif"; //$NON-NLS-1$ 
+    public static final String ADD_CONTEXT_ICON_FILE = "icons/elcl16/add-context.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -66,12 +66,12 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     /**
      * A Tree model for the checkbox tree viewer.
      */
-    private ContextModel fContextModel = new ContextModel();
+    private final ContextModel fContextModel = new ContextModel();
     /**
      * The contexts to add.
      */
-    private List<String> fSelectedContexts = new ArrayList<String>();
-    
+    private final List<String> fSelectedContexts = new ArrayList<String>();
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -83,11 +83,11 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
         super(shell);
         setShellStyle(SWT.RESIZE);
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IAddContextDialog#setAvalibleContexts(java.util.List)
@@ -96,7 +96,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     public void setAvalibleContexts(List<String> contexts) {
         fContextModel.setAvalibleContexts(contexts);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IAddContextDialog#getContexts()
@@ -141,18 +141,18 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
         layout = new GridLayout(1, true);
         contextGroup.setLayout(layout);
         contextGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
-        
+
         fContextsViewer = new CheckboxTreeViewer(contextGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        fContextsViewer.getTree().setToolTipText(Messages.TraceControl_AddContextAvailableContextsTooltip); 
+        fContextsViewer.getTree().setToolTipText(Messages.TraceControl_AddContextAvailableContextsTooltip);
 
         fContextsViewer.setContentProvider(new ContextsContentProvider());
         fContextsViewer.setLabelProvider(new ContextsLabelProvider());
         fContextsViewer.addCheckStateListener(new ContextCheckListener());
         fContextsViewer.setInput(fContextModel);
         fContextsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
-        
+
         getShell().setMinimumSize(new Point(500, 450));
-        
+
         return fDialogComposite;
     }
 
@@ -181,11 +181,11 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
                 fSelectedContexts.add(component.getName());
             }
         }
-        
+
         // validation successful -> call super.okPressed()
         super.okPressed();
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper classes and methods
     // ------------------------------------------------------------------------
@@ -238,7 +238,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     final public static class ContextsLabelProvider extends ColumnLabelProvider {
         @Override
         public String getText(Object element) {
-            
+
             if ((element != null) && (element instanceof IContextModelComponent)) {
                 return ((IContextModelComponent)element).getName();
             }
@@ -246,9 +246,9 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
             return "";//$NON-NLS-1$
         }
     }
-    
+
     /**
-     * Check state listener for the contexts tree. 
+     * Check state listener for the contexts tree.
      */
     final public class ContextCheckListener implements ICheckStateListener {
         @Override
@@ -256,8 +256,8 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
           if (event.getChecked()) {
               if (event.getElement() instanceof AllContexts) {
                   fContextsViewer.setSubtreeChecked(event.getElement(), true);
-              } 
-          } else { 
+              }
+          } else {
               if (event.getElement() instanceof AllContexts) {
                   fContextsViewer.setSubtreeChecked(event.getElement(), false);
               } else {
@@ -273,21 +273,30 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
      */
     public static class ContextModel implements IContextModelComponent {
 
-        private AllContexts fAllContexts;
-        
+        private final AllContexts fAllContexts;
+
+        /**
+         * Constructor
+         */
         public ContextModel() {
             fAllContexts = new AllContexts(this);
         }
 
+        /**
+         * Sets the available contexts
+         *
+         * @param contexts
+         *            The contexts to set
+         */
         public void setAvalibleContexts(List<String> contexts) {
             fAllContexts.setAvalibleContexts(contexts);
         }
-        
+
         @Override
         public String getName() {
             return "root"; //$NON-NLS-1$
         }
-        
+
         @Override
         public Object getParent() {
             return null;
@@ -307,25 +316,37 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     }
 
     /**
-     * Model element (to select/deselect) all contexts) for the context tree viewer 
+     * Model element (to select/deselect) all contexts) for the context tree viewer
      */
     public static class AllContexts implements IContextModelComponent {
         /**
          * The available list of contexts.
          */
         private List<Context> fAvailableContexts;
-        
-        private IContextModelComponent fParent;
 
+        private final IContextModelComponent fParent;
+
+        /**
+         * Constructor
+         *
+         * @param parent
+         *            The parent component
+         */
         public AllContexts(IContextModelComponent parent) {
             fParent = parent;
         }
-        
+
+        /**
+         * Sets the available contexts
+         *
+         * @param contexts
+         *            The contexts to set
+         */
         public void setAvalibleContexts(List<String> contexts) {
             fAvailableContexts = new ArrayList<Context>();
             if (contexts != null) {
                 for (Iterator<String> iterator = contexts.iterator(); iterator.hasNext();) {
-                    String name = (String) iterator.next();
+                    String name = iterator.next();
                     fAvailableContexts.add(new Context(this, name));
                 }
             }
@@ -335,17 +356,17 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
         public String getName() {
             return Messages.TraceControl_AddContextAllLabel;
         }
-        
+
         @Override
         public Object[] getChildren() {
             return fAvailableContexts.toArray();
         }
-        
+
         @Override
         public Object getParent() {
             return fParent;
         }
-        
+
         @Override
         public boolean hasChildren() {
             return true;
@@ -353,18 +374,26 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     }
 
     /**
-     * Model element (the context) for the context tree viewer 
+     * Model element (the context) for the context tree viewer
      */
     public static class Context implements IContextModelComponent {
 
-        private String fContextName;
-        private IContextModelComponent fParent; 
-        
+        private final String fContextName;
+        private final IContextModelComponent fParent;
+
+        /**
+         * Constructor
+         *
+         * @param parent
+         *            The parent component
+         * @param name
+         *            The name of this context
+         */
         public Context(IContextModelComponent parent, String name) {
             fParent = parent;
             fContextName = name;
         }
-        
+
         @Override
         public String getName() {
             return fContextName;
@@ -387,12 +416,28 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     }
 
     /**
-     * Interface for the tree model used for the context tree viewer. 
+     * Interface for the tree model used for the context tree viewer.
      */
     public interface IContextModelComponent {
+
+        /**
+         * @return The name of this component
+         */
         public String getName();
+
+        /**
+         * @return The parent component
+         */
         public Object getParent();
+
+        /**
+         * @return The array of children of this component
+         */
         public Object[] getChildren();
+
+        /**
+         * @return If this component has children or not
+         */
         public boolean hasChildren();
     }
 }

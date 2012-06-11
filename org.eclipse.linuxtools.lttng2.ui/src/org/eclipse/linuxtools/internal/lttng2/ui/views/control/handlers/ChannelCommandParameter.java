@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -16,10 +16,10 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 
 /**
  * Class containing parameter for the command execution.
- *  
+ *
  * @author Bernd Hufmann
  */
-public class ChannelCommandParameter extends CommandParameter implements Cloneable {
+public class ChannelCommandParameter extends CommandParameter {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -52,7 +52,7 @@ public class ChannelCommandParameter extends CommandParameter implements Cloneab
     public TraceChannelComponent getChannel() {
         return fChannel;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

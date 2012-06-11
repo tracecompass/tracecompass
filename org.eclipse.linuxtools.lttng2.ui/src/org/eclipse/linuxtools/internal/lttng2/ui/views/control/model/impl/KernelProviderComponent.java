@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 
@@ -25,11 +25,11 @@ import org.eclipse.ui.views.properties.IPropertySource;
  * <p>
  * Implementation of the Kernel provider component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class KernelProviderComponent extends TraceControlComponent {
-    
+
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
@@ -41,12 +41,12 @@ public class KernelProviderComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * Constructor 
+     * Constructor
      * @param name - the name of the component.
      * @param parent - the parent of this component.
      */
@@ -55,17 +55,17 @@ public class KernelProviderComponent extends TraceControlComponent {
         setToolTip(Messages.TraceControl_ProviderDisplayName);
         setImage(KERNEL_PROVIDER_ICON_FILE);
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
     /**
-     * Sets the events information for this component. 
-     * @param eventInfos - events information to set. 
+     * Sets the events information for this component.
+     * @param eventInfos - events information to set.
      */
     public void setEventInfo(List<IBaseEventInfo> eventInfos) {
         for (Iterator<IBaseEventInfo> iterator = eventInfos.iterator(); iterator.hasNext();) {
-            IBaseEventInfo baseEventInfo = (IBaseEventInfo) iterator.next();
+            IBaseEventInfo baseEventInfo = iterator.next();
             BaseEventComponent component = new BaseEventComponent(baseEventInfo.getName(), this);
             component.setEventInfo(baseEventInfo);
             addChild(component);
@@ -83,10 +83,10 @@ public class KernelProviderComponent extends TraceControlComponent {
             return new KernelProviderPropertySource(this);
         }
         return null;
-    } 
+    }
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
 }

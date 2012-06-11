@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
@@ -25,7 +25,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * <p>
  * Property source implementation for the trace probe event component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceProbeEventPropertySource extends TraceEventPropertySource {
@@ -61,17 +61,24 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     *
+     * @param component
+     *            A trace event component
+     */
     public TraceProbeEventPropertySource(TraceEventComponent component) {
         super(component);
         if (component.getClass() != TraceProbeEventComponent.class) {
             throw new IllegalArgumentException("Invalid type passed. Only class of type TraceProbeEventComponent allowed:\n" + component.getClass()); //$NON-NLS-1$
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -90,7 +97,7 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
         if (fEvent instanceof TraceProbeEventComponent) {
             TraceProbeEventComponent event = (TraceProbeEventComponent) fEvent;
             if (event.getAddress() != null) {
-                list.add(new TextPropertyDescriptor(TRACE_EVENT_PROBE_ADDRESS_PROPERTY_ID, TRACE_EVENT_PROBE_ADDRESS_PROPERTY_NAME));                
+                list.add(new TextPropertyDescriptor(TRACE_EVENT_PROBE_ADDRESS_PROPERTY_ID, TRACE_EVENT_PROBE_ADDRESS_PROPERTY_NAME));
             }
 
             if (event.getOffset() != null) {
@@ -101,7 +108,7 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
                 list.add(new TextPropertyDescriptor(TRACE_EVENT_PROBE_SYMBOL_PROPERTY_ID, TRACE_EVENT_PROBE_SYMBOL_PROPERTY_NAME));
             }
         }
-        return (IPropertyDescriptor [])list.toArray(new IPropertyDescriptor[list.size()]);
+        return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
     /*

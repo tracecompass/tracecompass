@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -27,7 +27,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * <p>
  * Command handler implementation to refresh node configuration.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class RefreshHandler extends BaseControlViewHandler {
@@ -39,7 +39,7 @@ public class RefreshHandler extends BaseControlViewHandler {
      * The node component reference.
      */
     private TargetNodeComponent fNode;
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -76,10 +76,10 @@ public class RefreshHandler extends BaseControlViewHandler {
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
-            
+
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceControlComponent) {
                     TraceControlComponent component = (TraceControlComponent) element;
                     boolean isConnected = component.getTargetNodeState() == TargetNodeState.CONNECTED;
@@ -94,9 +94,9 @@ public class RefreshHandler extends BaseControlViewHandler {
                 }
             }
         }
-        
+
         boolean isEnabled = node != null;
-        
+
         fLock.lock();
         try {
             fNode = null;
@@ -106,7 +106,7 @@ public class RefreshHandler extends BaseControlViewHandler {
         } finally {
             fLock.unlock();
         }
-        
+
         return isEnabled;
     }
 }

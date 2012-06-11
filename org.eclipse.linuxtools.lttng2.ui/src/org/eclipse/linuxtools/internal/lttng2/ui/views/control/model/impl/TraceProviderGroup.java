@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceContr
  * <p>
  * Implementation of the trace provider group.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceProviderGroup extends TraceControlComponent {
@@ -37,24 +37,24 @@ public class TraceProviderGroup extends TraceControlComponent {
      * Path to icon file for this component.
      */
     public static final String TRACE_PROVIDERS_ICON_FILE = "icons/obj16/providers.gif"; //$NON-NLS-1$
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * Constructor 
+     * Constructor
      * @param name - the name of the component.
      * @param parent - the parent of this component.
-     */    
+     */
     public TraceProviderGroup(String name, ITraceControlComponent parent) {
         super(name, parent);
         setImage(TRACE_PROVIDERS_ICON_FILE);
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -62,10 +62,10 @@ public class TraceProviderGroup extends TraceControlComponent {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
     /**
      * Gets the provider information from the target node.
-     * @throws ExecutionException
+     * @throws ExecutionException If the command fails
      */
     public void getProviderFromNode() throws ExecutionException {
         getProviderFromNode(new NullProgressMonitor());
@@ -74,19 +74,19 @@ public class TraceProviderGroup extends TraceControlComponent {
     /**
      * Gets the provider information from the target node.
      * @param monitor - a progress monitor
-     * @throws ExecutionException
+     * @throws ExecutionException If the command fails
      */
     public void getProviderFromNode(IProgressMonitor monitor) throws ExecutionException {
-        
+
         List<IBaseEventInfo> eventInfos = getControlService().getKernelProvider(monitor);
         KernelProviderComponent component = new KernelProviderComponent(Messages.TraceControl_KernelProviderDisplayName, this);
         addChild(component);
         component.setEventInfo(eventInfos);
-        
+
         List<IUstProviderInfo> allProviders = getControlService().getUstProvider(monitor);
-        
+
         for (Iterator<IUstProviderInfo> iterator = allProviders.iterator(); iterator.hasNext();) {
-            IUstProviderInfo ustProviderInfo = (IUstProviderInfo) iterator.next();
+            IUstProviderInfo ustProviderInfo = iterator.next();
             UstProviderComponent ustComponent = new UstProviderComponent(ustProviderInfo.getName(), this);
             addChild(ustComponent);
             ustComponent.setUstProvider(ustProviderInfo);

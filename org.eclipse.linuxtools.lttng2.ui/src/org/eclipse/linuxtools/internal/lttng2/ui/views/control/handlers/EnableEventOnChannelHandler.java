@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -30,7 +30,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * <p>
  * Command handler implementation to enable events for a known channel.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
@@ -94,7 +94,7 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
     public TraceDomainComponent getDomain(CommandParameter param) {
         if (param instanceof ChannelCommandParameter) {
             return (TraceDomainComponent) ((ChannelCommandParameter)param).getChannel().getParent();
-        } 
+        }
         return null;
     }
 
@@ -116,10 +116,10 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceChannelComponent) {
                     // Add only if corresponding TraceSessionComponents is inactive and not destroyed
-                    TraceChannelComponent tmpChannel = (TraceChannelComponent) element; 
+                    TraceChannelComponent tmpChannel = (TraceChannelComponent) element;
                     session = tmpChannel.getSession();
                     if(!session.isDestroyed()) {
                         channel = tmpChannel;
@@ -127,7 +127,7 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
                 }
             }
         }
-        
+
         boolean isEnabled = (channel != null);
         fLock.lock();
         try {

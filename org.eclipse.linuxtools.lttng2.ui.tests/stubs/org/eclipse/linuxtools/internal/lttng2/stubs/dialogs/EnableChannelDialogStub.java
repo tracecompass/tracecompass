@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;
@@ -17,17 +17,18 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableCh
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
- * Create channel dialog stub implementation. 
+ * Create channel dialog stub implementation.
  */
+@SuppressWarnings("javadoc")
 public class EnableChannelDialogStub implements IEnableChannelDialog {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     private TraceDomainComponent fDomain;
     private ChannelInfo fChannelInfo;
     private boolean fIsKernel;
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -39,14 +40,14 @@ public class EnableChannelDialogStub implements IEnableChannelDialog {
         fChannelInfo.setSwitchTimer(100);
         fChannelInfo.setSubBufferSize(16384);
     }
-   
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
     public void setIsKernel(boolean isKernel) {
         fIsKernel = isKernel;
     }
-    
+
     @Override
     public IChannelInfo getChannelInfo() {
         return fChannelInfo;
@@ -69,7 +70,7 @@ public class EnableChannelDialogStub implements IEnableChannelDialog {
     public boolean isKernel() {
         return fIsKernel;
     }
-    
+
     public void setChannelInfo(ChannelInfo info) {
         fChannelInfo = info;
     }

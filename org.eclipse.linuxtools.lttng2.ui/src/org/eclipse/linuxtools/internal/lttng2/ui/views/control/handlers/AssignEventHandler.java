@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -44,7 +44,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * Command handler implementation to assign events to a session and channel and enable/configure them.
  * This is done on the trace provider level.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class AssignEventHandler extends BaseControlViewHandler {
@@ -56,7 +56,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
      * The command execution parameter.
      */
     private Parameter fParam;
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
                         List<BaseEventComponent> events = param.getEvents();
                         // Create list of event names
                         for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
-                            BaseEventComponent event = (BaseEventComponent) iterator.next();
+                            BaseEventComponent event = iterator.next();
                             eventNames.add(event.getName());
                         }
 
@@ -113,7 +113,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
                     refresh(new CommandParameter(dialog.getSession()));
 
                     if (error != null) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_EnableEventsFailure, error);
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_EnableEventsFailure, error);
                     }
                     return Status.OK_STATUS;
                 }
@@ -146,14 +146,14 @@ public class AssignEventHandler extends BaseControlViewHandler {
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
-            
+
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof BaseEventComponent) {
                     BaseEventComponent event = (BaseEventComponent) element;
                     ITraceControlComponent provider = event.getParent();
-                    
+
                     // check for kernel or UST provider
                     boolean temp = false;
                     if (provider instanceof KernelProviderComponent) {
@@ -174,7 +174,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
 
                     // Add BaseEventComponents
                     events.add(event);
-                    
+
                     if (sessions == null) {
                         TargetNodeComponent  root = (TargetNodeComponent)event.getParent().getParent().getParent();
                         sessions = root.getSessions();
@@ -197,28 +197,28 @@ public class AssignEventHandler extends BaseControlViewHandler {
     }
 
     /**
-     *  Class containing parameter for the command execution. 
+     *  Class containing parameter for the command execution.
      */
     final static private class Parameter {
 
         /**
-         * The list of event components the command is to be executed on. 
+         * The list of event components the command is to be executed on.
          */
-        private List<BaseEventComponent> fEvents;
-        
+        private final List<BaseEventComponent> fEvents;
+
         /**
          * The list of available sessions.
          */
         final private TraceSessionComponent[] fSessions;
-        
+
         /**
          * Flag for indicating Kernel or UST.
          */
         final private boolean fIsKernel;
-        
+
         /**
          * Constructor
-         * 
+         *
          * @param sessions - a array of trace sessions
          * @param events - a lists of events to enable
          * @param isKernel - domain (true for kernel or UST)
@@ -229,7 +229,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
             fEvents.addAll(events);
             fIsKernel = isKernel;
         }
-        
+
         /**
          * Copy constructor
          * @param other - a parameter to copy
@@ -237,15 +237,15 @@ public class AssignEventHandler extends BaseControlViewHandler {
         public Parameter(Parameter other) {
             this(other.fSessions, other.fEvents, other.fIsKernel);
         }
-        
+
         public TraceSessionComponent[] getSessions() {
             return fSessions;
         }
-        
+
         public List<BaseEventComponent> getEvents() {
             return fEvents;
         }
-        
+
         public boolean isKernel() {
             return fIsKernel;
         }

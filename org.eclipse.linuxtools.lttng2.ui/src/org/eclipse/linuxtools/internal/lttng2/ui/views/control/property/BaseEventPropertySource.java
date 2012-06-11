@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
@@ -24,7 +24,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * <p>
  * Property source implementation for the base event component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class BaseEventPropertySource extends BasePropertySource {
@@ -46,7 +46,7 @@ public class BaseEventPropertySource extends BasePropertySource {
      */
     public static final String BASE_EVENT_LOGLEVEL_PROPERTY_ID = "base.event.loglevel"; //$NON-NLS-1$
     /**
-     *  The base event 'name' property name. 
+     *  The base event 'name' property name.
      */
     public static final String BASE_EVENT_NAME_PROPERTY_NAME = Messages.TraceControl_EventNamePropertyName;
     /**
@@ -57,15 +57,15 @@ public class BaseEventPropertySource extends BasePropertySource {
      * The base event 'log level' property name.
      */
     public static final String BASE_EVENT_LOGLEVEL_PROPERTY_NAME = Messages.TraceControl_LogLevelPropertyName;
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The base event component which this property source is for. 
+     * The base event component which this property source is for.
      */
     private final BaseEventComponent fBaseEvent;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public class BaseEventPropertySource extends BasePropertySource {
     public BaseEventPropertySource(BaseEventComponent component) {
         fBaseEvent = component;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -92,7 +92,7 @@ public class BaseEventPropertySource extends BasePropertySource {
         if (fBaseEvent.getLogLevel() != TraceLogLevel.LEVEL_UNKNOWN) {
             list.add(new TextPropertyDescriptor(BASE_EVENT_LOGLEVEL_PROPERTY_ID, BASE_EVENT_LOGLEVEL_PROPERTY_NAME));
         }
-        return (IPropertyDescriptor [])list.toArray(new IPropertyDescriptor[list.size()]);        
+        return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
     /*

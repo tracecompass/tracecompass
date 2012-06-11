@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.service;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * <p>
  * Constants for LTTng Control Service.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class LTTngControlServiceConstants {
@@ -25,6 +25,9 @@ public class LTTngControlServiceConstants {
     // ------------------------------------------------------------------------
     // Version constants
     // ------------------------------------------------------------------------
+    /**
+     * Constant for the LTTng toolchain version
+     */
     public final static String LTTNG_MAJOR_VERSION_2_0 = "2.0"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
@@ -51,35 +54,35 @@ public class LTTngControlServiceConstants {
      */
     public final static String COMMAND_LIST_UST = COMMAND_LIST + "-u";  //$NON-NLS-1$
     /**
-     * Command to create a session. 
+     * Command to create a session.
      */
     public final static String COMMAND_CREATE_SESSION = " create "; //$NON-NLS-1$
     /**
-     * Command to destroy a session. 
+     * Command to destroy a session.
      */
     public final static String COMMAND_DESTROY_SESSION = " destroy "; //$NON-NLS-1$
     /**
-     * Command to destroy a session. 
+     * Command to destroy a session.
      */
     public final static String COMMAND_START_SESSION = " start "; //$NON-NLS-1$
     /**
-     * Command to destroy a session. 
+     * Command to destroy a session.
      */
     public final static String COMMAND_STOP_SESSION = " stop "; //$NON-NLS-1$
     /**
-     * Command to enable a channel. 
+     * Command to enable a channel.
      */
     public final static String COMMAND_ENABLE_CHANNEL = " enable-channel "; //$NON-NLS-1$
     /**
-     * Command to disable a channel. 
+     * Command to disable a channel.
      */
     public final static String COMMAND_DISABLE_CHANNEL = " disable-channel "; //$NON-NLS-1$
     /**
-     * Command to enable a event. 
+     * Command to enable a event.
      */
     public final static String COMMAND_ENABLE_EVENT = " enable-event "; //$NON-NLS-1$
     /**
-     * Command to disable a event. 
+     * Command to disable a event.
      */
     public final static String COMMAND_DISABLE_EVENT = " disable-event "; //$NON-NLS-1$
     /**
@@ -169,7 +172,7 @@ public class LTTngControlServiceConstants {
     /**
      * Optional command line option for configuring a channel's overwrite mode.
      */
-    public final static String OPTION_OVERWRITE = " --overwrite ";  //$NON-NLS-1$ 
+    public final static String OPTION_OVERWRITE = " --overwrite ";  //$NON-NLS-1$
     /**
      * Optional command line option for configuring a channel's number of sub buffers.
      */
@@ -187,7 +190,7 @@ public class LTTngControlServiceConstants {
      */
     public final static String OPTION_READ_TIMER = " --read-timer ";  //$NON-NLS-1$
     /**
-     * Command line option for printing the help of a specif command 
+     * Command line option for printing the help of a specif command
      */
     public final static String OPTION_HELP = " -h ";  //$NON-NLS-1$
 

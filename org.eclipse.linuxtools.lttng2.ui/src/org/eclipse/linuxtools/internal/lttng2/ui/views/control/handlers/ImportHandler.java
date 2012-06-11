@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -48,7 +48,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Command handler implementation to import traces from a (remote) session to a tracing project.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class ImportHandler extends BaseControlViewHandler {
@@ -57,7 +57,7 @@ public class ImportHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     protected CommandParameter fParam;
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public class ImportHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -82,7 +82,7 @@ public class ImportHandler extends BaseControlViewHandler {
         fLock.lock();
         try {
             final CommandParameter param = fParam.clone();
-            
+
             final IImportDialog dialog = TraceControlDialogFactory.getInstance().getImportDialog();
             dialog.setSession(param.getSession());
 
@@ -96,15 +96,15 @@ public class ImportHandler extends BaseControlViewHandler {
                     try {
                         List<ImportFileInfo> traces = dialog.getTracePathes();
                         IProject project = dialog.getProject();
-                        
+
                         for (Iterator<ImportFileInfo> iterator = traces.iterator(); iterator.hasNext();) {
-                            ImportFileInfo remoteFile = (ImportFileInfo) iterator.next();
+                            ImportFileInfo remoteFile = iterator.next();
                             downloadTrace(remoteFile, project);
                         }
 
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e);
-                    }  
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e);
+                    }
                     return Status.OK_STATUS;
                 }
             };
@@ -134,7 +134,7 @@ public class ImportHandler extends BaseControlViewHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
-                Object element = (Object) iterator.next();
+                Object element = iterator.next();
                 if (element instanceof TraceSessionComponent) {
                     // Add only TraceSessionComponents that are inactive and not destroyed
                     TraceSessionComponent tmpSession = (TraceSessionComponent) element;
@@ -157,20 +157,23 @@ public class ImportHandler extends BaseControlViewHandler {
         }
         return isEnabled;
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
     /**
      * Downloads a trace from the remote host to the given project.
-     * @param trace - trace information of trace to import
-     * @param project - project to import to
+     *
+     * @param trace
+     *            - trace information of trace to import
+     * @param project
+     *            - project to import to
      * @throws ExecutionException
      */
     private void downloadTrace(ImportFileInfo trace, IProject project) throws ExecutionException {
         try {
             IRemoteFileSubSystem fsss = trace.getImportFile().getParentRemoteFileSubSystem();
-            
+
             IFolder traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
             if (!traceFolder.exists()) {
                 throw new ExecutionException(Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTraceFolder.TRACE_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
@@ -194,9 +197,9 @@ public class ImportHandler extends BaseControlViewHandler {
                 destinations[i] = folder.getLocation().addTrailingSeparator().append(sources[i].getName()).toString();
                 encodings[i] = null;
             }
-            
+
             fsss.downloadMultiple(sources, destinations, encodings, new NullProgressMonitor());
-            
+
         } catch (SystemMessageException e) {
             throw new ExecutionException(e.toString(), e);
         } catch (CoreException e) {

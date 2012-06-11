@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;
@@ -21,8 +21,9 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceD
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup;
 
 /**
- * Enable events dialog stub implementation. 
+ * Enable events dialog stub implementation.
  */
+@SuppressWarnings("javadoc")
 public class EnableEventsDialogStub implements IEnableEventsDialog {
 
     // ------------------------------------------------------------------------
@@ -112,7 +113,7 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     public void setLogLevelType(LogLevelType logLevelType) {
         fLogLevelType = logLevelType;
     }
-    
+
     public void setNames(List<String> names) {
         fNames = names;
     }

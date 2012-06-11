@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
@@ -27,7 +27,7 @@ import org.eclipse.swt.graphics.Image;
  * <p>
  * Base implementation for trace control component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceControlComponent implements ITraceControlComponent {
@@ -58,16 +58,16 @@ public class TraceControlComponent implements ITraceControlComponent {
     /**
      * The list if children components.
      */
-    private List<ITraceControlComponent> fChildren = new ArrayList<ITraceControlComponent>();
+    private final List<ITraceControlComponent> fChildren = new ArrayList<ITraceControlComponent>();
     /**
      * The list of listeners to be notified about changes.
      */
-    private ListenerList fListeners = new ListenerList();
+    private final ListenerList fListeners = new ListenerList();
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    
+
     /**
      * Constructor
      * @param name - the name of the component.
@@ -75,7 +75,7 @@ public class TraceControlComponent implements ITraceControlComponent {
     public TraceControlComponent(String name) {
         this(name, null);
     }
-    
+
     /**
      * Constructor
      * @param name - the name of the component.
@@ -85,7 +85,7 @@ public class TraceControlComponent implements ITraceControlComponent {
         fName = name;
         fParent = parent;
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -113,7 +113,7 @@ public class TraceControlComponent implements ITraceControlComponent {
      */
     @Override
     public Image getImage() {
-        return fImage; 
+        return fImage;
     }
 
     /*
@@ -133,7 +133,7 @@ public class TraceControlComponent implements ITraceControlComponent {
     public void setImage(Image image) {
         fImage = image;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent#getToolTip()
@@ -151,19 +151,19 @@ public class TraceControlComponent implements ITraceControlComponent {
     public void setToolTip(String toolTip) {
         fToolTip = toolTip;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent#getTargetNodeState()
      */
-    @Override    
+    @Override
     public TargetNodeState getTargetNodeState() {
         if (getParent() != null) {
             return getParent().getTargetNodeState();
         }
         return TargetNodeState.DISCONNECTED;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent#setTargetNodeState(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent.TargetNodeState)
@@ -199,7 +199,7 @@ public class TraceControlComponent implements ITraceControlComponent {
      */
     @Override
     public ITraceControlComponent[] getChildren() {
-        return (ITraceControlComponent [])fChildren.toArray(new ITraceControlComponent[fChildren.size()]);
+        return fChildren.toArray(new ITraceControlComponent[fChildren.size()]);
     }
 
     /*
@@ -208,7 +208,7 @@ public class TraceControlComponent implements ITraceControlComponent {
     @Override
     public void setChildren(List<ITraceControlComponent> children) {
         for (Iterator<ITraceControlComponent> iterator = children.iterator(); iterator.hasNext();) {
-            ITraceControlComponent traceControlComponent = (ITraceControlComponent) iterator.next();
+            ITraceControlComponent traceControlComponent = iterator.next();
             fChildren.add(traceControlComponent);
             fireComponentChanged(this);
         }
@@ -238,7 +238,7 @@ public class TraceControlComponent implements ITraceControlComponent {
        List<ITraceControlComponent> list = new ArrayList<ITraceControlComponent>();
 
        for (Iterator<ITraceControlComponent> iterator = fChildren.iterator(); iterator.hasNext();) {
-           ITraceControlComponent child = (ITraceControlComponent) iterator.next();
+           ITraceControlComponent child = iterator.next();
            if (child.getClass() == clazz) {
                list.add(child);
            }
@@ -313,7 +313,7 @@ public class TraceControlComponent implements ITraceControlComponent {
     @Override
     public void removeAllChildren() {
         for (Iterator<ITraceControlComponent> iterator = fChildren.iterator(); iterator.hasNext();) {
-            ITraceControlComponent child = (ITraceControlComponent) iterator.next();
+            ITraceControlComponent child = iterator.next();
             child.removeAllChildren();
         }
         fChildren.clear();
@@ -351,9 +351,9 @@ public class TraceControlComponent implements ITraceControlComponent {
      */
     @Override
     public void addComponentListener(ITraceControlComponentChangedListener listener) {
-        if (fParent != null)
+        if (fParent != null) {
             fParent.addComponentListener(listener);
-        else {
+        } else {
             fListeners.add(listener);
         }
     }
@@ -364,9 +364,9 @@ public class TraceControlComponent implements ITraceControlComponent {
      */
     @Override
     public void removeComponentListener(ITraceControlComponentChangedListener listener) {
-        if (fParent != null)
+        if (fParent != null) {
             fParent.removeComponentListener(listener);
-        else {
+        } else {
             fListeners.remove(listener);
         }
     }
@@ -412,7 +412,7 @@ public class TraceControlComponent implements ITraceControlComponent {
             }
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent#fireCompenentChanged(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent)

@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
@@ -37,20 +37,20 @@ import org.junit.Before;
  * The class <code>TraceControlComponentTest</code> contains tests for the class <code>{@link TraceControlComponent}</code>.
  *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class TraceControlComponentTest extends TestCase {
-    
+
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Static methods
     // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new ModelImplTestSetup(new TestSuite(TraceControlComponentTest.class));
@@ -83,13 +83,13 @@ public class TraceControlComponentTest extends TestCase {
     @After
     public void tearDown()  throws Exception {
     }
-    
+
     /**
      * Run the TraceControlComponent(String) constructor test.
      */
     public void testTraceControlComponent_1()
         throws Exception {
-        
+
         String name = "node";
 
         TraceControlComponent result = new TraceControlComponent(name);
@@ -135,7 +135,7 @@ public class TraceControlComponentTest extends TestCase {
         fixture.addChild(new TraceControlRoot());
         ITraceControlComponent component = new TraceControlRoot();
         fixture.addChild(component);
-        
+
         ITraceControlComponent child = fixture.getChild(TraceControlRoot.TRACE_CONTROL_ROOT_NAME);
         assertNotNull(child);
         assertEquals(TraceControlRoot.TRACE_CONTROL_ROOT_NAME, child.getName());
@@ -163,7 +163,7 @@ public class TraceControlComponentTest extends TestCase {
      * @throws Exception
      *
      */
-    
+
     public void testAddComponentListener_1()
         throws Exception {
         TraceControlComponent fixture = new TraceControlComponent("", (ITraceControlComponent) null);
@@ -175,7 +175,7 @@ public class TraceControlComponentTest extends TestCase {
         TraceControlRoot root = new TraceControlRoot();
         fixture.addChild(root);
         assertTrue(validator.isAddedCalled());
-        
+
         fixture.removeChild(root);
         assertTrue(validator.isRemovedCalled());
 
@@ -225,14 +225,14 @@ public class TraceControlComponentTest extends TestCase {
      * @throws Exception
      *
      */
-    
+
     public void testFireCompenentUpdated()
         throws Exception {
         ITraceControlComponent parent = new TraceControlRoot();
-        
+
         TraceControlComponent fixture = new TraceControlComponent("node", parent);
         fixture.setToolTip("");
-        
+
         ITraceControlComponent component = new TraceControlComponent("child");
         fixture.addChild(component);
 
@@ -243,9 +243,9 @@ public class TraceControlComponentTest extends TestCase {
         assertTrue(validator.isAddedCalled());
         assertEquals(parent.getName(), validator.getSavedParent().getName());
         assertEquals(component.getName(), validator.getSavedChild().getName());
-        
+
         validator.initialize();
-        
+
         fixture.fireComponentRemoved(parent, component);
         assertTrue(validator.isRemovedCalled());
         assertEquals(parent.getName(), validator.getSavedParent().getName());
@@ -263,7 +263,7 @@ public class TraceControlComponentTest extends TestCase {
      * @throws Exception
      *
      */
-    
+
     public void testGetAdapter()
         throws Exception {
         TraceControlComponent fixture = new TraceControlComponent("", new TraceControlRoot());
@@ -309,37 +309,37 @@ public class TraceControlComponentTest extends TestCase {
      */
     public void testGetAndSetControlService_1()
         throws Exception {
-        
+
         TraceControlComponent parent = new TraceControlComponent("parent") {
             ILttngControlService fService = null;
-            
+
             @Override
             public void setControlService(ILttngControlService service ) {
                 fService = service;
             }
-            
+
             @Override
             public ILttngControlService getControlService() {
                 return fService;
             }
         };
-        
+
         TraceControlComponent fixture = new TraceControlComponent("", parent);
         parent.addChild(fixture);
         fixture.setToolTip("");
         TraceControlComponent child = new TraceControlComponent("child", fixture);
         fixture.addChild(child);
-        
+
         ILttngControlService result = fixture.getControlService();
         assertEquals(null, result);
-        
+
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
         ILttngControlService service = new LTTngControlService(proxy.createCommandShell());
         fixture.setControlService(service);
         result = fixture.getControlService();
         assertNotNull(service);
         assertEquals(service, result);
-        
+
         result = fixture.getChildren()[0].getControlService();
         assertNotNull(service);
         assertEquals(service, result);
@@ -359,7 +359,7 @@ public class TraceControlComponentTest extends TestCase {
 
         Image result = fixture.getImage();
         assertEquals(null, result);
-        
+
         fixture.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER));
         assertNotNull(fixture.getImage());
     }
@@ -410,7 +410,7 @@ public class TraceControlComponentTest extends TestCase {
 
         fixture.addChild(new TraceControlRoot());
         fixture.addChild(new TraceControlComponent("child"));
-        
+
         fixture.removeAllChildren();
         assertFalse(fixture.hasChildren());
     }
@@ -426,7 +426,7 @@ public class TraceControlComponentTest extends TestCase {
         TraceControlComponent fixture = new TraceControlComponent("", new TraceControlRoot());
         fixture.setToolTip("");
         TraceControlComponent child = new TraceControlComponent("child", fixture);
-        
+
         fixture.addChild(child);
         fixture.removeChild(child);
         assertFalse(fixture.hasChildren());
@@ -438,7 +438,7 @@ public class TraceControlComponentTest extends TestCase {
      * @throws Exception
      *
      */
-    
+
     public void testRemoveChild_2()
         throws Exception {
         TraceControlComponent fixture = new TraceControlComponent("", new TraceControlRoot());
@@ -460,7 +460,7 @@ public class TraceControlComponentTest extends TestCase {
         throws Exception {
         TraceControlComponent fixture = new TraceControlComponent("", (ITraceControlComponent) null);
         fixture.setToolTip("");
-        
+
         ListenerValidator validator = new ListenerValidator();
         fixture.addComponentListener(validator);
 
@@ -470,7 +470,7 @@ public class TraceControlComponentTest extends TestCase {
         TraceControlRoot root = new TraceControlRoot();
         fixture.addChild(root);
         assertFalse(validator.isAddedCalled());
-        
+
         fixture.removeChild(root);
         assertFalse(validator.isRemovedCalled());
 
@@ -497,7 +497,7 @@ public class TraceControlComponentTest extends TestCase {
 
     /**
      * Run the void setChildren(List<ITraceControlComponent>)/ITraceControlComponent[] getChildren() method test.
-     * 
+     *
      *
      * @throws Exception
      *
@@ -511,7 +511,7 @@ public class TraceControlComponentTest extends TestCase {
         children.add(new TraceControlComponent("child2"));
 
         fixture.setChildren(children);
-        
+
         ITraceControlComponent[] result = fixture.getChildren();
         assertEquals(2, result.length);
         assertEquals("child1", result[0].getName());
@@ -567,30 +567,30 @@ public class TraceControlComponentTest extends TestCase {
      */
     public void testGetAndSetTargetNodeState_1()
         throws Exception {
-        
+
         TraceControlComponent parent = new TraceControlComponent("parent") {
             private TargetNodeState fState;
-            
+
             @Override
             public void setTargetNodeState(TargetNodeState state ) {
                 fState = state;
             }
-            
+
             @Override
             public TargetNodeState getTargetNodeState() {
                 return fState;
             }
         };
-        
+
         TraceControlComponent fixture = new TraceControlComponent("", parent);
         parent.addChild(fixture);
-        
+
         fixture.setToolTip("");
         TargetNodeState state = TargetNodeState.CONNECTED;
 
         fixture.setTargetNodeState(state);
         TargetNodeState result = fixture.getTargetNodeState();
-        
+
         assertNotNull(result);
         assertEquals(state, result);
         // Check also parent
@@ -605,7 +605,7 @@ public class TraceControlComponentTest extends TestCase {
         assertEquals("DISCONNECTED", result.name());
         assertEquals("DISCONNECTED", result.toString());
         assertEquals(0, result.ordinal());
-        
+
         state = TargetNodeState.CONNECTING;
 
         fixture.setTargetNodeState(state);
@@ -614,7 +614,7 @@ public class TraceControlComponentTest extends TestCase {
         assertEquals("CONNECTING", result.name());
         assertEquals("CONNECTING", result.toString());
         assertEquals(3, result.ordinal());
-        
+
         fixture.setTargetNodeState(TargetNodeState.DISCONNECTING);
         result = fixture.getTargetNodeState();
         assertNotNull(result);
@@ -629,9 +629,9 @@ public class TraceControlComponentTest extends TestCase {
      *
      * @throws Exception
      *
-     
+
      */
-    
+
     public void testGetSndSetToolTip()
         throws Exception {
         TraceControlComponent fixture = new TraceControlComponent("", new TraceControlRoot());

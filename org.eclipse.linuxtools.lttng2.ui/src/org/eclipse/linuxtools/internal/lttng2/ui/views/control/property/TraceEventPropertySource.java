@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
@@ -24,7 +24,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * <p>
  * Property source implementation for the trace event component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceEventPropertySource extends BasePropertySource {
@@ -49,7 +49,7 @@ public class TraceEventPropertySource extends BasePropertySource {
      */
     public static final String TRACE_EVENT_STATE_PROPERTY_ID = "trace.event.state"; //$NON-NLS-1$
     /**
-     *  The trace event 'name' property name. 
+     *  The trace event 'name' property name.
      */
     public static final String TRACE_EVENT_NAME_PROPERTY_NAME = Messages.TraceControl_EventNamePropertyName;
     /**
@@ -69,10 +69,10 @@ public class TraceEventPropertySource extends BasePropertySource {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The event component which this property source is for. 
+     * The event component which this property source is for.
      */
     protected final TraceEventComponent fEvent;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -83,7 +83,7 @@ public class TraceEventPropertySource extends BasePropertySource {
     public TraceEventPropertySource(TraceEventComponent component) {
         fEvent = component;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -100,7 +100,7 @@ public class TraceEventPropertySource extends BasePropertySource {
         if (fEvent.getLogLevel() != TraceLogLevel.LEVEL_UNKNOWN) {
             list.add(new TextPropertyDescriptor(TRACE_EVENT_LOGLEVEL_PROPERTY_ID, TRACE_EVENT_LOGLEVEL_PROPERTY_NAME));
         }
-        return (IPropertyDescriptor [])list.toArray(new IPropertyDescriptor[list.size()]);        
+        return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
     /*

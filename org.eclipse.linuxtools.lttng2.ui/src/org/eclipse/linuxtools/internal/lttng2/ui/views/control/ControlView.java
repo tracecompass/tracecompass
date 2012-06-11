@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Filled with content
@@ -35,9 +35,9 @@ import org.eclipse.ui.progress.UIJob;
 
 /**
  * <p>
- * View implementation for Trace Control. 
+ * View implementation for Trace Control.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class ControlView extends ViewPart implements ITraceControlComponentChangedListener {
@@ -58,12 +58,12 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
      * The tree viewer.
      */
     private TreeViewer fTreeViewer = null;
-    
+
     /**
-     * The trace control root node. This provides access to the whole model. 
+     * The trace control root node. This provides access to the whole model.
      */
     private ITraceControlComponent fRoot = null;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
 
     /**
      * Returns the trace control tree node (model)
-     * 
+     *
      * @return the trace control tree node (model).
      */
     public ITraceControlComponent getTraceControlRoot() {
@@ -87,7 +87,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
     @Override
@@ -106,22 +106,22 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
 
         // Create context menu for the tree viewer
         createContextMenu();
-        
+
         getSite().setSelectionProvider(fTreeViewer);
-        
+
         RSECorePlugin.getTheSystemRegistry(); // to load RSE
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
     @Override
     public void setFocus() {
         fTreeViewer.getControl().setFocus();
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener#componentAdded(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent)
@@ -159,7 +159,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
 
                 fTreeViewer.refresh(component);
 
-                // Change selection needed 
+                // Change selection needed
                 final ISelection sel = fTreeViewer.getSelection();
                 fTreeViewer.setSelection(null);
                 fTreeViewer.setSelection(sel);
@@ -173,7 +173,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
         myJob.setUser(false);
         myJob.schedule();
     }
-    
+
     /**
      * Sets the selected component in the tree
      * @param component - component to select
@@ -186,7 +186,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
 
     /**
      * Sets the selected components in the tree
-     * @param component - array of components to select
+     * @param components - array of components to select
      */
     public void setSelection(ITraceControlComponent[] components) {
         final StructuredSelection selection = new StructuredSelection(components);
@@ -200,7 +200,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
         myJob.setUser(false);
         myJob.schedule();
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------

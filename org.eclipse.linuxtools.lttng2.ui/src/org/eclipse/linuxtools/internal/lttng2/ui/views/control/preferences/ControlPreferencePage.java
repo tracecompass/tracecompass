@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences;
@@ -27,7 +27,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * <p>
  * Preference page implementation for configuring LTTng tracer control preferences.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class ControlPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -37,10 +37,14 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
     // ------------------------------------------------------------------------
     RadioGroupFieldEditor fVerboseLevel;
     BooleanFieldEditor  fIsAppend;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     */
     public ControlPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
 
@@ -48,7 +52,7 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         IPreferenceStore store = ControlPreferences.getInstance().getPreferenceStore();
         setPreferenceStore(store);
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -75,7 +79,7 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
 
         StringFieldEditor logfile = new StringFieldEditor(ControlPreferences.TRACE_CONTROL_LOG_FILE_PATH_PREF, Messages.TraceControl_LogfilePath, getFieldEditorParent());
         addField(logfile);
-        
+
         fIsAppend = new BooleanFieldEditor(ControlPreferences.TRACE_CONTROL_LOG_APPEND_PREF, Messages.TraceControl_AppendLogfilePreference, getFieldEditorParent());
         addField(fIsAppend);
 
@@ -89,15 +93,15 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
                         ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_NONE,
                     },
                     {
-                        Messages.TraceControl_VerboseLevelVerbosePreference, 
+                        Messages.TraceControl_VerboseLevelVerbosePreference,
                         ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_VERBOSE
                     },
                     {
-                        Messages.TraceControl_VerboseLevelVeryVerbosePreference, 
+                        Messages.TraceControl_VerboseLevelVeryVerbosePreference,
                         ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_V_VERBOSE
                     },
                     {
-                        Messages.TraceControl_VerboseLevelVeryVeryVerbosePreference, 
+                        Messages.TraceControl_VerboseLevelVeryVeryVerbosePreference,
                         ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_V_V_VERBOSE
                     }
                 },
@@ -118,7 +122,7 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        
+
         if (event.getProperty().equals(FieldEditor.VALUE)) {
             if (event.getSource() instanceof FieldEditor) {
                 FieldEditor editor = (FieldEditor) event.getSource();
@@ -131,7 +135,7 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         }
         super.propertyChange(event);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performDefaults()

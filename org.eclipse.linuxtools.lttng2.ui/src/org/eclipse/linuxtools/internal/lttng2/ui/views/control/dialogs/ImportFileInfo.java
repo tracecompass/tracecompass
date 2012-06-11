@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -17,7 +17,7 @@ import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
  * <p>
  * Helper class for storing information about a remote file to import.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class ImportFileInfo {
@@ -77,7 +77,7 @@ public class ImportFileInfo {
     }
     /**
      * Sets the overwrite flag.
-     * @param isOverwrite
+     * @param isOverwrite If the Overwrite checkbox is checked or not
      */
     public void setOverwrite(boolean isOverwrite) {
         this.fIsOverwrite = isOverwrite;
@@ -90,7 +90,7 @@ public class ImportFileInfo {
     }
     /**
      * Sets the remote file implementation
-     * @param the remote file implementation.
+     * @param remoteFile The remote file implementation.
      */
     public void setRemoteFile(IRemoteFile remoteFile) {
         fRemoteFile = remoteFile;
