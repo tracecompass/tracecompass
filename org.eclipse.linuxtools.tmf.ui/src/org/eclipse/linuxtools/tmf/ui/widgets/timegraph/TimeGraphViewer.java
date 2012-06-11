@@ -658,14 +658,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
-    public void setSelectedTime(long time, boolean ensureVisible, Object source) {
-        if (this == source) {
-            return;
-        }
-
-        setSelectedTimeNotify(time, ensureVisible);
-    }
-
     public void setSelectedEvent(ITimeEvent event, Object source) {
         if (event == null || source == this) {
             return;

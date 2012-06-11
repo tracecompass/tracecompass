@@ -611,7 +611,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
                 + "\nSelected Time: "
                 + selTimens + " " + fDate + " " + ns);
 
-        synchViewer.setSelectedTime(event.getTime(), true, event.getSource());
+        synchViewer.setSelectedTime(event.getTime(), true);
     }
 
     @Override
