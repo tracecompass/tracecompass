@@ -16,6 +16,10 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventTypeManager;
 
 /**
+ * The CTF extension of the TMF event type 
+ * 
+ * @version 1.0
+ * @author Matthew khouzam
  */
 public class CtfTmfEventType extends TmfEventType {
 

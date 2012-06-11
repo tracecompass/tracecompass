@@ -14,8 +14,12 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 /**
- * The ctflocation is the nugget of information that is unique to a location in a trace.
- * it can be copied and used to restore a position in a given trace.
+ * The nugget of information that is unique to a location in a CTF trace.
+ * 
+ * It can be copied and used to restore a position in a given trace.
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
  */
 public class CtfLocation implements ITmfLocation<Long>, Cloneable {
 

@@ -14,7 +14,12 @@ package org.eclipse.linuxtools.tmf.core.filter;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
-
+/**
+ * The TMF filter interface.
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public interface ITmfFilter {
 
 	/**

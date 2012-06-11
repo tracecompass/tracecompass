@@ -26,10 +26,11 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * <b><u>CTFEvent</u></b>
- * <p>
- * This is a wrapper class around CTF's Event Definition/Declaration so that we
- * can map all types of Declaration to native Java types.
+ * A wrapper class around CTF's Event Definition/Declaration that maps all
+ * types of Declaration to native Java types.
+ * 
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public final class CtfTmfEvent implements ITmfEvent, Cloneable {
 

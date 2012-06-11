@@ -19,6 +19,10 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
+ * The CTF adapter for the TMF timestamp
+ * 
+ * @version 1.0
+ * @author Matthew khouzam
  */
 public class CtfTmfTimestamp extends TmfTimestamp {
 

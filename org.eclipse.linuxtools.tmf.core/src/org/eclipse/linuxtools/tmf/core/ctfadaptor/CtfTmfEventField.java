@@ -24,7 +24,11 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 
 /**
- * <b><u>CTFEventField</u></b>
+ * The CTF implementation of the TMF event field model 
+ * 
+ * @version 1.0
+ * @author Matthew khouzam
+ * @author Alexandre Montplaisir
  */
 public abstract class CtfTmfEventField implements ITmfEventField {
 

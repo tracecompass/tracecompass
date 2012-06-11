@@ -21,8 +21,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  * Lightweight Context for CtfTmf traces. Should only use 3 references, 1 ref to
  * a boxed Long, a long and an int.
  *
+ * @versionj 1.0
  * @author Matthew Khouzam
- *
  */
 public class CtfTmfLightweightContext implements ITmfContext {
 

@@ -9,7 +9,6 @@
  * Contributors: Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import java.util.ArrayList;
@@ -31,8 +30,10 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 /**
- * @author Matthew Khouzam
- * A trace type that reads CTF.
+ * The CTf trace handler
+ *
+ * @version 1.0
+ * @author Matthew khouzam
  */
 public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParser<CtfTmfEvent>{
 

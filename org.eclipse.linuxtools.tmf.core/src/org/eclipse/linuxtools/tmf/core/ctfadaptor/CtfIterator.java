@@ -16,9 +16,13 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 /**
- * The ctfIterator is the class that will act like a reader for the trace
- * it does not have a file handle, so many iterators can be used without worries
- * of io errors.
+ * The CTF trace reader iterator.
+ * 
+ * It doesn't reserve a file handle, so many iterators can be used without worries
+ * of I/O errors or resource exhaustion.
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
  */
 public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparable<CtfIterator>, Cloneable {
 

@@ -14,7 +14,10 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 /**
- * CtfTmfcontent is a wrapper to allow pretty printing of the fields in a CtfTmfEvent
+ * A wrapper to allow pretty printing of the CtfTmfEvent fields
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
  */
 public class CtfTmfContent extends TmfEventField {
 

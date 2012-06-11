@@ -18,6 +18,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 
+/**
+ * A class to mitigate the Java I/O inefficiency of RandomAccessFile. 
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class BufferedRandomAccessFile extends RandomAccessFile {
 
 	private static final int DEFAULT_BUF_SIZE = 8192;
