@@ -9,7 +9,7 @@ import java.nio.ByteOrder;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDeclaration;
 import org.junit.Test;
 
-
+@SuppressWarnings("javadoc")
 public class FloatDeclarationTest {
     private FloatDeclaration fixture;
 

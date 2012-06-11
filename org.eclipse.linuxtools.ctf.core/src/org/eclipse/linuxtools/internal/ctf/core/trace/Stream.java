@@ -97,7 +97,8 @@ public class Stream {
 
     /**
      * Is the id of a stream set
-     * @param Is id the id of a stream set
+     *
+     * @return If the ID is set or not
      */
     public boolean isIdSet() {
         return id != null;
@@ -213,8 +214,10 @@ public class Stream {
      * is present in the map.
      *
      * @param event
-     *            The event to add.
+     *            The event to add
      * @throws ParseException
+     *             If there was a problem reading the event or adding it to the
+     *             stream
      */
     public void addEvent(EventDeclaration event) throws ParseException {
         /*

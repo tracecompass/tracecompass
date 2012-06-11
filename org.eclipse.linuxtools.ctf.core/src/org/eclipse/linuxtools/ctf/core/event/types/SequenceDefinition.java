@@ -42,6 +42,8 @@ public class SequenceDefinition extends Definition {
      *            the parent scope
      * @param fieldName
      *            the field name
+     * @throws CTFReaderException
+     *             If the sequence field was malformatted
      */
     public SequenceDefinition(SequenceDeclaration declaration,
             IDefinitionScope definitionScope, String fieldName)

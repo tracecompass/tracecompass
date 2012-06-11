@@ -41,7 +41,7 @@ public class StructDefinition extends Definition implements IDefinitionScope {
      *            the parent declaration
      * @param definitionScope
      *            the parent scope
-     * @param fieldName
+     * @param structFieldName
      *            the field name
      */
     public StructDefinition(StructDeclaration declaration,

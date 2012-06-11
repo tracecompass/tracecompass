@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
+@SuppressWarnings("javadoc")
 public class ReadTrace {
 
     /**

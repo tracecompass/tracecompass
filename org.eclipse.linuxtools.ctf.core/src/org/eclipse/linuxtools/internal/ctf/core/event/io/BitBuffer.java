@@ -521,8 +521,8 @@ public class BitBuffer {
     /**
      * Sets the position in the buffer.
      *
-     * @param order
-     *            The position of the buffer.
+     * @param newPosition
+     *            The new position of the buffer.
      */
     public void position(int newPosition) {
         this.pos = newPosition;

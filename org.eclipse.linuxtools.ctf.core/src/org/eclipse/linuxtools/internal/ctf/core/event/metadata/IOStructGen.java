@@ -81,8 +81,11 @@ public class IOStructGen {
 
     /**
      * Constuctor
-     * @param tree the tree (antlr generated) with the parsed TSDL data.
-     * @param trace the trace containing the places to put all the read metadata
+     *
+     * @param tree
+     *            the tree (ANTLR generated) with the parsed TSDL data.
+     * @param trace
+     *            the trace containing the places to put all the read metadata
      */
     public IOStructGen(CommonTree tree, CTFTrace trace) {
         this.trace = trace;
@@ -91,7 +94,9 @@ public class IOStructGen {
 
     /**
      * Parse the tree and populate the trace defined in the constructor.
+     *
      * @throws ParseException
+     *             If there was a problem parsing the metadata
      */
     public void generate() throws ParseException {
         parseRoot(tree);

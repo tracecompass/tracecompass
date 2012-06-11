@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
@@ -34,11 +33,9 @@ public class StringDefinitionTest {
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws CTFReaderException
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() {
         String name = "testString"; //$NON-NLS-1$
         StringDeclaration stringDec = new StringDeclaration();
         fixture = stringDec.createDefinition(null, name);

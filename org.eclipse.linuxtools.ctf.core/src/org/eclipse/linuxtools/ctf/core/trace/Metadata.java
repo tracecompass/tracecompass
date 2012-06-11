@@ -117,6 +117,7 @@ public class Metadata {
      * Parse the metadata file.
      *
      * @throws CTFReaderException
+     *             If there was a problem parsing the metadata
      */
     public void parse() throws CTFReaderException {
         CTFReaderException tempException = null;

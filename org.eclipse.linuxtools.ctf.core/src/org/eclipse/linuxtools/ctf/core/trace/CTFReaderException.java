@@ -33,6 +33,7 @@ public class CTFReaderException extends Exception {
      * Constructor with an attached message.
      *
      * @param message
+     *            The message attached to this exception
      */
     public CTFReaderException(String message) {
         super(message);
@@ -42,7 +43,7 @@ public class CTFReaderException extends Exception {
      * Re-throw an exception into this type.
      *
      * @param e
-     *            The previous Exception we caught.
+     *            The previous Exception we caught
      */
     public CTFReaderException(Exception e) {
         super(e);

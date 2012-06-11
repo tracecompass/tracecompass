@@ -76,7 +76,6 @@ public class CTFTraceReader {
      *
      * @param trace
      *            The trace to read from.
-     * @throws CTFReaderException
      */
     public CTFTraceReader(CTFTrace trace) {
         this.trace = trace;
@@ -105,6 +104,8 @@ public class CTFTraceReader {
 
     /**
      * Copy constructor
+     *
+     * @return The new CTFTraceReader
      */
     public CTFTraceReader copyFrom() {
         CTFTraceReader newReader = null;
@@ -259,8 +260,6 @@ public class CTFTraceReader {
 
     /**
      * Go to the last event in the trace.
-     *
-     * @throws CTFReaderException
      */
     public void goToLastEvent() {
         seek(this.getEndTime());
@@ -305,22 +304,22 @@ public class CTFTraceReader {
         return hasMoreEvents();
     }
 
-    /**
-     * Go to the first entry of a trace
-     *
-     * @return 0, the first index.
-     */
-    private long goToZero() {
-        long tempIndex;
-        for (StreamInputReader streamInputReader : this.streamInputReaders) {
-            /*
-             * Seek the trace reader.
-             */
-            streamInputReader.seek(0);
-        }
-        tempIndex = 0;
-        return tempIndex;
-    }
+//    /**
+//     * Go to the first entry of a trace
+//     *
+//     * @return 0, the first index.
+//     */
+//    private long goToZero() {
+//        long tempIndex;
+//        for (StreamInputReader streamInputReader : this.streamInputReaders) {
+//            /*
+//             * Seek the trace reader.
+//             */
+//            streamInputReader.seek(0);
+//        }
+//        tempIndex = 0;
+//        return tempIndex;
+//    }
 
     /**
      * gets the stream with the oldest event

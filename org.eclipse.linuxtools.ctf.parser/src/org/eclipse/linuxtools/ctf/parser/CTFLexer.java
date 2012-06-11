@@ -13,7 +13,7 @@ import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 
-@SuppressWarnings({"nls"})
+@SuppressWarnings({"nls", "javadoc"})
 public class CTFLexer extends Lexer {
     public static final int SIGN = 49;
     public static final int TERM = 47;

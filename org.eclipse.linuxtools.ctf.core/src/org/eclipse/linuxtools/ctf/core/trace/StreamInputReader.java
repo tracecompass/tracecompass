@@ -236,6 +236,7 @@ public class StreamInputReader {
      *
      * @param timestamp
      *            The timestamp to seek to.
+     * @return The offset compared to the current position
      */
     public long seek(long timestamp) {
         long offset = 0;

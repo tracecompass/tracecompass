@@ -21,6 +21,7 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
+@SuppressWarnings("javadoc")
 public class CTFTraceReaderTest {
 
     CTFTraceReader fixture;
@@ -203,11 +204,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
-     *
-     * @throws CTFReaderException
      */
     @Test
-    public void testGoToLastEvent() throws CTFReaderException {
+    public void testGoToLastEvent() {
         fixture.goToLastEvent();
         long ts1 = getTimestamp();
         long ts2 = fixture.getEndTime();

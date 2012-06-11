@@ -27,6 +27,7 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
+@SuppressWarnings("javadoc")
 public class StreamInputReaderTest {
 
     private StreamInputReader fixture;
@@ -142,11 +143,9 @@ public class StreamInputReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
-     *
-     * @throws CTFReaderException
      */
     @Test
-    public void testGoToLastEvent1() throws CTFReaderException {
+    public void testGoToLastEvent1() {
         final long endTimestamp = goToEnd();
         final long endTime = 4287422460315L;
         assertEquals(endTime , endTimestamp  );
@@ -154,11 +153,9 @@ public class StreamInputReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
-     *
-     * @throws CTFReaderException
      */
     @Test
-    public void testGoToLastEvent2() throws CTFReaderException {
+    public void testGoToLastEvent2() {
         long timestamp = -1;
         while(fixture.readNextEvent()) {
             timestamp = fixture.getCurrentEvent().getTimestamp();
@@ -167,10 +164,7 @@ public class StreamInputReaderTest {
         assertEquals(0 , timestamp- endTimestamp );
     }
 
-    /**
-     * @throws CTFReaderException
-     */
-    private long goToEnd() throws CTFReaderException {
+    private long goToEnd() {
         fixture.goToLastEvent();
         return fixture.getCurrentEvent().getTimestamp();
     }

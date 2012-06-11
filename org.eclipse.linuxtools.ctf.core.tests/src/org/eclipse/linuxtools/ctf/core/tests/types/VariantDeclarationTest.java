@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * The class <code>VariantDeclarationTest</code> contains tests for the class
  * <code>{@link VariantDeclaration}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -29,7 +29,7 @@ public class VariantDeclarationTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -78,8 +78,8 @@ public class VariantDeclarationTest {
     /**
      * Run the VariantDefinition createDefinition(DefinitionScope,String) method
      * test.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException Should not happen
      */
     @Test
     public void testCreateDefinition() throws CTFReaderException {

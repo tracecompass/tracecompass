@@ -96,10 +96,14 @@ public class VariantDeclaration implements IDeclaration {
         return new VariantDefinition(this, definitionScope, fieldName);
     }
 
+
     /**
+     * Add a field to this CTF Variant
      *
      * @param fieldTag
+     *            The tag of the new field
      * @param declaration
+     *            The Declaration of this new field
      */
     public void addField(String fieldTag, IDeclaration declaration) {
         fields.put(fieldTag, declaration);

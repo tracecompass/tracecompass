@@ -21,9 +21,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 
 /**
- * <b><u>EventDefinition</u></b>
- * <p>
- * Represents an instance of an event.
+ * Representation of a particular instance of an event.
  */
 public class EventDefinition implements IDefinitionScope {
 
@@ -64,7 +62,9 @@ public class EventDefinition implements IDefinitionScope {
      * Constructs an event definition.
      *
      * @param declaration
-     *            The corresponding event declaration.
+     *            The corresponding event declaration
+     * @param streamInputReader
+     *            The SIR from where this EventDef was read
      */
     public EventDefinition(EventDeclaration declaration,
             StreamInputReader streamInputReader) {

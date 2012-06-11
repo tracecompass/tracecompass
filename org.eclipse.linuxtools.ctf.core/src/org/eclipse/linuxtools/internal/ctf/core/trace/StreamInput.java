@@ -191,10 +191,11 @@ public class StreamInput implements IDefinitionScope {
 
     /**
      * Adds the next packet header index entry to the index of a stream input.
-     * @warning slow
-     * @warning can corrupt data if not used properly
+     *
+     * @warning slow, can corrupt data if not used properly
      * @return true if there are more packets to add
      * @throws CTFReaderException
+     *             If there was a problem reading the packed header
      */
     public boolean addPacketHeaderIndex() throws CTFReaderException {
         long currentPos = 0L;
@@ -216,24 +217,10 @@ public class StreamInput implements IDefinitionScope {
         return false;
     }
 
-    /**
-     * @param fileSizeBytes
-     * @return
-     */
     private long getStreamSize() {
         return file.length();
     }
 
-    /**
-     * @param fileSizeBytes
-     * @param packetOffsetBytes
-     * @param packetIndex
-     * @param tracePacketHeaderDef
-     * @param streamPacketContextDef
-     * @param bitBuffer
-     * @return
-     * @throws CTFReaderException
-     */
     private long createPacketIndexEntry(long fileSizeBytes,
             long packetOffsetBytes, StreamInputPacketIndexEntry packetIndex,
             StructDefinition tracePacketHeaderDef,
@@ -332,11 +319,6 @@ public class StreamInput implements IDefinitionScope {
         return bb;
     }
 
-    /**
-     * @param tracePacketHeaderDef
-     * @param bitBuffer
-     * @throws CTFReaderException
-     */
     private void parseTracePacketHeader(StructDefinition tracePacketHeaderDef,
             BitBuffer bitBuffer) throws CTFReaderException {
         tracePacketHeaderDef.read(bitBuffer);
@@ -391,10 +373,6 @@ public class StreamInput implements IDefinitionScope {
         }
     }
 
-    /**
-     * @param fileSizeBytes
-     * @param packetIndex
-     */
     private static void setPacketContextNull(long fileSizeBytes,
             StreamInputPacketIndexEntry packetIndex) {
         /*
@@ -405,12 +383,6 @@ public class StreamInput implements IDefinitionScope {
         packetIndex.setPacketSizeBits((int) (fileSizeBytes * 8));
     }
 
-    /**
-     * @param fileSizeBytes
-     * @param streamPacketContextDef
-     * @param bitBuffer
-     * @param packetIndex
-     */
     private void parsePacketContext(long fileSizeBytes,
             StructDefinition streamPacketContextDef, BitBuffer bitBuffer,
             StreamInputPacketIndexEntry packetIndex) {

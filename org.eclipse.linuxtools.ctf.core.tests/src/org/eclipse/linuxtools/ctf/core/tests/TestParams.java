@@ -11,6 +11,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
  * @author alexmont
  *
  */
+@SuppressWarnings("javadoc")
 public abstract class TestParams {
 
     /*

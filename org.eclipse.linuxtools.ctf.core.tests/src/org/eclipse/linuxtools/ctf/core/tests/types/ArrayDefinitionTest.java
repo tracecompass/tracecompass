@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
@@ -53,11 +52,9 @@ public class ArrayDefinitionTest {
      *
      * structDef shouldn't be null after parsing the CTFTraceReader object, so
      * we can ignore the warning.
-     *
-     * @throws CTFReaderException
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() {
         charArrayFixture = createCharArray();
         stringArrayFixture = createStringArray();
         longArrayFixture = createLongArray();

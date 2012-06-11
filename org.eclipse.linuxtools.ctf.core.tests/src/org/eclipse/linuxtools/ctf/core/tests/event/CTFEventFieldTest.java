@@ -30,8 +30,8 @@ import org.junit.Test;
  *
  * @author ematkho
  * @version $Revision: 1.0 $
- * @param <CTFIntegerArrayField>
  */
+@SuppressWarnings("javadoc")
 public class CTFEventFieldTest {
 
     private static final String fieldName = "id"; //$NON-NLS-1$

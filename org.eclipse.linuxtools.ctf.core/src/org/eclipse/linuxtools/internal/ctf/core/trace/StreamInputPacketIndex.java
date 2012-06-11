@@ -73,6 +73,7 @@ public class StreamInputPacketIndex {
      * @param entry
      *            The entry to add
      * @throws CTFReaderException
+     *             If there was a problem reading the entry
      */
     public void addEntry(StreamInputPacketIndexEntry entry)
             throws CTFReaderException {

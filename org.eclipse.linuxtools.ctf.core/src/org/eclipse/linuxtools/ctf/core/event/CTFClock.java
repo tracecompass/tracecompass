@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.ctf.core.event;
 import java.util.HashMap;
 
 /**
+ * Clock description used in CTF traces
  */
 public class CTFClock {
 
@@ -26,6 +27,11 @@ public class CTFClock {
      * Field name.
      */
     private String name;
+
+    /**
+     * Default constructor
+     */
+    public CTFClock() {}
 
     /**
      * Method addAttribute.

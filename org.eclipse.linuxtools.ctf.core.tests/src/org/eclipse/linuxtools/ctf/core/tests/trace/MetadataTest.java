@@ -19,6 +19,7 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
+@SuppressWarnings("javadoc")
 public class MetadataTest {
 
     private Metadata fixture;
@@ -35,8 +36,8 @@ public class MetadataTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {

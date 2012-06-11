@@ -17,9 +17,8 @@ import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
 /**
- * <b><u>EventDeclaration</u></b>
- * <p>
- * Represents one type of event.
+ * Representation of one type of event. A bit like "int" or "long" but for trace
+ * events.
  */
 public class EventDeclaration {
 
@@ -60,6 +59,12 @@ public class EventDeclaration {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    /**
+     * Default constructor. Use the setters afterwards to set the fields
+     * accordingly.
+     */
+    public EventDeclaration() {}
 
     /**
      * Creates an instance of EventDefinition corresponding to this declaration.
@@ -156,8 +161,9 @@ public class EventDeclaration {
     }
 
     /**
-     * Gets the id of am event declaration
-     * return id the id
+     * Gets the id of am event declaration return id the id
+     *
+     * @return The EventDeclaration ID
      */
     public Long getId() {
         return id;

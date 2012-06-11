@@ -33,11 +33,12 @@ public class SequenceDeclaration implements IDeclaration {
     // ------------------------------------------------------------------------
 
     /**
-     * Constuctor
+     * Constructor
      *
      * @param lengthName
-     *            the name of the field describing the lenght
+     *            the name of the field describing the length
      * @param elemType
+     *            The element type
      */
     public SequenceDeclaration(String lengthName, IDeclaration elemType) {
         this.elemType = elemType;
@@ -45,7 +46,7 @@ public class SequenceDeclaration implements IDeclaration {
     }
 
     // ------------------------------------------------------------------------
-    // Gettters/Setters/Predicates
+    // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
     /**

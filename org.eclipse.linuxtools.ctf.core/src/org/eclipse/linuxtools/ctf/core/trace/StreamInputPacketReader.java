@@ -339,6 +339,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
      * @return The event definition containing the event data that was just
      *         read.
      * @throws CTFReaderException
+     *             If there was a problem reading the trace
      */
     public EventDefinition readNextEvent() throws CTFReaderException {
         /* WARNING: This is very LTTng-specific. */
@@ -491,7 +492,6 @@ public class StreamInputPacketReader implements IDefinitionScope {
         return lastTimestamp;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Definition lookupDefinition(String lookupPath) {
         // TODO Auto-generated method stub

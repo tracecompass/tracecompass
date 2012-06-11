@@ -20,6 +20,7 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
+@SuppressWarnings("javadoc")
 public class StreamInputPacketIndexTest {
 
     private StreamInputPacketIndex fixture;
