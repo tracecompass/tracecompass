@@ -343,6 +343,12 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
                     TmfDataRequest<T> subRequest = new TmfDataRequest<T>(request.getDataType(), request.getIndex()
                             + nbRead[0], CHUNK_SIZE[0], blockSize, ExecutionType.BACKGROUND) {
+
+                        @Override
+                        public synchronized boolean isCompleted() {
+                            return super.isCompleted() || request.isCompleted();
+                        }
+
                         @Override
                         public void handleData(T data) {
                             super.handleData(data);
@@ -376,6 +382,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
                         try {
                             subRequest.waitForCompletion();
+                            if (request.isCompleted()) {
+                                isFinished[0] = Boolean.TRUE;
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

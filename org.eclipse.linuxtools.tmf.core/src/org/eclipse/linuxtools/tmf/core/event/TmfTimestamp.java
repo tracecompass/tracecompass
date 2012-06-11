@@ -195,6 +195,11 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable {
         if (fScale == scale && offset == 0) {
             return new TmfTimestamp(this);
         }
+        
+        // In case of big bang and big crunch just return this (no need to normalize) 
+        if (this.equals(BIG_BANG) || this.equals(BIG_CRUNCH)) {
+            return this;
+        }
 
         // First, scale the timestamp
         if (fScale != scale) {

@@ -128,6 +128,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
     protected synchronized void initialize(final IResource resource, final String path, final Class<LttngEvent> eventType)
             throws TmfTraceException {
         try {
+            if (resource != null) {
+                IProject project = resource.getProject();
+                traceLibPath = (project != null) ? TraceHelper.getTraceLibDirFromProject(project) : null;
+            }
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
         } catch (final Exception e) {
             throw new TmfTraceException(e.getMessage());
@@ -158,15 +162,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         setParser((ITmfEventParser<LttngEvent>) this);
         setCacheSize(CHECKPOINT_PAGE_SIZE);
  
-        // // Bypass indexing if asked
-        // if ( bypassIndexing == false ) {
-        // indexTrace(true);
-        // }
-        // else {
-        // Even if we don't have any index, set ONE checkpoint
-        // fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new
-        // LttngLocation() ) );
-
         initializeStreamingMonitor();
     }
 
@@ -312,49 +307,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
      */
     public LTTngTrace(final LTTngTrace other) throws Exception {
         this(other.getResource(), other.getPath(), other.getTraceLibPath(), false, true);
-//        this.fCheckpoints = other.fCheckpoints;
         setTimeRange(new TmfTimeRange(new LttngTimestamp(other.getStartTime()), new LttngTimestamp(other.getEndTime())));
     }
-
-    //    @Override
-    //    public synchronized LTTngTrace clone() {
-    //        LTTngTrace clone = null;
-    //        clone = (LTTngTrace) super.clone();
-    //        try {
-    //            clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), getTraceLibPath(),
-    //                    SHOW_LTT_DEBUG_DEFAULT);
-    //        } catch (final JniException e) {
-    //            // e.printStackTrace();
-    //        }
-    //
-    //        // Export all the event types from the JNI side
-    //        clone.traceTypes = new HashMap<Integer, LttngEventType>();
-    //        clone.traceTypeNames = new Vector<Integer>();
-    //        clone.initialiseEventTypes(clone.currentJniTrace);
-    //
-    //        // Verify that all those "default constructor" are safe to use
-    //        clone.eventTimestamp = new LttngTimestamp();
-    //        clone.eventSource = ""; //$NON-NLS-1$
-    //        clone.eventType = new LttngEventType();
-    //        clone.eventContent = new LttngEventContent(clone.currentLttngEvent);
-    //        clone.eventReference = getName();
-    //
-    //        // Create the skeleton event
-    //        clone.currentLttngEvent = new LttngEvent(this, clone.eventTimestamp, clone.eventSource, clone.eventType,
-    //                clone.eventContent, clone.eventReference, null);
-    //
-    //        // Create a new current location
-    //        clone.previousLocation = new LttngLocation();
-    //
-    //        // Set the currentEvent to the eventContent
-    //        clone.eventContent.setEvent(clone.currentLttngEvent);
-    //
-    //        // Set the start time of the trace
-    //        setTimeRange(new TmfTimeRange(new LttngTimestamp(clone.currentJniTrace.getStartTime().getTime()),
-    //                new LttngTimestamp(clone.currentJniTrace.getEndTime().getTime())));
-    //
-    //        return clone;
-    //    }
 
     public String getTraceLibPath() {
         return traceLibPath;
@@ -524,17 +478,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         if (PRINT_DEBUG)
             System.out.println("seekEvent(rank) rank -> " + rank); //$NON-NLS-1$
 
-//        ITmfTimestamp timestamp = null;
-//        long index = rank / getCacheSize();
-//
-//        // Get the timestamp of the closest check point to the given position
-//        if (fCheckpoints.size() > 0) {
-//            if (index >= fCheckpoints.size())
-//                index = fCheckpoints.size() - 1;
-//            timestamp = fCheckpoints.elementAt((int) index).getTimestamp();
-//        } else
-//            timestamp = getStartTime();
-
         // Position the trace at the checkpoint
         final ITmfContext checkpointContext = getIndexer().seekIndex(rank);
         LttngLocation location = (LttngLocation) checkpointContext.getLocation();
@@ -674,27 +617,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         updateAttributes(context, eventTimestamp);
         context.increaseRank();
     }
-
-    //    protected void updateIndex(TmfContext context, long rank, ITmfTimestamp timestamp) {
-    //
-    //        if (getStartTime().compareTo(timestamp, false) > 0)
-    //            setStartTime(timestamp);
-    //        if (getEndTime().compareTo(timestamp, false) < 0)
-    //            setEndTime(timestamp);
-    //        if (rank != ITmfContext.UNKNOWN_RANK) {
-    //            if (fNbEvents <= rank)
-    //                fNbEvents = rank + 1;
-    //            // Build the index as we go along
-    //            if ((rank % fIndexPageSize) == 0) {
-    //                // Determine the table position
-    //                long position = rank / fIndexPageSize;
-    //                // Add new entry at proper location (if empty)
-    //                if (fCheckpoints.size() == position) {
-    //                    addCheckPoint(context, timestamp);
-    //                }
-    //            }
-    //        }
-    //    }
 
     // this method was extracted for profiling purposes
     private synchronized LttngEvent readNextEvent(final LttngLocation curLocation) {
@@ -1014,25 +936,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         else
             return -1;
     }
-
-//    /**
-//     * Print the content of the checkpoint vector.
-//     * <p>
-//     * 
-//     * This is intended for debug purpose only.
-//     */
-//    public void printCheckpointsVector() {
-//        System.out.println("StartTime : " //$NON-NLS-1$
-//                + getTimeRange().getStartTime().getValue());
-//        System.out.println("EndTime   : " //$NON-NLS-1$
-//                + getTimeRange().getEndTime().getValue());
-//
-//        for (int pos = 0; pos < fCheckpoints.size(); pos++) {
-//            System.out.print(pos + ": " + "\t"); //$NON-NLS-1$ //$NON-NLS-2$
-//            System.out.print(fCheckpoints.get(pos).getTimestamp() + "\t"); //$NON-NLS-1$
-//            System.out.println(fCheckpoints.get(pos).getLocation());
-//        }
-//    }
 
     @Override
     public synchronized void dispose() {

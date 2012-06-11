@@ -349,8 +349,8 @@ public class HistogramView extends TmfView {
         boolean drawTimeRangeHistogram = fExperimentStartTime == 0;
         TmfTimeRange fullRange = signal.getRange();
 
-        fExperimentStartTime = fullRange.getStartTime().getValue();
-        fExperimentEndTime = fullRange.getEndTime().getValue();
+        fExperimentStartTime = fullRange.getStartTime().normalize(0, -9).getValue();
+        fExperimentEndTime = fullRange.getEndTime().normalize(0, -9).getValue();
 
         fFullTraceHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
         fTimeRangeHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
@@ -372,8 +372,8 @@ public class HistogramView extends TmfView {
             return;
         }
         TmfTimeRange fullRange = signal.getExperiment().getTimeRange();
-        fExperimentStartTime = fullRange.getStartTime().getValue();
-        fExperimentEndTime = fullRange.getEndTime().getValue();
+        fExperimentStartTime = fullRange.getStartTime().normalize(0, -9).getValue();
+        fExperimentEndTime = fullRange.getEndTime().normalize(0, -9).getValue();
 
         fFullTraceHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
         fTimeRangeHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
@@ -386,7 +386,7 @@ public class HistogramView extends TmfView {
 
         // Update the selected event time
         ITmfTimestamp currentTime = signal.getCurrentTime();
-        fCurrentTimestamp = currentTime.getValue();
+        fCurrentTimestamp = currentTime.normalize(0, -9).getValue();
 
         // Notify the relevant widgets
         fFullTraceHistogram.setCurrentEvent(fCurrentTimestamp);
@@ -401,8 +401,8 @@ public class HistogramView extends TmfView {
 
         if (fCurrentExperiment != null) {
             // Update the time range
-            fWindowStartTime = signal.getCurrentRange().getStartTime().getValue();
-            fWindowEndTime = signal.getCurrentRange().getEndTime().getValue();
+            fWindowStartTime = signal.getCurrentRange().getStartTime().normalize(0, -9).getValue();
+            fWindowEndTime = signal.getCurrentRange().getEndTime().normalize(0, -9).getValue();
             fWindowSpan = fWindowEndTime - fWindowStartTime;
 
             // Notify the relevant widgets
@@ -449,8 +449,8 @@ public class HistogramView extends TmfView {
 
         TmfTimeRange timeRange = fCurrentExperiment.getTimeRange();
         if (!timeRange.equals(TmfTimeRange.NULL_RANGE)) {
-            fExperimentStartTime = timeRange.getStartTime().getValue();
-            fExperimentEndTime = timeRange.getEndTime().getValue();
+            fExperimentStartTime = timeRange.getStartTime().normalize(0, -9).getValue();
+            fExperimentEndTime = timeRange.getEndTime().normalize(0, -9).getValue();
             fCurrentTimestamp = fExperimentStartTime;
         }
         return timeRange;
