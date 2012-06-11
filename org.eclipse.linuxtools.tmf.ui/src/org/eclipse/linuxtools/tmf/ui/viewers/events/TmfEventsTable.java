@@ -508,8 +508,6 @@ ITmfEventsFilterProvider {
         final IAction clearFiltersAction = new Action(Messages.TmfEventsTable_ClearFiltersActionText) {
             @Override
             public void run() {
-                stopFilterThread();
-                stopSearchThread();
                 clearFilters();
             }
         };
@@ -582,15 +580,7 @@ ITmfEventsFilterProvider {
                             subMenu.add(new Action(filter.getFilterName()) {
                                 @Override
                                 public void run() {
-                                    stopFilterThread();
-                                    fFilterMatchCount = 0;
-                                    fFilterCheckCount = 0;
-                                    fCache.applyFilter(filter);
-                                    fTable.clearAll();
-                                    fTable.setData(Key.FILTER_OBJ, filter);
-                                    fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status rows
-                                    startFilterThread();
-                                    fireFilterApplied(filter);
+                                    applyFilter(filter);
                                 }
                             });
                         }
@@ -907,8 +897,8 @@ ITmfEventsFilterProvider {
             }
 
             private void applyHeader() {
-                stopSearchThread();
                 if (fHeaderState == HeaderState.SEARCH) {
+                    stopSearchThread();
                     final TmfFilterAndNode filter = new TmfFilterAndNode(null);
                     for (final TableColumn column : fTable.getColumns()) {
                         final Object filterObj = column.getData(Key.SEARCH_OBJ);
@@ -927,9 +917,6 @@ ITmfEventsFilterProvider {
                         fireSearchApplied(null);
                     }
                 } else if (fHeaderState == HeaderState.FILTER) {
-                    stopFilterThread();
-                    fFilterMatchCount = 0;
-                    fFilterCheckCount = 0;
                     final TmfFilterAndNode filter = new TmfFilterAndNode(null);
                     for (final TableColumn column : fTable.getColumns()) {
                         final Object filterObj = column.getData(Key.FILTER_OBJ);
@@ -938,23 +925,9 @@ ITmfEventsFilterProvider {
                         }
                     }
                     if (filter.getChildrenCount() > 0) {
-                        fCache.applyFilter(filter);
-                        fTable.clearAll();
-                        fTable.setData(Key.FILTER_OBJ, filter);
-                        fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status rows
-                        startFilterThread();
-                        fireFilterApplied(filter);
+                        applyFilter(filter);
                     } else {
-                        fCache.clearFilter();
-                        stopFilterThread();
-                        fTable.clearAll();
-                        fTable.setData(Key.FILTER_OBJ, null);
-                        if (fTrace != null) {
-                            fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-                        } else {
-                            fTable.setItemCount(1); // +1 for header row
-                        }
-                        fireFilterApplied(null);
+                        clearFilters();
                     }
                 }
 
@@ -971,9 +944,8 @@ ITmfEventsFilterProvider {
                     stopSearchThread();
                     fTable.refresh();
                 } else if (e.character == SWT.DEL) {
-                    stopFilterThread();
-                    stopSearchThread();
                     if (fHeaderState == HeaderState.SEARCH) {
+                        stopSearchThread();
                         for (final TableColumn column : fTable.getColumns()) {
                             column.setData(Key.SEARCH_OBJ, null);
                             column.setData(Key.SEARCH_TXT, null);
@@ -1025,11 +997,26 @@ ITmfEventsFilterProvider {
             }
         }
     }
+    
+    protected void applyFilter(ITmfFilter filter) {
+    	stopFilterThread();
+    	stopSearchThread();
+        fFilterMatchCount = 0;
+        fFilterCheckCount = 0;
+        fCache.applyFilter(filter);
+        fTable.clearAll();
+        fTable.setData(Key.FILTER_OBJ, filter);
+        fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status rows
+        startFilterThread();
+        fireFilterApplied(filter);
+    }
 
     protected void clearFilters() {
         if (fTable.getData(Key.FILTER_OBJ) == null) {
             return;
         }
+        stopFilterThread();
+        stopSearchThread();
         fCache.clearFilter();
         fTable.clearAll();
         for (final TableColumn column : fTable.getColumns()) {
