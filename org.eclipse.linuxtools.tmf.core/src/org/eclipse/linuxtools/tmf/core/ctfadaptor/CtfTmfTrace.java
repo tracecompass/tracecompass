@@ -242,6 +242,9 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
     public synchronized CtfTmfEvent getNext(final ITmfContext context) {
         CtfTmfEvent event = null;
         if (context instanceof CtfTmfLightweightContext) {
+            if (CtfLocation.INVALID_LOCATION.equals(context.getLocation())) {
+                return null;
+            }
             CtfTmfLightweightContext ctfContext = (CtfTmfLightweightContext) context;
             event = ctfContext.getCurrentEvent();
 
