@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
@@ -21,9 +21,9 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IDomainInfo;
 /**
  * <p>
  * Implementation of the trace domain interface (IDomainInfo) to store domain
- * related data. 
+ * related data.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class DomainInfo extends TraceInfo implements IDomainInfo {
@@ -34,7 +34,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     /**
      * The channels information of the domain.
      */
-    private List<IChannelInfo> fChannels = new ArrayList<IChannelInfo>();
+    private final List<IChannelInfo> fChannels = new ArrayList<IChannelInfo>();
     private boolean fIsKernel = false;
 
     // ------------------------------------------------------------------------
@@ -63,7 +63,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         }
         fIsKernel = other.fIsKernel;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo#isKernel()
@@ -72,7 +72,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     public boolean isKernel() {
         return fIsKernel;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo#setIsKernel(boolean)
@@ -101,7 +101,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     @Override
     public void setChannels(List<IChannelInfo> channels) {
         for (Iterator<IChannelInfo> iterator = channels.iterator(); iterator.hasNext();) {
-            IChannelInfo channelInfo = (IChannelInfo) iterator.next();
+            IChannelInfo channelInfo = iterator.next();
             fChannels.add(channelInfo);
         }
     }
@@ -114,7 +114,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     public void addChannel(IChannelInfo channel) {
         fChannels.add(channel);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
@@ -172,7 +172,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                 output.append("None");
             } else {
                 for (Iterator<IChannelInfo> iterator = fChannels.iterator(); iterator.hasNext();) {
-                    IChannelInfo channel = (IChannelInfo) iterator.next();
+                    IChannelInfo channel = iterator.next();
                     output.append(channel.toString());
                 }
             }
@@ -181,5 +181,5 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
             output.append(")]");
             return output.toString();
     }
-    
+
 }

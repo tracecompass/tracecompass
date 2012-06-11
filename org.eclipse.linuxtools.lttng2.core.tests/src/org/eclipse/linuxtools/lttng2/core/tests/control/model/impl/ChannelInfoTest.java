@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
@@ -26,18 +26,18 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.EventInfo;
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link ChannelInfo}</code>.
  *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class ChannelInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
     private IChannelInfo fChannelInfo1 = null;
     private IChannelInfo fChannelInfo2 = null;
-   
+
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
-   
+
     /**
      * Perform pre-test initialization.
      *
@@ -66,7 +66,7 @@ public class ChannelInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Tests
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -78,7 +78,7 @@ public class ChannelInfoTest extends TestCase {
     public void testChannelInfo() {
         ChannelInfo result = new ChannelInfo("test");
         assertNotNull(result);
-        
+
         assertEquals("test", result.getName());
         assertEquals(0, result.getNumberOfSubBuffers());
         assertEquals("", result.getOutputType());
@@ -91,7 +91,7 @@ public class ChannelInfoTest extends TestCase {
 
     public void testChannelInfoCopy() {
         ChannelInfo channelInfo = new ChannelInfo((ChannelInfo)fChannelInfo1);
-        
+
         assertEquals(fChannelInfo1.getName(), channelInfo.getName());
         assertEquals(fChannelInfo1.getNumberOfSubBuffers(), channelInfo.getNumberOfSubBuffers());
         assertEquals(fChannelInfo1.getOutputType(), channelInfo.getOutputType());
@@ -100,7 +100,7 @@ public class ChannelInfoTest extends TestCase {
         assertEquals(fChannelInfo1.getState(), channelInfo.getState());
         assertEquals(fChannelInfo1.getSwitchTimer(), channelInfo.getSwitchTimer());
         assertEquals(fChannelInfo1.getEvents().length, channelInfo.getEvents().length);
-        
+
         IEventInfo[] orignalEvents = fChannelInfo1.getEvents();
         IEventInfo[] resultEvents = channelInfo.getEvents();
         for (int i = 0; i < orignalEvents.length; i++) {
@@ -132,7 +132,7 @@ public class ChannelInfoTest extends TestCase {
         fixture.setNumberOfSubBuffers(1);
         fixture.setOutputType("");
         fixture.setSubBufferSize(1L);
-        
+
         // add an event
         IEventInfo event = new EventInfo("event");
         fixture.addEvent(event);
@@ -163,22 +163,22 @@ public class ChannelInfoTest extends TestCase {
 
         long switchTimer = fixture.getSwitchTimer();
         assertEquals(2L, switchTimer);
-        
+
         boolean mode = fixture.isOverwriteMode();
         assertTrue(mode);
-        
+
         long readTimer = fixture.getReadTimer();
         assertEquals(3L, readTimer);
-        
+
         TraceEnablement state = fixture.getState();
         assertEquals("disabled", state.getInName());
-        
+
         long numSubBuffers = fixture.getNumberOfSubBuffers();
         assertEquals(4, numSubBuffers);
-        
+
         String outputType = fixture.getOutputType();
         assertEquals("splice()", outputType);
-        
+
         long subBufferSize = fixture.getSubBufferSize();
         assertEquals(1L, subBufferSize);
 
@@ -192,22 +192,22 @@ public class ChannelInfoTest extends TestCase {
 
         switchTimer = fixture.getSwitchTimer();
         assertEquals(5L, switchTimer);
-        
+
         mode = fixture.isOverwriteMode();
         assertFalse(mode);
-        
+
         readTimer = fixture.getReadTimer();
         assertEquals(6L, readTimer);
-        
+
         state = fixture.getState();
         assertEquals("enabled", state.getInName());
-        
+
         numSubBuffers = fixture.getNumberOfSubBuffers();
         assertEquals(7, numSubBuffers);
-        
+
         outputType = fixture.getOutputType();
         assertEquals("mmap()", outputType);
-        
+
         subBufferSize = fixture.getSubBufferSize();
         assertEquals(8L, subBufferSize);
     }
@@ -226,7 +226,7 @@ public class ChannelInfoTest extends TestCase {
         fixture.setOutputType("");
         fixture.setSubBufferSize(1L);
         List<IEventInfo> events = new LinkedList<IEventInfo>();
-        
+
         for (int i = 0; i < 2; i++) {
             IEventInfo info = new EventInfo("event" + i);
             info.setEventType("tracepoint");
@@ -237,9 +237,9 @@ public class ChannelInfoTest extends TestCase {
         fixture.setEvents(events);
 
         IEventInfo[] infos = fixture.getEvents();
-        
+
         assertEquals(events.size(), infos.length);
-        
+
         for (int i = 0; i < infos.length; i++) {
             assertEquals(events.get(i), infos[i]);
         }
@@ -271,7 +271,7 @@ public class ChannelInfoTest extends TestCase {
         // add additional test code here
         assertEquals("[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])]", result);
     }
-    
+
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
@@ -283,7 +283,7 @@ public class ChannelInfoTest extends TestCase {
         assertTrue("equals", !fChannelInfo1.equals(fChannelInfo2));
         assertTrue("equals", !fChannelInfo2.equals(fChannelInfo1));
     }
-    
+
     public void testEqualsSymmetry() {
         ChannelInfo event1 = new ChannelInfo((ChannelInfo)fChannelInfo1);
         ChannelInfo event2 = new ChannelInfo((ChannelInfo)fChannelInfo2);
@@ -294,7 +294,7 @@ public class ChannelInfoTest extends TestCase {
         assertTrue("equals", event2.equals(fChannelInfo2));
         assertTrue("equals", fChannelInfo2.equals(event2));
     }
-    
+
     public void testEqualsTransivity() {
         ChannelInfo channel1 = new ChannelInfo((ChannelInfo)fChannelInfo1);
         ChannelInfo channel2 = new ChannelInfo((ChannelInfo)fChannelInfo1);
@@ -304,12 +304,12 @@ public class ChannelInfoTest extends TestCase {
         assertTrue("equals", channel2.equals(channel3));
         assertTrue("equals", channel1.equals(channel3));
     }
-    
+
     public void testEqualsNull() throws Exception {
         assertTrue("equals", !fChannelInfo1.equals(null));
         assertTrue("equals", !fChannelInfo2.equals(null));
     }
-    
+
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------

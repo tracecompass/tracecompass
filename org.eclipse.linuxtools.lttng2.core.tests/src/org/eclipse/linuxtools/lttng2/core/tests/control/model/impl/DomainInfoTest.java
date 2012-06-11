@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.DomainInfo
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link DomainInfo}</code>.
  *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class DomainInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Test data
@@ -37,7 +37,7 @@ public class DomainInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
-   
+
     /**
      * Perform pre-test initialization.
      *
@@ -69,7 +69,7 @@ public class DomainInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Tests
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -81,7 +81,7 @@ public class DomainInfoTest extends TestCase {
     public void testDomainInfo() {
         DomainInfo result = new DomainInfo("test");
         assertNotNull(result);
-        
+
         assertEquals("test", result.getName());
         assertEquals(0, result.getChannels().length);
     }
@@ -111,19 +111,19 @@ public class DomainInfoTest extends TestCase {
      *
      */
     public void testGetAndSetters() {
-        
+
         // Note that addChannel() has been executed in setUp()
         // check get method here
         assertEquals(1, fDomainInfo1.getChannels().length);
         assertNotNull(fDomainInfo1.getChannels()[0]);
         assertEquals(fChannelInfo1, fDomainInfo1.getChannels()[0]);
-        
+
         IDomainInfo domain = new DomainInfo("domain");
         List<IChannelInfo> list = new LinkedList<IChannelInfo>();
         list.add(fChannelInfo1);
         list.add(fChannelInfo2);
         domain.setChannels(list);
-        
+
         IChannelInfo[] result = domain.getChannels();
         assertEquals(2, result.length);
         assertEquals(fChannelInfo1, result[0]);
@@ -147,7 +147,7 @@ public class DomainInfoTest extends TestCase {
 
         assertEquals("[DomainInfo([TraceInfo(Name=test1)],Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],isKernel=false)]", result);
     }
-    
+
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
@@ -159,7 +159,7 @@ public class DomainInfoTest extends TestCase {
         assertTrue("equals", !fDomainInfo1.equals(fDomainInfo2));
         assertTrue("equals", !fDomainInfo2.equals(fDomainInfo1));
     }
-    
+
     public void testEqualsSymmetry() {
         DomainInfo event1 = new DomainInfo((DomainInfo)fDomainInfo1);
         DomainInfo event2 = new DomainInfo((DomainInfo)fDomainInfo2);
@@ -170,7 +170,7 @@ public class DomainInfoTest extends TestCase {
         assertTrue("equals", event2.equals(fDomainInfo2));
         assertTrue("equals", fDomainInfo2.equals(event2));
     }
-    
+
     public void testEqualsTransivity() {
         DomainInfo channel1 = new DomainInfo((DomainInfo)fDomainInfo1);
         DomainInfo channel2 = new DomainInfo((DomainInfo)fDomainInfo1);
@@ -180,12 +180,12 @@ public class DomainInfoTest extends TestCase {
         assertTrue("equals", channel2.equals(channel3));
         assertTrue("equals", channel1.equals(channel3));
     }
-    
+
     public void testEqualsNull() throws Exception {
         assertTrue("equals", !fDomainInfo1.equals(null));
         assertTrue("equals", !fDomainInfo2.equals(null));
     }
-    
+
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------

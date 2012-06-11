@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
@@ -22,9 +22,9 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionSta
 /**
  * <p>
  * Implementation of the trace session interface (ISessionInfo) to store session
- * related data. 
+ * related data.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class SessionInfo extends TraceInfo implements ISessionInfo {
@@ -36,14 +36,14 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
      * The trace session state.
      */
     private TraceSessionState fState = TraceSessionState.INACTIVE;
-    /** 
+    /**
      * The trace session path for storing traces.
      */
     private String fSessionPath = ""; //$NON-NLS-1$
     /**
      * The domains information of this session.
      */
-    private List<IDomainInfo> fDomains = new ArrayList<IDomainInfo>();
+    private final List<IDomainInfo> fDomains = new ArrayList<IDomainInfo>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -64,7 +64,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         super(other);
         fState = other.fState;
         fSessionPath = other.fSessionPath;
-        
+
         for (Iterator<IDomainInfo> iterator = other.fDomains.iterator(); iterator.hasNext();) {
             IDomainInfo domain = iterator.next();
             if (domain instanceof DomainInfo) {
@@ -74,7 +74,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
             }
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -108,7 +108,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
             fState = TraceSessionState.ACTIVE;
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#getSessionPath()
@@ -143,7 +143,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     @Override
     public void setDomains(List<IDomainInfo> domains) {
         for (Iterator<IDomainInfo> iterator = domains.iterator(); iterator.hasNext();) {
-            IDomainInfo domainInfo = (IDomainInfo) iterator.next();
+            IDomainInfo domainInfo = iterator.next();
             fDomains.add(domainInfo);
         }
     }
@@ -159,7 +159,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     public void addDomain(IDomainInfo domainInfo) {
         fDomains.add(domainInfo);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
@@ -224,7 +224,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
             output.append(fState);
             output.append(",Domains=");
             for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
-                IDomainInfo domain = (IDomainInfo) iterator.next();
+                IDomainInfo domain = iterator.next();
                 output.append(domain.toString());
             }
             output.append(")]");

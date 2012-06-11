@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo;
 /**
  * The class <code>TraceInfoTest</code> contains test for the class <code>{@link TraceInfo}</code>.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class TraceInfoTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -27,8 +27,8 @@ public class TraceInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     private ITraceInfo fTraceInfo1 = null;
     private ITraceInfo fTraceInfo2 = null;
-   
-    
+
+
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public class TraceInfoTest extends TestCase {
     public void testTraceInfo() {
         TraceInfo fixture = new TraceInfo("event");
         assertNotNull(fixture);
-        
+
         assertEquals("event", fixture.getName());
     }
 
@@ -82,13 +82,13 @@ public class TraceInfoTest extends TestCase {
             // Success
         }
     }
-    
+
     /**
      * Test Copy Constructor
      */
     public void testTraceInfoCopy() {
         TraceInfo info = new TraceInfo((TraceInfo)fTraceInfo1);
-        
+
         assertEquals(fTraceInfo1.getName(), info.getName());
     }
 
@@ -105,7 +105,7 @@ public class TraceInfoTest extends TestCase {
             // Success
         }
     }
-    
+
     /**
      * Run the void setEventType(String) method test.
      *
@@ -126,7 +126,7 @@ public class TraceInfoTest extends TestCase {
         // add additional test code here
         assertEquals("[TraceInfo(Name=event1)]", result);
     }
-    
+
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
@@ -138,7 +138,7 @@ public class TraceInfoTest extends TestCase {
         assertTrue("equals", !fTraceInfo1.equals(fTraceInfo2));
         assertTrue("equals", !fTraceInfo2.equals(fTraceInfo1));
     }
-    
+
     public void testEqualsSymmetry() {
         TraceInfo info1 = new TraceInfo((TraceInfo)fTraceInfo1);
         TraceInfo info2 = new TraceInfo((TraceInfo)fTraceInfo2);
@@ -149,7 +149,7 @@ public class TraceInfoTest extends TestCase {
         assertTrue("equals", info2.equals(fTraceInfo2));
         assertTrue("equals", fTraceInfo2.equals(info2));
     }
-    
+
     public void testEqualsTransivity() {
         TraceInfo info1 = new TraceInfo((TraceInfo)fTraceInfo1);
         TraceInfo info2 = new TraceInfo((TraceInfo)fTraceInfo1);
@@ -159,12 +159,12 @@ public class TraceInfoTest extends TestCase {
         assertTrue("equals", info2.equals(info3));
         assertTrue("equals", info1.equals(info3));
     }
-    
+
     public void testEqualsNull() {
         assertTrue("equals", !fTraceInfo1.equals(null));
         assertTrue("equals", !fTraceInfo2.equals(null));
     }
-    
+
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------

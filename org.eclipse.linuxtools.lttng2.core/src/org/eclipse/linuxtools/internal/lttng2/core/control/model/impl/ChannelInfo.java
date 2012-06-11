@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
@@ -22,9 +22,9 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement
 /**
  * <p>
  * Implementation of the trace channel interface (IChannelInfo) to store channel
- * related data. 
+ * related data.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class ChannelInfo extends TraceInfo implements IChannelInfo {
@@ -63,9 +63,9 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     /**
      * The events information of the channel.
      */
-    private List<IEventInfo> fEvents = new ArrayList<IEventInfo>();
+    private final List<IEventInfo> fEvents = new ArrayList<IEventInfo>();
 
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -229,7 +229,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     public void setState(TraceEnablement state) {
         fState = state;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo#setState(java.lang.String)
@@ -243,7 +243,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
             fState = TraceEnablement.ENABLED;
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo#getEvents()
@@ -260,7 +260,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     @Override
     public void setEvents(List<IEventInfo> events) {
         for (Iterator<IEventInfo> iterator = events.iterator(); iterator.hasNext();) {
-            IEventInfo eventInfo = (IEventInfo) iterator.next();
+            IEventInfo eventInfo = iterator.next();
             fEvents.add(eventInfo);
         }
     }
@@ -273,7 +273,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     public void addEvent(IEventInfo channel) {
         fEvents.add(channel);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
@@ -291,7 +291,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         result = prime * result + (int) (fSubBufferSize ^ (fSubBufferSize >>> 32));
         result = prime * result + (int) (fSwitchTimer ^ (fSwitchTimer >>> 32));
         return result;
-    }  
+    }
 
     /*
      * (non-Javadoc)
@@ -343,7 +343,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         }
         return true;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#toString()
@@ -373,7 +373,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
                 output.append("None");
             } else {
                 for (Iterator<IEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
-                    IEventInfo event = (IEventInfo) iterator.next();
+                    IEventInfo event = iterator.next();
                     output.append(event.toString());
                 }
             }

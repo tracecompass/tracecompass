@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -31,11 +31,11 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.SessionInf
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.UstProviderInfo;
 
 /**
- *  Test facility to constants across test case 
+ *  Test facility to constants across test case
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class ModelImplFactory {
-    
+
     private ISessionInfo fSessionInfo1 = null;
     private ISessionInfo fSessionInfo2 = null;
     private IDomainInfo fDomainInfo1 = null;
@@ -51,7 +51,7 @@ public class ModelImplFactory {
     private IUstProviderInfo fUstProviderInfo2 = null;
     private IProbeEventInfo fProbeEventInfo1 = null;
     private IProbeEventInfo fProbeEventInfo2 = null;
-    
+
     public ModelImplFactory() {
         fBaseEventInfo1 = new BaseEventInfo("event1");
         fBaseEventInfo1.setEventType(TraceEventType.UNKNOWN);
@@ -59,7 +59,7 @@ public class ModelImplFactory {
         fBaseEventInfo2 = new BaseEventInfo("event2");
         fBaseEventInfo2.setEventType(TraceEventType.TRACEPOINT);
         fBaseEventInfo1.setLogLevel(TraceLogLevel.TRACE_DEBUG);
-        
+
         fEventInfo1 = new EventInfo("event1");
         fEventInfo1.setEventType(TraceEventType.TRACEPOINT);
         fEventInfo1.setState(TraceEnablement.ENABLED);
@@ -67,7 +67,7 @@ public class ModelImplFactory {
         fEventInfo2 = new EventInfo("event2");
         fEventInfo2.setEventType(TraceEventType.UNKNOWN);
         fEventInfo2.setState(TraceEnablement.DISABLED);
-        
+
         fEventInfo3 = new EventInfo("event3");
         fEventInfo3.setEventType(TraceEventType.TRACEPOINT);
         fEventInfo3.setState(TraceEnablement.DISABLED);
@@ -101,14 +101,14 @@ public class ModelImplFactory {
         fChannelInfo2.setSubBufferSize(4L);
         fChannelInfo2.addEvent(fEventInfo2);
         fChannelInfo2.addEvent(fEventInfo3);
-        
+
         fDomainInfo1 = new DomainInfo("test1");
         fDomainInfo1.addChannel(fChannelInfo1);
 
         fDomainInfo2 = new DomainInfo("test2");
         fDomainInfo2.addChannel(fChannelInfo1);
         fDomainInfo2.addChannel(fChannelInfo2);
-        
+
         fSessionInfo1 = new SessionInfo("session1");
         fSessionInfo1.setSessionPath("/home/user");
         fSessionInfo1.setSessionState(TraceSessionState.ACTIVE);
@@ -131,7 +131,7 @@ public class ModelImplFactory {
         fProbeEventInfo2.setOffset("0x100");
         fProbeEventInfo2.setSymbol("init_post");
     }
-    
+
     public ISessionInfo getSessionInfo1() {
         return fSessionInfo1;
     }
@@ -167,7 +167,7 @@ public class ModelImplFactory {
     public IEventInfo getEventInfo3() {
         return fEventInfo3;
     }
-    
+
     public IBaseEventInfo getBaseEventInfo1() {
         return fBaseEventInfo1;
     }
@@ -175,7 +175,7 @@ public class ModelImplFactory {
     public IBaseEventInfo getBaseEventInfo2() {
         return fBaseEventInfo2;
     }
-    
+
     public IUstProviderInfo getUstProviderInfo1() {
         return fUstProviderInfo1;
     }
@@ -183,7 +183,7 @@ public class ModelImplFactory {
     public IUstProviderInfo getUstProviderInfo2() {
         return fUstProviderInfo2;
     }
-    
+
     public IProbeEventInfo getProbeEventInfo1() {
         return fProbeEventInfo1;
     }

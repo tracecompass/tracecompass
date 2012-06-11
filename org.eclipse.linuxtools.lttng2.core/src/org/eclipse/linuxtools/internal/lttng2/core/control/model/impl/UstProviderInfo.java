@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
@@ -20,10 +20,10 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IUstProviderInf
 
 /**
  * <p>
- * Implementation of the Ust Provider interface (IUstProviderInfo) to store UST 
- * provider related data. 
+ * Implementation of the Ust Provider interface (IUstProviderInfo) to store UST
+ * provider related data.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
@@ -38,8 +38,8 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     /**
      * List of event information.
      */
-    private List<IBaseEventInfo> fEvents = new ArrayList<IBaseEventInfo>(); 
-    
+    private final List<IBaseEventInfo> fEvents = new ArrayList<IBaseEventInfo>();
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     public UstProviderInfo(String name) {
         super(name);
     }
-    
+
     /**
      * Copy constructor
      * @param other - the instance to copy
@@ -67,7 +67,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
             }
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -106,7 +106,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     @Override
     public void setEvents(List<IBaseEventInfo> events) {
         for (Iterator<IBaseEventInfo> iterator = events.iterator(); iterator.hasNext();) {
-            IBaseEventInfo eventInfo = (IBaseEventInfo) iterator.next();
+            IBaseEventInfo eventInfo = iterator.next();
             fEvents.add(eventInfo);
         }
     }
@@ -165,7 +165,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
         }
         return true;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#toString()
@@ -183,7 +183,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
                 output.append("None");
             } else {
                 for (Iterator<IBaseEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
-                    IBaseEventInfo event = (IBaseEventInfo) iterator.next();
+                    IBaseEventInfo event = iterator.next();
                     output.append(event.toString());
                 }
             }
@@ -191,5 +191,5 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
             return output.toString();
     }
 
- 
+
 }

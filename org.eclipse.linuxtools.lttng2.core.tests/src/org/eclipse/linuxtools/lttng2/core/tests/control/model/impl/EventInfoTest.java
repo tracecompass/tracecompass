@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.EventInfo;
 /**
  * The class <code>BaseEventInfoTest</code> contains test for the class <code>{@link BaseEventInfo}</code>.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class EventInfoTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -30,7 +30,7 @@ public class EventInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     private IEventInfo fEventInfo1 = null;
     private IEventInfo fEventInfo2 = null;
-   
+
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
@@ -68,15 +68,15 @@ public class EventInfoTest extends TestCase {
     public void testBaseEventInfo() {
         EventInfo fixture = new EventInfo("event");
         assertNotNull(fixture);
-        
+
         TraceEventType result = fixture.getEventType();
-        
+
         assertEquals("event", fixture.getName());
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
         assertEquals(3, result.ordinal());
-        
+
         TraceEnablement state = fixture.getState();
         assertEquals("disabled", state.getInName());
         assertEquals("DISABLED", state.name());
@@ -90,7 +90,7 @@ public class EventInfoTest extends TestCase {
      */
     public void testEventInfoCopy() {
         EventInfo info = new EventInfo((EventInfo)fEventInfo1);
-        
+
         assertEquals(fEventInfo1.getName(), info.getName());
         assertEquals(fEventInfo1.getEventType(), info.getEventType());
         assertEquals(fEventInfo1.getState(), info.getState());
@@ -109,13 +109,13 @@ public class EventInfoTest extends TestCase {
             // Success
         }
     }
-    
+
     /**
-     *  Getter/Setter tests 
+     *  Getter/Setter tests
      */
     public void testGetAndSetter() {
         EventInfo fixture = new EventInfo("event");
-        
+
         fixture.setEventType(TraceEventType.TRACEPOINT);
         TraceEventType result = fixture.getEventType();
 
@@ -132,12 +132,12 @@ public class EventInfoTest extends TestCase {
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
         assertEquals(3, result.ordinal());
-        
+
         // setEventType(String typeName)
         String typeName = "";
         fixture.setEventType(typeName);
         result = fixture.getEventType();
-        
+
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
@@ -147,7 +147,7 @@ public class EventInfoTest extends TestCase {
 
         fixture.setEventType(typeName);
         result = fixture.getEventType();
-        
+
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
@@ -167,14 +167,14 @@ public class EventInfoTest extends TestCase {
         assertEquals("DISABLED", state.name());
         assertEquals("DISABLED", state.toString());
         assertEquals(0, state.ordinal());
-        
+
         fixture.setState("enabled");
         state = fixture.getState();
         assertEquals("enabled", state.getInName());
         assertEquals("ENABLED", state.name());
         assertEquals("ENABLED", state.toString());
         assertEquals(1, state.ordinal());
-        
+
         // setState(TraceEnablement state)
         fixture.setState(TraceEnablement.DISABLED);
         state = fixture.getState();
@@ -182,7 +182,7 @@ public class EventInfoTest extends TestCase {
         assertEquals("DISABLED", state.name());
         assertEquals("DISABLED", state.toString());
         assertEquals(0, state.ordinal());
-        
+
         fixture.setState(TraceEnablement.ENABLED);
         state = fixture.getState();
         assertEquals("enabled", state.getInName());
@@ -215,7 +215,7 @@ public class EventInfoTest extends TestCase {
         assertTrue("equals", !fEventInfo1.equals(fEventInfo2));
         assertTrue("equals", !fEventInfo2.equals(fEventInfo1));
     }
-    
+
     public void testEqualsSymmetry() {
         EventInfo info1 = new EventInfo((EventInfo)fEventInfo1);
         EventInfo info2 = new EventInfo((EventInfo)fEventInfo2);
@@ -226,7 +226,7 @@ public class EventInfoTest extends TestCase {
         assertTrue("equals", info2.equals(fEventInfo2));
         assertTrue("equals", fEventInfo2.equals(info2));
     }
-    
+
     public void testEqualsTransivity() {
         EventInfo info1 = new EventInfo((EventInfo)fEventInfo1);
         EventInfo info2 = new EventInfo((EventInfo)fEventInfo1);
@@ -236,12 +236,12 @@ public class EventInfoTest extends TestCase {
         assertTrue("equals", info2.equals(info3));
         assertTrue("equals", info1.equals(info3));
     }
-    
+
     public void testEqualsNull() {
         assertTrue("equals", !fEventInfo1.equals(null));
         assertTrue("equals", !fEventInfo2.equals(null));
     }
-    
+
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------

@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
@@ -25,21 +25,21 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.SessionInf
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link SessionInfo}</code>.
  *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class SessionInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
     private ISessionInfo fSessionInfo1 = null;
     private ISessionInfo fSessionInfo2 = null;
-    
+
     private IDomainInfo fDomainInfo1 = null;
     private IDomainInfo fDomainInfo2 = null;
 
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
-   
+
     /**
      * Perform pre-test initialization.
      *
@@ -70,7 +70,7 @@ public class SessionInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Tests
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -82,7 +82,7 @@ public class SessionInfoTest extends TestCase {
     public void testSessionInfo() {
         ISessionInfo result = new SessionInfo("test");
         assertNotNull(result);
-        
+
         assertEquals("test", result.getName());
         assertEquals("", result.getSessionPath());
         TraceSessionState state = result.getSessionState();
@@ -95,7 +95,7 @@ public class SessionInfoTest extends TestCase {
 
     public void testSessionInfoCopy() {
         SessionInfo sessionInfo = new SessionInfo((SessionInfo)fSessionInfo1);
-        
+
         assertEquals(sessionInfo.getName(), fSessionInfo1.getName());
         assertEquals(sessionInfo.getSessionPath(), fSessionInfo1.getSessionPath());
         assertEquals(sessionInfo.getSessionState(), fSessionInfo1.getSessionState());
@@ -123,27 +123,27 @@ public class SessionInfoTest extends TestCase {
      *
      */
     public void testGetAndSetters() {
-        
+
         // Note that addDomain() has been executed in setUp()
         // check get method here
         assertEquals(1, fSessionInfo1.getDomains().length);
         assertNotNull(fSessionInfo1.getDomains()[0]);
         assertEquals(fDomainInfo1, fSessionInfo1.getDomains()[0]);
-        
+
         ISessionInfo session = new SessionInfo("session");
         List<IDomainInfo> list = new LinkedList<IDomainInfo>();
         list.add(fDomainInfo1);
         list.add(fDomainInfo2);
         session.setDomains(list);
-        
+
         IDomainInfo[] result = session.getDomains();
         assertEquals(2, result.length);
         assertEquals(fDomainInfo1, result[0]);
         assertEquals(fDomainInfo2, result[1]);
-        
+
         session.setSessionPath("/home/user");
         assertEquals("/home/user", session.getSessionPath());
-        
+
         session.setSessionState("active");
         TraceSessionState state = session.getSessionState();
         state = session.getSessionState();
@@ -151,7 +151,7 @@ public class SessionInfoTest extends TestCase {
         assertEquals("ACTIVE", state.name());
         assertEquals("ACTIVE", state.toString());
         assertEquals(1, state.ordinal());
-        
+
         session.setSessionState("inactive");
         state = session.getSessionState();
         assertEquals("inactive", state.getInName());
@@ -165,7 +165,7 @@ public class SessionInfoTest extends TestCase {
         assertEquals("INACTIVE", state.name());
         assertEquals("INACTIVE", state.toString());
         assertEquals(0, state.ordinal());
-        
+
         session.setSessionState(TraceSessionState.ACTIVE);
         state = session.getSessionState();
         assertEquals("active", state.getInName());
@@ -200,7 +200,7 @@ public class SessionInfoTest extends TestCase {
         // add additional test code here
         assertEquals("[SessionInfo([TraceInfo(Name=session1)],State=ACTIVE,Domains=[DomainInfo([TraceInfo(Name=test1)],Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],isKernel=false)])]", result);
     }
-    
+
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
@@ -212,7 +212,7 @@ public class SessionInfoTest extends TestCase {
         assertTrue("equals", !fSessionInfo1.equals(fSessionInfo2));
         assertTrue("equals", !fSessionInfo2.equals(fSessionInfo1));
     }
-    
+
     public void testEqualsSymmetry() {
         SessionInfo event1 = new SessionInfo((SessionInfo)fSessionInfo1);
         SessionInfo event2 = new SessionInfo((SessionInfo)fSessionInfo2);
@@ -223,7 +223,7 @@ public class SessionInfoTest extends TestCase {
         assertTrue("equals", event2.equals(fSessionInfo2));
         assertTrue("equals", fSessionInfo2.equals(event2));
     }
-    
+
     public void testEqualsTransivity() {
         SessionInfo channel1 = new SessionInfo((SessionInfo)fSessionInfo1);
         SessionInfo channel2 = new SessionInfo((SessionInfo)fSessionInfo1);
@@ -233,12 +233,12 @@ public class SessionInfoTest extends TestCase {
         assertTrue("equals", channel2.equals(channel3));
         assertTrue("equals", channel1.equals(channel3));
     }
-    
+
     public void testEqualsNull() throws Exception {
         assertTrue("equals", !fSessionInfo1.equals(null));
         assertTrue("equals", !fSessionInfo2.equals(null));
     }
-    
+
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------

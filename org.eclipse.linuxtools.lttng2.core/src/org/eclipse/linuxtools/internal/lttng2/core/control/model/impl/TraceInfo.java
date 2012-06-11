@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.ITraceInfo;
  * Implementation of the base trace information interface (ITraceInfo) to
  * store common data.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceInfo implements ITraceInfo {
@@ -52,9 +52,8 @@ public class TraceInfo implements ITraceInfo {
     public TraceInfo(TraceInfo other) {
         if (other == null) {
             throw new IllegalArgumentException();
-        } else {
-            fName = String.valueOf(other.fName);
         }
+        fName = String.valueOf(other.fName);
     }
 
     // ------------------------------------------------------------------------
@@ -77,7 +76,7 @@ public class TraceInfo implements ITraceInfo {
     public void setName(String name) {
         fName = name;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see java.lang.Object#hashCode()
@@ -114,7 +113,7 @@ public class TraceInfo implements ITraceInfo {
             return false;
         }
         return true;
-    }    
+    }
     /*
      * (non-Javadoc)
      * @see java.lang.Object#toString()

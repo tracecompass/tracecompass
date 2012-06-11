@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
@@ -25,21 +25,21 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.UstProvide
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link UstProviderInfo}</code>.
  *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class UstProviderInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
     private IUstProviderInfo fUstProviderInfo1 = null;
     private IUstProviderInfo fUstProviderInfo2 = null;
-    
+
     private IBaseEventInfo fEventInfo1 = null;
     private IBaseEventInfo fEventInfo2 = null;
-   
+
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
-   
+
     /**
      * Perform pre-test initialization.
      *
@@ -70,7 +70,7 @@ public class UstProviderInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // Tests
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -82,7 +82,7 @@ public class UstProviderInfoTest extends TestCase {
     public void testUstProviderInfo() {
         IUstProviderInfo result = new UstProviderInfo("test");
         assertNotNull(result);
-        
+
         assertEquals("test", result.getName());
         assertEquals(0, result.getPid());
         assertEquals(0, result.getEvents().length);
@@ -90,11 +90,11 @@ public class UstProviderInfoTest extends TestCase {
 
     public void testUstProviderInfoCopy() {
         IUstProviderInfo providerInf = new UstProviderInfo((UstProviderInfo)fUstProviderInfo1);
-        
+
         assertEquals(fUstProviderInfo1.getName(), providerInf.getName());
         assertEquals(fUstProviderInfo1.getPid(), providerInf.getPid());
         assertEquals(fUstProviderInfo1.getEvents().length, providerInf.getEvents().length);
-        
+
         IBaseEventInfo[] orignalEvents = fUstProviderInfo1.getEvents();
         IBaseEventInfo[] resultEvents = providerInf.getEvents();
         for (int i = 0; i < orignalEvents.length; i++) {
@@ -120,7 +120,7 @@ public class UstProviderInfoTest extends TestCase {
     public void testGetAndSetters() {
         IUstProviderInfo fixture = new UstProviderInfo("test");
         fixture.setPid(2468);
-        
+
         // add an event
         IBaseEventInfo event = new BaseEventInfo("event");
         fixture.addEvent(event);
@@ -132,7 +132,7 @@ public class UstProviderInfoTest extends TestCase {
         assertEquals(1, result.length);
         assertNotNull(result[0]);
         assertTrue(event.equals(result[0]));
-        
+
         assertEquals(2468, fixture.getPid());
     }
 
@@ -147,11 +147,11 @@ public class UstProviderInfoTest extends TestCase {
         events.add(fEventInfo1);
         events.add(fEventInfo2);
         fixture.setEvents(events);
-        
+
         IBaseEventInfo[] infos = fixture.getEvents();
-        
+
         assertEquals(events.size(), infos.length);
-        
+
         for (int i = 0; i < infos.length; i++) {
             assertEquals(events.get(i), infos[i]);
         }
@@ -173,7 +173,7 @@ public class UstProviderInfoTest extends TestCase {
         String result = fUstProviderInfo2.toString();
         assertEquals("[EventInfo([TraceInfo(Name=myUST2)],PID=2345,Events=[BaseEventInfo([TraceInfo(Name=event1)],type=UNKNOWN,level=TRACE_DEBUG)][BaseEventInfo([TraceInfo(Name=event2)],type=TRACEPOINT,level=TRACE_DEBUG)])]", result);
     }
-    
+
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
@@ -185,7 +185,7 @@ public class UstProviderInfoTest extends TestCase {
         assertTrue("equals", !fUstProviderInfo1.equals(fUstProviderInfo2));
         assertTrue("equals", !fUstProviderInfo2.equals(fUstProviderInfo1));
     }
-    
+
     public void testEqualsSymmetry() {
         UstProviderInfo event1 = new UstProviderInfo((UstProviderInfo)fUstProviderInfo1);
         UstProviderInfo event2 = new UstProviderInfo((UstProviderInfo)fUstProviderInfo2);
@@ -196,7 +196,7 @@ public class UstProviderInfoTest extends TestCase {
         assertTrue("equals", event2.equals(fUstProviderInfo2));
         assertTrue("equals", fUstProviderInfo2.equals(event2));
     }
-    
+
     public void testEqualsTransivity() {
         UstProviderInfo UstProvider1 = new UstProviderInfo((UstProviderInfo)fUstProviderInfo1);
         UstProviderInfo UstProvider2 = new UstProviderInfo((UstProviderInfo)fUstProviderInfo1);
@@ -206,12 +206,12 @@ public class UstProviderInfoTest extends TestCase {
         assertTrue("equals", UstProvider2.equals(UstProvider3));
         assertTrue("equals", UstProvider1.equals(UstProvider3));
     }
-    
+
     public void testEqualsNull() throws Exception {
         assertTrue("equals", !fUstProviderInfo1.equals(null));
         assertTrue("equals", !fUstProviderInfo2.equals(null));
     }
-    
+
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------

@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ProbeEvent
 /**
  * The class <code>BaseEventInfoTest</code> contains test for the class <code>{@link BaseEventInfo}</code>.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class ProbeEventInfoTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -30,7 +30,7 @@ public class ProbeEventInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     private IProbeEventInfo fEventInfo1 = null;
     private IProbeEventInfo fEventInfo2 = null;
-   
+
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
@@ -68,21 +68,21 @@ public class ProbeEventInfoTest extends TestCase {
     public void testBaseEventInfo() {
         ProbeEventInfo fixture = new ProbeEventInfo("event");
         assertNotNull(fixture);
-        
+
         TraceEventType result = fixture.getEventType();
-        
+
         assertEquals("event", fixture.getName());
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
         assertEquals(3, result.ordinal());
-        
+
         TraceEnablement state = fixture.getState();
         assertEquals("disabled", state.getInName());
         assertEquals("DISABLED", state.name());
         assertEquals("DISABLED", state.toString());
         assertEquals(0, state.ordinal());
-        
+
         assertNull(fixture.getAddress());
         assertNull(fixture.getOffset());
         assertNull(fixture.getSymbol());
@@ -93,7 +93,7 @@ public class ProbeEventInfoTest extends TestCase {
      */
     public void testEventInfoCopy() {
         ProbeEventInfo info = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
-        
+
         assertEquals(fEventInfo1.getName(), info.getName());
         assertEquals(fEventInfo1.getEventType(), info.getEventType());
         assertEquals(fEventInfo1.getState(), info.getState());
@@ -115,13 +115,13 @@ public class ProbeEventInfoTest extends TestCase {
             // Success
         }
     }
-    
+
     /**
-     *  Getter/Setter tests 
+     *  Getter/Setter tests
      */
     public void testGetAndSetter() {
         ProbeEventInfo fixture = new ProbeEventInfo("event");
-        
+
         fixture.setAddress("0xc12344321");
         String result = fixture.getAddress();
 
@@ -159,7 +159,7 @@ public class ProbeEventInfoTest extends TestCase {
         assertTrue("equals", !fEventInfo1.equals(fEventInfo2));
         assertTrue("equals", !fEventInfo2.equals(fEventInfo1));
     }
-    
+
     public void testEqualsSymmetry() {
         ProbeEventInfo info1 = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
         ProbeEventInfo info2 = new ProbeEventInfo((ProbeEventInfo)fEventInfo2);
@@ -170,7 +170,7 @@ public class ProbeEventInfoTest extends TestCase {
         assertTrue("equals", info2.equals(fEventInfo2));
         assertTrue("equals", fEventInfo2.equals(info2));
     }
-    
+
     public void testEqualsTransivity() {
         ProbeEventInfo info1 = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
         ProbeEventInfo info2 = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
@@ -180,12 +180,12 @@ public class ProbeEventInfoTest extends TestCase {
         assertTrue("equals", info2.equals(info3));
         assertTrue("equals", info1.equals(info3));
     }
-    
+
     public void testEqualsNull() {
         assertTrue("equals", !fEventInfo1.equals(null));
         assertTrue("equals", !fEventInfo2.equals(null));
     }
-    
+
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------
