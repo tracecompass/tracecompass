@@ -235,6 +235,12 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     @Override
     protected synchronized ITmfContext armRequest(final ITmfDataRequest<T> request) {
+        
+        // Make sure we have something to read from
+        if (fTraces == null) {
+            return null;
+        }
+        
         if (request instanceof ITmfEventRequest<?>
             && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
             && request.getIndex() == 0)
