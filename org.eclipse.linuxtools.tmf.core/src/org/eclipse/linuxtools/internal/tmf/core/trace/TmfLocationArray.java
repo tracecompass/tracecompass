@@ -70,7 +70,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
         ITmfLocation<? extends Comparable<?>>[] clones = (ITmfLocation<? extends Comparable<?>>[]) new ITmfLocation<?>[fLocations.length];
         for (int i = 0; i < fLocations.length; i++) {
             ITmfLocation<?> location = fLocations[i];
-            clones[i] = (location != null) ? location : null;
+            clones[i] = (location != null) ? location.clone() : null;
         }
         return new TmfLocationArray(clones);
     }
