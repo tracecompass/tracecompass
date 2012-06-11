@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
@@ -23,10 +23,11 @@ import org.junit.Test;
 
 /**
  * Tests for the LTTng 2.0 kernel state provider
- * 
+ *
  * @author alexmont
  *
  */
+@SuppressWarnings("javadoc")
 public class CtfKernelStateInputTest {
 
     static IStateChangeInput input;

@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
@@ -37,11 +37,11 @@ import org.junit.Test;
 /**
  * Unit tests for the StateHistorySystem, which uses a full (non-partial)
  * history and the non-threaded CTF kernel handler.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class StateSystemFullHistoryTest {
 
     static File stateFile;
@@ -83,15 +83,15 @@ public class StateSystemFullHistoryTest {
     /**
      * Rebuild independently so we can benchmark it. Too bad JUnit doesn't allow
      * us to @Test the @BeforeClass...
-     * 
-     * @throws IOException 
-     * @throws TmfTraceException 
+     *
+     * @throws IOException
+     * @throws TmfTraceException
      */
     @Test
     public void testBuild() throws TmfTraceException {
         IStateChangeInput input2;
         IStateSystemQuerier ssb2;
-        
+
         input2 = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
         ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2, true);
 
@@ -201,7 +201,7 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException {
 
         List<ITmfStateInterval> intervals;
-        
+
         int quark = ssq.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
         long ts1 = ssq.getStartTime(); /* start of the trace */
         long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid, but ignored */
@@ -234,7 +234,7 @@ public class StateSystemFullHistoryTest {
 
     /**
      * Ask for a time range outside of the trace's range
-     * 
+     *
      * @throws TimeRangeException
      */
     @Test(expected = TimeRangeException.class)
@@ -293,7 +293,7 @@ public class StateSystemFullHistoryTest {
 
     /**
      * Ask for a non-existing attribute
-     * 
+     *
      * @throws AttributeNotFoundException
      */
     @Test(expected = AttributeNotFoundException.class)
@@ -304,7 +304,7 @@ public class StateSystemFullHistoryTest {
 
     /**
      * Query but with the wrong State Value type
-     * 
+     *
      * @throws StateValueTypeException
      * @throws AttributeNotFoundException
      * @throws TimeRangeException
