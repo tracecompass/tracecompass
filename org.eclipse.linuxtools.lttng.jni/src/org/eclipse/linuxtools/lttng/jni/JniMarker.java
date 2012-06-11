@@ -1,12 +1,12 @@
 package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -20,23 +20,23 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniMarkerException;
 
 /**
  * <b><u>JniMarker</u></b><p>
- * 
+ *
  * A JniMarker contain information how to interpret the unparsed content (payload) of an event.<br>
  * Each JniMarker contains several MarkerFields for each fields in the event's payload.
- * 
- * Provides access to the marker_info C structure (from LTT) in java. 
- * 
+ *
+ * Provides access to the marker_info C structure (from LTT) in java.
+ *
  * Most important fields in the JniMarker are :
  * <ul>
  * <li> the name of the marker in String
  * <li> an overview of the marker format (in C style printf format)
  * <li> a reference to an ArrayList that contains MarkerFields object of this JniMarker
  * </ul>
- * 
+ *
  * <b>NOTE</b><p>
  * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<br>
  * Please look at the abstract functions to override at the bottom of this file.<p>
- * 
+ *
  */
 public abstract class JniMarker extends Jni_C_Common
 {
@@ -45,7 +45,7 @@ public abstract class JniMarker extends Jni_C_Common
 
     private String name = ""; //$NON-NLS-1$
     private String formatOverview = ""; //$NON-NLS-1$
-    
+
     // These two contains hold references to the same MarkerField object
     //  The ArrayList can be used to efficiently find a field by its position
     //  The HashMap can be used to find a field by its name
@@ -53,7 +53,7 @@ public abstract class JniMarker extends Jni_C_Common
     private ArrayList<JniMarkerField> markerFieldsArrayList = null;
 
     // Native access method
-    protected native String ltt_getName(int libId, long markerPtr);   
+    protected native String ltt_getName(int libId, long markerPtr);
     protected native String ltt_getFormatOverview(int libId, long markerPtr);
     protected native long ltt_getSize(int libId, long markerPtr);
     protected native short ltt_getLargestAlign(int libId, long markerPtr);
@@ -73,11 +73,11 @@ public abstract class JniMarker extends Jni_C_Common
      */
     protected JniMarker() {
     }
-    
+
     /**
      * Copy constructor.<p>
-     * 
-     * @param oldMarker Reference to the JniMarker you want to copy. 
+     *
+     * @param oldMarker Reference to the JniMarker you want to copy.
      */
     public JniMarker(JniMarker oldMarker) {
         thisMarkerPtr = oldMarker.thisMarkerPtr;
@@ -89,11 +89,13 @@ public abstract class JniMarker extends Jni_C_Common
     }
 
     /**
-     * Constructor, using pointer.<p>
-     * 
-     * @param newMarkerPtr  Pointer to a C marker_info structure
-     * 
+     * Constructor, using pointer.
+     * <p>
+     *
+     * @param newMarkerPtr
+     *            Pointer to a C marker_info structure
      * @exception JniException
+     *                If the JNI call fails
      */
     public JniMarker(Jni_C_Pointer_And_Library_Id newMarkerPtr) throws JniException {
         thisMarkerPtr = newMarkerPtr;
@@ -104,29 +106,27 @@ public abstract class JniMarker extends Jni_C_Common
         populateMarkerInformation();
     }
 
-    
-    /* 
+
+    /**
      * This function populates the marker data with data from LTT
-     * 
      */
     private void populateMarkerInformation() throws JniException {
         if (thisMarkerPtr.getPointer() == NULL) {
             throw new JniMarkerException("Pointer is NULL, trace closed? (populateMarkerInformatOverviewion)"); //$NON-NLS-1$
-        } else {
-            name = ltt_getName(thisMarkerPtr.getLibraryId(), thisMarkerPtr.getPointer());
-            formatOverview = ltt_getFormatOverview(thisMarkerPtr.getLibraryId(),  thisMarkerPtr.getPointer());
-            // To fill the markerFieldArray is a bit different
-            ltt_getAllMarkerFields(thisMarkerPtr.getLibraryId(),  thisMarkerPtr.getPointer());
         }
+        name = ltt_getName(thisMarkerPtr.getLibraryId(), thisMarkerPtr.getPointer());
+        formatOverview = ltt_getFormatOverview(thisMarkerPtr.getLibraryId(),  thisMarkerPtr.getPointer());
+        // To fill the markerFieldArray is a bit different
+        ltt_getAllMarkerFields(thisMarkerPtr.getLibraryId(),  thisMarkerPtr.getPointer());
     }
 
-    /* 
+    /**
      * Fills a map of all the JniMarkerField associated with this JniMarker.
-     * 
+     *
      * Note: This function is called from C and there is no way to propagate
      * exception back to the caller without crashing JNI. Therefore, it MUST
      * catch all exceptions.
-     * 
+     *
      * @param markerName        Name of the parent marker
      * @param markerFieldPtr    C Pointer (converted in long) to marker_field C Structure
      */
@@ -137,62 +137,83 @@ public abstract class JniMarker extends Jni_C_Common
             JniMarkerField newMarkerField = allocateNewJniMarkerField( new Jni_C_Pointer_And_Library_Id(thisMarkerPtr.getLibraryId(), markerFieldPtr));
             markerFieldsArrayList.add(newMarkerField);
             markerFieldsHashMap.put(markerFieldName, newMarkerField);
-            
+
         } catch (JniException e) {
             printlnC(thisMarkerPtr.getLibraryId(), "Failed to add marker field " + markerFieldName + " to marker fields list!(addMarkerFieldFromC)\n\tException raised : " + e.toString() ); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
-    // Access to class variable. Most of them doesn't have setter
+    // Access to class variables. Most of them doesn't have setters
+
+    /**
+     * Get the name of this marker
+     *
+     * @return The name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get the format overview
+     *
+     * @return The format overview, as one string
+     */
     public String getFormatOverview() {
         return formatOverview;
     }
 
+    /**
+     * Get the marker fields as a hashmap
+     *
+     * @return The map of fields
+     */
     public HashMap<String,JniMarkerField> getMarkerFieldsHashMap() {
         return markerFieldsHashMap;
     }
-    
+
+    /**
+     * Get the marker fields as an array list
+     *
+     * @return The array list of fields
+     */
     public ArrayList<JniMarkerField> getMarkerFieldsArrayList() {
         return markerFieldsArrayList;
     }
-    
+
     /**
      * Pointer to the marker_info C structure.<p>
-     * 
+     *
      * The pointer should only be used <u>INTERNALY</u>, do not use unless you
      * know what you are doing.<p>
-     * 
+     *
      * @return The actual (long converted) pointer or NULL
-     * 
+     *
      * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public Jni_C_Pointer_And_Library_Id getMarkerPtr() {
         return thisMarkerPtr;
     }
-    
-    
+
+
     /**
-     * Print information for this JniMarker. 
+     * Print information for this JniMarker.
      * <u>Intended to debug</u><br>
-     * 
-     * This function will call Ltt to print, so information printed will be the one from 
+     *
+     * This function will call Ltt to print, so information printed will be the one from
      * the C structure, not the one populated in java.<p>
-     * 
+     *
      * This function will not throw but will complain loudly if pointer is NULL
      */
     public void printMarkerInformation() {
         ltt_printMarker(thisMarkerPtr.getLibraryId(), thisMarkerPtr.getPointer());
     }
-    
+
     /**
-     * Print information for ALL marker fields for this marker. 
+     * Print information for ALL marker fields for this marker.
      * <u>Intended to debug</u><br>
-     * 
-     * This function will call Ltt to print, so information printed will be the one from 
+     *
+     * This function will call Ltt to print, so information printed will be the one from
      * the C structure, not the one populated in java.
      */
     public void printAllMarkerFieldsInformation() {
@@ -202,11 +223,11 @@ public abstract class JniMarker extends Jni_C_Common
             printlnC(thisMarkerPtr.getLibraryId(), allMarkersField[pos].toString());
         }
     }
-    
+
     /**
-     * toString() method. 
+     * toString() method.
      * <u>Intended to debug</u><br>
-     * 
+     *
      * @return Attributes of the object concatenated in String
      */
     @Override
@@ -217,16 +238,16 @@ public abstract class JniMarker extends Jni_C_Common
         returnData += "name                    : " + name + "\n";
         returnData += "formatOverview          : " + formatOverview + "\n";
         returnData += "markerFieldArrayList    : " + markerFieldsArrayList.hashCode() + " (size : " + markerFieldsArrayList.size() + " )" + "\n";
-        
+
         return returnData;
     }
-    
-    
+
+
     // ****************************
     // **** ABSTRACT FUNCTIONS ****
     // You MUST override those in your version specific implementation
-	
-	
+
+
 	/**
      * Function place holder to allocate a new JniMarkerField.<p>
      * <br>
@@ -234,16 +255,16 @@ public abstract class JniMarker extends Jni_C_Common
      * Effect of this function should be the same (allocate a fresh new JniMarkerField).<br>
      * <br>
      * <b>!! Override this with you version specific implementation.</b><br>
-     * 
+     *
      * @param newMarkerFieldPtr		The pointer and library id of an already opened marker_field C Structure
-     * 
+     *
      * @return						The newly allocated JniMarkerField of the correct version
-     * 
+     *
      * @throws JniException			The construction (allocation) failed.
-     * 
+     *
      * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      * @see org.eclipse.linuxtools.lttng.jni.JniMarkerField
      */
     public abstract JniMarkerField allocateNewJniMarkerField(Jni_C_Pointer_And_Library_Id newMarkerFieldPtr) throws JniException;
-    
+
 }
