@@ -389,7 +389,7 @@ public class TmfTraceTest extends TestCase {
         assertTrue("validate", trace.validate(null, testfile.getPath()));
 
         // InitTrace and wait for indexing completion...
-        trace.initTrace(null, testfile.getPath(), TmfEvent.class);
+        trace.initTrace(null, testfile.toURI().getPath(), TmfEvent.class);
         trace.indexTrace();
         int nbSecs = 0;
         while (trace.getNbEvents() < NB_EVENTS && nbSecs < 10) {
