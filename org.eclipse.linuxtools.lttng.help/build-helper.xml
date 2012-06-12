@@ -6,7 +6,7 @@
 
 	<!-- Set correct values -->
     <property name="help.doc.url.base" value="http://wiki.eclipse.org" />
-    <property name="ug.path"  value="Linux_Tools_Project/LTTng/User_Guide" />
+    <property name="ug.path"  value="Linux_Tools_Project/LTTng2/User_Guide" />
     <property name="ug.title" value="LTTng Plug-in User Guide" />
 
 	<!-- Replace dir with the dir you have eclipse installed into.-->
@@ -30,7 +30,7 @@
 = Updating This Document =
 
 This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit 
-http://wiki.eclipse.org/Linux_Tools_Project/LTTng/User_Guide .
+http://wiki.eclipse.org/Linux_Tools_Project/LTTng2/User_Guide.
                  </pageAppendum>
         </mediawiki-to-eclipse-help>
         <antcall target="test" />

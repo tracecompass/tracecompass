@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>LTTng Plug-in User Guide - How to use LTTng to diagnose problems</title>
+		<link type="text/css" rel="stylesheet" href="../../../book.css"/>
+	</head>
+	<body>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<th style="width: 100%" align="center" colspan="3">How to use LTTng to diagnose problems</th>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="Limitations.html" title="Limitations">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right">
+					<a href="References.html" title="References">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">Limitations</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">References</td>
+			</tr>
+		</table><hr/>
+		<h1 id="How_to_use_LTTng_to_diagnose_problems">How to use LTTng to diagnose problems</h1>
+		<p>LTTng is a tracer, it will give an enormous amount of information about the system it is running on. This means it can solve many types of problems.</p>
+		<p>The following are examples of problems that can be solved with a tracer. </p>
+		<h2 id="Random_stutters">Random stutters</h2>
+		<p>Bob is running a computer program and it stutters periodically every 2 minutes. The CPU load is relatively low and Bob isn't running low on RAM.</p>
+		<p>He decides to trace his complete system for 10 minutes. He opens the LTTng view in eclipse. From the control, he creates a session and enables all kernel tracepoints.</p>
+		<p>He now has a 10 GB trace file. He imports the trace to his viewer and loads it up.</p>
+		<p>A cursory look at the histogram bar on the bottom show relatively even event distribution, there are no interesting spikes, so he will have to dig deeper to find the issue. If he had seen a spike every 2 minutes, there would be strong chances this would be the first thing to investigate as it would imply a lot of kernel activity at the same period as his glitch, this would have been a path to investigate.</p>
+		<p>As Bob suspects that he may be having some hardware raising IRQs or some other hardware based issue and adding delays. He looks at the ressource view and doesn't see anything abnormal.</p>
+		<p>Bob did note an exact second one glitch occured: 11:58:03. He zooms into the time range or 11:58:02-11:58:04 using the histogram.He is happy to see the time is human readable local wall clock time and no longer in "nanseconds since the last reboot". 
+			<br/>In the resource view, once again, he sees many soft irqs being raised at the same time, around the time his gui would freeze. He changes views and looks at the control flow view at that time and sees a process spending a lot of time in the kernel: FooMonitor- his temperature monitoring software.
+		</p>
+		<p>At this point he closes FooMonitor and notices the bug dissapeared. He could call it a day but he wants to see what was causing the system to freeze. He cannot justify closing a piece of software without understanding the issue. It may be a conflict that HIS software is causing after all.</p>
+		<p>The system freezes around the time this program is running. He clicks on the process in the control flow view and looks at the corresponding events in the detailed events view. He sees: open - read - close repeated hundreds of times on the same file. The file being read was /dev/HWmonitor. He sends a report to the FooMonitor team and warns his team that FooMonitor was glitching their performance.</p>
+		<p>The FooMonitor team finds that they were calling a system bus call that would halt a cpu while reading the temperature so that the core would not induce an 0.1 degree error in the reading, by disabling this feature, they improve their software and stop the glitches from occurring on their custommer's machine. They also optimize their code to open the file read and clone it once.</p>
+		<p>By using system wide kernel tracing, even without deep kernel knowledge Bob was able to isolate a bug in a rogue piece of software in his system.</p>
+		<h2 id="Slow_I.2FO">Slow I/O</h2>
+		<p>Alice is running her server. She noticed that one of her nodes was slowing down, and wasn't sure why, upon reading the trace she noticed that her time between a block request and complete was around 10ms.</p>
+		<p>This is abnormal, normally her server handles IOs in under 100us, since they are quite local.</p>
+		<p>She walks up to the server and hears the hard drive thrashing, This prompts her to look up in the events view the sectors being read in the block complete requests. There are her requests interleaved with other ones at the opposite side of the hard drive.</p>
+		<p>She sees the tracer writing but there is another process that is writing to the server disk non stop. She looks in the control flow view and sees that there's a program from another fellow engineer, "Wally" that is writing in his home in a loop "All work and no play makes Jack a dull boy.".</p>
+		<p>Alice kills the program, and immediately the server speeds up. She then goes to discuss this with Wally and implements strict hard disk quotas on the server.</p><hr/>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="Limitations.html" title="Limitations">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center">
+					<a href="User-Guide.html" title="LTTng Plug-in User Guide">
+						<img alt="LTTng Plug-in User Guide" border="0" src="../../../images/home.gif"/>
+					</a>
+				</td>
+				<td style="width: 20%" align="right">
+					<a href="References.html" title="References">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">Limitations</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">References</td>
+			</tr>
+		</table>
+	</body>
+</html>

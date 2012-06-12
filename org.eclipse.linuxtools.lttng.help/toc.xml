@@ -1,96 +1,109 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<toc topic="Linux_Tools_Project/LTTng/User_Guide/User-Guide.html" label="LTTng Plug-in User Guide">
-	<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Guide.html" label="LTTng Plug-in User Guide">
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Guide.html" label="Introduction">
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Guide.html#About_Tracing" label="About Tracing"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Guide.html#Traces_and_Experiments" label="Traces and Experiments"></topic>
+<toc topic="Linux_Tools_Project/LTTng2/User_Guide/User-Guide.html" label="LTTng Plug-in User Guide">
+	<topic href="Linux_Tools_Project/LTTng2/User_Guide/User-Guide.html" label="LTTng Plug-in User Guide">
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/User-Guide.html" label="Overview">
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/User-Guide.html#About_Tracing" label="About Tracing"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/User-Guide.html#LTTng_integration" label="LTTng integration"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/User-Guide.html#Features" label="Features"></topic>
 		</topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html" label="Getting Started">
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Installing_the_LTTng_parsing_library" label="Installing the LTTng parsing library"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Downloading_Sample_Traces" label="Downloading Sample Traces"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Installation_of_the_LTTng_Agent" label="Installation of the LTTng Agent"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Installation_Verification" label="Installation Verification"></topic>
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/Installation.html" label="Installation">
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/Installation.html#LTTng_Tracer" label="LTTng Tracer"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/Installation.html#LTTng_Eclipse_Plug-ins" label="LTTng Eclipse Plug-ins"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/Installation.html#LTTng_Eclipse_Dependencies" label="LTTng Eclipse Dependencies"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/Installation.html#Installation_Verification" label="Installation Verification"></topic>
 		</topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html" label="LTTng Perspective">
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Project_View" label="Project View">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Creating_a_Project" label="Creating a Project"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Importing_Traces_in_a_Project" label="Importing Traces in a Project"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Drag_and_Drop" label="Drag and Drop"></topic>
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html" label="LTTng">
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Tracing_Perspective" label="Tracing Perspective"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Project_View" label="Project View">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Creating_a_Tracing_Project" label="Creating a Tracing Project"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Importing_Traces_in_a_Project" label="Importing Traces in a Project"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Selecting_a_Trace_Type" label="Selecting a Trace Type"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Creating_a_Experiment" label="Creating a Experiment"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Selecting_Traces_for_an_Experiment" label="Selecting Traces for an Experiment"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Removing_Traces_from_an_Experiment" label="Removing Traces from an Experiment"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Renaming_a_Trace_or_Experiment" label="Renaming a Trace or Experiment"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Copying_a_Trace_or_Experiment" label="Copying a Trace or Experiment"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Deleting_a_Trace_or_Experiment" label="Deleting a Trace or Experiment"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Deleting_Supplementary_Files" label="Deleting Supplementary Files"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Opening_a_Trace_or_Experiment" label="Opening a Trace or Experiment"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Drag_and_Drop" label="Drag and Drop"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Events_View" label="Events View">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Searching_and_Filtering" label="Searching and Filtering">
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Searching" label="Searching"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Filtering" label="Filtering"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Bookmarking" label="Bookmarking"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Events_View" label="Events View">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Searching_and_Filtering" label="Searching and Filtering">
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Searching" label="Searching"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Filtering" label="Filtering"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Bookmarking" label="Bookmarking"></topic>
 				</topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Histogram_View" label="Histogram View"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Control_Flow_View" label="Control Flow View">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Mouse_Control" label="Mouse Control"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Histogram_View" label="Histogram View"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Statistics_View" label="Statistics View"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Colors_View" label="Colors View"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Filters_View" label="Filters View"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Time_Chart_View" label="Time Chart View"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Environment_Variables_View" label="Environment Variables View"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Custom_Parser" label="Custom Parser">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Creating_a_custom_text_parser" label="Creating a custom text parser"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Creating_a_custom_XML_parser" label="Creating a custom XML parser"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Managing_custom_parsers" label="Managing custom parsers"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Opening_a_trace_using_a_custom_parser" label="Opening a trace using a custom parser"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Resources_View" label="Resources View">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Mouse_Control_2" label="Mouse Control"></topic>
-			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Statistics_View" label="Statistics View"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Latency_View" label="Latency View">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Latency_vs_Time_Graph" label="Latency vs Time Graph"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Latency_Distribution" label="Latency Distribution"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Mouse_Control_3" label="Mouse Control"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Tool_Bar_Menu" label="Tool Bar Menu"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#LTTng_Tracer_Control" label="LTTng Tracer Control">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Control_View" label="Control View">
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Creating_a_New_Connection_to_a_Remote_Host" label="Creating a New Connection to a Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Disconnecting_from_a_Remote_Host" label="Disconnecting from a Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Connecting_to_a_Remote_Host" label="Connecting to a Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Deleting_to_a_Remote_Host_Connection" label="Deleting to a Remote Host Connection"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Creating_a_Tracing_Session" label="Creating a Tracing Session"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Channels_-_General" label="Enabling Channels - General"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Channels_On_Session_Level" label="Enabling Channels On Session Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Channels_On_Domain_Level" label="Enabling Channels On Domain Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_and_Disabling_Channels" label="Enabling and Disabling Channels"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Events_-_General" label="Enabling Events - General"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Kernel_Events_On_Session_Level" label="Enabling Kernel Events On Session Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_UST_Events_On_Session_Level" label="Enabling UST Events On Session Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Events_On_Domain_Level" label="Enabling Events On Domain Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Events_On_Channel_Level" label="Enabling Events On Channel Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_and_Disabling_Events" label="Enabling and Disabling Events"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Enabling_Tracepoint_Events_From_Provider" label="Enabling Tracepoint Events From Provider"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Adding_Contexts_to_Channels_and_Events_of_a_Domain" label="Adding Contexts to Channels and Events of a Domain"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Adding_Contexts_to_All_Events_of_a_Channel" label="Adding Contexts to All Events of a Channel"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Adding_Contexts_to_a_Event_of_a_Specific_Channel" label="Adding Contexts to a Event of a Specific Channel"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Start_Tracing" label="Start Tracing"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Stop_Tracing" label="Stop Tracing"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Destroying_a_Tracing_Session" label="Destroying a Tracing Session"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Refreshing_the_Node_Information" label="Refreshing the Node Information"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Quantifing_LTTng_overhead_.28Calibrate.29" label="Quantifing LTTng overhead (Calibrate)"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Importing_Session_Traces_to_a_Tracing_Project" label="Importing Session Traces to a Tracing Project"></topic>
+				</topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Properties_View" label="Properties View"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#LTTng_Tracer_Control_Preferences" label="LTTng Tracer Control Preferences"></topic>
 			</topic>
 		</topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html" label="LTTng Tracer Control">
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#LTTng_Tracer_Control_.28LTTng_Tracer_Toolchain_v0.x.29" label="LTTng Tracer Control (LTTng Tracer Toolchain v0.x)">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Remote_Systems_View" label="Remote Systems View">
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Create_a_Remote_Connection" label="Create a Remote Connection"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#General" label="General"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Connect_to_Remote_Host" label="Connect to Remote Host"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Configure_Kernel_Markers" label="Configure Kernel Markers"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Create_a_New_Kernel_Trace" label="Create a New Kernel Trace"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Configure_a_Trace_and_Trace_Channels" label="Configure a Trace and Trace Channels"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Start_a_Trace" label="Start a Trace"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Pause_a_Trace" label="Pause a Trace"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Stop_a_Trace" label="Stop a Trace"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Import_a_Trace_in_the_LTTng_Perspective" label="Import a Trace in the LTTng Perspective"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Delete_a_Trace" label="Delete a Trace"></topic>
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html" label="LTTng Kernel Analysis">
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#LTTng_Kernel_Perspective" label="LTTng Kernel Perspective"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Control_Flow_View" label="Control Flow View">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#.3Cspan_style.3D.22color:_.23C84545.3B.22.3EProcess_tree.3C.2Fspan.3E_and_.3Cspan_style.3D.22color:_.23A1C81A.3B.22.3Einformations.3C.2Fspan.3E" label="&lt;span style=&quot;color: #C84545;&quot;&quot;Process tree&lt;/span&quot; and &lt;span style=&quot;color: #A1C81A;&quot;&quot;informations&lt;/span&quot;"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#.3Cspan_style.3D.22color:_.2367A3DC.3B.22.3E.3Cspan_id.3D.22anc-cfw-states-flow.22.3EStates_flow.3C.2Fspan.3E.3C.2Fspan.3E" label="&lt;span style=&quot;color: #67A3DC;&quot;&quot;&lt;span id=&quot;anc-cfw-states-flow&quot;&quot;States flow&lt;/span&quot;&lt;/span&quot;">
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Using_the_mouse" label="Using the mouse"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Incomplete_regions" label="Incomplete regions"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Zoom_region" label="Zoom region"></topic>
+					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Tooltips" label="Tooltips"></topic>
 				</topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Property_View" label="Property View"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#.3Cspan_style.3D.22color:_.23AD77D7.3B.22.3E.3Cspan_id.3D.22anc-cfw-toolbar.22.3EToolbar.3C.2Fspan.3E.3C.2Fspan.3E" label="&lt;span style=&quot;color: #AD77D7;&quot;&quot;&lt;span id=&quot;anc-cfw-toolbar&quot;&quot;Toolbar&lt;/span&quot;&lt;/span&quot;"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#LTTng_Tracer_Control_.28LTTng_Tracer_Toolchain_v2.0.29" label="LTTng Tracer Control (LTTng Tracer Toolchain v2.0)">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Control_View" label="Control View">
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_a_New_Connection_to_a_Remote_Host" label="Creating a New Connection to a Remote Host"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Disconnecting_from_a_Remote_Host" label="Disconnecting from a Remote Host"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Connecting_to_a_Remote_Host" label="Connecting to a Remote Host"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Deleting_to_a_Remote_Host_Connection" label="Deleting to a Remote Host Connection"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_a_Tracing_Session" label="Creating a Tracing Session"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Channels_-_General" label="Enabling Channels - General"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Channels_On_Session_Level" label="Enabling Channels On Session Level"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Channels_On_Domain_Level" label="Enabling Channels On Domain Level"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_and_Disabling_Channels" label="Enabling and Disabling Channels"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Events_-_General" label="Enabling Events - General"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Kernel_Events_On_Session_Level" label="Enabling Kernel Events On Session Level"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_UST_Events_On_Session_Level" label="Enabling UST Events On Session Level"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Events_On_Domain_Level" label="Enabling Events On Domain Level"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Events_On_Channel_Level" label="Enabling Events On Channel Level"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_and_Disabling_Events" label="Enabling and Disabling Events"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Tracepoint_Events_From_Provider" label="Enabling Tracepoint Events From Provider"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Adding_Contexts_to_Channels_and_Events_of_a_Domain" label="Adding Contexts to Channels and Events of a Domain"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Adding_Contexts_to_All_Events_of_a_Channel" label="Adding Contexts to All Events of a Channel"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Adding_Contexts_to_a_Event_of_a_Specific_Channel" label="Adding Contexts to a Event of a Specific Channel"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Start_Tracing" label="Start Tracing"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Stop_Tracing" label="Stop Tracing"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Destroying_a_Tracing_Session" label="Destroying a Tracing Session"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Refreshing_the_Node_Information" label="Refreshing the Node Information"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Quantifing_LTTng_overhead_.28Calibrate.29" label="Quantifing LTTng overhead (Calibrate)"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Importing_Session_Traces_to_a_Tracing_Project" label="Importing Session Traces to a Tracing Project"></topic>
-				</topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Property_View_2" label="Property View"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#LTTng_Trace_Control_Preferences" label="LTTng Trace Control Preferences"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Resources_View" label="Resources View">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Navigation" label="Navigation"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Incomplete_regions_2" label="Incomplete regions"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Toolbar" label="Toolbar"></topic>
 			</topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Events_View_2" label="Events View"></topic>
 		</topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/Limitations.html" label="Limitations"></topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/CTF-Parser.html" label="CTF Parser"></topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/References.html" label="References"></topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/Updating-This-Document.html" label="Updating This Document"></topic>
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/Limitations.html" label="Limitations"></topic>
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/How-to-use-LTTng-to-diagnose-problems.html" label="How to use LTTng to diagnose problems">
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/How-to-use-LTTng-to-diagnose-problems.html#Random_stutters" label="Random stutters"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/How-to-use-LTTng-to-diagnose-problems.html#Slow_I.2FO" label="Slow I/O"></topic>
+		</topic>
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/References.html" label="References"></topic>
+		<topic href="Linux_Tools_Project/LTTng2/User_Guide/Updating-This-Document.html" label="Updating This Document"></topic>
 	</topic>
 </toc>

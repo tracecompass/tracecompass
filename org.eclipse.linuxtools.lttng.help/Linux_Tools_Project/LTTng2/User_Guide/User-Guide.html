@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>LTTng Plug-in User Guide</title>
+		<link type="text/css" rel="stylesheet" href="../../../book.css"/>
+	</head>
+	<body>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<th style="width: 100%" align="center" colspan="3">LTTng Plug-in User Guide</th>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left"></td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right">
+					<a href="Installation.html" title="Installation">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top"></td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">Installation</td>
+			</tr>
+		</table><hr/>
+		<h1 id="Overview">Overview</h1>
+		<p>LTTng (Linux Trace Toolkit, next generation) is a highly efficient tracing tool for Linux that can be used to track down kernel and application performance issues as well as troubleshoot problems involving multiple concurrent processes and threads. It consists of a set of kernel modules, daemons - to collect the raw tracing data - and a set of tools to control, visualize and analyze the generated data. It also provides support for user space application instrumentation.</p>
+		<p>For more information about LTTng, refer to the project 
+			<a href="http://lttng.org">site</a>
+		</p>
+		<p>
+			<b>Note</b>: This User Guide covers the integration of the latest LTTng (v2.0) in Eclipse. The legacy version (v0.x) of both the tracer and the LTTng integration are no longer being maintained but are still available for download. The User Guide for the legacy LTTng integration is available 
+			<a href="http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng/User_Guide">here</a>.
+		</p>
+		<p>The latest version of this User Guide can be found 
+			<a href="http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng2/User_Guide">here</a>.
+		</p>
+		<h2 id="About_Tracing">About Tracing</h2>
+		<p>Tracing is a troubleshooting technique used to understand the behavior of an instrumented application by collecting information on its execution path. A tracer is the software used for tracing. Tracing can be used to troubleshoot a wide range of bugs that are otherwise extremely challenging. These include, for example, performance problems in complex parallel systems or real-time systems.</p>
+		<p>Tracing is similar to logging: it consists in recording events that happen in a system at selected execution locations. However, compared to logging, it is generally aimed at developers and it usually records low-level events at a high rate. Tracers can typically generate thousands of events per second. The generated traces can easily contain millions of events and have sizes from many megabytes to tens of gigabytes. Tracers must therefore be optimized to handle a lot of data while having a small impact on the system.</p>
+		<p>Traces may include events from the operating system kernel (IRQ handler entry/exit, system call entry/exit, scheduling activity, network activity, etc). They can also consists of application events (a.k.a UST - User Space Tracing) or a mix of the two.</p>
+		<p>For the maximum level of detail, tracing events may be viewed like a log file. However, trace analyzers and viewers are available to derive useful information from the raw data. These programs must be specially designed to handle quickly the enormous amount of data a trace may contain.</p>
+		<h2 id="LTTng_integration">LTTng integration</h2>
+		<p>The LTTng plug-in for Eclipse provides an Eclipse integration for the control of the LTTng tracer as well as fetching and visualization of the traces produced. It also provides the foundation for user-defined analysis tools.</p>
+		<p>The LTTng Eclipse plug-in provides the following views:</p>
+		<ul>
+			<li>
+				<i>Project</i> - an extension to the standard Eclipse Project view tailored for tracing projects
+			</li>
+			<li>
+				<i>Control</i> - to control the tracer and configure the tracepoints
+			</li>
+			<li>
+				<i>Events</i> - a versatile view that presents the raw events in tabular format with support for searching, filtering and bookmarking
+			</li>
+			<li>
+				<i>Statistics</i> - a view that that provides simple statistics on event occurrences by type
+			</li>
+			<li>
+				<i>Histogram</i> - a view that displays the event density with respect to time in traces
+			</li>
+		</ul>
+		<p>These views can be extended or tailored for specific trace types (e.g. kernel, HW, user app).</p>
+		<p>At present, the LTTng Eclipse plug-in for Eclipse supports the following kernel-oriented analysis:</p>
+		<ul>
+			<li>
+				<i>Control Flow</i> - to visualize processes state transitions
+			</li>
+			<li>
+				<i>Resources</i> - to visualize system resources state transitions
+			</li>
+		</ul>
+		<p>Although the control and fetching parts are targeted at the LTTng tracer, the underlying framework can also be used to process any trace that complies with the 
+			<i>Common Trace Format</i> (
+			<a href="http://www.efficios.com/ctf">CTF</a>). CTF specifies a very efficient and compact binary trace format that is meant to be application-, architecture-, and language-agnostic.
+		</p>
+		<h2 id="Features">Features</h2>
+		<p>The LTTng Eclipse plug-in has a number of features to allow efficient handling of very large traces (and sets of large traces):</p>
+		<ul>
+			<li>Support for arbitrarily large traces (larger than available memory)</li>
+			<li>Support for correlating multiple time-ordered traces</li>
+			<li>Support for zooming down to the nanosecond on any part of a trace or set of traces</li>
+			<li>Views synchronization of currently selected event</li>
+			<li>Efficient searching and filtering of events</li>
+			<li>Support for trace bookmarks</li>
+		</ul>
+		<p>There is also support for the integration of non-LTTng trace types:</p>
+		<ul>
+			<li>Built-in CTF parser</li>
+			<li>Dynamic creation of customized parsers (for XML and text traces)</li>
+		</ul><hr/>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<td style="width: 20%" align="left"></td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right">
+					<a href="Installation.html" title="Installation">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top"></td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">Installation</td>
+			</tr>
+		</table>
+	</body>
+</html>

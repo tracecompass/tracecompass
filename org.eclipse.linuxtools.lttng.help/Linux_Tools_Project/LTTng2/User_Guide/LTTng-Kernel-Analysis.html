@@ -1,0 +1,286 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>LTTng Plug-in User Guide - LTTng Kernel Analysis</title>
+		<link type="text/css" rel="stylesheet" href="../../../book.css"/>
+	</head>
+	<body>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<th style="width: 100%" align="center" colspan="3">LTTng Kernel Analysis</th>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="LTTng.html" title="LTTng">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right">
+					<a href="Limitations.html" title="Limitations">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">LTTng</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">Limitations</td>
+			</tr>
+		</table><hr/>
+		<h1 id="LTTng_Kernel_Analysis">LTTng Kernel Analysis</h1>
+		<p>Historically, LTTng was developped to trace the Linux kernel and, over time, a number of kernel-oriented analysis views were developped and organized in a perspective.</p>
+		<p>This section presents a description of the LTTng Kernel Perspective.</p>
+		<h2 id="LTTng_Kernel_Perspective">LTTng Kernel Perspective</h2>
+		<p>The 
+			<b>LTTng Kernel</b> perspective is built upon the 
+			<a href="LTTng.html#Tracing_Perspective">Tracing Perspective</a>, re-organizes them slightly and adds the following views: 
+		</p>
+		<ul>
+			<li>
+				<a href="LTTng-Kernel-Analysis.html#Control_Flow_View">Control Flow View</a> - to visualize processes state transitions
+			</li>
+			<li>
+				<a href="LTTng-Kernel-Analysis.html#Resources_View">Resources View</a> - to visualize system resources state transitions
+			</li>
+		</ul>
+		<p>
+			<img border="0" src="images/LTTngKernelPerspective.png"/>
+		</p>
+		<p>The perspective can be opened from the Eclipse Open Perspective dialog (
+			<b>Window &gt; Open Perspective... &gt; Other</b>).
+		</p>
+		<p>
+			<img border="0" src="images/OpenLTTngKernelPerspective.png"/>
+		</p>
+		<h2 id="Control_Flow_View">Control Flow View</h2>
+		<p>The 
+			<b>
+				<i>Control Flow View</i>
+			</b> is a LTTng-specific view that shows per-process events graphically. To enable it, select 
+			<i>Control Flow</i> under 
+			<i>LTTng</i> within the 
+			<i>Show View</i> window (
+			<b>Window</b> -&gt; 
+			<b>Show View</b> -&gt; 
+			<b>Other...</b>):
+		</p>
+		<p>
+			<img border="0" src="images/Cfv_show_view.png"/>
+		</p>
+		<p>You should get something like this:</p>
+		<p>
+			<img border="0" src="images/Cfv_global.png"/>
+		</p>
+		<p>The view is divided into the following important sections: 
+			<b><span style="color: #C84545;">process tree</span></b>, 
+			<b><span style="color: #A1C81A;">process TID, PTID and birth time</span></b>, 
+			<b><span style="color: #67A3DC;">states flow</span></b> and the 
+			<b><span style="color: #AD77D7;">toolbar</span></b>.
+		</p>
+		<p>The following sections provide detailed information for each part of the Control Flow View.</p>
+		<h3 id=".3Cspan_style.3D.22color:_.23C84545.3B.22.3EProcess_tree.3C.2Fspan.3E_and_.3Cspan_style.3D.22color:_.23A1C81A.3B.22.3Einformations.3C.2Fspan.3E"><span style="color: #C84545;">Process tree</span> and <span style="color: #A1C81A;">informations</span></h3>
+		<p>Processes are organized as a tree within this view. This way, child and parent processes are easy to identify.</p>
+		<p>
+			<img border="0" src="images/Cfv_process_tree.png"/>
+		</p>
+		<p>The layout is based on the states computed from the trace events.</p>
+		<p>A given process may be shown at different places within the tree since the nodes are 
+			<b>unique (TID, birth time) couples</b>. This means that if process B of parent A dies, you'll still see it in the tree. If process A forks process B again, it will be shown as a different node since it won't have the same birth time (and probably not the same TID). This has the advantage that the tree, once loaded, never changes: horizontal scrolling within the 
+			<a href="#anc-cfw-states-flow">states flow</a> remains possible.
+		</p>
+		<p>The TID column shows the process node's 
+			<b>thread ID</b> and the PTID column shows its 
+			<b>parent thread ID</b> (nothing is shown if the process has no parent).
+		</p>
+		<h3 id=".3Cspan_style.3D.22color:_.2367A3DC.3B.22.3E.3Cspan_id.3D.22anc-cfw-states-flow.22.3EStates_flow.3C.2Fspan.3E.3C.2Fspan.3E"><span style="color: #67A3DC;"><span id="anc-cfw-states-flow">States flow</span></span></h3>
+		<p>This part of the Control Flow View is probably the most interesting one. Using the mouse, you can navigate through the trace (go left, right) and zoom on a specific region to inspect its details.</p>
+		<p>The colored bars you see represent 
+			<b>states</b> for the associated process node. When a process state changes in time, so does the color. States colors legend is available through a 
+			<a href="#anc-cfw-toolbar">toolbar button</a>:
+		</p>
+		<p>
+			<img border="0" src="images/Cfv_legend.png"/>
+		</p>
+		<p>This dark yellow is what you'll see most of the time since scheduling puts processes on hold while others run.</p>
+		<p>The vertical blue line is the 
+			<b>current time indicator</b>.
+		</p>
+		<h4 id="Using_the_mouse">Using the mouse</h4>
+		<p>The states flow is usable with the mouse. The following actions are set:</p>
+		<ul>
+			<li>
+				<b>drag horizontally</b>: pan left or right
+			</li>
+			<li>
+				<b>click on a colored bar</b>: the associated process node is selected and the current time indicator is moved where the click happened
+			</li>
+			<li>
+				<b>mouse wheel up/down</b>: zoom in or out
+			</li>
+			<li>
+				<b>drag the time ruler horizontally</b>: zoom in or out
+			</li>
+			<li>
+				<b>drag the time ruler horizontally with the right button</b>: 
+				<a href="LTTng-Kernel-Analysis.html#Zoom_region">zoom region</a>
+			</li>
+			<li>
+				<b>double-click the time ruler</b>: reset zoom
+			</li>
+		</ul>
+		<p>When the current time indicator is changed (when clicking in the states flow), all the other views are 
+			<b>synchronized</b>. For example, the 
+			<a href="LTTng-Kernel-Analysis.html#Events_View_2">Events View</a> will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
+		</p>
+		<h4 id="Incomplete_regions">Incomplete regions</h4>
+		<p>You'll notice 
+			<b>small dots</b> over the colored bars at some places:
+		</p>
+		<p>
+			<img border="0" src="images/Cfv_small_dots.png"/>
+		</p>
+		<p>Those dots mean the underlying region is 
+			<b>incomplete</b>: there's not enough pixels to view all the events. In other words, you have to zoom in.
+		</p>
+		<p>When zooming in, small dots start to disappear:</p>
+		<p>
+			<img border="0" src="images/Cfv_zoom.png"/>
+		</p>
+		<p>When no dots are left, you are viewing 
+			<b>all the events and states</b> within that region.
+		</p>
+		<h4 id="Zoom_region">Zoom region</h4>
+		<p>To zoom in on a specific region, 
+			<b>right-click and drag the time ruler</b> in order to draw a time range:
+		</p>
+		<p>
+			<img border="0" src="images/Cfv_zoom_region.png"/>
+		</p>
+		<p>The states flow horizontal space will only show the selected region.</p>
+		<h4 id="Tooltips">Tooltips</h4>
+		<p>Hover the cursor over a colored bar and a 
+			<b>tooltip</b> will pop up:
+		</p>
+		<p>
+			<img border="0" src="images/Cfv_tooltip.png"/>
+		</p>
+		<p>The tooltip indicates:</p>
+		<ul>
+			<li>the process name</li>
+			<li>the pointed state name</li>
+			<li>the pointed state date and start/stop times</li>
+			<li>the pointed state duration (seconds)</li>
+		</ul>
+		<h3 id=".3Cspan_style.3D.22color:_.23AD77D7.3B.22.3E.3Cspan_id.3D.22anc-cfw-toolbar.22.3EToolbar.3C.2Fspan.3E.3C.2Fspan.3E"><span style="color: #AD77D7;"><span id="anc-cfw-toolbar">Toolbar</span></span></h3>
+		<p>The Control Flow View 
+			<b>toolbar</b>, located at the top right of the view, has shortcut buttons to perform common actions:
+		</p>
+		<p>
+			<img border="0" src="images/Cfv_toolbar.png"/>
+		</p>
+		<p>The 
+			<b>Previous event</b> and 
+			<b>Next event</b> buttons update the current time indicator so that it's on the previous or next event.
+		</p>
+		<p>The 
+			<b>Previous process</b> and 
+			<b>Next process</b> buttons select the previous and next process node within the process tree.
+		</p>
+		<h2 id="Resources_View">Resources View</h2>
+		<p>This view is specific to kernel trace. To open it, go in 
+			<b>Window</b> -&gt; 
+			<b>Show View</b> -&gt; 
+			<b>Other...</b> and select 
+			<b>LTTng/Resources</b> in the list.
+		</p>
+		<p>
+			<img title=" Example of resources view with all trace points and syscalls enabled" alt=" Example of resources view with all trace points and syscalls enabled" border="0" src="images/Rv_example.png"/>
+		</p>
+		<p>This view shows the state of system resources i.e. if changes occured during the trace either on 
+			<b>CPUs</b>, 
+			<b>IRQs</b> or 
+			<b>soft IRQs</b>, it will appear in this view. The left side of the view present a list of resources that are affected by at least one event of the trace. The right side illustrate the state in which each resource is at some point in time.
+		</p>
+		<p>Just like other views, according to which trace points and system calls are activated, the content of this view may change from one trace to another.</p>
+		<p>Each state are represented by one color so it is faster to say what is happening.</p>
+		<p>
+			<img title="Color for each state" alt="Color for each state" border="0" src="images/Rv_legend.png"/>
+		</p>
+		<p>To go through the state of a resource, you first have to select the resource and the timestamp that interest you. For the latter, you can pick some time before the interesting part of the trace.</p>
+		<p>
+			<img title="Shows the state of an IRQ" alt="Shows the state of an IRQ" border="0" src="images/RV_infobox1.png"/>
+		</p>
+		<p>Then, by selecting 
+			<b>Next Event</b>, it will show the next state transition and the event that occured at this time.
+		</p>
+		<p>
+			<img title="Shows the next state of the IRQ" alt="Shows the next state of the IRQ" border="0" src="images/RV_infobox2.png"/>
+		</p>
+		<p>This view is also synchronized with the others : 
+			<a href="LTTng.html#Histogram_View">histogram</a>, 
+			<a href="LTTng-Kernel-Analysis.html#Events_View_2">events view</a>, 
+			<a href="LTTng-Kernel-Analysis.html#Control_Flow_View">control flow view</a>, etc.
+		</p>
+		<h3 id="Navigation">Navigation</h3>
+		<p>See 
+			<a href="LTTng-Kernel-Analysis.html#Using_the_mouse">using the mouse </a> and 
+			<a href="LTTng-Kernel-Analysis.html#Zoom_region">zoom region </a>.
+		</p>
+		<h3 id="Incomplete_regions_2">Incomplete regions</h3>
+		<p>See 
+			<a href="LTTng-Kernel-Analysis.html#Incomplete_regions">Incomplete regions</a>.
+		</p>
+		<h3 id="Toolbar">Toolbar</h3>
+		<p>See 
+			<a href="LTTng-Kernel-Analysis.html#Toolbar">Toolbar</a>.
+		</p>
+		<h2 id="Events_View_2">Events View</h2>
+		<p>The LTTng Kernel Events View 
+			<b>is</b> the plain TMF 
+			<a href="LTTng.html#Events_View">Events Views</a> except that it provide its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
+		</p>
+		<ul>
+			<li>
+				<b>Timestamp</b>: the event timestamp
+			</li>
+			<li>
+				<b>Channel</b>: the event channel (data collector)
+			</li>
+			<li>
+				<b>Event Type</b>: the event type (or kernel marker)
+			</li>
+			<li>
+				<b>Content</b>: the raw event content 
+			</li>
+		</ul>
+		<p>
+			<img border="0" src="images/LTTngKernelEventsViewer.png"/>
+		</p><hr/>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="LTTng.html" title="LTTng">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center">
+					<a href="User-Guide.html" title="LTTng Plug-in User Guide">
+						<img alt="LTTng Plug-in User Guide" border="0" src="../../../images/home.gif"/>
+					</a>
+				</td>
+				<td style="width: 20%" align="right">
+					<a href="Limitations.html" title="Limitations">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">LTTng</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">Limitations</td>
+			</tr>
+		</table>
+	</body>
+</html>
