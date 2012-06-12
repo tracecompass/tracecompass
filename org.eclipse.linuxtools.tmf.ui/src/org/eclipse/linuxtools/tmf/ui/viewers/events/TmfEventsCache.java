@@ -26,8 +26,20 @@ import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
+/**
+ * The generic TMF Events table events cache
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfEventsCache {
 
+    /**
+     * The generic TMF Events table cached event
+     * 
+     * @version 1.0
+     * @author Patrick Tasse
+     */
     public static class CachedEvent {
         ITmfEvent event;
         long rank;

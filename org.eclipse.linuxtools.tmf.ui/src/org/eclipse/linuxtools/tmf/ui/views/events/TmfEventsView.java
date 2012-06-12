@@ -47,12 +47,21 @@ import org.eclipse.ui.ide.IGotoMarker;
 import org.osgi.framework.Bundle;
 
 /**
- * <b><u>TmfEventsView</u></b>
+ * The generic TMF Events View.
  * <p>
+ * Support for:
+ * <ul>
+ * <li>Traces larger than available memory
+ * <li>Searching and Filtering
+ * <li>Customized table viewers (per trace type)
+ * </ul>
  *
- * TODO: Implement me. Please.
  * TODO: Handle column selection, sort, ... generically (nothing less...)
  * TODO: Implement hide/display columns
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
+ * @author Patrick Tasse
  */
 public class TmfEventsView extends TmfView implements IResourceChangeListener {
 

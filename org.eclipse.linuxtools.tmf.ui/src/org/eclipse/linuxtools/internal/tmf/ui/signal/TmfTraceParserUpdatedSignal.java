@@ -16,7 +16,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 
 /**
- * <b><u>TmfTraceParserUpdatedSignal</u></b>
+ * Signal that a trace parser was updated
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
  */
 public class TmfTraceParserUpdatedSignal extends TmfSignal {
 

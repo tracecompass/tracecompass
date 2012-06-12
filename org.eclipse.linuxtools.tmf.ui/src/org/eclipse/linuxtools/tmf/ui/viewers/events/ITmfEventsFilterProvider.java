@@ -12,6 +12,12 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
 
+/**
+ * A filter/search event provider
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public interface ITmfEventsFilterProvider {
 
 	public void addEventsFilterListener (ITmfEventsFilterListener listener);

@@ -15,6 +15,12 @@ package org.eclipse.linuxtools.tmf.ui.viewers.events;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
+/**
+ * A filter/search event listener
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public interface ITmfEventsFilterListener {
 
 	public void filterApplied(ITmfFilter filter, ITmfTrace<?> trace);

@@ -16,7 +16,10 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * <b><u>TmfTraceClosedSignal</u></b>
+ * Signal that a trace was closed
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
  */
 public class TmfTraceClosedSignal extends TmfSignal {
 

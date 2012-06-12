@@ -110,7 +110,10 @@ import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.themes.ColorUtil;
 
 /**
- * <b><u>TmfEventsTable</u></b>
+ * The generic TMF Events table
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
  */
 public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorSettingsListener,
 ITmfEventsFilterProvider {
@@ -129,6 +132,12 @@ ITmfEventsFilterProvider {
     private static final String FILTER_HINT = Messages.TmfEventsTable_FilterHint;
     private static final int MAX_CACHE_SIZE = 1000;
 
+    /**
+     * The events table search/filter keys
+     * 
+     * @version 1.0
+     * @author Patrick Tasse
+     */
     public interface Key {
         String SEARCH_TXT = "$srch_txt"; //$NON-NLS-1$
         String SEARCH_OBJ = "$srch_obj"; //$NON-NLS-1$
@@ -140,6 +149,12 @@ ITmfEventsFilterProvider {
         String BOOKMARK = "$bookmark"; //$NON-NLS-1$
     }
 
+    /**
+     * The events table search/filter state
+     * 
+     * @version 1.0
+     * @author Patrick Tasse
+     */
     public static enum HeaderState {
         SEARCH, FILTER
     }

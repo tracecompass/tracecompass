@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *   Matthew Khouzam - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.environment;
 
 import java.util.ArrayList;
@@ -16,6 +27,12 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+/**
+ * Displays the CTF trace properties.
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
+ */
 public class TmfEnvironmentView extends TmfView {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.environment"; //$NON-NLS-1$

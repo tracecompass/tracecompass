@@ -12,6 +12,12 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.colors;
 
+/**
+ * A color change listener
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public interface IColorSettingsListener {
 
 	public void colorSettingsChanged(ColorSetting[] colorSettings);

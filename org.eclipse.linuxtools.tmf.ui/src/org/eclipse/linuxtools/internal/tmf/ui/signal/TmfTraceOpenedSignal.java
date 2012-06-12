@@ -18,7 +18,10 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.ITmfEventsFilterProvider;
 
 /**
- * <b><u>TmfTraceOpenedSignal</u></b>
+ * Signal that a trace was opened
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
  */
 public class TmfTraceOpenedSignal extends TmfSignal {
 
