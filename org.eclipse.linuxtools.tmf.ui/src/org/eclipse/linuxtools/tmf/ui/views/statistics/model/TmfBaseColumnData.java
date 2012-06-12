@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,32 +18,50 @@ import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * Contains all the information necessary to build a column of the table.
+ * @version 1.0 
+ * @author Mathieu Denis
  */
 public class TmfBaseColumnData implements ITmfStatisticsColumnData {
     
-    // Name of the column.
+    /**
+     * Name of the column.
+     */
     protected final String fHeader;
-    // Width of the column.
+    /**
+     * Width of the column.
+     */
     protected final int fWidth;
-    // Alignment of the column.
+    /**
+     * Alignment of the column.
+     */
     protected final int fAlignment;
-    // Tooltip of the column.
+    /**
+     * Tooltip of the column.
+     */
     protected final String fTooltip;
-    // Adapts a StatisticsTreeNode into the content of it's corresponding
-    // cell for that column.
+    /**
+     * Adapts a StatisticsTreeNode into the content of it's corresponding cell for that column.
+     */
     protected final ColumnLabelProvider fLabelProvider;
-    // Used to sort elements of this column. Can be null.
+    /**
+     * Used to sort elements of this column. Can be null.
+     */
     protected final ViewerComparator fComparator;
-    // Used to draw bar charts in this column. Can be null.
+    /**
+     * Used to draw bar charts in this column. Can be null.
+     */
     protected final ITmfColumnPercentageProvider fPercentageProvider;
     
-    // Used to draw bar charts in columns.
+    /**
+     * Used to draw bar charts in columns.
+     */
     public interface ITmfColumnPercentageProvider {
         public double getPercentage(TmfStatisticsTreeNode node);
     }
 
     /**
      * Constructor with parameters
+     * 
      * @param h header of the column. The name will be shown at the top of the column.
      * @param w width of the column.
      * @param a alignment of the text

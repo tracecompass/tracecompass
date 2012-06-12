@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 Ericsson
+ * Copyright (c) 2010, 2011, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Added supplementary files handling
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -39,8 +40,12 @@ import org.eclipse.ui.views.properties.IPropertySource2;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TmfTraceElement</u></b>
- * <p>
+ * Implementation of trace model element representing a trace. It provides methods to instantiate
+ * <code>ITmfTrace</code> and <code>ITmfEvent</code> as well as editor ID from the trace type
+ * extension definition.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfTraceElement extends TmfProjectModelElement implements IActionFilter, IPropertySource2 {
 
@@ -49,7 +54,13 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     // ------------------------------------------------------------------------
 
     // Other attributes
+    /**
+     * Bundle attribute name
+     */
     public static final String BUNDLE = "bundle"; //$NON-NLS-1$
+    /**
+     * IsLinked attribute name.
+     */
     public static final String IS_LINKED = "isLinked"; //$NON-NLS-1$
 
     // Property View stuff
@@ -92,7 +103,9 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     private static final Map<String, IConfigurationElement> sfTraceTypeAttributes = new HashMap<String, IConfigurationElement>();
     private static final Map<String, IConfigurationElement> sfTraceCategories = new HashMap<String, IConfigurationElement>();
 
-    // Initialize statically at startup
+    /**
+     *  Initialize statically at startup by getting extensions from the platform extension registry.
+     */
     public static void init() {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfTraceType.TMF_TRACE_TYPE_ID);
         for (IConfigurationElement ce : config) {
@@ -110,11 +123,23 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-
+    /**
+     * Constructor. 
+     * Creates trace model element under the trace folder.
+     * @param name The name of trace
+     * @param trace The trace resource.
+     * @param parent The parent element (trace folder)
+     */
     public TmfTraceElement(String name, IResource trace, TmfTraceFolder parent) {
         this(name, trace, (TmfProjectModelElement) parent);
     }
-
+    /**
+     * Constructor. 
+     * Creates trace model element under the experiment folder.
+     * @param name The name of trace
+     * @param trace The trace resource.
+     * @param parent The parent element (experiment folder)
+     */
     public TmfTraceElement(String name, IResource trace, TmfExperimentElement parent) {
         this(name, trace, (TmfProjectModelElement) parent);
     }
@@ -128,11 +153,18 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
+    /**
+     * Returns the trace type ID.
+     * @return trace type ID.
+     */
     public String getTraceType() {
         return fTraceTypeId;
     }
 
+    /**
+     * Refreshes the trace type filed by reading the trace type persistent property of the resource 
+     * referenece.
+     */
     public void refreshTraceType() {
         try {
             fTraceTypeId = getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
@@ -141,6 +173,11 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         }
     }
 
+    /**
+     * Instantiate a <code>ITmfTrace</code> object based on the trace type and the corresponding extension. 
+     * 
+     * @return the <code>ITmfTrace</code> or <code>null</code> for an error
+     */
     public ITmfTrace<?> instantiateTrace() {
         try {
 
@@ -172,6 +209,11 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         return null;
     }
 
+    /**
+     * Instantiate a <code>ITmfEvent</code> object based on the trace type and the corresponding extension. 
+     * 
+     * @return the <code>ITmfEvent</code> or <code>null</code> for an error
+     */
     public ITmfEvent instantiateEvent() {
         try {
             if (fTraceTypeId != null) {
@@ -199,6 +241,10 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         return null;
     }
 
+    /**
+     * Returns the optional editor ID from the trace type extension.
+     * @return the editor ID or <code>null</code> if not defined.
+     */
     public String getEditorId() {
         if (fTraceTypeId != null) {
             if (fTraceTypeId.startsWith(CustomTxtTrace.class.getCanonicalName())) {
@@ -392,7 +438,10 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     // ------------------------------------------------------------------------
     // TmfTraceElement
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getProject()
+     */
     @Override
     public TmfProjectElement getProject() {
         if (getParent() instanceof TmfTraceFolder) {
@@ -413,16 +462,28 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     // IPropertySource2
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+     */
     @Override
     public Object getEditableValue() {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
+     */
     @Override
     public Object getPropertyValue(Object id) {
 
@@ -463,19 +524,35 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         return "[no category]"; //$NON-NLS-1$
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.lang.Object)
+     */
     @Override
     public void resetPropertyValue(Object id) {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object, java.lang.Object)
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertyResettable(java.lang.Object)
+     */
     @Override
     public boolean isPropertyResettable(Object id) {
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertySet(java.lang.Object)
+     */
     @Override
     public boolean isPropertySet(Object id) {
         return false;

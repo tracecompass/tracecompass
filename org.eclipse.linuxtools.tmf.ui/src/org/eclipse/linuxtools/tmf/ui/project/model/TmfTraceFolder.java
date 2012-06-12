@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,15 +22,19 @@ import org.eclipse.ui.views.properties.IPropertySource2;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TmfTraceFolder</u></b>
+ * Implementation of trace folder model element representing the trace folder in the project.
  * <p>
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfTraceFolder extends TmfProjectModelElement implements IPropertySource2 {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-
+    /**
+     * The name of the trace folder 
+     */
     public static final String TRACE_FOLDER_NAME = "Traces"; //$NON-NLS-1$
 
     // Property View stuff
@@ -56,7 +60,13 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-
+    /**
+     * Constructor. 
+     * Creates trace folder model element under the project.
+     * @param name The name of trace folder.
+     * @param trace The folder resource.
+     * @param parent The parent element (project).
+     */
     public TmfTraceFolder(String name, IFolder resource, TmfProjectElement parent) {
         super(name, resource, parent);
         parent.addChild(this);
@@ -65,17 +75,29 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // ------------------------------------------------------------------------
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement#getResource()
+     */
     @Override
     public IFolder getResource() {
         return (IFolder) fResource;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getProject()
+     */
     @Override
     public TmfProjectElement getProject() {
         return (TmfProjectElement) getParent();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement#refresh()
+     */
     @Override
     public void refresh() {
         TmfProjectElement project = (TmfProjectElement) getParent();
@@ -85,7 +107,10 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
+    /**
+     * Returns a list of trace model elements under the traces folder.
+     * @return list of trace model elements
+     */
     public List<TmfTraceElement> getTraces() {
         List<ITmfProjectModelElement> children = getChildren();
         List<TmfTraceElement> traces = new ArrayList<TmfTraceElement>();
@@ -101,16 +126,28 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // IPropertySource2
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+     */
     @Override
     public Object getEditableValue() {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
+     */
     @Override
     public Object getPropertyValue(Object id) {
 
@@ -126,19 +163,35 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.lang.Object)
+     */
     @Override
     public void resetPropertyValue(Object id) {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object, java.lang.Object)
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertyResettable(java.lang.Object)
+     */
     @Override
     public boolean isPropertyResettable(Object id) {
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertySet(java.lang.Object)
+     */
     @Override
     public boolean isPropertySet(Object id) {
         return false;

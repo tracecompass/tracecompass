@@ -16,27 +16,27 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 import org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionModel;
 
 /**
- * <b><u>IHistogramDataModel</u></b>
- * <p>
+ * Histogram data model interface.
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
  */
-
 public interface IHistogramDataModel extends IBaseDistributionModel {
     /**
      * Add event to the correct bucket, compacting the if needed.
      * 
-     * @param eventCount the event to count
+     * @param eventCount the event to count 
      * @param timestamp the timestamp of the event to count
      */
     public void countEvent(long eventCount, long timestamp);
-    
     /**
      * Scale the model data to the width, height and bar width requested.
-     * 
-     * @param width
-     * @param height
-     * @param barWidth
-     * @return the result array of size [width] and where the highest value
-     *         doesn't exceed [height] considering the bar width [barWidth]
+     *
+     * @param width A width of the histogram canvas
+     * @param height A height of the histogram canvas
+     * @param barWidth A width (in pixel) of a histogram bar
+     * @return the result array of size [width] and where the highest value doesn't exceed [height]
+     *         while considering the bar width [barWidth]
      */
     public HistogramScaledData scaleTo(int width, int height, int barWidth);
 

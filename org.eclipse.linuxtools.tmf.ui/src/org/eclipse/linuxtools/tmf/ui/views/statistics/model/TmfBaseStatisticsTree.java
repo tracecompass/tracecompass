@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,8 +23,11 @@ import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 
 /**
- * <h4>Store information about base statistics data</h4>
+ * Store information about base statistics data.
  * <p>This class provides a way to represent statistics data that is compatible to every kind of traces</p>
+ * 
+ * @version 1.0
+ * @author Mathieu Denis
  */
 public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
@@ -44,8 +47,15 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * </p>
      */
     protected static final String NODE = "z"; //$NON-NLS-1$
+    /**
+     * Root node key.
+     */
     protected static final String ROOT_NODE_KEY = mergeString(ROOT.get(0), NODE);
 
+    /**
+     * Default constructor. Creates base statistics tree for counting total
+     * number of events and number of events per event type.
+     */
     public TmfBaseStatisticsTree() {
         super();
         Map<String, Set<String>> keys = getKeys();

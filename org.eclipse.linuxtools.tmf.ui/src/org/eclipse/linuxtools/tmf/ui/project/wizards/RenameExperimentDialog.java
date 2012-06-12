@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -49,8 +49,10 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
- * <b><u>RenameExperimentDialog</u></b>
- * <p>
+ * Implementation of a dialog box to rename an experiment.
+ * <p> 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class RenameExperimentDialog extends SelectionStatusDialog {
 
@@ -67,6 +69,11 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
     // Constructor
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param shell The parent shell
+     * @param experiment The experiment element rename
+     */
     public RenameExperimentDialog(Shell shell, TmfExperimentElement experiment) {
         super(shell);
         fExperiment = experiment;
@@ -80,7 +87,10 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // Dialog
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -160,17 +170,28 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // SelectionStatusDialog
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
+     */
     @Override
     protected void computeResult() {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#create()
+     */
     @Override
     public void create() {
         super.create();
         getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#okPressed()
+     */
     @Override
     protected void okPressed() {
         IFolder folder = renameExperiment(fNewExperimentName.getText());

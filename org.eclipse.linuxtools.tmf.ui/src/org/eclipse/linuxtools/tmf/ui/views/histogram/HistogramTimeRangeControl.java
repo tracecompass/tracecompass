@@ -16,20 +16,37 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <b><u>HistogramTimeRangeControl</u></b>
- * <p>
  * This control provides a group containing a text control.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class HistogramTimeRangeControl extends HistogramTextControl {
 
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
-
+    /**
+     * Constructor default values
+     * @param parentView The parent histogram view.
+     * @param parent The parent composite
+     * @param textStyle The text style bits.
+     * @param groupStyle The group style bits.
+     */
     public HistogramTimeRangeControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle) {
         this(parentView, parent, textStyle, groupStyle, "", HistogramUtils.nanosecondsToString(0L)); //$NON-NLS-1$
     }
 
+    /**
+     * Constructor with given group and text values.
+     * 
+     * @param parentView The parent histogram view.
+     * @param parent The parent composite
+     * @param textStyle The text style bits.
+     * @param groupStyle The group style bits.
+     * @param groupValue A group value
+     * @param textValue A text value
+     */
     public HistogramTimeRangeControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue) {
         super(parentView, parent, textStyle, groupStyle, groupValue, textValue);
     }
@@ -38,6 +55,10 @@ public class HistogramTimeRangeControl extends HistogramTextControl {
     // Operations
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramTextControl#updateValue()
+     */
     @Override
     protected void updateValue() {
         String stringValue = fTextValue.getText();

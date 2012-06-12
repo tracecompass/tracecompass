@@ -58,10 +58,14 @@ public class HistogramView extends TmfView {
     // Constants
     // ------------------------------------------------------------------------
 
-    // The view ID as defined in plugin.xml
+    /**
+     *  The view ID as defined in plugin.xml
+     */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.histogram"; //$NON-NLS-1$
 
-    // The initial window span (in nanoseconds)
+    /**
+     *  The initial window span (in nanoseconds)
+     */
     public static final long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
 
     // Time scale
@@ -101,6 +105,9 @@ public class HistogramView extends TmfView {
     // Constructor
     // ------------------------------------------------------------------------
 
+    /**
+     * Default constructor
+     */
     public HistogramView() {
         super(ID);
     }
@@ -258,6 +265,11 @@ public class HistogramView extends TmfView {
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * Returns the time range of the current selected window (base on default time scale).
+     * 
+     * @return the time range of current selected window.
+     */
     public TmfTimeRange getTimeRange() {
         return new TmfTimeRange(new TmfTimestamp(fWindowStartTime, TIME_SCALE), new TmfTimestamp(fWindowEndTime,
                 TIME_SCALE));
@@ -267,6 +279,10 @@ public class HistogramView extends TmfView {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Broadcast TmfSignal about new current time value.
+     * @param newTime the new current time.
+     */
     public void updateCurrentEventTime(long newTime) {
         if (fCurrentExperiment != null) {
             TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BIG_CRUNCH);
@@ -283,6 +299,11 @@ public class HistogramView extends TmfView {
         }
     }
 
+    /**
+     * Broadcast TmfSignal about new selected time range.
+     * @param startTime the new start time
+     * @param endTime the new end time
+     */
     public void updateTimeRange(long startTime, long endTime) {
         if (fCurrentExperiment != null) {
             // Build the new time range; keep the current time
@@ -298,6 +319,10 @@ public class HistogramView extends TmfView {
         }
     }
 
+    /**
+     * Broadcast TmfSignal about new selected time range.
+     * @param newDuration new duration (relative to current start time)
+     */
     public synchronized void updateTimeRange(long newDuration) {
         if (fCurrentExperiment != null) {
             long delta = newDuration - fWindowSpan;
@@ -326,6 +351,11 @@ public class HistogramView extends TmfView {
     // Signal handlers
     // ------------------------------------------------------------------------
 
+    /**
+     * Handles experiment selected signal. Loads histogram if new experiment time range is not
+     * equal <code>TmfTimeRange.NULL_RANGE</code>
+     * @param signal the experiment selected signal
+     */
     @TmfSignalHandler
     @SuppressWarnings("unchecked")
     public void experimentSelected(TmfExperimentSelectedSignal<ITmfEvent> signal) {
@@ -339,6 +369,13 @@ public class HistogramView extends TmfView {
         fParent.redraw();
     }
 
+    /**
+     * Handles experiment range updated signal. Extends histogram according to the new time range. If a 
+     * HistogramRequest is already ongoing, it will be cancelled and a new request with the new range
+     * will be issued.
+     * 
+     * @param signal the experiment range updated signal
+     */
     @TmfSignalHandler
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
 
@@ -366,6 +403,10 @@ public class HistogramView extends TmfView {
         sendFullRangeRequest(fullRange);
     }
 
+    /**
+     * Handles the experiment updated signal. Used to update time limits (start and end time)
+     * @param signal the experiment updated signal
+     */
     @TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
         if (signal.getExperiment() != fCurrentExperiment) {
@@ -379,6 +420,12 @@ public class HistogramView extends TmfView {
         fTimeRangeHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
     }
 
+    /**
+     * Handles the current time updated signal. Sets the current time in the time range
+     * histogram as well as the full histogram.
+     * 
+     * @param signal the signal to process
+     */
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
         // Because this can't happen :-)
@@ -394,6 +441,10 @@ public class HistogramView extends TmfView {
         fCurrentEventTimeControl.setValue(fCurrentTimestamp);
     }
 
+    /**
+     * Updates the current time range in the time range histogram and full range histogram.
+     * @param signal the signal to process
+     */
     @TmfSignalHandler
     public void timeRangeUpdated(TmfRangeSynchSignal signal) {
         // Because this can't happen :-)

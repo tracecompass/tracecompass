@@ -17,8 +17,10 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * <b><u>Messages</u></b>
+ * Messages file for the histogram widgets.
  * <p>
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class Messages extends NLS {
 
@@ -28,7 +30,13 @@ public class Messages extends NLS {
 
 	private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.histogram.messages"; //$NON-NLS-1$
     
+	/**
+	 * The label for the current event time
+	 */
 	public static String HistogramView_currentEventLabel;
+	/**
+	 * The label for the window span.
+	 */
     public static String HistogramView_windowSpanLabel;
     
     // ------------------------------------------------------------------------

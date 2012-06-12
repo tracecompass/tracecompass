@@ -18,9 +18,10 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <b><u>HistogramUtils</u></b>
- * <p>
  * Bunch of conversion utilities.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  * <p>
  */
 public abstract class HistogramUtils {

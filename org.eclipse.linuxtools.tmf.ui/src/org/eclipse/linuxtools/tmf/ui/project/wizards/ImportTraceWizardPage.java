@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 2011 Ericsson
+ * Copyright (c) 2009, 2010, 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -96,7 +96,9 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  * For our purpose, a trace can either be a single file or a whole directory sub-tree, whichever is reached first from
  * the root directory.
  * <p>
- * TODO: Consider adding Filter/Select/Deselect buttons
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class ImportTraceWizardPage extends WizardResourceImportPage implements Listener {
 
@@ -129,10 +131,22 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor.
+     * Creates the trace wizard page.
+     * 
+     * @param name The name of the page.
+     * @param selection The current selection
+     */
     protected ImportTraceWizardPage(String name, IStructuredSelection selection) {
         super(name, selection);
     }
 
+    /**
+     * Constructor
+     * @param workbench The workbench reference.
+     * @param selection The current selection
+     */
     public ImportTraceWizardPage(IWorkbench workbench, IStructuredSelection selection) {
         this(IMPORT_WIZARD_PAGE, selection);
         setTitle(Messages.ImportTraceWizard_FileSystemTitle);
@@ -167,7 +181,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // ------------------------------------------------------------------------
     // WizardResourceImportPage
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#createControl(org.eclipse.swt.widgets.Composite)
+     */
     @Override
     public void createControl(Composite parent) {
         super.createControl(parent);
@@ -178,6 +195,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#createSourceGroup(org.eclipse.swt.widgets.Composite)
+     */
     @Override
     protected void createSourceGroup(Composite parent) {
         createDirectorySelectionGroup(parent);
@@ -186,6 +207,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         validateSourceGroup();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#createFileSelectionGroup(org.eclipse.swt.widgets.Composite)
+     */
     @Override
     protected void createFileSelectionGroup(Composite parent) {
 
@@ -229,11 +254,19 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#getFolderProvider()
+     */
     @Override
     protected ITreeContentProvider getFolderProvider() {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#getFileProvider()
+     */
     @Override
     protected ITreeContentProvider getFileProvider() {
         return new WorkbenchContentProvider() {
@@ -276,7 +309,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
             }
         }
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#getSelectedResources()
+     */
     @Override
     protected List<FileSystemElement> getSelectedResources() {
         List<FileSystemElement> resources = new ArrayList<FileSystemElement>();
@@ -293,10 +330,20 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // Directory Selection Group (forked WizardFileSystemResourceImportPage1)
     // ------------------------------------------------------------------------
 
+    /**
+     * The directory name field
+     */
     protected Combo directoryNameField;
+    /**
+     * The directory browse button.
+     */
     protected Button directoryBrowseButton;
     private boolean entryChanged = false;
 
+    /**
+     * creates the directory selection group.
+     * @param parent the parent composite
+     */
     protected void createDirectorySelectionGroup(Composite parent) {
 
         Composite directoryContainerGroup = new Composite(parent, SWT.NONE);
@@ -370,6 +417,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // Browse for the source directory
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#handleEvent(org.eclipse.swt.widgets.Event)
+     */
     @Override
     public void handleEvent(Event event) {
         if (event.widget == directoryBrowseButton) {
@@ -378,6 +429,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         super.handleEvent(event);
     }
 
+    /**
+     * Handle the button pressed event
+     */
     protected void handleSourceDirectoryBrowseButtonPressed() {
         String currentSource = directoryNameField.getText();
         DirectoryDialog dialog = new DirectoryDialog(directoryNameField.getShell(), SWT.SAVE | SWT.SHEET);
@@ -603,6 +657,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     private Button overwriteExistingResourcesCheckbox;
     private Button createLinksInWorkspaceButton;
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardDataTransferPage#createOptionsGroupButtons(org.eclipse.swt.widgets.Group)
+     */
     @Override
     protected void createOptionsGroupButtons(Group optionsGroup) {
 
@@ -632,6 +690,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // Determine if the finish button can be enabled
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.WizardDataTransferPage#validateSourceGroup()
+     */
     @Override
     public boolean validateSourceGroup() {
 
@@ -733,6 +795,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // Import the trace(s)
     // ------------------------------------------------------------------------
 
+    /**
+     * Finish the import.
+     * @return <code>true</code> if successful else false
+     */
     public boolean finish() {
         // Ensure source is valid
         File sourceDir = new File(getSourceDirectoryName());

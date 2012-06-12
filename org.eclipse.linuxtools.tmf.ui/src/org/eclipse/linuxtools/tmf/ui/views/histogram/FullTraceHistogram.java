@@ -9,7 +9,6 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Changed to updated histogram data model
- *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -25,11 +24,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * <b><u>FullTraceHistogram</u></b>
- * <p>
  * A histogram that displays the full trace.
  * <p>
  * It also features a selected range window that can be dragged and zoomed.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class FullTraceHistogram extends Histogram implements MouseMoveListener {
 
@@ -53,6 +53,12 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
     // Construction
     // ------------------------------------------------------------------------
 
+    /**
+     * Standard Constructor.
+     * 
+     * @param view A reference to the parent histogram view 
+     * @param parent A reference to the parent composite
+     */
     public FullTraceHistogram(HistogramView view, Composite parent) {
         super(view, parent);
         fZoom = new HistogramZoom(this, fCanvas, getStartTime(), getTimeLimit());
@@ -69,10 +75,22 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Sets the time range of the full histogram.  
+     * 
+     * @param startTime A start time
+     * @param endTime A end time
+     */
     public void setFullRange(long startTime, long endTime) {
         fZoom.setFullRange(startTime, endTime);
     }
 
+    /**
+     * Sets the selected time range.
+     * 
+     * @param startTime A start time
+     * @param duration A window duration
+     */
     public void setTimeRange(long startTime, long duration) {
         fRangeStartTime = startTime;
         fRangeDuration = duration;

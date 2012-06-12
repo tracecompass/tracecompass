@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,13 +14,18 @@ package org.eclipse.linuxtools.tmf.ui.project.wizards;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * Message string for TMF model handling.
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ */
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.project.wizards.messages"; //$NON-NLS-1$
 
     public static String NewProjectWizard_DialogHeader;
     public static String NewProjectWizard_DialogMessage;
-    
     public static String ImportTraceWizard_DialogTitle;
     public static String ImportTraceWizard_FileSystemTitle;
     public static String ImportTraceWizard_ImportTrace;

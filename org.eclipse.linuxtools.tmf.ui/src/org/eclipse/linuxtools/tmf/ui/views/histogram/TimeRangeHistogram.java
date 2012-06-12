@@ -17,13 +17,15 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <b><u>TimeRangeHistogram</u></b>
  * <p>
  * A basic histogram with the following additional features:
  * <ul>
  * <li>zoom in: mouse wheel up (or forward)
  * <li>zoom out: mouse wheel down (or backward)
  * </ul>
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TimeRangeHistogram extends Histogram {
 
@@ -31,12 +33,16 @@ public class TimeRangeHistogram extends Histogram {
     // Attributes
     // ------------------------------------------------------------------------
 
-    HistogramZoom fZoom = null;
+    private HistogramZoom fZoom = null;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-
+    /**
+     * Constructor 
+     * @param view The parent histogram view
+     * @param parent The parent composite
+     */
     public TimeRangeHistogram(HistogramView view, Composite parent) {
         super(view, parent);
         fZoom = new HistogramZoom(this, fCanvas, getStartTime(), getTimeLimit());
@@ -46,11 +52,19 @@ public class TimeRangeHistogram extends Histogram {
     // Operations
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.histogram.Histogram#updateTimeRange(long, long)
+     */
     @Override
     public void updateTimeRange(long startTime, long endTime) {
         ((HistogramView) fParentView).updateTimeRange(startTime, endTime);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.histogram.Histogram#clear()
+     */
     @Override
     public synchronized void clear() {
         if (fZoom != null)
@@ -58,10 +72,20 @@ public class TimeRangeHistogram extends Histogram {
         super.clear();
     }
 
+    /**
+     * Sets the time range of the histogram
+     * @param startTime The start time 
+     * @param duration The duration of the time range
+     */
     public synchronized void setTimeRange(long startTime, long duration) {
         fZoom.setNewRange(startTime, duration);
     }
 
+    /**
+     * Sets the full time range of the whole trace.
+     * @param startTime The start time 
+     * @param endTime The end time
+     */
     public void setFullRange(long startTime, long endTime) {
         long currentFirstEvent = getStartTime();
         fZoom.setFullRange((currentFirstEvent == 0) ? startTime : currentFirstEvent, endTime);

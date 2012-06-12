@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2011 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,7 +29,10 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Create a basic list of columns with providers
+ * Create a basic list of columns with providers.
+ * 
+ * @version 1.0
+ * @author Mathieu Denis
  */
 public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
 
@@ -37,7 +40,6 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
      * Contains the list of the columns
      */
     protected List<TmfBaseColumnData> fColumnData = null;
-
     /**
      * Level column names
      */
@@ -46,7 +48,6 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
      * Number of events column names
      */
     protected final static String EVENTS_COUNT_COLUMN = Messages.TmfStatisticsView_NbEventsColumn;
-
     /**
      * Level column tooltips
      */
@@ -55,12 +56,10 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
      * Number of events column tooltips
      */
     protected final static String EVENTS_COUNT_COLUMN_TIP = Messages.TmfStatisticsView_NbEventsTip;
-
     /**
      * Level for which statistics should not be displayed.
      */
     protected Set<String> fFolderLevels = new HashSet<String>(Arrays.asList(new String[] { "Event Types" })); //$NON-NLS-1$
-
     /**
      * Create basic columns to represent the statistics data
      */

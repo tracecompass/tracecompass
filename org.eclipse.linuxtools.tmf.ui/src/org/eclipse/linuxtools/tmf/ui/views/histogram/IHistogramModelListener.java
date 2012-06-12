@@ -14,12 +14,14 @@
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 /**
- * <b><u>IHistogramModelListener</u></b>
- * <p>
+ * Listener interface for receiving histogram data model notifications.
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
  */
 public interface IHistogramModelListener {
     /**
-     * Method to notify listeners about model updates 
+     * Method to implement to receive notification about model updates. 
      */
     public void modelUpdated();
 }

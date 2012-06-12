@@ -16,9 +16,10 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <b><u>HistogramCurrentTimeControl</u></b>
- * <p>
  * This control provides a group containing a text control.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class HistogramCurrentTimeControl extends HistogramTextControl {
 
@@ -26,10 +27,28 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
     // Construction
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor with default group and text value.
+     * 
+     * @param parentView A parent histogram view
+     * @param parent A parent composite to draw in
+     * @param textStyle A test style 
+     * @param groupStyle A group style
+     */
     public HistogramCurrentTimeControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle) {
         this(parentView, parent, textStyle, groupStyle, "", HistogramUtils.nanosecondsToString(0L)); //$NON-NLS-1$
     }
 
+    /**
+     * 
+     * Constructor
+     * @param parentView A parent histogram view
+     * @param parent A parent composite to draw in
+     * @param textStyle A test style 
+     * @param groupStyle A group style
+     * @param groupValue A group value
+     * @param textValue A text value
+     */
     public HistogramCurrentTimeControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue) {
         super(parentView, parent, textStyle, groupStyle, groupValue, textValue);
     }

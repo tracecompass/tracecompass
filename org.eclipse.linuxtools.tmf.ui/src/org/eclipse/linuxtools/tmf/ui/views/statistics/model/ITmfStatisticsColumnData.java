@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,7 +17,10 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
 
 /**
- * Provide the basic interface to create a statistics column 
+ * Provide the basic interface to create a statistics column for the statistics table tree.
+ * 
+ *  @version 1.0
+ *  @author Mathieu Denis
  */
 public interface ITmfStatisticsColumnData {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 20112 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,8 +7,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Mathieu Denis      (mathieu.denis@polymtl.ca)  - Generalized version based on LTTng
+ *   Mathieu Denis  (mathieu.denis@polymtl.ca)  - Generalized version based on LTTng
  *   Bernd Hufmann - Updated to use trace reference in TmfEvent and streaming
+ *   
+ *   @version 1.0
+ *   @author Mathieu Denis
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics;
@@ -53,13 +57,13 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * <b><u>TmfStatisticsView</u></b>
- * <p>
  * The generic Statistics View displays statistics for any kind of traces.
  * 
  * It is implemented according to the MVC pattern. - The model is a TmfStatisticsTreeNode built by the State Manager. - The view is built with a
  * TreeViewer. - The controller that keeps model and view synchronized is an observer of the model.
  * </p>
+ * 
+ * 
  */
 public class TmfStatisticsView extends TmfView {
     /**

@@ -29,9 +29,10 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>HistogramTextControl</u></b>
- * <p>
  * This control provides a group containing a text control.
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class HistogramTextControl implements FocusListener, KeyListener {
 
@@ -39,11 +40,17 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // Attributes
     // ------------------------------------------------------------------------
 
+    /**
+     * The parent histogram view.
+     */
     protected final HistogramView fParentView;
     private final Composite fParent;
 
     // Controls
     private final Group fGroup;
+    /**
+     * The text value field.
+     */
     protected final Text fTextValue;
     private long fValue;
 
@@ -51,10 +58,29 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor default values
+     *
+     * @param parentView The parent histogram view.
+     * @param parent The parent composite
+     * @param textStyle The text style bits.
+     * @param groupStyle The group style bits.
+     * 
+     */
     public HistogramTextControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle) {
         this(parentView, parent, textStyle, groupStyle, "", HistogramUtils.nanosecondsToString(0L)); //$NON-NLS-1$
     }
 
+   /**
+    * Constructor with given group and text values.
+    * 
+    * @param parentView The parent histogram view.
+    * @param parent The parent composite
+    * @param textStyle The text style bits.
+    * @param groupStyle The group style bits.
+    * @param groupValue A group value
+    * @param textValue A text value
+    */
     public HistogramTextControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue) {
 
         fParentView = parentView;
@@ -117,7 +143,10 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // Accessors
     // ------------------------------------------------------------------------
 
-    // State
+    /**
+     * Returns if widget isDisposed or not
+     * @return <code>true</code> if widget is disposed else <code>false</code>  
+     */
     public boolean isDisposed() {
         return fGroup.isDisposed();
     }
@@ -126,19 +155,32 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Updates the text value.
+     */
     protected abstract void updateValue();
 
-    // LayoutData
+    /**
+     * Set the Grid Layout Data for the group.
+     * @param layoutData A GridData to set.
+     */
     public void setLayoutData(GridData layoutData) {
         fGroup.setLayoutData(layoutData);
     }
 
-    // Time value
+    /**
+     * Sets the value converted to nano-seconds in the text field.
+     * @param timeString the time string (input)
+     */
     public void setValue(String timeString) {
         long timeValue = HistogramUtils.stringToNanoseconds(timeString);
         setValue(timeValue);
     }
 
+    /**
+     * The time value in nano-seconds to set in the text field. 
+     * @param time the time to set
+     */
     public void setValue(final long time) {
         // If this is the UI thread, process now
         Display display = Display.getCurrent();
@@ -160,7 +202,11 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
             });
         }
     }
-
+    
+    /**
+     * Returns the time value.
+     * @return time value.
+     */
     public long getValue() {
         return fValue;
     }
@@ -169,10 +215,18 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // FocusListener
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+     */
     @Override
     public void focusGained(FocusEvent event) {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
+     */
     @Override
     public void focusLost(FocusEvent event) {
         updateValue();
@@ -182,6 +236,10 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // KeyListener
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.swt.events.KeyListener#keyPressed(org.eclipse.swt.events.KeyEvent)
+     */
     @Override
     public void keyPressed(KeyEvent event) {
         switch (event.keyCode) {
@@ -193,6 +251,10 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.swt.events.KeyListener#keyReleased(org.eclipse.swt.events.KeyEvent)
+     */
     @Override
     public void keyReleased(KeyEvent e) {
     }

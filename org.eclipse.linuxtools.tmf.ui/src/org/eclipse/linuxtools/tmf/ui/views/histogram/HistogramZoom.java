@@ -18,7 +18,10 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.widgets.Canvas;
 
 /**
- * <b><u>HistogramZoom</u></b>
+ * Class to handle zooming within histogram windows..
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  * <p>
  */
 public class HistogramZoom implements MouseWheelListener {
@@ -66,14 +69,26 @@ public class HistogramZoom implements MouseWheelListener {
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * Get start time of the zoom window.
+     * @return the start time.
+     */
     public synchronized long getStartTime() {
         return fRangeStartTime;
     }
 
+    /**
+     * Get the end time of the zoom window.
+     * @return the end time
+     */
     public synchronized long getEndTime() {
         return fRangeStartTime + fRangeDuration;
     }
 
+    /**
+     * Get the duration of the zoom window.
+     * @return the duration of the zoom window.
+     */
     public synchronized long getDuration() {
         return fRangeDuration;
     }
@@ -82,6 +97,9 @@ public class HistogramZoom implements MouseWheelListener {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Stops the zooming (multiple consecutive execution)
+     */
     public synchronized void stop() {
         if (fScrollCounter != null) {
             fScrollCounter.interrupt();
@@ -89,11 +107,22 @@ public class HistogramZoom implements MouseWheelListener {
         }
     }
 
+    /**
+     * The the full time range of the histogram
+     *   
+     * @param startTime the start time the histogram
+     * @param endTime the end time of the histogram
+     */
     public synchronized void setFullRange(long startTime, long endTime) {
         fAbsoluteStartTime = startTime;
         fAbsoluteEndTime = endTime;
     }
 
+    /**
+     * Sets the new zoom window
+     * @param startTime the start time
+     * @param duration the duration
+     */
     public synchronized void setNewRange(long startTime, long duration) {
         if (startTime < fAbsoluteStartTime)
             startTime = fAbsoluteStartTime;
@@ -186,6 +215,10 @@ public class HistogramZoom implements MouseWheelListener {
         // Constructors
         // --------------------------------------------------------------------
 
+        /** 
+         * Constructor of inner class to handle consecutive scrolls of mouse wheel.
+         * @param zoom the histogram zoom reference
+         */
         public MouseScrollCounter(HistogramZoom zoom) {
             fZoom = zoom;
             fLastPoolTime = System.currentTimeMillis();
@@ -194,7 +227,11 @@ public class HistogramZoom implements MouseWheelListener {
         // --------------------------------------------------------------------
         // Operation
         // --------------------------------------------------------------------
-
+        
+        /**
+         * Increments the number of scroll clicks.
+         * @param nbScrolls the number to add to the current value
+         */
         public void incrementMouseScroll(int nbScrolls) {
             fLastPoolTime = System.currentTimeMillis();
             nbScrollClick += nbScrolls;

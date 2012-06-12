@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 2011 Ericsson
+ * Copyright (c) 2009, 2010, 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -45,8 +45,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
- * <b><u>SelectTracesWizardPage</u></b>
+ * Implementation of a wizard page for selecting trace for an experiment.
  * <p>
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class SelectTracesWizardPage extends WizardPage {
 
@@ -62,7 +65,11 @@ public class SelectTracesWizardPage extends WizardPage {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-
+    /**
+     * Constructor
+     * @param project The project model element.
+     * @param experiment The experiment model experiment.
+     */
     protected SelectTracesWizardPage(TmfProjectElement project, TmfExperimentElement experiment) {
         super(""); //$NON-NLS-1$
         setTitle(Messages.SelectTracesWizardPage_WindowTitle);
@@ -74,7 +81,10 @@ public class SelectTracesWizardPage extends WizardPage {
     // ------------------------------------------------------------------------
     // Dialog
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+     */
     @Override
     public void createControl(Composite parent) {
         Composite container = new Composite(parent, SWT.NULL);
@@ -127,6 +137,10 @@ public class SelectTracesWizardPage extends WizardPage {
         }
     }
 
+    /**
+     * Method to finalize the select operation.
+     * @return <code>true</code> if successful else <code>false</code>
+     */
     public boolean performFinish() {
 
         IFolder experiment = fExperiment.getResource();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,10 +15,11 @@ package org.eclipse.linuxtools.tmf.ui.project.wizards;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 /**
- * <b><u>NewProjectMainWizardPage</u></b>
+ * The wizard page for creation of a new TMF tracing project.
  * <p>
- *
- * TODO: Implement me. Please.
+ * @version 1.0
+ * @author Francois Chouinard
+
  */
 public class NewTmfProjectMainWizardPage extends WizardNewProjectCreationPage {
 

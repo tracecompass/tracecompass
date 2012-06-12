@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -49,8 +49,10 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
- * <b><u>CopyExperimentDialog</u></b>
+ * Implementation of the copy trace dialog box.
  * <p>
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class CopyTraceDialog extends SelectionStatusDialog {
 
@@ -66,7 +68,11 @@ public class CopyTraceDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-
+    /**
+     * Constructor.
+     * @param shell The parent shell
+     * @param trace The trace model element.
+     */
     public CopyTraceDialog(Shell shell, TmfTraceElement trace) {
         super(shell);
         fTrace = trace;
@@ -80,7 +86,10 @@ public class CopyTraceDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // Dialog
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -163,16 +172,28 @@ public class CopyTraceDialog extends SelectionStatusDialog {
     // SelectionStatusDialog
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
+     */
     @Override
     protected void computeResult() {
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#create()
+     */
     @Override
     public void create() {
         super.create();
         getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#okPressed()
+     */
     @Override
     protected void okPressed() {
         IResource trace = copyTrace(fNewTraceName.getText());

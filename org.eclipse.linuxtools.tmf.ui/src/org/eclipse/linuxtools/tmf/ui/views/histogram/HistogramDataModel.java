@@ -20,9 +20,9 @@ import java.util.Arrays;
 import org.eclipse.core.runtime.ListenerList;
 
 /**
- * <b><u>HistogramDataModel</u></b>
- * <p>
- * Histogram-independent data model with the following characteristics:
+ * Histogram-independent data model.
+ * 
+ * It has the following characteristics:
  * <ul>
  * <li>The <i>basetime</i> is the timestamp of the first event
  * <li>There is a fixed number (<i>n</i>) of buckets of uniform duration
@@ -57,10 +57,9 @@ import org.eclipse.core.runtime.ListenerList;
  * respect to to the number of pixels in the actual histogram, we should achieve
  * a nice result when visualizing the histogram.
  * <p>
- * TODO: Add filter support for more refined event counting (e.g. by trace,
- * event type, etc.)
- * <p>
- * TODO: Cut-off eccentric values? TODO: Support for going back in time?
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class HistogramDataModel implements IHistogramDataModel {
 
@@ -68,9 +67,14 @@ public class HistogramDataModel implements IHistogramDataModel {
     // Constants
     // ------------------------------------------------------------------------
 
-    // The default number of buckets
+    /**
+     *  The default number of buckets
+     */
     public static final int DEFAULT_NUMBER_OF_BUCKETS = 16 * 1000;
 
+    /**
+     * Number of events after which listeners will be notified.  
+     */
     public static final int REFRESH_FREQUENCY = DEFAULT_NUMBER_OF_BUCKETS;
 
     // ------------------------------------------------------------------------
@@ -98,10 +102,17 @@ public class HistogramDataModel implements IHistogramDataModel {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Default constructor with default number of buckets.
+     */
     public HistogramDataModel() {
         this(DEFAULT_NUMBER_OF_BUCKETS);
     }
 
+    /**
+     * Constructor with non-default number of buckets.
+     * @param nbBuckets A number of buckets.
+     */
     public HistogramDataModel(int nbBuckets) {
         fNbBuckets = nbBuckets;
         fBuckets = new long[nbBuckets];
@@ -109,6 +120,10 @@ public class HistogramDataModel implements IHistogramDataModel {
         clear();
     }
 
+    /**
+     * Copy constructor.
+     * @param other A model to copy.
+     */
     public HistogramDataModel(HistogramDataModel other) {
         fNbBuckets = other.fNbBuckets;
         fBuckets = Arrays.copyOf(other.fBuckets, fNbBuckets);
@@ -131,34 +146,66 @@ public class HistogramDataModel implements IHistogramDataModel {
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * Returns the number of events in the data model.
+     * @return number of events.
+     */
     public long getNbEvents() {
         return fNbEvents;
     }
 
+    /**
+     * Returns the number of buckets in the model.
+     * @return number of buckets.
+     */
     public int getNbBuckets() {
         return fNbBuckets;
     }
 
+   /**
+    * Returns the current bucket duration.
+    * @return bucket duration
+    */
     public long getBucketDuration() {
         return fBucketDuration;
     }
 
+    /**
+     * Returns the time value of the first bucket in the model.
+     * @return time of first bucket.
+     */
     public long getFirstBucketTime() {
         return fFirstBucketTime;
     }
 
+    /**
+     * Returns the time of the first event in the model.
+     * @return time of first event.
+     */
     public long getStartTime() {
         return fFirstEventTime;
     }
 
+    /**
+     * Returns the time of the last event in the model.
+     * @return the time of last event.
+     */
     public long getEndTime() {
         return fLastEventTime;
     }
 
+    /**
+     * Returns the time of the current event in the model. 
+     * @return the time of the current event.
+     */
     public long getCurrentEventTime() {
         return fCurrentEventTime;
     }
 
+    /**
+     * Returns the time limit with is: start time + nbBuckets * bucketDuration
+     * @return the time limit.
+     */
     public long getTimeLimit() {
         return fTimeLimit;
     }
@@ -167,18 +214,28 @@ public class HistogramDataModel implements IHistogramDataModel {
     // Listener handling
     // ------------------------------------------------------------------------
 
+    /**
+     * Add a listener to the model to be informed about model changes.
+     * @param listener A listener to add.
+     */
     public void addHistogramListener(IHistogramModelListener listener) {
         fModelListeners.add(listener);
     }
 
+    /**
+     * Remove a given model listener.
+     * @param listener A listener to remove.
+     */
     public void removeHistogramListener(IHistogramModelListener listener) {
         fModelListeners.remove(listener);
     }
 
+    // Notify listeners (always) 
     private void fireModelUpdateNotification() {
         fireModelUpdateNotification(0);
     }
 
+    // Notify listener on boundary
     private void fireModelUpdateNotification(long count) {
         if ((count % REFRESH_FREQUENCY) == 0) {
             Object[] listeners = fModelListeners.getListeners();
@@ -193,6 +250,10 @@ public class HistogramDataModel implements IHistogramDataModel {
     // Operations
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionModel#complete()
+     */
     @Override
     public void complete() {
         fireModelUpdateNotification();
@@ -200,6 +261,7 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     /**
      * Clear the histogram model.
+     * @see org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionModel#clear()
      */
     @Override
     public void clear() {
@@ -215,18 +277,18 @@ public class HistogramDataModel implements IHistogramDataModel {
     }
 
     /**
-     * Sets the current event time
+     * Sets the current event time (no notification of listeners) 
      *
-     * @param timestamp
+     * @param timestamp A time stamp to set.
      */
     public void setCurrentEvent(long timestamp) {
         fCurrentEventTime = timestamp;
     }
 
     /**
-     * Sets the current event time
+     * Sets the current event time with notification of listeners 
      *
-     * @param timestamp
+     * @param timestamp A time stamp to set.
      */
     public void setCurrentEventNotifyListeners(long timestamp) {
         fCurrentEventTime = timestamp;
@@ -236,7 +298,9 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Add event to the correct bucket, compacting the if needed.
      *
-     * @param timestamp the timestamp of the event to count
+     * @param eventCount The current event Count (for notification purposes)
+     * @param timestamp The timestamp of the event to count
+     *  
      */
     @Override
     public void countEvent(long eventCount, long timestamp) {
@@ -301,11 +365,12 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Scale the model data to the width, height and bar width requested.
      *
-     * @param width
-     * @param height
-     * @param barWidth
-     * @return the result array of size [width] and where the highest value
-     *         doesn't exceed [height]
+     * @param width A width of the histogram canvas
+     * @param height A height of the histogram canvas
+     * @param barWidth A width (in pixel) of a histogram bar
+     * @return the result array of size [width] and where the highest value doesn't exceed [height]
+     *         
+     * @see org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramDataModel#scaleTo(int, int, int)
      */
     @Override
     public HistogramScaledData scaleTo(int width, int height, int barWidth) {

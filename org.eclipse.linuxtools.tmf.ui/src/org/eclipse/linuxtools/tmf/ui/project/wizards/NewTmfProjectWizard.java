@@ -37,31 +37,49 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
 /**
- * <b><u>NewTmfProjectWizard</u></b>
+ * Wizard implementation for creating a TMF tracing project.
  * <p>
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutableExtension {
 
     private final String fTtitle;
     private final String fDescription;
 
+    /**
+     * Wizard main page
+     */
     protected NewTmfProjectMainWizardPage fMainPage;
+    /**
+     * The Project name
+     */
     protected String fProjectName;
+    /**
+     * The project location
+     */
     protected URI fProjectLocation;
+    /**
+     * The configuration element.
+     */
     protected IConfigurationElement fConfigElement;
 
+    /**
+     * The project reference
+     */
     protected IProject fProject;
 
     /**
-     * 
+     * Default constructor
      */
     public NewTmfProjectWizard() {
         this(Messages.NewProjectWizard_DialogHeader, Messages.NewProjectWizard_DialogMessage);
     }
 
     /**
-     * @param title
-     * @param desc
+     * Constructor
+     * @param title The tile string
+     * @param desc The description string
      */
     public NewTmfProjectWizard(String title, String desc) {
         super();
@@ -110,12 +128,6 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
         return true;
     }
 
-    /**
-     * @param projectName
-     * @param projectLocation
-     * @param monitor
-     * @return
-     */
     private IProject createProject(String projectName, URI projectLocation, IProgressMonitor monitor) {
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -173,6 +185,10 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
     // IExecutableExtension
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+     */
     @Override
     public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
         fConfigElement = config;

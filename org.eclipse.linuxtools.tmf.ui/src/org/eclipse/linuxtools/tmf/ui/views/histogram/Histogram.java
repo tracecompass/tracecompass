@@ -38,9 +38,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>Histogram</u></b>
- * <p>
- * Re-usable histogram widget with the following features:
+ * Re-usable histogram widget.
+ * 
+ * It has the following features:
  * <ul>
  * <li>Y-axis labels displaying min/max count values
  * <li>X-axis labels displaying time range
@@ -70,6 +70,9 @@ import org.eclipse.swt.widgets.Text;
  * <li>end of the time range
  * <li>number of events in that time range
  * </ul>
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class Histogram implements ControlListener, PaintListener, KeyListener, MouseListener, MouseTrackListener, IHistogramModelListener {
 
@@ -84,8 +87,14 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private final Color fHistoBarColor = new Color(Display.getDefault(), 74, 112, 139);
 
     // Timestamp scale (nanosecond)
+    /**
+     * The time scale of the histogram (nano seconds)
+     */
     public static final byte TIME_SCALE = -9;
 
+    /**
+     * The histogram bar width (number of pixels).
+     */
     public static final int HISTOGRAM_BAR_WIDTH = 1;
 
     // ------------------------------------------------------------------------
@@ -93,6 +102,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     // Owner view
+    /**
+     * The parent TMF view.
+     */
     protected TmfView fParentView;
 
     // Histogram text fields
@@ -101,11 +113,17 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private Text fTimeRangeStartText;
     private Text fTimeRangeEndText;
 
-    // Histogram drawing area
+    /**
+     *  Histogram drawing area
+     */
     protected Canvas fCanvas;
-
-    // Data model
+    /**
+     *  The histogram data model.
+     */
     protected final HistogramDataModel fDataModel;
+    /**
+     * The histogram data model scaled to current resolution and screen width. 
+     */
     protected HistogramScaledData fScaledData;
 
     protected long fCurrentEventTime = 0;
@@ -114,6 +132,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // Construction
     // ------------------------------------------------------------------------
 
+    /**
+     * Standard constructor.
+     * 
+     * @param view A reference to the parent TMF view.
+     * @param parent A parent composite
+     */
     public Histogram(final TmfView view, final Composite parent) {
         fParentView = view;
 
@@ -129,6 +153,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fCanvas.addMouseTrackListener(this);
     }
 
+    /**
+     * Dispose resources and deregisters listeners.
+     */
     public void dispose() {
         fHistoBarColor.dispose();
         fDataModel.removeHistogramListener(this);
@@ -240,18 +267,34 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * Returns the start time (equal first bucket time).
+     * @return the start time.
+     */
     public long getStartTime() {
         return fDataModel.getFirstBucketTime();
     }
 
+    /**
+     * Returns the end time.
+     * @return the end time.
+     */
     public long getEndTime() {
         return fDataModel.getEndTime();
     }
 
+    /**
+     * Returns the time limit (end of last bucket)
+     * @return the time limit.
+     */
     public long getTimeLimit() {
         return fDataModel.getTimeLimit();
     }
 
+    /** 
+     * Returns a data model reference. 
+     * @return data model.
+     */
     public HistogramDataModel getDataModel() {
         return fDataModel;
     }
@@ -259,6 +302,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+    /**
+     * Updates the time range. 
+     * @param startTime A start time
+     * @param endTime A end time.
+     */
     public abstract void updateTimeRange(long startTime, long endTime);
 
     /**
@@ -412,7 +460,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
     // PaintListener
     // ------------------------------------------------------------------------
-
+    /**
+     * Image key string for the canvas.
+     */
     protected final String IMAGE_KEY = "double-buffer-image"; //$NON-NLS-1$
 
     @Override

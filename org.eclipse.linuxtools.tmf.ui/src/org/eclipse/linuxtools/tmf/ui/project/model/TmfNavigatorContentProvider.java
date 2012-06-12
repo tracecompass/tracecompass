@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 Ericsson
+ * Copyright (c) 2010, 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -31,25 +31,38 @@ import org.eclipse.ui.navigator.PipelinedShapeModification;
 import org.eclipse.ui.navigator.PipelinedViewerUpdate;
 
 /**
- * <b><u>TmfNavigatorContentProvider</u></b>
+ * The TMF project content provider for the tree viewer in the project explorer view. 
  * <p>
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public class TmfNavigatorContentProvider implements ICommonContentProvider, IPipelinedTreeContentProvider {
 
     // ------------------------------------------------------------------------
     // ICommonContentProvider
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.Object)
+     */
     @Override
     public Object[] getElements(Object inputElement) {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+     */
     @Override
     public Object getParent(Object element) {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+     */
     @Override
     public boolean hasChildren(Object element) {
         if (element instanceof IProject) {
@@ -71,22 +84,42 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
     @Override
     public void dispose() {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+     */
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
+     */
     @Override
     public void restoreState(IMemento aMemento) {
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
+     */
     @Override
     public void saveState(IMemento aMemento) {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
+     */
     @Override
     public void init(ICommonContentExtensionSite aConfig) {
     }
@@ -94,7 +127,10 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
     // ------------------------------------------------------------------------
     // ICommonContentProvider - getChildren()
     // ------------------------------------------------------------------------
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+     */
     @Override
     public synchronized Object[] getChildren(Object parentElement) {
 
@@ -121,6 +157,9 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
         return new Object[0];
     }
 
+    // ------------------------------------------------------------------------
+    // Helper method
+    // ------------------------------------------------------------------------
     private Object[] getProjectChildren(IProject project) {
         // The children structure
         List<Object> children = new ArrayList<Object>();
@@ -302,12 +341,20 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
     // IPipelinedTreeContentProvider
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedChildren(java.lang.Object, java.util.Set)
+     */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void getPipelinedChildren(Object parent, Set currentChildren) {
         customizeTmfElements(getChildren(parent), currentChildren);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedElements(java.lang.Object, java.util.Set)
+     */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void getPipelinedElements(Object input, Set currentElements) {
@@ -340,29 +387,48 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedParent(java.lang.Object, java.lang.Object)
+     */
     @Override
     public Object getPipelinedParent(Object anObject, Object aSuggestedParent) {
         return aSuggestedParent;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptAdd(org.eclipse.ui.navigator.PipelinedShapeModification)
+     */
     @Override
     public PipelinedShapeModification interceptAdd(PipelinedShapeModification anAddModification) {
         return anAddModification;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRemove(org.eclipse.ui.navigator.PipelinedShapeModification)
+     */
     @Override
     public PipelinedShapeModification interceptRemove(PipelinedShapeModification aRemoveModification) {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRefresh(org.eclipse.ui.navigator.PipelinedViewerUpdate)
+     */
     @Override
     public boolean interceptRefresh(PipelinedViewerUpdate aRefreshSynchronization) {
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptUpdate(org.eclipse.ui.navigator.PipelinedViewerUpdate)
+     */
     @Override
     public boolean interceptUpdate(PipelinedViewerUpdate anUpdateSynchronization) {
         return false;
     }
-
 }
