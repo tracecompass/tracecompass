@@ -2,6 +2,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events;
 
 import org.eclipse.osgi.util.NLS;
 
+@SuppressWarnings("javadoc")
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events.messages"; //$NON-NLS-1$
 	public static String EventsTable_channelColumn;

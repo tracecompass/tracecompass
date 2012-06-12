@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -19,10 +19,13 @@ import java.util.NoSuchElementException;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
 
+/**
+ * An iterator for time events
+ */
 public class EventIterator implements Iterator<ITimeEvent> {
 
-    private long fStartTime;
-    private long fEndTime;
+    private final long fStartTime;
+    private final long fEndTime;
     private List<ITimeEvent> fEventList;
     private List<ITimeEvent> fZoomedEventList;
     private long fZoomedStartTime;
@@ -32,11 +35,33 @@ public class EventIterator implements Iterator<ITimeEvent> {
     private ITimeEvent fNext = null;
     private ITimeEvent fZoomedNext = null;
 
+    /**
+     * Basic constructor, with start time and end times equal to the lowest and
+     * highest values possible, respectively.
+     *
+     * @param eventList
+     *            The list on which this iterator will iterate
+     * @param zoomedEventList
+     *            The "zoomed" list
+     */
     public EventIterator(List<ITimeEvent> eventList, List<ITimeEvent> zoomedEventList) {
         this(eventList, zoomedEventList, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
-    public EventIterator(List<ITimeEvent> eventList, List<ITimeEvent> zoomedEventList, long startTime, long endTime) {
+    /**
+     * Complete constructor, where we specify start and end times.
+     *
+     * @param eventList
+     *            The list on which this iterator will iterate
+     * @param zoomedEventList
+     *            The "zoomed" list
+     * @param startTime
+     *            The start time
+     * @param endTime
+     *            The end time
+     */
+    public EventIterator(List<ITimeEvent> eventList,
+            List<ITimeEvent> zoomedEventList, long startTime, long endTime) {
         fEventList = eventList;
         fZoomedEventList = zoomedEventList;
         if (zoomedEventList != null && zoomedEventList.size() > 0) {

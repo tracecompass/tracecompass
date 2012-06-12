@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -58,20 +58,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 
+/**
+ * Main implementation for the LTTng 2.0 kernel Resource view
+ *
+ * @author Patrick Tasse
+ */
 public class ResourcesView extends TmfView {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
 
-    /**
-     * View ID.
-     */
+    /** View ID. */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.views.resources"; //$NON-NLS-1$
 
-    /**
-     * Initial time range
-     */
+    /** Initial time range */
     private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
 
     // ------------------------------------------------------------------------
@@ -97,7 +98,7 @@ public class ResourcesView extends TmfView {
     private long fEndTime;
 
     // The display width
-    private int fDisplayWidth;
+    private final int fDisplayWidth;
 
     // The next resource action
     private Action fNextResourceAction;
@@ -114,15 +115,15 @@ public class ResourcesView extends TmfView {
 
     private class TraceEntry implements ITimeGraphEntry {
         // The Trace
-        private CtfKernelTrace fTrace;
+        private final CtfKernelTrace fTrace;
         // The start time
-        private long fTraceStartTime;
+        private final long fTraceStartTime;
         // The end time
-        private long fTraceEndTime;        
+        private final long fTraceEndTime;
         // The children of the entry
-        private ArrayList<ResourcesEntry> fChildren;
+        private final ArrayList<ResourcesEntry> fChildren;
         // The name of entry
-        private String fName;
+        private final String fName;
 
         public TraceEntry(CtfKernelTrace trace, String name, long startTime, long endTime) {
             fTrace = trace;
@@ -197,7 +198,7 @@ public class ResourcesView extends TmfView {
             fChildren.add(index, entry);
         }
     }
-    
+
     private static class TraceEntryComparator implements Comparator<ITimeGraphEntry> {
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
@@ -210,9 +211,9 @@ public class ResourcesView extends TmfView {
     }
 
     private class ZoomThread extends Thread {
-        private long fZoomStartTime;
-        private long fZoomEndTime;
-        private IProgressMonitor fMonitor;
+        private final long fZoomStartTime;
+        private final long fZoomEndTime;
+        private final IProgressMonitor fMonitor;
 
         public ZoomThread(long startTime, long endTime) {
             super("ResourcesView zoom"); //$NON-NLS-1$
@@ -241,7 +242,7 @@ public class ResourcesView extends TmfView {
                         entry.setZoomedEventList(null);
                     } else {
                         List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, resolution, true, fMonitor);
-                        if (zoomedEventList != null) { 
+                        if (zoomedEventList != null) {
                             entry.setZoomedEventList(zoomedEventList);
                         }
                     }
@@ -259,6 +260,9 @@ public class ResourcesView extends TmfView {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Default constructor
+     */
     public ResourcesView() {
         super(ID);
         fDisplayWidth = Display.getDefault().getBounds().width;
@@ -326,6 +330,12 @@ public class ResourcesView extends TmfView {
     // Signal handlers
     // ------------------------------------------------------------------------
 
+    /**
+     * Handler for the ExperimentSelected signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void experimentSelected(final TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
         if (signal.getExperiment().equals(fSelectedExperiment)) {
@@ -341,6 +351,12 @@ public class ResourcesView extends TmfView {
         thread.start();
     }
 
+    /**
+     * Handler for the TimeSynch signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void synchToTime(final TmfTimeSynchSignal signal) {
         if (signal.getSource() == this || fSelectedExperiment == null) {
@@ -359,6 +375,12 @@ public class ResourcesView extends TmfView {
         });
     }
 
+    /**
+     * Handler for the RangeSynch signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void synchToRange(final TmfRangeSynchSignal signal) {
         if (signal.getSource() == this || fSelectedExperiment == null) {
@@ -380,6 +402,12 @@ public class ResourcesView extends TmfView {
         });
     }
 
+    /**
+     * Handler for the StatesystemBuildCompleted signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void stateSystemBuildCompleted (final TmfStateSystemBuildCompleted signal) {
         final TmfExperiment<?> selectedExperiment = fSelectedExperiment;

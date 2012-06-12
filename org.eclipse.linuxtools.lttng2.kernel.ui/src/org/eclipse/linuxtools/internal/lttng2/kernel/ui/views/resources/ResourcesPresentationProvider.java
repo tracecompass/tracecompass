@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -30,6 +30,12 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProv
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.swt.graphics.RGB;
 
+/**
+ * Presentation provider for the Resource view, based on the generic TMF
+ * presentation provider.
+ *
+ * @author Patrick Tasse
+ */
 public class ResourcesPresentationProvider extends TimeGraphPresentationProvider {
 
     private enum State {
@@ -50,7 +56,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         }
     }
 
-    @Override 
+    @Override
     public String getStateTypeName() {
         return Messages.ResourcesView_stateTypeName;
     }
@@ -131,7 +137,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-        
+
         Map<String, String> retMap = new HashMap<String, String>();
         if (event instanceof ResourcesEvent) {
 
@@ -139,14 +145,14 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
             // Check for IRQ or Soft_IRQ type
             if (resourcesEvent.getType().equals(Type.IRQ) || resourcesEvent.getType().equals(Type.SOFT_IRQ)) {
-                
+
                 // Get CPU of IRQ or SoftIRQ and provide it for the tooltip display
                 int cpu = resourcesEvent.getValue();
                 if (cpu >= 0) {
                     retMap.put(Messages.ResourcesView_attributeCpuName, String.valueOf(cpu));
                 }
-            } 
-            
+            }
+
             // Check for type CPU
             if (resourcesEvent.getType().equals(Type.CPU)) {
                 int status = resourcesEvent.getValue();

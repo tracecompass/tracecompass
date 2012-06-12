@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -95,14 +95,35 @@ public class Activator extends AbstractUIPlugin {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Get the image object from a given path
+     *
+     * @param path
+     *            The path to the image file
+     * @return The Image object
+     */
     public Image getImageFromPath(String path) {
         return getImageDescripterFromPath(path).createImage();
     }
 
+    /**
+     * Get the ImageDescriptor from a given path
+     *
+     * @param path
+     *            The path to the image file
+     * @return The ImageDescriptor object
+     */
     public ImageDescriptor getImageDescripterFromPath(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
+    /**
+     * Get the Image from a registry
+     *
+     * @param path
+     *            The path to the image registry
+     * @return The Image object
+     */
     public Image getImageFromImageRegistry(String path) {
         Image icon = getImageRegistry().get(path);
         if (icon == null) {
@@ -111,19 +132,19 @@ public class Activator extends AbstractUIPlugin {
         }
         return icon;
     }
-    
+
     /**
      * Logs a message with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logInfo(String message) {
         getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */
@@ -133,16 +154,16 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logWarning(String message) {
         getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */
@@ -152,16 +173,16 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logError(String message) {
         getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */

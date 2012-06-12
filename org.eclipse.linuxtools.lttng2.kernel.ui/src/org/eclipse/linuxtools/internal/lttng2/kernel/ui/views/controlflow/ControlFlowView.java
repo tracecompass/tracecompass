@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -67,6 +67,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
 
+/**
+ * The Control Flow view main object
+ *
+ */
 public class ControlFlowView extends TmfView {
 
     // ------------------------------------------------------------------------
@@ -120,7 +124,7 @@ public class ControlFlowView extends TmfView {
     private long fEndTime;
 
     // The display width
-    private int fDisplayWidth;
+    private final int fDisplayWidth;
 
     // The zoom thread
     private ZoomThread fZoomThread;
@@ -130,9 +134,9 @@ public class ControlFlowView extends TmfView {
 
     // The previous resource action
     private Action fPreviousResourceAction;
-    
+
     // A comparator class
-    private ControlFlowEntryComparator fControlFlowEntryComparator = new ControlFlowEntryComparator();
+    private final ControlFlowEntryComparator fControlFlowEntryComparator = new ControlFlowEntryComparator();
 
     // ------------------------------------------------------------------------
     // Classes
@@ -244,12 +248,12 @@ public class ControlFlowView extends TmfView {
         }
     }
 
-    
+
     private class ZoomThread extends Thread {
-        private long fZoomStartTime;
-        private long fZoomEndTime;
-        private long fResolution;
-        private IProgressMonitor fMonitor;
+        private final long fZoomStartTime;
+        private final long fZoomEndTime;
+        private final long fResolution;
+        private final IProgressMonitor fMonitor;
 
         public ZoomThread(long startTime, long endTime) {
             super("ControlFlowView zoom"); //$NON-NLS-1$
@@ -303,6 +307,9 @@ public class ControlFlowView extends TmfView {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     */
     public ControlFlowView() {
         super(ID);
         fDisplayWidth = Display.getDefault().getBounds().width;
@@ -386,6 +393,12 @@ public class ControlFlowView extends TmfView {
     // Signal handlers
     // ------------------------------------------------------------------------
 
+    /**
+     * Handler for the experiment selected signal
+     *
+     * @param signal
+     *            The signal that's received
+     */
     @TmfSignalHandler
     public void experimentSelected(final TmfExperimentSelectedSignal<? extends ITmfEvent> signal) {
         if (signal.getExperiment().equals(fSelectedExperiment)) {
@@ -401,6 +414,12 @@ public class ControlFlowView extends TmfView {
         thread.start();
     }
 
+    /**
+     * Handler for the synch signal
+     *
+     * @param signal
+     *            The signal that's received
+     */
     @TmfSignalHandler
     public void synchToTime(final TmfTimeSynchSignal signal) {
         if (signal.getSource() == this || fSelectedExperiment == null) {
@@ -442,7 +461,7 @@ public class ControlFlowView extends TmfView {
             }
         }
         final int selectedThread = thread;
- 
+
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -467,6 +486,12 @@ public class ControlFlowView extends TmfView {
         });
     }
 
+    /**
+     * Handler for the range sync signal
+     *
+     * @param signal
+     *            The signal that's received
+     */
     @TmfSignalHandler
     public void synchToRange(final TmfRangeSynchSignal signal) {
         if (signal.getSource() == this || fSelectedExperiment == null) {
@@ -488,6 +513,12 @@ public class ControlFlowView extends TmfView {
         });
     }
 
+    /**
+     * Handler for the state system build completed signal
+     *
+     * @param signal
+     *            The signal that's received
+     */
     @TmfSignalHandler
     public void stateSystemBuildCompleted (final TmfStateSystemBuildCompleted signal) {
         final TmfExperiment<?> selectedExperiment = fSelectedExperiment;

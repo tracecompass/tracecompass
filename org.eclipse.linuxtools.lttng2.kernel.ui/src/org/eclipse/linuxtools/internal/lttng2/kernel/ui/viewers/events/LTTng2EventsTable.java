@@ -20,6 +20,9 @@ import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Events table specific for LTTng 2.0 kernel traces
+ */
 public class LTTng2EventsTable extends TmfEventsTable {
 
     // ------------------------------------------------------------------------
@@ -49,6 +52,14 @@ public class LTTng2EventsTable extends TmfEventsTable {
     // Constructor
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            The parent composite
+     * @param cacheSize
+     *            The size of the rows cache
+     */
     public LTTng2EventsTable(Composite parent, int cacheSize) {
         super(parent, cacheSize, COLUMN_DATA);
         fTable.getColumns()[0].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TIMESTAMP);

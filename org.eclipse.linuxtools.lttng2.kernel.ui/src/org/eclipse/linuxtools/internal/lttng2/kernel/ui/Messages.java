@@ -2,6 +2,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui;
 
 import org.eclipse.osgi.util.NLS;
 
+@SuppressWarnings("javadoc")
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.lttng2.kernel.ui.messages"; //$NON-NLS-1$
 
@@ -10,13 +11,13 @@ public class Messages extends NLS {
     public static String ControlFlowView_ptidColumn;
     public static String ControlFlowView_processColumn;
     public static String ControlFlowView_traceColumn;
-    
+
     public static String ControlFlowView_stateTypeName;
     public static String ControlFlowView_nextProcessActionNameText;
     public static String ControlFlowView_nextProcessActionToolTipText;
     public static String ControlFlowView_previousProcessActionNameText;
     public static String ControlFlowView_previousProcessActionToolTipText;
-    
+
     public static String ControlFlowView_attributeSyscallName;
 
     public static String ResourcesView_stateTypeName;
@@ -27,7 +28,7 @@ public class Messages extends NLS {
     public static String ResourcesView_attributeCpuName;
     public static String ResourcesView_attributeIrqName;
     public static String ResourcesView_attributeSoftIrqName;
-    
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

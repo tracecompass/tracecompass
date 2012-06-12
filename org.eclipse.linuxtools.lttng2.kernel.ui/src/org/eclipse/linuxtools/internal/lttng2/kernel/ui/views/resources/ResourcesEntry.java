@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -21,21 +21,49 @@ import org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
+/**
+ * An entry, or row, in the resource view
+ *
+ * @author Patrick Tasse
+ */
 public class ResourcesEntry implements ITimeGraphEntry {
-    public static enum Type { NULL, CPU, IRQ, SOFT_IRQ };
 
-    private int fQuark;
-    private CtfKernelTrace fTrace;
+    /** Type of resource */
+    public static enum Type {
+        /** Null resources (filler rows, etc.) */
+        NULL,
+        /** Entries for CPUs */
+        CPU,
+        /** Entries for IRQs */
+        IRQ,
+        /** Entries for Soft IRQ */
+        SOFT_IRQ }
+
+    private final int fQuark;
+    private final CtfKernelTrace fTrace;
     private ITimeGraphEntry fParent = null;
-    private ITimeGraphEntry[] children = null;
-    private String fName;
-    private Type fType;
-    private int fId;
+    private final ITimeGraphEntry[] children = null;
+    private final String fName;
+    private final Type fType;
+    private final int fId;
     private long fStartTime;
     private long fEndTime;
     private List<ITimeEvent> fEventList = new ArrayList<ITimeEvent>();
     private List<ITimeEvent> fZoomedEventList = null;
 
+    /**
+     * Standard constructor
+     *
+     * @param quark
+     *            The quark of the state system attribute whose state is shown
+     *            on this row
+     * @param trace
+     *            The trace that this view is talking about
+     * @param type
+     *            Type of entry, see the Type enum
+     * @param id
+     *            The integer id associated with this entry or row
+     */
     public ResourcesEntry(int quark, CtfKernelTrace trace, Type type, int id) {
         fQuark = quark;
         fTrace = trace;
@@ -89,26 +117,59 @@ public class ResourcesEntry implements ITimeGraphEntry {
         return new EventIterator(fEventList, fZoomedEventList, startTime, stopTime);
     }
 
+    /**
+     * Assign a parent entry to this one, to organize them in a tree in the
+     * view.
+     *
+     * @param parent
+     *            The parent entry
+     */
     public void setParent(ITimeGraphEntry parent) {
         fParent = parent;
     }
 
+    /**
+     * Retrieve the attribute quark that's represented by this entry.
+     *
+     * @return The integer quark
+     */
     public int getQuark() {
         return fQuark;
     }
 
+    /**
+     * Retrieve the trace that is associated to this Resource view.
+     *
+     * @return The LTTng 2 kernel trace
+     */
     public CtfKernelTrace getTrace() {
         return fTrace;
     }
 
+    /**
+     * Get the entry Type of this entry. Uses the inner Type enum.
+     *
+     * @return The entry type
+     */
     public Type getType() {
         return fType;
     }
 
+    /**
+     * Get the integer ID associated with this entry.
+     *
+     * @return The ID
+     */
     public int getId() {
         return fId;
     }
 
+    /**
+     * Assign the target event list to this view.
+     *
+     * @param eventList
+     *            The list of time events
+     */
     public void setEventList(List<ITimeEvent> eventList) {
         fEventList = eventList;
         if (eventList != null && eventList.size() > 0) {
@@ -118,6 +179,12 @@ public class ResourcesEntry implements ITimeGraphEntry {
         }
     }
 
+    /**
+     * Assign the zoomed event list to this view.
+     *
+     * @param eventList
+     *            The list of "zoomed" time events
+     */
     public void setZoomedEventList(List<ITimeEvent> eventList) {
         fZoomedEventList = eventList;
     }

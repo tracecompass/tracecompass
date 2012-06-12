@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -27,7 +27,7 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
 
-    // Perspective ID
+    /** Perspective ID */
     public static final String ID = "org.eclipse.linuxtools.lttng2.ui.perspective"; //$NON-NLS-1$
 
     // LTTng views
@@ -45,7 +45,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
      */
     @Override
@@ -76,7 +76,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
         // Create the middle right folder
         IFolderLayout middleRightFolder = layout.createFolder(
-                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$ 
+                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         middleRightFolder.addView(EVENTS_VIEW_ID);
 
         // Create the bottom right folder
@@ -89,7 +89,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
     /**
      * Add fast views to the perspective
-     * 
+     *
      * @param layout
      */
     private void addFastViews(IPageLayout layout) {
@@ -97,7 +97,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
     /**
      * Add view shortcuts to the perspective
-     * 
+     *
      * @param layout
      */
     private void addViewShortcuts(IPageLayout layout) {
@@ -105,7 +105,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
     /**
      * Add perspective shortcuts to the perspective
-     * 
+     *
      * @param layout
      */
     private void addPerspectiveShortcuts(IPageLayout layout) {
