@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.internal.tmf.core.trace;
 
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
@@ -64,7 +63,6 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> impleme
      */
     @Override
     public TmfExperimentLocation clone() {
-//        super.clone(); // To keep FindBugs happy
         TmfLocationArray array = (TmfLocationArray) getLocation();
         TmfLocationArray clones = array.clone();
         return new TmfExperimentLocation(clones);
@@ -81,8 +79,8 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> impleme
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        ITmfLocation<? extends Comparable<?>>[] locations = ((TmfLocationArray) getLocation()).getLocations();
-        for (ITmfLocation<?> location : locations) {
+        TmfRankedLocation[] locations = ((TmfLocationArray) getLocation()).getLocations();
+        for (TmfRankedLocation location : locations) {
             result.append("[" + location + "]");
         }
         result.append("]");

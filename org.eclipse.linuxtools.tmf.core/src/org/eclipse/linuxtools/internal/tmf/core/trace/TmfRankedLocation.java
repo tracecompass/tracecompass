@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,27 +8,27 @@
  * 
  * Contributors:
  * Patrick Tasse - Initial API and implementation
- * Francois Chouinard - Put in shape for 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.trace;
 
-import java.util.Arrays;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 /**
- * A convenience class to store trace location arrays. The main purpose is to
- * provide a Comparable implementation for TmfExperimentLocation.
+ * A pair of trace location and trace rank.
  * 
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable {
+public class TmfRankedLocation implements Comparable<TmfRankedLocation>, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private TmfRankedLocation[] fLocations;
+    private ITmfLocation<? extends Comparable<?>> fLocation;
+    private long fRank;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -37,10 +37,22 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     /**
      * The standard constructor
      * 
-     * @param locations the locations
+     * @param context a trace context
      */
-    public TmfLocationArray(TmfRankedLocation[] locations) {
-        fLocations = locations;
+    public TmfRankedLocation(ITmfContext context) {
+        fLocation = context.getLocation().clone();
+        fRank = context.getRank();
+    }
+
+    /**
+     * Private constructor
+     * 
+     * @param location the trace location
+     * @param rank the trace rank
+     */
+    private TmfRankedLocation(ITmfLocation<? extends Comparable<?>> location, long rank) {
+        fLocation = location;
+        fRank = rank;
     }
 
     // ------------------------------------------------------------------------
@@ -48,12 +60,21 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // ------------------------------------------------------------------------
 
     /**
-     * The standard constructor
+     * Get the trace location
      * 
-     * @param locations the locations
+     * @return the trace location
      */
-    public TmfRankedLocation[] getLocations() {
-        return fLocations;
+    public ITmfLocation<? extends Comparable<?>> getLocation() {
+        return fLocation;
+    }
+
+    /**
+     * Get the trace rank
+     * 
+     * @return the trace rank
+     */
+    public long getRank() {
+        return fRank;
     }
 
     // ------------------------------------------------------------------------
@@ -64,30 +85,21 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      * @see java.lang.Object#clone()
      */
     @Override
-    public TmfLocationArray clone() {
-        TmfRankedLocation[] clones = new TmfRankedLocation[fLocations.length];
-        for (int i = 0; i < fLocations.length; i++) {
-            TmfRankedLocation location = fLocations[i];
-            clones[i] = (location != null) ? location.clone() : null;
-        }
-        return new TmfLocationArray(clones);
+    public TmfRankedLocation clone() {
+        return new TmfRankedLocation(fLocation.clone(), fRank);
     }
 
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------
 
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
-    public int compareTo(TmfLocationArray o) {
-        for (int i = 0; i < fLocations.length; i++) {
-            TmfRankedLocation l1 = fLocations[i];
-            TmfRankedLocation l2 = o.fLocations[i];
-            int result = l1.compareTo(l2);
-            if (result != 0) {
-                return result;
-            }
-        }
-        return 0;
+    public int compareTo(TmfRankedLocation o) {
+        return Long.valueOf(fRank).compareTo(Long.valueOf(o.fRank));
     }
 
     // ------------------------------------------------------------------------
@@ -101,7 +113,8 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(fLocations);
+        result = prime * result + ((fLocation == null) ? 0 : fLocation.hashCode());
+        result = prime * result + (int) (fRank ^ (fRank >>> 32));
         return result;
     }
 
@@ -119,8 +132,15 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
         if (getClass() != obj.getClass()) {
             return false;
         }
-        TmfLocationArray other = (TmfLocationArray) obj;
-        if (!Arrays.equals(fLocations, other.fLocations)) {
+        TmfRankedLocation other = (TmfRankedLocation) obj;
+        if (fLocation == null) {
+            if (other.fLocation != null) {
+                return false;
+            }
+        } else if (!fLocation.equals(other.fLocation)) {
+            return false;
+        }
+        if (fRank != other.fRank) {
             return false;
         }
         return true;
@@ -132,7 +152,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfLocationArray [locations=" + Arrays.toString(fLocations) + "]";
+        return fLocation + "," + fRank;
     }
 
 }

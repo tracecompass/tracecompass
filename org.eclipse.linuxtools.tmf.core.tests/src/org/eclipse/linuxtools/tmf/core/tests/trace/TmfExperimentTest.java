@@ -244,23 +244,17 @@ public class TmfExperimentTest extends TestCase {
         // First event
         ITmfContext context = fExperiment.seekEvent((ITmfLocation) null);
         double ratio = fExperiment.getLocationRatio(context.getLocation());
-        context = fExperiment.seekEvent(ratio);
-        double ratio2 = fExperiment.getLocationRatio(context.getLocation());
-        assertEquals("getLocationRatio", ratio, ratio2);
+        assertEquals("getLocationRatio", 0.0, ratio);
 
         // Middle event
         context = fExperiment.seekEvent(NB_EVENTS / 2);
         ratio = fExperiment.getLocationRatio(context.getLocation());
-        context = fExperiment.seekEvent(ratio);
-        ratio2 = fExperiment.getLocationRatio(context.getLocation());
-        assertEquals("getLocationRatio", ratio, ratio2);
+        assertEquals("getLocationRatio", (double) (NB_EVENTS / 2) / NB_EVENTS, ratio);
 
         // Last event
         context = fExperiment.seekEvent(NB_EVENTS - 1);
         ratio = fExperiment.getLocationRatio(context.getLocation());
-        context = fExperiment.seekEvent(ratio);
-        ratio2 = fExperiment.getLocationRatio(context.getLocation());
-        assertEquals("getLocationRatio", ratio, ratio2);
+        assertEquals("getLocationRatio", (double) (NB_EVENTS - 1) / NB_EVENTS, ratio);
     }
 
 //    @SuppressWarnings({ "unchecked", "rawtypes" })
