@@ -18,7 +18,8 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <p>
- * A basic histogram with the following additional features:
+ * A basic histogram widget that displays the event distribution of a specific time range of a trace. 
+ * It has the following additional features:
  * <ul>
  * <li>zoom in: mouse wheel up (or forward)
  * <li>zoom out: mouse wheel down (or backward)

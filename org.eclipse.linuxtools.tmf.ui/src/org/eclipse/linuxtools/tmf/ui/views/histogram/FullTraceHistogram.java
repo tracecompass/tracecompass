@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * A histogram that displays the full trace.
+ * A histogram widget that displays the event distribution of a whole trace.
  * <p>
  * It also features a selected range window that can be dragged and zoomed.
  * 

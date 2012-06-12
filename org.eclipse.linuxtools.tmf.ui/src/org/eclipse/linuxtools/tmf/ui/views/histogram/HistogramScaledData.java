@@ -8,7 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Bernd Hufmann - Added setter and getter
+ *   Bernd Hufmann - Added setter and getter and bar width support
  *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
 

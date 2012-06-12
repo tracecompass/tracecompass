@@ -13,14 +13,23 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.distribution.model;
 
+/**
+ * Base distribution model interface. 
+ * 
+ * Distribution models such histograms need to implement this interface. 
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
+ *
+ */
 public interface IBaseDistributionModel {
     /**
-     * Interface to complete the model
+     * Complete the model (all data received)
      */
     public void complete();
     
     /**
-     * Interface to clear the model
+     * Clear the model (delete all data). 
      */
     public void clear();
 }

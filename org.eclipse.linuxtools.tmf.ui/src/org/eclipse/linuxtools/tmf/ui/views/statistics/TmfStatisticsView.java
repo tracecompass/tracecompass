@@ -10,9 +10,6 @@
  *   Mathieu Denis  (mathieu.denis@polymtl.ca)  - Generalized version based on LTTng
  *   Bernd Hufmann - Updated to use trace reference in TmfEvent and streaming
  *   
- *   @version 1.0
- *   @author Mathieu Denis
- *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics;
@@ -63,47 +60,66 @@ import org.eclipse.swt.widgets.Listener;
  * TreeViewer. - The controller that keeps model and view synchronized is an observer of the model.
  * </p>
  * 
- * 
+ * @version 1.0
+ * @author @author Mathieu Denis
  */
 public class TmfStatisticsView extends TmfView {
     /**
      * The ID correspond to the package in which this class is embedded
      */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.statistics"; //$NON-NLS-1$
-
-    // view name
+    /**
+     *  The view name.
+     */
     public static final String TMF_STATISTICS_VIEW = "StatisticsView"; //$NON-NLS-1$
-
-    // Refresh frequency
+    /**
+     *  Refresh frequency 
+     */
     protected static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
-    
-    // Default PAGE_SIZE
-    protected static final int PAGE_SIZE = 50000; // For background request
-    
-    // The actual tree to display
+    /**
+     *  Default PAGE_SIZE for background requests
+     */
+    protected static final int PAGE_SIZE = 50000;
+    /**
+     *  The actual tree viewer to display
+     */
     protected TreeViewer fTreeViewer;
-    // Stores the request to the experiment
+    /**
+     *  Stores the request to the experiment
+     */
     protected ITmfEventRequest<ITmfEvent> fRequest = null;
-
-    // Update synchronization parameters (used for streaming)
+    /**
+     *  Update synchronization parameter (used for streaming): Update busy indicator
+     */
     protected boolean fStatisticsUpdateBusy = false;
+    /**
+     *  Update synchronization parameter (used for streaming): Update pending indicator
+     */
     protected boolean fStatisticsUpdatePending = false;
+    /**
+     *  Update synchronization parameter (used for streaming): Pending Update time range
+     */
     protected TmfTimeRange fStatisticsUpdateRange = null;
+    /**
+     * Update synchronization object.
+     */
     protected final Object fStatisticsUpdateSyncObj = new Object();
-
-    // Flag to force request the data from trace
+    /**
+     *  Flag to force request the data from trace
+     */
     protected boolean fRequestData = false; 
-
-    
-    // Object to store the cursor while waiting for the experiment to load
+    /**
+     *  Object to store the cursor while waiting for the experiment to load
+     */
     private Cursor fWaitCursor = null;
-
-    // Stores the number of instance
+    /**
+     *  View instance counter (for multiple statistic views) 
+     */
     private static int fCountInstance = 0;
-
-    // Number of this instance. Used as an instance ID
+    /**
+     * Number of this instance. Used as an instance ID.
+     */
     private int fInstanceNb;
-    
 
     /**
      * Constructor of a statistics view.
@@ -267,8 +283,7 @@ public class TmfStatisticsView extends TmfView {
     /**
      * Called when an experiment request has failed or has been canceled Remove the data retrieved from the experiment from the statistics tree.
      * 
-     * @param name
-     *            the experiment name
+     * @param name The experiment name
      */
     public void modelIncomplete(String name) {
         Object input = fTreeViewer.getInput();
@@ -285,9 +300,9 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
-     * If the user choose another experiment, the current must be disposed.
+     * Handles the signal about disposal of the current experiment.
      * 
-     * @param signal
+     * @param signal The disposed signal
      */
     @TmfSignalHandler
     public void experimentDisposed(TmfExperimentDisposedSignal<? extends ITmfEvent> signal) {
@@ -298,11 +313,10 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
-     * Handler called when an experiment is selected. Checks if the experiment has changed and requests the selected experiment if it has not yet been
-     * cached.
+     * Handler called when an experiment is selected. Checks if the experiment has changed 
+     * and requests the selected experiment if it has not yet been cached.
      * 
-     * @param signal
-     *            contains the information about the selection.
+     * @param signal Contains the information about the selection.
      */
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<? extends ITmfEvent> signal) {
@@ -367,7 +381,8 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
-     * @param signal
+     * Handles the signal about new experiment range.
+     * @param signal The experiment range updated signal
      */
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
@@ -392,6 +407,7 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
+     * Returns the quantity of data to retrieve before a refresh of the view is performed
      * 
      * @return the quantity of data to retrieve before a refresh of the view is performed.
      */
@@ -418,7 +434,8 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
-     * Construct the ID based on the experiment name
+     * Constructs the ID based on the experiment name and <code>fInstanceNb</code>
+     * 
      * @param experimentName the name of the trace name to show in the view 
      * @return a view ID
      */
@@ -429,8 +446,7 @@ public class TmfStatisticsView extends TmfView {
     /**
      * When the experiment is loading the cursor will be different so the user know the processing is not finished yet.
      * 
-     * @param waitInd
-     *            indicates if we need to show the waiting cursor, or the default one
+     * @param waitInd Indicates if we need to show the waiting cursor, or the default one
      */
     protected void waitCursor(final boolean waitInd) {
         if ((fTreeViewer == null) || (fTreeViewer.getTree().isDisposed())) {

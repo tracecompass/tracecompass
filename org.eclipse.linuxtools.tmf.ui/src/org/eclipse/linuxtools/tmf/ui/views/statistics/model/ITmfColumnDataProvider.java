@@ -16,7 +16,9 @@ import java.util.List;
 
 /**
  * Basic methods that must be implemented in a column data provider.
- * </p>
+ * The <code>TmfStatisticsView</code> uses classes implementing this
+ * interface to define the columns in the statistics tree viewer. 
+ * 
  * @version 1.0
  * @author Mathieu Denis
  */
