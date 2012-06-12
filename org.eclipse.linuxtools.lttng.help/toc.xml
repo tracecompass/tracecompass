@@ -82,19 +82,19 @@
 		<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html" label="LTTng Kernel Analysis">
 			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#LTTng_Kernel_Perspective" label="LTTng Kernel Perspective"></topic>
 			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Control_Flow_View" label="Control Flow View">
-				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#.3Cspan_style.3D.22color:_.23C84545.3B.22.3EProcess_tree.3C.2Fspan.3E_and_.3Cspan_style.3D.22color:_.23A1C81A.3B.22.3Einformations.3C.2Fspan.3E" label="&lt;span style=&quot;color: #C84545;&quot;&quot;Process tree&lt;/span&quot; and &lt;span style=&quot;color: #A1C81A;&quot;&quot;informations&lt;/span&quot;"></topic>
-				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#.3Cspan_style.3D.22color:_.2367A3DC.3B.22.3E.3Cspan_id.3D.22anc-cfw-states-flow.22.3EStates_flow.3C.2Fspan.3E.3C.2Fspan.3E" label="&lt;span style=&quot;color: #67A3DC;&quot;&quot;&lt;span id=&quot;anc-cfw-states-flow&quot;&quot;States flow&lt;/span&quot;&lt;/span&quot;">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Process_Tree_and_Information" label="Process Tree and Information"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#States_Flow" label="States Flow">
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Using_the_mouse" label="Using the mouse"></topic>
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Incomplete_regions" label="Incomplete regions"></topic>
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Zoom_region" label="Zoom region"></topic>
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Tooltips" label="Tooltips"></topic>
 				</topic>
-				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#.3Cspan_style.3D.22color:_.23AD77D7.3B.22.3E.3Cspan_id.3D.22anc-cfw-toolbar.22.3EToolbar.3C.2Fspan.3E.3C.2Fspan.3E" label="&lt;span style=&quot;color: #AD77D7;&quot;&quot;&lt;span id=&quot;anc-cfw-toolbar&quot;&quot;Toolbar&lt;/span&quot;&lt;/span&quot;"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Toolbar" label="Toolbar"></topic>
 			</topic>
 			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Resources_View" label="Resources View">
 				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Navigation" label="Navigation"></topic>
 				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Incomplete_regions_2" label="Incomplete regions"></topic>
-				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Toolbar" label="Toolbar"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Toolbar_2" label="Toolbar"></topic>
 			</topic>
 			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Events_View_2" label="Events View"></topic>
 		</topic>
