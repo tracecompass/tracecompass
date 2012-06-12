@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -81,10 +81,9 @@ import org.eclipse.ui.part.ViewPart;
  * <p>
  * This class implements sequence diagram widget used in the sequence diagram view.
  * </p>
- * 
- * @version 1.0 
+ *
+ * @version 1.0
  * @author sveyrier
- * 
  */
 public class SDWidget extends ScrollView implements SelectionListener, IPropertyChangeListener, DisposeListener, ITimeCompressionListener {
 
@@ -101,59 +100,59 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     protected Image fOverView = null;
     /**
-     * The zoom in menu item. 
+     * The zoom in menu item.
      */
     protected MenuItem fZoomIn = null;
     /**
-     * The zoom out menu item. 
+     * The zoom out menu item.
      */
     protected MenuItem fZoomOut = null;
     /**
-     * The sequence diagram selection provider. 
+     * The sequence diagram selection provider.
      */
     protected SDWidgetSelectionProvider fSelProvider = null;
     /**
-     * The current zoom value. 
+     * The current zoom value.
      */
     public float fZoomValue = 1;
     /**
-     * The current zoomInMode (true for zoom in). 
+     * The current zoomInMode (true for zoom in).
      */
     protected boolean fZoomInMode = false;
     /**
-     * The current zoomOutMode (true for zoom out). 
+     * The current zoomOutMode (true for zoom out).
      */
     protected boolean fZoomOutMode = false;
     /**
-     * The current list of selected graph nodes. 
+     * The current list of selected graph nodes.
      */
     protected List<GraphNode> fSelectedNodeList = null;
     /**
-     * Flag whether ctrl button is selected or not. 
+     * Flag whether ctrl button is selected or not.
      */
     protected boolean fCtrlSelection = false;
     /**
-     * A reference to the view site. 
+     * A reference to the view site.
      */
     protected ViewPart fSite = null;
     /**
-     * The current graph node (the last selected one). 
+     * The current graph node (the last selected one).
      */
     public GraphNode fCurrentGraphNode = null;
     /**
-     * The first graph node in list (multiple selection). 
+     * The first graph node in list (multiple selection).
      */
     public GraphNode fListStart = null;
     /**
-     * The previous graph node (multiple selection). 
+     * The previous graph node (multiple selection).
      */
     public List<GraphNode> fPrevList = null;
     /**
-     * The time compression bar.  
+     * The time compression bar.
      */
     protected TimeCompressionBar fTimeBar = null;
     /**
-     * The current diagram tool tip. 
+     * The current diagram tool tip.
      */
     protected DiagramToolTip fToolTip = null;
     /**
@@ -169,7 +168,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     protected Lifeline fDragAndDrop = null;
     /**
-     * The number of focused widgets. 
+     * The number of focused widgets.
      */
     protected int fFocusedWidget = -1;
     /**
@@ -185,7 +184,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     protected int fPrinterX = 0;
     /**
-     * Flag whether drag and drop is enabled or not. 
+     * Flag whether drag and drop is enabled or not.
      */
     protected boolean fIsDragAndDrop = false;
     /**
@@ -233,19 +232,19 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     protected Printer fPrinter = null;
     /**
-     * Flag whether shift was selected or not. 
+     * Flag whether shift was selected or not.
      */
     protected boolean fShiftSelection = false;
     /**
-     * The scroll tooltip. 
+     * The scroll tooltip.
      */
     protected DiagramToolTip fScrollToolTip = null;
-    /** 
-     * Timer for auto_scroll feature 
+    /**
+     * Timer for auto_scroll feature
      */
     protected AutoScroll fLocalAutoScroll = null;
     /**
-     * TimerTask for auto_scroll feature !=null when auto scroll is running 
+     * TimerTask for auto_scroll feature !=null when auto scroll is running
      */
     protected Timer fLocalAutoScrollTimer = null;
 
@@ -368,8 +367,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                     e.detail |= ACC.STATE_FOCUSED;
                 } else {
                     e.detail |= ACC.STATE_SELECTABLE;
-                    if (e.childID == fFocusedWidget)
+                    if (e.childID == fFocusedWidget) {
                         e.detail |= ACC.STATE_FOCUSED | ACC.STATE_SELECTED | ACC.STATE_CHECKED;
+                    }
                 }
             }
         });
@@ -410,13 +410,13 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             }
         });
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /**
      * Sets the time compression bar.
-     * 
+     *
      * @param bar The time compression bar to set
      */
     public void setTimeBar(TimeCompressionBar bar) {
@@ -425,10 +425,10 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             fTimeBar.addTimeCompressionListener(this);
         }
     }
-    
+
     /**
      * Resize the contents to insure the frame fit into the view
-     * 
+     *
      * @param frame the frame which will be drawn in the view
      */
     public void resizeContents(Frame frame) {
@@ -439,7 +439,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * The frame to render (the sequence diagram)
-     * 
+     *
      * @param theFrame the frame to display
      * @param resetPosition boolean
      */
@@ -463,8 +463,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Returns the current Frame (the sequence diagram container)
-     * 
-     * @return the frame 
+     *
+     * @return the frame
      */
     public Frame getFrame() {
         return fFrame;
@@ -472,16 +472,16 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Returns the selection provider for the current sequence diagram
-     * 
-     * @return the selection provider 
+     *
+     * @return the selection provider
      */
     public ISelectionProvider getSelectionProvider() {
         return fSelProvider;
     }
-    
+
     /**
      * Returns a list of selected graph nodes.
-     * 
+     *
      * @return a list of selected graph nodes.
      */
     public List<GraphNode> getSelection() {
@@ -490,7 +490,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Adds a graph node to the selected nodes list.
-     * 
+     *
      * @param node A graph node
      */
     public void addSelection(GraphNode node) {
@@ -506,7 +506,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Adds a list of node to the selected nodes list.
-     *  
+     *
      * @param list of graph nodes
      */
     public void addSelection(List<GraphNode> list) {
@@ -523,7 +523,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Removes a node from the selected nodes list.
-     * 
+     *
      * @param node to remove
      */
     public void removeSelection(GraphNode node) {
@@ -536,7 +536,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Removes a list of graph nodes from the selected nodes list.
-     * 
+     *
      * @param list of nodes to remove.
      */
     public void removeSelection(List<GraphNode> list) {
@@ -564,7 +564,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Sets view part.
-     *  
+     *
      * @param viewSite The view part to set
      */
     public void setSite(ViewPart viewSite) {
@@ -577,17 +577,17 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Returns the GraphNode overView the mouse if any
-     * 
-     * @return the current graph node 
+     *
+     * @return the current graph node
      * */
     public GraphNode getMouseOverNode() {
         return fCurrentGraphNode;
     }
-    
+
     /**
      * Sets the zoom in mode.
-     * 
-     * @param The mode value to set. 
+     *
+     * @param The mode value to set.
      */
     public void setZoomInMode(boolean value) {
         if (value) {
@@ -598,7 +598,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Sets the zoom out mode.
-     * 
+     *
      * @param The mode value to set.
      */
     public void setZoomOutMode(boolean value) {
@@ -610,7 +610,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Moves the Sequence diagram to ensure the given node is visible and draw it selected
-     * 
+     *
      * @param node the GraphNode to move to
      */
     public void moveTo(GraphNode node) {
@@ -624,7 +624,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Moves the Sequence diagram to ensure the given node is visible
-     * 
+     *
      * @param node the GraphNode to move to
      */
     public void ensureVisible(GraphNode node) {
@@ -662,7 +662,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Returns teh printer reference.
-     * 
+     *
      * @return the printer reference
      */
     public Printer getPrinter() {
@@ -671,7 +671,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Returns whether the widget is used for printing or not.
-     * 
+     *
      * @return whether the widget is used for printing or not
      */
     public boolean isPrinting() {
@@ -680,7 +680,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Gets the overview image.
-     * 
+     *
      * @param rect Rectangle to include overview.
      * @return the overview image
      */
@@ -706,7 +706,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         fZoomValue = oldzoom;
         return fOverView;
     }
-    
+
     /**
      * Resets the zoom factor.
      */
@@ -724,7 +724,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Enable or disable the lifeline reodering using Drag and Drop
-     * 
+     *
      * @param mode - true to enable false otherwise
      */
     public void setReorderMode(boolean mode) {
@@ -734,8 +734,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * Return the lifelines reorder sequence (using Drag and Drop) if the the reorder mode is turn on. Each ArryList
      * element is of type Lifeline[2] with Lifeline[0] inserted before Lifeline[1] in the diagram
-     * 
-     * @return - the re-odered sequence 
+     *
+     * @return - the re-odered sequence
      */
     public List<Lifeline[]> getLifelineReoderList() {
         return fReorderList;
@@ -743,7 +743,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Sets the focus on given graph node (current node).
-     * 
+     *
      * @param the graph node to focus on.
      */
     public void setFocus(GraphNode node) {
@@ -761,7 +761,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Returns the graph node focused on.
-     * 
+     *
      * @return the current graph node
      */
     public GraphNode getFocusNode() {
@@ -896,7 +896,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             traverseLeft();
         }
         GraphNode node = null;
-        
+
         if (selectedNode instanceof BaseMessage) {
             if (((BaseMessage) selectedNode).getStartLifeline() != null) {
                 node = fFrame.getNextLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), null);
@@ -952,7 +952,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Method to print UI.
-     * 
+     *
      * @param sdPrintDialog the sequence diagram printer dialog.
      */
     public void printUI(SDPrintDialogUI sdPrintDialog) {
@@ -961,12 +961,12 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         if ((data == null) || (fFrame == null)) {
             return;
         }
-        
+
         fPrinter = new Printer(data);
-        
+
         String jobName = MessageFormat.format(SDMessages._116, new Object[] { String.valueOf(fSite.getContentDescription()), String.valueOf(fFrame.getName()) });
         fPrinter.startJob(jobName);
-        
+
         GC gc = new GC(fPrinter);
 //        Frame.setUserPref(SDViewPref.getInstance());
 
@@ -1087,7 +1087,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Method to print a page.
-     * 
+     *
      * @param pageNum The page number
      * @param pd The sequence diagram print dialog
      * @param context The graphical context
@@ -1114,7 +1114,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Method to print page ranges.
-     * 
+     *
      * @param i The start page
      * @param j The end page
      * @param pd The sequence diagram print dialog
@@ -1146,20 +1146,20 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         fIsPrinting = false;
         fZoomValue = lastZoom;
     }
-    
+
     /**
      * Sets the collapse provider.
-     * 
+     *
      * @param provider The collapse provider to set
      */
     protected void setCollapseProvider(ISDCollapseProvider provider) {
         fCollapseProvider = provider;
     }
 
-    
+
     /**
      * Checks for focus of children.
-     * 
+     *
      * @param children Control to check
      * @return true if child is on focus else false
      */
@@ -1179,7 +1179,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * A post action for a tooltip (before displaying).
-     *  
+     *
      * @param accessible true if accessible else false
      * @return the tooltip text.
      */
@@ -1188,20 +1188,20 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 //        String postfix = "";//$NON-NLS-1$
         // Determine if the tooltip must show the time difference between the current mouse position and
         // the last selected graphNode
-        if ((fCurrentGraphNode != null) && 
-                (fCurrentGraphNode instanceof ITimeRange) && 
-                (fToolTipNode instanceof ITimeRange) && 
-                (fCurrentGraphNode != fToolTipNode) && 
-                ((ITimeRange) fToolTipNode).hasTimeInfo() && 
+        if ((fCurrentGraphNode != null) &&
+                (fCurrentGraphNode instanceof ITimeRange) &&
+                (fToolTipNode instanceof ITimeRange) &&
+                (fCurrentGraphNode != fToolTipNode) &&
+                ((ITimeRange) fToolTipNode).hasTimeInfo() &&
                 ((ITimeRange) fCurrentGraphNode).hasTimeInfo()) {
             postfix.append(" -> "); //$NON-NLS-1$
             postfix.append(fCurrentGraphNode.getName());
             postfix.append("\n"); //$NON-NLS-1$
             postfix.append(SDMessages._138);
             postfix.append(" "); //$NON-NLS-1$
-            
-//            postfix = " -> " + fCurrentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
-            
+
+//            postfix = " -> " + fCurrentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
             //double delta = ((ITimeRange)toolTipNode).getLastTime()-((ITimeRange)currentGraphNode).getLastTime();
             ITmfTimestamp firstTime = ((ITimeRange) fCurrentGraphNode).getEndTime();
             ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();
@@ -1214,21 +1214,21 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                 postfix.append("\n"); //$NON-NLS-1$
 //                postfix = "\n";//$NON-NLS-1$
                 ITmfTimestamp firstTime = ((ITimeRange) fToolTipNode).getStartTime();
-                ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();  
-                
+                ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();
+
                 if (firstTime != null) {
                     if (lastTime != null && firstTime.compareTo(lastTime, true) != 0) {
                         postfix.append("start: "); //$NON-NLS-1$
                         postfix.append(firstTime.toString());
                         postfix.append("\n"); //$NON-NLS-1$
-                        postfix.append("end: "); //$NON-NLS-1$ 
+                        postfix.append("end: "); //$NON-NLS-1$
                         postfix.append(lastTime.toString());
                         postfix.append("\n"); //$NON-NLS-1$
 //                            postfix += "start: " + firstTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
 //                            postfix += "end: " + lastTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
                         } else {
                             postfix.append(firstTime.toString());
-//                            postfix += firstTime.toString();    
+//                            postfix += firstTime.toString();
                         }
                     }
                 else if (lastTime != null) {
@@ -1242,7 +1242,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Sets a new focused widget.
-     * 
+     *
      * @param newFocusShape A new focus shape.
      */
     protected void setFocus(int newFocusShape) {
@@ -1257,7 +1257,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * Highlight the given GraphNode<br>
      * The GraphNode is then displayed using the system default selection color
-     * 
+     *
      * @param node the GraphNode to highlight
      */
     protected void performSelection(GraphNode node) {
@@ -1281,8 +1281,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /**
      * Returns a draw buffer image.
-     * 
-     * @return a Image containing the draw buffer. 
+     *
+     * @return a Image containing the draw buffer.
      */
     protected Image getDrawBuffer() {
 
@@ -1356,7 +1356,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         context.dispose();
         return dbuffer;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#keyPressedEvent(org.eclipse.swt.events.KeyEvent)
@@ -1415,8 +1415,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
         if (event.character == ' ') {
             performSelection(fCurrentGraphNode);
-            if (!fShiftSelection)
+            if (!fShiftSelection) {
                 fListStart = fCurrentGraphNode;
+            }
         }
 
         if ((fShiftSelection) && (prevNode != getFocusNode())) {
@@ -1425,7 +1426,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             addSelection(fFrame.getNodeList(fListStart, getFocusNode()));
             if (getFocusNode() instanceof Lifeline) {
                 ensureVisible(getFocusNode().getX(), getFocusNode().getY(), getFocusNode().getWidth(), getFocusNode().getHeight(), SWT.CENTER | SWT.VERTICAL, true);
-            } else { 
+            } else {
                 ensureVisible(getFocusNode());
             }
         } else if ((!fCtrlSelection) && (!fShiftSelection)) {
@@ -1475,10 +1476,12 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     @Override
     protected void keyReleasedEvent(KeyEvent event) {
         setFocus(-1);
-        if (event.keyCode == SWT.CTRL)
+        if (event.keyCode == SWT.CTRL) {
             fCtrlSelection = false;
-        if (event.keyCode == SWT.SHIFT)
+        }
+        if (event.keyCode == SWT.SHIFT) {
             fShiftSelection = false;
+        }
         super.keyReleasedEvent(event);
         setFocus(1);
     }
@@ -1508,7 +1511,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     public boolean setContentsPos(int x, int y) {
         int localX = x;
         int localY = y;
-        
+
         if (localX < 0) {
             localX = 0;
         }
@@ -1810,9 +1813,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         fIsDragAndDrop = (event.button == 1);
 
     }
-    
-    /** 
-     * TimerTask for auto scroll feature. 
+
+    /**
+     * TimerTask for auto scroll feature.
      */
     protected static class AutoScroll extends TimerTask {
         /**
@@ -1830,7 +1833,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
         /**
          * Constructor for AutoScroll.
-         * @param sv sequence diagram widget reference 
+         * @param sv sequence diagram widget reference
          * @param dx delta x
          * @param dy delta y
          */
@@ -1849,8 +1852,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    if (fSdWidget.isDisposed())
+                    if (fSdWidget.isDisposed()) {
                         return;
+                    }
                     fSdWidget.fDragX += fDeltaX;
                     fSdWidget.fDragY += fDeltaY;
                     fSdWidget.scrollBy(fDeltaX, fDeltaY);
@@ -1926,7 +1930,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
     /*
      * Called when property changed occurs in the preference page. "PREFOK" is fired when the user press the ok or apply button
-     * 
+     *
      * (non-Javadoc)
      * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
      */
@@ -1939,8 +1943,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         {
             // Prepare the overview to be reused for the new
             // settings (especially the colors)
-            if (fOverView != null)
+            if (fOverView != null) {
                 fOverView.dispose();
+            }
             fOverView = null;
             redraw();
         }
@@ -2102,7 +2107,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         }
         return super.getContentsY();
     }
-    
+
     /**
      * Traverse Listener implementation.
      */

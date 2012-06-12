@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -23,10 +23,16 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 
+/**
+ * Provider for decorations in the time chart view
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeChartDecorationProvider {
 
-	private IFile fBookmarksFile;
-    private Set<Long> fBookmarksSet = new HashSet<Long>();
+	private final IFile fBookmarksFile;
+    private final Set<Long> fBookmarksSet = new HashSet<Long>();
     private ITmfFilter fFilterFilter;
     private ITmfFilter fSearchFilter;
 
@@ -38,11 +44,11 @@ public class TimeChartDecorationProvider {
 	public IFile getBookmarksFile() {
 		return fBookmarksFile;
 	}
-	
+
 	public boolean isBookmark(long rank) {
 	    return fBookmarksSet.contains(rank);
     }
-	
+
 	public void refreshBookmarks() {
 		try {
 			fBookmarksSet.clear();
@@ -68,16 +74,16 @@ public class TimeChartDecorationProvider {
 		}
 		return true;
 	}
-	
+
 	public void searchApplied(ITmfFilter filter) {
 		fSearchFilter = filter;
     }
-	
+
 	public boolean isSearchMatch(ITmfEvent event) {
 		if (fSearchFilter != null) {
 			return fSearchFilter.matches(event);
 		}
 		return false;
 	}
-	
+
 }

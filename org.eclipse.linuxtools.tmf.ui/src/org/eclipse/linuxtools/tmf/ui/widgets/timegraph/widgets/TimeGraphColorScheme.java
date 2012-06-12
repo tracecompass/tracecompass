@@ -18,7 +18,12 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
-
+/**
+ * Color theme used by the timegraph view
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeGraphColorScheme {
 
     // elements color indices
@@ -226,15 +231,15 @@ public class TimeGraphColorScheme {
         new SysCol(SWT.COLOR_YELLOW), // BLOCKED_SEL
         new SysCol(SWT.COLOR_RED), // DEADLOCK_SEL
         new SysCol(SWT.COLOR_DARK_GRAY), // STOPPED_SEL
-        new SysCol(SWT.COLOR_WHITE), 
-        new SysCol(SWT.COLOR_GREEN), 
-        new SysCol(SWT.COLOR_BLUE), 
-        new SysCol(SWT.COLOR_CYAN), 
-        new SysCol(SWT.COLOR_YELLOW), 
-        new SysCol(SWT.COLOR_RED), 
-        new SysCol(SWT.COLOR_DARK_GRAY), 
-        new SysCol(SWT.COLOR_WHITE), 
-        new SysCol(SWT.COLOR_GREEN), 
+        new SysCol(SWT.COLOR_WHITE),
+        new SysCol(SWT.COLOR_GREEN),
+        new SysCol(SWT.COLOR_BLUE),
+        new SysCol(SWT.COLOR_CYAN),
+        new SysCol(SWT.COLOR_YELLOW),
+        new SysCol(SWT.COLOR_RED),
+        new SysCol(SWT.COLOR_DARK_GRAY),
+        new SysCol(SWT.COLOR_WHITE),
+        new SysCol(SWT.COLOR_GREEN),
 
 
         new SysCol(SWT.COLOR_LIST_BACKGROUND), // BACKGROUND
@@ -296,7 +301,7 @@ public class TimeGraphColorScheme {
         new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_WIDGET_BACKGROUND), 1, 6), // BACKGROUND_NAME_SEL_NOFOCUS
     };
 
-    private Color _colors[];
+    private final Color _colors[];
 
     public TimeGraphColorScheme() {
         _colors = new Color[_providersMap.length];
@@ -324,41 +329,51 @@ public class TimeGraphColorScheme {
 
     public Color getBkColor(boolean selected, boolean focused, boolean name) {
         if (name) {
-            if (selected && focused)
+            if (selected && focused) {
                 return getColor(BACKGROUND_NAME_SEL);
-            if (selected)
+            }
+            if (selected) {
                 return getColor(BACKGROUND_NAME_SEL_NOFOCUS);
+            }
             return getColor(BACKGROUND_NAME);
         } else {
-            if (selected && focused)
+            if (selected && focused) {
                 return getColor(BACKGROUND_SEL);
-            if (selected)
+            }
+            if (selected) {
                 return getColor(BACKGROUND_SEL_NOFOCUS);
+            }
             return getColor(BACKGROUND);
         }
     }
 
     public Color getFgColor(boolean selected, boolean focused) {
-        if (selected && focused)
+        if (selected && focused) {
             return getColor(FOREGROUND_SEL);
-        if (selected)
+        }
+        if (selected) {
             return getColor(FOREGROUND_SEL_NOFOCUS);
+        }
         return getColor(FOREGROUND);
     }
 
     public Color getBkColorGroup(boolean selected, boolean focused) {
-        if (selected && focused)
+        if (selected && focused) {
             return getColor(GR_BACKGROUND_SEL);
-        if (selected)
+        }
+        if (selected) {
             return getColor(GR_BACKGROUND_SEL_NOFOCUS);
+        }
         return getColor(GR_BACKGROUND);
     }
 
     public Color getFgColorGroup(boolean selected, boolean focused) {
-        if (selected && focused)
+        if (selected && focused) {
             return getColor(GR_FOREGROUND_SEL);
-        if (selected)
+        }
+        if (selected) {
             return getColor(GR_FOREGROUND_SEL_NOFOCUS);
+        }
         return getColor(GR_FOREGROUND);
     }
 }

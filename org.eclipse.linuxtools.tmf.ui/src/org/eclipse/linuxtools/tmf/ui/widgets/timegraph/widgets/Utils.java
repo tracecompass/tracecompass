@@ -28,11 +28,18 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
+/**
+ * General utilities and definitions used by the time graph widget
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public class Utils {
 
     public enum TimeFormat {
         RELATIVE, ABSOLUTE
-    };
+    }
 
     static public final int IMG_THREAD_RUNNING = 0;
     static public final int IMG_THREAD_SUSPENDED = 1;
@@ -45,7 +52,7 @@ public class Utils {
 
     public static enum Resolution {
         SECONDS, MILLISEC, MICROSEC, NANOSEC
-    };
+    }
 
     static private final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
     static private final SimpleDateFormat sdateformat = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
@@ -90,8 +97,9 @@ public class Utils {
     }
 
     static void dispose(Color col) {
-        if (null != col)
+        if (null != col) {
             col.dispose();
+        }
     }
 
     static public Color mixColors(Device display, Color c1, Color c2, int w1,
@@ -125,7 +133,7 @@ public class Utils {
 
     /**
      * Formats time in format: MM:SS:NNN
-     * 
+     *
      * @param time time
      * @param format  0: MMMM:ss:nnnnnnnnn, 1: HH:MM:ss MMM.mmmm.nnn
      * @param resolution the resolution
@@ -166,7 +174,7 @@ public class Utils {
 
     /**
      * From input time in nanoseconds, convert to Date format YYYY-MM-dd
-     * 
+     *
      * @param absTime
      * @return the formatted date
      */
@@ -177,7 +185,7 @@ public class Utils {
 
     /**
      * Formats time in ns to Calendar format: HH:MM:SS MMM.mmm.nnn
-     * 
+     *
      * @param time
      * @return the formatted time
      */
@@ -199,7 +207,7 @@ public class Utils {
      * nanoseconds. e.g. input: 1241207054171080214 ns The number of fraction
      * seconds can be obtained by removing the last 9 digits: 1241207054 the
      * fractional portion of seconds, expressed in ns is: 171080214
-     * 
+     *
      * @param time
      * @param res
      * @return the formatted nanosec
@@ -279,7 +287,7 @@ public class Utils {
      * N means: <list> <li>-1: Previous Event</li> <li>0: Current Event</li> <li>
      * 1: Next Event</li> <li>2: Previous Event when located in a non Event Area
      * </list>
-     * 
+     *
      * @param entry
      * @param time
      * @param n
@@ -357,8 +365,9 @@ public class Utils {
         StringBuffer result = new StringBuffer("("); //$NON-NLS-1$
         for (int i = 0; i < args.length; i++) {
             String arg = args[i].trim();
-            if (arg.length() == 0 && args.length == 1)
+            if (arg.length() == 0 && args.length == 1) {
                 break;
+            }
             result.append(getTypeSignature(arg));
         }
         result.append(")").append(getTypeSignature(ret)); //$NON-NLS-1$
@@ -368,53 +377,64 @@ public class Utils {
     static public String getTypeSignature(String type) {
         int dim = 0;
         for (int j = 0; j < type.length(); j++) {
-            if (type.charAt(j) == '[')
+            if (type.charAt(j) == '[') {
                 dim++;
+            }
         }
         int pos = type.indexOf('[');
-        if (pos >= 0)
+        if (pos >= 0) {
             type = type.substring(0, pos);
+        }
         StringBuffer sig = new StringBuffer(""); //$NON-NLS-1$
         for (int j = 0; j < dim; j++)
+         {
             sig.append("[");                 //$NON-NLS-1$
-        if (type.equals("boolean"))     //$NON-NLS-1$
+        }
+        if (type.equals("boolean")) {
             sig.append("Z");                 //$NON-NLS-1$
-        else if (type.equals("byte"))   //$NON-NLS-1$
+        } else if (type.equals("byte")) {
             sig.append("B");                 //$NON-NLS-1$
-        else if (type.equals("char"))   //$NON-NLS-1$
+        } else if (type.equals("char")) {
             sig.append("C");                 //$NON-NLS-1$
-        else if (type.equals("short"))  //$NON-NLS-1$
+        } else if (type.equals("short")) {
             sig.append("S");                 //$NON-NLS-1$
-        else if (type.equals("int"))    //$NON-NLS-1$
+        } else if (type.equals("int")) {
             sig.append("I");                 //$NON-NLS-1$
-        else if (type.equals("long"))   //$NON-NLS-1$
+        } else if (type.equals("long")) {
             sig.append("J");                 //$NON-NLS-1$
-        else if (type.equals("float"))  //$NON-NLS-1$
+        } else if (type.equals("float")) {
             sig.append("F");                 //$NON-NLS-1$
-        else if (type.equals("double")) //$NON-NLS-1$
+        } else if (type.equals("double")) {
             sig.append("D");                 //$NON-NLS-1$
-        else if (type.equals("void"))   //$NON-NLS-1$
+        } else if (type.equals("void")) {
             sig.append("V");                 //$NON-NLS-1$
-        else
+        }
+        else {
             sig.append("L").append(type.replace('.', '/')).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         return sig.toString();
     }
 
     static public int compare(double d1, double d2) {
-        if (d1 > d2)
+        if (d1 > d2) {
             return 1;
-        if (d1 < d2)
+        }
+        if (d1 < d2) {
             return 1;
+        }
         return 0;
     }
 
     static public int compare(String s1, String s2) {
-        if (s1 != null && s2 != null)
+        if (s1 != null && s2 != null) {
             return s1.compareToIgnoreCase(s2);
-        if (s1 != null)
+        }
+        if (s1 != null) {
             return 1;
-        if (s2 != null)
+        }
+        if (s2 != null) {
             return -1;
+        }
         return 0;
     }
 }

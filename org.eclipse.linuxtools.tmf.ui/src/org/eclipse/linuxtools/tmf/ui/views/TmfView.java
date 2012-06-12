@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -29,7 +29,7 @@ import org.eclipse.ui.part.ViewPart;
 public abstract class TmfView extends ViewPart implements ITmfComponent {
 
 	private final String fName;
-	
+
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
@@ -67,7 +67,7 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	public String getName() {
 		return fName;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#broadcast(org.eclipse.linuxtools.tmf.core.signal.TmfSignal)

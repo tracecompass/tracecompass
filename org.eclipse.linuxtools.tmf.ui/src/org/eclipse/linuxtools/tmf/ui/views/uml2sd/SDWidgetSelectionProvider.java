@@ -5,8 +5,8 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -24,10 +24,9 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
  * <p>
  * Informs all registered listeners of graph node selection change in the Frame.
  * </p>
- * 
- * @version 1.0 
+ *
+ * @version 1.0
  * @author sveyrier
- * 
  */
 public class SDWidgetSelectionProvider implements ISelectionProvider {
 
@@ -64,8 +63,9 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
      */
     @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
-        if (!fListenerList.contains(listener))
+        if (!fListenerList.contains(listener)) {
             fListenerList.add(listener);
+        }
     }
 
     /*

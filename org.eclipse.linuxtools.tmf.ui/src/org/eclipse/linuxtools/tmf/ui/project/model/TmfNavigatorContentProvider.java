@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -25,18 +25,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
-import org.eclipse.ui.navigator.ICommonContentProvider;
 import org.eclipse.ui.navigator.IPipelinedTreeContentProvider;
 import org.eclipse.ui.navigator.PipelinedShapeModification;
 import org.eclipse.ui.navigator.PipelinedViewerUpdate;
 
 /**
- * The TMF project content provider for the tree viewer in the project explorer view. 
+ * The TMF project content provider for the tree viewer in the project explorer view.
  * <p>
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfNavigatorContentProvider implements ICommonContentProvider, IPipelinedTreeContentProvider {
+public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvider {
 
     // ------------------------------------------------------------------------
     // ICommonContentProvider
@@ -99,7 +98,7 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
@@ -107,7 +106,7 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
     @Override
     public void restoreState(IMemento aMemento) {
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
@@ -363,7 +362,7 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
 
     /**
      * Add/replace the ITmfProjectElement to the list of children
-     * 
+     *
      * @param elements
      *            the list returned by getChildren()
      * @param children

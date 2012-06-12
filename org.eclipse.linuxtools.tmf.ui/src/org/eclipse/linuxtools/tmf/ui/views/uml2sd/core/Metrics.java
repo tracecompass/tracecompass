@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -16,10 +16,10 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 /**
  * This class contains the metrics used to layout a sequence diagram on a view The class method are mostly used in
  * combination with the preferences
- * 
- * @version
+ *
+ * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class Metrics {
     // ------------------------------------------------------------------------
@@ -94,7 +94,7 @@ public class Metrics {
      */
     public static final int STOP_WIDTH = 20;
     /**
-     * The internal message width. 
+     * The internal message width.
      */
     public static final int INTERNAL_MESSAGE_WIDTH = 20;
     /**
@@ -132,7 +132,7 @@ public class Metrics {
      * The focus drawing margin.
      */
     public static final int FOCUS_DRAWING_MARGIN = 10;
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -170,19 +170,19 @@ public class Metrics {
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * 
+     *
      * Hide private constructor
      */
     private Metrics() {
     }
-    
+
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
 
     /**
      * Set the character height used to draw the lifeline name
-     * 
+     *
      * @param height the character height
      */
     static public void setLifelineFontHeight(int height) {
@@ -191,7 +191,7 @@ public class Metrics {
 
     /**
      * Set the character width used to draw the lifeline name
-     * 
+     *
      * @param width the character width
      */
     static public void setLifelineFontWidth(int width) {
@@ -200,7 +200,7 @@ public class Metrics {
 
     /**
      * Set the character height used to draw the message name
-     * 
+     *
      * @param fontHeight the character height
      */
     static public void setMessageFontHeight(int fontHeight) {
@@ -209,7 +209,7 @@ public class Metrics {
 
     /**
      * Returns the character height used to draw the lifeline name
-     * 
+     *
      * @return the character height
      */
     static public int getFrameFontHeigth() {
@@ -218,7 +218,7 @@ public class Metrics {
 
     /**
      * Set the character height used to draw the message name
-     * 
+     *
      * @param fontHeight the character height
      */
     static public void setFrameFontHeight(int fontHeight) {
@@ -227,7 +227,7 @@ public class Metrics {
 
     /**
      * Returns the character height used to draw the lifeline name
-     * 
+     *
      * @return the character height
      */
     static public int getLifelineHeaderFontHeigth() {
@@ -236,7 +236,7 @@ public class Metrics {
 
     /**
      * Set the character height used to draw the message name
-     * 
+     *
      * @param fontHeight the character height
      */
     static public void setLifelineHeaderFontHeight(int fontHeight) {
@@ -245,7 +245,7 @@ public class Metrics {
 
     /**
      * Returns the character height used to draw the lifeline name
-     * 
+     *
      * @return the character height
      */
     static public int getLifelineFontHeigth() {
@@ -254,7 +254,7 @@ public class Metrics {
 
     /**
      * Returns the character height used to draw the message name
-     * 
+     *
      * @return the character height
      */
     static public int getMessageFontHeigth() {
@@ -266,7 +266,7 @@ public class Metrics {
 
     /**
      * This is the vertical space used by a Lifeline (mostly the rectangle which contain its name)
-     * 
+     *
      * @return the vertical space used by a Lifeline
      */
     static public int getLifelineWidth() {
@@ -275,7 +275,7 @@ public class Metrics {
 
     /**
      * Set the vertical space used by a Lifeline (mostly the rectangle which contain its name)
-     * 
+     *
      * @param value the vertical space
      */
     static public void setLifelineWidth(int value) {
@@ -284,7 +284,7 @@ public class Metrics {
 
     /**
      * Returns the swimming lane width
-     * 
+     *
      * @return the swimming lane width
      */
     static public int swimmingLaneWidth() {
@@ -293,7 +293,7 @@ public class Metrics {
 
     /**
      * Returns the character width used to draw the Lifelines name
-     * 
+     *
      * @return the average character width
      */
     static public int getAverageCharWidth() {
@@ -302,19 +302,19 @@ public class Metrics {
 
     /**
      * Returns the message spacing.
-     * 
+     *
      * @return the message spacing
      */
     static public int getMessagesSpacing() {
         if (fForcedEventSpacing >= 0) {
             return fForcedEventSpacing;
-        } 
+        }
         return MESSAGES_SPACING;
     }
 
     /**
      * Sets the forced event spacing value .
-     * 
+     *
      * @param eventSpacing
      */
     static public void setForcedEventSpacing(int eventSpacing) {
@@ -323,7 +323,7 @@ public class Metrics {
 
     /**
      * Gets the forced event spacing value.
-     * 
+     *
      * @return forcedEventSpacing
      */
     static public int getForcedEventSpacing() {

@@ -23,6 +23,13 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Base control abstract class for the time graph widget
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public abstract class TimeGraphBaseControl extends Canvas implements PaintListener {
 
     static public final int MARGIN = 4;
@@ -50,8 +57,9 @@ public abstract class TimeGraphBaseControl extends Canvas implements PaintListen
 
     @Override
     public void paintControl(PaintEvent e) {
-        if (e.widget != this)
+        if (e.widget != this) {
             return;
+        }
         _fontHeight = e.gc.getFontMetrics().getHeight();
         Rectangle bound = getClientArea();
         if (!bound.isEmpty()) {

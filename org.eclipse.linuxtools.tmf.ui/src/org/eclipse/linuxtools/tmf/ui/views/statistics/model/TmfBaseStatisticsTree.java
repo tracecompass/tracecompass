@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Mathieu Denis      (mathieu.denis@polymtl.ca)  - Initial API and Implementation
  *******************************************************************************/
@@ -24,8 +24,10 @@ import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 
 /**
  * Store information about base statistics data.
- * <p>This class provides a way to represent statistics data that is compatible to every kind of traces</p>
- * 
+ *
+ * This class provides a way to represent statistics data that is compatible
+ * with every type of trace.
+ *
  * @version 1.0
  * @author Mathieu Denis
  */
@@ -90,21 +92,26 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
             TmfStatisticsTreeNode current = null;
             for (String value : getKeys().get(path.get(path.size() - 1))) {
                 current = get(path.append(value));
-                if (current != null && current.getValue().nbEvents != 0)
+                if (current != null && current.getValue().nbEvents != 0) {
                     result.add(current);
+                }
             }
         } else if (path.size() == 1) { // Special case.
-            if (path.equals(ROOT)) // Asking for the root.
-                for (String value : getKeys().get(ROOT.get(0)))
+            if (path.equals(ROOT)) {
+                for (String value : getKeys().get(ROOT.get(0))) {
                     result.add(getOrCreate(new TmfFixedArray<String>(value)));
-            else
+                }
+            } else {
                 // Get value under the root
-                for (String value : getKeys().get(ROOT_NODE_KEY))
+                for (String value : getKeys().get(ROOT_NODE_KEY)) {
                     result.add(getOrCreate(path.append(value)));
+                }
+            }
         } else {// If we are at a value
-            for (String value : getKeys().get(mergeString(path.get(path.size() - 2), NODE)))
+            for (String value : getKeys().get(mergeString(path.get(path.size() - 2), NODE))) {
                 // Search the parent name + NODE
                 result.add(getOrCreate(path.append(value)));
+            }
         }
 
         return result;
@@ -122,28 +129,33 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
             TmfStatisticsTreeNode current = null;
             for (String value : getKeys().get(path.get(path.size() - 1))) {
                 current = get(path.append(value));
-                if (current != null)
+                if (current != null) {
                     result.add(current);
+                }
             }
         } else if (path.size() == 1) { // Special case.
-            if (path.equals(ROOT)) // Asking for the root.
-                for (String value : getKeys().get(ROOT.get(0)))
+            if (path.equals(ROOT)) {
+                for (String value : getKeys().get(ROOT.get(0))) {
                     result.add(getOrCreate(new TmfFixedArray<String>(value)));
-            else
+                }
+            } else {
                 // Get value under the root
-                for (String value : getKeys().get(ROOT_NODE_KEY))
+                for (String value : getKeys().get(ROOT_NODE_KEY)) {
                     result.add(getOrCreate(path.append(value)));
+                }
+            }
         } else {// If we are at a value
-            for (String value : getKeys().get(mergeString(path.get(path.size() - 2), NODE)))
+            for (String value : getKeys().get(mergeString(path.get(path.size() - 2), NODE))) {
                 // Search the parent name + NODE
                 result.add(getOrCreate(path.append(value)));
+            }
         }
         return result;
     }
 
     /**
      * <h4>Get the event types paths.</h4>
-     * 
+     *
      * @param event
      *            Event to get the path for.
      * @param extraInfo
@@ -164,7 +176,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     /**
      * <h4>Get the standard paths for an event.</h4>
-     * 
+     *
      * @param event
      *            Event to get the path for.
      * @param extraInfo
@@ -178,7 +190,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         TmfFixedArray[] paths = { new TmfFixedArray<String>(trace) };
         return paths;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#increase(org.eclipse.linuxtools.tmf.event.TmfEvent, org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfEventInfo, int)
@@ -195,12 +207,14 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     @Override
     public void registerEvent(ITmfEvent event, ITmfExtraEventInfo extraInfo) {
         TmfFixedArray<String>[] paths = getNormalPaths(event, extraInfo);
-        for (TmfFixedArray<String> path : paths)
+        for (TmfFixedArray<String> path : paths) {
             ++(getOrCreate(path).getValue().nbEvents);
+        }
 
         paths = getTypePaths(event, extraInfo);
-        for (TmfFixedArray<String> path : paths)
+        for (TmfFixedArray<String> path : paths) {
             ++(getOrCreate(path).getValue().nbEvents);
+        }
     }
 
     /*
@@ -211,9 +225,11 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     @Override
     protected void registerName(TmfFixedArray<String> path) {
         if (path.size() == 1) {
-            if (!path.equals(ROOT))
+            if (!path.equals(ROOT)) {
                 getKeys().get(ROOT.get(0)).add(path.get(0));
-        } else if (path.size() % 2 != 0)
+            }
+        } else if (path.size() % 2 != 0) {
             getKeys().get(path.get(path.size() - 2)).add(path.get(path.size() - 1));
+        }
     }
 }

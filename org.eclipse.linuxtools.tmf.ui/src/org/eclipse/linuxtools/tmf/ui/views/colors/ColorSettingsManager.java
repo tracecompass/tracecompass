@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated to use RGB for the tick color
@@ -24,16 +24,16 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * Static class for managing color settings.
- *  
+ *
  * @version 1.0
  * @author Patrick Tasse
  *
  */
 public class ColorSettingsManager {
-    
+
     // The color settings file name
 	private static final String COLOR_SETTINGS_FILE_NAME = "color_settings.xml"; //$NON-NLS-1$
-	
+
 	// The path for the color settings file
 	private static final String COLOR_SETTINGS_PATH_NAME =
         Activator.getDefault().getStateLocation().addTrailingSeparator().append(COLOR_SETTINGS_FILE_NAME).toString();
@@ -46,7 +46,7 @@ public class ColorSettingsManager {
 			null);
 
 	/**
-	 * Special value for priority if unknown. 
+	 * Special value for priority if unknown.
 	 */
 	public static final int PRIORITY_NONE = Integer.MAX_VALUE;
 
@@ -58,16 +58,16 @@ public class ColorSettingsManager {
 
 	/**
 	 * Returns an array of color settings.
-	 * 
+	 *
 	 * @return an array of color settings.
 	 */
 	public static ColorSetting[] getColorSettings() {
 		return (fColorSettings != null) ? Arrays.copyOf(fColorSettings, fColorSettings.length) : null;
 	}
-	
+
 	/**
 	 * Sets the array of color settings.
-	 * 
+	 *
 	 * @param colorSettings A array of color settings to set
 	 */
 	public static void setColorSettings(ColorSetting[] colorSettings) {
@@ -76,13 +76,15 @@ public class ColorSettingsManager {
 		fireColorSettingsChanged();
 	}
 
-	/**
-	 * Gets the color settings that matches the filter for given event.
-	 * 
-	 * @param A event the event to check
-	 * 
-	 * @return color settings defined for filter if found else default color settings
-	 */
+	    /**
+     * Gets the color settings that matches the filter for given event.
+     *
+     * @param event
+     *            The event to check
+     *
+     * @return color settings defined for filter if found else default color
+     *         settings
+     */
 	public static ColorSetting getColorSetting(ITmfEvent event) {
         for (int i = 0; i < fColorSettings.length; i++) {
         	ColorSetting colorSetting = fColorSettings[i];
@@ -95,7 +97,7 @@ public class ColorSettingsManager {
 
 	/**
 	 * Gets the color settings priority for the given event.
-	 *   
+	 *
 	 * @param event A event the event to check
 	 * @return the priority defined for the filter else PRIORITY_NONE
 	 */
@@ -110,8 +112,8 @@ public class ColorSettingsManager {
 	}
 
 	/**
-	 * Returns the color settings based the priority. 
-	 * 
+	 * Returns the color settings based the priority.
+	 *
 	 * @param priority A priority (index) of color settings
 	 * @return the color settings defined for the priority else default color settings
 	 */
@@ -119,12 +121,12 @@ public class ColorSettingsManager {
 		if (priority < fColorSettings.length) {
 			return fColorSettings[priority];
 		}
-		return DEFAULT_COLOR_SETTING; 
+		return DEFAULT_COLOR_SETTING;
 	}
 
 	/**
 	 * Adds a color settings listener.
-	 * 
+	 *
 	 * @param listener A listener to add.
 	 */
 	public static void addColorSettingsListener(IColorSettingsListener listener) {
@@ -132,16 +134,16 @@ public class ColorSettingsManager {
 			fListeners.add(listener);
 		}
 	}
-	
+
 	/**
 	 * Removes a color settings listener.
-	 * 
+	 *
 	 * @param listener A listener to remove.
 	 */
 	public static void removeColorSettingsListener(IColorSettingsListener listener) {
 		fListeners.remove(listener);
 	}
-	
+
 	// Notify listeners
 	private static void fireColorSettingsChanged() {
 		for (IColorSettingsListener listener : fListeners) {

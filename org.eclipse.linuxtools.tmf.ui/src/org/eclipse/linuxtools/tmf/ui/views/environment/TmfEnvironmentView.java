@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
@@ -29,18 +29,23 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * Displays the CTF trace properties.
- * 
+ *
  * @version 1.0
  * @author Matthew Khouzam
  */
 public class TmfEnvironmentView extends TmfView {
 
+    /** The Environment View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.environment"; //$NON-NLS-1$
+
     private TmfExperiment<?> fExperiment;
     private Table fTable;
 //    final private String fTitlePrefix;
     private Composite fParent;
 
+    /**
+     * Default constructor
+     */
     public TmfEnvironmentView() {
         super("EnvironmentVariables"); //$NON-NLS-1$
 //        fTitlePrefix = getTitle();
@@ -124,6 +129,12 @@ public class TmfEnvironmentView extends TmfView {
         super.dispose();
     }
 
+    /**
+     * Handler for the experiment updated signal.
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {

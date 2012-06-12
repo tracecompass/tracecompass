@@ -4,8 +4,8 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -27,12 +27,12 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncMessageComparato
  * <br>
  * <br>
  * Usage example:
- * 
+ *
  * <pre>
  * Frame frame;
  * Lifeline lifeLine1;
  * Lifeline lifeLine2;
- * 
+ *
  * AsyncMessage message = new AsyncMessage();
  * // Create a new event occurrence on each lifeline
  * lifeline1.getNewOccurrenceIndex();
@@ -44,11 +44,10 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncMessageComparato
  * // add the message to the frame
  * frame.addMessage(message);
  * </pre>
- * 
+ *
  * @see Lifeline Lifeline for more event occurence details
- * @version 1.0 
+ * @version 1.0
  * @author sveyrier
- * 
  */
 public class AsyncMessage extends BaseMessage implements ITimeRange {
 
@@ -110,7 +109,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         }
         return x;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#getY()
@@ -160,7 +159,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Set the message return associated with this message.
-     * 
+     *
      * @param message the message return to associate
      */
     protected void setMessageReturn(AsyncMessageReturn message) {
@@ -169,7 +168,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Set the event occurrence attached to this message for its end lifeline
-     * 
+     *
      * @param occurrence the event occurrence to set
      */
     public void setEndOccurrence(int occurrence) {
@@ -182,7 +181,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Informs the given lifeline about the maximum occurrence if applicable.
-     * 
+     *
      * @param lifeLine
      * @param occurrence
      */
@@ -194,7 +193,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Set the event occurrence attached to this message for its start lifeline
-     * 
+     *
      * @param occurrence the event occurrence to set
      */
     public void setStartOccurrence(int occurrence) {
@@ -208,7 +207,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     /**
      * Set the lifeLine which has sent the message.<br>
      * A new EventOccurence will be create on this lifeLine.<br>
-     * 
+     *
      * @param lifeline the message sender
      */
     public void autoSetStartLifeline(Lifeline lifeline) {
@@ -219,7 +218,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     /**
      * Set the lifeLine which has received the message.<br>
      * A new EventOccurence will be create on this lifeLine.<br>
-     * 
+     *
      * @param lifeline the message receiver
      */
     public void autoSetEndLifeline(Lifeline lifeline) {
@@ -252,7 +251,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Returns true if the point C is on the segment defined with the point A and B
-     * 
+     *
      * @param xA point A x coordinate
      * @param yA point A y coordinate
      * @param xB point B x coordinate
@@ -294,8 +293,9 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         if (fStartLifeline == fEndLifeline) {
             return super.contains(x, y);
         }
-        if (isNearSegment(getX(), getY(), getX() + getWidth(), getY() + getHeight(), x, y))
+        if (isNearSegment(getX(), getY(), getX() + getWidth(), getY() + getHeight(), x, y)) {
             return true;
+        }
         int messageMaxWidth = Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH;
         int nameWidth = getName().length() * Metrics.getAverageCharWidth();
         if (getName().length() * Metrics.getAverageCharWidth() > messageMaxWidth) {
@@ -312,7 +312,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Draws the asynchronous message using giving graphical context.
-     * 
+     *
      * @param context A graphical context to draw in.
      */
     protected void drawAsyncMessage(IGC context) {
@@ -395,7 +395,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Set the time when the message end
-     * 
+     *
      * @param time the time when the message end
      */
     public void setEndTime(ITmfTimestamp time) {
@@ -410,7 +410,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
     /**
      * Set the time when the message start
-     * 
+     *
      * @param time the time when the message start
      */
     public void setStartTime(ITmfTimestamp time) {

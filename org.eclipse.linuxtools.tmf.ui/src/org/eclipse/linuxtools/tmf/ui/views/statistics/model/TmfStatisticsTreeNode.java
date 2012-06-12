@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Yann N. Dauphin     (dhaemon@gmail.com)    - Implementation for stats
  *   Francois Godin (copelnug@gmail.com)        - Re-design for new stats structure
@@ -19,12 +19,14 @@ import java.util.Collection;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 
 /**
- * <h4>A tree where nodes can be accessed efficiently using paths.</h4>
- * 
- * <p>It works like file systems. Each node is identified by a key. A path is an array ({@link TmfFixedArray}) of String. The elements of the array represent the path from the root to this node.</p>
- * 
+ * A tree where nodes can be accessed efficiently using paths.
+ *
+ * It works like file systems. Each node is identified by a key. A path is
+ * an array ({@link TmfFixedArray}) of String. The elements of the array
+ * represent the path from the root to this node.
+ *
  * @version 1.0
- * @author Mathieu Denis 
+ * @author Mathieu Denis
  */
 public class TmfStatisticsTreeNode {
 	/**
@@ -55,8 +57,9 @@ public class TmfStatisticsTreeNode {
 	 * @return true: if child with given key is present, false: if no child exists with given key name
 	 */
 	public boolean containsChild(String key) {
-		if(AbsTmfStatisticsTree.ROOT.equals(fPath))
-			return fNodes.get(new TmfFixedArray<String>(key)) != null;
+		if(AbsTmfStatisticsTree.ROOT.equals(fPath)) {
+            return fNodes.get(new TmfFixedArray<String>(key)) != null;
+        }
 		return (fNodes.get(fPath.append(key)) != null);
 	}
 	/**

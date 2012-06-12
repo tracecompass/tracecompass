@@ -39,13 +39,19 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-
+/**
+ * Handler for the tool tips in the generic time graph view.
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public class TimeGraphTooltipHandler {
 
-    private Shell _tipShell;
-    private Table _tipTable;
+    private final Shell _tipShell;
+    private final Table _tipTable;
     private Point _tipPosition;
-    private ITimeDataProvider _timeDataProvider;
+    private final ITimeDataProvider _timeDataProvider;
     ITimeGraphPresentationProvider _utilImp = null;
 
     public TimeGraphTooltipHandler(Shell parent, ITimeGraphPresentationProvider rUtilImpl,
@@ -158,7 +164,7 @@ public class TimeGraphTooltipHandler {
                         }
                     }
 
-                    // TODO: Check if we need "format"					
+                    // TODO: Check if we need "format"
                     //					TimeFormat format = TimeFormat.RELATIVE;
                     Resolution res = Resolution.NANOSEC;
                     if (_timeDataProvider.isCalendarFormat()) {

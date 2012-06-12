@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -24,7 +24,6 @@ import org.eclipse.ui.IPerspectiveFactory;
  * 
  * @version 1.0
  * @author Francois Chouinard
- * 
  */
 public class TracingPerspectiveFactory implements IPerspectiveFactory {
 
@@ -32,9 +31,7 @@ public class TracingPerspectiveFactory implements IPerspectiveFactory {
     // Constants
     // ------------------------------------------------------------------------
 
-    /**
-     *  The Perspective ID
-     */
+    /** The Perspective ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.perspective.tracing"; //$NON-NLS-1$
 
     // Standard TMF views

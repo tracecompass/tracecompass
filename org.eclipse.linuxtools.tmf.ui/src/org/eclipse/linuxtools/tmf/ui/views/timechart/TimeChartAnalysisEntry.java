@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -20,10 +20,16 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
+/**
+ * An entry (row) in the time chart analysis view
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeChartAnalysisEntry implements ITimeGraphEntry {
 
-    private ITmfTrace<?> fTrace;
-    private Vector<TimeChartEvent> fTraceEvents;
+    private final ITmfTrace<?> fTrace;
+    private final Vector<TimeChartEvent> fTraceEvents;
     private int fPower = 0; // 2^fPower nanoseconds per vector position
     private long fReferenceTime = -1; // time corresponding to beginning of index 0
     private long fStartTime = -1; // time of first event
@@ -34,7 +40,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
         fTrace = trace;
         fTraceEvents = new Vector<TimeChartEvent>(modelSize);
     }
-    
+
     @Override
     public ITimeGraphEntry[] getChildren() {
         return null;
@@ -74,12 +80,12 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
     public Iterator<ITimeEvent> getTimeEventsIterator() {
         return new EntryIterator(0, Long.MAX_VALUE, 0);
     }
-    
+
     @Override
     public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long maxDuration) {
         return new EntryIterator(startTime, stopTime, maxDuration);
     }
-    
+
     private class EntryIterator implements Iterator<ITimeEvent> {
         private final long fIteratorStartTime;
         private final long fIteratorStopTime;
@@ -87,17 +93,19 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
         private long lastTime = -1;
         private TimeChartEvent next = null;
         private Iterator<ITimeEvent> nestedIterator = null;
-        
+
         public EntryIterator(long startTime, long stopTime, long maxDuration) {
             fIteratorStartTime = startTime;
             fIteratorStopTime = stopTime;
             fIteratorMaxDuration = maxDuration;
         }
-        
+
         @Override
         public boolean hasNext() {
             synchronized (fTraceEvents) {
-                if (next != null) return true;
+                if (next != null) {
+                    return true;
+                }
                 if (nestedIterator != null) {
                     if (nestedIterator.hasNext()) {
                         return true;
@@ -132,7 +140,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
                 if (nestedIterator != null) {
                     TimeChartEvent event = (TimeChartEvent) nestedIterator.next();
                     lastTime = event.getTime() + event.getDuration();
-                    return event;  
+                    return event;
                 }
                 if (hasNext()) {
                     TimeChartEvent event = next;
@@ -147,7 +155,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-            
+
     }
 
     public void addTraceEvent(ITimeEvent timeEvent) {
@@ -230,15 +238,15 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
             fTraceEvents.set(i, null);
         }
     }
-    
+
     public ITmfTrace<?> getTrace() {
         return fTrace;
     }
-    
+
     public void setLastRank(long rank) {
         fLastRank = rank;
     }
-    
+
     public long getLastRank() {
         return fLastRank;
     }

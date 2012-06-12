@@ -15,6 +15,13 @@
 
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
 
+/**
+ * Time data provider interface, for use in the timegraph widget.
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public interface ITimeDataProvider {
 
     long getSelectedTime();
@@ -35,7 +42,7 @@ public interface ITimeDataProvider {
 
     /**
      * Updates the time range and notify registered listeners
-     * 
+     *
      * @param time0
      * @param time1
      */
@@ -43,7 +50,7 @@ public interface ITimeDataProvider {
 
     /**
      * Update the time range but do not trigger event notification
-     * 
+     *
      * @param time0
      * @param time1
      */
@@ -57,16 +64,16 @@ public interface ITimeDataProvider {
     /**
      * Updates the selected time, adjusts the time range if necessary and notifies
      * any registered listeners about the new selected time and new range (if necessary)
-     *  
+     *
      * @param time - A Time to set
      * @param ensureVisible - Ensure visibility of new time (will adjust time range if necessary)
      */
     public void setSelectedTimeNotify(long time, boolean ensureVisible);
-    
+
     /**
-     * Updates the selected time and adjusts the time range if necessary 
+     * Updates the selected time and adjusts the time range if necessary
      * without notifying registered listeners.
-     *  
+     *
      * @param time - A Time to set
      * @param ensureVisible - Ensure visibility of new time (will adjust time range if necessary)
      */

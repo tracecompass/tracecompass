@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
@@ -14,9 +14,11 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * <p>
- * Class that contains the color of a state and the corresponding state string to display.
- * </p>
+ * Class that contains the color of a state and the corresponding state string
+ * to display.
+ *
+ * @version 1.0
+ * @author Bernd Hufmann
  */
 public class StateItem {
 
@@ -27,7 +29,7 @@ public class StateItem {
      * Name of state if not known
      */
     public static final String UNDEFINED_STATE_NAME = "Undefined"; //$NON-NLS-1$
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -39,24 +41,24 @@ public class StateItem {
      * The State string.
      */
     private String fStateString;
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     /**
      * Creates a state item with given color and unspecified name.
-     * 
+     *
      * @param stateColor A state color
      */
     public StateItem(RGB stateColor) {
         this(stateColor, UNDEFINED_STATE_NAME);
     }
-    
+
     /**
      * Creates a state color - state string pair.
-     * 
+     *
      * @param stateColor A state color
      * @param stateString A state string
      */
@@ -70,7 +72,7 @@ public class StateItem {
     // ------------------------------------------------------------------------
     /**
      * Returns the state color.
-     *  
+     *
      * @return Returns the state color.
      */
     public RGB getStateColor() {
@@ -79,7 +81,7 @@ public class StateItem {
 
     /**
      * Sets the state color.
-     * 
+     *
      * @param stateColor A state color to set
      */
     public void setStateColor(RGB stateColor) {
@@ -88,7 +90,7 @@ public class StateItem {
 
     /**
      * Returns the state string.
-     * 
+     *
      * @return the state string.
      */
     public String getStateString() {

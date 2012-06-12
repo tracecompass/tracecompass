@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2006 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -22,11 +22,12 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage;
 /**
  * Synchronous message comparator Compare two syncMessages only taking into account the event occurrence when their
  * appear.<br>
- * 
+ *
  * The message with the greater event occurrence is considered to be the greater.<br>
- * 
+ *
+ * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class SortSyncMessageComparator implements Comparator<GraphNode>, Serializable {
 

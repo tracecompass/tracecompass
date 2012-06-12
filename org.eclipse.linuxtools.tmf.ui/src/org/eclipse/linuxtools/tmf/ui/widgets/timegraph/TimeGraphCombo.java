@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -51,6 +51,13 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+/**
+ * Time graph "combo" view (with the list/tree on the left and the gantt chart
+ * on the right)
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeGraphCombo extends Composite {
 
     // ------------------------------------------------------------------------
@@ -70,7 +77,7 @@ public class TimeGraphCombo extends Composite {
     private TimeGraphViewer fTimeGraphViewer;
 
     // The selection listener map
-    private HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper>();
+    private final HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper>();
 
     // Flag to block the tree selection changed listener when triggered by the time graph combo
     private boolean fInhibitTreeSelection = false;
@@ -90,7 +97,7 @@ public class TimeGraphCombo extends Composite {
      * the elements of the tree's real content provider.
      */
     private class TreeContentProviderWrapper implements ITreeContentProvider {
-        private ITreeContentProvider contentProvider;
+        private final ITreeContentProvider contentProvider;
 
         public TreeContentProviderWrapper(ITreeContentProvider contentProvider) {
             this.contentProvider = contentProvider;
@@ -150,7 +157,7 @@ public class TimeGraphCombo extends Composite {
      * from the calls to the tree's real label provider.
      */
     private class TreeLabelProviderWrapper implements ITableLabelProvider {
-        private ITableLabelProvider labelProvider;
+        private final ITableLabelProvider labelProvider;
 
         public TreeLabelProviderWrapper(ITableLabelProvider labelProvider) {
             this.labelProvider = labelProvider;
@@ -207,7 +214,7 @@ public class TimeGraphCombo extends Composite {
      * time graph at the same time.
      */
     private class SelectionListenerWrapper implements ISelectionChangedListener, ITimeGraphSelectionListener {
-        private ITimeGraphSelectionListener listener;
+        private final ITimeGraphSelectionListener listener;
         private ITimeGraphEntry selection = null;
 
         public SelectionListenerWrapper(ITimeGraphSelectionListener listener) {
@@ -246,7 +253,7 @@ public class TimeGraphCombo extends Composite {
     /**
      * Constructs a new instance of this class given its parent
      * and a style value describing its behavior and appearance.
-     * 
+     *
      * @param parent a widget which will be the parent of the new instance (cannot be null)
      * @param style the style of widget to construct
      */
@@ -268,7 +275,7 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setNameWidthPref(0);
 
         // Feature in Windows. The tree vertical bar reappears when
-        // the control is resized so we need to hide it again. 
+        // the control is resized so we need to hide it again.
         // Bug in Linux. The tree header height is 0 in constructor,
         // so we need to reset it later when the control is resized.
         tree.addControlListener(new ControlAdapter() {
@@ -509,7 +516,7 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Returns this time graph combo's tree viewer.
-     * 
+     *
      * @return the tree viewer
      */
     public TreeViewer getTreeViewer() {
@@ -518,7 +525,7 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Returns this time graph combo's time graph viewer.
-     * 
+     *
      * @return the time graph viewer
      */
     public TimeGraphViewer getTimeGraphViewer() {
@@ -544,7 +551,7 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Sets the tree content provider used by this time graph combo.
-     * 
+     *
      * @param contentProvider the tree content provider
      */
     public void setTreeContentProvider(ITreeContentProvider contentProvider) {
@@ -553,7 +560,7 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Sets the tree label provider used by this time graph combo.
-     * 
+     *
      * @param treeLabelProvider the tree label provider
      */
     public void setTreeLabelProvider(ITableLabelProvider labelProvider) {
@@ -562,7 +569,7 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Sets the tree columns for this time graph combo.
-     * 
+     *
      * @param columnNames the tree column names
      */
     public void setTreeColumns(String[] columnNames) {
@@ -577,7 +584,7 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Sets the time graph provider used by this time graph combo.
-     * 
+     *
      * @param timeGraphProvider the time graph provider
      */
     public void setTimeGraphProvider(ITimeGraphPresentationProvider timeGraphProvider) {

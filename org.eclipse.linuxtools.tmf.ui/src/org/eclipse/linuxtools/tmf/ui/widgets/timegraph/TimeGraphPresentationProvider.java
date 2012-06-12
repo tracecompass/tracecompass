@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon - Initial API and implementation
  *   Patrick Tasse - Refactoring
@@ -22,6 +22,13 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 
+/**
+ * Provider class for the time graph provider
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ *
+ */
 public class TimeGraphPresentationProvider implements ITimeGraphPresentationProvider {
 
     // ------------------------------------------------------------------------

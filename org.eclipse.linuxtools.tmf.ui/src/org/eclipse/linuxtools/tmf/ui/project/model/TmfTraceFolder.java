@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -33,7 +33,7 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // Constants
     // ------------------------------------------------------------------------
     /**
-     * The name of the trace folder 
+     * The name of the trace folder
      */
     public static final String TRACE_FOLDER_NAME = "Traces"; //$NON-NLS-1$
 
@@ -61,10 +61,10 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // Constructor
     // ------------------------------------------------------------------------
     /**
-     * Constructor. 
+     * Constructor.
      * Creates trace folder model element under the project.
      * @param name The name of trace folder.
-     * @param trace The folder resource.
+     * @param resource The folder resource.
      * @param parent The parent element (project).
      */
     public TmfTraceFolder(String name, IFolder resource, TmfProjectElement parent) {
@@ -75,7 +75,7 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // ------------------------------------------------------------------------
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement#getResource()
@@ -151,14 +151,17 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     @Override
     public Object getPropertyValue(Object id) {
 
-        if (sfName.equals(id))
+        if (sfName.equals(id)) {
             return getName();
+        }
 
-        if (sfPath.equals(id))
+        if (sfPath.equals(id)) {
             return getPath().toString();
+        }
 
-        if (sfLocation.equals(id))
+        if (sfLocation.equals(id)) {
             return getLocation().toString();
+        }
 
         return null;
     }

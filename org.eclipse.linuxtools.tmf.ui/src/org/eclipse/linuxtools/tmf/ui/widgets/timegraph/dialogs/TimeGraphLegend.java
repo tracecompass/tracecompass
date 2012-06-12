@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson.
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon - Initial API and implementation
  *   Patrick Tasse - Refactoring
@@ -37,11 +37,17 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
-
+/**
+ * Legend for the colors used in the time graph view
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public class TimeGraphLegend extends TitleAreaDialog {
 
-    private ITimeGraphPresentationProvider provider;
-    private LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
+    private final ITimeGraphPresentationProvider provider;
+    private final LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
     public static void open(Shell parent, ITimeGraphPresentationProvider provider) {
         (new TimeGraphLegend(parent, provider)).open();
@@ -85,7 +91,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
         layout.marginBottom = 10;
         gs.setLayout(layout);
 
-        // Go through all the defined pairs of state color and state name and display them. 
+        // Go through all the defined pairs of state color and state name and display them.
         StateItem[] stateItems = provider.getStateTable();
         for (int i = 0; i < stateItems.length; i++) {
             //Get the color related to the index
@@ -123,7 +129,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
     }
 
     class Bar extends Canvas {
-        private Color color;
+        private final Color color;
 
         public Bar(Composite parent, RGB rgb) {
             super(parent, SWT.NONE);

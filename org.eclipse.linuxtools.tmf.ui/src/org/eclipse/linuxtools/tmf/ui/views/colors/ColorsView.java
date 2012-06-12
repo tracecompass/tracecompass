@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated to use RGB for the tick color
@@ -56,14 +56,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 
 /**
- * Color view implementation. This view provides support for managing color settings for filters. 
- *  
+ * Color view implementation. This view provides support for managing color settings for filters.
+ *
  * @version 1.0
  * @author Patrick Tasse
  *
  */
 public class ColorsView extends TmfView {
 
+    /** ID for the color view */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.colors"; //$NON-NLS-1$
 
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
@@ -76,7 +77,7 @@ public class ColorsView extends TmfView {
     // ------------------------------------------------------------------------
     // Main data structures
     // ------------------------------------------------------------------------
-    
+
     /**
      * The composite shell.
      */
@@ -86,7 +87,7 @@ public class ColorsView extends TmfView {
      */
     protected ScrolledComposite fScrolledComposite;
     /**
-     * The list composite. 
+     * The list composite.
      */
     protected Composite fListComposite;
     /**
@@ -160,7 +161,7 @@ public class ColorsView extends TmfView {
         gl.verticalSpacing = 1;
         fListComposite.setLayout(gl);
 
-        fColorSettings = new ArrayList<ColorSetting>(Arrays.asList(ColorSettingsManager.getColorSettings())); 
+        fColorSettings = new ArrayList<ColorSetting>(Arrays.asList(ColorSettingsManager.getColorSettings()));
         for (ColorSetting colorSetting : fColorSettings) {
             new ColorSettingRow(fListComposite, colorSetting);
         }
@@ -196,7 +197,7 @@ public class ColorsView extends TmfView {
                 fSelectedRow = null;
                 refresh();
             }
-        }; 
+        };
         fillerLabel.addMouseListener(mouseListener);
 
         fScrolledComposite.setMinSize(fListComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -234,7 +235,7 @@ public class ColorsView extends TmfView {
 
         fAddAction = new AddAction();
         fAddAction.setImageDescriptor(ImageDescriptor.createFromImage(ADD_IMAGE));
-        fAddAction.setToolTipText(Messages.ColorsView_AddActionToolTipText);	
+        fAddAction.setToolTipText(Messages.ColorsView_AddActionToolTipText);
 
         fDeleteAction = new DeleteAction();
         fDeleteAction.setImageDescriptor(ImageDescriptor.createFromImage(DELETE_IMAGE));
@@ -293,7 +294,7 @@ public class ColorsView extends TmfView {
     }
 
     private class DeleteAction extends Action {
-        
+
         @Override
         public void run() {
             if (fSelectedRow != null) {
@@ -334,7 +335,7 @@ public class ColorsView extends TmfView {
                 int index = fColorSettings.indexOf(fSelectedRow.getColorSetting());
                 if (index < fColorSettings.size() - 1) {
                     fColorSettings.add(index + 1, fColorSettings.remove(index));
-                    
+
                     fSelectedRow.moveBelow(fListComposite.getChildren()[index + 1]);
                     refresh();
                     ColorSettingsManager.setColorSettings(fColorSettings.toArray(new ColorSetting[0]));
@@ -429,7 +430,7 @@ public class ColorsView extends TmfView {
             labelComposite.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, false));
             gl = new GridLayout();
             gl.marginHeight = 0;
-            gl.marginWidth = 0;;
+            gl.marginWidth = 0;
             labelComposite.setLayout(gl);
             labelComposite.setBackground(colorSetting.getBackgroundColor());
 
@@ -564,7 +565,7 @@ public class ColorsView extends TmfView {
                     fSelectedRow = ColorSettingRow.this;
                     refresh();
                 }
-            }; 
+            };
             addMouseListener(mouseListener);
             label.addMouseListener(mouseListener);
             tickCanvas.addMouseListener(mouseListener);

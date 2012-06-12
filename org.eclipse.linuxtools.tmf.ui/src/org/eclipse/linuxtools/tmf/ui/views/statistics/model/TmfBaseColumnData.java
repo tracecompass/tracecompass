@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Mathieu Denis      (mathieu.denis@polymtl.ca)  - Initial Implementation
- *   Bernd Hufmann - Added Annotations 
+ *   Bernd Hufmann - Added Annotations
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
@@ -18,11 +18,12 @@ import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * Contains all the information necessary to build a column of the table.
- * @version 1.0 
+ *
+ * @version 1.0
  * @author Mathieu Denis
  */
 public class TmfBaseColumnData implements ITmfStatisticsColumnData {
-    
+
     /**
      * Name of the column.
      */
@@ -51,7 +52,7 @@ public class TmfBaseColumnData implements ITmfStatisticsColumnData {
      * Used to draw bar charts in this column. Can be null.
      */
     protected final ITmfColumnPercentageProvider fPercentageProvider;
-    
+
     /**
      * Used to draw bar charts in columns.
      */
@@ -61,7 +62,7 @@ public class TmfBaseColumnData implements ITmfStatisticsColumnData {
 
     /**
      * Constructor with parameters
-     * 
+     *
      * @param h header of the column. The name will be shown at the top of the column.
      * @param w width of the column.
      * @param a alignment of the text
@@ -79,7 +80,7 @@ public class TmfBaseColumnData implements ITmfStatisticsColumnData {
         fComparator = c;
         fPercentageProvider = p;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.ITmfStatisticsColumnData#getHeader()

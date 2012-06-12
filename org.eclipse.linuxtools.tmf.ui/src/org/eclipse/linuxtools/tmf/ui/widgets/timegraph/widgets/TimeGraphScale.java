@@ -31,6 +31,15 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Implementation of the scale for the time graph view.
+ *
+ * This goes above the "gantt chart" area.
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public class TimeGraphScale extends TimeGraphBaseControl implements MouseListener, MouseMoveListener {
 
     public TimeGraphScale(Composite parent, TimeGraphColorScheme colors) {
@@ -60,7 +69,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
     private long _time0bak;
     private long _time1bak;
     private boolean _isInUpdate;
-    private Rectangle _rect0 = new Rectangle(0, 0, 0, 0);
+    private final Rectangle _rect0 = new Rectangle(0, 0, 0, 0);
     private int _height;
 
     public void setTimeProvider(ITimeDataProvider timeProvider) {
@@ -138,42 +147,45 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
     TimeDraw getTimeDraw(long timeDelta) {
         TimeDraw timeDraw;
         if (_timeProvider != null && _timeProvider.isCalendarFormat()) {
-            if (timeDelta >= YEAR_IN_NS)
+            if (timeDelta >= YEAR_IN_NS) {
                 timeDraw = TIMEDRAW_ABS_YEAR;
-            else if (timeDelta >= MONTH_IN_NS)
+            } else if (timeDelta >= MONTH_IN_NS) {
                 timeDraw = TIMEDRAW_ABS_MONTH;
-            else if (timeDelta >= DAY_IN_NS)
+            } else if (timeDelta >= DAY_IN_NS) {
                 timeDraw = TIMEDRAW_ABS_DAY;
-            else if (timeDelta >= HOUR_IN_NS)
+            } else if (timeDelta >= HOUR_IN_NS) {
                 timeDraw = TIMEDRAW_ABS_HRS;
-            else if (timeDelta >= MIN_IN_NS)
+            } else if (timeDelta >= MIN_IN_NS) {
                 timeDraw = TIMEDRAW_ABS_MIN;
-            else if (timeDelta >= SEC_IN_NS)
+            } else if (timeDelta >= SEC_IN_NS) {
                 timeDraw = TIMEDRAW_ABS_SEC;
-            else if (timeDelta >= 1000000)
+            } else if (timeDelta >= 1000000) {
                 timeDraw = TIMEDRAW_ABS_MILLISEC;
-            else if (timeDelta >= 1000)
+            } else if (timeDelta >= 1000) {
                 timeDraw = TIMEDRAW_ABS_MICROSEC;
-            else
+            } else {
                 timeDraw = TIMEDRAW_ABS_NANOSEC;
+            }
             return timeDraw;
         }
-        if (timeDelta >= 1000000000)
+        if (timeDelta >= 1000000000) {
             timeDraw = TIMEDRAW_SEC;
-        else if (timeDelta >= 1000000)
+        } else if (timeDelta >= 1000000) {
             timeDraw = TIMEDRAW_MILLISEC;
-        else if (timeDelta >= 1000)
+        } else if (timeDelta >= 1000) {
             timeDraw = TIMEDRAW_MICROSEC;
-        else
+        } else {
             timeDraw = TIMEDRAW_NANOSEC;
+        }
         return timeDraw;
     }
 
     @Override
     void paint(Rectangle rect, PaintEvent e) {
 
-        if (_isInUpdate || null == _timeProvider)
+        if (_isInUpdate || null == _timeProvider) {
             return;
+        }
 
         GC gc = e.gc;
         gc.fillRectangle(rect);
@@ -228,8 +240,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
             }
         }
 
-        if (_rect0.isEmpty())
+        if (_rect0.isEmpty()) {
             return;
+        }
 
         // draw selected time
         int x = _rect0.x + (int) ((double)(selectedTime - time0) * pixelsPerNanoSec);
@@ -266,8 +279,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
             if (x >= rect.x + leftSpace) {
                 gc.drawLine(x, y, x, y + 4);
                 _rect0.x = x;
-                if (x + _rect0.width <= rect.x + rect.width)
+                if (x + _rect0.width <= rect.x + rect.width) {
                     timeDraw.draw(gc, time, _rect0);
+                }
             }
             if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - _timeDelta || _timeDelta == 0) {
                 break;
@@ -491,10 +505,11 @@ abstract class TimeDraw {
 
     static String pad(long n) {
         String s = S;
-        if (n < 10)
+        if (n < 10) {
             s = S00;
-        else if (n < 100)
+        } else if (n < 100) {
             s = S0;
+        }
         return s + n;
     }
 

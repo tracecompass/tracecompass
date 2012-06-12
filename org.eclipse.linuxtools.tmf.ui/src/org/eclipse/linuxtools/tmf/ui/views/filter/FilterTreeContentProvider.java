@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Yuriy Vashchuk - Initial API and implementation
  *******************************************************************************/
@@ -19,10 +19,10 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 
 /**
- * <b><u>FilterTreeContentProvider</u></b>
- * <p>
  * This is the Content Provider of our tree
- * <p>
+ *
+ * @version 1.0
+ * @author Yuriy Vashchuk
  */
 public class FilterTreeContentProvider implements ITreeContentProvider {
 
@@ -55,7 +55,7 @@ public class FilterTreeContentProvider implements ITreeContentProvider {
 			for(int i = 0; i < ((ITmfFilterTreeNode)inputElement).getChildrenCount(); i++) {
 				result.add(((ITmfFilterTreeNode)inputElement).getChild(i));
 			}
-			
+
 			return result.toArray();
 		}
         return null;

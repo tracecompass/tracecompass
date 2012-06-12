@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated to use RGB for the tick color
@@ -22,10 +22,10 @@ import org.eclipse.ui.themes.ColorUtil;
 
 /**
  * Class for storing color settings of a TMF filter.
- * 
+ *
  * Application code must explicitly invoke the ColorSetting.dispose() method to release the operating system
  * resources managed by each instance when those instances are no longer required.
- * 
+ *
  *  @version 1.0
  *  @author Patrick Tasse
  */
@@ -40,12 +40,21 @@ public class ColorSetting {
 	private Color fDimmedBackgroundColor;
 	private Color fTickColor;
 	private ITmfFilterTreeNode fFilter;
-	
-	/**
-	 * Constructor
-	 * 
-	 * You must dispose the color setting when it is no longer required.
-	 */
+
+	    /**
+     * Constructor
+     *
+     * You must dispose the color setting when it is no longer required.
+     *
+     * @param foreground
+     *            The foreground color
+     * @param background
+     *            The background color
+     * @param tickColorRGB
+     *            The color for the checkbox ticks
+     * @param filter
+     *            The filter tree node
+     */
 	public ColorSetting(RGB foreground, RGB background, RGB tickColorRGB, ITmfFilterTreeNode filter) {
 		fForegroundRGB = foreground;
 		fBackgroundRGB = background;
@@ -60,7 +69,7 @@ public class ColorSetting {
 				fBackgroundRGB, display.getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB()));
 		fTickColor = new Color(display, fTickColorRGB);
 	}
-	
+
 	/**
 	 * Dispose the color setting resources
 	 */
@@ -71,19 +80,19 @@ public class ColorSetting {
 		fDimmedBackgroundColor.dispose();
 		fTickColor.dispose();
 	}
-	
+
 	/**
 	 * Returns foreground RGB value.
-	 * 
+	 *
 	 * @return the foreground RGB
 	 */
 	public RGB getForegroundRGB() {
 		return fForegroundRGB;
 	}
-	
+
 	/**
 	 * Sets the foreground RGB value
-	 * 
+	 *
 	 * @param foreground the foreground to set
 	 */
 	public void setForegroundRGB(RGB foreground) {
@@ -95,19 +104,19 @@ public class ColorSetting {
 		fDimmedForegroundColor = new Color(display, ColorUtil.blend(
 				fForegroundRGB, fBackgroundRGB));
 	}
-	
+
 	/**
 	 * Returns the background RGB value.
-	 * 
+	 *
 	 * @return the background RGB
 	 */
 	public RGB getBackgroundRGB() {
 		return fBackgroundRGB;
 	}
-	
+
 	/**
 	 * Sets the background RGB value.
-	 * 
+	 *
 	 * @param background the background to set
 	 */
 	public void setBackgroundRGB(RGB background) {
@@ -122,17 +131,17 @@ public class ColorSetting {
 
 	/**
 	 * Returns the RGB of the tick color
-	 * 
+	 *
 	 * @return the RGB of the tick color
 	 */
 	public RGB getTickColorRGB() {
 		return fTickColorRGB;
 	}
-	
+
 	/**
-	 * Sets the RGB of the tick color 
-	 * 
-	 * @param tickColorRGB the tick color TGB 
+	 * Sets the RGB of the tick color
+	 *
+	 * @param tickColorRGB the tick color TGB
 	 */
 	public void setTickColorRGB(RGB tickColorRGB) {
 	       fTickColorRGB = tickColorRGB;
@@ -140,7 +149,7 @@ public class ColorSetting {
            Display display = Display.getDefault();
            fTickColor = new Color(display, fTickColorRGB);
 	}
-	
+
 	/**
 	 * Returns the filter implementation.
 	 * @return the filter
@@ -148,10 +157,10 @@ public class ColorSetting {
 	public ITmfFilterTreeNode getFilter() {
 		return fFilter;
 	}
-	
+
 	/**
 	 * Sets the filter implementation.
-	 * 
+	 *
 	 * @param filter the filter to set
 	 */
 	public void setFilter(ITmfFilterTreeNode filter) {
@@ -160,7 +169,7 @@ public class ColorSetting {
 
 	/**
 	 * Returns the foreground color.
-	 * 
+	 *
 	 * @return the foreground color
 	 */
 	public Color getForegroundColor() {
@@ -169,7 +178,7 @@ public class ColorSetting {
 
 	/**
 	 * Returns the background color.
-	 * 
+	 *
 	 * @return the background color
 	 */
 	public Color getBackgroundColor() {
@@ -178,7 +187,7 @@ public class ColorSetting {
 
 	/**
 	 * Returns the dimmed foreground color.
-	 * 
+	 *
 	 * @return the dimmed foreground color
 	 */
 	public Color getDimmedForegroundColor() {
@@ -187,16 +196,16 @@ public class ColorSetting {
 
 	/**
 	 * Returns the dimmed background color.
-	 * 
+	 *
 	 * @return the dimmed background color
 	 */
 	public Color getDimmedBackgroundColor() {
 		return fDimmedBackgroundColor;
 	}
-	
+
 	/**
 	 * Returns the tick color.
-	 * 
+	 *
 	 * @return the tick color
 	 */
 	public Color getTickColor() {

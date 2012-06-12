@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -39,6 +39,9 @@ import org.eclipse.swt.widgets.TabFolder;
 
 /**
  * This is the common dialog to define Find and/or Filter Criteria(s)
+ *
+ * @version 1.0
+ * @author Bernd Hufmann
  */
 public class SearchFilterDialog extends Dialog {
 
@@ -54,7 +57,7 @@ public class SearchFilterDialog extends Dialog {
      */
     protected static final String FIND_EXPRESSION_LIST = "findExpressionList"; //$NON-NLS-1$
     /**
-     * The filter criteria poperty name 
+     * The filter criteria poperty name
      */
     protected static final String FILTER_CRITERIA = "filterCriteria"; //$NON-NLS-1$
     /**
@@ -92,14 +95,14 @@ public class SearchFilterDialog extends Dialog {
 
     /**
      * The okText is the text for the Ok button and title is the title of the dialog.<br>
-     * Both depend (okText and title (below)) on the usage that is done of this dialog 
+     * Both depend (okText and title (below)) on the usage that is done of this dialog
      * (find or filter).
      */
     protected String fOkText;
-    
+
     /**
      * The title is the title of the dialog.<br>
-     * Both depend (okText and title) on the usage that is done of this dialog 
+     * Both depend (okText and title) on the usage that is done of this dialog
      * (find or filter).
      */
     protected String fTitle;
@@ -119,10 +122,10 @@ public class SearchFilterDialog extends Dialog {
     // ------------------------------------------------------------------------
     /**
      * Standard constructor
-     * 
+     *
      * @param view A sequence diagram view reference
      * @param provider A graph node supporter provider
-     * @param filter A flag to indicate filtering (true) or finding (false)  
+     * @param filter A flag to indicate filtering (true) or finding (false)
      * @param style Style bits
      */
     public SearchFilterDialog(SDView view, ISDGraphNodeSupporter provider, boolean filter, int style) {
@@ -132,7 +135,7 @@ public class SearchFilterDialog extends Dialog {
         fSdView = view;
         fIsFind = !filter;
     }
-    
+
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
@@ -246,9 +249,9 @@ public class SearchFilterDialog extends Dialog {
     }
 
     /**
-     * Called when the dialog box ok button is pressed and calls back 
+     * Called when the dialog box ok button is pressed and calls back
      * the appropriate action provider (ISDFilterProvider or ISDFindProvider).
-     * 
+     *
      * @see org.eclipse.jface.dialogs.Dialog#okPressed()
      */
     @Override
@@ -320,7 +323,7 @@ public class SearchFilterDialog extends Dialog {
 
     /**
 	 * Returns the criteria
-	 * 
+	 *
 	 * @return the criteria
 	 */
     public Criteria getCriteria() {
@@ -329,7 +332,7 @@ public class SearchFilterDialog extends Dialog {
 
     /**
      * Sets the criteria.
-     * 
+     *
      * @param criteria the criteria to set.
      */
     public void setCriteria(Criteria criteria) {
@@ -354,7 +357,7 @@ public class SearchFilterDialog extends Dialog {
 
     /**
      * Returns the tab content reference.
-     * 
+     *
      * @return the tab content
      */
     protected TabContents getTabContents() {
@@ -370,7 +373,7 @@ public class SearchFilterDialog extends Dialog {
     /**
      * Initialize the dialog with the settings of an existing Criteria<br>
      * Criteria must not be null and the TabContents must have been created
-     * 
+     *
      * @param from the criteria to copy from
      */
     public void copyFromCriteria(Criteria from) {
@@ -389,7 +392,7 @@ public class SearchFilterDialog extends Dialog {
 
     /**
      * Sets the text to be used for the ok button
-     * 
+     *
      * @param okText text to set
      */
     public void setOkText(String okText) {
@@ -398,7 +401,7 @@ public class SearchFilterDialog extends Dialog {
 
     /**
      * Sets the title to be used for the dialog box.
-     * 
+     *
      * @param title The title to set
      */
     public void setTitle(String title) {

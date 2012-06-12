@@ -111,12 +111,15 @@ import org.eclipse.ui.themes.ColorUtil;
 
 /**
  * The generic TMF Events table
- * 
+ *
+ * This is a view that will list events that are read from a trace.
+ *
  * @version 1.0
+ * @author Francois Chouinard
  * @author Patrick Tasse
  */
-public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorSettingsListener,
-ITmfEventsFilterProvider {
+public class TmfEventsTable extends TmfComponent implements IGotoMarker,
+        IColorSettingsListener, ITmfEventsFilterProvider {
 
     private static final Image BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/bookmark_obj.gif"); //$NON-NLS-1$
@@ -134,29 +137,48 @@ ITmfEventsFilterProvider {
 
     /**
      * The events table search/filter keys
-     * 
+     *
      * @version 1.0
      * @author Patrick Tasse
      */
     public interface Key {
+        /** Search text */
         String SEARCH_TXT = "$srch_txt"; //$NON-NLS-1$
+
+        /** Search object */
         String SEARCH_OBJ = "$srch_obj"; //$NON-NLS-1$
+
+        /** Filter text */
         String FILTER_TXT = "$fltr_txt"; //$NON-NLS-1$
+
+        /** Filter object */
         String FILTER_OBJ = "$fltr_obj"; //$NON-NLS-1$
+
+        /** Timestamp*/
         String TIMESTAMP = "$time"; //$NON-NLS-1$
+
+        /** Rank */
         String RANK = "$rank"; //$NON-NLS-1$
+
+        /** Field ID */
         String FIELD_ID = "$field_id"; //$NON-NLS-1$
+
+        /** Bookmark indicator */
         String BOOKMARK = "$bookmark"; //$NON-NLS-1$
     }
 
     /**
      * The events table search/filter state
-     * 
+     *
      * @version 1.0
      * @author Patrick Tasse
      */
     public static enum HeaderState {
-        SEARCH, FILTER
+        /** A search is being run */
+        SEARCH,
+
+        /** A filter is applied */
+        FILTER
     }
 
     interface Direction {
@@ -220,10 +242,28 @@ ITmfEventsFilterProvider {
     // Constructor
     // ------------------------------------------------------------------------
 
+    /**
+     * Basic constructor, will use default column data.
+     *
+     * @param parent
+     *            The parent composite UI object
+     * @param cacheSize
+     *            The size of the event table cache
+     */
     public TmfEventsTable(final Composite parent, final int cacheSize) {
         this(parent, cacheSize, COLUMN_DATA);
     }
 
+    /**
+     * Advanced constructor, where we also define which column data to use.
+     *
+     * @param parent
+     *            The parent composite UI object
+     * @param cacheSize
+     *            The size of the event table cache
+     * @param columnData
+     *            The column data to use for this table
+     */
     public TmfEventsTable(final Composite parent, int cacheSize, final ColumnData[] columnData) {
         super("TmfEventsTable"); //$NON-NLS-1$
 
@@ -408,6 +448,8 @@ ITmfEventsFilterProvider {
                             tooltipShell.dispose();
                             tooltipShell = null;
                         }
+                        break;
+                    default:
                         break;
                 }
             }
@@ -650,10 +692,21 @@ ITmfEventsFilterProvider {
         super.dispose();
     }
 
+    /**
+     * Assign a layout data object to this view.
+     *
+     * @param layoutData
+     *            The layout data to assign
+     */
     public void setLayoutData(final Object layoutData) {
         fComposite.setLayoutData(layoutData);
     }
 
+    /**
+     * Get the virtual table contained in this event table.
+     *
+     * @return The TMF virtual table
+     */
     public TmfVirtualTable getTable() {
         return fTable;
     }
@@ -1018,7 +1071,7 @@ ITmfEventsFilterProvider {
             }
         }
     }
-    
+
     protected void applyFilter(ITmfFilter filter) {
     	stopFilterThread();
     	stopSearchThread();
@@ -1123,9 +1176,8 @@ ITmfEventsFilterProvider {
                 if (refreshBusy) {
                     refreshPending = true;
                     return;
-                } else {
-                    refreshBusy = true;
                 }
+                refreshBusy = true;
             }
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
@@ -1324,11 +1376,10 @@ ITmfEventsFilterProvider {
                                 fSearchThread = null;
                             }
                             return Status.OK_STATUS;
-                        } else {
-                            nbRequested = (int) rank;
-                            rank = 0;
-                            wrapped = true;
                         }
+                        nbRequested = (int) rank;
+                        rank = 0;
+                        wrapped = true;
                     } else {
                         rank--;
                         if (rank < 0) {
@@ -1425,14 +1476,21 @@ ITmfEventsFilterProvider {
         return fields;
     }
 
+    /**
+     * Notify this table that is got the UI focus.
+     */
     public void setFocus() {
         fTable.setFocus();
     }
 
     /**
+     * Assign a new trace to this event table.
+     *
      * @param trace
+     *            The trace to assign to this event table
      * @param disposeOnClose
-     *            true if the trace should be disposed when the table is disposed
+     *            true if the trace should be disposed when the table is
+     *            disposed
      */
     public void setTrace(final ITmfTrace<?> trace, final boolean disposeOnClose) {
         if ((fTrace != null) && fDisposeOnClose) {
@@ -1471,15 +1529,21 @@ ITmfEventsFilterProvider {
     // Event cache
     // ------------------------------------------------------------------------
 
+    /**
+     * Notify that the event cache has been updated
+     *
+     * @param completed
+     *            Also notify if the populating of the cache is complete, or
+     *            not.
+     */
     public void cacheUpdated(final boolean completed) {
         synchronized (fCacheUpdateSyncObj) {
             if (fCacheUpdateBusy) {
                 fCacheUpdatePending = true;
                 fCacheUpdateCompleted = completed;
                 return;
-            } else {
-                fCacheUpdateBusy = true;
             }
+            fCacheUpdateBusy = true;
         }
         // Event cache is now updated. Perform update on the UI thread
         if (!fTable.isDisposed()) {
@@ -1513,6 +1577,12 @@ ITmfEventsFilterProvider {
     // Bookmark handling
     // ------------------------------------------------------------------------
 
+    /**
+     * Add a bookmark to this event table.
+     *
+     * @param bookmarksFile
+     *            The file to use for the bookmarks
+     */
     public void addBookmark(final IFile bookmarksFile) {
         fBookmarksFile = bookmarksFile;
         final TableItem[] selection = fTable.getSelection();
@@ -1551,6 +1621,12 @@ ITmfEventsFilterProvider {
 
     }
 
+    /**
+     * Remove a bookmark from this event table.
+     *
+     * @param bookmark
+     *            The bookmark to remove
+     */
     public void removeBookmark(final IMarker bookmark) {
         for (final Entry<Long, Long> entry : fBookmarksMap.entrySet()) {
             if (entry.getValue().equals(bookmark.getId())) {
@@ -1581,6 +1657,13 @@ ITmfEventsFilterProvider {
         }
     }
 
+    /**
+     * Refresh the bookmarks assigned to this trace, from the contents of a
+     * bookmark file.
+     *
+     * @param bookmarksFile
+     *            The bookmark file to use
+     */
     public void refreshBookmarks(final IFile bookmarksFile) {
         fBookmarksFile = bookmarksFile;
         if (bookmarksFile == null) {
@@ -1647,6 +1730,12 @@ ITmfEventsFilterProvider {
     // Signal handlers
     // ------------------------------------------------------------------------
 
+    /**
+     * Handler for the experiment updated signal.
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void experimentUpdated(final TmfExperimentUpdatedSignal signal) {
         if ((signal.getExperiment() != fTrace) || fTable.isDisposed()) {
@@ -1674,6 +1763,12 @@ ITmfEventsFilterProvider {
         });
     }
 
+    /**
+     * Handler for the trace updated signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void traceUpdated(final TmfTraceUpdatedSignal signal) {
         if ((signal.getTrace() != fTrace) || fTable.isDisposed()) {
@@ -1701,6 +1796,12 @@ ITmfEventsFilterProvider {
         });
     }
 
+    /**
+     * Handler for the time synch signal.
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void currentTimeUpdated(final TmfTimeSynchSignal signal) {

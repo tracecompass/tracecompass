@@ -60,6 +60,13 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 
+/**
+ * Time graph control implementation
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public class TimeGraphControl extends TimeGraphBaseControl implements FocusListener, KeyListener, MouseMoveListener, MouseListener, MouseWheelListener, ControlListener, SelectionListener, MouseTrackListener, TraverseListener, ISelectionProvider {
 
     private static final int DRAG_NONE = 0;
@@ -91,13 +98,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     private ITimeGraphPresentationProvider fTimeGraphProvider = null;
     private ItemData _data = null;
     private List<SelectionListener> _selectionListeners;
-    private List<ISelectionChangedListener> _selectionChangedListeners = new ArrayList<ISelectionChangedListener>();
-    private List<ITimeGraphTreeListener> _treeListeners = new ArrayList<ITimeGraphTreeListener>();
-    private Cursor _dragCursor3;
-    private Cursor _WaitCursor;
+    private final List<ISelectionChangedListener> _selectionChangedListeners = new ArrayList<ISelectionChangedListener>();
+    private final List<ITimeGraphTreeListener> _treeListeners = new ArrayList<ITimeGraphTreeListener>();
+    private final Cursor _dragCursor3;
+    private final Cursor _WaitCursor;
 
     // Vertical formatting formatting for the state control view
-    private boolean _visibleVerticalScroll = true;
+    private final boolean _visibleVerticalScroll = true;
     private int _borderWidth = 0;
     private int _headerHeight = 0;
 
@@ -107,7 +114,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     protected Color[] fEventColorMap = null;
 
     private MouseScrollNotifier fMouseScrollNotifier;
-    private Object fMouseScrollNotifierLock = new Object();
+    private final Object fMouseScrollNotifierLock = new Object();
     private class MouseScrollNotifier extends Thread {
         private final static long DELAY = 400L;
         private final static long POLLING_INTERVAL = 10L;
@@ -177,7 +184,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     /**
      * Sets the timegraph provider used by this timegraph viewer.
-     * 
+     *
      * @param timeGraphProvider the timegraph provider
      */
     public void setTimeGraphProvider(ITimeGraphPresentationProvider timeGraphProvider) {
@@ -207,16 +214,19 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     public void addSelectionListener(SelectionListener listener) {
-        if (listener == null)
+        if (listener == null) {
             SWT.error(SWT.ERROR_NULL_ARGUMENT);
-        if (null == _selectionListeners)
+        }
+        if (null == _selectionListeners) {
             _selectionListeners = new ArrayList<SelectionListener>();
+        }
         _selectionListeners.add(listener);
     }
 
     public void removeSelectionListener(SelectionListener listener) {
-        if (null != _selectionListeners)
+        if (null != _selectionListeners) {
             _selectionListeners.remove(listener);
+        }
     }
 
     public void fireSelectionChanged() {
@@ -294,25 +304,29 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         boolean changed = false;
         if (idx < 0) {
             for (idx = 0; idx < _data._expandedItems.length; idx++) {
-                if (((Item) _data._expandedItems[idx])._selected)
+                if (((Item) _data._expandedItems[idx])._selected) {
                     break;
+                }
             }
         }
-        if (idx >= _data._expandedItems.length)
+        if (idx >= _data._expandedItems.length) {
             return changed;
+        }
         if (idx < _topIndex) {
             setTopIndex(idx);
             //FIXME:getVerticalBar().setSelection(_topItem);
-            if (redraw)
+            if (redraw) {
                 redraw();
+            }
             changed = true;
         } else {
             int page = countPerPage();
             if (idx >= _topIndex + page) {
                 setTopIndex(idx - page + 1);
                 //FIXME:getVerticalBar().setSelection(_topItem);
-                if (redraw)
+                if (redraw) {
                     redraw();
+                }
                 changed = true;
             }
         }
@@ -365,10 +379,11 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         if (null != trace && null != _timeProvider) {
             long selectedTime = _timeProvider.getSelectedTime();
             ITimeEvent event = Utils.findEvent(trace, selectedTime, 0);
-            if (event != null)
+            if (event != null) {
                 sel.add(event);
-            else
+            } else {
                 sel.add(trace);
+            }
         }
         return sel;
     }
@@ -382,7 +397,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return sel;
     }
 
-    
+
     // TODO select implementation for selectTrace
 //    public void selectTrace(int n) {
 //        if (n != 1 && n != -1)
@@ -492,22 +507,26 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             fireSelectionChanged();
         }
     }
-    
+
     public void selectEvent(int n) {
-        if (null == _timeProvider)
+        if (null == _timeProvider) {
             return;
+        }
         ITimeGraphEntry trace = getSelectedTrace();
-        if (trace == null)
+        if (trace == null) {
             return;
+        }
         long selectedTime = _timeProvider.getSelectedTime();
         long endTime = _timeProvider.getEndTime();
         ITimeEvent nextEvent;
-        if (-1 == n && selectedTime > endTime)
+        if (-1 == n && selectedTime > endTime) {
             nextEvent = Utils.findEvent(trace, selectedTime, 0);
-        else
+        } else {
             nextEvent = Utils.findEvent(trace, selectedTime, n);
-        if (null == nextEvent && -1 == n)
+        }
+        if (null == nextEvent && -1 == n) {
             nextEvent = Utils.getFirstEvent(trace);
+        }
         if (null != nextEvent) {
             long nextTime = nextEvent.getTime();
             // If last event detected e.g. going back or not moving to a next
@@ -550,7 +569,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     /**
      * Zoom based on mouse cursor location with mouse scrolling
-     * 
+     *
      * @param zoomIn true to zoom in, false to zoom out
      */
     public void zoom(boolean zoomIn) {
@@ -642,8 +661,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     public ITimeGraphEntry getSelectedTrace() {
         ITimeGraphEntry trace = null;
         int idx = getSelectedIndex();
-        if (idx >= 0)
+        if (idx >= 0) {
             trace = _data._expandedItems[idx]._trace;
+        }
         return trace;
     }
 
@@ -698,8 +718,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     boolean isOverSplitLine(int x) {
-        if (x < 0 || null == _timeProvider)
+        if (x < 0 || null == _timeProvider) {
             return false;
+        }
         int w = 4;
         int nameWidth = _timeProvider.getNameSpace();
         if (x > nameWidth - w && x < nameWidth + w) {
@@ -715,8 +736,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     long getTimeAtX(int x) {
-        if (null == _timeProvider)
+        if (null == _timeProvider) {
             return -1;
+        }
         long hitTime = -1;
         Point size = getCtrlSize();
         long time0 = _timeProvider.getTime0();
@@ -754,8 +776,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             }
         }
         changed |= ensureVisibleItem(idx, true);
-        if (changed)
+        if (changed) {
             redraw();
+        }
     }
 
     public void selectItem(ITimeGraphEntry trace, boolean addSelection) {
@@ -852,8 +875,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         gc.setBackground(_colors.getColor(TimeGraphColorScheme.BACKGROUND));
         drawBackground(gc, bounds.x, bounds.y, bounds.width, bounds.height);
 
-        if (bounds.width < 2 || bounds.height < 2 || null == _timeProvider)
+        if (bounds.width < 2 || bounds.height < 2 || null == _timeProvider) {
             return;
+        }
 
         _idealNameSpace = 0;
         int nameSpace = _timeProvider.getNameSpace();
@@ -895,7 +919,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     /**
      * Draws the item
-     * 
+     *
      * @param item the item to draw
      * @param bounds the container rectangle
      * @param i the item index
@@ -1082,7 +1106,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             } else {
                 stateColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
             }
-            
+
             timeSelected = timeSelected && selected;
             if (timeSelected) {
                 // modify the color?
@@ -1141,8 +1165,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     @Override
     public void keyTraversed(TraverseEvent e) {
-        if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS))
+        if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
             e.doit = true;
+        }
     }
 
     @Override
@@ -1157,16 +1182,18 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             idx = _data._expandedItems.length - 1;
         } else if (SWT.ARROW_DOWN == e.keyCode) {
             idx = getSelectedIndex();
-            if (idx < 0)
+            if (idx < 0) {
                 idx = 0;
-            else if (idx < _data._expandedItems.length - 1)
+            } else if (idx < _data._expandedItems.length - 1) {
                 idx++;
+            }
         } else if (SWT.ARROW_UP == e.keyCode) {
             idx = getSelectedIndex();
-            if (idx < 0)
+            if (idx < 0) {
                 idx = 0;
-            else if (idx > 0)
+            } else if (idx > 0) {
                 idx--;
+            }
         } else if (SWT.ARROW_LEFT == e.keyCode) {
             selectPrevEvent();
         } else if (SWT.ARROW_RIGHT == e.keyCode) {
@@ -1174,19 +1201,23 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         } else if (SWT.PAGE_DOWN == e.keyCode) {
             int page = countPerPage();
             idx = getSelectedIndex();
-            if (idx < 0)
+            if (idx < 0) {
                 idx = 0;
+            }
             idx += page;
-            if (idx >= _data._expandedItems.length)
+            if (idx >= _data._expandedItems.length) {
                 idx = _data._expandedItems.length - 1;
+            }
         } else if (SWT.PAGE_UP == e.keyCode) {
             int page = countPerPage();
             idx = getSelectedIndex();
-            if (idx < 0)
+            if (idx < 0) {
                 idx = 0;
+            }
             idx -= page;
-            if (idx < 0)
+            if (idx < 0) {
                 idx = 0;
+            }
         } else if (SWT.CR == e.keyCode) {
             idx = getSelectedIndex();
             if (idx >= 0) {
@@ -1246,7 +1277,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     /**
      * Provide the possibilty to control the wait cursor externally e.g. data
      * requests in progress
-     * 
+     *
      * @param waitInd
      */
     public void waitCursor(boolean waitInd) {
@@ -1269,7 +1300,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      * ranges), then change the cursor to a drag cursor to indicate the user the
      * possibility of resizing
      * </p>
-     * 
+     *
      * @param x
      * @param y
      */
@@ -1291,8 +1322,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     @Override
     public void mouseMove(MouseEvent e) {
-        if (null == _timeProvider)
+        if (null == _timeProvider) {
             return;
+        }
         Point size = getCtrlSize();
         if (DRAG_TRACE_ITEM == _dragState) {
             int nameWidth = _timeProvider.getNameSpace();
@@ -1303,8 +1335,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 long timeDelta = (long) ((pixelsPerNanoSec == 0) ? 0 : ((_dragX - _dragX0) / pixelsPerNanoSec));
                 long time1 = _time1bak - timeDelta;
                 long maxTime = _timeProvider.getMaxTime();
-                if (time1 > maxTime)
+                if (time1 > maxTime) {
                     time1 = maxTime;
+                }
                 long time0 = time1 - (_time1bak - _time0bak);
                 if (time0 < _timeProvider.getMinTime()) {
                     time0 = _timeProvider.getMinTime();
@@ -1327,8 +1360,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     @Override
     public void mouseDoubleClick(MouseEvent e) {
-        if (null == _timeProvider)
+        if (null == _timeProvider) {
             return;
+        }
         if (1 == e.button) {
             if (isOverSplitLine(e.x) && _timeProvider.getNameSpace() != 0) {
                 _timeProvider.setNameSpace(_idealNameSpace);
@@ -1349,8 +1383,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     @Override
     public void mouseDown(MouseEvent e) {
-        if (null == _timeProvider)
+        if (null == _timeProvider) {
             return;
+        }
         int idx;
         if (1 == e.button) {
             int nameSpace = _timeProvider.getNameSpace();
@@ -1576,15 +1611,16 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         public Item[] _items = new Item[0];
         private ITimeGraphEntry _traces[] = new ITimeGraphEntry[0];
         private boolean traceFilter[] = new boolean[0];
-        private Vector<ITimeGraphEntry> filteredOut = new Vector<ITimeGraphEntry>();
+        private final Vector<ITimeGraphEntry> filteredOut = new Vector<ITimeGraphEntry>();
         public ITimeGraphPresentationProvider provider;
 
         public ItemData() {
         }
 
         Item findItem(ITimeGraphEntry entry) {
-            if (entry == null)
+            if (entry == null) {
                 return null;
+            }
 
             for (int i = 0; i < _items.length; i++) {
                 Item item = _items[i];
@@ -1597,8 +1633,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
 
         int findItemIndex(ITimeGraphEntry trace) {
-            if (trace == null)
+            if (trace == null) {
                 return -1;
+            }
 
             for (int i = 0; i < _expandedItems.length; i++) {
                 Item item = _expandedItems[i];
@@ -1657,8 +1694,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
 
         public void expandItem(int idx) {
-            if (idx < 0 || idx >= _expandedItems.length)
+            if (idx < 0 || idx >= _expandedItems.length) {
                 return;
+            }
             Item item = (Item) _expandedItems[idx];
             if (item._hasChildren && !item._expanded) {
                 item._expanded = true;

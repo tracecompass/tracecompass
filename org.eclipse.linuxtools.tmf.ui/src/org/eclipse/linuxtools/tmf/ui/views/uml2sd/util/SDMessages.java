@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2000, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,13 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.util;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * Messages related to the sequence diagram
+ *
+ * @version 1.0
+ * @author Bernd Hufmann
+ *
+ */
 public final class SDMessages extends NLS {
 
     protected static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.messages";//$NON-NLS-1$
@@ -166,7 +173,7 @@ public final class SDMessages extends NLS {
     public static String _140;
     public static String _141;
     public static String _142;
-    
+
     public static String uml_23;
     public static String uml_25;
     public static String uml_45;

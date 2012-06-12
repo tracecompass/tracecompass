@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -21,16 +21,28 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+/**
+ * The input interface for TMF editors.
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfEditorInput implements IEditorInput {
 
-    private IFile fFile;
-    private ITmfTrace<?> fTrace;
+    private final IFile fFile;
+    private final ITmfTrace<?> fTrace;
 
+    /**
+     * Standard constructor
+     *
+     * @param file The IFile pointer
+     * @param trace Reference to the trace
+     */
     public TmfEditorInput(IFile file, ITmfTrace<?> trace) {
         fFile = file;
         fTrace = trace;
     }
-    
+
     @Override
 	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
         return null;
@@ -63,10 +75,20 @@ public class TmfEditorInput implements IEditorInput {
         return fFile.getFullPath().makeRelative().toString();
     }
 
+    /**
+     * Get this editor input's file object
+     *
+     * @return The IFile
+     */
     public IFile getFile() {
         return fFile;
     }
 
+    /**
+     * Get this editor input's trace
+     *
+     * @return The trace
+     */
     public ITmfTrace<?> getTrace() {
         return fTrace;
     }
@@ -88,23 +110,30 @@ public class TmfEditorInput implements IEditorInput {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         TmfEditorInput other = (TmfEditorInput) obj;
         if (fFile == null) {
-            if (other.fFile != null)
+            if (other.fFile != null) {
                 return false;
-        } else if (!fFile.getLocation().equals(other.fFile.getLocation()))
+            }
+        } else if (!fFile.getLocation().equals(other.fFile.getLocation())) {
             return false;
+        }
         if (fTrace == null) {
-            if (other.fTrace != null)
+            if (other.fTrace != null) {
                 return false;
-        } else if (!fTrace.getName().equals(other.fTrace.getName()))
+            }
+        } else if (!fTrace.getName().equals(other.fTrace.getName())) {
             return false;
+        }
         return true;
     }
 

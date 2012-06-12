@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -21,11 +21,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * The dialog for user-defined filters.
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class FilterDialog extends Dialog {
 
 	TmfFilterNode fRoot;
 	FilterViewer fViewer;
-	
+
+    /**
+     * Constructor.
+     *
+     * @param shell
+     *            The shell to which this dialog is attached
+     */
 	public FilterDialog(Shell shell) {
 		super(shell);
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
@@ -39,7 +51,7 @@ public class FilterDialog extends Dialog {
         getShell().setText(Messages.FilterDialog_FilterDialogTitle);
 		getShell().setMinimumSize(getShell().computeSize(500, 200));
         Composite composite = (Composite) super.createDialogArea(parent);
-        
+
         fViewer = new FilterViewer(composite, SWT.BORDER);
         fViewer.setInput(fRoot);
         return composite;
@@ -57,7 +69,7 @@ public class FilterDialog extends Dialog {
 			fViewer.setInput(fRoot);
 		}
 	}
-	
+
 	/**
 	 * @return the filter
 	 */

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -16,6 +16,12 @@ import java.util.EventObject;
 
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
+/**
+ * Notifier for the time graph that an object in the views has been selected.
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeGraphSelectionEvent extends EventObject {
 
     /**
@@ -27,7 +33,7 @@ public class TimeGraphSelectionEvent extends EventObject {
     /**
      * The selected entry.
      */
-    private ITimeGraphEntry fSelection;
+    private final ITimeGraphEntry fSelection;
 
     public TimeGraphSelectionEvent(Object source, ITimeGraphEntry selection) {
         super(source);

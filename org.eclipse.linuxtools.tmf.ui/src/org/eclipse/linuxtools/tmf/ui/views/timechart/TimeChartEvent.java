@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -20,16 +20,22 @@ import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
+/**
+ * Event in the time chart view
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeChartEvent implements ITimeEvent {
 
     private static final byte TIMESTAMP_SCALE = -9;
-    
-    private TimeChartAnalysisEntry fParentEntry;
+
+    private final TimeChartAnalysisEntry fParentEntry;
     private long fTime;
     private long fDuration;
     private long fFirstRank;
     private long fLastRank;
-    private RankRangeList fRankRangeList;
+    private final RankRangeList fRankRangeList;
     private long fNbEvents;
     private int fColorSettingPriority;
     private boolean fIsBookmark;
@@ -69,18 +75,20 @@ public class TimeChartEvent implements ITimeEvent {
     public long getFirstRank() {
         return fFirstRank;
     }
-    
+
     public long getLastRank() {
         return fLastRank;
     }
-    
+
     public RankRangeList getRankRangeList() {
         return fRankRangeList;
     }
-    
+
     public void merge(TimeChartEvent event) {
     	mergeDecorations(event);
-        if (fTime == event.getTime() && fDuration == event.getDuration()) return;
+        if (fTime == event.getTime() && fDuration == event.getDuration()) {
+            return;
+        }
         long endTime = Math.max(fTime + fDuration, event.getTime() + event.getDuration());
         fTime = Math.min(fTime, event.getTime());
         fDuration = endTime - fTime;
@@ -99,7 +107,7 @@ public class TimeChartEvent implements ITimeEvent {
     	fIsVisible |= event.fIsVisible;
     	fIsSearchMatch |= event.fIsSearchMatch;
     }
-    
+
     public long getNbEvents() {
         return fNbEvents;
     }
@@ -107,11 +115,11 @@ public class TimeChartEvent implements ITimeEvent {
     public int getColorSettingPriority() {
     	return fColorSettingPriority;
     }
-    
+
     public void setColorSettingPriority(int priority) {
     	fColorSettingPriority = priority;
     }
-    
+
     public boolean isBookmarked() {
     	return fIsBookmark;
     }
@@ -119,7 +127,7 @@ public class TimeChartEvent implements ITimeEvent {
     public void setIsBookmarked(boolean isBookmarked) {
     	fIsBookmark = isBookmarked;
     }
-    
+
     public boolean isVisible() {
     	return fIsVisible;
     }
@@ -127,7 +135,7 @@ public class TimeChartEvent implements ITimeEvent {
     public void setIsVisible(boolean isVisible) {
     	fIsVisible = isVisible;
     }
-    
+
     public boolean isSearchMatch() {
     	return fIsSearchMatch;
     }
@@ -135,7 +143,7 @@ public class TimeChartEvent implements ITimeEvent {
     public void setIsSearchMatch(boolean isSearchMatch) {
     	fIsSearchMatch = isSearchMatch;
     }
-    
+
     public void setItemizedEntry(TimeChartAnalysisEntry timeAnalysisEntry) {
         fItemizedEntry = timeAnalysisEntry;
     }
@@ -155,7 +163,7 @@ public class TimeChartEvent implements ITimeEvent {
     public class RankRange {
         private long firstRank;
         private long lastRank;
-        
+
         public RankRange(long firstRank, long lastRank) {
             this.firstRank = firstRank;
             this.lastRank = lastRank;
@@ -178,22 +186,22 @@ public class TimeChartEvent implements ITimeEvent {
                 return 0;
             }
         }
-        
+
         @Override
         public String toString() {
             return "["+firstRank+","+lastRank+"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
     }
-    
+
     private class RankRangeList extends ArrayList<RankRange> {
-        
+
         private static final long serialVersionUID = 6060485531208535986L;
 
         public RankRangeList(long rank) {
             super(1);
             add(new RankRange(rank, rank));
         }
-        
+
         public void merge(RankRangeList rankRangeList) {
             long threshold = fParentEntry.getTrace().getCacheSize();
             for (RankRange newRange : rankRangeList) {

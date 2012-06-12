@@ -12,6 +12,12 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * Messages related to the sequence diagram loader
+ *
+ * @version 1.0
+ * @author Bernd Hufmann
+ */
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.messages"; //$NON-NLS-1$
     public static String TmfUml2SDSyncLoader_ViewName;
@@ -20,7 +26,7 @@ public class Messages extends NLS {
     public static String TmfUml2SDSyncLoader_FrameName;
     public static String TmfUml2SDSyncLoader_SearchJobDescrition;
     public static String TmfUml2SDSyncLoader_SearchNotFound;
-    
+
     public static String TmfUml2SDSyncCloader_EventTypeSend;
     public static String TmfUml2SDSyncCloader_EventTypeReceive;
     public static String TmfUml2SDSyncCloader_FieldSender;

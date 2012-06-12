@@ -28,7 +28,10 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * The generic TMF Events table events cache
- * 
+ *
+ * This can help avoid re-reading the trace when the user scrolls a window,
+ * for example.
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
@@ -36,7 +39,7 @@ public class TmfEventsCache {
 
     /**
      * The generic TMF Events table cached event
-     * 
+     *
      * @version 1.0
      * @author Patrick Tasse
      */
@@ -44,6 +47,14 @@ public class TmfEventsCache {
         ITmfEvent event;
         long rank;
 
+        /**
+         * Constructor for new cached events.
+         *
+         * @param iTmfEvent
+         *            The original trace event
+         * @param rank
+         *            The rank of this event in the trace
+         */
         public CachedEvent (ITmfEvent iTmfEvent, long rank) {
             this.event = iTmfEvent;
             this.rank = rank;
@@ -59,32 +70,70 @@ public class TmfEventsCache {
     private ITmfFilter fFilter;
     private final List<Integer> fFilterIndex = new ArrayList<Integer>(); // contains the event rank at each 'cache size' filtered events
 
+    /**
+     * Constructor for the event cache
+     *
+     * @param cacheSize
+     *            The size of the cache, in number of events
+     * @param table
+     *            The Events table this cache will cover
+     */
     public TmfEventsCache(int cacheSize, TmfEventsTable table) {
         fCache = new CachedEvent[cacheSize];
         fTable = table;
     }
 
+    /**
+     * Assign a new trace to this events cache. This clears the current
+     * contents.
+     *
+     * @param trace
+     *            The trace to assign.
+     */
     public void setTrace(ITmfTrace<?> trace) {
         fTrace = trace;
         clear();
     }
 
+    /**
+     * Clear the current contents of this cache.
+     */
     public synchronized void clear() {
         fCacheStartIndex = 0;
         fCacheEndIndex = 0;
         fFilterIndex.clear();
     }
 
+    /**
+     * Apply a filter on this event cache. This clears the current cache
+     * contents.
+     *
+     * @param filter
+     *            The ITmfFilter to apply.
+     */
     public void applyFilter(ITmfFilter filter) {
         fFilter = filter;
         clear();
     }
 
+    /**
+     * Clear the current filter on this cache. This also clears the current
+     * cache contents.
+     */
     public void clearFilter() {
         fFilter = null;
         clear();
     }
 
+    /**
+     * Get an event from the cache. This will remove the event from the cache.
+     *
+     * FIXME this does not currently remove the event!
+     *
+     * @param index
+     *            The index of this event in the cache
+     * @return The cached event, or 'null' if there is no event at that index
+     */
     public synchronized CachedEvent getEvent(int index) {
         if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
             int i = index - fCacheStartIndex;
@@ -94,6 +143,14 @@ public class TmfEventsCache {
         return null;
     }
 
+    /**
+     * Read an event, but without removing it from the cache.
+     *
+     * @param index
+     *            Index of the event to peek
+     * @return A reference to the event, or 'null' if there is no event at this
+     *         index
+     */
     public synchronized CachedEvent peekEvent(int index) {
         if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
             int i = index - fCacheStartIndex;
@@ -102,6 +159,16 @@ public class TmfEventsCache {
         return null;
     }
 
+    /**
+     * Add a trace event to the cache.
+     *
+     * @param event
+     *            The original trace event to be cached
+     * @param rank
+     *            The rank of this event in the trace
+     * @param index
+     *            The index this event will occupy in the cache
+     */
     public synchronized void storeEvent(ITmfEvent event, long rank, int index) {
         if (index == fCacheEndIndex) {
             int i = index - fCacheStartIndex;
@@ -116,6 +183,14 @@ public class TmfEventsCache {
         }
     }
 
+    /**
+     * Get the cache index of an event from his rank in the trace. This will
+     * take in consideration any filter that might be applied.
+     *
+     * @param rank
+     *            The rank of the event in the trace
+     * @return The position (index) this event should use once cached
+     */
     @SuppressWarnings("unchecked")
     public int getFilteredEventIndex(final long rank) {
         int current;
@@ -294,9 +369,8 @@ public class TmfEventsCache {
                 // Flag the UI thread that the cache is ready
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
-                } else {
-                    return Status.OK_STATUS;
                 }
+                return Status.OK_STATUS;
             }
         };
         //job.setSystem(true);

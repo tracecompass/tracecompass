@@ -1,16 +1,16 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
- * 
+ *
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd;
 
@@ -62,10 +62,9 @@ import org.eclipse.swt.widgets.Display;
  * <p>
  * The time compression bar implementation.
  * </p>
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
  */
 public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
@@ -102,7 +101,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
      */
     protected DrawableToolTip fTooltip = null;
     /**
-     *  Array of colors for displaying wight of time deltas. 
+     *  Array of colors for displaying wight of time deltas.
      */
     protected ColorImpl[] fColors;
     /**
@@ -114,7 +113,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
      */
     protected int fFocusedWidget = -1;
     /**
-     * The sequence diagram view reference. 
+     * The sequence diagram view reference.
      */
     protected SDView view = null;
     /**
@@ -130,15 +129,15 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
      */
     protected int fLifelineNumEvents = 0;
     /**
-     * The Current color of range to display. 
+     * The Current color of range to display.
      */
     protected IColor fLifelineColor = null;
     /**
-     *  The next graph node y coordinate. 
+     *  The next graph node y coordinate.
      */
     protected int fNextNodeY = 0;
     /**
-     *  The previous graph node y coordinate. 
+     *  The previous graph node y coordinate.
      */
     protected int fPrevNodeY = 0;
 
@@ -147,7 +146,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     // ------------------------------------------------------------------------
     /**
      * Standard constructor
-     * 
+     *
      * @param parent The parent composite
      * @param s The style bits
      */
@@ -272,7 +271,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     /**
      * Sets the focus widget
-     * 
+     *
      * @param newFocusShape widget reference to set
      */
     void setFocus(int newFocusShape) {
@@ -286,7 +285,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     /**
      * Sets the current frame.
-     * 
+     *
      * @param theFrame The frame to set
      */
     public void setFrame(Frame theFrame) {
@@ -411,7 +410,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
             ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime()).getDelta(fMinTime);
             long absDelta = Math.abs(delta.getValue());
-            
+
             ColorImpl color;
             if (gr != 0) {
                 int colIndex = Math.round((float) (absDelta / gr));
@@ -484,7 +483,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     /**
      * Checks for focus of children.
-     * 
+     *
      * @param children Control to check
      * @return true if child is on focus else false
      */
@@ -609,8 +608,9 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
      */
     @Override
     protected void contentsMouseExit(MouseEvent e) {
-        if (fTooltip != null)
+        if (fTooltip != null) {
             fTooltip.hideToolTip();
+        }
     }
 
     /*
@@ -627,14 +627,14 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Force the time compression bar to highlight the event occurrences between the two given messages. The event
      * occurrences are highlighted on the first message's end lifeline
-     * 
+     *
      * @param mes1 the first message
      * @param localMes2 the second message
      */
     public void highlightRegion(BaseMessage mes1, BaseMessage mes2) {
-        BaseMessage localMes1 = mes1; 
+        BaseMessage localMes1 = mes1;
         BaseMessage localMes2 = mes2;
-        
+
         if (fFrame == null) {
             return;
         }
@@ -730,7 +730,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Force the time compression bar to highlight the event occurrences between the two given messages. The event
      * occurrences are highlighted on the first message's end lifeline
-     * 
+     *
      * @param mes1 the first message
      * @param mes2 the second message
      */
@@ -753,7 +753,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     /**
      * Sets the zoom value.
-     * 
+     *
      * @param value The zoom value to set.
      */
     public void setZoom(float value) {
@@ -763,7 +763,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     /**
      * Adds a listener to the time compression listener list to be notified about selected deltas.
-     *  
+     *
      * @param listener The listener to add
      */
     public void addTimeCompressionListener(ITimeCompressionListener listener) {
@@ -774,7 +774,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     /**
      * Removes a time compression listener.
-     * 
+     *
      * @param listener The listener to remove.
      */
     public void removeSelectionChangedListener(ITimeCompressionListener listener) {
@@ -891,8 +891,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     /**
      * Selects the time delta for given delta y coordinate and direction.
-     * 
-     * @param dy The delta in y coordinate. 
+     *
+     * @param dy The delta in y coordinate.
      * @param direction 0 no direction, 1 = down, 2 = up
      */
     protected void selectTimeDelta(int dy, int direction) {
@@ -1019,7 +1019,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     }
 
     /**
-     * Creates a fake tool tip. 
+     * Creates a fake tool tip.
      */
     protected void createFakeTooltip() {
         if (fTooltip == null) {
@@ -1079,7 +1079,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             }
         }
     }
-    
+
     /**
      * Traverse Listener implementation.
      */

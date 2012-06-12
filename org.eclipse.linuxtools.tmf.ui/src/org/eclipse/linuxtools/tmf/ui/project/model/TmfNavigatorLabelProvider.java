@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -29,7 +29,7 @@ import org.eclipse.ui.navigator.ICommonLabelProvider;
 import org.osgi.framework.Bundle;
 
 /**
- * The TMF project label provider for the tree viewer in the project explorer view. 
+ * The TMF project label provider for the tree viewer in the project explorer view.
  * <p>
  * @version 1.0
  * @author Francois Chouinard
@@ -59,8 +59,8 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
     // ------------------------------------------------------------------------
 
     /**
-     * Constructor. 
-     * 
+     * Constructor.
+     *
      * Creates the TMF navigator content provider.
      */
     public TmfNavigatorLabelProvider() {
@@ -107,14 +107,17 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
             return fDefaultTraceIcon;
         }
 
-        if (element instanceof TmfExperimentElement)
+        if (element instanceof TmfExperimentElement) {
             return fExperimentIcon;
+        }
 
-        if (element instanceof TmfExperimentFolder)
+        if (element instanceof TmfExperimentFolder) {
             return fExperimentFolderIcon;
+        }
 
-        if (element instanceof TmfTraceFolder)
+        if (element instanceof TmfTraceFolder) {
             return fTraceFolderIcon;
+        }
 
         return null;
     }

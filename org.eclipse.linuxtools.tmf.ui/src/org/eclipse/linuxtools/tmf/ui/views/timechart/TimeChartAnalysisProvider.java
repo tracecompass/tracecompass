@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -23,6 +23,12 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
+/**
+ * Provider for a time chart analysis view
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
 
     private static final Color BOOKMARK_INNER_COLOR = new Color(Display.getDefault(), 115, 165, 224);
@@ -36,7 +42,7 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
 
     @Override
     public StateItem[] getStateTable() {
-        
+
         ColorSetting[] settings = ColorSettingsManager.getColorSettings();
         StateItem[] stateItems = new StateItem[settings.length];
         for (int i = 0; i < settings.length; i++) {

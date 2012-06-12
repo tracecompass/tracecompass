@@ -58,16 +58,14 @@ import org.osgi.framework.Bundle;
  *
  * TODO: Handle column selection, sort, ... generically (nothing less...)
  * TODO: Implement hide/display columns
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  * @author Patrick Tasse
  */
 public class TmfEventsView extends TmfView implements IResourceChangeListener {
 
-    /**
-     * ID for serializing purposes.
-     */
+    /** Event View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.events"; //$NON-NLS-1$
 
     private TmfExperiment<?> fExperiment;
@@ -89,7 +87,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
     }
 
     /**
-     * Default contructor
+     * Default constructor, with a default cache size
      */
     public TmfEventsView() {
     	this(DEFAULT_CACHE_SIZE);
@@ -231,10 +229,12 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
 	// ------------------------------------------------------------------------
 
     /**
-     * ExperimentSelected, a callback called when the TmfSignal "TmfExperimentSelectedSignal" is sent.
-     * @param signal the signal that triggered the callback
+     * Handler for the experiment selected signal.
+     *
+     * @param signal
+     *            The incoming signal
      */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<ITmfEvent> signal) {
         // Update the trace reference
@@ -255,17 +255,19 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
         }
     }
 
-	/**
-	 * Experiment disposed, a callback called when the TmfSignal "TmfExperimentDisposedSignal" is sent.
-	 * @param signal the signal that triggered the callback
+    /**
+     * Handler for the experiment disposed signal.
+     *
+     * @param signal
+     *            The incoming signal
      */
-	@SuppressWarnings("unchecked")
-	@TmfSignalHandler
-	public void experimentDisposed(TmfExperimentDisposedSignal<ITmfEvent> signal) {
-		// Clear the trace reference
-		TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) signal.getExperiment();
-		if (experiment.equals(fExperiment)) {
-			fEventsTable.setTrace(null, false);
+    @SuppressWarnings("unchecked")
+    @TmfSignalHandler
+    public void experimentDisposed(TmfExperimentDisposedSignal<ITmfEvent> signal) {
+        // Clear the trace reference
+        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) signal.getExperiment();
+        if (experiment.equals(fExperiment)) {
+            fEventsTable.setTrace(null, false);
 
             Activator.getDefault().getWorkbench().getWorkbenchWindows()[0].getShell().getDisplay().syncExec(new Runnable() {
                 @Override
@@ -278,10 +280,10 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
                 ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
             }
 
-		}
-	}
+        }
+    }
 
-	@Override
+    @Override
     public void resourceChanged(final IResourceChangeEvent event) {
 	    if ((fExperiment == null) || (fExperiment.getBookmarksFile() == null)) {
 	        return;

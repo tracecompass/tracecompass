@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Added supplementary files/folder handling
@@ -30,8 +30,8 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 
 /**
- * The implementation of the base TMF project model element. It provides default implementation 
- * of the <code>ITmfProjectModelElement</code> interface. 
+ * The implementation of the base TMF project model element. It provides default implementation
+ * of the <code>ITmfProjectModelElement</code> interface.
  * <p>
  * @version 1.0
  * @author Francois Chouinard
@@ -66,7 +66,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     // ------------------------------------------------------------------------
     /**
      * Constructor.
-     * 
+     *
      * Creates a base project model element.
      * @param name The name of the element.
      * @param resource The element resource.
@@ -203,20 +203,23 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
      */
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if (this == other) {
             return true;
-        if (other == null)
+        }
+        if (other == null) {
             return false;
-        if (!(other instanceof TmfProjectModelElement))
+        }
+        if (!(other instanceof TmfProjectModelElement)) {
             return false;
+        }
         TmfProjectModelElement element = (TmfProjectModelElement) other;
         return element.fName.equals(fName) && element.fLocation.equals(fLocation);
     }
-    
+
     /**
      * Returns the trace specific supplementary directory under the project's supplementary folder.
-     * The folder will be created if it doesn't exist. 
-     * 
+     * The folder will be created if it doesn't exist.
+     *
      * @param supplFoldername - folder name.
      * @return returns the trace specific supplementary directory
      */
@@ -227,12 +230,12 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
 
     /**
      * Returns the supplementary folder for this project
-     * 
-     * @return the supplementary folder for this project  
+     *
+     * @return the supplementary folder for this project
      */
     public IFolder getSupplementaryFolderParent() {
         TmfProjectElement project = getProject();
-        IProject projectResource = (IProject)project.getResource();
+        IProject projectResource = project.getResource();
         IFolder supplFolderParent = projectResource.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
 
         if (!supplFolderParent.exists()) {

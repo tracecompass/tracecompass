@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon - Initial API and implementation
  *   Patrick Tasse - Refactoring
@@ -15,6 +15,13 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model;
 
 import java.util.Iterator;
 
+/**
+ * Interface for an entry (row) in the time graph view
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public interface ITimeGraphEntry {
 
     /**
@@ -65,7 +72,7 @@ public interface ITimeGraphEntry {
      * If true, the time events iterator should not be null.
      *
      * @return true if the entry has time events
-     * 
+     *
      * @see #getTimeEventsIterator
      * @see #getTimeEventsIterator(long, long, long)
      */
@@ -82,7 +89,7 @@ public interface ITimeGraphEntry {
      * Get an iterator which only returns events that fall within the start time and the stop time.
      * The visible duration is the event duration below which further detail is not discernible.
      * If no such iterator is implemented, provide a basic iterator which returns all events.
-     * 
+     *
      * @param startTime start time in nanoseconds
      * @param stopTime stop time in nanoseconds
      * @param visibleDuration duration of one pixel in nanoseconds

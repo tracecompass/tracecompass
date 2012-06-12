@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Got rid of dependency on internal platform class
@@ -74,7 +74,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.FileSystemElement;
 import org.eclipse.ui.dialogs.WizardResourceImportPage;
@@ -94,11 +93,11 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  * For our purpose, a trace can either be a single file or a whole directory sub-tree, whichever is reached first from
  * the root directory.
  * <p>
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
-public class ImportTraceWizardPage extends WizardResourceImportPage implements Listener {
+public class ImportTraceWizardPage extends WizardResourceImportPage {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -132,7 +131,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     /**
      * Constructor.
      * Creates the trace wizard page.
-     * 
+     *
      * @param name The name of the page.
      * @param selection The current selection
      */
@@ -278,10 +277,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                     Object[] files = element.getFiles().getChildren();
 
                     List<Object> result = new LinkedList<Object>();
-                    for (Object folder : folders)
+                    for (Object folder : folders) {
                         result.add(folder);
-                    for (Object file : files)
+                    }
+                    for (Object file : files) {
                         result.add(file);
+                    }
 
                     return result.toArray();
                 }
@@ -307,7 +308,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
             }
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.dialogs.WizardResourceImportPage#getSelectedResources()
@@ -594,8 +595,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     }
 
     // The mapping of available trace type IDs to their corresponding configuration element
-    private Map<String, IConfigurationElement> fTraceTypeAttributes = new HashMap<String, IConfigurationElement>();
-    private Map<String, IConfigurationElement> fTraceCategories = new HashMap<String, IConfigurationElement>();
+    private final Map<String, IConfigurationElement> fTraceTypeAttributes = new HashMap<String, IConfigurationElement>();
+    private final Map<String, IConfigurationElement> fTraceCategories = new HashMap<String, IConfigurationElement>();
     private final Map<String, IConfigurationElement> fTraceAttributes = new HashMap<String, IConfigurationElement>();
 
     private String[] getAvailableTraceTypes() {
@@ -747,8 +748,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                     }
                 } catch (CoreException e) {
                 } finally {
-                    if (tmfTrace != null)
+                    if (tmfTrace != null) {
                         tmfTrace.dispose();
+                    }
                 }
             }
         }

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -59,6 +59,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 
+/**
+ * Generic Time Chart view, which is similar to a Gantt chart for trace analysis
+ *
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TimeChartView extends TmfView implements ITimeGraphRangeListener, ITimeGraphSelectionListener, ITimeGraphTimeListener, IColorSettingsListener,
         IResourceChangeListener, ITmfEventsFilterListener {
 

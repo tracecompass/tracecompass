@@ -21,6 +21,13 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+/**
+ * Selection object for the time graph scale
+ *
+ * @version 1.0
+ * @author Alvaro Sanchez-Leon
+ * @author Patrick Tasse
+ */
 public class TimeGraphSelection implements IStructuredSelection {
 
     List<Object> list = new ArrayList<Object>();
@@ -33,14 +40,16 @@ public class TimeGraphSelection implements IStructuredSelection {
     }
 
     public void add(Object sel) {
-        if (null != sel && !list.contains(sel))
+        if (null != sel && !list.contains(sel)) {
             list.add(sel);
+        }
     }
 
     @Override
     public Object getFirstElement() {
-        if (!list.isEmpty())
+        if (!list.isEmpty()) {
             return list.get(0);
+        }
         return null;
     }
 
