@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import java.util.Arrays;
 
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+
 /**
  * A convenience class to store trace location arrays. The main purpose is to
  * provide a Comparable implementation for TmfExperimentLocation.
@@ -28,7 +30,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // Attributes
     // ------------------------------------------------------------------------
 
-    private TmfRankedLocation[] fLocations;
+    private ITmfLocation<? extends Comparable<?>>[] fLocations;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -39,7 +41,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      * 
      * @param locations the locations
      */
-    public TmfLocationArray(TmfRankedLocation[] locations) {
+    public TmfLocationArray(ITmfLocation<? extends Comparable<?>>[] locations) {
         fLocations = locations;
     }
 
@@ -52,7 +54,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      * 
      * @param locations the locations
      */
-    public TmfRankedLocation[] getLocations() {
+    public ITmfLocation<? extends Comparable<?>>[] getLocations() {
         return fLocations;
     }
 
@@ -65,9 +67,9 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      */
     @Override
     public TmfLocationArray clone() {
-        TmfRankedLocation[] clones = new TmfRankedLocation[fLocations.length];
+        ITmfLocation<? extends Comparable<?>>[] clones = (ITmfLocation<? extends Comparable<?>>[]) new ITmfLocation<?>[fLocations.length];
         for (int i = 0; i < fLocations.length; i++) {
-            TmfRankedLocation location = fLocations[i];
+            ITmfLocation<?> location = fLocations[i];
             clones[i] = (location != null) ? location.clone() : null;
         }
         return new TmfLocationArray(clones);
@@ -78,11 +80,12 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // ------------------------------------------------------------------------
 
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(TmfLocationArray o) {
         for (int i = 0; i < fLocations.length; i++) {
-            TmfRankedLocation l1 = fLocations[i];
-            TmfRankedLocation l2 = o.fLocations[i];
-            int result = l1.compareTo(l2);
+            ITmfLocation<? extends Comparable> l1 = (ITmfLocation<? extends Comparable>) fLocations[i].getLocation();
+            ITmfLocation<? extends Comparable> l2 = (ITmfLocation<? extends Comparable>) o.fLocations[i].getLocation();
+            int result = l1.getLocation().compareTo(l2.getLocation());
             if (result != 0) {
                 return result;
             }

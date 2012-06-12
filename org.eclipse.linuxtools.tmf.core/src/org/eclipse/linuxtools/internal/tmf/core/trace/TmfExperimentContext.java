@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 /**
@@ -61,17 +62,20 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
         super();
         fContexts = contexts;
         fEvents = new ITmfEvent[fContexts.length];
-        final TmfRankedLocation[] locations = new TmfRankedLocation[fContexts.length];
+        final ITmfLocation<?>[] locations = new ITmfLocation[fContexts.length];
 
+        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations.clone())));
+        
+        final long[] ranks = new long[fContexts.length];
         long rank = 0;
-        for (int i = 0; i < fContexts.length; i++) {
+        for (int i = 0; i < fContexts.length; i++)
             if (contexts[i] != null) {
-                locations[i] = new TmfRankedLocation(contexts[i]);
+                locations[i] = contexts[i].getLocation();
+                ranks[i] = contexts[i].getRank();
                 rank += contexts[i].getRank();
             }
-        }
 
-        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations)));
+//        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations)));
         setRank(rank);
         fLastTraceRead = NO_TRACE;
     }

@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentLocation;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfLocationArray;
-import org.eclipse.linuxtools.internal.tmf.core.trace.TmfRankedLocation;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -284,29 +283,24 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
         // Instantiate the location
         final TmfExperimentLocation expLocation = (location == null)
-                ? new TmfExperimentLocation(new TmfLocationArray(new TmfRankedLocation[fTraces.length])) 
+                ? new TmfExperimentLocation(new TmfLocationArray(new ITmfLocation<?>[fTraces.length])) 
                 : (TmfExperimentLocation) location.clone();
 
         // Create and populate the context's traces contexts
         final TmfExperimentContext context = new TmfExperimentContext(new ITmfContext[fTraces.length]);
 
-        long rank = 0;
         for (int i = 0; i < fTraces.length; i++) {
             // Get the relevant trace attributes
-            final TmfRankedLocation rankedLocation = expLocation.getLocation().getLocations()[i];
-            final ITmfLocation<?> traceLocation = (rankedLocation == null) ? null : rankedLocation.getLocation();
-            final long traceRank = (rankedLocation == null) ? 0 : rankedLocation.getRank();
-            context.getContexts()[i] = fTraces[i].seekEvent(traceLocation);
-            context.getContexts()[i].setRank(traceRank);
-            expLocation.getLocation().getLocations()[i] = new TmfRankedLocation(context.getContexts()[i]);
+            final ITmfLocation<?> trcLocation = expLocation.getLocation().getLocations()[i];
+            context.getContexts()[i] = fTraces[i].seekEvent(trcLocation);
+            expLocation.getLocation().getLocations()[i] = context.getContexts()[i].getLocation().clone();
             context.getEvents()[i] = fTraces[i].getNext(context.getContexts()[i]);
-            rank += traceRank;
         }
 
         // Finalize context
         context.setLocation(expLocation);
         context.setLastTrace(TmfExperimentContext.NO_TRACE);
-        context.setRank(rank);
+        context.setRank(ITmfContext.UNKNOWN_RANK);
 
         fExperimentContext = context;
         return (ITmfContext) context;
@@ -331,11 +325,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     @Override
     public double getLocationRatio(final ITmfLocation<?> location) {
         if (location instanceof TmfExperimentLocation) {
-            long rank = 0;
-            for (TmfRankedLocation rankedLocation : ((TmfExperimentLocation) location).getLocation().getLocations()) {
-                rank += rankedLocation.getRank();
-            }
-            return (double) rank / getNbEvents();
+            return (double) seekEvent(location).getRank() / getNbEvents();
         }
         return 0.0;
     }
@@ -345,9 +335,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     @Override
     public ITmfLocation<?> getCurrentLocation() {
-        TmfRankedLocation[] locations = new TmfRankedLocation[fTraces.length];
+        ITmfLocation<?>[] locations = new ITmfLocation<?>[fTraces.length];
         for (int i = 0; i < fTraces.length; i++) {
-            locations[i] = new TmfRankedLocation(new TmfContext(fTraces[i].getCurrentLocation(), ITmfContext.UNKNOWN_RANK));
+            locations[i] = fTraces[i].getCurrentLocation();
         }
         return new TmfExperimentLocation(new TmfLocationArray(locations));
     }
@@ -414,9 +404,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
                 updateAttributes(expContext, event.getTimestamp());
                 expContext.increaseRank();
                 expContext.setLastTrace(trace);
-                final TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
+                final TmfExperimentLocation location = (TmfExperimentLocation) expContext.getLocation();
                 final ITmfContext traceContext = expContext.getContexts()[trace];
-                expLocation.getLocation().getLocations()[trace] = new TmfRankedLocation(traceContext);
+                location.getLocation().getLocations()[trace] = traceContext.getLocation().clone();
                 fExperimentContext = expContext;
                 processEvent(event);
             }
