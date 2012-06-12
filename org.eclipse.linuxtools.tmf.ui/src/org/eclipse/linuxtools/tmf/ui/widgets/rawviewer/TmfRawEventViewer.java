@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Ericsson
+ * Copyright (c) 2010, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -50,8 +50,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Slider;
 
 /**
- * <b><u>TmfRawEventViewer</u></b>
- * <p>
  * TmfRawEventViewer allows for the display of the raw data for an arbitrarily
  * large number of TMF events.
  * 
@@ -59,6 +57,9 @@ import org.eclipse.swt.widgets.Slider;
  * of visible lines in the StyledText control is set to fill the viewer display area.
  * An underlying data model is used to store a cache of event raw text line data.
  * The slider is ratio-based.
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
  */
 public class TmfRawEventViewer extends Composite implements ControlListener, SelectionListener,
                 KeyListener, CaretListener, MouseMoveListener, MouseTrackListener, MouseWheelListener {
@@ -124,8 +125,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	// ------------------------------------------------------------------------
 
 	/**
-	 * @param parent
-	 * @param style
+	 * Constructor
+	 * @param parent The parent composite
+	 * @param style The style bits
 	 */
 	public TmfRawEventViewer(Composite parent, int style) {
 		super(parent, style & (~SWT.H_SCROLL) & (~SWT.V_SCROLL));
@@ -241,6 +243,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         fStyledText.setMenu(menu);
     }
 
+    /**
+     * Sets the trace and updates the content
+     * @param trace The trace to set
+     */
     public void setTrace(ITmfTrace<?> trace) {
 	    fTrace = trace;
 	    fTopLineIndex = 0;
@@ -248,6 +254,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	    refreshEventCount();
 	}
 
+    /**
+     * Refreshes the event count, updates the slider thumb and loads display
+     */
 	public void refreshEventCount() {
 		if (fTrace != null) {
 			if (fTrace.getNbEvents() > 0) {
@@ -270,6 +279,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 		}
 	}
 	
+	/**
+	 * Selects the event of given rank and makes it visible.
+	 * @param rank The rank of event
+	 */
     public void selectAndReveal(long rank) {
         if (fTrace == null || !isVisible()) {
             return;
@@ -293,13 +306,20 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             refreshLineBackgrounds();
         }
     }
-    
+    /**
+     * Add a selection listener
+     * @param listener A listener to add
+     */
     public void addSelectionListener(Listener listener) {
         checkWidget();
         if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
         addListener (SWT.Selection, listener);
     }
 
+    /**
+     * Remove selection listener
+     * @param listener A listener to remove
+     */
     public void removeSelectionListener(Listener listener) {
         checkWidget();
         if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);

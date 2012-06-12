@@ -85,8 +85,6 @@ import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 /**
- * <b><u>ImportTraceWizardPage</u></b>
- * <p>
  * A variant of the standard resource import wizard with the following changes:
  * <ul>
  * <li>A folder/file combined checkbox tree viewer to select traces

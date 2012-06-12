@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,9 +18,13 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * <b><u>TmfView</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * Basic abstract TMF view class implementation.
+ * 
+ * It registers any sub class to the signal manager for receiving and sending
+ * TMF signals.  
+ * 
+ * @version 1.0
+ * @author Francois Chouinard
  */
 public abstract class TmfView extends ViewPart implements ITmfComponent {
 
@@ -30,12 +34,21 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	// Constructor
 	// ------------------------------------------------------------------------
 
+	/**
+	 * Constructor. Creates a TMF view and registers to the signal manager.
+	 * 
+	 * @param viewName A view name
+	 */
 	public TmfView(String viewName) {
 		super();
 		fName = viewName;
 		TmfSignalManager.register(this);
 	}
 
+	/**
+	 * Disposes this view and deregisters itself from the signal manager 
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	@Override
 	public void dispose() {
 		TmfSignalManager.deregister(this);
@@ -46,11 +59,19 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	// ITmfComponent
 	// ------------------------------------------------------------------------
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#getName()
+	 */
 	@Override
 	public String getName() {
 		return fName;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#broadcast(org.eclipse.linuxtools.tmf.core.signal.TmfSignal)
+	 */
 	@Override
 	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);

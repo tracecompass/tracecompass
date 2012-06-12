@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,13 +15,20 @@ package org.eclipse.linuxtools.tmf.core.util;
 import java.util.ArrayList;
 
 /**
- * <b><u>TmfSortedArrayList</u></b>
- * <p>
+ * Implementation of a sorted array list.
+ * 
+ * @version 1.0
+ * @Francois Chouinard
  */
 
 public class TmfSortedArrayList<T> extends ArrayList<T> {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Inserts a new value in the list according to its sorted position.  
+     * 
+     * @param value A value to insert 
+     */
     @SuppressWarnings("unchecked")
     public void insertSorted(T value) {
         add(value);
