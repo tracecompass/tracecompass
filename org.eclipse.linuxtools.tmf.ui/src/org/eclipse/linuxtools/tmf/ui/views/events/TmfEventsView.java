@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Patrick Tasse - Factored out events table
@@ -65,6 +65,9 @@ import org.osgi.framework.Bundle;
  */
 public class TmfEventsView extends TmfView implements IResourceChangeListener {
 
+    /**
+     * ID for serializing purposes.
+     */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.events"; //$NON-NLS-1$
 
     private TmfExperiment<?> fExperiment;
@@ -72,15 +75,22 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
     private static final int DEFAULT_CACHE_SIZE = 100;
     private String fTitlePrefix;
     private Composite fParent;
-    
+
 	// ------------------------------------------------------------------------
     // Constructor
 	// ------------------------------------------------------------------------
 
+    /**
+     * Create an events view with a cache size
+     * @param cacheSize not used
+     */
     public TmfEventsView(int cacheSize) {
     	super("TmfEventsView"); //$NON-NLS-1$
     }
 
+    /**
+     * Default contructor
+     */
     public TmfEventsView() {
     	this(DEFAULT_CACHE_SIZE);
     }
@@ -95,7 +105,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
         fParent = parent;
 
         fTitlePrefix = getTitle();
-        
+
         // If an experiment is already selected, update the table
         TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) TmfExperiment.getCurrentExperiment();
         if (experiment != null) {
@@ -133,7 +143,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
                     return new TmfEventsTable(parent, cacheSize);
                 }
                 String traceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
-                if (commonTraceType != null && !commonTraceType.equals(traceType)) {
+                if ((commonTraceType != null) && !commonTraceType.equals(traceType)) {
                     return new TmfEventsTable(parent, cacheSize);
                 }
                 commonTraceType = traceType;
@@ -154,7 +164,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
                         break;
                     }
                     String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
-                    if (eventsTableType == null || eventsTableType.length() == 0) {
+                    if ((eventsTableType == null) || (eventsTableType.length() == 0)) {
                         break;
                     }
                     Bundle bundle = Platform.getBundle(ce.getContributor().getName());
@@ -219,7 +229,11 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
     // ------------------------------------------------------------------------
     // Signal handlers
 	// ------------------------------------------------------------------------
-    
+
+    /**
+     * ExperimentSelected, a callback called when the TmfSignal "TmfExperimentSelectedSignal" is sent.
+     * @param signal the signal that triggered the callback
+     */
 	@SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<ITmfEvent> signal) {
@@ -241,6 +255,10 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
         }
     }
 
+	/**
+	 * Experiment disposed, a callback called when the TmfSignal "TmfExperimentDisposedSignal" is sent.
+	 * @param signal the signal that triggered the callback
+     */
 	@SuppressWarnings("unchecked")
 	@TmfSignalHandler
 	public void experimentDisposed(TmfExperimentDisposedSignal<ITmfEvent> signal) {
@@ -265,12 +283,12 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
 
 	@Override
     public void resourceChanged(final IResourceChangeEvent event) {
-	    if (fExperiment == null || fExperiment.getBookmarksFile() == null) {
+	    if ((fExperiment == null) || (fExperiment.getBookmarksFile() == null)) {
 	        return;
 	    }
 
-        for (final IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false))
-            if (delta.getResource().equals(fExperiment.getBookmarksFile()))
+        for (final IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
+            if (delta.getResource().equals(fExperiment.getBookmarksFile())) {
                 if (delta.getKind() == IResourceDelta.REMOVED) {
                     final IMarker bookmark = delta.getMarker();
                     Display.getDefault().asyncExec(new Runnable() {
@@ -279,12 +297,15 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
                             fEventsTable.removeBookmark(bookmark);
                         }
                     });
-                } else if (delta.getKind() == IResourceDelta.CHANGED)
+                } else if (delta.getKind() == IResourceDelta.CHANGED) {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
                             fEventsTable.getTable().refresh();
                         }
                     });
+                }
+            }
+        }
     }
 }

@@ -61,26 +61,64 @@ import org.eclipse.ui.PlatformUI;
  * 
  * Styles:
  * H_SCROLL, V_SCROLL, SINGLE, CHECK, FULL_SELECTION, HIDE_SELECTION, NO_SCROLL
+ * @author Matthew Khouzam, Francois Chouinard, Patrick Tasse, Xavier Raynaud
+ * @version $Revision: 1.0 
  */
 public class TmfVirtualTable extends Composite {
 
     // The table
+    /**
+     * Field fTable.
+     */
     private Table   fTable;
+    /**
+     * Field fTableRows.
+     */
     private int     fTableRows         = 0;      // Number of table rows
+    /**
+     * Field fFullyVisibleRows.
+     */
     private int     fFullyVisibleRows  = 0;      // Number of fully visible table rows
+    /**
+     * Field fFrozenRowCount.
+     */
     private int     fFrozenRowCount    = 0;      // Number of frozen table rows at top of table
 
+    /**
+     * Field fTableTopEventRank.
+     */
     private int     fTableTopEventRank = 0;      // Global rank of the first entry displayed
+    /**
+     * Field fSelectedEventRank.
+     */
     private int     fSelectedEventRank = 0;      // Global rank of the selected event
+    /**
+     * Field fPendingSelection.
+     */
     private boolean fPendingSelection  = false;  // Pending selection update
 
+    /**
+     * Field fTableItemCount.
+     */
     private int       fTableItemCount  = 0;
 
     // The slider
+    /**
+     * Field fSlider.
+     */
     private Slider fSlider;
 
+    /**
+     * Field fLinuxItemHeight.
+     */
     private int fLinuxItemHeight = 0;            // Calculated item height for Linux workaround
+    /**
+     * Field tooltipProvider.
+     */
     private TooltipProvider tooltipProvider = null;
+    /**
+     * Field doubleClickListener.
+     */
     private IDoubleClickListener doubleClickListener = null;
 
     // ------------------------------------------------------------------------
@@ -265,6 +303,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Create the table and add listeners
+     * @param style int can be H_SCROLL, V_SCROLL, SINGLE, CHECK, FULL_SELECTION, HIDE_SELECTION, NO_SCROLL
      */
     private void createTable(int style) {
         fTable = new Table(this, style | SWT.NO_SCROLL);
@@ -484,6 +523,12 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method setDataItem.
+     * @param index int
+     * @param item TableItem
+     * @return boolean
+     */
     private boolean setDataItem(int index, TableItem item) {
         if (index != -1) {
             Event event = new Event();
@@ -504,6 +549,10 @@ public class TmfVirtualTable extends Composite {
     // Slider handling
     // ------------------------------------------------------------------------
 
+    /**
+     * Method createSlider.
+     * @param style int
+     */
     private void createSlider(int style) {
         fSlider = new Slider(this, SWT.VERTICAL | SWT.NO_FOCUS);
         fSlider.setMinimum(0);
@@ -536,47 +585,88 @@ public class TmfVirtualTable extends Composite {
     // Simulated Table API
     // ------------------------------------------------------------------------
 
+    /**
+     * Method setHeaderVisible.
+     * @param b boolean
+     */
     public void setHeaderVisible(boolean b) {
         fTable.setHeaderVisible(b);
     }
 
+    /**
+     * Method setLinesVisible.
+     * @param b boolean
+     */
     public void setLinesVisible(boolean b) {
         fTable.setLinesVisible(b);
     }
 
+    /**
+     * Method getSelection. 
+     * @return TableItem[] the items that are selected.
+     */
     public TableItem[] getSelection() {
         return fTable.getSelection();
     }
 
+    /**
+     * Method addListener.
+     * @param eventType int
+     * @param listener Listener
+     */
     @Override
     public void addListener(int eventType, Listener listener) {
         fTable.addListener(eventType, listener);
     }
 
+    /**
+     * Method addKeyListener.
+     * @param listener KeyListener
+     */
     @Override
     public void addKeyListener(KeyListener listener) {
         fTable.addKeyListener(listener);
     }
 
 
+    /**
+     * Method addMouseListener.
+     * @param listener MouseListener
+     */
     @Override
     public void addMouseListener(MouseListener listener) {
         fTable.addMouseListener(listener);
     }
 
+    /**
+     * Method addSelectionListener.
+     * @param listener SelectionListener
+     */
     public void addSelectionListener(SelectionListener listener) {
         fTable.addSelectionListener(listener);
     }
 
+    /**
+     * Method setMenu sets the menu
+     * @param menu Menu the menu
+     */
     @Override
     public void setMenu(Menu menu) {
         fTable.setMenu(menu);
     }
 
+    /**
+     * Method clearAll empties a table. 
+     */
     public void clearAll() {
         setItemCount(0);
     }
 
+    /**
+     * Method setItemCount
+     * @param nbItems int the number of items in the table
+	 * 
+     */
     public void setItemCount(int nbItems) {
         nbItems = Math.max(0, nbItems);
 
@@ -593,10 +683,18 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method getItemCount.
+     * @return int the number of items in the table
+     */
     public int getItemCount() {
         return fTableItemCount;
     }
 
+    /**
+     * Method getItemHeight.
+     * @return int the height of a table item in pixels. (may vary from one os to another)
+     */
     public int getItemHeight() {
         /*
          * Bug in Linux.  The method getItemHeight doesn't always return the correct value.
@@ -618,14 +716,26 @@ public class TmfVirtualTable extends Composite {
         return fTable.getItemHeight();
     }
 
+    /**
+     * Method getHeaderHeight.
+     * @return int get the height of the header in pixels.
+     */
     public int getHeaderHeight() {
         return fTable.getHeaderHeight();
     }
 
+    /**
+     * Method getTopIndex.
+     * @return int get the first data item index, if you have a header it is offset.
+     */
     public int getTopIndex() {
         return fTableTopEventRank + fFrozenRowCount;
     }
 
+    /**
+     * Method setTopIndex.
+     * @param i int suggested top index for the table. 
+     */
     public void setTopIndex(int i) {
         if (fTableItemCount > 0) {
             i = Math.min(i, fTableItemCount - 1);
@@ -640,6 +750,11 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method indexOf. Return the index of a table item
+     * @param ti TableItem the table item to search for in the table
+     * @return int the index of the first match. (there should only be one match) 
+     */
     public int indexOf(TableItem ti) {
         int index = fTable.indexOf(ti);
         if (index < fFrozenRowCount) {
@@ -649,14 +764,26 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method getColumns.
+     * @return TableColumn[] the table columns 
+     */
     public TableColumn[] getColumns() {
         return fTable.getColumns();
     }
 
+    /**
+     * Method getItem.
+     * @param point Point the coordinates in the table
+     * @return TableItem the corresponding table item 
+     */
     public TableItem getItem(Point point) {
         return fTable.getItem(point);
     }
 
+    /**
+     * Method resize.
+     */
     private void resize() {
         // Compute the numbers of rows that fit the new area
         int tableHeight = Math.max(0, getSize().y - fTable.getHeaderHeight());
@@ -678,6 +805,10 @@ public class TmfVirtualTable extends Composite {
     // Controls interactions
     // ------------------------------------------------------------------------
 
+    /**
+     * Method setFocus.
+     * @return boolean is this visible?
+     */
     @Override
     public boolean setFocus() {
         boolean isVisible = isVisible();
@@ -687,6 +818,9 @@ public class TmfVirtualTable extends Composite {
         return isVisible;
     }
 
+    /**
+     * Method refresh.
+     */
     public void refresh() {
         boolean done = refreshTable();
         if (fPendingSelection && done) {
@@ -699,6 +833,10 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method setColumnHeaders.
+     * @param columnData ColumnData[] the columndata array. 
+     */
     public void setColumnHeaders(ColumnData columnData[]) {
         for (int i = 0; i < columnData.length; i++) {
             TableColumn column = new TableColumn(fTable, columnData[i].alignment, i);
@@ -711,6 +849,10 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method removeAll.
+     * @return int 0 the number of elements in the table
+     */
     public int removeAll() {
         setItemCount(0);
         fSlider.setMaximum(0);
@@ -719,6 +861,10 @@ public class TmfVirtualTable extends Composite {
         return 0;
     }
 
+    /**
+     * Method refreshTable.
+     * @return boolean did all the items regresh properly? 
+     */
     private boolean refreshTable() {
         boolean done = true;
         for (int i = 0; i < fTableRows; i++) {
@@ -751,6 +897,10 @@ public class TmfVirtualTable extends Composite {
         return done;
     }
 
+    /**
+     * Method setSelection.
+     * @param i int the item number to select in the table. 
+     */
     public void setSelection(int i) {
         if (fTableItemCount > 0) {
             i = Math.min(i, fTableItemCount - 1);
@@ -770,6 +920,10 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method getSelectionIndex.
+     * @return int the table index of the selected event. not necessarrily the index of the event due to filtering.
+     */
     public int getSelectionIndex() {
         int index = fTable.getSelectionIndex();
         if (index == -1) {
@@ -782,15 +936,28 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    /**
+     * Method setFrozenRowCount.
+     * @param count int the number of rows to freeze from the top row
+     */
     public void setFrozenRowCount(int count) {
         fFrozenRowCount = count;
         refreshTable();
     }
 
+    /**
+     * Method createTableEditor.
+     * @return a TableEditor of the table
+     */
     public TableEditor createTableEditor() {
         return new TableEditor(fTable);
     }
 
+    /**
+     * Method createTableEditorControl.
+     * @param control Class<? extends Control>
+     * @return Control
+     */
     public Control createTableEditorControl(Class<? extends Control> control) {
         try {
             return control.getConstructor(Composite.class, int.class).newInstance(new Object[] {fTable, SWT.NONE});
@@ -802,7 +969,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * @return the tooltipProvider
-     */
+	 */
     public TooltipProvider getTooltipProvider() {
         return tooltipProvider;
     }
@@ -816,7 +983,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * @return the doubleClickListener
-     */
+	 */
     public IDoubleClickListener getDoubleClickListener() {
         return doubleClickListener;
     }
