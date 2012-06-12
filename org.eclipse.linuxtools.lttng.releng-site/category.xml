@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site
-      mirrorsURL="http://www.eclipse.org/downloads/download.php?file=/technology/linuxtools/updates-nightly/site.xml&amp;format=xml">
-   <description url="http://download.eclipse.org/technology/linuxtools/updates-nightly">
+      mirrorsURL="http://www.eclipse.org/downloads/download.php?file=/linuxtools/updates-nightly-juno/site.xml&amp;format=xml">
+   <description url="http://download.eclipse.org/linuxtools/updates-nightly-juno">
       Nightly builds of Linux Tools project.
    </description>
    <feature url="features/org.eclipse.linuxtools.lttng_1.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng" version="1.0.0.qualifier" os="linux" ws="*" arch="*">
