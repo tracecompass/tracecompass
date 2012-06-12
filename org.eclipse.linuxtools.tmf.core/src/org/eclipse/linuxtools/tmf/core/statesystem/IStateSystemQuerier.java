@@ -23,8 +23,8 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
  * This is the read-only interface to the generic state system. It contains all
  * the read-only quark-getting methods, as well as the history-querying ones.
  *
- * @author alexmont
- *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public interface IStateSystemQuerier {
 

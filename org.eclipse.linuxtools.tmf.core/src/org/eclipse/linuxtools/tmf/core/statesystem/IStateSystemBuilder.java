@@ -19,13 +19,13 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 
 /**
  * This is the external interface to build or modify an existing state history.
- * 
+ *
  * It extends IStateSystemEnquirer, so you can still use it for reading the
  * history, but it also provides write-access to it with the quark-creating and
  * state-change insertion methods.
- * 
- * @author alexmont
- * 
+ *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public interface IStateSystemBuilder extends IStateSystemQuerier {
 
@@ -36,11 +36,11 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
     /**
      * Basic quark-retrieving method. Pass an attribute in parameter as an array
      * of strings, the matching quark will be returned.
-     * 
+     *
      * This version WILL create new attributes: if the attribute passed in
      * parameter is new in the system, it will be added and its new quark will
      * be returned.
-     * 
+     *
      * @param attribute
      *            Attribute given as its full path in the Attribute Tree
      * @return The quark of the attribute (which either existed or just got
@@ -52,15 +52,15 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
      * "Relative path" quark-getting method. Instead of specifying a full path,
      * if you know the path is relative to another attribute for which you
      * already have the quark, use this for better performance.
-     * 
+     *
      * This is useful for cases where a lot of modifications or queries will
      * originate from the same branch of the attribute tree : the common part of
      * the path won't have to be re-hashed for every access.
-     * 
+     *
      * This version WILL create new attributes: if the attribute passed in
      * parameter is new in the system, it will be added and its new quark will
      * be returned.
-     * 
+     *
      * @param startingNodeQuark
      *            The quark of the attribute from which 'subPath' originates.
      * @param subPath
@@ -76,15 +76,15 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
     /**
      * Modify a current "ongoing" state (instead of inserting a state change,
      * like modifyAttribute() and others).
-     * 
+     *
      * This can be used to update the value of a previous state change, for
      * example when we get information at the end of the state and not at the
      * beginning. (return values of system calls, etc.)
-     * 
+     *
      * Note that past states can only be modified while they are still in
      * memory, so only the "current state" can be updated. Once they get
      * committed to disk (by inserting a new state change) it becomes too late.
-     * 
+     *
      * @param newValue
      *            The new value that will overwrite the "current" one.
      * @param attributeQuark
@@ -98,7 +98,7 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
     /**
      * Basic attribute modification method, we simply specify a new value, for a
      * given attribute, effective at the given timestamp.
-     * 
+     *
      * @param t
      *            Timestamp of the state change
      * @param value
@@ -122,7 +122,7 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
      * Increment attribute method. Reads the current value of a given integer
      * attribute (this value is right now in the Transient State), and increment
      * it by 1. Useful for statistics.
-     * 
+     *
      * @param t
      *            Timestamp of the state change
      * @param attributeQuark
@@ -145,7 +145,7 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
      * Sub-attributes will be created, their base-name will be the position in
      * the stack (1, 2, etc.) and their value will be the state value 'value'
      * that was pushed to this position.
-     * 
+     *
      * @param t
      *            Timestamp of the state change
      * @param value
@@ -170,7 +170,7 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
      * stack-attribute. If this brings it back to depth = 0, the attribute is
      * kept with depth = 0. If the value is already 0, or if the attribute
      * doesn't exist, nothing is done.
-     * 
+     *
      * @param t
      *            Timestamp of the state change
      * @param attributeQuark
@@ -191,7 +191,7 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
      * Remove attribute method. Similar to the above modify- methods, with value
      * = 0 / null, except we will also "nullify" all the sub-contents of the
      * requested path (a bit like "rm -rf")
-     * 
+     *
      * @param t
      *            Timestamp of the state change
      * @param attributeQuark
@@ -209,7 +209,7 @@ public interface IStateSystemBuilder extends IStateSystemQuerier {
      * we are done reading an off-line trace. First we close the TransientState,
      * commit it to the Provider, mark it as inactive, then we write the
      * Attribute Tree somewhere so we can reopen it later.
-     * 
+     *
      * @param endTime
      *            The requested End Time of the history, since it could be
      *            bigger than the timestamp of the last event or state change we

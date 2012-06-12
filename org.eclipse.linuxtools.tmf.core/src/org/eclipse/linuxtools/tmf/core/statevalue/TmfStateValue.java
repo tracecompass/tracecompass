@@ -25,8 +25,8 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
  *
  * For now the two available types are either int or String.
  *
- * @author alexmont
- *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public abstract class TmfStateValue implements ITmfStateValue {
 

@@ -19,10 +19,8 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
  * given time. It is the main object being returned from queries to the state
  * system.
  *
-
- *
- * @author alexmont
- *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public final class TmfStateInterval implements ITmfStateInterval {
 

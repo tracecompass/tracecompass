@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel
  * traces. It uses the CtfKernelStateInput to generate the state history.
  *
- * @author alexmont
- *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public class CtfKernelTrace extends CtfTmfTrace {
 

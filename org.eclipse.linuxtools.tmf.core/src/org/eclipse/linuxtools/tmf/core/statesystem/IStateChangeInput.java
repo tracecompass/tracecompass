@@ -22,8 +22,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * Usually a state change input, also called "state provider" is the piece of
  * the pipeline which converts trace events to state changes.
  *
- * @author alexmont
- *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public interface IStateChangeInput {
 

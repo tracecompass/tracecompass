@@ -18,8 +18,8 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 /**
  * This is the interface for using state values and reading their contents.
  *
- * @author alexmont
- *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public interface ITmfStateValue {
 

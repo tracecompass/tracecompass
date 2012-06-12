@@ -26,8 +26,8 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * This abstract manager class handles loading or creating state history files
  * for use in TMF's generic state system.
  *
- * @author alexmont
- *
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public abstract class StateSystemManager extends TmfComponent {
 
