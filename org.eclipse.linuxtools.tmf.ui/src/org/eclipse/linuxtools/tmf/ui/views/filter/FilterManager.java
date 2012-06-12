@@ -48,10 +48,21 @@ public class FilterManager {
         }
     }
 
+    /**
+     * Retrieve the currently saved filters
+     *
+     * @return The array of filters
+     */
     public static ITmfFilterTreeNode[] getSavedFilters() {
     	return fRoot.clone().getChildren();
     }
 
+    /**
+     * Set the passed filters as the currently saved ones.
+     *
+     * @param filters
+     *            The filters to save
+     */
     public static void setSavedFilters(ITmfFilterTreeNode[] filters) {
     	fRoot = new TmfFilterRootNode();
     	for (ITmfFilterTreeNode filter : filters) {

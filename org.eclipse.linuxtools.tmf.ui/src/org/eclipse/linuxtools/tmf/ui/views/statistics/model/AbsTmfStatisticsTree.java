@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
- *   Mathieu Denis      (mathieu.denis@polymtl.ca) - Implementation and Initial API
- *   
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Implementation and Initial API
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
  * It allow to implement a tree structure while avoiding the need to run through
  * the tree each time you need to add a node at a given place.
  * </p>
- * 
+ *
  *  @version 1.0
  *  @author Mathieu Denis
  */
@@ -45,15 +45,16 @@ public abstract class AbsTmfStatisticsTree {
 
     /**
      * <h4>Function to merge many string with more efficacy.</h4>
-     * 
+     *
      * @param strings
      *            Strings to merge.
      * @return A new string containing all the strings.
      */
     public synchronized static String mergeString(String... strings) {
         fBuilder.setLength(0);
-        for (String s : strings)
+        for (String s : strings) {
             fBuilder.append(s);
+        }
                 return fBuilder.toString();
     }
 
@@ -82,7 +83,7 @@ public abstract class AbsTmfStatisticsTree {
 
     /**
      * <h4>Get a node.</h4>
-     * 
+     *
      * @param path
      *            Path to the node.
      * @return The node or null.
@@ -93,7 +94,7 @@ public abstract class AbsTmfStatisticsTree {
 
     /**
      * <h4>Get the children of a node.</h4>
-     * 
+     *
      * @param path
      *            Path to the node.
      * @return Collection containing the children.
@@ -102,16 +103,16 @@ public abstract class AbsTmfStatisticsTree {
 
     /**
      * <h4>Get every children of a node, even if it doesn't have any registered events, as opposed to getChildren</h4>
-     * 
+     *
      * @param path
      *            Path to the node.
      * @return Collection containing all the children.
      */
     public abstract Collection<TmfStatisticsTreeNode> getAllChildren(final TmfFixedArray<String> path);
-    
+
     /**
      * <h4>Get the map of existing elements of path classified by parent.</h4>
-     * 
+     *
      * @return The map.
      */
     public Map<String, Set<String>> getKeys() {
@@ -120,7 +121,7 @@ public abstract class AbsTmfStatisticsTree {
 
     /**
      * <h4>Get or create a node.</h4>
-     * 
+     *
      * @param path
      *            Path to the node.
      * @return The node.
@@ -137,17 +138,18 @@ public abstract class AbsTmfStatisticsTree {
 
     /**
      * <h4>Get the parent of a node.</h4>
-     * 
+     *
      * @param path
      *            Path to the node.
      * @return Parent node or null.
      */
     public TmfStatisticsTreeNode getParent(final TmfFixedArray<String> path) {
         if (path.size() == 1) {
-            if (path.equals(ROOT))
+            if (path.equals(ROOT)) {
                 return null;
-            else
+            } else {
                 return get(ROOT);
+            }
         }
         return get(path.subArray(0, path.size() - 1));
     }
@@ -184,7 +186,7 @@ public abstract class AbsTmfStatisticsTree {
      * Must make sure the {@link #getChildren(TmfFixedArray)} on the parent node
      * will return the newly created node.
      * </p>
-     * 
+     *
      * @param path
      *            Path of the new node.
      */
@@ -195,7 +197,7 @@ public abstract class AbsTmfStatisticsTree {
      * <p>
      * Work recursively.
      * </p>
-     * 
+     *
      * @param path
      *            Path to the node.
      */

@@ -44,7 +44,20 @@ public class TimeChartEvent implements ITimeEvent {
     private TimeChartAnalysisEntry fItemizedEntry;
     private boolean fItemizing;
 
-    public TimeChartEvent(TimeChartAnalysisEntry parentEntry, ITmfEvent event, long rank, TimeChartDecorationProvider decorationProvider) {
+    /**
+     * Standard constructor
+     *
+     * @param parentEntry
+     *            The parent entry
+     * @param event
+     *            The event from which this time chart event originates
+     * @param rank
+     *            The rank of the event in the trace
+     * @param decorationProvider
+     *            The decoration provider to use
+     */
+    public TimeChartEvent(TimeChartAnalysisEntry parentEntry, ITmfEvent event,
+            long rank, TimeChartDecorationProvider decorationProvider) {
         fParentEntry = parentEntry;
         fTime = event.getTimestamp().normalize(0, TIMESTAMP_SCALE).getValue();
         fDuration = 0;
@@ -72,18 +85,39 @@ public class TimeChartEvent implements ITimeEvent {
         return fDuration;
     }
 
+    /**
+     * Retrieve the rank of the trace event which started this time event.
+     *
+     * @return The rank of the beginning
+     */
     public long getFirstRank() {
         return fFirstRank;
     }
 
+    /**
+     * Retrieve the rank of the trace event which *finished* this time event.
+     *
+     * @return The rank of the end
+     */
     public long getLastRank() {
         return fLastRank;
     }
 
+    /**
+     * Get the list of rank ranges corresponding to this time event.
+     *
+     * @return The rank range list
+     */
     public RankRangeList getRankRangeList() {
         return fRankRangeList;
     }
 
+    /**
+     * Merge another time event with this one.
+     *
+     * @param event
+     *            The other event
+     */
     public void merge(TimeChartEvent event) {
     	mergeDecorations(event);
         if (fTime == event.getTime() && fDuration == event.getDuration()) {
@@ -101,6 +135,13 @@ public class TimeChartEvent implements ITimeEvent {
         }
     }
 
+    /**
+     * Merge the decorations of another time event with the decorations of this
+     * one.
+     *
+     * @param event
+     *            The other event
+     */
     public void mergeDecorations(TimeChartEvent event) {
         fColorSettingPriority = Math.min(fColorSettingPriority, event.getColorSettingPriority());
         fIsBookmark |= event.fIsBookmark;
@@ -108,38 +149,87 @@ public class TimeChartEvent implements ITimeEvent {
     	fIsSearchMatch |= event.fIsSearchMatch;
     }
 
+    /**
+     * Get the number of time events that have been merged with this one (starts
+     * counting at 1 if no merge happened).
+     *
+     * @return The current number of events in the bath
+     */
     public long getNbEvents() {
         return fNbEvents;
     }
 
+    /**
+     * Retrieve the color setting priority.
+     *
+     * @return The priority
+     */
     public int getColorSettingPriority() {
     	return fColorSettingPriority;
     }
 
+    /**
+     * Set the color setting priority.
+     *
+     * @param priority
+     *            The priority to set
+     */
     public void setColorSettingPriority(int priority) {
     	fColorSettingPriority = priority;
     }
 
+    /**
+     * Check if this time event is bookmarked
+     *
+     * @return Y/N
+     */
     public boolean isBookmarked() {
     	return fIsBookmark;
     }
 
+    /**
+     * Set this time event to be bookmarked or not.
+     *
+     * @param isBookmarked
+     *            Should time time event become a bookmark, or not
+     */
     public void setIsBookmarked(boolean isBookmarked) {
     	fIsBookmark = isBookmarked;
     }
 
+    /**
+     * Check if this time is currently visible or not.
+     *
+     * @return If the event is visible
+     */
     public boolean isVisible() {
     	return fIsVisible;
     }
 
+    /**
+     * Set this time event to visible (or to non-visible).
+     *
+     * @param isVisible The new status
+     */
     public void setIsVisible(boolean isVisible) {
     	fIsVisible = isVisible;
     }
 
+    /**
+     * Check if the time event matches the current search.
+     *
+     * @return If it matches, Y/N
+     */
     public boolean isSearchMatch() {
     	return fIsSearchMatch;
     }
 
+    /**
+     * Mark this event as matching (or non-matching) the current search.
+     *
+     * @param isSearchMatch
+     *            The new matching status
+     */
     public void setIsSearchMatch(boolean isSearchMatch) {
     	fIsSearchMatch = isSearchMatch;
     }

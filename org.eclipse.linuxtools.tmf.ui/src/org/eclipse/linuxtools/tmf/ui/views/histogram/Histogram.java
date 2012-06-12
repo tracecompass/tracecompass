@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Changed to updated histogram data model
@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * Re-usable histogram widget.
- * 
+ *
  * It has the following features:
  * <ul>
  * <li>Y-axis labels displaying min/max count values
@@ -70,7 +70,7 @@ import org.eclipse.swt.widgets.Text;
  * <li>end of the time range
  * <li>number of events in that time range
  * </ul>
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -122,7 +122,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     protected final HistogramDataModel fDataModel;
     /**
-     * The histogram data model scaled to current resolution and screen width. 
+     * The histogram data model scaled to current resolution and screen width.
      */
     protected HistogramScaledData fScaledData;
 
@@ -134,7 +134,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Standard constructor.
-     * 
+     *
      * @param view A reference to the parent TMF view.
      * @param parent A parent composite
      */
@@ -291,8 +291,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         return fDataModel.getTimeLimit();
     }
 
-    /** 
-     * Returns a data model reference. 
+    /**
+     * Returns a data model reference.
      * @return data model.
      */
     public HistogramDataModel getDataModel() {
@@ -303,7 +303,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // Operations
     // ------------------------------------------------------------------------
     /**
-     * Updates the time range. 
+     * Updates the time range.
      * @param startTime A start time
      * @param endTime A end time.
      */
@@ -319,8 +319,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Increase the histogram bucket corresponding to [timestamp]
-     * 
+     *
+     * @param eventCount
+     *            The new event count
      * @param timestamp
+     *            The latest timestamp
      */
     public void countEvent(final long eventCount, final long timestamp) {
         fDataModel.countEvent(eventCount, timestamp);
@@ -328,8 +331,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Sets the current event time and refresh the display
-     * 
+     *
      * @param timestamp
+     *            The time of the current event
      */
     public void setCurrentEvent(final long timestamp) {
         fCurrentEventTime = (timestamp > 0) ? timestamp : 0;
@@ -338,7 +342,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Computes the timestamp of the bucket at [offset]
-     * 
+     *
      * @param offset offset from the left on the histogram
      * @return the start timestamp of the corresponding bucket
      */
@@ -353,59 +357,69 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Computes the offset of the timestamp in the histogram
-     * 
+     *
      * @param timestamp the timestamp
      * @return the offset of the corresponding bucket (-1 if invalid)
      */
     public synchronized int getOffset(final long timestamp) {
-        if (timestamp < fDataModel.getFirstBucketTime() || timestamp > fDataModel.getEndTime())
+        if (timestamp < fDataModel.getFirstBucketTime() || timestamp > fDataModel.getEndTime()) {
             return -1;
+        }
         return (int) ((timestamp - fDataModel.getFirstBucketTime()) / fScaledData.fBucketDuration);
     }
 
     /**
      * Move the currently selected bar cursor to a non-empty bucket.
-     * 
+     *
      * @param keyCode the SWT key code
      */
     protected void moveCursor(final int keyCode) {
 
-        if (fScaledData.fCurrentBucket == HistogramScaledData.OUT_OF_RANGE_BUCKET)
+        if (fScaledData.fCurrentBucket == HistogramScaledData.OUT_OF_RANGE_BUCKET) {
             return;
+        }
 
         int index;
         switch (keyCode) {
 
             case SWT.HOME:
                 index = 0;
-                while (index < fScaledData.fLastBucket && fScaledData.fData[index] == 0)
+                while (index < fScaledData.fLastBucket && fScaledData.fData[index] == 0) {
                     index++;
-                if (index < fScaledData.fLastBucket)
+                }
+                if (index < fScaledData.fLastBucket) {
                     fScaledData.fCurrentBucket = index;
+                }
                 break;
 
             case SWT.ARROW_RIGHT:
                 index = fScaledData.fCurrentBucket + 1;
-                while (index < fScaledData.fWidth && fScaledData.fData[index] == 0)
+                while (index < fScaledData.fWidth && fScaledData.fData[index] == 0) {
                     index++;
-                if (index < fScaledData.fLastBucket)
+                }
+                if (index < fScaledData.fLastBucket) {
                     fScaledData.fCurrentBucket = index;
+                }
                 break;
 
             case SWT.END:
                 index = fScaledData.fLastBucket;
-                while (index >= 0 && fScaledData.fData[index] == 0)
+                while (index >= 0 && fScaledData.fData[index] == 0) {
                     index--;
-                if (index >= 0)
+                }
+                if (index >= 0) {
                     fScaledData.fCurrentBucket = index;
+                }
                 break;
 
             case SWT.ARROW_LEFT:
                 index = fScaledData.fCurrentBucket - 1;
-                while (index >= 0 && fScaledData.fData[index] == 0)
+                while (index >= 0 && fScaledData.fData[index] == 0) {
                     index--;
-                if (index >= 0)
+                }
+                if (index >= 0) {
                     fScaledData.fCurrentBucket = index;
+                }
                 break;
 
             default:
@@ -420,7 +434,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     @Override
     public void modelUpdated() {
-        if (!fCanvas.isDisposed() && fCanvas.getDisplay() != null)
+        if (!fCanvas.isDisposed() && fCanvas.getDisplay() != null) {
             fCanvas.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -428,8 +442,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         // Retrieve and normalize the data
                         final int canvasWidth = fCanvas.getBounds().width;
                         final int canvasHeight = fCanvas.getBounds().height;
-                        if (canvasWidth <= 0 || canvasHeight <= 0)
+                        if (canvasWidth <= 0 || canvasHeight <= 0) {
                             return;
+                        }
                         fDataModel.setCurrentEvent(fCurrentEventTime);
                         fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight, HISTOGRAM_BAR_WIDTH);
                         synchronized(fScaledData) {
@@ -446,6 +461,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                     }
                 }
             });
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -473,8 +489,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         final int canvasHeight = fCanvas.getBounds().height;
 
         // Make sure we have something to draw upon
-        if (canvasWidth <= 0 || canvasHeight <= 0)
+        if (canvasWidth <= 0 || canvasHeight <= 0) {
             return;
+        }
 
         // Retrieve image; re-create only if necessary
         Image image = (Image) fCanvas.getData(IMAGE_KEY);
@@ -492,8 +509,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     private void formatImage(final GC imageGC, final Image image) {
 
-        if (fScaledData == null)
+        if (fScaledData == null) {
             return;
+        }
 
         final HistogramScaledData scaledData = new HistogramScaledData(fScaledData);
 
@@ -516,13 +534,15 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
             // Draw the current event bar
             final int currentBucket = scaledData.fCurrentBucket;
-            if (currentBucket >= 0 && currentBucket < limit)
+            if (currentBucket >= 0 && currentBucket < limit) {
                 drawDelimiter(imageGC, fCurrentEventColor, height, currentBucket);
+            }
 
             // Add a dashed line as a delimiter (at the right of the last bar)
             int lastEventIndex = limit - 1;
-            while (lastEventIndex >= 0 && scaledData.fData[lastEventIndex] == 0)
+            while (lastEventIndex >= 0 && scaledData.fData[lastEventIndex] == 0) {
                 lastEventIndex--;
+            }
             lastEventIndex += (lastEventIndex < limit - 1) ? 1 : 0;
             drawDelimiter(imageGC, fLastEventColor, height, lastEventIndex);
         } catch (final Exception e) {
@@ -595,8 +615,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private String formatToolTipLabel(final int index) {
         long startTime = fScaledData.getBucketStartTime(fScaledData.fCurrentBucket);
         // negative values are possible if time values came into the model in decreasing order
-        if (startTime < 0)
+        if (startTime < 0) {
             startTime = 0;
+        }
         final long endTime = fScaledData.getBucketEndTime(fScaledData.fCurrentBucket);
         final int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
 

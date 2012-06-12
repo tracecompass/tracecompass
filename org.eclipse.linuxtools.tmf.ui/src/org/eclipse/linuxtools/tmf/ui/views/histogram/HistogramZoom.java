@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Moved from LTTng to TMF
@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Canvas;
 
 /**
  * Class to handle zooming within histogram windows..
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  * <p>
@@ -52,7 +52,20 @@ public class HistogramZoom implements MouseWheelListener {
     // Constructors
     // ------------------------------------------------------------------------
 
-    public HistogramZoom(Histogram histogram, Canvas canvas, long start, long end) {
+    /**
+     * Standard constructor.
+     *
+     * @param histogram
+     *            The parent histogram object
+     * @param canvas
+     *            The canvas
+     * @param start
+     *            The start time of the zoom area
+     * @param end
+     *            The end time of the zoom area
+     */
+    public HistogramZoom(Histogram histogram, Canvas canvas, long start,
+            long end) {
         fHistogram = histogram;
         fCanvas = canvas;
         fAbsoluteStartTime = start;
@@ -109,7 +122,7 @@ public class HistogramZoom implements MouseWheelListener {
 
     /**
      * The the full time range of the histogram
-     *   
+     *
      * @param startTime the start time the histogram
      * @param endTime the end time of the histogram
      */
@@ -124,15 +137,16 @@ public class HistogramZoom implements MouseWheelListener {
      * @param duration the duration
      */
     public synchronized void setNewRange(long startTime, long duration) {
-        if (startTime < fAbsoluteStartTime)
+        if (startTime < fAbsoluteStartTime) {
             startTime = fAbsoluteStartTime;
+        }
 
         long endTime = startTime + duration;
         if (endTime > fAbsoluteEndTime) {
             endTime = fAbsoluteEndTime;
-            if (endTime - duration > fAbsoluteStartTime)
+            if (endTime - duration > fAbsoluteStartTime) {
                 startTime = endTime - duration;
-            else {
+            } else {
                 startTime = fAbsoluteStartTime;
             }
         }
@@ -174,18 +188,22 @@ public class HistogramZoom implements MouseWheelListener {
     }
 
     private long validateStart(long start) {
-        if (start < fAbsoluteStartTime)
+        if (start < fAbsoluteStartTime) {
             start = fAbsoluteStartTime;
-        if (start > fAbsoluteEndTime)
+        }
+        if (start > fAbsoluteEndTime) {
             start = fAbsoluteEndTime - fMinWindowSize;
+        }
         return start;
     }
 
     private long validateEnd(long start, long end) {
-        if (end > fAbsoluteEndTime)
+        if (end > fAbsoluteEndTime) {
             end = fAbsoluteEndTime;
-        if (end < start + fMinWindowSize)
+        }
+        if (end < start + fMinWindowSize) {
             end = start + fMinWindowSize;
+        }
         return end;
     }
 
@@ -215,7 +233,7 @@ public class HistogramZoom implements MouseWheelListener {
         // Constructors
         // --------------------------------------------------------------------
 
-        /** 
+        /**
          * Constructor of inner class to handle consecutive scrolls of mouse wheel.
          * @param zoom the histogram zoom reference
          */
@@ -227,7 +245,7 @@ public class HistogramZoom implements MouseWheelListener {
         // --------------------------------------------------------------------
         // Operation
         // --------------------------------------------------------------------
-        
+
         /**
          * Increments the number of scroll clicks.
          * @param nbScrolls the number to add to the current value
@@ -251,8 +269,9 @@ public class HistogramZoom implements MouseWheelListener {
                 }
             }
             // Done waiting. Notify the histogram.
-            if (!isInterrupted())
+            if (!isInterrupted()) {
                 fZoom.zoom(nbScrollClick);
+            }
         }
     }
 

@@ -158,6 +158,12 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
 
     }
 
+    /**
+     * Add a time event to the time chart entry
+     *
+     * @param timeEvent
+     *            The event to add
+     */
     public void addTraceEvent(ITimeEvent timeEvent) {
         long time = timeEvent.getTime();
         synchronized (fTraceEvents) {
@@ -239,14 +245,30 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
         }
     }
 
+    /**
+     * Retrieve the trace associated with this entry
+     *
+     * @return The trace object
+     */
     public ITmfTrace<?> getTrace() {
         return fTrace;
     }
 
+    /**
+     * Set the last rank of the entry
+     *
+     * @param rank
+     *            The rank to set
+     */
     public void setLastRank(long rank) {
         fLastRank = rank;
     }
 
+    /**
+     * Retrieve the last rank of the entry
+     *
+     * @return The last rank
+     */
     public long getLastRank() {
         return fLastRank;
     }

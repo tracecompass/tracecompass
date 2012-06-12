@@ -52,9 +52,10 @@ import org.xml.sax.SAXException;
  */
 public class FilterView extends TmfView {
 
-	public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.filter"; //$NON-NLS-1$
+    /** ID for the Filter view */
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.filter"; //$NON-NLS-1$
 
-	private static final Image SAVE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/save_button.gif"); //$NON-NLS-1$
+    private static final Image SAVE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/save_button.gif"); //$NON-NLS-1$
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
     private static final Image DELETE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
     private static final Image IMPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/import_button.gif"); //$NON-NLS-1$
@@ -64,16 +65,16 @@ public class FilterView extends TmfView {
     // Main data structures
     // ------------------------------------------------------------------------
 
-	private FilterViewer fViewer;
+    private FilterViewer fViewer;
     private final ITmfFilterTreeNode fRoot;
 
     private final IWorkspace fWorkspace;
 
     private SaveAction fSaveAction;
-	private AddAction fAddAction;
-	private DeleteAction fDeleteAction;
-	private ExportAction fExportAction;
-	private ImportAction fImportAction;
+    private AddAction fAddAction;
+    private DeleteAction fDeleteAction;
+    private ExportAction fExportAction;
+    private ImportAction fImportAction;
 
     /**
      * Getter for the Filter Tree Root
@@ -90,13 +91,13 @@ public class FilterView extends TmfView {
     // ------------------------------------------------------------------------
 
     /**
-     *  Default Constructor
+     * Default Constructor
      */
-	public FilterView() {
-		super("Filter"); //$NON-NLS-1$
+    public FilterView() {
+        super("Filter"); //$NON-NLS-1$
 
-		fWorkspace = ResourcesPlugin.getWorkspace();
-		try {
+        fWorkspace = ResourcesPlugin.getWorkspace();
+        try {
             fWorkspace.getRoot().refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
             Activator.getDefault().logError("Error refreshing workspace", e); //$NON-NLS-1$

@@ -1,15 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2011, 20112 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Mathieu Denis  (mathieu.denis@polymtl.ca)  - Generalized version based on LTTng
  *   Bernd Hufmann - Updated to use trace reference in TmfEvent and streaming
- *   
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics;
@@ -55,11 +55,11 @@ import org.eclipse.swt.widgets.Listener;
 
 /**
  * The generic Statistics View displays statistics for any kind of traces.
- * 
+ *
  * It is implemented according to the MVC pattern. - The model is a TmfStatisticsTreeNode built by the State Manager. - The view is built with a
  * TreeViewer. - The controller that keeps model and view synchronized is an observer of the model.
  * </p>
- * 
+ *
  * @version 1.0
  * @author @author Mathieu Denis
  */
@@ -73,7 +73,7 @@ public class TmfStatisticsView extends TmfView {
      */
     public static final String TMF_STATISTICS_VIEW = "StatisticsView"; //$NON-NLS-1$
     /**
-     *  Refresh frequency 
+     *  Refresh frequency
      */
     protected static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
     /**
@@ -107,23 +107,23 @@ public class TmfStatisticsView extends TmfView {
     /**
      *  Flag to force request the data from trace
      */
-    protected boolean fRequestData = false; 
+    protected boolean fRequestData = false;
     /**
      *  Object to store the cursor while waiting for the experiment to load
      */
     private Cursor fWaitCursor = null;
     /**
-     *  View instance counter (for multiple statistic views) 
+     *  View instance counter (for multiple statistic views)
      */
     private static int fCountInstance = 0;
     /**
      * Number of this instance. Used as an instance ID.
      */
-    private int fInstanceNb;
+    private final int fInstanceNb;
 
     /**
      * Constructor of a statistics view.
-     * 
+     *
      * @param viewName
      *            The name to give to the view.
      */
@@ -261,20 +261,25 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Refresh the view.
+     *
+     * @param complete
+     *            Should a pending update be sent afterwards or not
      */
     public void modelInputChanged(boolean complete) {
         // Ignore update if disposed
-        if (fTreeViewer.getTree().isDisposed())
+        if (fTreeViewer.getTree().isDisposed()) {
             return;
+        }
 
         fTreeViewer.getTree().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (!fTreeViewer.getTree().isDisposed())
+                if (!fTreeViewer.getTree().isDisposed()) {
                     fTreeViewer.refresh();
+                }
             }
         });
-        
+
         if (complete) {
             sendPendingUpdate();
         }
@@ -282,7 +287,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Called when an experiment request has failed or has been canceled Remove the data retrieved from the experiment from the statistics tree.
-     * 
+     *
      * @param name The experiment name
      */
     public void modelIncomplete(String name) {
@@ -301,7 +306,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Handles the signal about disposal of the current experiment.
-     * 
+     *
      * @param signal The disposed signal
      */
     @TmfSignalHandler
@@ -313,9 +318,9 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
-     * Handler called when an experiment is selected. Checks if the experiment has changed 
+     * Handler called when an experiment is selected. Checks if the experiment has changed
      * and requests the selected experiment if it has not yet been cached.
-     * 
+     *
      * @param signal Contains the information about the selection.
      */
     @TmfSignalHandler
@@ -350,7 +355,7 @@ public class TmfStatisticsView extends TmfView {
                     if (same) {
                         // no need to reload data, all traces are already loaded
                         fTreeViewer.setInput(experimentTreeNode);
-                        
+
                         resetUpdateSynchronization();
 
                         return;
@@ -372,7 +377,7 @@ public class TmfStatisticsView extends TmfView {
 
             // set input to a clean data model
             fTreeViewer.setInput(treeModelRoot);
-            
+
             if (fRequestData) {
                 requestData(experiment, experiment.getTimeRange());
                 fRequestData = false;
@@ -396,10 +401,10 @@ public class TmfStatisticsView extends TmfView {
         requestData(experiment, signal.getRange());
     }
 
-    
+
     /**
      * Return the size of the request when performing background request.
-     * 
+     *
      * @return the block size for background request.
      */
     protected int getIndexPageSize() {
@@ -408,7 +413,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Returns the quantity of data to retrieve before a refresh of the view is performed
-     * 
+     *
      * @return the quantity of data to retrieve before a refresh of the view is performed.
      */
     protected long getInputChangedRefresh() {
@@ -417,7 +422,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * This method can be overridden to implement another way to represent the statistics data and to retrieve the information for display.
-     * 
+     *
      * @return a TmfStatisticsData object.
      */
     protected AbsTmfStatisticsTree getStatisticData() {
@@ -426,7 +431,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * This method can be overridden to change the representation of the data in the columns.
-     * 
+     *
      * @return an object implementing ITmfBaseColumnDataProvider.
      */
     protected ITmfColumnDataProvider getColumnDataProvider() {
@@ -435,8 +440,8 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Constructs the ID based on the experiment name and <code>fInstanceNb</code>
-     * 
-     * @param experimentName the name of the trace name to show in the view 
+     *
+     * @param experimentName the name of the trace name to show in the view
      * @return a view ID
      */
     protected String getTreeID(String experimentName) {
@@ -445,7 +450,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * When the experiment is loading the cursor will be different so the user know the processing is not finished yet.
-     * 
+     *
      * @param waitInd Indicates if we need to show the waiting cursor, or the default one
      */
     protected void waitCursor(final boolean waitInd) {
@@ -475,7 +480,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Perform the request for an experiment and populates the statistics tree with event.
-     * 
+     *
      * @param experiment experiment for which we need the statistics data.
      * @param timeRange to request
      */
@@ -501,7 +506,7 @@ public class TmfStatisticsView extends TmfView {
                     super.handleData(data);
                     if (data != null) {
                         AbsTmfStatisticsTree statisticsData = TmfStatisticsTreeRootFactory.getStatTree(getTreeID(experiment.getName()));
-                        
+
                         final String traceName = data.getTrace().getName();
                         ITmfExtraEventInfo extraInfo = new ITmfExtraEventInfo() {
                             @Override
@@ -553,7 +558,7 @@ public class TmfStatisticsView extends TmfView {
             fRequest.cancel();
         }
     }
-    
+
     /**
      * Reset update synchronization information
      */
@@ -565,10 +570,10 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
-     * Checks if statistic update is ongoing. If it is ongoing the new time range is stored as pending 
-     * 
+     * Checks if statistic update is ongoing. If it is ongoing the new time range is stored as pending
+     *
      * @param timeRange - new time range
-     * @return true if statistic update is ongoing else false 
+     * @return true if statistic update is ongoing else false
      */
     protected boolean checkUpdateBusy(TmfTimeRange timeRange) {
         synchronized (fStatisticsUpdateSyncObj) {
@@ -576,7 +581,7 @@ public class TmfStatisticsView extends TmfView {
                 fStatisticsUpdatePending = true;
                 fStatisticsUpdateRange = timeRange;
                 return true;
-            } 
+            }
             fStatisticsUpdateBusy = true;
             return false;
         }

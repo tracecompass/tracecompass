@@ -36,54 +36,103 @@ public class TimeChartDecorationProvider {
     private ITmfFilter fFilterFilter;
     private ITmfFilter fSearchFilter;
 
-	public TimeChartDecorationProvider(IFile bookmarksFile) {
-	    fBookmarksFile = bookmarksFile;
-	    refreshBookmarks();
+    /**
+     * Constructor
+     *
+     * @param bookmarksFile
+     *            Bookmark file associated with the trace
+     */
+    public TimeChartDecorationProvider(IFile bookmarksFile) {
+        fBookmarksFile = bookmarksFile;
+        refreshBookmarks();
     }
 
-	public IFile getBookmarksFile() {
-		return fBookmarksFile;
-	}
-
-	public boolean isBookmark(long rank) {
-	    return fBookmarksSet.contains(rank);
+    /**
+     * Retrieve the bookmark file that was assigned to this provider
+     *
+     * @return The bookmark file
+     */
+    public IFile getBookmarksFile() {
+        return fBookmarksFile;
     }
 
-	public void refreshBookmarks() {
-		try {
-			fBookmarksSet.clear();
-	        for (IMarker bookmark : fBookmarksFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
-	        	int location = bookmark.getAttribute(IMarker.LOCATION, -1);
-	        	if (location != -1) {
-	        		Long rank = (long) location;
-	        		fBookmarksSet.add(rank);
-	        	}
-	        }
+    /**
+     * Verify if the selected rank has a bookmark assigned to it.
+     *
+     * @param rank
+     *            The rank to check for
+     * @return If there is a bookmark there
+     */
+    public boolean isBookmark(long rank) {
+        return fBookmarksSet.contains(rank);
+    }
+
+    /**
+     * Refresh the bookmark display.
+     */
+    public void refreshBookmarks() {
+        try {
+            fBookmarksSet.clear();
+            for (IMarker bookmark : fBookmarksFile.findMarkers(
+                    IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
+                int location = bookmark.getAttribute(IMarker.LOCATION, -1);
+                if (location != -1) {
+                    Long rank = (long) location;
+                    fBookmarksSet.add(rank);
+                }
+            }
         } catch (CoreException e) {
             Activator.getDefault().logError("Error refreshing bookmarks", e); //$NON-NLS-1$
         }
     }
 
-	public void filterApplied(ITmfFilter filter) {
-		fFilterFilter = filter;
+    /**
+     * Notify that a filter is now applied on the view.
+     *
+     * @param filter
+     *            The filter that was applied
+     */
+    public void filterApplied(ITmfFilter filter) {
+        fFilterFilter = filter;
     }
 
-	public boolean isVisible(ITmfEvent event) {
-		if (fFilterFilter != null) {
-			return fFilterFilter.matches(event);
-		}
-		return true;
-	}
-
-	public void searchApplied(ITmfFilter filter) {
-		fSearchFilter = filter;
+    /**
+     * Check if an event is currently visible in the view or not.
+     *
+     * @param event
+     *            The event to check for
+     * @return If the event is visible or not
+     */
+    public boolean isVisible(ITmfEvent event) {
+        if (fFilterFilter != null) {
+            return fFilterFilter.matches(event);
+        }
+        return true;
     }
 
-	public boolean isSearchMatch(ITmfEvent event) {
-		if (fSearchFilter != null) {
-			return fSearchFilter.matches(event);
-		}
-		return false;
-	}
+    /**
+     * Notify that a search is applied on the view.
+     *
+     * @param filter
+     *            The search filter that was applied
+     */
+    public void searchApplied(ITmfFilter filter) {
+        fSearchFilter = filter;
+    }
+
+    /**
+     * Verify if the currently active search filter applies to the given event
+     * or not.
+     *
+     * @param event
+     *            The event to check for
+     * @return If the event matches
+     */
+    public boolean isSearchMatch(ITmfEvent event) {
+        if (fSearchFilter != null) {
+            return fSearchFilter.matches(event);
+        }
+        return false;
+    }
 
 }

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Added setter and getter and bar width support
@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 /**
  * Convenience class/struct for scaled histogram data.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -45,7 +45,7 @@ public class HistogramScaledData {
      */
     public int fHeight;
     /**
-     * Width of one histogram bar (number of pixels). 
+     * Width of one histogram bar (number of pixels).
      */
     public int fBarWidth;
     /**
@@ -57,7 +57,7 @@ public class HistogramScaledData {
      */
     public long fBucketDuration;
     /**
-     * The maximum number of events of all buckets. 
+     * The maximum number of events of all buckets.
      */
     public long fMaxValue;
     /**
@@ -65,7 +65,7 @@ public class HistogramScaledData {
      */
     public int fCurrentBucket;
     /**
-     * The index of the last bucket. 
+     * The index of the last bucket.
      */
     public int fLastBucket;
     /**
@@ -121,7 +121,7 @@ public class HistogramScaledData {
         fScalingFactor = other.fScalingFactor;
         fFirstBucketTime = other.fFirstBucketTime;
     }
-    
+
     // ------------------------------------------------------------------------
     // Setter and Getter
     // ------------------------------------------------------------------------
@@ -135,13 +135,13 @@ public class HistogramScaledData {
     }
 
     /**
-     * Set the first event time. 
-     * @param firstEventTime
+     * Set the first event time.
+     * @param firstEventTime The time to set
      */
     public void setFirstBucketTime(long firstEventTime) {
         fFirstBucketTime = firstEventTime;
     }
-    
+
     /**
      * Returns the time of the last bucket.
      * @return last bucket time
@@ -149,7 +149,7 @@ public class HistogramScaledData {
     public long getLastBucketTime() {
         return getBucketStartTime(fLastBucket);
     }
-    
+
     /**
      * Returns the time of the bucket start time for given index.
      * @param index A bucket index.
@@ -158,7 +158,7 @@ public class HistogramScaledData {
     public long getBucketStartTime(int index) {
         return fFirstBucketTime + index * fBucketDuration;
     }
-    
+
     /**
      * Returns the time of the bucket end time for given index.
      * @param index A bucket index.
