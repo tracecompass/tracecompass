@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.ctf.core.trace;
 /**
  * General exception that is thrown when there is a problem somewhere with the
  * CTF trace reader.
- *
- * @author alexmont
- *
+ * 
+ * @version 1.0
+ * @author Alexandre Montplaisir
  */
 public class CTFReaderException extends Exception {
 

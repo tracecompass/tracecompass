@@ -49,8 +49,8 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndex;
 
 /**
- * <b><u>CTFTrace</u></b>
- * <p>
+ * A CTF trace on the file system.
+ *
  * Represents a trace on the filesystem. It is responsible of parsing the
  * metadata, creating declarations data structures, indexing the event packets
  * (in other words, all the work that can be shared between readers), but the

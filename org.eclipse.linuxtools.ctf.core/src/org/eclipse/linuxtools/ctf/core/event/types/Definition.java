@@ -15,14 +15,19 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
- * <b><u>Definition</u></b><br>
- * A definition is like an object of a declaration class. It fills the declaration with values. <br>
+ * A CTF definiton
+ *
+ * A definition is like an object of a declaration class. It fills the declaration
+ * with values. <br>
  * An example: <br>
  * int i = 0; <br>
  * <b>int</b> is the declaration.<br>
  * <b>i</b> is the definition.<br>
  * <b>0</b> is the value assigned to the definition, not the declaration.<br>
  *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public abstract class Definition {
 

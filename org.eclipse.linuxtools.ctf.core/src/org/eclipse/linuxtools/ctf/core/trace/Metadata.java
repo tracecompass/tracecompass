@@ -36,9 +36,11 @@ import org.eclipse.linuxtools.internal.ctf.core.event.metadata.IOStructGen;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 
 /**
- * <b><u>Metadata</u></b>
- * <p>
- * Represents a metadata file
+ * The CTF trace metadata file
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class Metadata {
 

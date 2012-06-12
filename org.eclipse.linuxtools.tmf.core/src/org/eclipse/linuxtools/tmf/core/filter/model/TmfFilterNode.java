@@ -17,7 +17,12 @@ import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
-
+/**
+ * Filter node for the event match operation
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "FILTER"; //$NON-NLS-1$

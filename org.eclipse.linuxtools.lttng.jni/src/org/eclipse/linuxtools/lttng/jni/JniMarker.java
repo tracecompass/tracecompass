@@ -19,8 +19,6 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.internal.lttng.jni.exception.JniMarkerException;
 
 /**
- * <b><u>JniMarker</u></b><p>
- *
  * A JniMarker contain information how to interpret the unparsed content (payload) of an event.<br>
  * Each JniMarker contains several MarkerFields for each fields in the event's payload.
  *
@@ -37,6 +35,8 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniMarkerException;
  * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<br>
  * Please look at the abstract functions to override at the bottom of this file.<p>
  *
+ * @version 0.1
+ * @author William Bourque
  */
 public abstract class JniMarker extends Jni_C_Common
 {

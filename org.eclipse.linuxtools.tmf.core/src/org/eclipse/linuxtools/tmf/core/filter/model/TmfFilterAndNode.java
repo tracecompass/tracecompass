@@ -15,6 +15,12 @@ package org.eclipse.linuxtools.tmf.core.filter.model;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
+/**
+ * Filter node for the 'and' operation
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterAndNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "AND"; //$NON-NLS-1$

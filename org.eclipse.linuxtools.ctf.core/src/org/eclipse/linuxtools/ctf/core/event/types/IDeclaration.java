@@ -13,7 +13,17 @@
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 /**
- * <b><u>IDeclaration</u></b>
+ * A CTF data type declaration.
+ * 
+ * An example: <br>
+ * int i = 0; <br>
+ * <b>int</b> is the declaration.<br>
+ * <b>i</b> is the definition.<br>
+ * <b>0</b> is the value assigned to the definition, not the declaration.<br>
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public interface IDeclaration {
 

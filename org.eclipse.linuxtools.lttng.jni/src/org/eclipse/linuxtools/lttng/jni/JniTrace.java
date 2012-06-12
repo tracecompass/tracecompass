@@ -28,8 +28,6 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTraceException;
 import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileWithoutEventException;
 
 /**
- * <b><u>JniTrace</u></b>
- * <p>
  * This is the top level class in the JNI. It provides access to the LttTrace C
  * structure in java.
  * <p>
@@ -44,7 +42,9 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileWithoutEv
  * This class is ABSTRACT, you need to extends it to support your specific LTTng
  * version.<br>
  * Please look at the abstract functions to override at the bottom of this file.
- * <p>
+ *
+ * @version 0.1
+ * @author William Bourque
  */
 public abstract class JniTrace extends Jni_C_Common {
 

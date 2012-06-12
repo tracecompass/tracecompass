@@ -13,7 +13,15 @@
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 /**
- * <b><u>StringDeclaration</u></b>
+ * A CTF string declaration.
+ * 
+ * Strings are an array of bytes of variable size and are terminated by a '\0'
+ * "NULL" character. Their encoding is described in the TSDL meta-data. In
+ * absence of encoding attribute information, the default encoding is UTF-8.
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class StringDeclaration implements IDeclaration {
 

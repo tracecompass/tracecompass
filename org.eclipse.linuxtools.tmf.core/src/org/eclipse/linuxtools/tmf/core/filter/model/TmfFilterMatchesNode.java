@@ -19,7 +19,12 @@ import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
-
+/**
+ * Filter node for the regex match
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterMatchesNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "MATCHES"; //$NON-NLS-1$

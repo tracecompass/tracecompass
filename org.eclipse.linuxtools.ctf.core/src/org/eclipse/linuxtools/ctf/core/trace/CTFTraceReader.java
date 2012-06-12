@@ -24,9 +24,12 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestampComparator;
 
 /**
- * Reads the events of a trace.
+ * A CTF trace reader. Reads the events of a trace.
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Alexandre Montplaisir
  */
-
 public class CTFTraceReader {
 
     // ------------------------------------------------------------------------

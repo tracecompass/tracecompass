@@ -14,10 +14,12 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import java.nio.ByteOrder;
 
 /**
- * Float declaration
+ * A CTF float declaration.
+ * 
+ * The declaration of a floating point basic data type.
  *
+ * @version 1.0
  * @author Matthew Khouzam
- *
  */
 public class FloatDeclaration implements IDeclaration {
 

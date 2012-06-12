@@ -15,7 +15,17 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
- * <b><u>ArrayDefinition</u></b>
+ * A CTF array definiton
+ *
+ * Arrays are fixed-length. Their length is declared in the type
+ * declaration within the meta-data. They contain an array of "inner type"
+ * elements, which can refer to any type not containing the type of the
+ * array being declared (no circular dependency). The length is the number
+ * of elements in an array.
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class ArrayDefinition extends Definition {
 

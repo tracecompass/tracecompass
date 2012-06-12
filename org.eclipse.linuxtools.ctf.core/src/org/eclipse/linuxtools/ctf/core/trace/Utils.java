@@ -15,9 +15,11 @@ package org.eclipse.linuxtools.ctf.core.trace;
 import java.util.UUID;
 
 /**
- * <b><u>Utils</u></b>
- * <p>
  * Various utilities.
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class Utils {
 

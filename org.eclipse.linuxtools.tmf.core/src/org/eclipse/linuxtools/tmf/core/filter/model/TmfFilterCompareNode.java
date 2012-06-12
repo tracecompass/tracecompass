@@ -21,6 +21,12 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 
+/**
+ * Filter node for the comparison operation
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterCompareNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "COMPARE"; //$NON-NLS-1$
@@ -30,6 +36,9 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
 	public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
 	public static final String VALUE_ATTR = "value"; //$NON-NLS-1$
 	
+	/**
+	 * Supported comparison types
+	 */
 	public static enum Type {
 		NUM,
 		ALPHA,

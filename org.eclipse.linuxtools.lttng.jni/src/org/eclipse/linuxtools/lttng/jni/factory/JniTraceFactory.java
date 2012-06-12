@@ -20,13 +20,13 @@ import org.eclipse.linuxtools.internal.lttng.jni_v2_6.JniTrace_v2_6;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 
 /**
- * <b><u>JniTraceFactory</u></b>
- * <p>
  * This class factory is responsible of returning the correct JniTrace implementation from a (valid) trace path.<p>
  *
  * The different version supported are listed below and the same version string are expected to be returned by JniTraceVersion.<br>
  * Each version need a different Lttv library so each need its liblttvtraceread-X.Y.so installed and available on the system.
  *
+ * @version 0.1
+ * @author William Bourque
  */
 public class JniTraceFactory {
 

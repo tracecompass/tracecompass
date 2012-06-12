@@ -17,14 +17,14 @@ import java.io.File;
 import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTraceVersionException;
 
 /**
- * <b><u>JniTraceVersion</u></b>
- * <p>
  * This class is responsible of returning the correct version number of a trace at a certain given path.<p>
  *
  * The class will call the C library to get the correct version number from the trace.<p>
  *
  * Lttv library loader (liblttvtraceread_loader.so) and the default Lttv library (liblttvtraceread.so) must be installed on system and available to java.
  *
+ * @version 0.1
+ * @author William Bourque
  */
 public class JniTraceVersion {
 

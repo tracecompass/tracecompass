@@ -14,9 +14,14 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
- * Float definition
- * @author Matthew Khouzam
+ * A CTF float definition.
+ * 
+ * The definition of a floating point basic data type. It will take the data
+ * from a trace and store it (and make it fit) as a double.
  *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class FloatDefinition extends Definition {
     // ------------------------------------------------------------------------

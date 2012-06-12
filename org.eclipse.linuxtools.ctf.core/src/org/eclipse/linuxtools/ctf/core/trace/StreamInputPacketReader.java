@@ -31,9 +31,11 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
- * <b><u>StreamInputPacketReader</u></b>
- * <p>
- * Reads the events of a packet of a trace file.
+ * CTF trace packet reader. Reads the events of a packet of a trace file.
+ * 
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class StreamInputPacketReader implements IDefinitionScope {
 

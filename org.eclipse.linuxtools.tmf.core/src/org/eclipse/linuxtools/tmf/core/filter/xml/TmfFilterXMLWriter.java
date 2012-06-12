@@ -38,10 +38,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * <b><u>FilterXMLParser</u></b>
- * <p>
- * This is SAX based XML parser
- * <p>
+ * The SAX based XML writer
+ * 
+ * @version 1.0
+ * @author Yuriy Vashchuk
+ * @author Patrick Tasse
  */
 public class TmfFilterXMLWriter {
 	

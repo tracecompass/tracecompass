@@ -17,7 +17,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <b><u>StructDeclaration</u></b>
+ * A CTF structure declaration.
+ * 
+ * A structure is similar to a C structure, it is a compound data type that
+ * contains other datatypes in fields. they are stored in an hashmap and indexed
+ * by names which are strings.
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class StructDeclaration implements IDeclaration {
 

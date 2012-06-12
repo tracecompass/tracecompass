@@ -17,7 +17,12 @@ import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
-
+/**
+ * Filter node for an event
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "EVENTTYPE"; //$NON-NLS-1$

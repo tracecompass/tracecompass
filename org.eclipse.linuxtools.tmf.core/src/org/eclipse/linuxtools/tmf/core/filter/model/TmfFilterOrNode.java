@@ -14,7 +14,12 @@ package org.eclipse.linuxtools.tmf.core.filter.model;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
-
+/**
+ * Filter node for the 'or' operation
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterOrNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "OR"; //$NON-NLS-1$

@@ -18,6 +18,12 @@ import java.util.List;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
+/**
+ * Filter node for the '==' operation
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterEqualsNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "EQUALS"; //$NON-NLS-1$

@@ -16,7 +16,14 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
- * <b><u>SequenceDefinition</u></b>
+ * A CTF sequence definition (a fixed-size array).
+ * 
+ * An array where the size is fixed but declared in the trace, unlike array
+ * where it is declared with a literal
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class SequenceDefinition extends Definition {
 

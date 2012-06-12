@@ -17,7 +17,12 @@ import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
-
+/**
+ * Filter node for the 'contains' operation
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterContainsNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "CONTAINS"; //$NON-NLS-1$

@@ -15,9 +15,14 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
- * <b><u>SequenceDeclaration</u></b> <br>
+ * A CTF sequence declaration.
+ * 
  * An array where the size is fixed but declared in the trace, unlike array
  * where it is declared with a literal
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class SequenceDeclaration implements IDeclaration {
 

@@ -13,9 +13,11 @@
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 /**
- * <b><u>Encoding</u></b>
- * <p>
- * Encoding types
+ * CTF encoding types
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public enum Encoding {
     /** UTF-8 encoding */

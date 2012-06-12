@@ -21,9 +21,7 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.internal.lttng.jni.exception.JniNoSuchEventException;
 
 /**
- * <b><u>JniEvent</u></b> <p>
- *
- * A JniEvent has the actual content that got traced by Lttng.<br>
+ * The LTTng event in its native (C) format.<br>
  * Provides access to the LttEvent C structure in java. <p>
  *
  * Most important fields in the JniEvent are :
@@ -36,6 +34,8 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniNoSuchEventExcepti
  * <b>NOTE</b><p>
  * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<p>
  *
+ * @version 0.1
+ * @author William Bourque
  */
 public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
 {

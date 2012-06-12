@@ -23,8 +23,6 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileException
 import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileWithoutEventException;
 
 /**
- * <b><u>JniTracefile</u></b>
- * <p>
  * A tracefile own an event of a certain type.<br>
  * Provides access to the LttTracefile C structure in java.
  * <p>
@@ -39,6 +37,8 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileWithoutEv
  * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<br>
  * Please look at the abstract functions to override at the bottom of this file.<p>
  *
+ * @version 0.1
+ * @author William Bourque
  */
 public abstract class JniTracefile extends Jni_C_Common
 {

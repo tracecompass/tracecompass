@@ -19,7 +19,15 @@ import java.util.ListIterator;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
- * <b><u>StructDefinition</u></b>
+ * A CTF structure definition (similar to a C structure).
+ * 
+ * A structure is similar to a C structure, it is a compound data type that
+ * contains other datatypes in fields. they are stored in an hashmap and indexed
+ * by names which are strings.
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class StructDefinition extends Definition implements IDefinitionScope {
 

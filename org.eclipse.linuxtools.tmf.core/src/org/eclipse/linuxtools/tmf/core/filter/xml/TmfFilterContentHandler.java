@@ -33,10 +33,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * <b><u>FilterContentHandler</u></b>
- * <p>
- * The Filter SAX Content Handler
- * <p>
+ * The SAX Content Handler
+ * 
+ * @version 1.0
+ * @author Yuriy Vashchuk
+ * @author Patrick Tasse
  */
 public class TmfFilterContentHandler extends DefaultHandler {
 	

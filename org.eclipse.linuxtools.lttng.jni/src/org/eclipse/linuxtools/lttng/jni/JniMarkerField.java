@@ -6,7 +6,6 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniMarkerFieldExcepti
 
 
 /**
- * <b><u>JniMarkerField</u></b> <p>
  * A JniMarkerField is one of the field of the unparsed content (payload) of an event. <p>
  *
  * Provides access to the marker_field C structure (from LTT) in java.<p>
@@ -20,6 +19,8 @@ import org.eclipse.linuxtools.internal.lttng.jni.exception.JniMarkerFieldExcepti
  * <b>NOTE</b><p>
  * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<p>
  *
+ * @version 0.1
+ * @author William Bourque
  */
 public abstract class JniMarkerField extends Jni_C_Common
 {

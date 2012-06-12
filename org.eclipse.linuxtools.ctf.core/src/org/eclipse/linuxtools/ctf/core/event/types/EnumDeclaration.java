@@ -16,7 +16,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <b><u>EnumDeclaration</u></b>
+ * A CTF enum declaration.
+ * 
+ * The definition of a enum point basic data type. It will take the data
+ * from a trace and store it (and make it fit) as an integer and a string.
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class EnumDeclaration implements IDeclaration {
 

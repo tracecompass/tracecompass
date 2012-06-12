@@ -15,10 +15,17 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
- * <b><u>IntegerDefinition</u></b>
- * <p>
+ * A CTF integer definition.
+ * 
+ * The definition of a integer basic data type. It will take the data
+ * from a trace and store it (and make it fit) as a long.
+ *
  * TODO: Reading integers with an endianness different from the trace endianness
  * is not supported
+ *
+ * @version 1.0
+ * @author Matthew Khouzam
+ * @author Simon Marchi
  */
 public class IntegerDefinition extends Definition {
 

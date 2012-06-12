@@ -21,10 +21,11 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 
 /**
- * <b><u>TmfFilterTreeNode</u></b>
- * <p>
- * The Filter Tree node
- * <p>
+ * The base class for the Filter tree nodes
+ * 
+ * @version 1.0
+ * @author Yuriy Vashchuk
+ * @author Patrick Tasse
  */
 public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable {
 

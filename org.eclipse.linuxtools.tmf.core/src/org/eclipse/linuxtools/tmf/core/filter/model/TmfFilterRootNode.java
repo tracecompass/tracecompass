@@ -17,7 +17,12 @@ import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
-
+/**
+ * The Filter tree root node
+ * 
+ * @version 1.0
+ * @author Patrick Tasse
+ */
 public class TmfFilterRootNode extends TmfFilterTreeNode {
 	
 	public static final String NODE_NAME = "ROOT"; //$NON-NLS-1$
