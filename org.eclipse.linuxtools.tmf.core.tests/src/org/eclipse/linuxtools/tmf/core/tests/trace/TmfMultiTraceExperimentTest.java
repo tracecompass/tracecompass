@@ -386,10 +386,10 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // getNext - updates the context
+    // readtNextEvent - updates the context
     // ------------------------------------------------------------------------
 
-    public void testGetNext() throws Exception {
+    public void testReadNextEvent() throws Exception {
 
         // On lower bound, returns the first event (ts = 0)
         final ITmfContext context = fExperiment.seekEvent(0);
@@ -400,26 +400,6 @@ public class TmfMultiTraceExperimentTest extends TestCase {
             event = fExperiment.getNext(context);
             assertEquals("Event timestamp", i, event.getTimestamp().getValue());
         }
-    }
-
-    public void testGetNextLocation() throws Exception {
-
-        ITmfContext context1 = fExperiment.seekEvent(0);
-        fExperiment.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
-        ITmfEvent event1 = fExperiment.getNext(context1);
-        ITmfContext context2 = fExperiment.seekEvent(location);
-        ITmfEvent event2 = fExperiment.getNext(context2);
-        assertEquals("Event timestamp", event1.getTimestamp().getValue(), event2.getTimestamp().getValue());
-    }
-
-    public void testGetNextEndLocation() throws Exception {
-        ITmfContext context1 = fExperiment.seekEvent(fExperiment.getNbEvents() - 1);
-        fExperiment.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
-        ITmfContext context2 = fExperiment.seekEvent(location);
-        ITmfEvent event = fExperiment.getNext(context2);
-        assertNull("Event", event);
     }
 
     // ------------------------------------------------------------------------

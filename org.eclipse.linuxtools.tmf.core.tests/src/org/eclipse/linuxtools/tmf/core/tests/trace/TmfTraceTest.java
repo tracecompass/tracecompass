@@ -35,7 +35,6 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -969,10 +968,10 @@ public class TmfTraceTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // getNext - updates the context
+    // readNextEvent - updates the context
     // ------------------------------------------------------------------------
 
-    public void testGetNext() throws Exception {
+    public void testReadNextEvent() throws Exception {
 
         final int NB_READS = 20;
 
@@ -991,26 +990,6 @@ public class TmfTraceTest extends TestCase {
         event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", NB_READS + 1, event.getTimestamp().getValue());
         assertEquals("Event rank", NB_READS, context.getRank());
-    }
-
-    public void testGetNextLocation() throws Exception {
-
-        ITmfContext context1 = fTrace.seekEvent(0);
-        fTrace.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
-        ITmfEvent event1 = fTrace.getNext(context1);
-        ITmfContext context2 = fTrace.seekEvent(location);
-        ITmfEvent event2 = fTrace.getNext(context2);
-        assertEquals("Event timestamp", event1.getTimestamp().getValue(), event2.getTimestamp().getValue());
-    }
-
-    public void testGetNextEndLocation() throws Exception {
-        ITmfContext context1 = fTrace.seekEvent(fTrace.getNbEvents() - 1);
-        fTrace.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
-        ITmfContext context2 = fTrace.seekEvent(location);
-        ITmfEvent event = fTrace.getNext(context2);
-        assertNull("Event", event);
     }
 
     // ------------------------------------------------------------------------
