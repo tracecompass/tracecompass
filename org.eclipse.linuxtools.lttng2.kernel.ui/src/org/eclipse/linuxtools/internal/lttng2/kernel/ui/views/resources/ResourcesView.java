@@ -87,6 +87,9 @@ public class ResourcesView extends TmfView {
     // The time graph entry list
     private ArrayList<TraceEntry> fEntryList;
 
+    // The time graph entry list synchronization object
+    final private Object fEntryListSyncObj = new Object();
+
     // The start time
     private long fStartTime;
 
@@ -220,7 +223,10 @@ public class ResourcesView extends TmfView {
 
         @Override
         public void run() {
-            ArrayList<TraceEntry> entryList = fEntryList;
+            ArrayList<TraceEntry> entryList = null;
+            synchronized (fEntryListSyncObj) {
+                entryList = fEntryList;
+            }
             if (entryList == null) {
                 return;
             }
@@ -443,9 +449,11 @@ public class ResourcesView extends TmfView {
                 }
             }
         }
-        fEntryList = entryList;
+        synchronized (fEntryListSyncObj) {
+            fEntryList = (ArrayList<TraceEntry>) entryList.clone();
+        }
         refresh(INITIAL_WINDOW_OFFSET);
-        for (TraceEntry traceEntry : fEntryList) {
+        for (TraceEntry traceEntry : entryList) {
             CtfKernelTrace ctfKernelTrace = ((TraceEntry) traceEntry).getTrace();
             IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
             long startTime = ssq.getStartTime();
@@ -562,7 +570,10 @@ public class ResourcesView extends TmfView {
                 if (fTimeGraphViewer.getControl().isDisposed()) {
                     return;
                 }
-                ITimeGraphEntry[] entries = fEntryList.toArray(new ITimeGraphEntry[0]);
+                ITimeGraphEntry[] entries = null;
+                synchronized (fEntryListSyncObj) {
+                    entries = fEntryList.toArray(new ITimeGraphEntry[0]);
+                }
                 Arrays.sort(entries, new TraceEntryComparator());
                 fTimeGraphViewer.setInput(entries);
                 fTimeGraphViewer.setTimeBounds(fStartTime, fEndTime);

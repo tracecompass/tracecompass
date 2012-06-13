@@ -110,6 +110,9 @@ public class ControlFlowView extends TmfView {
     // The timegraph entry list
     private ArrayList<ControlFlowEntry> fEntryList;
 
+    // The time graph entry list synchronization object
+    final private Object fEntryListSyncObj = new Object();
+
     // The start time
     private long fStartTime;
 
@@ -258,7 +261,10 @@ public class ControlFlowView extends TmfView {
 
         @Override
         public void run() {
-            ArrayList<ControlFlowEntry> entryList = fEntryList;
+            ArrayList<ControlFlowEntry> entryList = null;
+            synchronized (fEntryListSyncObj) {
+                entryList = fEntryList;
+            }
             if (entryList == null) {
                 return;
             }
@@ -574,7 +580,9 @@ public class ControlFlowView extends TmfView {
                 buildTree(entryList, rootList);
             }
             Collections.sort(rootList, fControlFlowEntryComparator);
-            fEntryList = rootList;
+            synchronized (fEntryListSyncObj) {
+                fEntryList = (ArrayList<ControlFlowEntry>) rootList.clone();
+            }
             refresh(INITIAL_WINDOW_OFFSET);
         }
         for (ControlFlowEntry entry : rootList) {
@@ -661,7 +669,10 @@ public class ControlFlowView extends TmfView {
                 if (fTimeGraphCombo.isDisposed()) {
                     return;
                 }
-                ITimeGraphEntry[] entries = fEntryList.toArray(new ITimeGraphEntry[0]);
+                ITimeGraphEntry[] entries = null;
+                synchronized (fEntryListSyncObj) {
+                    entries = fEntryList.toArray(new ITimeGraphEntry[0]);
+                }
                 Arrays.sort(entries, fControlFlowEntryComparator);
                 fTimeGraphCombo.setInput(entries);
                 fTimeGraphCombo.getTimeGraphViewer().setTimeBounds(fStartTime, fEndTime);
