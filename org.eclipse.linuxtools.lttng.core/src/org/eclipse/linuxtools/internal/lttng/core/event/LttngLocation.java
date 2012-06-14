@@ -36,7 +36,7 @@ public class LttngLocation implements ITmfLocation<LttngTimestamp>, Comparable<L
         this.isLastOperationParse = oldLocation.isLastOperationParse;
         this.isLastOperationReadNext = oldLocation.isLastOperationReadNext;
         this.isLastOperationSeek = oldLocation.isLastOperationSeek;
-        this.operationTime = oldLocation.operationTime;
+        this.operationTime = oldLocation.operationTime.clone();
     }
 
     @Override

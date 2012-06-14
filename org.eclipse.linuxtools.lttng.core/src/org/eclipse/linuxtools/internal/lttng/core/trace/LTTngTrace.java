@@ -582,6 +582,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
                             + previousLocation.getOperationTimeValue() + " CurrentTime" //$NON-NLS-1$
                             + curLocation.getOperationTimeValue() + " ]"); //$NON-NLS-1$
                 seekEvent(curLocation.getOperationTime());
+
+                // If the location is marked with the read next flag
+                // then it is pointing to the next event following the operation time
+                if (curLocation.isLastOperationReadNext()) {
+                    readNextEvent(curLocation);
+                }
             }
             // Read the next event from the trace. The last one will NO LONGER
             // BE VALID.

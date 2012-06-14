@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngLocation;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -407,6 +408,113 @@ public class LTTngTraceTest extends TestCase {
         tmpEvent = testStream1.getNext(tmpContext);
         assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
         assertEquals("tmpEvent has wrong timestamp", nextnextEventTimestamp, tmpEvent.getTimestamp().getValue());
+    }
+
+    public void testConcurrentOperations() {
+        final LTTngTrace testStream = prepareStreamToTest();
+        ITmfEvent event1 = null;
+        ITmfEvent event2 = null;
+        ITmfContext context1;
+        ITmfContext context2;
+
+        // Test concurrent interference (seek) after a seek
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (parseEvent) after a seek
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event2 = testStream.parseEvent(context2);
+        assertTrue("event is null after parseEvent()", event2 != null);
+        assertEquals("event has wrong timestamp", timestampToSeekLast, event2.getTimestamp().getValue());
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (getNext) after a seek
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event2 = testStream.getNext(context2);
+        assertTrue("event is null after getNext()", event2 != null);
+        assertEquals("event has wrong timestamp", timestampToSeekLast, event2.getTimestamp().getValue());
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (seek) after a parseEvent
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event1 = testStream.parseEvent(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (parseEvent) after a parseEvent
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event1 = testStream.parseEvent(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+        event2 = testStream.parseEvent(context2);
+        assertTrue("event is null after parseEvent()", event2 != null);
+        assertEquals("event has wrong timestamp", timestampToSeekLast, event2.getTimestamp().getValue());
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (getNext) after a parseEvent
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event1 = testStream.parseEvent(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+        event2 = testStream.getNext(context2);
+        assertTrue("event is null after getNext()", event2 != null);
+        assertEquals("event has wrong timestamp", timestampToSeekLast, event2.getTimestamp().getValue());
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (seek) after a getNext
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", nextEventTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (parseEvent) after a getNext
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+        event2 = testStream.parseEvent(context2);
+        assertTrue("event is null after parseEvent()", event2 != null);
+        assertEquals("event has wrong timestamp", timestampToSeekLast, event2.getTimestamp().getValue());
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", nextEventTimestamp, event1.getTimestamp().getValue());
+
+        // Test concurrent interference (getNext) after a getNext
+        context2 = testStream.seekEvent(new LttngLocation(timestampToSeekLast));
+        context1 = testStream.seekEvent(new LttngLocation(seekTimestamp));
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", seekTimestamp, event1.getTimestamp().getValue());
+        event2 = testStream.getNext(context2);
+        assertTrue("event is null after getNext()", event2 != null);
+        assertEquals("event has wrong timestamp", timestampToSeekLast, event2.getTimestamp().getValue());
+        event1 = testStream.getNext(context1);
+        assertTrue("event is null after getNext()", event1 != null);
+        assertEquals("event has wrong timestamp", nextEventTimestamp, event1.getTimestamp().getValue());
     }
 
     public void testGetter() {
