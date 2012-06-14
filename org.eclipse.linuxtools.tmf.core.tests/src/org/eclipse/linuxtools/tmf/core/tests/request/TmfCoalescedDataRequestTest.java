@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -41,7 +41,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	private TmfCoalescedDataRequest<TmfEvent> fRequest1c;
 
 	private int fRequestCount;
-	
+
 	// ------------------------------------------------------------------------
 	// Housekeeping
 	// ------------------------------------------------------------------------
@@ -70,8 +70,8 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 		super.tearDown();
 	}
 
-	private TmfCoalescedDataRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
-		
+	private static TmfCoalescedDataRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
+
 		TmfCoalescedDataRequest<TmfEvent> request = new TmfCoalescedDataRequest<TmfEvent>(TmfEvent.class, 10, 100, 200) {
 		    @Override
 			public void handleCompleted() {
@@ -96,7 +96,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 		};
 		return request;
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
@@ -186,13 +186,13 @@ public class TmfCoalescedDataRequestTest extends TestCase {
         assertFalse("equals", fRequest3.equals(fRequest1));
         assertFalse("equals", fRequest3.equals(fRequest2));
 	}
-	
+
 	public void testEqualsTransivity() throws Exception {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1c));
         assertTrue("equals", fRequest1.equals(fRequest1c));
 	}
-	
+
 	public void testEqualsNull() throws Exception {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));
@@ -207,7 +207,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
         assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
 		assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
@@ -352,7 +352,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testDone() {
-		
+
 		// Test request
 		final boolean[] crFlags = new boolean[4];
 		TmfCoalescedDataRequest<TmfEvent> request = setupTestRequest(crFlags);
@@ -389,7 +389,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testFail() {
-		
+
 		final boolean[] crFlags = new boolean[4];
 		TmfCoalescedDataRequest<TmfEvent> request = setupTestRequest(crFlags);
 		TmfDataRequest<TmfEvent> subRequest1 = new TmfDataRequestStub<TmfEvent>(TmfEvent.class, 10, 100, 200);
@@ -456,7 +456,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 		assertTrue ("isCancelled", subRequest2.isCancelled());
 	}
 
-	
+
 	// ------------------------------------------------------------------------
 	// cancel sub-requests
 	// ------------------------------------------------------------------------
@@ -480,7 +480,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	        // Validate the coalescing request
 	        assertFalse("isCompleted", request.isCompleted());
 	        assertFalse("isFailed",     request.isFailed());
-	        assertFalse("isCancelled", request.isCancelled());  
+	        assertFalse("isCancelled", request.isCancelled());
 
 	        // Cancel second sub-request
 	        subRequest2.cancel();
@@ -495,7 +495,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	        assertFalse("isFailed",    request.isFailed());
 	        assertTrue ("isCancelled", request.isCancelled());
 
-	        // Finalize coalescing request - 
+	        // Finalize coalescing request -
 	        // Note: No need to check "request.isCancelled()" since it was verified above
             request.cancel();
 

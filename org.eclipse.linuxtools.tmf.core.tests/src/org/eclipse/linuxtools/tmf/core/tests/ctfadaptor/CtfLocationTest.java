@@ -23,7 +23,6 @@ public class CtfLocationTest {
      *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
-    @SuppressWarnings("static-method")
     @Test
     public void testCtfLocation_1() {
         Long location = Long.valueOf(1);
@@ -40,7 +39,6 @@ public class CtfLocationTest {
      *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
-    @SuppressWarnings("static-method")
     @Test
     public void testCtfLocation_2() {
         ITmfTimestamp timestamp = new TmfTimestamp();
@@ -57,7 +55,6 @@ public class CtfLocationTest {
      *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
-    @SuppressWarnings("static-method")
     @Test
     public void testClone_1() {
         CtfLocation fixture = new CtfLocation(Long.valueOf(1));
@@ -75,7 +72,6 @@ public class CtfLocationTest {
      *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
-    @SuppressWarnings("static-method")
     @Test
     public void testGetLocation_1() {
         CtfLocation fixture = new CtfLocation(Long.valueOf(1));
@@ -99,7 +95,6 @@ public class CtfLocationTest {
      *
      * @generatedBy CodePro at 03/05/12 2:29 PM
      */
-    @SuppressWarnings("static-method")
     @Test
     public void testSetLocation_1() {
         CtfLocation fixture = new CtfLocation(Long.valueOf(1));
@@ -111,14 +106,12 @@ public class CtfLocationTest {
         // add additional test code here
     }
 
-    @SuppressWarnings("static-method")
     @Test
     public void testToString1(){
         CtfLocation fixture = new CtfLocation(new Long(1337L));
         assertEquals("CtfLocation: 1337",fixture.toString()); //$NON-NLS-1$
     }
 
-    @SuppressWarnings("static-method")
     @Test
     public void testToString2(){
         CtfLocation fixture = new CtfLocation(new Long(-1L));

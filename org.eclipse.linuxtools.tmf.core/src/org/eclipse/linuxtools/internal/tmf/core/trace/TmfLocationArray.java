@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Patrick Tasse - Initial API and implementation
  * Francois Chouinard - Put in shape for 1.0
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 /**
  * A convenience class to store trace location arrays. The main purpose is to
  * provide a Comparable implementation for TmfExperimentLocation.
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
@@ -30,7 +30,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // Attributes
     // ------------------------------------------------------------------------
 
-    private ITmfLocation<? extends Comparable<?>>[] fLocations;
+    private final ITmfLocation<? extends Comparable<?>>[] fLocations;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -38,7 +38,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
 
     /**
      * The standard constructor
-     * 
+     *
      * @param locations the locations
      */
     public TmfLocationArray(ITmfLocation<? extends Comparable<?>>[] locations) {
@@ -51,7 +51,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
 
     /**
      * The standard constructor
-     * 
+     *
      * @param locations the locations
      */
     public ITmfLocation<? extends Comparable<?>>[] getLocations() {
@@ -67,7 +67,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      */
     @Override
     public TmfLocationArray clone() {
-        ITmfLocation<? extends Comparable<?>>[] clones = (ITmfLocation<? extends Comparable<?>>[]) new ITmfLocation<?>[fLocations.length];
+        ITmfLocation<? extends Comparable<?>>[] clones = new ITmfLocation<?>[fLocations.length];
         for (int i = 0; i < fLocations.length; i++) {
             ITmfLocation<?> location = fLocations[i];
             clones[i] = (location != null) ? location.clone() : null;

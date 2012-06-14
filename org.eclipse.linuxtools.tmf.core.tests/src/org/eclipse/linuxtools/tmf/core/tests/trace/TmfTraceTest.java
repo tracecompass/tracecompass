@@ -83,7 +83,7 @@ public class TmfTraceTest extends TestCase {
     // Helper functions
     // ------------------------------------------------------------------------
 
-    private TmfTraceStub setupTrace(final String path) {
+    private static TmfTraceStub setupTrace(final String path) {
         if (fTrace == null) {
             try {
                 final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
@@ -173,7 +173,6 @@ public class TmfTraceTest extends TestCase {
             fail("IOException");
         }
 
-        assertFalse ("Open trace", trace == null);
         assertEquals("getType",  TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
@@ -247,7 +246,6 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void testCopyConstructor() throws Exception {
         TmfTraceStub original = null;
         TmfTraceStub trace = null;
@@ -320,8 +318,7 @@ public class TmfTraceTest extends TestCase {
         } catch (Exception e) {
             fail("TmfTrace.initialize() - Exception thrown");
         }
-        
-        assertFalse ("Open trace", trace == null);
+
         assertEquals("getType", TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
@@ -349,8 +346,7 @@ public class TmfTraceTest extends TestCase {
         } catch (Exception e) {
             fail("TmfTrace.initialize() - Exception thrown");
         }
-        
-        assertFalse ("Open trace", trace == null);
+
         assertEquals("getType", TmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
@@ -370,7 +366,6 @@ public class TmfTraceTest extends TestCase {
         // Instantiate an "empty" trace
         final TmfTraceStub trace = new TmfTraceStub();
 
-        assertFalse ("Open trace", trace == null);
         assertNull  ("getType",  trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());

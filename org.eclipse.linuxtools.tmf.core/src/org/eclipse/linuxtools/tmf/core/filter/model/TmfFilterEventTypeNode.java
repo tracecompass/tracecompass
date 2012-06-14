@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * Filter node for an event
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
@@ -28,10 +28,10 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 	public static final String NODE_NAME = "EVENTTYPE"; //$NON-NLS-1$
 	public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
 	public static final String NAME_ATTR = "name"; //$NON-NLS-1$
-	
+
 	private String fType;
 	private String fName;
-	
+
 	public TmfFilterEventTypeNode(ITmfFilterTreeNode parent) {
 		super(parent);
 	}
@@ -88,9 +88,8 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 	public List<String> getValidChildren() {
 		if (getChildrenCount() == 0) {
 			return super.getValidChildren();
-		} else {
-			return new ArrayList<String>(0); // only one child allowed
 		}
+        return new ArrayList<String>(0); // only one child allowed
 	}
 
 	@Override

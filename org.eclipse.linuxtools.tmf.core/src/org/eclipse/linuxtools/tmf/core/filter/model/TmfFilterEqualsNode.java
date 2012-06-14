@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * Filter node for the '==' operation
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
@@ -31,12 +31,12 @@ public class TmfFilterEqualsNode extends TmfFilterTreeNode {
 	public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
 	public static final String VALUE_ATTR = "value"; //$NON-NLS-1$
 	public static final String IGNORECASE_ATTR = "ignorecase"; //$NON-NLS-1$
-	
+
 	private boolean fNot = false;
 	private String fField;
 	private String fValue;
 	private boolean fIgnoreCase = false;
-	
+
 	public TmfFilterEqualsNode(ITmfFilterTreeNode parent) {
 		super(parent);
 	}
@@ -44,11 +44,11 @@ public class TmfFilterEqualsNode extends TmfFilterTreeNode {
 	public boolean isNot() {
 		return fNot;
 	}
-	
+
 	public void setNot(boolean not) {
 		this.fNot = not;
 	}
-	
+
 	public String getField() {
 		return fField;
 	}
@@ -68,11 +68,11 @@ public class TmfFilterEqualsNode extends TmfFilterTreeNode {
 	public boolean isIgnoreCase() {
 		return fIgnoreCase;
 	}
-	
+
 	public void setIgnoreCase(boolean ignoreCase) {
 		this.fIgnoreCase = ignoreCase;
 	}
-	
+
 	@Override
 	public String getNodeName() {
 		return NODE_NAME;
@@ -90,9 +90,8 @@ public class TmfFilterEqualsNode extends TmfFilterTreeNode {
         }
         if (fIgnoreCase) {
             return valueString.equalsIgnoreCase(fValue) ^ fNot;
-        } else {
-            return valueString.equals(fValue) ^ fNot;
         }
+        return valueString.equals(fValue) ^ fNot;
 	}
 
 	@Override

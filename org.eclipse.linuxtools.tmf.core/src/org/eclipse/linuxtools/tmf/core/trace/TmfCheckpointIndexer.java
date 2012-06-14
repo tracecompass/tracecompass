@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
+import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -32,7 +33,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 
 /**
  * A simple indexer that manages the trace index as an array of trace
- * checkpoints. Checkpoints are stored at fixed intervals (event rank) in 
+ * checkpoints. Checkpoints are stored at fixed intervals (event rank) in
  * ascending timestamp order.
  * <p>
  * The goal being to access a random trace event reasonably fast from the user's
@@ -42,7 +43,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
  * <p>
  * Locating a specific checkpoint is trivial for both rank (rank % interval) and
  * timestamp (bsearch in the array).
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -71,10 +72,10 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     protected final List<ITmfCheckpoint> fTraceIndex;
 
     /**
-     * The indexing request 
+     * The indexing request
      */
     private ITmfEventRequest<ITmfEvent> fIndexingRequest = null;
-    
+
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
@@ -82,16 +83,16 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     /**
      * Basic constructor that uses the default trace block size as checkpoints
      * intervals
-     * 
+     *
      * @param trace the trace to index
      */
     public TmfCheckpointIndexer(final ITmfTrace<ITmfEvent> trace) {
-        this(trace, TmfTrace.DEFAULT_BLOCK_SIZE);
+        this(trace, TmfDataProvider.DEFAULT_BLOCK_SIZE);
     }
 
     /**
      * Full trace indexer
-     * 
+     *
      * @param trace the trace to index
      * @param interval the checkpoints interval
      */
@@ -130,11 +131,11 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * 
+     *
      * The index is a list of contexts that point to events at regular interval
      * (rank-wise) in the trace. After it is built, the index can be used to
      * quickly access any event by rank or timestamp (using seekIndex()).
-     * 
+     *
      * The index is built simply by reading the trace
      *
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#buildIndex(long, org.eclipse.linuxtools.tmf.core.event.TmfTimeRange, boolean)
@@ -142,7 +143,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     @Override
     public void buildIndex(final long offset, final TmfTimeRange range, final boolean waitForCompletion) {
 
-        // Don't do anything if we are already indexing 
+        // Don't do anything if we are already indexing
         synchronized (fTraceIndex) {
             if (fIsIndexing) {
                 return;
@@ -223,7 +224,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
 
     /**
      * Notify the interested parties that the trace time range has changed
-     * 
+     *
      * @param startTime the new start time
      * @param endTime the new end time
      */
@@ -299,7 +300,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
 
     /**
      * Position the trace at the given checkpoint
-     * 
+     *
      * @param checkpoint the checkpoint index
      * @return the corresponding context
      */
@@ -335,7 +336,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     // Context conversion functions
     // ------------------------------------------------------------------------
 
-    private ITmfContext shrinkContext(ITmfContext context) {
+    private static ITmfContext shrinkContext(ITmfContext context) {
         if (context instanceof TmfExperimentContext) {
             return shrinkExpContext(context);
         }
@@ -343,7 +344,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         return ctx;
     }
 
-    private ITmfContext shrinkExpContext(ITmfContext context) {
+    private static ITmfContext shrinkExpContext(ITmfContext context) {
         TmfExperimentContext expContext = (TmfExperimentContext) context;
         int size = expContext.getContexts().length;
         ITmfContext[] trcCtxts = new TmfContext[size];

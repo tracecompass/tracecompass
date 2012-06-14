@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import java.io.File;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
@@ -213,7 +213,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         String traceName = (resource != null) ? resource.getName() : null;
         // If no resource was provided, extract the display name the trace path
         if (traceName == null) {
-            final int sep = path.lastIndexOf(Path.SEPARATOR);
+            final int sep = path.lastIndexOf(IPath.SEPARATOR);
             traceName = (sep >= 0) ? path.substring(sep + 1) : path;
         }
         if (fParser == null) {

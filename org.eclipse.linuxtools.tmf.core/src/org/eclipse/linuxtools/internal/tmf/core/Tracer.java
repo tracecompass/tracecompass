@@ -12,7 +12,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "javadoc"})
 public class Tracer {
 
     private static String pluginID = Activator.PLUGIN_ID;

@@ -26,8 +26,8 @@ public interface ITmfDataRequest<T extends ITmfEvent> {
 	// Constants
 	// ------------------------------------------------------------------------
 
-    public enum ExecutionType { BACKGROUND, FOREGROUND };
-    
+    public enum ExecutionType { BACKGROUND, FOREGROUND }
+
 	// ------------------------------------------------------------------------
 	// Accessors
 	// ------------------------------------------------------------------------

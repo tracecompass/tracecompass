@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * Filter node for the 'contains' operation
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
@@ -30,13 +30,13 @@ public class TmfFilterContainsNode extends TmfFilterTreeNode {
 	public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
 	public static final String VALUE_ATTR = "value"; //$NON-NLS-1$
 	public static final String IGNORECASE_ATTR = "ignorecase"; //$NON-NLS-1$
-	
+
 	private boolean fNot = false;
 	private String fField;
 	private String fValue;
 	private String fValueUpperCase;
 	private boolean fIgnoreCase = false;
-	
+
 	public TmfFilterContainsNode(ITmfFilterTreeNode parent) {
 		super(parent);
 	}
@@ -44,11 +44,11 @@ public class TmfFilterContainsNode extends TmfFilterTreeNode {
 	public boolean isNot() {
 		return fNot;
 	}
-	
+
 	public void setNot(boolean not) {
 		this.fNot = not;
 	}
-	
+
 	public String getField() {
 		return fField;
 	}
@@ -69,11 +69,11 @@ public class TmfFilterContainsNode extends TmfFilterTreeNode {
 	public boolean isIgnoreCase() {
 		return fIgnoreCase;
 	}
-	
+
 	public void setIgnoreCase(boolean ignoreCase) {
 		this.fIgnoreCase = ignoreCase;
 	}
-	
+
 	@Override
 	public String getNodeName() {
 		return NODE_NAME;
@@ -88,9 +88,8 @@ public class TmfFilterContainsNode extends TmfFilterTreeNode {
         String valueString = value.toString();
         if (fIgnoreCase) {
             return valueString.toUpperCase().contains(fValueUpperCase) ^ fNot;
-        } else {
-            return valueString.contains(fValue) ^ fNot;
         }
+        return valueString.contains(fValue) ^ fNot;
 	}
 
 	@Override

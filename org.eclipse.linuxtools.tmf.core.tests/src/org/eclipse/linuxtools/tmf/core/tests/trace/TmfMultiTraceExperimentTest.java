@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adjusted for new Trace Model
@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -95,7 +96,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         super.setUp();
         setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
         if (fExperiment == null) {
-            fExperiment = new TmfExperimentStub<TmfEvent>(EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, BLOCK_SIZE);
+            fExperiment = new TmfExperimentStub<TmfEvent>(EXPERIMENT, fTraces, BLOCK_SIZE);
             fExperiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
         }
     }
@@ -306,7 +307,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testSeekLocationOnCacheBoundary() throws Exception {
-        
+
         long cacheSize = fExperiment.getCacheSize();
 
         // Position trace at event rank 0
@@ -464,7 +465,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
     public void testProcessRequestForAllEvents() throws Exception {
 
-        final int nbEvents  = TmfEventRequest.ALL_DATA;
+        final int nbEvents  = TmfDataRequest.ALL_DATA;
         final int blockSize =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         final long nbExpectedEvents = NB_EVENTS;

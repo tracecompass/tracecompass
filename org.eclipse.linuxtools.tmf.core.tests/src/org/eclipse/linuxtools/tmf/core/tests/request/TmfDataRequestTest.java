@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -38,7 +38,7 @@ public class TmfDataRequestTest extends TestCase {
 	private static TmfDataRequest<TmfEvent> fRequest4;
 
 	private static int fRequestCount;
-	
+
     // ------------------------------------------------------------------------
 	// Housekeeping
 	// ------------------------------------------------------------------------
@@ -65,8 +65,8 @@ public class TmfDataRequestTest extends TestCase {
 		super.tearDown();
 	}
 
-	private TmfDataRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
-		
+	private static TmfDataRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
+
 		TmfDataRequest<TmfEvent> request = new TmfDataRequestStub<TmfEvent>(TmfEvent.class, 10, 100, 200) {
 		    @Override
 			public void handleCompleted() {
@@ -91,7 +91,7 @@ public class TmfDataRequestTest extends TestCase {
 		};
 		return request;
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
@@ -181,13 +181,13 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("equals", fRequest3.equals(fRequest1));
         assertFalse("equals", fRequest3.equals(fRequest2));
 	}
-	
+
 	public void testEqualsTransivity() throws Exception {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1c));
         assertTrue("equals", fRequest1.equals(fRequest1c));
 	}
-	
+
 	public void testEqualsNull() throws Exception {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));
@@ -202,7 +202,7 @@ public class TmfDataRequestTest extends TestCase {
         assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
 		assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
@@ -224,7 +224,7 @@ public class TmfDataRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testDone() {
-		
+
 		final boolean[] flags = new boolean[4];
 		TmfDataRequest<TmfEvent> request = setupTestRequest(flags);
 		request.done();
@@ -244,7 +244,7 @@ public class TmfDataRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testFail() {
-		
+
 		final boolean[] flags = new boolean[4];
 		TmfDataRequest<TmfEvent> request = setupTestRequest(flags);
 		request.fail();

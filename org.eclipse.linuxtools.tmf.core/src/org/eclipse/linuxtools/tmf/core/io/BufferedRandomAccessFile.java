@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation, based on article by Nick Zhang
  *                   (http://www.javaworld.com/javatips/jw-javatip26.html)
@@ -19,8 +19,8 @@ import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 
 /**
- * A class to mitigate the Java I/O inefficiency of RandomAccessFile. 
- * 
+ * A class to mitigate the Java I/O inefficiency of RandomAccessFile.
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
@@ -28,22 +28,22 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 
 	private static final int DEFAULT_BUF_SIZE = 8192;
 	private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8"); //$NON-NLS-1$
-	
+
 	final int BUF_SIZE;
 	byte buffer[];
 	int buf_end = 0;
 	int buf_pos = 0;
 	long real_pos = 0;
 	StringBuilder sb = new StringBuilder();
-	
+
 	public BufferedRandomAccessFile(String name, String mode) throws IOException {
 		this(name, mode, DEFAULT_BUF_SIZE);
 	}
-	
+
 	public BufferedRandomAccessFile(File file, String mode) throws IOException {
 		this(file, mode, DEFAULT_BUF_SIZE);
 	}
-	
+
 	public BufferedRandomAccessFile(String name, String mode, int bufsize) throws IOException {
 	    super(name, mode);
 	    invalidate();
@@ -67,11 +67,10 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 		}
 		if (buf_end == 0) {
 			return -1;
-		} else {
-			return buffer[buf_pos++];
 		}
+        return buffer[buf_pos++];
 	}
-	
+
 	@Override
     public int read(byte b[], int off, int len) throws IOException {
 		int leftover = buf_end - buf_pos;
@@ -90,7 +89,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 		}
 		return len;
 	}
-	
+
 	@Override
     public long getFilePointer() throws IOException{
 		long l = real_pos;
@@ -144,7 +143,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 		buf_pos = lineend + 1;
 		return str;
 	}
-	  
+
 	private int fillBuffer() throws IOException {
 		int n = super.read(buffer, 0, BUF_SIZE);
 		if (n >= 0) {
@@ -154,7 +153,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 		}
 		return n;
 	}
-	
+
 	private void invalidate() throws IOException {
 		buf_end = 0;
 		buf_pos = 0;

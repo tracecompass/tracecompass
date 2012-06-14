@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 
 /**
  * The TMF coalesced data request
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -42,7 +42,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request all the events of a given type (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      */
     public TmfCoalescedDataRequest(Class<T> dataType) {
@@ -52,7 +52,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request all the events of a given type (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param priority the requested execution priority
      */
@@ -63,7 +63,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request all the events of a given type from the given index (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      */
@@ -74,7 +74,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request all the events of a given type from the given index (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param priority the requested execution priority
@@ -86,7 +86,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request 'n' events of a given type from the given index (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -98,7 +98,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request 'n' events of a given type from the given index (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -111,7 +111,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request 'n' events of a given type from the given index (high priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -124,7 +124,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     /**
      * Request 'n' events of a given type from the given index (given priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -139,17 +139,29 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     // Management
     // ------------------------------------------------------------------------
 
-	public void addRequest(ITmfDataRequest<T> request) {
-		fRequests.add(request);
+    /**
+     * Add a request to this one.
+     *
+     * @param request The request to add
+     */
+    public void addRequest(ITmfDataRequest<T> request) {
+        fRequests.add(request);
         merge(request);
-	}
+    }
 
-	public boolean isCompatible(ITmfDataRequest<T> request) {
-		if (request.getExecType() == getExecType()) {
-	        return overlaps(request);
-		}
-		return false;
-	}
+    /**
+     * Check if a request is compatible with the current coalesced one
+     *
+     * @param request
+     *            The request to verify
+     * @return If the request is compatible, true or false
+     */
+    public boolean isCompatible(ITmfDataRequest<T> request) {
+        if (request.getExecType() == getExecType()) {
+            return overlaps(request);
+        }
+        return false;
+    }
 
     private boolean overlaps(ITmfDataRequest<T> request) {
         long start = request.getIndex();
@@ -163,7 +175,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     private void merge(ITmfDataRequest<T> request) {
         long start = request.getIndex();
         long end = Math.min(start + request.getNbRequested(), TmfDataRequest.ALL_DATA);
-        
+
         if (start < fIndex) {
             if (fNbRequested != TmfDataRequest.ALL_DATA) {
                 fNbRequested += (fIndex - start);
@@ -179,11 +191,16 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
         }
     }
 
+	/**
+	 * @return The list of IDs of the sub-requests
+	 */
 	@SuppressWarnings("nls")
     public String getSubRequestIds() {
 	    StringBuffer result = new StringBuffer("[");
 	    for (int i = 0; i < fRequests.size(); i++) {
-	        if (i != 0) result.append(", ");
+	        if (i != 0) {
+                result.append(", ");
+            }
 	        result.append(fRequests.get(i).getRequestId());
 	    }
 	    result.append("]");
@@ -225,7 +242,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
         }
         super.start();
     }
-    
+
 	@Override
     public void done() {
     	for (ITmfDataRequest<T> request : fRequests) {
@@ -253,9 +270,9 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     	}
     	super.cancel();
     }
-    
+
     @Override
-    public boolean isCompleted() {
+    public synchronized boolean isCompleted() {
         // Firstly, check if coalescing request is completed
         if (super.isCompleted()) {
             return true;
@@ -263,7 +280,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 
         // Secondly, check if all sub-requests are finished
         if (fRequests.size() > 0) {
-            // If all sub requests are completed the coalesced request is 
+            // If all sub requests are completed the coalesced request is
             // treated as completed, too.
             for (ITmfDataRequest<T> request : fRequests) {
                 if (!request.isCompleted()) {
@@ -278,7 +295,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     }
 
     @Override
-    public boolean isCancelled() {
+    public synchronized boolean isCancelled() {
         // Firstly, check if coalescing request is canceled
         if (super.isCancelled()) {
             return true;
@@ -286,7 +303,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 
         // Secondly, check if all sub-requests are canceled
         if (fRequests.size() > 0) {
-            // If all sub requests are canceled the coalesced request is 
+            // If all sub requests are canceled the coalesced request is
             // treated as completed, too.
             for (ITmfDataRequest<T> request : fRequests) {
                 if (!request.isCancelled()) {
@@ -301,7 +318,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
 
     }
 
-    
+
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
@@ -327,7 +344,7 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
+		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName()
 			+ "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
     }
 }

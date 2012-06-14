@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adjusted for new Event Model
@@ -74,8 +74,8 @@ public class TmfEventTypeTest extends TestCase {
 
     public void testDefaultConstructor() {
         final ITmfEventType type = new TmfEventType();
-        assertEquals("getContext", TmfEventType.DEFAULT_CONTEXT_ID, type.getContext());
-        assertEquals("getName", TmfEventType.DEFAULT_TYPE_ID, type.getName());
+        assertEquals("getContext", ITmfEventType.DEFAULT_CONTEXT_ID, type.getContext());
+        assertEquals("getName", ITmfEventType.DEFAULT_TYPE_ID, type.getName());
         assertNull("getRootField", type.getRootField());
         assertEquals("getFieldNames", 0, type.getFieldNames().length);
         assertNull("getFieldName", type.getFieldName(0));
@@ -88,8 +88,9 @@ public class TmfEventTypeTest extends TestCase {
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels0), type0.getRootField());
         final String[] labels0 = type0.getFieldNames();
         assertEquals("getFieldNames length", fLabels0.length, labels0.length);
-        for (int i = 0; i < labels0.length; i++)
+        for (int i = 0; i < labels0.length; i++) {
             assertEquals("getFieldNames", fLabels0[i], labels0[i]);
+        }
         assertNull("getFieldName", type0.getFieldName(labels0.length));
 
         final ITmfEventType type1 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
@@ -98,8 +99,9 @@ public class TmfEventTypeTest extends TestCase {
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), type1.getRootField());
         final String[] labels1 = type1.getFieldNames();
         assertEquals("getFieldNames length", fLabels1.length, labels1.length);
-        for (int i = 0; i < labels1.length; i++)
+        for (int i = 0; i < labels1.length; i++) {
             assertEquals("getFieldNames", fLabels1[i], labels1[i]);
+        }
         assertNull("getFieldName", type1.getFieldName(labels1.length));
 
         final ITmfEventType type2 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels2));
@@ -108,8 +110,9 @@ public class TmfEventTypeTest extends TestCase {
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels2), type2.getRootField());
         final String[] labels2 = type2.getFieldNames();
         assertEquals("getFieldNames length", fLabels2.length, labels2.length);
-        for (int i = 0; i < labels2.length; i++)
+        for (int i = 0; i < labels2.length; i++) {
             assertEquals("getFieldNames", fLabels2[i], labels2[i]);
+        }
         assertNull("getFieldName", type2.getFieldName(labels2.length));
     }
 
@@ -136,8 +139,9 @@ public class TmfEventTypeTest extends TestCase {
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), copy.getRootField());
         final String[] labels1 = copy.getFieldNames();
         assertEquals("getFieldNames length", fLabels1.length, labels1.length);
-        for (int i = 0; i < labels1.length; i++)
+        for (int i = 0; i < labels1.length; i++) {
             assertEquals("getFieldNames", fLabels1[i], labels1[i]);
+        }
         assertNull("getFieldName", copy.getFieldName(labels1.length));
     }
 
@@ -265,8 +269,8 @@ public class TmfEventTypeTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testToString() {
-        final String expected1 = "TmfEventType [fContext=" + TmfEventType.DEFAULT_CONTEXT_ID +
-                ", fTypeId=" + TmfEventType.DEFAULT_TYPE_ID + "]";
+        final String expected1 = "TmfEventType [fContext=" + ITmfEventType.DEFAULT_CONTEXT_ID +
+                ", fTypeId=" + ITmfEventType.DEFAULT_TYPE_ID + "]";
         final TmfEventType type1 = new TmfEventType();
         assertEquals("toString", expected1, type1.toString());
 

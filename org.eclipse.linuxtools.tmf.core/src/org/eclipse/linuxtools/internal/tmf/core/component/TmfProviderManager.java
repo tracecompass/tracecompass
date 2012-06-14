@@ -43,9 +43,9 @@ public class TmfProviderManager {
 
 	/**
 	 * Registers [provider] as a provider of [eventType]
-	 * 
-	 * @param eventType
-	 * @param provider
+	 *
+	 * @param eventType The event type
+	 * @param provider The data provider
 	 */
 	public static <T extends ITmfEvent> void register(Class<T> eventType, TmfDataProvider<? extends ITmfEvent> provider) {
 		if (fProviders.get(eventType) == null)
@@ -55,9 +55,9 @@ public class TmfProviderManager {
 
 	/**
 	 * Re-registers [provider] as a provider of [eventType]
-	 * 
-	 * @param eventType
-	 * @param provider
+	 *
+	 * @param eventType The event type
+	 * @param provider The data provider
 	 */
 	public static <T extends ITmfEvent> void deregister(Class<T> eventType, TmfDataProvider<? extends ITmfEvent> provider) {
 		List<TmfDataProvider<? extends ITmfEvent>> list = fProviders.get(eventType);
@@ -70,8 +70,8 @@ public class TmfProviderManager {
 
 	/**
 	 * Returns the list of components that provide [eventType]
-	 * 
-	 * @param eventType
+	 *
+	 * @param eventType The event type
 	 * @return the list of components that provide [eventType]
 	 */
 	@SuppressWarnings("unchecked")
@@ -85,9 +85,9 @@ public class TmfProviderManager {
 
 	/**
 	 * Returns the list of components of type [providerType] that provide [eventType]
-	 * 
-	 * @param eventType
-	 * @param providerType
+	 *
+	 * @param eventType The event type
+	 * @param providerType The data provider
      * @return the list of components of type [providerType] that provide [eventType]
 	 */
 	@SuppressWarnings("unchecked")

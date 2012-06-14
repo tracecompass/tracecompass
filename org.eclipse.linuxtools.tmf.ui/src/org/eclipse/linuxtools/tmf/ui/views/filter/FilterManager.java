@@ -71,8 +71,6 @@ public class FilterManager {
 		try {
 	        TmfFilterXMLWriter writerXML = new TmfFilterXMLWriter(fRoot);
 	        writerXML.saveTree(SAVED_FILTERS_PATH_NAME);
-        } catch (IOException e) {
-            Activator.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         } catch (ParserConfigurationException e) {
             Activator.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         }

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -14,11 +14,11 @@ package org.eclipse.linuxtools.tmf.core.event;
 
 /**
  * A simplified timestamp where scale and precision are set to 0.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfSimpleTimestamp extends TmfTimestamp implements Cloneable {
+public class TmfSimpleTimestamp extends TmfTimestamp {
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -42,7 +42,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp implements Cloneable {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param timestamp the timestamp to copy
      */
     public TmfSimpleTimestamp(final ITmfTimestamp timestamp) {

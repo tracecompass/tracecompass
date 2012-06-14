@@ -13,8 +13,8 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 /**
  * A basic implementation of ITmfEvent.
@@ -54,7 +54,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
      * event rank is set to TmfContext.UNKNOWN_RANK.
      */
     public TmfEvent() {
-        this(null, TmfContext.UNKNOWN_RANK, null, null, null, null, null);
+        this(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
     }
 
     /**
@@ -71,7 +71,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
     public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final ITmfTimestamp timestamp, final String source,
             final ITmfEventType type, final ITmfEventField content, final String reference)
     {
-        this(trace, TmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
+        this(trace, ITmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
     }
 
     /**

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Godin (copelnug@gmail.com)        - Initial design and implementation
  *   Mathieu Denis  (mathieu.denis@polymtl.ca)  - Correction and refactoring
@@ -21,7 +21,7 @@ import java.util.RandomAccess;
 
 /**
  * <h4>Allow to create a List object that contain an already existing array.</h4>
- * <p>Works like {@link java.util.Arrays#asList} but offers more functions : 
+ * <p>Works like {@link java.util.Arrays#asList} but offers more functions :
  * <ul>
  *  <li>{@link #hashCode()}</li>
  *  <li>{@link #equals(Object)}</li>
@@ -84,7 +84,7 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      * @param array Array to use. WILL NOT BE COPIED.
      */
     public TmfFixedArray(final T... array) {
-        fArray = array; 
+        fArray = array;
     }
     /**
      * Append a FixedArray to this FixedArray.
@@ -103,8 +103,9 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      */
     public TmfFixedArray<T> append(final TmfFixedArray<T>... values) {
         int newLength = 0;
-        for(TmfFixedArray<T> value : values)
+        for(TmfFixedArray<T> value : values) {
             newLength += value.size();
+        }
                 TmfFixedArray<T> result = new TmfFixedArray<T>(copyOf(fArray, fArray.length + newLength));
         newLength = fArray.length;
         for(TmfFixedArray<T> value : values)
@@ -131,8 +132,9 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      */
     public TmfFixedArray<T> append(final T... values) {
         TmfFixedArray<T> result = new TmfFixedArray<T>(copyOf(fArray, fArray.length + values.length));
-        for(int i = 0; i < values.length; ++i)
+        for(int i = 0; i < values.length; ++i) {
             result.set(fArray.length + i, values[i]);
+        }
         return result;
     }
     /*
@@ -150,13 +152,17 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      */
     @Override
     public boolean equals(Object o) {
-        if(o instanceof TmfFixedArray<?>)
+        if(o instanceof TmfFixedArray<?>) {
             return Arrays.equals(fArray, ((TmfFixedArray<?>)o).fArray);
-        if(!(o instanceof List))
+        }
+        if(!(o instanceof List)) {
             return false;
-        for(int i = 0; i < fArray.length; ++i)
-            if(!fArray[i].equals((List<?>)o))
+        }
+        for(int i = 0; i < fArray.length; ++i) {
+            if(!fArray[i].equals(o)) {
                 return false;
+            }
+        }
         return true;
     }
     /*
@@ -235,11 +241,13 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
     @SuppressWarnings("unchecked")
     public <E> E[] toArray(E[] array)
     {
-        if(array.length < fArray.length)
+        if(array.length < fArray.length) {
             return copyOf(fArray, fArray.length,(Class<? extends E[]>)array.getClass());
+        }
         System.arraycopy(fArray, 0, array, 0, fArray.length);
-        if(array.length > fArray.length)
+        if(array.length > fArray.length) {
             array[fArray.length] = null;
+        }
         return array;
     }
     /*

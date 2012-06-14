@@ -264,7 +264,6 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
      * sub-classes.
      * @throws TmfTraceException
      */
-    @SuppressWarnings({ "static-method" })
     protected void buildStateSystem() throws TmfTraceException {
         /*
          * Nothing is done in the basic implementation, please specify

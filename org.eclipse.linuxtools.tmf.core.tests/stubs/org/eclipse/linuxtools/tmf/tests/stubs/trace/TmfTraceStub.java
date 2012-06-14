@@ -234,8 +234,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
                     }
                     final TmfContext context = new TmfContext(getCurrentLocation(), rank);
                     return context;
-                } else {
-                    
                 }
             } catch (final IOException e) {
                 e.printStackTrace();
@@ -316,7 +314,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     }
 
     @Override
-    public void setNbEvents(final long nbEvents) {
+    public synchronized void setNbEvents(final long nbEvents) {
         super.setNbEvents(nbEvents);
     }
 
@@ -341,7 +339,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     }
 
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
         fLock.lock();
         try {
             if (fTrace != null) {

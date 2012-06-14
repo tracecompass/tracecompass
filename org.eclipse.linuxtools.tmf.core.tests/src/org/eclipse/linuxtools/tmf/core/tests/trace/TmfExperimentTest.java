@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adjusted for new Trace Model
@@ -30,6 +30,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -184,7 +185,7 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testSeekBadLocation() throws Exception {
-        ITmfContext context = fExperiment.seekEvent((ITmfLocation<?>) new TmfLocation<Long>(0L));
+        ITmfContext context = fExperiment.seekEvent(new TmfLocation<Long>(0L));
         assertNull("seekEvent", context);
     }
 
@@ -215,21 +216,21 @@ public class TmfExperimentTest extends TestCase {
         event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", midTrace + 1, event.getTimestamp().getValue());
         assertEquals("Context rank", midTrace, context.getRank());
-        
+
         // Last event
         context = fExperiment.seekEvent(1.0);
         assertEquals("Context rank", NB_EVENTS, context.getRank());
         event = fExperiment.parseEvent(context);
         assertNull("Event timestamp", event);
         assertEquals("Context rank", NB_EVENTS, context.getRank());
-        
+
         // Beyond last event
         context = fExperiment.seekEvent(1.1);
         assertEquals("Context rank", NB_EVENTS, context.getRank());
         event = fExperiment.parseEvent(context);
         assertNull("Event timestamp", event);
         assertEquals("Context rank", NB_EVENTS, context.getRank());
-        
+
         // Negative ratio
         context = fExperiment.seekEvent(-0.5);
         assertEquals("Context rank", 0, context.getRank());
@@ -457,7 +458,7 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testSeekLocationOnCacheBoundary() throws Exception {
-        
+
         long cacheSize = fExperiment.getCacheSize();
 
         // Position trace at event rank 0
@@ -615,7 +616,7 @@ public class TmfExperimentTest extends TestCase {
 
     public void testProcessRequestForAllEvents() throws Exception {
 
-        final int nbEvents  = TmfEventRequest.ALL_DATA;
+        final int nbEvents  = TmfDataRequest.ALL_DATA;
         final int blockSize =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         final long nbExpectedEvents = NB_EVENTS;

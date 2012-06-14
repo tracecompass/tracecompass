@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * Francois Chouinard - Initial API and implementation
  * Francois Chouinard - Updated as per TMF Trace Model 1.0
@@ -25,13 +25,13 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  * <p>
  * It is the responsibility of the user the individual trace locations are valid
  * and that they are matched to the correct trace.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  * @see TmfLocationArray
  */
-public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> implements Cloneable {
+public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -39,7 +39,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> impleme
 
     /**
      * The standard constructor
-     * 
+     *
      * @param locations the set of trace locations
      */
     public TmfExperimentLocation(TmfLocationArray locations) {
@@ -48,7 +48,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> impleme
 
     /**
      * The copy constructor
-     * 
+     *
      * @param location the other experiment location
      */
     public TmfExperimentLocation(TmfExperimentLocation location) {
@@ -65,7 +65,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> impleme
     @Override
     public TmfExperimentLocation clone() {
 //        super.clone(); // To keep FindBugs happy
-        TmfLocationArray array = (TmfLocationArray) getLocation();
+        TmfLocationArray array = getLocation();
         TmfLocationArray clones = array.clone();
         return new TmfExperimentLocation(clones);
     }
@@ -81,7 +81,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> impleme
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        ITmfLocation<? extends Comparable<?>>[] locations = ((TmfLocationArray) getLocation()).getLocations();
+        ITmfLocation<? extends Comparable<?>>[] locations = getLocation().getLocations();
         for (ITmfLocation<?> location : locations) {
             result.append("[" + location + "]");
         }

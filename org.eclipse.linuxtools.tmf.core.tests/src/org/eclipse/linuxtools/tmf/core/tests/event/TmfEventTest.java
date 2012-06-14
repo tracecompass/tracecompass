@@ -32,8 +32,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
@@ -48,7 +48,7 @@ public class TmfEventTest extends TestCase {
 
     private final String fSource = "Source";
 
-    private final String fContext = TmfEventType.DEFAULT_CONTEXT_ID;
+    private final String fContext = ITmfEventType.DEFAULT_CONTEXT_ID;
     private final String fTypeId = "TestType";
     private final String fLabel1 = "AString";
     private final String fLabel2 = "AnInteger";
@@ -104,7 +104,7 @@ public class TmfEventTest extends TestCase {
     // Helper functions
     // ------------------------------------------------------------------------
 
-    private TmfTraceStub openTrace() {
+    private static TmfTraceStub openTrace() {
         final String DIRECTORY = "testfiles";
         final String TEST_STREAM = "A-Test-10K";
         final String path = DIRECTORY + File.separator + TEST_STREAM;
@@ -131,7 +131,7 @@ public class TmfEventTest extends TestCase {
     public void testDefaultConstructor() {
         final ITmfEvent event = new TmfEvent();
         assertNull("getTrace", event.getTrace());
-        assertEquals("getRank", TmfContext.UNKNOWN_RANK, event.getRank());
+        assertEquals("getRank", ITmfContext.UNKNOWN_RANK, event.getRank());
         assertNull("getTimestamp", event.getTimestamp());
         assertNull("getSource", event.getSource());
         assertNull("getType", event.getType());
@@ -160,7 +160,7 @@ public class TmfEventTest extends TestCase {
     public void testNoRankConstructor() {
         final TmfEvent event = new TmfEvent(null, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertNull("getTrace", event.getTrace());
-        assertEquals("getRank", TmfContext.UNKNOWN_RANK, event.getRank());
+        assertEquals("getRank", ITmfContext.UNKNOWN_RANK, event.getRank());
         assertEquals("getTimestamp", fTimestamp1, event.getTimestamp());
         assertEquals("getSource", fSource, event.getSource());
         assertEquals("getType", fType, event.getType());

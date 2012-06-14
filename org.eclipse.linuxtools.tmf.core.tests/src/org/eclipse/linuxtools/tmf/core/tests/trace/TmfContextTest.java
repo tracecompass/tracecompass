@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adapted for TMF Trace Model 1.0
@@ -75,7 +75,7 @@ public class TmfContextTest extends TestCase {
     public void testTmfContextDefault() {
         final TmfContext context = new TmfContext();
         assertEquals("getLocation", null, context.getLocation());
-        assertEquals("getRank", TmfContext.UNKNOWN_RANK, context.getRank());
+        assertEquals("getRank", ITmfContext.UNKNOWN_RANK, context.getRank());
     }
 
     public void testTmfContextNoRank() {
@@ -87,9 +87,9 @@ public class TmfContextTest extends TestCase {
         assertEquals("getLocation", fLocation2, context2.getLocation());
         assertEquals("getLocation", fLocation3, context3.getLocation());
 
-        assertEquals("getRank", TmfContext.UNKNOWN_RANK, context1.getRank());
-        assertEquals("getRank", TmfContext.UNKNOWN_RANK, context2.getRank());
-        assertEquals("getRank", TmfContext.UNKNOWN_RANK, context3.getRank());
+        assertEquals("getRank", ITmfContext.UNKNOWN_RANK, context1.getRank());
+        assertEquals("getRank", ITmfContext.UNKNOWN_RANK, context2.getRank());
+        assertEquals("getRank", ITmfContext.UNKNOWN_RANK, context3.getRank());
     }
 
     public void testTmfContext() {

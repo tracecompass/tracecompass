@@ -88,7 +88,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      * @param type
      * @param id
      * @param traces
-     * @throws TmfTraceException 
+     * @throws TmfTraceException
      */
     public TmfExperiment(final Class<T> type, final String id, final ITmfTrace<T>[] traces) {
         this(type, id, traces, DEFAULT_INDEX_PAGE_SIZE);
@@ -99,7 +99,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      * @param id
      * @param traces
      * @param indexPageSize
-     * @throws TmfTraceException 
+     * @throws TmfTraceException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public TmfExperiment(final Class<T> type, final String path, final ITmfTrace<T>[] traces, final int indexPageSize) {
@@ -137,8 +137,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         }
 
         if (fTraces != null) {
-            for (final ITmfTrace trace : fTraces)
+            for (final ITmfTrace trace : fTraces) {
                 trace.dispose();
+            }
             fTraces = null;
         }
         super.dispose();
@@ -169,7 +170,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Selects the current, framework-wide, experiment
-     * 
+     *
      * @param experiment das experiment
      */
     public static void setCurrentExperiment(final TmfExperiment<?> experiment) {
@@ -188,7 +189,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Get the list of traces. Handle with care...
-     * 
+     *
      * @return the experiment traces
      */
     public ITmfTrace<T>[] getTraces() {
@@ -198,7 +199,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     /**
      * Returns the timestamp of the event at the requested index. If none,
      * returns null.
-     * 
+     *
      * @param index the event index (rank)
      * @return the corresponding event timestamp
      */
@@ -210,7 +211,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Set the file to be used for bookmarks on this experiment
-     * 
+     *
      * @param file the bookmarks file
      */
     public void setBookmarksFile(final IFile file) {
@@ -219,7 +220,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Get the file used for bookmarks on this experiment
-     * 
+     *
      * @return the bookmarks file or null if none is set
      */
     public IFile getBookmarksFile() {
@@ -235,12 +236,12 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     @Override
     protected synchronized ITmfContext armRequest(final ITmfDataRequest<T> request) {
-        
+
         // Make sure we have something to read from
         if (fTraces == null) {
             return null;
         }
-        
+
         if (request instanceof ITmfEventRequest<?>
             && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime())
             && request.getIndex() == 0)
@@ -265,19 +266,19 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#seekEvent(long)
-     * 
+     *
      * TmfTrace.seekEvent(rank) will return a context that will position the
      * trace to read the event at rank 'rank' in the trace. In the case of an
      * experiment context, that event has to be actually read in the fEvents
      * buffer and the corresponding trace context has to point to the next
      * event (rank + 1) in the trace (the sum of the traces contexts ranks
      * should equal [exp context rank + #traces] (corner cases not considered).
-     * 
+     *
      * In the likely case that TmfTrace.seekEvent() computed the context
      * by using a read loop (reading from the experiment), the 'lastTraceRead'
      * field will be set to the actual trace that needs to be read to obtain
      * event at rank 'rank'.
-     * 
+     *
      * Therefore, if 'lastTraceRead' is set, we need to read that particular
      * trace *and* then decrease the context rank (which has to correspond to
      * the rank of the event to be returned next by TmfExperiemnt.getNext().
@@ -296,9 +297,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /* (non-Javadoc)
      *
-     * Returns a brand new context based on the location provided and 
+     * Returns a brand new context based on the location provided and
      * initializes the event queues
-     * 
+     *
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfLocation)
      */
     @Override
@@ -314,7 +315,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
         // Instantiate the location
         final TmfExperimentLocation expLocation = (location == null)
-                ? new TmfExperimentLocation(new TmfLocationArray(new ITmfLocation<?>[fTraces.length])) 
+                ? new TmfExperimentLocation(new TmfLocationArray(new ITmfLocation<?>[fTraces.length]))
                 : (TmfExperimentLocation) location.clone();
 
         // Create and populate the context's traces contexts
@@ -334,7 +335,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         context.setRank(ITmfContext.UNKNOWN_RANK);
 
         fExperimentContext = context;
-        return (ITmfContext) context;
+        return context;
     }
 
     // ------------------------------------------------------------------------
@@ -454,7 +455,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     @Override
     @SuppressWarnings("nls")
-    public String toString() {
+    public synchronized String toString() {
         return "[TmfExperiment (" + getName() + ")]";
     }
 
@@ -472,8 +473,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         if (getStreamingInterval() == 0) {
             final ITmfContext context = seekEvent(0);
             final ITmfEvent event = getNext(context);
-            if (event == null)
+            if (event == null) {
                 return;
+            }
             final TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp().clone(), TmfTimestamp.BIG_CRUNCH);
             final TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(this, this, timeRange);
 
@@ -498,15 +500,18 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
                         ITmfTimestamp startTimestamp = TmfTimestamp.BIG_CRUNCH;
                         ITmfTimestamp endTimestamp = TmfTimestamp.BIG_BANG;
                         for (final ITmfTrace<T> trace : fTraces) {
-                            if (trace.getStartTime().compareTo(startTimestamp) < 0)
+                            if (trace.getStartTime().compareTo(startTimestamp) < 0) {
                                 startTimestamp = trace.getStartTime();
-                            if (trace.getStreamingInterval() != 0 && trace.getEndTime().compareTo(endTimestamp) > 0)
+                            }
+                            if (trace.getStreamingInterval() != 0 && trace.getEndTime().compareTo(endTimestamp) > 0) {
                                 endTimestamp = trace.getEndTime();
+                            }
                         }
-                        if (safeTimestamp != null && safeTimestamp.compareTo(getTimeRange().getEndTime(), false) > 0)
+                        if (safeTimestamp != null && safeTimestamp.compareTo(getTimeRange().getEndTime(), false) > 0) {
                             timeRange = new TmfTimeRange(startTimestamp, safeTimestamp);
-                        else
+                        } else {
                             timeRange = null;
+                        }
                         safeTimestamp = endTimestamp;
                         if (timeRange != null) {
                             final TmfExperimentRangeUpdatedSignal signal =
@@ -531,8 +536,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     @Override
     public long getStreamingInterval() {
         long interval = 0;
-        for (final ITmfTrace<T> trace : fTraces)
+        for (final ITmfTrace<T> trace : fTraces) {
             interval = Math.max(interval, trace.getStreamingInterval());
+        }
         return interval;
     }
 
@@ -544,7 +550,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Signal handler for the TmfExperimentSelectedSignal signal
-     * 
+     *
      * @param signal
      */
     @TmfSignalHandler
@@ -558,7 +564,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Signal handler for the TmfEndSynchSignal signal
-     * 
+     *
      * @param signal
      */
     @TmfSignalHandler
@@ -571,7 +577,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Signal handler for the TmfTraceUpdatedSignal signal
-     * 
+     *
      * @param signal
      */
     @TmfSignalHandler
@@ -583,7 +589,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
     /**
      * Signal handler for the TmfExperimentRangeUpdatedSignal signal
-     * 
+     *
      * @param signal
      */
     @TmfSignalHandler

@@ -32,7 +32,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
  * The last trace refers to the trace from which the last event was "consumed"
  * at the experiment level.
  */
-public class TmfExperimentContext extends TmfContext implements Cloneable {
+public class TmfExperimentContext extends TmfContext {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -65,15 +65,16 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
         final ITmfLocation<?>[] locations = new ITmfLocation[fContexts.length];
 
         setLocation(new TmfExperimentLocation(new TmfLocationArray(locations.clone())));
-        
+
         final long[] ranks = new long[fContexts.length];
         long rank = 0;
-        for (int i = 0; i < fContexts.length; i++)
+        for (int i = 0; i < fContexts.length; i++) {
             if (contexts[i] != null) {
                 locations[i] = contexts[i].getLocation();
                 ranks[i] = contexts[i].getRank();
                 rank += contexts[i].getRank();
             }
+        }
 
 //        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations)));
         setRank(rank);
@@ -86,8 +87,9 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
     public TmfExperimentContext(final TmfExperimentContext other) {
         this(other.cloneContexts());
         fEvents = other.fEvents;
-        if (other.getLocation() != null)
+        if (other.getLocation() != null) {
             setLocation(other.getLocation().clone());
+        }
         setRank(other.getRank());
         setLastTrace(other.fLastTraceRead);
     }
@@ -107,15 +109,17 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
 
     private ITmfContext[] cloneContexts() {
         final ITmfContext[] contexts = new ITmfContext[fContexts.length];
-        for (int i = 0; i < fContexts.length; i++)
+        for (int i = 0; i < fContexts.length; i++) {
             contexts[i] = (fContexts[i] != null) ? fContexts[i].clone() : null;
+        }
         return contexts;
     }
 
     private ITmfEvent[] cloneEvents() {
         final ITmfEvent[] events = new ITmfEvent[fEvents.length];
-        for (int i = 0; i < fEvents.length; i++)
+        for (int i = 0; i < fEvents.length; i++) {
             events[i] = (fEvents[i] != null) ? fEvents[i].clone() : null;
+        }
         return events;
     }
 
@@ -154,12 +158,15 @@ public class TmfExperimentContext extends TmfContext implements Cloneable {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other)
+        if (this == other) {
             return true;
-        if (!super.equals(other))
+        }
+        if (!super.equals(other)) {
             return false;
-        if (!(other instanceof TmfExperimentContext))
+        }
+        if (!(other instanceof TmfExperimentContext)) {
             return false;
+        }
         final TmfExperimentContext o = (TmfExperimentContext) other;
         boolean isEqual = true;
         int i = 0;

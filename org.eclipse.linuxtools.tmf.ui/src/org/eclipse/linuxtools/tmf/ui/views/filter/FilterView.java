@@ -264,8 +264,6 @@ public class FilterView extends TmfView {
 
 			} catch (ParserConfigurationException e) {
 			    Activator.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
-			} catch (IOException e) {
-			    Activator.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
 			}
 		}
 	}

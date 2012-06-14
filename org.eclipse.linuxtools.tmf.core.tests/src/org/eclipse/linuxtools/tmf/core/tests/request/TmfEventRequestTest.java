@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -35,7 +35,7 @@ public class TmfEventRequestTest extends TestCase {
 
 	private static TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.ETERNITY);
 	private static TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
-	
+
 	private static TmfEventRequest<TmfEvent> fRequest1;
 	private static TmfEventRequest<TmfEvent> fRequest1b;
 	private static TmfEventRequest<TmfEvent> fRequest1c;
@@ -44,7 +44,7 @@ public class TmfEventRequestTest extends TestCase {
 	private static TmfEventRequest<TmfEvent> fRequest4;
 
 	private static int fRequestCount;
-	
+
 	// ------------------------------------------------------------------------
 	// Housekeeping
 	// ------------------------------------------------------------------------
@@ -71,8 +71,8 @@ public class TmfEventRequestTest extends TestCase {
 		super.tearDown();
 	}
 
-	private TmfEventRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
-		
+	private static TmfEventRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
+
 		TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, new TmfTimeRange(TmfTimeRange.ETERNITY), 100, 200) {
 		    @Override
 			public void handleCompleted() {
@@ -97,7 +97,7 @@ public class TmfEventRequestTest extends TestCase {
 		};
 		return request;
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
@@ -202,13 +202,13 @@ public class TmfEventRequestTest extends TestCase {
         assertFalse("equals", fRequest3.equals(fRequest1));
         assertFalse("equals", fRequest3.equals(fRequest2));
 	}
-	
+
 	public void testEqualsTransivity() throws Exception {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1c));
         assertTrue("equals", fRequest1.equals(fRequest1c));
 	}
-	
+
 	public void testEqualsNull() throws Exception {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));
@@ -223,7 +223,7 @@ public class TmfEventRequestTest extends TestCase {
         assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
 		assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
@@ -245,7 +245,7 @@ public class TmfEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testDone() {
-		
+
 		final boolean[] flags = new boolean[4];
 		TmfEventRequest<TmfEvent> request = setupTestRequest(flags);
 		request.done();
@@ -265,7 +265,7 @@ public class TmfEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testFail() {
-		
+
 		final boolean[] flags = new boolean[4];
 		TmfEventRequest<TmfEvent> request = setupTestRequest(flags);
 		request.fail();

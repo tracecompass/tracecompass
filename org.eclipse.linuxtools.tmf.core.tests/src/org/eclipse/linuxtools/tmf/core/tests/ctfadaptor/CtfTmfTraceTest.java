@@ -71,7 +71,7 @@ public class CtfTmfTraceTest {
      * @return
      * @throws TmfTraceException
      */
-    private CtfTmfTrace initTrace() throws TmfTraceException {
+    private static CtfTmfTrace initTrace() throws TmfTraceException {
         CtfTmfTrace fixture = new CtfTmfTrace();
         fixture.initTrace((IResource) null, PATH, CtfTmfEvent.class);
         return fixture;
