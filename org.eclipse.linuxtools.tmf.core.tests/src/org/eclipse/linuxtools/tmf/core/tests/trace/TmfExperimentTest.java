@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentLocation;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
@@ -160,12 +161,14 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testGetTimestamp() throws Exception {
-        assertTrue("getTimestamp", fExperiment.getTimestamp(    0).equals(new TmfTimestamp(   1, (byte) -3)));
-        assertTrue("getTimestamp", fExperiment.getTimestamp(   10).equals(new TmfTimestamp(  11, (byte) -3)));
-        assertTrue("getTimestamp", fExperiment.getTimestamp(  100).equals(new TmfTimestamp( 101, (byte) -3)));
-        assertTrue("getTimestamp", fExperiment.getTimestamp( 1000).equals(new TmfTimestamp(1001, (byte) -3)));
-        assertTrue("getTimestamp", fExperiment.getTimestamp( 2000).equals(new TmfTimestamp(2001, (byte) -3)));
-        assertTrue("getTimestamp", fExperiment.getTimestamp( 2500).equals(new TmfTimestamp(2501, (byte) -3)));
+        assertEquals("getTimestamp", new TmfTimestamp(    1, (byte) -3), fExperiment.getTimestamp(   0));
+        assertEquals("getTimestamp", new TmfTimestamp(    2, (byte) -3), fExperiment.getTimestamp(   1));
+        assertEquals("getTimestamp", new TmfTimestamp(   11, (byte) -3), fExperiment.getTimestamp(  10));
+        assertEquals("getTimestamp", new TmfTimestamp(  101, (byte) -3), fExperiment.getTimestamp( 100));
+        assertEquals("getTimestamp", new TmfTimestamp( 1001, (byte) -3), fExperiment.getTimestamp(1000));
+        assertEquals("getTimestamp", new TmfTimestamp( 2001, (byte) -3), fExperiment.getTimestamp(2000));
+        assertEquals("getTimestamp", new TmfTimestamp( 2501, (byte) -3), fExperiment.getTimestamp(2500));
+        assertEquals("getTimestamp", new TmfTimestamp(10000, (byte) -3), fExperiment.getTimestamp(9999));
         assertNull("getTimestamp", fExperiment.getTimestamp(10000));
     }
 
@@ -264,7 +267,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("getLocationRatio", ratio, ratio2);
     }
 
-//    @SuppressWarnings({ "unchecked", "rawtypes" })
+//    @SuppressWarnings("rawtypes")
 //    public void testGetCurrentLocation() throws Exception {
 //        ITmfContext context = fExperiment.seekEvent((ITmfLocation) null);
 //        ITmfLocation location = fExperiment.getCurrentLocation();
@@ -538,22 +541,280 @@ public class TmfExperimentTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // readtNextEvent - updates the context
+    // getNext - updates the context
     // ------------------------------------------------------------------------
 
-    public void testReadNextEvent() throws Exception {
+    private void validateContextRanks(ITmfContext context) {
+        assertTrue("Experiment context type", context instanceof TmfExperimentContext);
+        TmfExperimentContext ctx = (TmfExperimentContext) context;
 
-        // On lower bound, returns the first event (ts = 0)
-        final ITmfContext context = fExperiment.seekEvent(0);
-        ITmfEvent event = fExperiment.getNext(context);
-        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        int nbTraces = ctx.getContexts().length;
 
-        for (int i = 2; i < 20; i++) {
-            event = fExperiment.getNext(context);
-            assertEquals("Event timestamp", i, event.getTimestamp().getValue());
+        // expRank = sum(trace ranks) - nbTraces + 1 (if lastTraceRead != NO_TRACE)
+        long expRank = -nbTraces + ((ctx.getLastTrace() != TmfExperimentContext.NO_TRACE) ? 1 : 0);
+        for (int i = 0; i < nbTraces; i++) {
+            long rank = ctx.getContexts()[i].getRank();
+            if (rank == -1) {
+                expRank = -1;
+                break;
+            }
+            expRank += rank;
         }
+        assertEquals("Experiment context rank", expRank, ctx.getRank());
     }
 
+    public void testGetNextAfteSeekingOnTS_1() throws Exception {
+
+        final long INITIAL_TS = 1;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (ts = 1)
+        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE, 0));
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_TS + i, event.getTimestamp().getValue());
+            assertEquals("Event rank", INITIAL_TS + i, context.getRank());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_TS + NB_READS, event.getTimestamp().getValue());
+        assertEquals("Event rank", INITIAL_TS + NB_READS - 1, context.getRank());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfteSeekingOnTS_2() throws Exception {
+
+        final long INITIAL_TS = 2;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (ts = 2)
+        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE, 0));
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_TS + i, event.getTimestamp().getValue());
+            assertEquals("Event rank", INITIAL_TS + i, context.getRank());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_TS + NB_READS, event.getTimestamp().getValue());
+        assertEquals("Event rank", INITIAL_TS + NB_READS - 1, context.getRank());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfteSeekingOnTS_3() throws Exception {
+
+        final long INITIAL_TS = 500;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (ts = 500)
+        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE, 0));
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_TS + i, event.getTimestamp().getValue());
+            assertEquals("Event rank", INITIAL_TS + i, context.getRank());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_TS + NB_READS, event.getTimestamp().getValue());
+        assertEquals("Event rank", INITIAL_TS + NB_READS - 1, context.getRank());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfterSeekingOnRank_1() throws Exception {
+
+        final long INITIAL_RANK = 0L;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (rank = 0)
+        final ITmfContext context = fExperiment.seekEvent(INITIAL_RANK);
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_RANK + i + 1, event.getTimestamp().getValue());
+            assertEquals("Event rank", INITIAL_RANK + i + 1, context.getRank());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_RANK + NB_READS + 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", INITIAL_RANK + NB_READS, context.getRank());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfterSeekingOnRank_2() throws Exception {
+
+        final long INITIAL_RANK = 1L;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (rank = 0)
+        final ITmfContext context = fExperiment.seekEvent(INITIAL_RANK);
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_RANK + i + 1, event.getTimestamp().getValue());
+            assertEquals("Event rank", INITIAL_RANK + i + 1, context.getRank());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_RANK + NB_READS + 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", INITIAL_RANK + NB_READS, context.getRank());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfterSeekingOnRank_3() throws Exception {
+
+        final long INITIAL_RANK = 500L;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (rank = 0)
+        final ITmfContext context = fExperiment.seekEvent(INITIAL_RANK);
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_RANK + i + 1, event.getTimestamp().getValue());
+            assertEquals("Event rank", INITIAL_RANK + i + 1, context.getRank());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_RANK + NB_READS + 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", INITIAL_RANK + NB_READS, context.getRank());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfterSeekingOnLocation_1() throws Exception {
+
+        final ITmfLocation<?> INITIAL_LOC = null;
+        final long INITIAL_TS = 1;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (ts = 1)
+        final ITmfContext context = fExperiment.seekEvent(INITIAL_LOC);
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_TS + i, event.getTimestamp().getValue());
+            assertEquals("Event rank", INITIAL_TS + i, context.getRank());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_TS + NB_READS, event.getTimestamp().getValue());
+        assertEquals("Event rank", INITIAL_TS + NB_READS - 1, context.getRank());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfterSeekingOnLocation_2() throws Exception {
+
+        final ITmfLocation<?> INITIAL_LOC = fExperiment.seekEvent(1L).getLocation();
+        final long INITIAL_TS = 2;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (ts = 2)
+        final ITmfContext context = fExperiment.seekEvent(INITIAL_LOC);
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_TS + i, event.getTimestamp().getValue());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_TS + NB_READS, event.getTimestamp().getValue());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextAfterSeekingOnLocation_3() throws Exception {
+
+        final ITmfLocation<?> INITIAL_LOC = fExperiment.seekEvent(500L).getLocation();
+        final long INITIAL_TS = 501;
+        final int NB_READS = 20;
+
+        // On lower bound, returns the first event (ts = 501)
+        final ITmfContext context = fExperiment.seekEvent(INITIAL_LOC);
+
+        validateContextRanks(context);
+
+        // Read NB_EVENTS
+        ITmfEvent event;
+        for (int i = 0; i < NB_READS; i++) {
+            event = fExperiment.getNext(context);
+            assertEquals("Event timestamp", INITIAL_TS + i, event.getTimestamp().getValue());
+        }
+
+        // Make sure we stay positioned
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", INITIAL_TS + NB_READS, event.getTimestamp().getValue());
+
+        validateContextRanks(context);
+    }
+
+    public void testGetNextLocation() throws Exception {
+        ITmfContext context1 = fExperiment.seekEvent(0);
+        fExperiment.getNext(context1);
+        ITmfLocation<?> location = context1.getLocation().clone();
+        ITmfEvent event1 = fExperiment.getNext(context1);
+        ITmfContext context2 = fExperiment.seekEvent(location);
+        ITmfEvent event2 = fExperiment.getNext(context2);
+        assertEquals("Event timestamp", event1.getTimestamp().getValue(), event2.getTimestamp().getValue());
+    }
+
+    public void testGetNextEndLocation() throws Exception {
+        ITmfContext context1 = fExperiment.seekEvent(fExperiment.getNbEvents() - 1);
+        fExperiment.getNext(context1);
+        ITmfLocation<?> location = context1.getLocation().clone();
+        ITmfContext context2 = fExperiment.seekEvent(location);
+        ITmfEvent event = fExperiment.getNext(context2);
+        assertNull("Event", event);
+    }
+        
     // ------------------------------------------------------------------------
     // processRequest
     // ------------------------------------------------------------------------

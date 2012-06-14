@@ -482,7 +482,6 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
         ITmfEvent event = getNext(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
-//            getNext(context);
             context = nextEventContext.clone();
             event = getNext(nextEventContext);
         }
@@ -492,7 +491,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         }
         return context;
     }
-
+    
     // ------------------------------------------------------------------------
     // ITmfTrace - Read operations (returning an actual event)
     // ------------------------------------------------------------------------

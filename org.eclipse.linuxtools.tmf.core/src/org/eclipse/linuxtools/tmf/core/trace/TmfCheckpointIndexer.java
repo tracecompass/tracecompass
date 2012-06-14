@@ -247,7 +247,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             final long position = rank / fCheckpointInterval;
             // Add new entry at proper location (if empty)
             if (fTraceIndex.size() == position) {
-                fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), shrinkContext(context)));
+                fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), saveContext(context)));
             }
         }
     }
@@ -336,15 +336,15 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
     // Context conversion functions
     // ------------------------------------------------------------------------
 
-    private static ITmfContext shrinkContext(ITmfContext context) {
+    private static ITmfContext saveContext(ITmfContext context) {
         if (context instanceof TmfExperimentContext) {
-            return shrinkExpContext(context);
+            return saveExpContext(context);
         }
         TmfContext ctx = new TmfContext(context.getLocation().clone(), context.getRank());
         return ctx;
     }
 
-    private static ITmfContext shrinkExpContext(ITmfContext context) {
+    private static ITmfContext saveExpContext(ITmfContext context) {
         TmfExperimentContext expContext = (TmfExperimentContext) context;
         int size = expContext.getContexts().length;
         ITmfContext[] trcCtxts = new TmfContext[size];
@@ -392,4 +392,5 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         }
         return ctx;
     }
+
 }

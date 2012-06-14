@@ -150,18 +150,18 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#initTrace(org.eclipse.core.resources.IResource, java.lang.String, java.lang.Class)
+     */
+    @Override
+    public void initTrace(final IResource resource, final String path, final Class<T> type) {
+    }
+
+    /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
      */
     @Override
     public boolean validate(final IProject project, final String path) {
         return true;
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#initTrace(org.eclipse.core.resources.IResource, java.lang.String, java.lang.Class)
-     */
-    @Override
-    public void initTrace(final IResource resource, final String path, final Class<T> type) {
     }
 
     // ------------------------------------------------------------------------
@@ -265,37 +265,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#seekEvent(long)
-     *
-     * TmfTrace.seekEvent(rank) will return a context that will position the
-     * trace to read the event at rank 'rank' in the trace. In the case of an
-     * experiment context, that event has to be actually read in the fEvents
-     * buffer and the corresponding trace context has to point to the next
-     * event (rank + 1) in the trace (the sum of the traces contexts ranks
-     * should equal [exp context rank + #traces] (corner cases not considered).
-     *
-     * In the likely case that TmfTrace.seekEvent() computed the context
-     * by using a read loop (reading from the experiment), the 'lastTraceRead'
-     * field will be set to the actual trace that needs to be read to obtain
-     * event at rank 'rank'.
-     *
-     * Therefore, if 'lastTraceRead' is set, we need to read that particular
-     * trace *and* then decrease the context rank (which has to correspond to
-     * the rank of the event to be returned next by TmfExperiemnt.getNext().
-     */
-    @Override
-    public synchronized ITmfContext seekEvent(final long rank) {
-        TmfExperimentContext context = (TmfExperimentContext) super.seekEvent(rank);
-        int lastTrace = context.getLastTrace();
-        if (lastTrace != TmfExperimentContext.NO_TRACE) {
-            getNext(context);
-            context.setRank(rank);
-            context.setLastTrace(TmfExperimentContext.NO_TRACE);
-        }
-        return context;
-    }
-
-    /* (non-Javadoc)
      *
      * Returns a brand new context based on the location provided and
      * initializes the event queues
@@ -332,7 +301,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         // Finalize context
         context.setLocation(expLocation);
         context.setLastTrace(TmfExperimentContext.NO_TRACE);
-        context.setRank(ITmfContext.UNKNOWN_RANK);
+        context.setRank((location == null) ? 0 : ITmfContext.UNKNOWN_RANK);
 
         fExperimentContext = context;
         return context;
@@ -411,12 +380,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         final int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
             final ITmfContext traceContext = expContext.getContexts()[lastTrace];
-
-            TmfExperimentLocation location = (TmfExperimentLocation) expContext.getLocation();
-            if (location != null) {
-                location.getLocation().getLocations()[lastTrace] = traceContext.getLocation().clone();
-            }
-
             expContext.getEvents()[lastTrace] = fTraces[lastTrace].getNext(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
         }
@@ -442,7 +405,14 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
                 updateAttributes(expContext, event.getTimestamp());
                 expContext.increaseRank();
                 expContext.setLastTrace(trace);
-                fExperimentContext = expContext;
+                final ITmfContext traceContext = expContext.getContexts()[trace];
+
+                TmfExperimentLocation location = (TmfExperimentLocation) expContext.getLocation();
+                if (location != null) {
+                    location.getLocation().getLocations()[trace] = traceContext.getLocation().clone();
+                }
+
+                fExperimentContext = expContext.clone();
                 processEvent(event);
             }
         }
