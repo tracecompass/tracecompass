@@ -57,6 +57,7 @@ public class StreamInputReader {
 
     private CTFTraceReader parent;
 
+    @SuppressWarnings("unused")
     private final long prevIndex;
 
     // ------------------------------------------------------------------------
@@ -178,8 +179,8 @@ public class StreamInputReader {
                     .getCurrentPacket();
             if (prevPacket != null) {
                 goToNextPacket();
-                final StreamInputPacketIndexEntry currentPacket = this.packetReader
-                        .getCurrentPacket();
+//                final StreamInputPacketIndexEntry currentPacket = this.packetReader
+//                        .getCurrentPacket();
             }
         }
 
@@ -297,7 +298,7 @@ public class StreamInputReader {
          */
         final int len = this.streamInput.getIndex().getEntries().size();
 
-        StreamInputPacketIndexEntry entry = null;
+//        StreamInputPacketIndexEntry entry = null;
         /*
          * Go to beginning of trace.
          */

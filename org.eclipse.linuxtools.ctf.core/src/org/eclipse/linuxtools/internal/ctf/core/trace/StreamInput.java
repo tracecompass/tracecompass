@@ -13,10 +13,7 @@
 package org.eclipse.linuxtools.internal.ctf.core.trace;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
@@ -226,8 +223,8 @@ public class StreamInput implements IDefinitionScope {
             StructDefinition tracePacketHeaderDef,
             StructDefinition streamPacketContextDef, BitBuffer bitBuffer)
             throws CTFReaderException {
-        MappedByteBuffer bb = createPacketBitBuffer(fileSizeBytes,
-                packetOffsetBytes, packetIndex, bitBuffer);
+//        MappedByteBuffer bb = createPacketBitBuffer(fileSizeBytes,
+//                packetOffsetBytes, packetIndex, bitBuffer);
 
         /*
          * Read the trace packet header if it exists.
@@ -279,45 +276,45 @@ public class StreamInput implements IDefinitionScope {
                 + ((packetIndex.getPacketSizeBits() + 7) / 8);
     }
 
-    /**
-     * @param fileSizeBytes
-     * @param packetOffsetBytes
-     * @param packetIndex
-     * @param bitBuffer
-     * @return
-     * @throws CTFReaderException
-     */
-    private MappedByteBuffer createPacketBitBuffer(long fileSizeBytes,
-            long packetOffsetBytes, StreamInputPacketIndexEntry packetIndex,
-            BitBuffer bitBuffer) throws CTFReaderException {
-        /*
-         * Initial size, it should map at least the packet header + context
-         * size.
-         *
-         * TODO: use a less arbitrary size.
-         */
-        long mapSize = 4096;
-        /*
-         * If there is less data remaining than what we want to map, reduce the
-         * map size.
-         */
-        if ((fileSizeBytes - packetIndex.getOffsetBytes()) < mapSize) {
-            mapSize = fileSizeBytes - packetIndex.getOffsetBytes();
-        }
-
-        /*
-         * Map the packet.
-         */
-        MappedByteBuffer bb;
-
-        try {
-            bb = fileChannel.map(MapMode.READ_ONLY, packetOffsetBytes, mapSize);
-        } catch (IOException e) {
-            throw new CTFReaderException(e);
-        }
-        bitBuffer.setByteBuffer(bb);
-        return bb;
-    }
+//    /**
+//     * @param fileSizeBytes
+//     * @param packetOffsetBytes
+//     * @param packetIndex
+//     * @param bitBuffer
+//     * @return
+//     * @throws CTFReaderException
+//     */
+//    private MappedByteBuffer createPacketBitBuffer(long fileSizeBytes,
+//            long packetOffsetBytes, StreamInputPacketIndexEntry packetIndex,
+//            BitBuffer bitBuffer) throws CTFReaderException {
+//        /*
+//         * Initial size, it should map at least the packet header + context
+//         * size.
+//         *
+//         * TODO: use a less arbitrary size.
+//         */
+//        long mapSize = 4096;
+//        /*
+//         * If there is less data remaining than what we want to map, reduce the
+//         * map size.
+//         */
+//        if ((fileSizeBytes - packetIndex.getOffsetBytes()) < mapSize) {
+//            mapSize = fileSizeBytes - packetIndex.getOffsetBytes();
+//        }
+//
+//        /*
+//         * Map the packet.
+//         */
+//        MappedByteBuffer bb;
+//
+//        try {
+//            bb = fileChannel.map(MapMode.READ_ONLY, packetOffsetBytes, mapSize);
+//        } catch (IOException e) {
+//            throw new CTFReaderException(e);
+//        }
+//        bitBuffer.setByteBuffer(bb);
+//        return bb;
+//    }
 
     private void parseTracePacketHeader(StructDefinition tracePacketHeaderDef,
             BitBuffer bitBuffer) throws CTFReaderException {

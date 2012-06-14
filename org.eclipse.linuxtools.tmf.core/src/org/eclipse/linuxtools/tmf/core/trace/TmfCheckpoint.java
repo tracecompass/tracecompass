@@ -114,6 +114,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint#getLocation()
      */
+    @Override
     public ITmfLocation<? extends Comparable<?>> getLocation() {
         return fContext.getLocation();
     }
