@@ -38,6 +38,16 @@ public class TimeGraphRangeUpdateEvent extends EventObject {
      */
     private final long fEndTime;
 
+    /**
+     * Standard constructor
+     *
+     * @param source
+     *            The source of this event
+     * @param startTime
+     *            The start time
+     * @param endTime
+     *            The end time
+     */
     public TimeGraphRangeUpdateEvent(Object source, long startTime, long endTime) {
         super(source);
         fStartTime = startTime;

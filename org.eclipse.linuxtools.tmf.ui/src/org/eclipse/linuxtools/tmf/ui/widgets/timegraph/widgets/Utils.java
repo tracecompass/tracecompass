@@ -37,8 +37,12 @@ import org.eclipse.swt.widgets.Display;
  */
 public class Utils {
 
+    /** Time format for dates and timestamp */
     public enum TimeFormat {
-        RELATIVE, ABSOLUTE
+        /** Relative to the start of the trace */
+        RELATIVE,
+        /** Absolute timestamp (ie, relative to the Unix epoch) */
+        ABSOLUTE
     }
 
     static public final int IMG_THREAD_RUNNING = 0;
@@ -61,6 +65,12 @@ public class Utils {
         return new Rectangle(source.x, source.y, source.width, source.height);
     }
 
+    /**
+     * Initialize a Rectangle object to default values (all equal to 0)
+     *
+     * @param rect
+     *            The Rectangle to initialize
+     */
     static public void init(Rectangle rect) {
         rect.x = 0;
         rect.y = 0;
@@ -68,6 +78,20 @@ public class Utils {
         rect.height = 0;
     }
 
+    /**
+     * Initialize a Rectangle object with all the given values
+     *
+     * @param rect
+     *            The Rectangle object to initialize
+     * @param x
+     *            The X coordinate
+     * @param y
+     *            The Y coordinate
+     * @param width
+     *            The width of the rectangle
+     * @param height
+     *            The height of the rectangle
+     */
     static public void init(Rectangle rect, int x, int y, int width, int height) {
         rect.x = x;
         rect.y = y;
@@ -75,6 +99,14 @@ public class Utils {
         rect.height = height;
     }
 
+    /**
+     * Initialize a Rectangle object to another existing Rectangle's values.
+     *
+     * @param rect
+     *            The Rectangle to initialize
+     * @param source
+     *            The reference Rectangle to copy
+     */
     static public void init(Rectangle rect, Rectangle source) {
         rect.x = source.x;
         rect.y = source.y;
@@ -82,6 +114,16 @@ public class Utils {
         rect.height = source.height;
     }
 
+    /**
+     * Reduce the size of a given rectangle by the given amounts.
+     *
+     * @param rect
+     *            The rectangle to modify
+     * @param x
+     *            The reduction in width
+     * @param y
+     *            The reduction in height
+     */
     static public void deflate(Rectangle rect, int x, int y) {
         rect.x += x;
         rect.y += y;
@@ -89,6 +131,16 @@ public class Utils {
         rect.height -= y + y;
     }
 
+    /**
+     * Increase the size of a given rectangle by the given amounts.
+     *
+     * @param rect
+     *            The rectangle to modify
+     * @param x
+     *            The augmentation in width
+     * @param y
+     *            The augmentation in height
+     */
     static public void inflate(Rectangle rect, int x, int y) {
         rect.x -= x;
         rect.y -= y;
@@ -102,6 +154,22 @@ public class Utils {
         }
     }
 
+    /**
+     * Get the resulting color from a mix of two existing ones for a given
+     * display.
+     *
+     * @param display
+     *            The display device (which might affect the color conversion)
+     * @param c1
+     *            The first color
+     * @param c2
+     *            The second color
+     * @param w1
+     *            The gamma level for color 1
+     * @param w2
+     *            The gamma level for color 2
+     * @return The resulting color
+     */
     static public Color mixColors(Device display, Color c1, Color c2, int w1,
             int w2) {
         return new Color(display, (w1 * c1.getRed() + w2 * c2.getRed())
@@ -110,21 +178,70 @@ public class Utils {
                 / (w1 + w2));
     }
 
+    /**
+     * Get the system color with the given ID.
+     *
+     * @param id
+     *            The color ID
+     * @return The resulting color
+     */
     static public Color getSysColor(int id) {
         Color col = Display.getCurrent().getSystemColor(id);
         return new Color(col.getDevice(), col.getRGB());
     }
 
+    /**
+     * Get the resulting color from a mix of two existing ones for the current
+     * display.
+     *
+     * @param col1
+     *            The first color
+     * @param col2
+     *            The second color
+     * @param w1
+     *            The gamma level for color 1
+     * @param w2
+     *            The gamma level for color 2
+     * @return The resulting color
+     */
     static public Color mixColors(Color col1, Color col2, int w1, int w2) {
         return mixColors(Display.getCurrent(), col1, col2, w1, w2);
     }
 
+    /**
+     * Draw text in a rectangle.
+     *
+     * @param gc
+     *            The SWT GC object
+     * @param text
+     *            The text to draw
+     * @param rect
+     *            The rectangle object which is being drawn
+     * @param transp
+     *            Should we transpose the color
+     * @return The X coordinate where we have written
+     */
     static public int drawText(GC gc, String text, Rectangle rect, boolean transp) {
         Point size = gc.stringExtent(text);
         gc.drawText(text, rect.x, rect.y, transp);
         return size.x;
     }
 
+    /**
+     * Draw text at a given location.
+     *
+     * @param gc
+     *            The SWT GC object
+     * @param text
+     *            The text to draw
+     * @param x
+     *            The X coordinate of the starting point
+     * @param y
+     *            the Y coordinate of the starting point
+     * @param transp
+     *            Should we transpose the color
+     * @return The X coordinate where we have written
+     */
     static public int drawText(GC gc, String text, int x, int y, boolean transp) {
         Point size = gc.stringExtent(text);
         gc.drawText(text, x, y, transp);
@@ -176,6 +293,7 @@ public class Utils {
      * From input time in nanoseconds, convert to Date format YYYY-MM-dd
      *
      * @param absTime
+     *            The source time, in ns
      * @return the formatted date
      */
     public static String formatDate(long absTime) {
@@ -187,6 +305,9 @@ public class Utils {
      * Formats time in ns to Calendar format: HH:MM:SS MMM.mmm.nnn
      *
      * @param time
+     *            The source time, in ns
+     * @param res
+     *            The resolution to use
      * @return the formatted time
      */
     static public String formatTimeAbs(long time, Resolution res) {
@@ -209,7 +330,9 @@ public class Utils {
      * fractional portion of seconds, expressed in ns is: 171080214
      *
      * @param time
+     *            The source time in ns
      * @param res
+     *            The Resolution to use
      * @return the formatted nanosec
      */
     public static String formatNs(long time, Resolution res) {
@@ -255,6 +378,19 @@ public class Utils {
         return ""; //$NON-NLS-1$
     }
 
+    /**
+     * FIXME Currently does nothing.
+     *
+     * @param opt
+     *            The option name
+     * @param def
+     *            The option value
+     * @param min
+     *            The minimal accepted value
+     * @param max
+     *            The maximal accepted value
+     * @return The value that was read
+     */
     static public int loadIntOption(String opt, int def, int min, int max) {
         // int val =
         // TraceUIPlugin.getDefault().getPreferenceStore().getInt(opt);
@@ -267,6 +403,14 @@ public class Utils {
         return def;
     }
 
+    /**
+     * FIXME currently does nothing
+     *
+     * @param opt
+     *            The option name
+     * @param val
+     *            The option value
+     */
     static public void saveIntOption(String opt, int val) {
         // TraceUIPlugin.getDefault().getPreferenceStore().setValue(opt, val);
     }
@@ -340,6 +484,13 @@ public class Utils {
         return null;
     }
 
+    /**
+     * Pretty-print a method signature.
+     *
+     * @param sig
+     *            The original signature
+     * @return The pretty signature
+     */
     static public String fixMethodSignature(String sig) {
         int pos = sig.indexOf('(');
         if (pos >= 0) {
@@ -350,6 +501,13 @@ public class Utils {
         return sig;
     }
 
+    /**
+     * Restore an original method signature from a pretty-printed one.
+     *
+     * @param sig
+     *            The pretty-printed signature
+     * @return The original method signature
+     */
     static public String restoreMethodSignature(String sig) {
         String ret = ""; //$NON-NLS-1$
         int pos = sig.indexOf('(');
@@ -374,6 +532,14 @@ public class Utils {
         return result.toString();
     }
 
+    /**
+     * Get the mangled type information from an array of types.
+     *
+     * @param type
+     *            The types to convert. See method implementation for what it
+     *            expects.
+     * @return The mangled string of types
+     */
     static public String getTypeSignature(String type) {
         int dim = 0;
         for (int j = 0; j < type.length(); j++) {
@@ -415,6 +581,18 @@ public class Utils {
         return sig.toString();
     }
 
+    /**
+     * Compare two doubles together.
+     *
+     * @param d1
+     *            First double
+     * @param d2
+     *            Second double
+     * @return 1 if they are different, and 0 if they are *exactly* the same.
+     *         Because of the way doubles are stored, it's possible for the
+     *         same number obtained in two different ways to actually look
+     *         different.
+     */
     static public int compare(double d1, double d2) {
         if (d1 > d2) {
             return 1;
@@ -425,6 +603,19 @@ public class Utils {
         return 0;
     }
 
+    /**
+     * Compare two character strings alphabetically. This is simply a wrapper
+     * around String.compareToIgnoreCase but that will handle cases where
+     * strings can be null
+     *
+     * @param s1
+     *            The first string
+     * @param s2
+     *            The second string
+     * @return A number below, equal, or greater than zero if the first string
+     *         is smaller, equal, or bigger (alphabetically) than the second
+     *         one.
+     */
     static public int compare(String s1, String s2) {
         if (s1 != null && s2 != null) {
             return s1.compareToIgnoreCase(s2);

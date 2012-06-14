@@ -150,6 +150,14 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent composite object
+     * @param colors
+     *            The color scheme to use
+     */
     public TimeGraphControl(Composite parent, TimeGraphColorScheme colors) {
 
         super(parent, colors, SWT.NO_BACKGROUND | SWT.H_SCROLL | SWT.DOUBLE_BUFFERED);
@@ -207,12 +215,24 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * Assign the given time provider
+     *
+     * @param timeProvider
+     *            The time provider
+     */
     public void setTimeProvider(ITimeDataProvider timeProvider) {
         _timeProvider = timeProvider;
         adjustScrolls();
         redraw();
     }
 
+    /**
+     * Add a selection listener
+     *
+     * @param listener
+     *            The listener to add
+     */
     public void addSelectionListener(SelectionListener listener) {
         if (listener == null) {
             SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -223,12 +243,21 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         _selectionListeners.add(listener);
     }
 
+    /**
+     * Remove a selection listener
+     *
+     * @param listener
+     *            The listener to remove
+     */
     public void removeSelectionListener(SelectionListener listener) {
         if (null != _selectionListeners) {
             _selectionListeners.remove(listener);
         }
     }
 
+    /**
+     * Selection changed callback
+     */
     public void fireSelectionChanged() {
         if (null != _selectionListeners) {
             Iterator<SelectionListener> it = _selectionListeners.iterator();
@@ -239,6 +268,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * Default selection callback
+     */
     public void fireDefaultSelection() {
         if (null != _selectionListeners) {
             Iterator<SelectionListener> it = _selectionListeners.iterator();
@@ -249,26 +281,48 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * Get the traces in the model
+     *
+     * @return The array of traces
+     */
     public ITimeGraphEntry[] getTraces() {
         return _data.getTraces();
     }
 
+    /**
+     * Get the on/off trace filters
+     *
+     * @return The array of filters
+     */
     public boolean[] getTraceFilter() {
         return _data.getTraceFilter();
     }
 
+    /**
+     * Refresh the data for the thing
+     */
     public void refreshData() {
         _data.refreshData();
         adjustScrolls();
         redraw();
     }
 
+    /**
+     * Refresh data for the given traces
+     *
+     * @param traces
+     *            The traces to refresh
+     */
     public void refreshData(ITimeGraphEntry[] traces) {
         _data.refreshData(traces);
         adjustScrolls();
         redraw();
     }
 
+    /**
+     * Adjust the scoll bars
+     */
     public void adjustScrolls() {
         if (null == _timeProvider) {
             getHorizontalBar().setValues(0, 1, 1, 1, 1, 1);
@@ -333,6 +387,12 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return changed;
     }
 
+    /**
+     * Assign the given index as the top one
+     *
+     * @param idx
+     *            The index
+     */
     public void setTopIndex(int idx) {
         idx = Math.min(idx, _data._expandedItems.length - countPerPage());
         idx = Math.max(0,  idx);
@@ -340,6 +400,14 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         redraw();
     }
 
+    /**
+     * Set the expanded state of a given entry
+     *
+     * @param entry
+     *            The entry
+     * @param expanded
+     *            True if expanded, false if collapsed
+     */
     public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
         Item item = _data.findItem(entry);
         if (item != null && item._expanded != expanded) {
@@ -349,18 +417,38 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
-    public void addTreeListener (ITimeGraphTreeListener listener) {
+    /**
+     * Add a tree listener
+     *
+     * @param listener
+     *            The listener to add
+     */
+    public void addTreeListener(ITimeGraphTreeListener listener) {
         if (!_treeListeners.contains(listener)) {
             _treeListeners.add(listener);
         }
     }
 
-    public void removeTreeListener (ITimeGraphTreeListener listener) {
+    /**
+     * Remove a tree listener
+     *
+     * @param listener
+     *            The listener to remove
+     */
+    public void removeTreeListener(ITimeGraphTreeListener listener) {
         if (_treeListeners.contains(listener)) {
             _treeListeners.remove(listener);
         }
     }
 
+    /**
+     * Tree event callback
+     *
+     * @param entry
+     *            The affected entry
+     * @param expanded
+     *            The expanded state (true for expanded, false for collapsed)
+     */
     public void fireTreeEvent(ITimeGraphEntry entry, boolean expanded) {
         TimeGraphTreeExpansionEvent event = new TimeGraphTreeExpansionEvent(this, entry);
         for (ITimeGraphTreeListener listener : _treeListeners) {
@@ -388,6 +476,11 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return sel;
     }
 
+    /**
+     * Get the selection object
+     *
+     * @return The selection
+     */
     public ISelection getSelectionTrace() {
         TimeGraphSelection sel = new TimeGraphSelection();
         ITimeGraphEntry trace = getSelectedTrace();
@@ -469,6 +562,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 //        }
 //    }
 
+    /**
+     * Enable/disable one of the traces in the model
+     *
+     * @param n
+     *            1 to enable it, -1 to disable. The method returns immediately
+     *            if another value is used.
+     */
     public void selectTrace(int n) {
         if ((n != 1) && (n != -1)) {
             return;
@@ -508,6 +608,12 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * Select an event
+     *
+     * @param n
+     *            1 to enable, -1 to disable
+     */
     public void selectEvent(int n) {
         if (null == _timeProvider) {
             return;
@@ -547,22 +653,34 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * Select the next event
+     */
     public void selectNextEvent() {
         selectEvent(1);
         // Notify if visible time window has been adjusted
         _timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
     }
 
+    /**
+     * Select the previous event
+     */
     public void selectPrevEvent() {
         selectEvent(-1);
         // Notify if visible time window has been adjusted
         _timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
     }
 
+    /**
+     * Select the next trace
+     */
     public void selectNextTrace() {
         selectTrace(1);
     }
 
+    /**
+     * Select the previous trace
+     */
     public void selectPrevTrace() {
         selectTrace(-1);
     }
@@ -658,6 +776,11 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         _timeProvider.setStartFinishTimeNotify(time0, time1);
     }
 
+    /**
+     * Return the currently selected trace
+     *
+     * @return The entry matching the trace
+     */
     public ITimeGraphEntry getSelectedTrace() {
         ITimeGraphEntry trace = null;
         int idx = getSelectedIndex();
@@ -667,6 +790,11 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return trace;
     }
 
+    /**
+     * Retrieve the index of the currently selected item
+     *
+     * @return The index
+     */
     public int getSelectedIndex() {
         int idx = -1;
         for (int i = 0; i < _data._expandedItems.length; i++) {
@@ -781,11 +909,24 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * Callback for item selection
+     *
+     * @param trace
+     *            The entry matching the trace
+     * @param addSelection
+     *            If the selection is added or removed
+     */
     public void selectItem(ITimeGraphEntry trace, boolean addSelection) {
         int idx = _data.findItemIndex(trace);
         selectItem(idx, addSelection);
     }
 
+    /**
+     * Retrieve the number of entries shown per page.
+     *
+     * @return The count
+     */
     public int countPerPage() {
         int height = getCtrlSize().y;
         int count = 0;
@@ -813,14 +954,29 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return count;
     }
 
+    /**
+     * Get the index of the top element
+     *
+     * @return The index
+     */
     public int getTopIndex() {
         return _topIndex;
     }
 
+    /**
+     * Get the number of expanded items
+     *
+     * @return The count of expanded items
+     */
     public int getExpandedElementCount() {
         return _data._expandedItems.length;
     }
 
+    /**
+     * Get an array of all expanded elements
+     *
+     * @return The expanded elements
+     */
     public ITimeGraphEntry[] getExpandedElements() {
         ArrayList<ITimeGraphEntry> elements = new ArrayList<ITimeGraphEntry>();
         for (Item item : _data._expandedItems) {
@@ -909,7 +1065,24 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
-    public void drawItems(Rectangle bounds, ITimeDataProvider timeProvider, Item[] items, int topIndex, int nameSpace, GC gc) {
+    /**
+     * Draw many items at once
+     *
+     * @param bounds
+     *            The rectangle of the area
+     * @param timeProvider
+     *            The time provider
+     * @param items
+     *            The array items to draw
+     * @param topIndex
+     *            The index of the first element to draw
+     * @param nameSpace
+     *            The width reserved for the names
+     * @param gc
+     *            Reference to the SWT GC object
+     */
+    public void drawItems(Rectangle bounds, ITimeDataProvider timeProvider,
+            Item[] items, int topIndex, int nameSpace, GC gc) {
         for (int i = topIndex; i < items.length; i++) {
             Item item = (Item) items[i];
             drawItem(item, bounds, timeProvider, i, nameSpace, gc);
@@ -1270,15 +1443,18 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         redraw();
     }
 
+    /**
+     * @return If the current view is focused
+     */
     public boolean isInFocus() {
         return _isInFocus;
     }
 
     /**
-     * Provide the possibilty to control the wait cursor externally e.g. data
+     * Provide the possibility to control the wait cursor externally e.g. data
      * requests in progress
      *
-     * @param waitInd
+     * @param waitInd Should we wait indefinitely?
      */
     public void waitCursor(boolean waitInd) {
         // Update cursor as indicated
@@ -1533,6 +1709,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
     }
 
+    /**
+     * @return The current visibility of the vertical scroll bar
+     */
     public boolean isVisibleVerticalScroll() {
         return _visibleVerticalScroll;
     }
@@ -1542,34 +1721,69 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return _borderWidth;
     }
 
+    /**
+     * Set the border width
+     *
+     * @param borderWidth
+     *            The width
+     */
     public void setBorderWidth(int borderWidth) {
         this._borderWidth = borderWidth;
     }
 
+    /**
+     * @return The current height of the header row
+     */
     public int getHeaderHeight() {
         return _headerHeight;
     }
 
+    /**
+     * Set the height of the header row
+     *
+     * @param headerHeight
+     *            The height
+     */
     public void setHeaderHeight(int headerHeight) {
         this._headerHeight = headerHeight;
     }
 
+    /**
+     * @return The height of regular item rows
+     */
     public int getItemHeight() {
         return _itemHeight;
     }
 
+    /**
+     * Set the height of regular itew rows
+     *
+     * @param rowHeight
+     *            The height
+     */
     public void setItemHeight(int rowHeight) {
         this._itemHeight = rowHeight;
     }
 
+    /**
+     * Set the minimum item width
+     *
+     * @param width The minimum width
+     */
     public void setMinimumItemWidth(int width) {
         this._minimumItemWidth = width;
     }
 
+    /**
+     * @return The minimum item width
+     */
     public int getMinimumItemWidth() {
         return _minimumItemWidth;
     }
 
+    /**
+     * @return The entries that are currently filtered out
+     */
     public Vector<ITimeGraphEntry> getFilteredOut() {
         return _data.getFilteredOut();
     }

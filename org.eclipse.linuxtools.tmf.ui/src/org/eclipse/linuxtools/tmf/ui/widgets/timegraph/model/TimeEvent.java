@@ -23,6 +23,16 @@ public class TimeEvent implements ITimeEvent {
     protected long fTime;
     protected long fDuration;
 
+    /**
+     * Standard constructor
+     *
+     * @param entry
+     *            The entry matching this event
+     * @param time
+     *            The timestamp of this event
+     * @param duration
+     *            The duration of the event
+     */
     public TimeEvent(ITimeGraphEntry entry, long time, long duration) {
         fEntry = entry;
         fTime = time;

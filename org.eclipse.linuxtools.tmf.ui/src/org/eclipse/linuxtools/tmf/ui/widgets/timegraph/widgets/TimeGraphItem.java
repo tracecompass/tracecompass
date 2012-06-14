@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  * @version 1.0
  * @author Patrick Tasse
  */
+@SuppressWarnings("javadoc")
 public class TimeGraphItem {
     public boolean _expanded;
     public boolean _selected;
@@ -33,6 +34,16 @@ public class TimeGraphItem {
     public String _name;
     public ITimeGraphEntry _trace;
 
+    /**
+     * Standard constructor
+     *
+     * @param trace
+     *            The entry matching to trace to which this item is associated
+     * @param name
+     *            The name of the item
+     * @param level
+     *            The tree level of this entry (0 = top level)
+     */
     public TimeGraphItem(ITimeGraphEntry trace, String name, int level) {
         this._trace = trace;
         this._name = name;

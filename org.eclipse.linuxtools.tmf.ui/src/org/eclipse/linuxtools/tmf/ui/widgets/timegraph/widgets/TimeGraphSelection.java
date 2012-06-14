@@ -32,13 +32,29 @@ public class TimeGraphSelection implements IStructuredSelection {
 
     List<Object> list = new ArrayList<Object>();
 
+    /**
+     * Default constructor
+     */
     public TimeGraphSelection() {
     }
 
+    /**
+     * "Wrapper" constructor. Instantiate a new selection object with only one
+     * existing selection.
+     *
+     * @param sel
+     *            The initial selection to add to this one
+     */
     public TimeGraphSelection(Object sel) {
         add(sel);
     }
 
+    /**
+     * Add a selection to this one.
+     *
+     * @param sel
+     *            The selection to add
+     */
     public void add(Object sel) {
         if (null != sel && !list.contains(sel)) {
             list.add(sel);

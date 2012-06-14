@@ -561,7 +561,7 @@ public class TimeGraphCombo extends Composite {
     /**
      * Sets the tree label provider used by this time graph combo.
      *
-     * @param treeLabelProvider the tree label provider
+     * @param labelProvider the tree label provider
      */
     public void setTreeLabelProvider(ITableLabelProvider labelProvider) {
         fTreeViewer.setLabelProvider(new TreeLabelProviderWrapper(labelProvider));

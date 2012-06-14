@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
- *   Francois Chouinard - Refactoring, slider support, bug fixing 
+ *   Francois Chouinard - Refactoring, slider support, bug fixing
  *   Patrick Tasse - Improvements and bug fixing
  *   Xavier Raynaud - Improvements
  ******************************************************************************/
@@ -52,17 +52,17 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * TmfVirtualTable allows for the tabular display of arbitrarily large data sets
  * (well, up to Integer.MAX_VALUE or ~2G rows).
- * 
+ *
  * It is essentially a Composite of Table and Slider, where the number of rows
  * in the table is set to fill the table display area. The slider is rank-based.
- * 
+ *
  * It differs from Table with the VIRTUAL style flag where an empty entry is
  * created for each virtual row. This does not scale well for very large data sets.
- * 
+ *
  * Styles:
  * H_SCROLL, V_SCROLL, SINGLE, CHECK, FULL_SELECTION, HIDE_SELECTION, NO_SCROLL
  * @author Matthew Khouzam, Francois Chouinard, Patrick Tasse, Xavier Raynaud
- * @version $Revision: 1.0 
+ * @version $Revision: 1.0
  */
 public class TmfVirtualTable extends Composite {
 
@@ -126,8 +126,12 @@ public class TmfVirtualTable extends Composite {
     // ------------------------------------------------------------------------
 
     /**
+     * Standard constructor
+     *
      * @param parent
+     *            The parent composite object
      * @param style
+     *            The style to use
      */
     public TmfVirtualTable(Composite parent, int style) {
         super(parent, style & (~SWT.H_SCROLL) & (~SWT.V_SCROLL) & (~SWT.SINGLE) & (~SWT.FULL_SELECTION) & (~SWT.HIDE_SELECTION) & (~SWT.CHECK));
@@ -398,7 +402,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Handle key-based navigation in table.
-     * 
+     *
      * @param event
      */
     private void handleTableKeyEvent(KeyEvent event) {
@@ -602,7 +606,7 @@ public class TmfVirtualTable extends Composite {
     }
 
     /**
-     * Method getSelection. 
+     * Method getSelection.
      * @return TableItem[] the items that are selected.
      */
     public TableItem[] getSelection() {
@@ -656,7 +660,7 @@ public class TmfVirtualTable extends Composite {
     }
 
     /**
-     * Method clearAll empties a table. 
+     * Method clearAll empties a table.
      */
     public void clearAll() {
         setItemCount(0);
@@ -665,7 +669,7 @@ public class TmfVirtualTable extends Composite {
     /**
      * Method setItemCount
      * @param nbItems int the number of items in the table
-	 * 
+	 *
      */
     public void setItemCount(int nbItems) {
         nbItems = Math.max(0, nbItems);
@@ -734,7 +738,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Method setTopIndex.
-     * @param i int suggested top index for the table. 
+     * @param i int suggested top index for the table.
      */
     public void setTopIndex(int i) {
         if (fTableItemCount > 0) {
@@ -753,7 +757,7 @@ public class TmfVirtualTable extends Composite {
     /**
      * Method indexOf. Return the index of a table item
      * @param ti TableItem the table item to search for in the table
-     * @return int the index of the first match. (there should only be one match) 
+     * @return int the index of the first match. (there should only be one match)
      */
     public int indexOf(TableItem ti) {
         int index = fTable.indexOf(ti);
@@ -766,7 +770,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Method getColumns.
-     * @return TableColumn[] the table columns 
+     * @return TableColumn[] the table columns
      */
     public TableColumn[] getColumns() {
         return fTable.getColumns();
@@ -775,7 +779,7 @@ public class TmfVirtualTable extends Composite {
     /**
      * Method getItem.
      * @param point Point the coordinates in the table
-     * @return TableItem the corresponding table item 
+     * @return TableItem the corresponding table item
      */
     public TableItem getItem(Point point) {
         return fTable.getItem(point);
@@ -835,7 +839,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Method setColumnHeaders.
-     * @param columnData ColumnData[] the columndata array. 
+     * @param columnData ColumnData[] the columndata array.
      */
     public void setColumnHeaders(ColumnData columnData[]) {
         for (int i = 0; i < columnData.length; i++) {
@@ -863,7 +867,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Method refreshTable.
-     * @return boolean did all the items regresh properly? 
+     * @return boolean did all the items regresh properly?
      */
     private boolean refreshTable() {
         boolean done = true;
@@ -899,7 +903,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Method setSelection.
-     * @param i int the item number to select in the table. 
+     * @param i int the item number to select in the table.
      */
     public void setSelection(int i) {
         if (fTableItemCount > 0) {

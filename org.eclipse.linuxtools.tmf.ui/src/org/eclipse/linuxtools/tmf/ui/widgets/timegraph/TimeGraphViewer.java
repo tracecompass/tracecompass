@@ -103,7 +103,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private Action zoomInAction;
     private Action zoomOutAction;
 
-    /** ctor */
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent UI composite object
+     * @param style
+     *            The style to use
+     */
     public TimeGraphViewer(Composite parent, int style) {
         createDataViewer(parent, style);
     }
@@ -139,18 +146,45 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Refresh the view
+     */
     public void refresh() {
         setInput(_stateCtrl.getTraces());
     }
 
+    /**
+     * Callback for when the control is moved
+     *
+     * @param e
+     *            The caller event
+     */
     public void controlMoved(ControlEvent e) {
     }
 
+    /**
+     * Callback for when the control is resized
+     *
+     * @param e
+     *            The caller event
+     */
     public void controlResized(ControlEvent e) {
         resizeControls();
     }
 
-    // called from the display order in the API
+    /**
+     * Handler for when the model is updated. Called from the display order in
+     * the API
+     *
+     * @param traces
+     *            The traces in the model
+     * @param start
+     *            The start time
+     * @param end
+     *            The end time
+     * @param updateTimeBounds
+     *            Should we updated the time bounds too
+     */
     public void modelUpdate(ITimeGraphEntry[] traces, long start,
             long end, boolean updateTimeBounds) {
         if (null != _stateCtrl) {
@@ -259,6 +293,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return _dataViewer;
     }
 
+    /**
+     * Dispose the view.
+     */
     public void dispose() {
         saveOptions();
         _stateCtrl.dispose();
@@ -270,6 +307,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return new TimeGraphControl(_dataViewer, _colors);
     }
 
+    /**
+     * Resize the controls
+     */
     public void resizeControls() {
         Rectangle r = _dataViewer.getClientArea();
         if (r.isEmpty()) {
@@ -286,7 +326,12 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         adjustVerticalScrollBar();
     }
 
-    /** Tries to set most convenient time range for display. */
+    /**
+     * Try to set most convenient time range for display.
+     *
+     * @param traces
+     *            The traces in the model
+     */
     public void setTimeRange(ITimeGraphEntry traces[]) {
         _endTime = 0;
         _beginTime = -1;
@@ -307,6 +352,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Recalculate the time bounds
+     */
     public void setTimeBounds() {
         //_time0_ = _beginTime - (long) ((_endTime - _beginTime) * 0.02);
         _time0_ = _beginTime;
@@ -362,20 +410,38 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Callback for when this view is focused
+     */
     public void setFocus() {
         if (null != _stateCtrl) {
             _stateCtrl.setFocus();
         }
     }
 
+    /**
+     * Get the current focus status of this view.
+     *
+     * @return If the view is currently focused, or not
+     */
     public boolean isInFocus() {
         return _stateCtrl.isInFocus();
     }
 
+    /**
+     * Get the view's current selection
+     *
+     * @return The entry that is selected
+     */
     public ITimeGraphEntry getSelection() {
         return _stateCtrl.getSelectedTrace();
     }
 
+    /**
+     * Get the index of the current selection
+     *
+     * @return The index
+     */
     public int getSelectionIndex() {
         return _stateCtrl.getSelectedIndex();
     }
@@ -500,6 +566,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _timeScaleCtrl.redraw();
     }
 
+    /**
+     * Set the time bounds to the provided values
+     *
+     * @param beginTime
+     *            The start time of the window
+     * @param endTime
+     *            The end time
+     */
     public void setTimeBounds(long beginTime, long endTime) {
         _beginTime = beginTime;
         _endTime = endTime;
@@ -583,26 +657,41 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Callback for when the next event is selected
+     */
     public void selectNextEvent() {
         _stateCtrl.selectNextEvent();
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Callback for when the previous event is selected
+     */
     public void selectPrevEvent() {
         _stateCtrl.selectPrevEvent();
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Callback for when the next item is selected
+     */
     public void selectNextItem() {
         _stateCtrl.selectNextTrace();
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Callback for when the previous item is selected
+     */
     public void selectPrevItem() {
         _stateCtrl.selectPrevTrace();
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Callback for the show legend action
+     */
     public void showLegend() {
         if (_dataViewer == null || _dataViewer.isDisposed()) {
             return;
@@ -611,10 +700,16 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         TimeGraphLegend.open(_dataViewer.getShell(), fTimeGraphProvider);
     }
 
+    /**
+     * Callback for the Zoom In action
+     */
     public void zoomIn() {
         _stateCtrl.zoomIn();
     }
 
+    /**
+     * Callback for the Zoom Out action
+     */
     public void zoomOut() {
         _stateCtrl.zoomOut();
     }
@@ -623,10 +718,22 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return getViewTypeStr() + "." + string; //$NON-NLS-1$
     }
 
+    /**
+     * Add a selection listener
+     *
+     * @param listener
+     *            The listener to add
+     */
     public void addSelectionListener(ITimeGraphSelectionListener listener) {
         fSelectionListeners.add(listener);
     }
 
+    /**
+     * Remove a selection listener
+     *
+     * @param listener
+     *            The listener to remove
+     */
     public void removeSelectionListener(ITimeGraphSelectionListener listener) {
         fSelectionListeners.remove(listener);
     }
@@ -639,10 +746,22 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Add a time listener
+     *
+     * @param listener
+     *            The listener to add
+     */
     public void addTimeListener(ITimeGraphTimeListener listener) {
         fTimeListeners.add(listener);
     }
 
+    /**
+     * Remove a time listener
+     *
+     * @param listener
+     *            The listener to remove
+     */
     public void removeTimeListener(ITimeGraphTimeListener listener) {
         fTimeListeners.remove(listener);
     }
@@ -655,10 +774,22 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Add a range listener
+     *
+     * @param listener
+     *            The listener to add
+     */
     public void addRangeListener(ITimeGraphRangeListener listener) {
         fRangeListeners.add(listener);
     }
 
+    /**
+     * Remove a range listener
+     *
+     * @param listener
+     *            The listener to remove
+     */
     public void removeRangeListener(ITimeGraphRangeListener listener) {
         fRangeListeners.remove(listener);
     }
@@ -678,6 +809,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Callback to set a selected event in the view
+     *
+     * @param event
+     *            The event that was selected
+     * @param source
+     *            The source of this selection event
+     */
     public void setSelectedEvent(ITimeEvent event, Object source) {
         if (event == null || source == this) {
             return;
@@ -689,6 +828,16 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Set the seeked time of a trace
+     *
+     * @param trace
+     *            The trace that was seeked
+     * @param time
+     *            The target time
+     * @param source
+     *            The source of this seek event
+     */
     public void setSelectedTraceTime(ITimeGraphEntry trace, long time, Object source) {
         if (trace == null || source == this) {
             return;
@@ -699,12 +848,28 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         setSelectedTimeInt(time, true, true);
     }
 
+    /**
+     * Callback for a trace selection
+     *
+     * @param trace
+     *            The trace that was selected
+     */
     public void setSelection(ITimeGraphEntry trace) {
         _selectedEntry = trace;
         _stateCtrl.selectItem(trace, false);
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Callback for a time window selection
+     *
+     * @param time0
+     *            Start time of the range
+     * @param time1
+     *            End time of the range
+     * @param source
+     *            Source of the event
+     */
     public void setSelectVisTimeWindow(long time0, long time1, Object source) {
         if (source == this) {
             return;
@@ -727,6 +892,12 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _time1_extSynch = _time1;
     }
 
+    /**
+     * Set the calendar format
+     *
+     * @param toAbsoluteCaltime
+     *            True for absolute time, false for relative
+     */
     public void setTimeCalendarFormat(boolean toAbsoluteCaltime) {
         calendarTimeFormat = toAbsoluteCaltime;
     }
@@ -736,10 +907,21 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return calendarTimeFormat;
     }
 
+    /**
+     * Retrieve the border width
+     *
+     * @return The width
+     */
     public int getBorderWidth() {
         return borderWidth;
     }
 
+    /**
+     * Set the border width
+     *
+     * @param borderWidth
+     *            The width
+     */
     public void setBorderWidth(int borderWidth) {
         if (borderWidth > -1) {
             this.borderWidth = borderWidth;
@@ -748,10 +930,21 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Retrieve the height of the header
+     *
+     * @return The height
+     */
     public int getHeaderHeight() {
         return timeScaleHeight;
     }
 
+    /**
+     * Set the height of the header
+     *
+     * @param headerHeight
+     *            The height to set
+     */
     public void setHeaderHeight(int headerHeight) {
         if (headerHeight > -1) {
             this.timeScaleHeight = headerHeight;
@@ -759,6 +952,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Retrieve the height of an item row
+     *
+     * @return The height
+     */
     public int getItemHeight() {
         if (_stateCtrl != null) {
             return _stateCtrl.getItemHeight();
@@ -766,18 +964,35 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return 0;
     }
 
+    /**
+     * Set the height of an item row
+     *
+     * @param rowHeight
+     *            The height to set
+     */
     public void setItemHeight(int rowHeight) {
         if (_stateCtrl != null) {
             _stateCtrl.setItemHeight(rowHeight);
         }
     }
 
+    /**
+     * Set the minimum item width
+     *
+     * @param width
+     *            The min width
+     */
     public void setMinimumItemWidth(int width) {
         if (_stateCtrl != null) {
             _stateCtrl.setMinimumItemWidth(width);
         }
     }
 
+    /**
+     * Set the width for the name column
+     *
+     * @param width The width
+     */
     public void setNameWidthPref(int width) {
         _nameWidthPref = width;
         if (width == 0) {
@@ -786,6 +1001,13 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * Retrieve the configure width for the name column
+     *
+     * @param width
+     *            Unused?
+     * @return The width
+     */
     public int getNameWidthPref(int width) {
         return _nameWidthPref;
     }
@@ -826,55 +1048,110 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return _stateCtrl;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Wait for the cursor
      *
-     * @see
-     * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer
-     * #waitCursor(boolean)
+     * @param waitInd
+     *            Wait indefinitely?
      */
     public void waitCursor(boolean waitInd) {
         _stateCtrl.waitCursor(waitInd);
     }
 
+    /**
+     * Get the horizontal scroll bar object
+     *
+     * @return The scroll bar
+     */
     public ScrollBar getHorizontalBar() {
         return _stateCtrl.getHorizontalBar();
     }
 
+    /**
+     * Get the vertical scroll bar object
+     *
+     * @return The scroll bar
+     */
     public Slider getVerticalBar() {
         return _verticalScrollBar;
     }
 
+    /**
+     * Set the given index as the top one
+     *
+     * @param index
+     *            The index that will go to the top
+     */
     public void setTopIndex(int index) {
         _stateCtrl.setTopIndex(index);
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Retrieve the current top index
+     *
+     * @return The top index
+     */
     public int getTopIndex() {
         return _stateCtrl.getTopIndex();
     }
 
+    /**
+     * Set the expanded state of an entry
+     *
+     * @param entry
+     *            The entry to expand/collapse
+     * @param expanded
+     *            True for expanded, false for collapsed
+     */
     public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
         _stateCtrl.setExpandedState(entry, expanded);
         adjustVerticalScrollBar();
     }
 
+    /**
+     * Get the number of sub-elements when expanded
+     *
+     * @return The element count
+     */
     public int getExpandedElementCount() {
         return _stateCtrl.getExpandedElementCount();
     }
 
+    /**
+     * Get the sub-elements
+     *
+     * @return The array of entries that are below this one
+     */
     public ITimeGraphEntry[] getExpandedElements() {
         return _stateCtrl.getExpandedElements();
     }
 
+    /**
+     * Add a tree listener
+     *
+     * @param listener
+     *            The listener to add
+     */
     public void addTreeListener(ITimeGraphTreeListener listener) {
         _stateCtrl.addTreeListener(listener);
     }
 
+    /**
+     * Remove a tree listener
+     *
+     * @param listener
+     *            The listener to remove
+     */
     public void removeTreeListener(ITimeGraphTreeListener listener) {
         _stateCtrl.removeTreeListener(listener);
     }
 
+    /**
+     * Get the reset scale action.
+     *
+     * @return The Action object
+     */
     public Action getResetScaleAction() {
         if (resetScale == null) {
             // resetScale
@@ -891,6 +1168,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return resetScale;
     }
 
+    /**
+     * Get the show legend action.
+     *
+     * @return The Action object
+     */
     public Action getShowLegendAction() {
         if (showLegendAction == null) {
             // showLegend
@@ -908,6 +1190,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return showLegendAction;
     }
 
+    /**
+     * Get the the next event action.
+     *
+     * @return The action object
+     */
     public Action getNextEventAction() {
         if (nextEventAction == null) {
             nextEventAction = new Action() {
@@ -925,6 +1212,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return nextEventAction;
     }
 
+    /**
+     * Get the previous event action.
+     *
+     * @return The Action object
+     */
     public Action getPreviousEventAction() {
         if (prevEventAction == null) {
             prevEventAction = new Action() {
@@ -942,6 +1234,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return prevEventAction;
     }
 
+    /**
+     * Get the next item action.
+     *
+     * @return The Action object
+     */
     public Action getNextItemAction() {
         if (nextItemAction == null) {
 
@@ -958,6 +1255,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return nextItemAction;
     }
 
+    /**
+     * Get the previous item action.
+     *
+     * @return The Action object
+     */
     public Action getPreviousItemAction() {
         if (previousItemAction == null) {
 
@@ -974,6 +1276,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return previousItemAction;
     }
 
+    /**
+     * Get the zoom in action
+     *
+     * @return The Action object
+     */
     public Action getZoomInAction() {
         if (zoomInAction == null) {
             zoomInAction = new Action() {
@@ -989,6 +1296,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return zoomInAction;
     }
 
+    /**
+     * Get the zoom out action
+     *
+     * @return The Action object
+     */
     public Action getZoomOutAction() {
         if (zoomOutAction == null) {
             zoomOutAction = new Action() {

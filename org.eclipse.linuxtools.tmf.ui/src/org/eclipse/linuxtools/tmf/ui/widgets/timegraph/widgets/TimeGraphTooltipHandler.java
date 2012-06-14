@@ -54,6 +54,16 @@ public class TimeGraphTooltipHandler {
     private final ITimeDataProvider _timeDataProvider;
     ITimeGraphPresentationProvider _utilImp = null;
 
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent composite object
+     * @param rUtilImpl
+     *            The presentation provider
+     * @param timeProv
+     *            The time provider
+     */
     public TimeGraphTooltipHandler(Shell parent, ITimeGraphPresentationProvider rUtilImpl,
             ITimeDataProvider timeProv) {
         final Display display = parent.getDisplay();
@@ -86,6 +96,12 @@ public class TimeGraphTooltipHandler {
         // | GridData.VERTICAL_ALIGN_CENTER));
     }
 
+    /**
+     * Callback for the mouse-over tooltip
+     *
+     * @param control
+     *            The control object to use
+     */
     public void activateHoverHelp(final Control control) {
         //FIXME: remove old listeners
         control.addMouseListener(new MouseAdapter() {

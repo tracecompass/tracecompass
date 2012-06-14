@@ -24,6 +24,7 @@ import org.eclipse.swt.graphics.Color;
  * @version 1.0
  * @author Patrick Tasse
  */
+@SuppressWarnings("javadoc")
 public class TimeGraphColorScheme {
 
     // elements color indices
@@ -303,10 +304,16 @@ public class TimeGraphColorScheme {
 
     private final Color _colors[];
 
+    /**
+     * Default constructor
+     */
     public TimeGraphColorScheme() {
         _colors = new Color[_providersMap.length];
     }
 
+    /**
+     * Dispose this color scheme
+     */
     public void dispose() {
         for (int i = 0; i < _colors.length; i++) {
             Utils.dispose(_colors[i]);
@@ -314,6 +321,13 @@ public class TimeGraphColorScheme {
         }
     }
 
+    /**
+     * Get the color matching the given index
+     *
+     * @param idx
+     *            The index
+     * @return The matching color
+     */
     public Color getColor(int idx) {
         if (null == _colors[idx]) {
             if (idx >= STATES_SEL0 && idx <= STATES_SEL1) {
@@ -327,6 +341,17 @@ public class TimeGraphColorScheme {
         return _colors[idx];
     }
 
+    /**
+     * Get an entry's background color based on its status.
+     *
+     * @param selected
+     *            If the entry is selected
+     * @param focused
+     *            If the entry is focused
+     * @param name
+     *            Get the color of the name column (false for other columns)
+     * @return The matching color
+     */
     public Color getBkColor(boolean selected, boolean focused, boolean name) {
         if (name) {
             if (selected && focused) {
@@ -347,6 +372,15 @@ public class TimeGraphColorScheme {
         }
     }
 
+    /**
+     * Get the correct foreground color
+     *
+     * @param selected
+     *            Is the entry selected
+     * @param focused
+     *            Is the entry focused
+     * @return The matching color
+     */
     public Color getFgColor(boolean selected, boolean focused) {
         if (selected && focused) {
             return getColor(FOREGROUND_SEL);
@@ -357,6 +391,15 @@ public class TimeGraphColorScheme {
         return getColor(FOREGROUND);
     }
 
+    /**
+     * Get the correct background color group
+     *
+     * @param selected
+     *            Is the entry selected
+     * @param focused
+     *            Is the entry focused
+     * @return The matching color
+     */
     public Color getBkColorGroup(boolean selected, boolean focused) {
         if (selected && focused) {
             return getColor(GR_BACKGROUND_SEL);
@@ -367,6 +410,15 @@ public class TimeGraphColorScheme {
         return getColor(GR_BACKGROUND);
     }
 
+    /**
+     * Get the correct foreground color group
+     *
+     * @param selected
+     *            Is the entry selected
+     * @param focused
+     *            Is the entry focused
+     * @return The matching color
+     */
     public Color getFgColorGroup(boolean selected, boolean focused) {
         if (selected && focused) {
             return getColor(GR_FOREGROUND_SEL);

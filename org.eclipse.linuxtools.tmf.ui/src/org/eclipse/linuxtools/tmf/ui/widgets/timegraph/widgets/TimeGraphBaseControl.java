@@ -32,18 +32,43 @@ import org.eclipse.swt.widgets.Composite;
  */
 public abstract class TimeGraphBaseControl extends Canvas implements PaintListener {
 
+    /** Default left margin size */
     static public final int MARGIN = 4;
+
+    /** Default expanded size */
     static public final int EXPAND_SIZE = 9; // the [+] or [-] control size
+
+    /** Default size of the right margin */
     static public final int RIGHT_MARGIN = 1; // 1 pixels less to make sure end time is visible
+
+    /** Default size for small icons */
     static public final int SMALL_ICON_SIZE = 16;
 
     protected TimeGraphColorScheme _colors;
     protected int _fontHeight = 0;
 
+    /**
+     * Basic constructor. Uses a default style value
+     *
+     * @param parent
+     *            The parent composite object
+     * @param colors
+     *            The color scheme to use
+     */
     public TimeGraphBaseControl(Composite parent, TimeGraphColorScheme colors) {
         this(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS);
     }
 
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent composite object
+     * @param colors
+     *            The color scheme to use
+     * @param style
+     *            The index of the style to use
+     */
     public TimeGraphBaseControl(Composite parent, TimeGraphColorScheme colors, int style) {
         super(parent, style);
         _colors = colors;
@@ -69,6 +94,11 @@ public abstract class TimeGraphBaseControl extends Canvas implements PaintListen
         }
     }
 
+    /**
+     * Retrieve the current font's height
+     *
+     * @return The height
+     */
     public int getFontHeight() {
         return _fontHeight;
     }

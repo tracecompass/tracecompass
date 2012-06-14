@@ -24,20 +24,44 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
  */
 public interface ITimeDataProvider {
 
+    /**
+     * @return The selected time
+     */
     long getSelectedTime();
 
+    /**
+     * @return The beginning time
+     */
     long getBeginTime();
 
+    /**
+     * @return The end time
+     */
     long getEndTime();
 
+    /**
+     * @return The minimum time
+     */
     long getMinTime();
 
+    /**
+     * @return The maximum time
+     */
     long getMaxTime();
 
+    /**
+     * @return The start time of the current selection window
+     */
     long getTime0();
 
+    /**
+     * @return The end time of the current selection window
+     */
     long getTime1();
 
+    /**
+     * @return The minimal time interval
+     */
     long getMinTimeInterval();
 
     /**
@@ -62,30 +86,54 @@ public interface ITimeDataProvider {
     void notifyStartFinishTime();
 
     /**
-     * Updates the selected time, adjusts the time range if necessary and notifies
-     * any registered listeners about the new selected time and new range (if necessary)
+     * Updates the selected time, adjusts the time range if necessary and
+     * notifies any registered listeners about the new selected time and new
+     * range (if necessary)
      *
-     * @param time - A Time to set
-     * @param ensureVisible - Ensure visibility of new time (will adjust time range if necessary)
+     * @param time
+     *            A Time to set
+     * @param ensureVisible
+     *            Ensure visibility of new time (will adjust time range if
+     *            necessary)
      */
     public void setSelectedTimeNotify(long time, boolean ensureVisible);
 
     /**
-     * Updates the selected time and adjusts the time range if necessary
-     * without notifying registered listeners.
+     * Updates the selected time and adjusts the time range if necessary without
+     * notifying registered listeners.
      *
-     * @param time - A Time to set
-     * @param ensureVisible - Ensure visibility of new time (will adjust time range if necessary)
+     * @param time
+     *            A Time to set
+     * @param ensureVisible
+     *            Ensure visibility of new time (will adjust time range if
+     *            necessary)
      */
     public void setSelectedTime(long time, boolean ensureVisible);
 
+    /**
+     * Reset the start and end times
+     */
     void resetStartFinishTime();
 
+    /**
+     * @return The names' width
+     */
     int getNameSpace();
 
+    /**
+     * Set the names' width
+     *
+     * @param width
+     */
     void setNameSpace(int width);
 
+    /**
+     * @return The width for timestamps
+     */
     int getTimeSpace();
 
+    /**
+     * @return If the calendar format is absolute (true) or relative (false)
+     */
     boolean isCalendarFormat();
 }

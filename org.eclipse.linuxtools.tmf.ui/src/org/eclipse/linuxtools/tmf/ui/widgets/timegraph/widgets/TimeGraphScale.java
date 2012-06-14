@@ -40,8 +40,17 @@ import org.eclipse.swt.widgets.Composite;
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  */
-public class TimeGraphScale extends TimeGraphBaseControl implements MouseListener, MouseMoveListener {
+public class TimeGraphScale extends TimeGraphBaseControl implements
+        MouseListener, MouseMoveListener {
 
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent composite object
+     * @param colors
+     *            The color scheme to use
+     */
     public TimeGraphScale(Composite parent, TimeGraphColorScheme colors) {
         super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED);
         addMouseListener(this);
@@ -72,6 +81,12 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
     private final Rectangle _rect0 = new Rectangle(0, 0, 0, 0);
     private int _height;
 
+    /**
+     * Assign the time provider for this scale
+     *
+     * @param timeProvider
+     *            The provider to use
+     */
     public void setTimeProvider(ITimeDataProvider timeProvider) {
         _timeProvider = timeProvider;
     }
@@ -83,6 +98,12 @@ public class TimeGraphScale extends TimeGraphBaseControl implements MouseListene
         return super.computeSize(wHint, _height, changed);
     }
 
+    /**
+     * Set the height of the scale
+     *
+     * @param height
+     *            The height to use
+     */
     public void setHeight(int height) {
         this._height = height;
     }

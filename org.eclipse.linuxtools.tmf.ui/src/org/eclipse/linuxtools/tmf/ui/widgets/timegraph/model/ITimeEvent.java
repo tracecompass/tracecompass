@@ -22,8 +22,18 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model;
  */
 public interface ITimeEvent {
 
+    /**
+     * Get the entry matching this time event.
+     *
+     * @return The time graph entry
+     */
     public ITimeGraphEntry getEntry();
 
+    /**
+     * Get the timestamp of this event.
+     *
+     * @return The event's time
+     */
     public long getTime();
 
     /**

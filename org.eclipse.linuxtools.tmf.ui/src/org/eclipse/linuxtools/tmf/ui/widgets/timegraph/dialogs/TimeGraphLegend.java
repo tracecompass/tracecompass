@@ -49,10 +49,26 @@ public class TimeGraphLegend extends TitleAreaDialog {
     private final ITimeGraphPresentationProvider provider;
     private final LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
+    /**
+     * Open the time graph legend window
+     *
+     * @param parent
+     *            The parent shell
+     * @param provider
+     *            The presentation provider
+     */
     public static void open(Shell parent, ITimeGraphPresentationProvider provider) {
         (new TimeGraphLegend(parent, provider)).open();
     }
 
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent shell
+     * @param provider
+     *            The presentation provider
+     */
     public TimeGraphLegend(Shell parent, ITimeGraphPresentationProvider provider) {
         super(parent);
         this.provider = provider;

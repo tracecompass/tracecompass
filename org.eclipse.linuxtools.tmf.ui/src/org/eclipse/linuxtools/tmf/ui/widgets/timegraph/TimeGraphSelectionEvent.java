@@ -35,6 +35,14 @@ public class TimeGraphSelectionEvent extends EventObject {
      */
     private final ITimeGraphEntry fSelection;
 
+    /**
+     * Standard constructor
+     *
+     * @param source
+     *            The source of this event
+     * @param selection
+     *            The entry that was selected
+     */
     public TimeGraphSelectionEvent(Object source, ITimeGraphEntry selection) {
         super(source);
         fSelection = selection;

@@ -60,26 +60,34 @@ public interface ITimeGraphPresentationProvider {
     /**
      * Called after drawing the control
      *
-     * @bounds the drawing rectangle
-     * @param gc the graphics context
+     * @param bounds
+     *            The drawing rectangle
+     * @param gc
+     *            The graphics context
      */
     public void postDrawControl(Rectangle bounds, GC gc);
 
     /**
      * Called after drawing an entry
      *
-     * @param entry the entry that was drawn
-     * @bounds the drawing rectangle
-     * @param gc the graphics context
+     * @param entry
+     *            the entry that was drawn
+     * @param bounds
+     *            the drawing rectangle
+     * @param gc
+     *            the graphics context
      */
     public void postDrawEntry(ITimeGraphEntry entry, Rectangle bounds, GC gc);
 
     /**
      * Called after drawing an event
      *
-     * @param event the event that was drawn
-     * @bounds the drawing rectangle
-     * @param gc the graphics context
+     * @param event
+     *            the event that was drawn
+     * @param bounds
+     *            the drawing rectangle
+     * @param gc
+     *            the graphics context
      */
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc);
 
@@ -104,7 +112,9 @@ public interface ITimeGraphPresentationProvider {
     /**
      * Returns the name of this event.
      *
-     * @return the event name
+     * @param event
+     *            The event
+     * @return The event name
      */
     public String getEventName(ITimeEvent event);
 

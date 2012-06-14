@@ -33,6 +33,14 @@ public class TimeGraphTimeEvent extends EventObject {
      */
     private final long fTime;
 
+    /**
+     * Standard constructor
+     *
+     * @param source
+     *            The source of this event
+     * @param time
+     *            The time that was requested
+     */
     public TimeGraphTimeEvent(Object source, long time) {
         super(source);
         fTime = time;
