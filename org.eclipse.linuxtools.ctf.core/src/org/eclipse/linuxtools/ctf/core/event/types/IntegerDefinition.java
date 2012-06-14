@@ -16,7 +16,7 @@ import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
  * A CTF integer definition.
- * 
+ *
  * The definition of a integer basic data type. It will take the data
  * from a trace and store it (and make it fit) as a long.
  *
@@ -83,6 +83,7 @@ public class IntegerDefinition extends Definition {
 
     @Override
     public void read(BitBuffer input) {
+        final long longNegBit = 0x0000000080000000L;
         int align = (int) declaration.getAlignment();
         int pos = input.position() + ((align-(input.position() % align))%align);
         input.position(pos);
@@ -102,6 +103,13 @@ public class IntegerDefinition extends Definition {
         } else {
             bits = input.getInt(length, signed);
             bits = bits & 0x00000000FFFFFFFFL;
+            /*
+             * The previous line loses sign information but is necessary, this fixes the sign
+             * for 32 bit numbers. Sorry, in java all 64 bit ints are signed.
+             */
+            if( (longNegBit == (bits & longNegBit)) && signed) {
+                bits |= 0xffffffff00000000L;
+            }
         }
 
         value = bits;
