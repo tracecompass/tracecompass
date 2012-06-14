@@ -144,7 +144,9 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
                     }
 
                     // In all cases notify listeners
-                    session.fireComponentChanged(session);
+                    if (session != null) {
+                        session.fireComponentChanged(session);
+                    }
 
                     if (error != null) {
                         return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeChannelStateFailure, error);

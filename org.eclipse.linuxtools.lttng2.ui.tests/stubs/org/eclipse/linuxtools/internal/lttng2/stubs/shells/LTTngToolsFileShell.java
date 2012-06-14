@@ -258,7 +258,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
-    private boolean isComment(String line) {
+    private static boolean isComment(String line) {
         if (line == null) {
             throw new RuntimeException("line is null"); //$NON-NLS-1$
         }

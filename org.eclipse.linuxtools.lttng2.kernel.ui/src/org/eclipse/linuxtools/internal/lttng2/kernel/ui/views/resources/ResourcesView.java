@@ -482,7 +482,7 @@ public class ResourcesView extends TmfView {
         }
         refresh(INITIAL_WINDOW_OFFSET);
         for (TraceEntry traceEntry : entryList) {
-            CtfKernelTrace ctfKernelTrace = ((TraceEntry) traceEntry).getTrace();
+            CtfKernelTrace ctfKernelTrace = traceEntry.getTrace();
             IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
             long startTime = ssq.getStartTime();
             long endTime = ssq.getCurrentEndTime() + 1;
@@ -495,7 +495,9 @@ public class ResourcesView extends TmfView {
         }
     }
 
-    private List<ITimeEvent> getEventList(ResourcesEntry entry, long startTime, long endTime, long resolution, boolean includeNull, IProgressMonitor monitor) {
+    private static List<ITimeEvent> getEventList(ResourcesEntry entry,
+            long startTime, long endTime, long resolution, boolean includeNull,
+            IProgressMonitor monitor) {
         IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
         startTime = Math.max(startTime, ssq.getStartTime());
         endTime = Math.min(endTime, ssq.getCurrentEndTime() + 1);

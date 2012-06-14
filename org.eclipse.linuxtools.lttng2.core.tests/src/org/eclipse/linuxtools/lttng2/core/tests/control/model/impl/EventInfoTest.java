@@ -16,7 +16,6 @@ import junit.framework.TestCase;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
-import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.EventInfo;
 
 /**

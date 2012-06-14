@@ -219,7 +219,7 @@ public class CommandShell implements ICommandShell {
      *            The original command
      * @return formatted command string
      */
-    private String formatShellCommand(String cmd) {
+    private static String formatShellCommand(String cmd) {
         if (cmd == null || cmd.equals("")) { //$NON-NLS-1$
             return cmd;
         }

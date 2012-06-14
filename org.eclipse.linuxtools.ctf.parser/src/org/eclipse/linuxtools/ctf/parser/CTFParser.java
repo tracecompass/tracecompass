@@ -34,7 +34,8 @@ import org.antlr.runtime.tree.TreeAdaptor;
  * @author Matthew Khouzam and Antlr
  *
  */
-@SuppressWarnings({ "nls", "unused", "unchecked", "rawtypes", "javadoc"})
+@SuppressWarnings({ "nls", "unused", "unchecked", "rawtypes", "javadoc",
+        "null", "incomplete-switch" })
 public class CTFParser extends Parser {
     public static final String[] tokenNames = new String[] { "<invalid>",
             "<EOR>", "<DOWN>", "<UP>", "ALIGNTOK", "CONSTTOK", "CHARTOK",

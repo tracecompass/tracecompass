@@ -20,7 +20,7 @@ import org.antlr.runtime.RecognizerSharedState;
  * @author Matthew Khouzam and Antlr
  *
  */
-@SuppressWarnings({"nls", "javadoc"})
+@SuppressWarnings({"nls", "javadoc", "incomplete-switch"})
 public class CTFLexer extends Lexer {
     public static final int SIGN = 49;
     public static final int TERM = 47;

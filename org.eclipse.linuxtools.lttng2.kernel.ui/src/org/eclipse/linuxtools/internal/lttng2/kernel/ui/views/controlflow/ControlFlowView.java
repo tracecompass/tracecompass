@@ -621,7 +621,8 @@ public class ControlFlowView extends TmfView {
         }
     }
 
-    private void buildTree(ArrayList<ControlFlowEntry> entryList, ArrayList<ControlFlowEntry> rootList) {
+    private static void buildTree(ArrayList<ControlFlowEntry> entryList,
+            ArrayList<ControlFlowEntry> rootList) {
         for (ControlFlowEntry entry : entryList) {
             boolean root = true;
             if (entry.getParentThreadId() > 0) {
@@ -654,7 +655,9 @@ public class ControlFlowView extends TmfView {
         }
     }
 
-    private List<ITimeEvent> getEventList(ControlFlowEntry entry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    private static List<ITimeEvent> getEventList(ControlFlowEntry entry,
+            long startTime, long endTime, long resolution,
+            IProgressMonitor monitor) {
         startTime = Math.max(startTime, entry.getStartTime());
         endTime = Math.min(endTime, entry.getEndTime());
         if (endTime <= startTime) {

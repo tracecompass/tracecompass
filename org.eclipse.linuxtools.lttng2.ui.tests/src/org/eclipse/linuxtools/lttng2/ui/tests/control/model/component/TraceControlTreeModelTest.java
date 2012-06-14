@@ -458,7 +458,7 @@ public class TraceControlTreeModelTest extends TestCase {
         node.getParent().removeChild(node);
     }
 
-    private void verifySessionGetterSetters(TraceSessionComponent session) {
+    private static void verifySessionGetterSetters(TraceSessionComponent session) {
         // save original values
         String name = session.getName();
         String origPath = session.getSessionPath();
@@ -498,7 +498,7 @@ public class TraceControlTreeModelTest extends TestCase {
         session.setSessionState(origState);
     }
 
-    private void verifyDomainGettersSetters(TraceDomainComponent domain) {
+    private static void verifyDomainGettersSetters(TraceDomainComponent domain) {
         // save original values
         boolean isKernel = domain.isKernel();
 
@@ -523,7 +523,7 @@ public class TraceControlTreeModelTest extends TestCase {
         domain.setIsKernel(isKernel);
     }
 
-    private void verifyBaseEventGettersSetters(BaseEventComponent event) {
+    private static void verifyBaseEventGettersSetters(BaseEventComponent event) {
         // save original values
         String name =  event.getName();
         TraceLogLevel level = event.getLogLevel();
@@ -549,7 +549,7 @@ public class TraceControlTreeModelTest extends TestCase {
         event.setEventType(type);
     }
 
-    private void verifyEventGettersSetters(TraceEventComponent event) {
+    private static void verifyEventGettersSetters(TraceEventComponent event) {
         // save original values
         String name =  event.getName();
         TraceLogLevel level = event.getLogLevel();
@@ -590,7 +590,7 @@ public class TraceControlTreeModelTest extends TestCase {
         event.setState(state);
     }
 
-    private void verifyProbeEventGettersSetters(TraceProbeEventComponent event) {
+    private static void verifyProbeEventGettersSetters(TraceProbeEventComponent event) {
         // save original values
         String address = event.getAddress();
         String offset = event.getOffset();
@@ -612,7 +612,7 @@ public class TraceControlTreeModelTest extends TestCase {
         event.setSymbol(symbol);
     }
 
-    private void verifyChannelGettersSetters(TraceChannelComponent channel) {
+    private static void verifyChannelGettersSetters(TraceChannelComponent channel) {
         // save original values
         String name = channel.getName();
         int nbSubBuffers = channel.getNumberOfSubBuffers();
@@ -668,7 +668,7 @@ public class TraceControlTreeModelTest extends TestCase {
         channel.setSwitchTimer(switchTimer);
     }
 
-    private void verifyUstProviderGettersSetters(UstProviderComponent ustProvider) {
+    private static void verifyUstProviderGettersSetters(UstProviderComponent ustProvider) {
         // save original values
         String name = ustProvider.getName();
         int pid = ustProvider.getPid();

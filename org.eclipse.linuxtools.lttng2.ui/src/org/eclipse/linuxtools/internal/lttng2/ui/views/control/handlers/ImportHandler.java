@@ -170,7 +170,8 @@ public class ImportHandler extends BaseControlViewHandler {
      *            - project to import to
      * @throws ExecutionException
      */
-    private void downloadTrace(ImportFileInfo trace, IProject project) throws ExecutionException {
+    private static void downloadTrace(ImportFileInfo trace, IProject project)
+            throws ExecutionException {
         try {
             IRemoteFileSubSystem fsss = trace.getImportFile().getParentRemoteFileSubSystem();
 
