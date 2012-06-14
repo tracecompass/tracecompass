@@ -22,6 +22,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Bernd Hufmann
  *
  */
+@SuppressWarnings("javadoc")
 public final class SDMessages extends NLS {
 
     protected static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.messages";//$NON-NLS-1$

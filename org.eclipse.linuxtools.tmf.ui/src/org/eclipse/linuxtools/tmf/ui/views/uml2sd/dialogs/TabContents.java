@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * Class implementation contains the controls that allows to create or update a find or filter Criteria.
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -98,7 +98,7 @@ public class TabContents extends Composite {
 
     /**
      * Creates the dialog contents
-     * 
+     *
      * @param parent the parent widget
      * @param provider the provider which handle the action
      * @param okButton of the dialog (to be enabled/disabled)
@@ -172,7 +172,7 @@ public class TabContents extends Composite {
             } else {
                 fStopButton.setText(SDMessages._29);
             }
-            
+
             fStopButton.setEnabled(true);
             fStopButton.addSelectionListener(fGraphNodeTypeListener);
         }
@@ -237,9 +237,9 @@ public class TabContents extends Composite {
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
-    
+
     /**
-     * Set result text visibility  
+     * Set result text visibility
      * @param found <code>true</code> for found (enable visibility) else false
      */
     public void setResult(boolean found) {
@@ -260,7 +260,7 @@ public class TabContents extends Composite {
 
     /**
      * Sets the parent OK button reference.
-     * 
+     *
      * @param okButton The parent OK button
      */
     public void setOkButton(Button okButton) {
@@ -269,7 +269,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the asynchronous message check button state
-     * 
+     *
      * @return true if check, false otherwise
      */
     public boolean isAsynMessageButtonSelected() {
@@ -281,7 +281,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the asynchronous message return check button state
-     * 
+     *
      * @return true if check, false otherwise
      */
     public boolean isAsynMessageReturnButtonSelected() {
@@ -293,7 +293,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the case sensitive check button state
-     * 
+     *
      * @return true if check, false otherwise
      */
     public boolean isCaseSensitiveSelected() {
@@ -305,7 +305,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the lifeline check button state
-     * 
+     *
      * @return true if check, false otherwise
      */
     public boolean isLifelineButtonSelected() {
@@ -317,7 +317,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the user input string
-     * 
+     *
      * @return the string to search for
      */
     public String getSearchText() {
@@ -326,7 +326,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the stop check button state
-     * 
+     *
      * @return true if check, false otherwise
      */
     public boolean isStopButtonSelected() {
@@ -338,7 +338,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the synchronous message check button state
-     * 
+     *
      * @return true if check, false otherwise
      */
     public boolean isSynMessageButtonSelected() {
@@ -350,7 +350,7 @@ public class TabContents extends Composite {
 
     /**
      * Returns the synchronous message return check button state
-     * 
+     *
      * @return true if check, false otherwise
      */
     public boolean isSynMessageReturnButtonSelected() {
@@ -362,6 +362,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the asynchronous message check button state
+     *
+     * @param state
+     *            The new state to set
      */
     public void setAsynMessageButtonSelection(boolean state) {
         if (fAsynMessageButton != null) {
@@ -371,6 +374,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the asynchronous message return check button state
+     *
+     * @param state
+     *            The new state to set
      */
     public void setAsynMessageReturnButtonSelection(boolean state) {
         if (fAsynMessageReturnButton != null) {
@@ -380,6 +386,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the case sensitive check button state
+     *
+     * @param state
+     *            The new state to set
      */
     public void setCaseSensitiveSelection(boolean state) {
         if (fCaseSensitive != null) {
@@ -389,6 +398,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the lifeline check button state
+     *
+     * @param state
+     *            The new state to set
      */
     public void setLifelineButtonSelection(boolean state) {
         if (fLifelineButton != null) {
@@ -398,6 +410,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the user input string
+     *
+     * @param text
+     *            The search text
      */
     public void setSearchText(String text) {
         fSearchText.setText(text);
@@ -405,6 +420,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the stop check button state
+     *
+     * @param state
+     *            The new state to set
      */
     public void setStopButtonSelection(boolean state) {
         if (fStopButton != null) {
@@ -414,6 +432,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the synchronous message check button state
+     *
+     * @param state
+     *            The new state to set
      */
     public void setSynMessageButtonSelection(boolean state) {
         if (fSynMessageButton != null) {
@@ -423,6 +444,9 @@ public class TabContents extends Composite {
 
     /**
      * Set the synchronous message return check button state
+     *
+     * @param state
+     *            The new state to set
      */
     public void setSynMessageReturnButtonSelection(boolean state) {
         if (fSynMessageReturnButton != null) {
@@ -460,7 +484,7 @@ public class TabContents extends Composite {
 
     /**
      * Modify listener implementation for the expression field.
-     * 
+     *
      * @version 1.0
      */
     protected class ExpressionListener implements ModifyListener {

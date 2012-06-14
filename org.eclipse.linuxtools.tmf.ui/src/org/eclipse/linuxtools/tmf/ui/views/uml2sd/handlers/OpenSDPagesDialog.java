@@ -55,7 +55,10 @@ public class OpenSDPagesDialog extends Action {
     /**
      * Constructor
      *
-     * @param view The view reference
+     * @param view
+     *            The view reference
+     * @param provider
+     *            The provider
      */
     public OpenSDPagesDialog(SDView view, ISDAdvancedPagingProvider provider) {
         super(SDMessages._44);

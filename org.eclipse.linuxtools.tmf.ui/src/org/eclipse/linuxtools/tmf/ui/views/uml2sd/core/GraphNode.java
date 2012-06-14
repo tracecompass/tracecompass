@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * The base class used for all UML2 graph nodes displayed in the Sequence Diagram SDWidget.
- * 
+ *
  * @author sveyrier
  * @version 1.0
  */
@@ -58,7 +58,7 @@ public abstract class GraphNode {
      */
     protected boolean fFocused = false;
     /**
-     * Flag to indicate whether node has children or not. 
+     * Flag to indicate whether node has children or not.
      */
     protected boolean fHasChilden = false;
     /**
@@ -93,7 +93,7 @@ public abstract class GraphNode {
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
-    
+
     /**
      * Reset the internal index of the first visible GraphNode for each ordered GraphNode lists
      */
@@ -111,7 +111,7 @@ public abstract class GraphNode {
 
     /**
      * Add a GraphNode into the receiver
-     * 
+     *
      * @param nodeToAdd the node to add
      */
     public void addNode(GraphNode nodeToAdd) {
@@ -176,7 +176,7 @@ public abstract class GraphNode {
     /**
      * Set the graph node name.<br>
      * It is the name display in the view to label the graph node.
-     * 
+     *
      * @param nodeName the name to set
      */
     public void setName(String nodeName) {
@@ -186,7 +186,7 @@ public abstract class GraphNode {
     /**
      * Returns the graph node name.<br>
      * It is the name display in the view to label the graph node.
-     * 
+     *
      * @return the graph node name
      */
     public String getName() {
@@ -197,7 +197,7 @@ public abstract class GraphNode {
      * Tags the the graph node has selected.<br>
      * WARNING: This method is only used to draw the graph node using the system selection colors. <br>
      * To use the complete SDViewer selection mechanism (selection management, notification, etc..) see SDWidget class
-     * 
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#addSelection(GraphNode)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#removeSelection(GraphNode)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#clearSelection()
@@ -211,7 +211,7 @@ public abstract class GraphNode {
      * Tags the the graph node as focused.<br>
      * WARNING: This method is only used to draw the graph node using the system focus style. <br>
      * To use the complete SDViewer focus mechanism see SDWidget class
-     * 
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#addSelection(GraphNode)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#removeSelection(GraphNode)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#clearSelection()
@@ -224,7 +224,7 @@ public abstract class GraphNode {
     /**
      * Returns true if the graph node is selected, false otherwise.<br>
      * The returned value is used to highlight the graph node in the View.
-     * 
+     *
      * @return true if selected, false otherwise
      */
     public boolean isSelected() {
@@ -234,75 +234,83 @@ public abstract class GraphNode {
     /**
      * Returns true if the graph node is focused, false otherwise.<br>
      * The returned value is used to highlight the graph node in the View.
-     * 
-     * @return true if focued, false otherwise
+     *
+     * @return true if focused, false otherwise
      */
     public boolean hasFocus() {
         return fFocused;
     }
 
     /**
-     * Returns true if the graph node contains the point given in parameter, return false otherwise.
-     * 
-     * @param x the x coordinate of the point to test containment <br>
-     *            y the y coordinate of the point to test containment
+     * Returns true if the graph node contains the point given in parameter,
+     * return false otherwise.
+     *
+     * @param x
+     *            the x coordinate of the point to test containment
+     * @param y
+     *            the y coordinate of the point to test containment
      * @return true if contained, false otherwise
      */
     abstract public boolean contains(int x, int y);
 
     /**
      * Returns the x coordinate of the graph node
-     * 
+     *
      * @return the x coordinate
      */
     abstract public int getX();
 
     /**
      * Returns the y coordinate of the graph node
-     * 
+     *
      * @return the y coordinate
      */
     abstract public int getY();
 
     /**
      * Returns the graph node height
-     * 
+     *
      * @return the graph node height
      */
     abstract public int getHeight();
 
     /**
      * Returns the graph node width
-     * 
+     *
      * @return the graph node width
      */
     abstract public int getWidth();
 
     /**
      * Draws the graph node in the given context
-     * 
+     *
      * @param context the graphical context to draw in
      */
     abstract protected void draw(IGC context);
 
     /**
-     * Returns the GraphNode visibility for the given visible area. Wrong visibility calculation, may strongly impact
-     * drawing performance
-     * 
+     * Returns the GraphNode visibility for the given visible area. Wrong
+     * visibility calculation, may strongly impact drawing performance
+     *
      * @param x
+     *            The X coordinate
      * @param y
+     *            The Y coordinate
      * @param width
+     *            The width of the area
      * @param height
-     * @return true if visible false otherwise
+     *            The height of the area
+     * @return true if visible, false otherwise
      */
     public boolean isVisible(int x, int y, int width, int height) {
         return true;
     }
 
     /**
-     * Return a comparator to sort the GraphNode of the same type This comparator is used to order the GraphNode array
-     * of the given node type. (see getArrayId).
-     * 
+     * Return a comparator to sort the GraphNode of the same type This
+     * comparator is used to order the GraphNode array of the given node type.
+     * (see getArrayId).
+     *
      * @return the comparator
      */
     public Comparator<GraphNode> getComparator() {
@@ -310,8 +318,9 @@ public abstract class GraphNode {
     }
 
     /**
-     * If needed, return a different comparator to backward scan the GraphNode array
-     * 
+     * If needed, return a different comparator to backward scan the GraphNode
+     * array
+     *
      * @return the backward comparator or null if not needed
      */
     public Comparator<GraphNode> getBackComparator() {
@@ -320,8 +329,9 @@ public abstract class GraphNode {
 
     /**
      * Compare two graphNodes
-     * 
-     * @param node the node to compare to
+     *
+     * @param node
+     *            the node to compare to
      * @return true if equal false otherwise
      */
     public boolean isSameAs(GraphNode node) {
@@ -331,14 +341,14 @@ public abstract class GraphNode {
     /**
      * Return the node type for all class instances. This id is used to store the same nodes kind in the same ordered
      * array.
-     * 
+     *
      * @return the node type identifier
      */
     abstract public String getArrayId();
 
     /**
      * Return true if the distance from the GraphNode to the given point is positive
-     * 
+     *
      * @param x the point x coordinate
      * @param y the point y coordinate
      * @return true if positive false otherwise
@@ -350,7 +360,7 @@ public abstract class GraphNode {
     /**
      * Returns the graph node which contains the point given in parameter WARNING: Only graph nodes in the current
      * visible area can be returned
-     * 
+     *
      * @param x the x coordinate of the point to test
      * @param y the y coordinate of the point to test
      * @return the graph node containing the point given in parameter, null otherwise
@@ -447,7 +457,7 @@ public abstract class GraphNode {
      * Returns the graph node which contains the point given in parameter for the given graph node list and starting the
      * iteration at the given index<br>
      * WARNING: Only graph nodes with smaller coordinates than the current visible area can be returned.<br>
-     * 
+     *
      * @param x the x coordinate of the point to test
      * @param y the y coordinate of the point to test
      * @param list the list to search in
@@ -469,7 +479,7 @@ public abstract class GraphNode {
 
     /**
      * Returns the start event occurrence attached to this graphNode.
-     * 
+     *
      * @return the start event occurrence attached to the graphNode
      */
     public int getStartOccurrence() {
@@ -478,7 +488,7 @@ public abstract class GraphNode {
 
     /**
      * Returns the end event occurrence attached to this graphNode
-     * 
+     *
      * @return the start event occurrence attached to the graphNode
      */
     public int getEndOccurrence() {
@@ -488,7 +498,7 @@ public abstract class GraphNode {
     /**
      * Computes the index of the first visible GraphNode for each ordered graph node lists depending on the visible area
      * given in parameter
-     * 
+     *
      * @param x visible area top left corner x coordinate
      * @param y visible area top left corner y coordinate
      * @param width visible area width
@@ -522,7 +532,7 @@ public abstract class GraphNode {
 
                 if ((direction == -1) && (fBackwardNodes.get(nodeType) != null)) {
                     GraphNode currentNode = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex);
-                    drawIndex = Arrays.binarySearch(((List<GraphNode>) fBackwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>) fBackwardNodes.get(nodeType)).size()]), 
+                    drawIndex = Arrays.binarySearch(((List<GraphNode>) fBackwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>) fBackwardNodes.get(nodeType)).size()]),
                             ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex), currentNode.getBackComparator());
                     fNodes.put(nodeType, (List<GraphNode>) fBackwardNodes.get(nodeType));
                     if (drawIndex < 0) {
@@ -606,7 +616,7 @@ public abstract class GraphNode {
                 }
             }
             if (TmfUiTracer.isIndexTraced()) {
-                TmfUiTracer.traceIndex("First drawn " + nodeType + " index = " + drawIndex + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
+                TmfUiTracer.traceIndex("First drawn " + nodeType + " index = " + drawIndex + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 TmfUiTracer.traceIndex(nodeType + " found in " + 0 + " iterations\n"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
@@ -620,7 +630,7 @@ public abstract class GraphNode {
      * Draws the children nodes on the given context.<br>
      * This method start width GraphNodes ordering if needed.<br>
      * After, depending on the visible area, only visible GraphNodes are drawn.<br>
-     * 
+     *
      * @param context the context to draw to
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#draw(IGC)
      */
@@ -693,7 +703,7 @@ public abstract class GraphNode {
 
     /**
      * Draw the GraphNode stored in the given list, starting at index startIndex with the given step
-     * 
+     *
      * @param context the context to draw to
      * @param list the GraphNodes list
      * @param startIndex the start index
@@ -733,7 +743,7 @@ public abstract class GraphNode {
             // ***Common*** nodes visibility
             if ((!toDraw.isSameAs(last) || toDraw.isSelected()) && (toDraw.isVisible(context.getContentsX(), context.getContentsY(), context.getVisibleWidth(), context.getVisibleHeight()))) {
                 nodesCount++;
-                
+
                 toDraw.draw(context);
                 if (hasFocus()) {
                     toDraw.drawFocus(context);
@@ -746,7 +756,9 @@ public abstract class GraphNode {
 
     /**
      * Draws the focus within the graphical context.
+     *
      * @param context
+     *            The context
      */
     public void drawFocus(IGC context) {
         context.drawFocus(getX(), getY(), getWidth(), getHeight());
@@ -754,7 +766,7 @@ public abstract class GraphNode {
 
     /**
      * Determine if the given point (px,py) is contained in the rectangle (x,y,width,height)
-     * 
+     *
      * @param x the rectangle x coordinate
      * @param y the rectangle y coordinate
      * @param width the rectangle width

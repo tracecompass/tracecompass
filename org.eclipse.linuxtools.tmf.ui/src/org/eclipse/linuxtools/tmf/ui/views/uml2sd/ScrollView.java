@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -51,19 +51,19 @@ import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * ScrollView widget provides a scrolling area with on-demand scroll bars. 
+ * ScrollView widget provides a scrolling area with on-demand scroll bars.
  * Overview scrollable panel can be used (@see setOverviewEnabled()).
- * 
+ *
  * @author Eric Miravete
  * @version 1.0
  */
 public class ScrollView extends Composite {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    // Value for scroll bar mode, default is AUTO 
+    // Value for scroll bar mode, default is AUTO
     /**
      * Scroll bar mode AUTO
      */
@@ -77,11 +77,11 @@ public class ScrollView extends Composite {
      */
     public static final int ALWAYS_OFF = 2;
     /**
-     * Bit mask for visible vertical scroll bar  
+     * Bit mask for visible vertical scroll bar
      */
     public static final int VBAR = 0x01;
     /**
-     * Bit mask for visible horizontal scroll bar  
+     * Bit mask for visible horizontal scroll bar
      */
     public static final int HBAR = 0x02;
     /**
@@ -93,20 +93,20 @@ public class ScrollView extends Composite {
      */
     protected int fContentsWidth = 0;
     /**
-     * Value of the contents x coordinate property 
+     * Value of the contents x coordinate property
      */
     protected int fContentsX = 0;
     /**
-     * Value of the contents y coordinate property 
+     * Value of the contents y coordinate property
      */
     protected int fContentsY = 0;
     /**
-     * Scroll bar mode of horizontal scroll bar. 
-     */    
+     * Scroll bar mode of horizontal scroll bar.
+     */
     protected int fHorScrollbarMode = AUTO;
     /**
-     * Scroll bar mode of vertical scroll bar. 
-     */    
+     * Scroll bar mode of vertical scroll bar.
+     */
     protected int fVertScrollbarMode = AUTO;
     /**
      * Increment for the horizontal scroll bar.
@@ -158,7 +158,7 @@ public class ScrollView extends Composite {
      */
     protected Canvas fViewControl;
     /**
-     * Control used in the bottom right corner @see setCornerControl() and @see setOverviewEnabled(true) 
+     * Control used in the bottom right corner @see setCornerControl() and @see setOverviewEnabled(true)
      */
     protected Control fCornerControl;
     /**
@@ -166,23 +166,23 @@ public class ScrollView extends Composite {
      */
     protected int fOverviewSize = 100; // default size for overview
     /**
-     * Timer for auto_scroll feature 
+     * Timer for auto_scroll feature
      */
     protected AutoScroll fAutoScroll = null;
-    /** 
-     * TimerTask for auto_scroll feature !=null when auto scroll is running 
+    /**
+     * TimerTask for auto_scroll feature !=null when auto scroll is running
      */
     protected Timer fAutoScrollTimer = null;
-    /** 
-     * where mouse down appear on contents area (x coordinate) 
+    /**
+     * where mouse down appear on contents area (x coordinate)
      */
     protected int fMouseDownX = -1;
-    /** 
-     * where mouse down appear on contents area (y coordinate) 
+    /**
+     * where mouse down appear on contents area (y coordinate)
      */
     protected int fMousDownY = -1;
 
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -190,7 +190,7 @@ public class ScrollView extends Composite {
     /**
      * Create a ScrollView, child of composite c. Both scroll bar have the mode AUTO. Auto scroll feature is enabled
      * using a delay of 250ms. Overview feature is not enabled by default (use setOverviewEnabled()).
-     * 
+     *
      * @param c The parent composite
      * @param style The SWT style bits @see SWT
      */
@@ -201,7 +201,7 @@ public class ScrollView extends Composite {
     /**
      * Create a ScrollView, child of composite c. Both scroll bar have the mode AUTO. Auto scroll feature is enabled
      * using a delay of 250ms. Overview feature is not enabled by default (use setOverviewEnabled()).
-     * 
+     *
      * @param c The parent composite.
      * @param style The SWT style bits @see SWT
      * @param mouseWheel Flag to force scrollView to handles mouse wheel
@@ -356,7 +356,7 @@ public class ScrollView extends Composite {
             }
         });
 
-        if (fViewControl.getVerticalBar() != null)
+        if (fViewControl.getVerticalBar() != null) {
             // add fViewControl hidden scrollbar listener to get mouse wheel ...
             fViewControl.getVerticalBar().addSelectionListener(new SelectionListener() {
                 @Override
@@ -371,6 +371,7 @@ public class ScrollView extends Composite {
                 public void widgetDefaultSelected(SelectionEvent e) {
                 }
             });
+        }
         getHorizontalBar().addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -386,7 +387,7 @@ public class ScrollView extends Composite {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        if (fViewControl.getHorizontalBar() != null)
+        if (fViewControl.getHorizontalBar() != null) {
             fViewControl.getHorizontalBar().addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -400,6 +401,7 @@ public class ScrollView extends Composite {
                 public void widgetDefaultSelected(SelectionEvent e) {
                 }
             });
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -426,7 +428,7 @@ public class ScrollView extends Composite {
 
     /*
      * Dispose controls used in scroll view
-     * 
+     *
      * (non-Javadoc)
      * @see org.eclipse.swt.widgets.Widget#dispose()
      */
@@ -491,7 +493,7 @@ public class ScrollView extends Composite {
      * Draw overview area, @see setOverviewEnabled. By default draw a rectangle corresponding to the visible area of
      * scroll view. You can redefine this method to draw the contents as drawContents does... ...in an other magnify
      * factor.
-     * 
+     *
      * @param gc GC to used to draw.
      * @param r Rectangle corresponding to the client area of overview.
      */
@@ -522,7 +524,7 @@ public class ScrollView extends Composite {
 
     /**
      * Remove the local Listener and add the new listener.
-     * 
+     *
      * @param nlistener the new listener
      */
     public void replaceControlListener(ControlListener nlistener) {
@@ -535,7 +537,7 @@ public class ScrollView extends Composite {
 
     /**
      * Remove the local Listener and add the new listener.
-     * 
+     *
      * @param nlistener the new listener
      */
     public void replaceKeyListener(KeyListener nlistener) {
@@ -548,7 +550,7 @@ public class ScrollView extends Composite {
 
     /**
      * Remove the local Listener and add the new listener.
-     * 
+     *
      * @param nlistener the new listener
      */
     public void replaceMouseListener(MouseListener nlistener) {
@@ -561,7 +563,7 @@ public class ScrollView extends Composite {
 
     /**
      * Remove the local Listener and add the new listener.
-     * 
+     *
      * @param nlistener the new listener
      */
     public void replaceMouseMoveListener(MouseMoveListener nlistener) {
@@ -574,7 +576,7 @@ public class ScrollView extends Composite {
 
     /**
      * Remove the local Listener and add the new listener.
-     * 
+     *
      * @param nlistener the new listener
      */
     public void replacePaintListener(PaintListener nlistener) {
@@ -587,7 +589,7 @@ public class ScrollView extends Composite {
 
     /**
      * Access method for the contentsHeight property.
-     * 
+     *
      * @return the current value of the contentsHeight property
      */
     public int getContentsHeight() {
@@ -596,7 +598,7 @@ public class ScrollView extends Composite {
 
     /**
      * Access method for the contentsWidth property.
-     * 
+     *
      * @return the current value of the contentsWidth property
      */
     public int getContentsWidth() {
@@ -605,7 +607,7 @@ public class ScrollView extends Composite {
 
     /**
      * Access method for the contentsX property.
-     * 
+     *
      * @return the current value of the contentsX property
      */
     public int getContentsX() {
@@ -614,7 +616,7 @@ public class ScrollView extends Composite {
 
     /**
      * Access method for the contentsY property.
-     * 
+     *
      * @return the current value of the contentsY property
      */
     public int getContentsY() {
@@ -623,7 +625,7 @@ public class ScrollView extends Composite {
 
     /**
      * Determines if the dragAutoScroll property is true.
-     * 
+     *
      * @return <code>true<code> if the dragAutoScroll property is true
      */
     public boolean isDragAutoScroll() {
@@ -632,7 +634,7 @@ public class ScrollView extends Composite {
 
     /**
      * Sets the value of the dragAutoScroll property.
-     * 
+     *
      * @param aDragAutoScroll the new value of the dragAutoScroll property
      */
     public void setDragAutoScroll(boolean aDragAutoScroll) {
@@ -645,7 +647,7 @@ public class ScrollView extends Composite {
 
     /**
      * Change delay (in millisec) used for auto scroll feature.
-     * 
+     *
      * @param period new period between to auto scroll
      */
     public void setDragAutoScrollPeriod(int period) {
@@ -654,6 +656,8 @@ public class ScrollView extends Composite {
 
     /**
      * Return auto scroll period.
+     *
+     * @return The period
      */
     public int getDragAutoScrollPeriod() {
         return fAutoScrollPeriod;
@@ -661,7 +665,7 @@ public class ScrollView extends Composite {
 
     /**
      * Access method for the hScrollBarMode property.
-     * 
+     *
      * @return the current value of the hScrollBarMode property
      */
     public int getHScrollBarMode() {
@@ -670,7 +674,7 @@ public class ScrollView extends Composite {
 
     /**
      * Sets the value of the hScrollBarMode property.
-     * 
+     *
      * @param aHScrollBarMode the new value of the hScrollBarMode property
      */
     public void setHScrollBarMode(int aHScrollBarMode) {
@@ -679,7 +683,7 @@ public class ScrollView extends Composite {
 
     /**
      * Access method for the vScrollBarMode property.
-     * 
+     *
      * @return the current value of the vScrollBarMode property
      */
     public int getVScrollBarMode() {
@@ -688,7 +692,7 @@ public class ScrollView extends Composite {
 
     /**
      * Sets the value of the vScrollBarMode property.
-     * 
+     *
      * @param aVScrollBarMode the new value of the vScrollBarMode property
      */
     public void setVScrollBarMode(int aVScrollBarMode) {
@@ -697,6 +701,8 @@ public class ScrollView extends Composite {
 
     /**
      * Return horizontal scroll bar increment, default:1
+     *
+     * @return The increment
      */
     public int getHScrollBarIncrement() {
         return fHorScrollbarIncrement;
@@ -704,20 +710,30 @@ public class ScrollView extends Composite {
 
     /**
      * Return vertical scroll bar increment, default:1
+     *
+     * @return The increment
      */
     public int getVScrollBarIncrement() {
         return fVertScrollbarIncrement;
     }
 
     /**
-     * Change horizontal scroll bar increment, minimum:1. Page increment is always set to visible width.
+     * Change horizontal scroll bar increment, minimum:1. Page increment is
+     * always set to visible width.
+     *
+     * @param inc
+     *            Increment value to set
      */
     public void setHScrollBarIncrement(int inc) {
         fHorScrollbarIncrement = Math.max(1, inc);
     }
 
     /**
-     * Change vertical scroll bar increment, minimum:1. Page increment is always set to visible height.
+     * Change vertical scroll bar increment, minimum:1. Page increment is always
+     * set to visible height.
+     *
+     * @param inc
+     *            Increment value to set
      */
     public void setVScrollBarIncrement(int inc) {
         fVertScrollbarIncrement = Math.max(1, inc);
@@ -727,7 +743,7 @@ public class ScrollView extends Composite {
      * Enable or disable overview feature. Enabling overview, dispose and replace existing corner control by a button.
      * Clicking in it open overview, move mouse cursor holding button to move scroll view and release button to hide
      * overview. Tip: hold control and/or shift key while moving mouse when overview is open made fine scroll.
-     * 
+     *
      * @param value true to engage overview feature
      */
     public void setOverviewEnabled(boolean value) {
@@ -750,6 +766,9 @@ public class ScrollView extends Composite {
 
     /**
      * Change overview size (at ratio 1:1), default is 100
+     *
+     * @param size
+     *            The new size
      */
     public void setOverviewSize(int size) {
         fOverviewSize = Math.abs(size);
@@ -757,7 +776,7 @@ public class ScrollView extends Composite {
 
     /**
      * Returns whether the overview is enabled or not.
-     * 
+     *
      * @return true is overview feature is enabled
      */
     public boolean isOverviewEnabled() {
@@ -773,7 +792,7 @@ public class ScrollView extends Composite {
 
     /**
      * Returns the overview size at ratio 1:1.
-     * 
+     *
      * @return current overview size at ratio 1:1
      */
     public int getOverviewSize() {
@@ -783,8 +802,8 @@ public class ScrollView extends Composite {
     /**
      * Returns control used to display view (might not be this object). Use this control to add/remove listener on the
      * draw area.
-     * 
-     * @return control used to display view (might not be this object). 
+     *
+     * @return control used to display view (might not be this object).
      */
     public Control getViewControl() {
         return fViewControl;
@@ -792,7 +811,7 @@ public class ScrollView extends Composite {
 
     /**
      * Called when the mouse enter the ScrollView area
-     * 
+     *
      * @param e
      */
     protected void contentsMouseExit(MouseEvent e) {
@@ -800,7 +819,7 @@ public class ScrollView extends Composite {
 
     /**
      * Called when the mouse enter the ScrollView area after and system defined time
-     * 
+     *
      * @param e
      */
     protected void contentsMouseHover(MouseEvent e) {
@@ -808,7 +827,7 @@ public class ScrollView extends Composite {
 
     /**
      * Called when the mouse enter the ScrollView area
-     * 
+     *
      * @param e
      */
     protected void contentsMouseEnter(MouseEvent e) {
@@ -816,7 +835,7 @@ public class ScrollView extends Composite {
 
     /**
      * Called when user double on contents area.
-     * 
+     *
      * @param e
      */
     protected void contentsMouseDoubleClickEvent(MouseEvent e) {
@@ -824,7 +843,7 @@ public class ScrollView extends Composite {
 
     /**
      * Called when mouse is on contents area and button is pressed.
-     * 
+     *
      * @param e
      */
     protected void contentsMouseDownEvent(MouseEvent e) {
@@ -832,8 +851,8 @@ public class ScrollView extends Composite {
         fMousDownY = e.y;
     }
 
-    /** 
-     * TimerTask for auto scroll feature. 
+    /**
+     * TimerTask for auto scroll feature.
      */
     protected static class AutoScroll extends TimerTask {
         public int deltaX;
@@ -859,7 +878,7 @@ public class ScrollView extends Composite {
 
     /**
      * Called when mouse is on contents area and mode.
-     * 
+     *
      * @param event
      */
     protected void contentsMouseMoveEvent(MouseEvent event) {
@@ -915,7 +934,7 @@ public class ScrollView extends Composite {
 
     /**
      * Called when mouse is on contents area and button is released
-     * 
+     *
      * @param event
      */
     protected void contentsMouseUpEvent(MouseEvent event) {
@@ -929,7 +948,7 @@ public class ScrollView extends Composite {
     /**
      * Responsible to draw contents area. At least rectangle clipX must be redrawn. This rectangle is given in contents
      * coordinates. By default, no paint is produced.
-     * 
+     *
      * @param gc
      * @param clipx
      * @param clipy
@@ -941,14 +960,14 @@ public class ScrollView extends Composite {
 
     /**
      * Change the size of the contents area.
-     * 
+     *
      * @param width new width of the area.
      * @param height new height of the area.
      */
     public void resizeContents(int width, int height) {
         int localWidth = width;
         int localHeight = height;
-        
+
         if (localWidth < 0) {
             localWidth = 0;
         }
@@ -1009,7 +1028,7 @@ public class ScrollView extends Composite {
     }
 
     /**
-     * @param delataX The delta in X 
+     * @param delataX The delta in X
      * @param deltaY the delta in Y
      */
     public void scrollBy(int delataX, int deltaY) {
@@ -1018,7 +1037,7 @@ public class ScrollView extends Composite {
 
     /**
      * Scroll to ensure point(in contents coordinates) is visible.
-     * 
+     *
      * @param px Point's x position
      * @param py Point's y position
      */
@@ -1042,7 +1061,7 @@ public class ScrollView extends Composite {
     /**
      * Make rectangle (x,y,w,h, in contents coordinates) visible. if rectangle cannot be completely visible, use
      * align flags.
-     * 
+     *
      * @param xValue x contents coordinates of rectangle.
      * @param yValue y contents coordinates of rectangle.
      * @param width width of rectangle.
@@ -1057,7 +1076,7 @@ public class ScrollView extends Composite {
     /**
      * Make rectangle (xValue,yValue,width,height, in contents coordinates) visible. if rectangle cannot be completely visible, use
      * align flags.
-     * 
+     *
      * @param xValue x contents coordinates of rectangle.
      * @param yValue y contents coordinates of rectangle.
      * @param width width of rectangle.
@@ -1067,7 +1086,7 @@ public class ScrollView extends Composite {
      * @param forceAlign force alignment for rectangle smaller than the visible area
      */
     protected void ensureVisible(int xValue, int yValue, int width, int height, int align, boolean forceAlign) {
-        
+
         int localX = xValue;
         int localY = yValue;
         int localWidth = width;
@@ -1133,7 +1152,7 @@ public class ScrollView extends Composite {
 
     /**
      * Returns true if point is visible (expressed in contents coordinates).
-     * 
+     *
      * @param px Point's x position
      * @param py Point's y position
      * @return true if point is visible (expressed in contents coordinates)
@@ -1156,7 +1175,7 @@ public class ScrollView extends Composite {
 
     /**
      * Returns true if rectangle if partially visible.
-     * 
+     *
      * @param xValue x contents coordinates of rectangle.
      * @param yValue y contents coordinates of rectangle.
      * @param width width of rectangle.
@@ -1182,20 +1201,24 @@ public class ScrollView extends Composite {
     }
 
     /**
-     * Returns visible part of rectangle, or null if rectangle is not visible. Rectangle is expressed in contents
-     *         coordinates.
+     * Returns visible part of rectangle, or null if rectangle is not visible.
+     * Rectangle is expressed in contents coordinates.
      *
-     * @param xValue x contents coordinates of rectangle.
-     * @param yValue y contents coordinates of rectangle.
-     * @param width width of rectangle.
-     * @param height height of rectangle.
-     * @return visible part of rectangle, or null if rectangle is not visible. 
+     * @param xValue
+     *            x contents coordinates of rectangle.
+     * @param yValue
+     *            y contents coordinates of rectangle.
+     * @param width
+     *            width of rectangle.
+     * @param height
+     *            height of rectangle.
+     * @return visible part of rectangle, or null if rectangle is not visible.
      */
-    public Rectangle getVisiblePart(int xValue, int yYalue, int width, int height) {
+    public Rectangle getVisiblePart(int xValue, int yValue, int width, int height) {
         if (xValue + width < getContentsX()) {
             return null;
         }
-        if (yYalue + height < getContentsY()) {
+        if (yValue + height < getContentsY()) {
             return null;
         }
         int vr = getContentsX() + getVisibleWidth();
@@ -1203,19 +1226,19 @@ public class ScrollView extends Composite {
         if (xValue > vr) {
             return null;
         }
-        if (yYalue > vb) {
+        if (yValue > vb) {
             return null;
         }
-        int rr = xValue + width, rb = yYalue + height;
-        int nl = Math.max(xValue, getContentsX()), nt = Math.max(yYalue, getContentsY()), nr = Math.min(rr, vr), nb = Math.min(rb, vb);
+        int rr = xValue + width, rb = yValue + height;
+        int nl = Math.max(xValue, getContentsX()), nt = Math.max(yValue, getContentsY()), nr = Math.min(rr, vr), nb = Math.min(rb, vb);
         return new Rectangle(nl, nt, nr - nl, nb - nt);
     }
 
     /**
-     * Returns the visible part for given rectangle. 
-     * 
+     * Returns the visible part for given rectangle.
+     *
      * @param rect A rectangle
-     * 
+     *
      * @return gets visible part of rectangle (or <code>null</code>)
      */
     public final Rectangle getVisiblePart(Rectangle rect) {
@@ -1227,7 +1250,7 @@ public class ScrollView extends Composite {
 
     /**
      * Change top left position of visible area. Check if the given point is inside contents area.
-     * 
+     *
      * @param xValue x contents coordinates of visible area.
      * @param yValue y contents coordinates of visible area.
      * @return true if view really moves
@@ -1291,10 +1314,10 @@ public class ScrollView extends Composite {
      * @param forHeight height of foreground
      * @param currHorVis The current visibility state of horizontal scroll bar
      * @param currVertvis The current visibility state of vertical scroll bar
-     * @return <code>true</code> if visibility changed else <code>false</code> 
+     * @return <code>true</code> if visibility changed else <code>false</code>
      */
     public int computeBarVisibility(int forWidth, int forHeight, boolean currHorVis, boolean currVertvis) {
-        
+
         int localForWidth = forWidth;
         int vis = 0x00;
         switch (fVertScrollbarMode) {
@@ -1421,7 +1444,7 @@ public class ScrollView extends Composite {
      * corner control. This control is visible only if at least one scrollbar is visible. Given control will be disposed
      * by ScrollView, at dispose() time, at next setCornetControl() call or when calling setOverviewEnabled(). Pay
      * attention calling this reset overview feature until setOverviewEnabled(true) if called.
-     * @param control The control for the overview 
+     * @param control The control for the overview
      */
     public void setCornerControl(Control control) {
         if (fCornerControl != null) {
@@ -1438,7 +1461,7 @@ public class ScrollView extends Composite {
 
     /**
      * Transform (x,y) point in widget coordinates to contents coordinates.
-     * 
+     *
      * @param x The x widget coordinate.
      * @param y The y widget coordinate.
      * @return org.eclipse.swt.graphics.Point with content coordinates.
@@ -1447,21 +1470,21 @@ public class ScrollView extends Composite {
         return new Point(viewToContentsX(x), viewToContentsY(y));
     }
 
-    /** 
+    /**
      * Transform x in widget coordinates to contents coordinates
-     * 
+     *
      * @param x The y widget coordinate.
-     * @return the x content coordinate. 
+     * @return the x content coordinate.
      */
     public int viewToContentsX(int x) {
         return fContentsX + x;
     }
 
-    /** 
+    /**
      * Transform y in widget coordinates to contents coordinates
-     *  
+     *
      * @param y The y widget coordinate.
-     * @return the y content coordinate. 
+     * @return the y content coordinate.
      */
     public int viewToContentsY(int y) {
         return fContentsY + y;
@@ -1469,7 +1492,7 @@ public class ScrollView extends Composite {
 
     /**
      * Transform (x,y) point from contents coordinates, to widget coordinates.
-     * 
+     *
      * @param x The x content coordinate.
      * @param y The y content coordinate.
      * @return coordinates widget area as.
@@ -1480,7 +1503,7 @@ public class ScrollView extends Composite {
 
     /**
      * Transform X axis coordinates from contents to widgets.
-     * 
+     *
      * @param x contents coordinate to transform.
      * @return x coordinate in widget area
      */
@@ -1490,7 +1513,7 @@ public class ScrollView extends Composite {
 
     /**
      * Transform Y axis coordinates from contents to widgets.
-     * 
+     *
      * @param y contents coordinate to transform
      * @return y coordinate in widget area
      */
@@ -1500,7 +1523,7 @@ public class ScrollView extends Composite {
 
     /**
      * Return the visible height of scroll view, might be > contentsHeight
-     * 
+     *
      * @return the visible height of scroll view, might be > contentsHeight()
      */
     public int getVisibleHeight() {
@@ -1509,7 +1532,7 @@ public class ScrollView extends Composite {
 
     /**
      * Return int the visible width of scroll view, might be > contentsWidth().
-     * 
+     *
      * @return int the visible width of scroll view, might be > contentsWidth()
      */
     public int getVisibleWidth() {
@@ -1538,9 +1561,9 @@ public class ScrollView extends Composite {
         }
     }
 
-    /** 
+    /**
      * Redefine this method at your convenience
-     * 
+     *
      * @param event The key event.
      */
     protected void keyReleasedEvent(KeyEvent event) {
@@ -1548,8 +1571,8 @@ public class ScrollView extends Composite {
 
     /**
      * Returns vertical bar width, even if bar isn't visible.
-     * 
-     * @return vertical bar width, even if bar isn't visible 
+     *
+     * @return vertical bar width, even if bar isn't visible
      */
     public int getVerticalBarWidth() {
         // include vertical bar width and trimming of scrollable used
@@ -1559,8 +1582,8 @@ public class ScrollView extends Composite {
 
     /**
      * Returns horizontal bar height even if bar isn't visible.
-     * 
-     * @return horizontal bar height even if bar isn't visible 
+     *
+     * @return horizontal bar height even if bar isn't visible
      */
     public int getHorizontalBarHeight() {
         // include horiz. bar height and trimming of scrollable used
@@ -1587,7 +1610,7 @@ public class ScrollView extends Composite {
     }
 
     /**
-     *  Internal layout for ScrollView, handle scrollbars, drawzone and corner control 
+     *  Internal layout for ScrollView, handle scrollbars, drawzone and corner control
      */
     protected class SVLayout extends Layout {
         /**
@@ -1598,7 +1621,7 @@ public class ScrollView extends Composite {
          * The do-it-not flag
          */
         boolean dontLayout = false;
-        
+
         /*
          * (non-Javadoc)
          * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite, int, int, boolean)
@@ -1645,10 +1668,12 @@ public class ScrollView extends Composite {
                 fCornerControl.setVisible(true);
                 cww = vbw;
                 cwh = hbh;
-                if (wb == 0)
+                if (wb == 0) {
                     wb = vbw;
-                if (hb == 0)
+                }
+                if (hb == 0) {
                     hb = hbh;
+                }
             } else if (vb_vis && hb_vis) {
                 if (fCornerControl != null) {
                     fCornerControl.setVisible(false);
@@ -1664,7 +1689,7 @@ public class ScrollView extends Composite {
             int vh = cs.y - (hb_vis ? hbh : 0);
             int vbx = cs.x - wb;
             int hby = cs.y - hb;
-            
+
             fViewControl.setBounds(0, 0, vw, vh);
 
             if (vb_vis) {
@@ -1690,7 +1715,7 @@ public class ScrollView extends Composite {
 
     /** Support for click-and-see overview shell on this ScrollView */
     protected class Overview {
-        
+
         /**
          *  factor for X from real and overview sizes, for mouse move speed.
          */
@@ -1714,7 +1739,10 @@ public class ScrollView extends Composite {
         protected int fSaveCursorY;
 
         /**
-         *  apply overview support on a control. Replace existing corner_widget 
+         * Apply overview support on a control. Replace existing corner_widget
+         *
+         * @param control
+         *            The control to use
          */
         public void useControl(Control control) {
             final Point pos = control.getLocation();
@@ -1742,8 +1770,9 @@ public class ScrollView extends Composite {
 
                 @Override
                 public void focusLost(FocusEvent e) {
-                    if (overviewing())
+                    if (overviewing()) {
                         overviewDisappear(false);
+                    }
                 }
 
             });
@@ -1792,8 +1821,8 @@ public class ScrollView extends Composite {
             });
         }
 
-        /** 
-         * Dispose controls of overview 
+        /**
+         * Dispose controls of overview
          */
         public void dispose() {
             if (fOverview != null) {
@@ -1801,14 +1830,14 @@ public class ScrollView extends Composite {
             }
         }
 
-        /** 
+        /**
          * @return true if overview is currently on screen
          */
         protected boolean overviewing() {
             return (fOverview != null && fOverview.isVisible());
         }
 
-        /** 
+        /**
          * Process overview appear
          */
         protected void overviewAppear(int mx, int my) {
@@ -1880,8 +1909,9 @@ public class ScrollView extends Composite {
                 int s = 1;
                 byte src[] = new byte[s * s];
                 byte msk[] = new byte[s * s];
-                for (int i = 0; i < s * s; ++i)
+                for (int i = 0; i < s * s; ++i) {
                     src[i] = (byte) 0xFF;
+                }
                 ImageData i_src = new ImageData(s, s, 1, palette, 1, src);
                 ImageData i_msk = new ImageData(s, s, 1, palette, 1, msk);
                 fOverviewCursor = new Cursor(null, i_src, i_msk, 0, 0);
@@ -1900,16 +1930,16 @@ public class ScrollView extends Composite {
             p = toGlobalCoordinates(fOverview.getParent(), cx, cy);
         }
 
-        /** 
-         * Process disappear of overview 
+        /**
+         * Process disappear of overview
          */
         protected void overviewDisappear() {
             overviewDisappear(true);
         }
 
-        /** 
+        /**
          * Process disappear of overview
-         * @param restoreCursorLoc A flag to restore cursor location 
+         * @param restoreCursorLoc A flag to restore cursor location
          */
         protected void overviewDisappear(boolean restoreCursorLoc) {
             if (fOverview == null) {
@@ -1935,9 +1965,9 @@ public class ScrollView extends Composite {
             overviewMove(dx, dy, event);
         }
 
-        /** 
+        /**
          * Process mouse move event when overviewing
-         *  
+         *
          * @param dx The x coordinates delta
          * @param dy The y coordinates delta
          * @param event The typed event
@@ -1985,7 +2015,7 @@ public class ScrollView extends Composite {
 
         /**
          * Convert overview coordinates to global coordinates.
-         * 
+         *
          * @param loc the control reference
          * @param x The x coordinate to convert
          * @param y The y coordinate to convert

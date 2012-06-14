@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -29,10 +29,10 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.TimeEventComparator;
  * For instance, only one frame can be drawn in the View.<br>
  * Lifelines, Messages and Stop which are supposed to represent a Sequence diagram are drawn in a Frame.<br>
  * Only the graph node added to their representing list will be drawn.
- * 
+ *
  * The lifelines are appended along the X axsis when added in a frame.<br>
  * The syncMessages are ordered along the Y axsis depending on the event occurrence they are attached to.<br>
- * 
+ *
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline Lifeline for more event occurence details
  * @author sveyrier
  * @version 1.0
@@ -74,19 +74,19 @@ public class Frame extends BasicFrame {
     /**
      * Returns a list of all lifelines known by this frame. Known lifelines are the only one which can be displayed on
      * screen.
-     * 
+     *
      * @return the lifelines list
      */
     protected List<GraphNode> getLifelines() {
         if (!fHasChilden) {
             return null;
-        } 
+        }
         return (List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG);
     }
 
     /**
      * Returns the number of lifelines stored in the frame
-     * 
+     *
      * @return the number of lifelines
      */
     public int lifeLinesCount() {
@@ -99,7 +99,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the lifeline at the given index in the lifelines array
-     * 
+     *
      * @param index the position in the lifeline array
      * @return the lifeline or <code>null</code>
      */
@@ -113,31 +113,31 @@ public class Frame extends BasicFrame {
     /**
      * Returns a list of syncMessages known by this frame. Known syncMessages are the only on which can be displayed on
      * screen
-     * 
+     *
      * @return the syncMessages list
      */
     protected List<GraphNode> getSyncMessages() {
         if (!fHasChilden) {
             return null;
-        } 
+        }
         return (List<GraphNode>) fNodes.get(SyncMessage.SYNC_MESS_TAG);
     }
 
     /**
      * Returns the number of syncMessages stored in the frame
-     * 
+     *
      * @return the number of syncMessage
      */
     public int syncMessageCount() {
         if (getSyncMessages() != null) {
             return getSyncMessages().size();
-        } 
+        }
         return 0;
     }
 
     /**
      * Returns the syncMessage at the given index in the syncMessages array
-     * 
+     *
      * @param index the position in the syncMessages array
      * @return the syncMessage or <code>null</code>
      */
@@ -151,7 +151,7 @@ public class Frame extends BasicFrame {
     /**
      * Returns a list of asyncMessages known by this frame. Known asyncMessages are the only on which can be displayed
      * on screen
-     * 
+     *
      * @return the asyncMessages list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessages() {
@@ -163,7 +163,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the number of asyncMessage stored in the frame
-     * 
+     *
      * @return the number of asyncMessage
      */
     public int asyncMessageCount() {
@@ -175,7 +175,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the asyncMessage at the given index in the asyncMessage array
-     * 
+     *
      * @param index the position in the asyncMessage array
      * @return the asyncMessage or <code>null</code>
      */
@@ -189,7 +189,7 @@ public class Frame extends BasicFrame {
     /**
      * Returns a list of syncMessages return known by this frame. Known syncMessages return are the only on which can be
      * displayed on screen
-     * 
+     *
      * @return the syncMessages return list or <code>null</code>
      */
     protected List<GraphNode> getSyncMessagesReturn() {
@@ -201,7 +201,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the number of syncMessageReturn stored in the frame
-     * 
+     *
      * @return the number of syncMessageReturn
      */
     public int syncMessageReturnCount() {
@@ -213,7 +213,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the syncMessageReturn at the given index in the syncMessageReturn array
-     * 
+     *
      * @param index the position in the syncMessageReturn array
      * @return the syncMessageReturn or <code>null</code>
      */
@@ -227,7 +227,7 @@ public class Frame extends BasicFrame {
     /**
      * Returns a list of asyncMessageRetun known by this frame. Known asyncMessageRetun are the only on which can be
      * displayed on screen
-     * 
+     *
      * @return the asyncMessageRetun list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessagesReturn() {
@@ -239,7 +239,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the number of asyncMessageReturn stored in the frame
-     * 
+     *
      * @return the number of asyncMessageReturn
      */
     public int asyncMessageReturnCount() {
@@ -251,7 +251,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the asyncMessageReturn at the given index in the asyncMessageReturn array
-     * 
+     *
      * @param index the position in the asyncMessageReturn array
      * @return the asyncMessageReturn or <code>null</code>
      */
@@ -265,7 +265,7 @@ public class Frame extends BasicFrame {
     /**
      * Adds a lifeline to the frame lifelines list. The lifeline X drawing order depends on the lifeline addition order
      * into the frame lifelines list.
-     * 
+     *
      * @param lifeline the lifeline to add
      */
     public void addLifeLine(Lifeline lifeline) {
@@ -287,7 +287,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the first visible lifeline drawn in the view
-     * 
+     *
      * @return the first visible lifeline index
      */
     public int getFirstVisibleLifeline() {
@@ -301,7 +301,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the first visible synchronous message drawn in the view
-     * 
+     *
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleSyncMessage() {
@@ -315,7 +315,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the first visible synchronous message return drawn in the view
-     * 
+     *
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleSyncMessageReturn() {
@@ -329,7 +329,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the first visible synchronous message drawn in the view
-     * 
+     *
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleAsyncMessage() {
@@ -343,7 +343,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the first visible synchronous message return drawn in the view
-     * 
+     *
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleAsyncMessageReturn() {
@@ -357,7 +357,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the list of execution occurrences.
-     * 
+     *
      * @return the list of execution occurrences
      */
     public List<SDTimeEvent> getExecutionOccurrencesWithTime() {
@@ -366,9 +366,9 @@ public class Frame extends BasicFrame {
 
     /**
      * Inserts a lifeline after a given lifeline.
-     * 
+     *
      * @param toInsert A lifeline to insert
-     * @param after A lifelife the toInsert-lifeline will be inserted after.  
+     * @param after A lifelife the toInsert-lifeline will be inserted after.
      */
     public void insertLifelineAfter(Lifeline toInsert, Lifeline after) {
         if ((toInsert == null)) {
@@ -410,9 +410,11 @@ public class Frame extends BasicFrame {
 
     /**
      * Inserts a lifeline before a given lifeline.
-     * 
-     * @param toInsert A lifeline to insert
-     * @param after A lifelife the toInsert-lifeline will be inserted before.  
+     *
+     * @param toInsert
+     *            A lifeline to insert
+     * @param before
+     *            A lifeline the toInsert-lifeline will be inserted before.
      */
     public void insertLifelineBefore(Lifeline toInsert, Lifeline before) {
         if ((toInsert == null)) {
@@ -454,9 +456,9 @@ public class Frame extends BasicFrame {
 
     /**
      * Gets the closer life line to the given x-coordinate.
-     * 
+     *
      * @param x A x coordinate
-     * @return the closer lifeline 
+     * @return the closer lifeline
      */
     public Lifeline getCloserLifeline(int x) {
         int index = (x - Metrics.FRAME_H_MARGIN + Metrics.LIFELINE_H_MAGIN) / Metrics.swimmingLaneWidth() - 1;
@@ -488,7 +490,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Re-orders the given list of lifelines.
-     * 
+     *
      * @param list A list of lifelines to reorder.
      */
     public void reorder(List<?> list) {
@@ -545,7 +547,7 @@ public class Frame extends BasicFrame {
      * Find the two graph nodes that are closest to this date, one just earlier, second just later. If date is before
      * any graph node, bounds[0] is null and bounds[1] is the earliest. If date is after any graph node, bounds[1] is
      * null and bounds[0] is the latest.
-     * 
+     *
      * @param dateToFind date to be found
      * @param bounds a two items array that will receive bounds if found
      * @return true if both bounds not null
@@ -578,7 +580,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Set whether time information is available or not
-     * 
+     *
      * @param value <code>true</code> for has time information else <code>false</code>
      */
     protected void setHasTimeInfo(boolean value) {
@@ -587,7 +589,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns whether frame has time info or not.
-     * 
+     *
      * @return <code>true</code> whether frame has time info else <code>false</code>
      */
     public boolean hasTimeInfo() {
@@ -596,7 +598,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Highlights the time compression.
-     * 
+     *
      * @param lifeline A lifeline to highlight
      * @param startEvent A start event number
      * @param nbEvent A number of events
@@ -611,7 +613,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Set the lifeline categories which will be use during the lifelines creation
-     * 
+     *
      * @see Lifeline#setCategory(int)
      * @param categories the lifeline categories array
      */
@@ -621,11 +623,11 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the lifeline categories array set for the this frame
-     * 
+     *
      * @return the lifeline categories array or null if not set
      */
     public LifelineCategories[] getLifelineCategories() {
-        return  Arrays.copyOf(fLifelineCategories, fLifelineCategories.length); 
+        return  Arrays.copyOf(fLifelineCategories, fLifelineCategories.length);
     }
 
     /**
@@ -636,7 +638,7 @@ public class Frame extends BasicFrame {
      * - asynchronous syncMessages return<br>
      * For drawing performance reason, it is recommended to add synchronous syncMessages in the same order they should
      * appear along the Y axis in the Frame.
-     * 
+     *
      * @param message the message to add
      */
     public void addMessage(BaseMessage message) {
@@ -653,7 +655,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return;
         }
-        
+
         if (fHighlightLifeline != null) {
             IColor backupColor = context.getBackground();
             context.setBackground(SDViewPref.getInstance().getTimeCompressionSelectionColor());
@@ -762,7 +764,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Get the closer leaving message.
-     * 
+     *
      * @param lifeline A lifeline reference
      * @param message A message reference
      * @param list A list of graph nodes
@@ -820,10 +822,10 @@ public class Frame extends BasicFrame {
         return null;
     }
 
-    
+
     /**
      * Get the closer entering message.
-     * 
+     *
      * @param lifeline A lifeline reference
      * @param message A message reference
      * @param list A list of graph nodes
@@ -855,12 +857,13 @@ public class Frame extends BasicFrame {
             }
         } else {
             int event = getMaxEventOccurrence();
-            if (message != null)
+            if (message != null) {
                 if (message instanceof AsyncMessage) {
                     event = ((AsyncMessage) message).getStartOccurrence();
                 } else {
                     event = message.getEventOccurrence();
                 }
+            }
             for (int i = list.size() - 1; i >= 0; i--) {
                 GraphNode node = (GraphNode) list.get(i);
                 if (node instanceof SyncMessage) {
@@ -881,7 +884,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Get distance of given event from given graph node.
-     * 
+     *
      * @param node A graph node reference.
      * @param event A event number to check.
      * @return distance of event from graph node.
@@ -904,7 +907,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Get node from 2 given nodes that is close to event.
-     * 
+     *
      * @param node1 A first graph node
      * @param node2 A second graph node
      * @param event A event to check.
@@ -921,13 +924,13 @@ public class Frame extends BasicFrame {
             return node1;
         } else if (node2 != null) {
             return node2;
-        } 
+        }
         return null;
     }
 
     /**
      * Get called message based on given start message.
-     * 
+     *
      * @param startMessage A start message to check.
      * @return called message (graph node) or <code>null</code>
      */
@@ -957,7 +960,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Get caller message based on given start message.
-     * 
+     *
      * @param startMessage A start message to check.
      * @return called message (graph node) or <code>null</code>
      */
@@ -987,7 +990,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Get next lifeline based on given message.
-     * 
+     *
      * @param lifeline A lifeline reference
      * @param startMessage A start message to check
      * @return next lifeline or <code>null</code>
@@ -1012,19 +1015,20 @@ public class Frame extends BasicFrame {
 
     /**
      * Get previous lifeline based on given message.
-     * 
+     *
      * @param lifeline A lifeline reference
      * @param startMessage A start message to check.
      * @return previous lifeline or <code>null</code>
      */
     public GraphNode getPrevLifelineMessage(Lifeline lifeline, BaseMessage startMessage) {
         int event = getMaxEventOccurrence();
-        if (startMessage != null)
+        if (startMessage != null) {
             if (startMessage instanceof AsyncMessage) {
                 event = ((AsyncMessage) startMessage).getStartOccurrence();
             } else {
                 event = startMessage.getEventOccurrence();
             }
+        }
         if (lifeline == null) {
             return null;
         }
@@ -1037,10 +1041,10 @@ public class Frame extends BasicFrame {
         result = getCloserToEvent(result, messageReturn, event);
         return result;
     }
-    
+
     /**
      * Get the first execution occurrence.
-     * 
+     *
      * @param lifeline A lifeline reference
      * @return the first execution occurrence of lifeline or <code>null</code>.
      */
@@ -1063,10 +1067,10 @@ public class Frame extends BasicFrame {
         }
         return result;
     }
-    
+
     /**
      * Get the previous execution occurrence relative to a given execution occurrence.
-     * 
+     *
      * @param exec A execution occurrence reference.
      * @return the previous execution occurrence of lifeline or <code>null</code>.
      */
@@ -1097,7 +1101,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Get the next execution occurrence relative to a given execution occurrence.
-     * 
+     *
      * @param exec A execution occurrence reference.
      * @return the next execution occurrence of lifeline or <code>null</code>.
      */
@@ -1128,7 +1132,7 @@ public class Frame extends BasicFrame {
 
     /**
      * Get the last execution occurrence.
-     * 
+     *
      * @param lifeline A lifeline reference.
      * @return the last execution occurrence of lifeline or <code>null</code>.
      */

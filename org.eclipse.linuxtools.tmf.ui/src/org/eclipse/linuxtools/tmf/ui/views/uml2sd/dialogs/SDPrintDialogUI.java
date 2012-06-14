@@ -1,15 +1,15 @@
-/********************************************************************** 
+/**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- *  
- * All rights reserved.   This program and the accompanying materials 
- * are made available under the terms of the Eclipse Public License v1.0 
- * which accompanies this distribution, and is available at 
- * http://www.eclipse.org/legal/epl-v10.html         
- * 
- * Contributors: 
+ *
+ * All rights reserved.   This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
  * IBM - Initial API and implementation
- * Bernd Hufmann - Updated for TMF 
+ * Bernd Hufmann - Updated for TMF
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs;
 
@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * The class implements the actual print dialog UI for collecting printing data.
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -64,15 +64,15 @@ public class SDPrintDialogUI {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The set horizontal pages number. 
+     * The set horizontal pages number.
      */
     protected Button fSetHPagesNumber;
     /**
-     * The set vertical pages number. 
+     * The set vertical pages number.
      */
     protected Button fSetVPagesNumber;
     /**
-     * Flag whether to use current zoom or not. 
+     * Flag whether to use current zoom or not.
      */
     protected Button fUseCurrentZoom;
     /**
@@ -100,7 +100,7 @@ public class SDPrintDialogUI {
      */
     protected Text fToPage;
     /**
-     *  The sequence diagram widget reference. 
+     *  The sequence diagram widget reference.
      */
     protected SDWidget fSdView;
     /**
@@ -116,7 +116,7 @@ public class SDPrintDialogUI {
      */
     protected Text fTotalPages;
     /**
-     * A modify listener implementation to handle modifications. 
+     * A modify listener implementation to handle modifications.
      */
     protected ModifyListener fModifyListener;
     /**
@@ -136,7 +136,7 @@ public class SDPrintDialogUI {
      */
     protected int fPageNum = -1;
     /**
-     * Number of first page. 
+     * Number of first page.
      */
     protected int fFirstPage = -1;
     /**
@@ -144,15 +144,15 @@ public class SDPrintDialogUI {
      */
     protected int fPagesList[];
     /**
-     * Values for dividing sequence diagram into pages.   
+     * Values for dividing sequence diagram into pages.
      */
     protected float fStepX, fStepY, sTX, sTY;
     /**
-     * Page which to print from. 
+     * Page which to print from.
      */
     protected int fFrom;
     /**
-     * Page which to print to. 
+     * Page which to print to.
      */
     protected int fTo;
     /**
@@ -192,7 +192,7 @@ public class SDPrintDialogUI {
      */
     protected float fZoomFactor;
     /**
-     * The printer data reference. 
+     * The printer data reference.
      */
     protected PrinterData fPrinterData;
     /**
@@ -216,7 +216,7 @@ public class SDPrintDialogUI {
      */
     protected boolean fShowPrintButton;
     /**
-     * Test value  
+     * Test value
      */
     protected int fTest = 3;
     /**
@@ -224,7 +224,7 @@ public class SDPrintDialogUI {
      */
     protected WizardPage fParentWizardPage = null;
     /**
-     * Reference to parent print dialog. 
+     * Reference to parent print dialog.
      */
     protected SDPrintDialog fParentDialog = null;
 
@@ -233,7 +233,7 @@ public class SDPrintDialogUI {
     // ------------------------------------------------------------------------
     /**
      * Local sequence diagram widget used to display overview of sequence diagram to print.
-     * @version 1.0 
+     * @version 1.0
      */
     protected class LocalSD extends SDWidget {
 
@@ -280,7 +280,7 @@ public class SDPrintDialogUI {
 
         /**
          * Creates page selection images.
-         * 
+         *
          * @param img - Overview image
          * @param width -The width value
          * @param stepX - Step X
@@ -355,7 +355,7 @@ public class SDPrintDialogUI {
             imGC.dispose();
             return over;
         }
-        
+
         /*
          * (non-Javadoc)
          * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#drawContents(org.eclipse.swt.graphics.GC, int, int, int, int)
@@ -648,20 +648,25 @@ public class SDPrintDialogUI {
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * 
-     * @param shell The shell reference
-     * @param sdWidget The sequence diagram widget reference
+     *
+     * @param shell
+     *            The shell reference
+     * @param sdWidget
+     *            The sequence diagram widget reference
      */
     public SDPrintDialogUI(Shell shell, SDWidget sdWidget) {
         this(shell, sdWidget, false);
     }
-    
+
     /**
      * Constructor
-     * 
-     * @param shello The shell reference
-     * @param sdWidget The sequence diagram widget reference
-     * @param showPrintBtn Flag for showing print buttons
+     *
+     * @param shell
+     *            The shell reference
+     * @param sdWidget
+     *            The sequence diagram widget reference
+     * @param showPrintBtn
+     *            Flag for showing print buttons
      */
     public SDPrintDialogUI(Shell shell, SDWidget sdWidget, boolean showPrintBtn) {
         fShell = shell;
@@ -690,7 +695,7 @@ public class SDPrintDialogUI {
                         fCurrentPage.setSelection(false);
                         fAllPages.setSelection(true);
                     }
-                    if ("".equals(fHorPagesNum.getText())) { //$NON-NLS-1$ 
+                    if ("".equals(fHorPagesNum.getText())) { //$NON-NLS-1$
                         fHorPagesNum.setText("1"); //$NON-NLS-1$
                     }
                 }
@@ -720,7 +725,7 @@ public class SDPrintDialogUI {
                     fPagesList[0] = 1;
                     fPageNum = 1;
                     fFirstPage = 1;
-                } else if ((fOverviewCanvas.isEnabled() && (e.widget == fPageList)) && 
+                } else if ((fOverviewCanvas.isEnabled() && (e.widget == fPageList)) &&
                            (fPagesList == null || fPagesList.length <= 0)) {
 
                     fPagesList = new int[1];
@@ -769,7 +774,7 @@ public class SDPrintDialogUI {
 
     /**
      * Creates new grid data object.
-     * 
+     *
      * @param span horizontal span.
      * @return grid data
      */
@@ -781,7 +786,7 @@ public class SDPrintDialogUI {
 
     /**
      * Creates the dialog area.
-     * 
+     *
      * @param parent The parent composite
      * @return dialog control
      */
@@ -1031,6 +1036,11 @@ public class SDPrintDialogUI {
         return fNbPages;
     }
 
+    /**
+     * Handler for when the OK button is pressed
+     *
+     * @return True if the operation was successful, false if there was an error
+     */
     public boolean okPressed() {
         fPrintAll = fAllPages.getSelection();
         fPrintCurrent = fCurrentPage.getSelection();
@@ -1168,7 +1178,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the pages list.
-     * 
+     *
      * @return the pages list.
      */
     public int[] getPageList() {
@@ -1177,7 +1187,9 @@ public class SDPrintDialogUI {
 
     /**
      * Adds a page to pages list.
+     *
      * @param num
+     *            The number of the the new page
      */
     public void addToPagesList(int num) {
         int temp[] = new int[fPagesList.length + 1];
@@ -1189,7 +1201,9 @@ public class SDPrintDialogUI {
 
     /**
      * Removes a page from the pages list.
+     *
      * @param num
+     *            The number of the page to remove
      */
     public void removeFromPagesList(int num) {
         int pos = Arrays.binarySearch(fPagesList, num);
@@ -1202,7 +1216,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the maximum number of pages.
-     * 
+     *
      * @return maximum number of pages.
      */
     public int maxNumOfPages() {
@@ -1211,7 +1225,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the number of rows.
-     * 
+     *
      * @return number of rows.
      */
     public int getNbRow() {
@@ -1233,7 +1247,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the number of lines.
-     * 
+     *
      * @return number of lines
      */
     public int getNbLines() {
@@ -1255,7 +1269,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns whether to print all pages or not.
-     * 
+     *
      * @return <code>true</code> for all pages else <code>false</code>.
      */
     public boolean printAll() {
@@ -1263,8 +1277,8 @@ public class SDPrintDialogUI {
     }
 
     /**
-     * Returns whether to print only current page 
-     * 
+     * Returns whether to print only current page
+     *
      * @return <code>true</code> for current page only else <code>false</code>..
      */
     public boolean printCurrent() {
@@ -1273,16 +1287,16 @@ public class SDPrintDialogUI {
 
     /**
      * Returns whether to print selected pages.
-     * 
-     * @return <code>true</code> for selected pages only else <code>false</code>. 
+     *
+     * @return <code>true</code> for selected pages only else <code>false</code>.
      */
     public boolean printSelection() {
         return fPrintSelection;
     }
-    
+
     /**
      * Returns whether to print range of pages.
-     * 
+     *
      * @return <code>true</code> for range of pages only else <code>false</code>.
      */
     public boolean printRange() {
@@ -1291,7 +1305,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the step in X direction.
-     * 
+     *
      * @return step in X direction
      */
     public float getStepX() {
@@ -1300,7 +1314,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the step in Y direction.
-     * 
+     *
      * @return step in Y direction
      */
     public float getStepY() {
@@ -1309,7 +1323,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the zoom factor
-     * 
+     *
      * @return zoom factor
      */
     public float getZoomFactor() {
@@ -1318,7 +1332,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the printer data reference.
-     * 
+     *
      * @return printer data reference
      */
     public PrinterData getPrinterData() {
@@ -1327,7 +1341,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the page number to start printing from.
-     * 
+     *
      * @return page number to start printing from
      */
     public int getFrom() {
@@ -1336,7 +1350,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the page number to print to.
-     * 
+     *
      * @return page number to print to
      */
     public int getTo() {
@@ -1356,7 +1370,7 @@ public class SDPrintDialogUI {
 
     /**
      * Returns the shell reference.
-     * 
+     *
      * @return the shell reference.
      */
     public Shell getShell() {
@@ -1365,7 +1379,7 @@ public class SDPrintDialogUI {
 
     /**
      * Sets the shell.
-     * 
+     *
      * @param shell The shell reference.
      */
     public void setShell(Shell shell) {
@@ -1424,7 +1438,7 @@ public class SDPrintDialogUI {
 
     /**
      * Sets parent wizard page
-     * 
+     *
      * @param parent The parent wizard page
      */
     public void setParentWizardPage(WizardPage parent) {
@@ -1433,8 +1447,8 @@ public class SDPrintDialogUI {
 
     /**
      * Sets the parent dialog box.
-     * 
-     * @param parent The parent dialog box. 
+     *
+     * @param parent The parent dialog box.
      */
     public void setParentDialog(SDPrintDialog parent) {
         fParentDialog = parent;

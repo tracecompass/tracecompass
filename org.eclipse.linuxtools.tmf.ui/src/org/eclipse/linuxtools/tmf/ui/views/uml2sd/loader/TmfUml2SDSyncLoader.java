@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader;
@@ -64,25 +64,34 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * <p>
- * This class is a reference implementation of the <code>org.eclipse.linuxtools.tmf.ui.Uml2SDLoader</code> extension point. It provides
- * a Sequence Diagram loader for a user space trace with specific trace content for sending and
- * receiving signals between components. I also includes a default implementation for the <code>ITmfEvent</code> parsing.
+ * This class is a reference implementation of the
+ * <code>org.eclipse.linuxtools.tmf.ui.Uml2SDLoader</code> extension point. It
+ * provides a Sequence Diagram loader for a user space trace with specific trace
+ * content for sending and receiving signals between components. I also includes
+ * a default implementation for the <code>ITmfEvent</code> parsing.
  * </p>
- * 
- * The class <code>TmfUml2SDSyncLoader</code> analyzes events from type <code>ITmfEvent</code> and creates events type 
- * <code>ITmfSyncSequenceDiagramEvent</code> if the <code>ITmfEvent</code> contains all relevant information. 
- * The analysis checks that the event type strings contains either string SEND or RECEIVE. If event type matches these key 
- * words, the analyzer will look for strings sender, receiver and signal in the event fields of type <code>ITmfEventField</code>. 
- * If all the data is found a sequence diagram event from can be created. Note that Sync Messages are assumed, which 
- * means start and end time are the same. <br> 
+ *
+ * The class <code>TmfUml2SDSyncLoader</code> analyzes events from type
+ * <code>ITmfEvent</code> and creates events type
+ * <code>ITmfSyncSequenceDiagramEvent</code> if the <code>ITmfEvent</code>
+ * contains all relevant information. The analysis checks that the event type
+ * strings contains either string SEND or RECEIVE. If event type matches these
+ * key words, the analyzer will look for strings sender, receiver and signal in
+ * the event fields of type <code>ITmfEventField</code>. If all the data is
+ * found a sequence diagram event from can be created. Note that Sync Messages
+ * are assumed, which means start and end time are the same. <br>
  * <br>
- * The parsing of the <code>ITmfEvent</code> is done in the method <code>getSequnceDiagramEvent()</code> of class 
- * <code>TmfUml2SDSyncLoader</code>. By extending the class <code>TmfUml2SDSyncLoader</code> and overwriting 
- * <code>getSequnceDiagramEvent()</code> a customized parsing algorithm can be implemented.<br> 
- *  <br>
- * Note that combined traces of multiple components, that contain the trace information about the same interactions are not 
- * supported in the class <code>TmfUml2SDSyncLoader</code>.    
- * 
+ * The parsing of the <code>ITmfEvent</code> is done in the method
+ * <code>getSequnceDiagramEvent()</code> of class
+ * <code>TmfUml2SDSyncLoader</code>. By extending the class
+ * <code>TmfUml2SDSyncLoader</code> and overwriting
+ * <code>getSequnceDiagramEvent()</code> a customized parsing algorithm can be
+ * implemented.<br>
+ * <br>
+ * Note that combined traces of multiple components, that contain the trace
+ * information about the same interactions are not supported in the class
+ * <code>TmfUml2SDSyncLoader</code>.
+ *
  * @version 1.0
  * @author Bernd Hufmann
  */
@@ -104,7 +113,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      */
     protected final static int MAX_NUM_OF_MSG = 10000;
     /**
-     * Initial time range window. 
+     * Initial time range window.
      */
     protected final static long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
 
@@ -164,11 +173,11 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Flag to specify that selection of message is done by selection or by signal.
      */
-    volatile protected boolean fIsSelect = false; 
+    volatile protected boolean fIsSelect = false;
 
     // Search attributes
     /**
-     * The job for searching across pages. 
+     * The job for searching across pages.
      */
     protected SearchJob fFindJob = null;
     /**
@@ -189,13 +198,13 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      * The list of active filters.
      */
     protected List<FilterCriteria> fFilterCriteria = null;
-    
+
     // Thread synchronization
     /**
      * The synchronization lock.
      */
     protected ReentrantLock fLock = new ReentrantLock();
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -208,7 +217,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Constructor
-     * 
+     *
      * @param name Name of loader
      */
     public TmfUml2SDSyncLoader(String name) {
@@ -220,13 +229,13 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     // ------------------------------------------------------------------------
     /**
      * Returns the current time if available else null.
-     * 
+     *
      * @return the current time if available else null
      */
     public ITmfTimestamp getCurrentTime() {
-        fLock.lock(); 
+        fLock.lock();
         try {
-            if (fCurrentTime != null) { 
+            if (fCurrentTime != null) {
                 return fCurrentTime.clone();
             }
             return null;
@@ -234,7 +243,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             fLock.unlock();
         }
     }
-    
+
     /**
      * Waits for the page request to be completed
      */
@@ -242,20 +251,21 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         fLock.lock();
         ITmfEventRequest<ITmfEvent> request = fPageRequest;
         fLock.unlock();
-        if (request != null)
-        try {
-            request.waitForCompletion();
-        } catch (InterruptedException e) {
-            // ignore
+        if (request != null) {
+            try {
+                request.waitForCompletion();
+            } catch (InterruptedException e) {
+                // ignore
+            }
         }
     }
 
     /**
      * Signal handler for the experiment selected signal.
-     * 
+     *
      * Spawns a request to index the experiment (checkpoints creation) as well as it fills
      * the first page.
-     * 
+     *
      * @param signal The experiment selected signal
      */
     @SuppressWarnings("unchecked")
@@ -266,7 +276,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         job.setUser(false);
         job.schedule();
 
-        fLock.lock(); 
+        fLock.lock();
         try {
             // Update the trace reference
             TmfExperiment<ITmfEvent> exp = (TmfExperiment<ITmfEvent>) signal.getExperiment();
@@ -374,12 +384,12 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         } finally {
             fLock.unlock();
         }
-    
+
     }
 
     /**
-     * Signal handler for the experiment disposed signal. 
-     * 
+     * Signal handler for the experiment disposed signal.
+     *
      * @param signal The experiment disposed signal
      */
     @TmfSignalHandler
@@ -430,10 +440,10 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     }
 
     /**
-     * Moves to the page that contains the current time provided by signal. 
-     * No message will be selected however the focus will be set to the message 
+     * Moves to the page that contains the current time provided by signal.
+     * No message will be selected however the focus will be set to the message
      * if the provided time is the time of a message.
-     * 
+     *
      * @param signal The time range sync signal
      */
     @TmfSignalHandler
@@ -798,7 +808,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     @Override
     public void pageNumberChanged(int pagenNumber) {
         int localPageNumber = pagenNumber;
-        
+
         fLock.lock();
         try {
             cancelOngoingRequests();
@@ -877,7 +887,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Fills current page with sequence diagram content.
-     * 
+     *
      * @param events sequence diagram events
      */
     protected void fillCurrentPage(List<ITmfSyncSequenceDiagramEvent> events) {
@@ -1074,7 +1084,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Moves to a certain page.
-     * 
+     *
      * @param notifyAll true to broadcast time range signal to other signal handlers else false
      */
     protected void moveToPage(boolean notifyAll) {
@@ -1128,7 +1138,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Gets page that contains timestamp
-     * 
+     *
      * @param time The timestamp
      * @return page that contains the time
      */
@@ -1155,7 +1165,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Background search in trace for expression in criteria.
-     * 
+     *
      * @param findCriteria The find criteria
      * @return true if background request was started else false
      */
@@ -1185,7 +1195,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Gets time range for time range signal.
-     * 
+     *
      * @param startTime The start time of time range.
      * @return the time range
      */
@@ -1202,7 +1212,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Checks if filter criteria matches the message name in given SD event.
-     * 
+     *
      * @param sdEvent The SD event to check
      * @return true if match else false.
      */
@@ -1224,7 +1234,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Checks if filter criteria matches a lifeline name (sender or receiver) in given SD event.
-     * 
+     *
      * @param lifeline the message receiver
      * @return true if match else false.
      */
@@ -1250,7 +1260,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     protected class SearchJob extends Job {
 
         /**
-         * The search event request. 
+         * The search event request.
          */
         final protected SearchEventRequest fSearchRequest;
 
@@ -1427,8 +1437,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         /**
          * Set progress monitor.
-         * 
-         * @param monitor
+         *
+         * @param monitor The monitor to assign
          */
         public void setMonitor(IProgressMonitor monitor) {
             fMonitor = monitor;
@@ -1436,7 +1446,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         /**
          * Check if find criteria was met.
-         * 
+         *
          * @return true if find criteria was met.
          */
         public boolean isFound() {
@@ -1445,7 +1455,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         /**
          * Returns timestamp of found time.
-         * 
+         *
          * @return timestamp of found time.
          */
         public ITmfTimestamp getFoundTime() {
@@ -1454,8 +1464,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     }
 
     /**
-     * Job class to provide progress monitor feedback. 
-     * 
+     * Job class to provide progress monitor feedback.
+     *
      * @version 1.0
      * @author Bernd Hufmann
      *
@@ -1480,10 +1490,10 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         }
     }
 
-    
+
     /**
      * Returns sequence diagram event if details in given event are available else null.
-     * 
+     *
      * @param tmfEvent Event to parse for sequence diagram event details
      * @return sequence diagram event if details are available else null
      */

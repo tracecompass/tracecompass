@@ -625,11 +625,14 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     }
 
     /**
-     * Force the time compression bar to highlight the event occurrences between the two given messages. The event
-     * occurrences are highlighted on the first message's end lifeline
+     * Force the time compression bar to highlight the event occurrences between
+     * the two given messages. The event occurrences are highlighted on the
+     * first message's end lifeline
      *
-     * @param mes1 the first message
-     * @param localMes2 the second message
+     * @param mes1
+     *            the first message
+     * @param mes2
+     *            the second message
      */
     public void highlightRegion(BaseMessage mes1, BaseMessage mes2) {
         BaseMessage localMes1 = mes1;

@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * This is the Sequence Diagram preference handler. This class is responsible for accessing the current user preferences
  * selection This class also provider getters for each modifiable preferences.
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -46,15 +46,15 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     // Constants
     // ------------------------------------------------------------------------
     /**
-     * Postfix string for background color property 
+     * Postfix string for background color property
      */
     public static final String BACK_COLOR_POSTFIX = "_BACK_COLOR";//$NON-NLS-1$
     /**
-     * Postfix string for foreground color property 
+     * Postfix string for foreground color property
      */
     public static final String FORE_COLOR_POSTFIX = "_FORE_COLOR";//$NON-NLS-1$
     /**
-     * Postfix string for text color property 
+     * Postfix string for text color property
      */
     public static final String TEXT_COLOR_POSTFIX = "_TEXT_COLOR";//$NON-NLS-1$
     /**
@@ -78,7 +78,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      */
     private static final String[] PREF_TEXT_COLOR_LIST = { PREF_LIFELINE, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
     /**
-     * Temporary tag 
+     * Temporary tag
      */
     protected static final String TEMP_TAG = "_TEMP";//$NON-NLS-1$
 
@@ -91,19 +91,19 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      */
     private static SDViewPref fHandle = null;
     /**
-     * Hashtable for font preferences 
+     * Hashtable for font preferences
      */
     protected Map<String, IFont> fFontPref;
     /**
-     * Hashtable for foreground color preferences 
+     * Hashtable for foreground color preferences
      */
     protected Map<String, IColor> fForeColorPref;
     /**
-     * Hashtable for background color preferences 
+     * Hashtable for background color preferences
      */
     protected Map<String, IColor> fBackColorPref;
     /**
-     * Hashtable for text color preferences 
+     * Hashtable for text color preferences
      */
     protected Map<String, IColor> fTextColorPref;
     /**
@@ -122,7 +122,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    
+
     /**
      * Builds the Sequence Diagram preference handler: - Define the preference default values. - Load the currently used
      * preferences setting
@@ -212,7 +212,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
     /**
      * Returns the PreferenceStore
-     * 
+     *
      * @return the PreferenceStore
      */
     public IPreferenceStore getPreferenceStore() {
@@ -229,7 +229,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
     /**
      * Returns an unique instance of the Sequence Diagram preference handler
-     * 
+     *
      * @return the preference handler instance
      */
     public static synchronized SDViewPref getInstance() {
@@ -313,7 +313,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
     /**
      * Returns the SwimLane width chosen
-     * 
+     *
      * @return the SwimLane width
      */
     public int getLifelineWidth() {
@@ -322,7 +322,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
     /**
      * Returns if font linkage with zoom has been chosen
-     * 
+     *
      * @return true if checked false otherwise
      */
     public boolean fontLinked() {
@@ -331,7 +331,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
     /**
      * Returns the tooltip enablement
-     * 
+     *
      * @return true if checked false otherwise
      */
     public boolean tooltipEnabled() {
@@ -341,7 +341,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     /**
      * Return true if the user do not want to take external time (basically found and lost messages with time) into
      * account in the min max computation
-     * 
+     *
      * @return true if checked false otherwise
      */
     public boolean excludeExternalTime() {
@@ -412,10 +412,22 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
         fTimeCompressionSelectionColor = new ColorImpl(display, rgb.red, rgb.green, rgb.blue);
     }
 
+    /**
+     * Add a property-change listener
+     *
+     * @param listener
+     *            The listener to add
+     */
     public void addPropertyChangeListener(IPropertyChangeListener listener) {
         fPrefStore.addPropertyChangeListener(listener);
     }
 
+    /**
+     * Remove a property-change listener
+     *
+     * @param listener
+     *            The listerner to remove
+     */
     public void removePropertyChangeListener(IPropertyChangeListener listener) {
         fPrefStore.removePropertyChangeListener(listener);
     }
@@ -428,53 +440,59 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     public void propertyChange(PropertyChangeEvent event) {
         if (!event.getProperty().equals("PREFOK")) { //$NON-NLS-1$
             buildFontsAndColors();
-            fPrefStore.firePropertyChangeEvent("PREFOK", null, null); //$NON-NLS-1$	
+            fPrefStore.firePropertyChangeEvent("PREFOK", null, null); //$NON-NLS-1$
         }
     }
 
+    /**
+     * Set the "no focus selection" preference
+     *
+     * @param v
+     *            New value to use
+     */
     public void setNoFocusSelection(boolean v) {
         fNoFocusSelection = v;
     }
 
     /**
      * Returns the static font list.
-     * 
+     *
      * @return static font list
      */
     public static String[] getFontList() {
         return Arrays.copyOf(FONT_LIST, FONT_LIST.length);
     }
-    
+
     /**
      * Returns the 2nd static font list.
-     * 
+     *
      * @return 2nd static font list
      */
     public static String[] getFontList2() {
         return Arrays.copyOf(FONT_LIST2, FONT_LIST2.length);
     }
-    
+
     /**
      * Returns the preference background color list.
-     * 
+     *
      * @return preference background color list
      */
     public static String[] getPrefBackColorList() {
         return Arrays.copyOf(PREF_BACK_COLOR_LIST, PREF_BACK_COLOR_LIST.length);
     }
-    
+
     /**
      * Returns the preference foreground color list.
-     * 
+     *
      * @return preference foreground color list
      */
     public static String[] getPrefForeColorList() {
         return Arrays.copyOf(PREF_FORE_COLOR_LIST, PREF_FORE_COLOR_LIST.length);
     }
-    
+
     /**
      * Returns the preference text color list color list.
-     * 
+     *
      * @return preference text color list color list
      */
     public static String[] getPrefTextColorList() {

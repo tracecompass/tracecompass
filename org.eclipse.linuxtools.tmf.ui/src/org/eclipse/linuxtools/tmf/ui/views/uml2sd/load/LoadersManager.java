@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -32,7 +32,7 @@ import org.eclipse.ui.IWorkbenchPage;
 
 /**
  * Manager class for the UML2SD extension point.
- * 
+ *
  * @version 1.0
  * @author sveyrier
  * @author Bernd Hufmann
@@ -68,7 +68,7 @@ public class LoadersManager {
      * Map for caching information (view ID to list of configuration elements)
      */
     protected Map<String, ArrayList<IConfigurationElement>> fViewLoadersList = new HashMap<String, ArrayList<IConfigurationElement>>();
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -83,7 +83,7 @@ public class LoadersManager {
     // ------------------------------------------------------------------------
     /**
      * A static method to get the manager instance.
-     * 
+     *
      * @return the manager instance
      */
     public synchronized static LoadersManager getInstance() {
@@ -92,11 +92,11 @@ public class LoadersManager {
         }
         return fLoadersManager;
     }
-    
+
     /**
      * Creates a loader instance and associate it to the view. It requires
      * that the loader-view-association was created by an eclipse extension.
-     * 
+     *
      * @param className The name of the class to create an instance from
      * @param view The UML2 Sequence Diagram view instance
      * @return The created loader
@@ -123,12 +123,12 @@ public class LoadersManager {
                 return loader;
             }
         }
-        return null; 
+        return null;
     }
 
     /**
      * Sets the loader to null for this view, a kind of clean-up while disposing.
-     * 
+     *
      * @param viewId the id of the view
      */
     public void resetLoader(String viewId) {
@@ -141,7 +141,7 @@ public class LoadersManager {
 
     /**
      * Returns the loader in use in given Sequence Diagram View
-     * 
+     *
      * @param viewId The Sequence Diagram viewId.
      * @return the current loader if any - null otherwise
      */
@@ -151,7 +151,7 @@ public class LoadersManager {
 
     /**
      * Returns the loader in use in this Sequence Diagram View
-     * 
+     *
      * @param viewId The Sequence Diagram viewId
      * @param view The Sequence Diagram view (if known). Use null to reference the primary SD View.
      * @return the current loader if any - null otherwise
@@ -172,7 +172,7 @@ public class LoadersManager {
                 if (viewref != null) {
                     sdView = (SDView) viewref.getView(false);
                 }
-                
+
                 if (sdView == null) {
                     // no corresponding view exists -> return null for the loader
                     return null;
@@ -195,7 +195,7 @@ public class LoadersManager {
 
     /**
      * Returns the loader class name that have been saved last time.
-     * 
+     *
      * @param viewId The view this loader belongs to
      * @return the class name of the saved loader
      */
@@ -206,6 +206,11 @@ public class LoadersManager {
 
     /**
      * Saves the last loader in order to reload it on next session.
+     *
+     * @param id
+     *            Standalone ID of the loader
+     * @param id2
+     *            Suffix ID of the loader
      */
     public void saveLastLoader(String id, String id2) {
         IPreferenceStore p = Activator.getDefault().getPreferenceStore();
@@ -214,7 +219,7 @@ public class LoadersManager {
 
     /**
      * Changes the current unique loader to the given secondary viewId.
-     * 
+     *
      * @param loader The current loader
      * @param id the view secondary id or null
      */
@@ -258,11 +263,11 @@ public class LoadersManager {
             saveLastLoader(loader.getClass().getName(), id);
         }
     }
-    
+
     /**
      * Creates the last loader and saves it. If not last is not available, it creates
      * and saves the default loader, else no loader is created.
-     * 
+     *
      * @param viewId The view ID.
      */
     private void createLastLoaderIfAny(String viewId) {
@@ -298,7 +303,7 @@ public class LoadersManager {
         if (iep == null) {
             return ret;
         }
-        
+
         IExtension[] ie = iep.getExtensions();
         if (ie == null) {
             return ret;
@@ -317,12 +322,12 @@ public class LoadersManager {
     }
 
     /**
-     * Returns the loader configuration element for given loader class name and for the given 
+     * Returns the loader configuration element for given loader class name and for the given
      * list of configuration elements, if available else null.
-     * 
+     *
      * @param loaderClassName The loader class name.
      * @param loaderElements  The list of loader configuration elements
-     * @return Extension point configuration element 
+     * @return Extension point configuration element
      */
     private IConfigurationElement getLoaderConfigurationElement(String loaderClassName, List<IConfigurationElement> loaderElements) {
         if (loaderClassName != null && loaderClassName.length() > 0) {
@@ -338,7 +343,7 @@ public class LoadersManager {
     }
 
     /**
-     * Returns the loader configuration element for the given list of configuration elements, if available else null. 
+     * Returns the loader configuration element for the given list of configuration elements, if available else null.
      * Note that if multiple default loaders are defined it selects the first one
 
      * @param loaderElements The list of loader configuration elements
@@ -358,7 +363,7 @@ public class LoadersManager {
     /**
      * Creates an instance of the loader class for a given extension point configuration element and
      * also sets it as current loader for the given view.
-     * 
+     *
      * @param viewId The view ID.
      * @param ce The extension point configuration element
      */

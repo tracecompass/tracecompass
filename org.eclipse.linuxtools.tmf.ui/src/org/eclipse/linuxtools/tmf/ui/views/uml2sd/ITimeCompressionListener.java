@@ -29,10 +29,14 @@ public interface ITimeCompressionListener {
     /**
      * Notifies listeners about a selected delta.
      *
-     * @param lifeline The current lifeline.
-     * @param startEvent The start event selected.
-     * @param nbEvent A number of events.
-     * @param color The current color to use.
+     * @param lifeline
+     *            The current lifeline.
+     * @param startEvent
+     *            The start event selected.
+     * @param nbEvent
+     *            A number of events.
+     * @param color
+     *            The current color to use.
      */
     public void deltaSelected(Lifeline lifeline, int startEvent, int nbEvent, IColor color);
 

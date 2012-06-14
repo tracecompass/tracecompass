@@ -316,6 +316,7 @@ public class Metrics {
      * Sets the forced event spacing value .
      *
      * @param eventSpacing
+     *            The spacing value
      */
     static public void setForcedEventSpacing(int eventSpacing) {
         fForcedEventSpacing = eventSpacing;

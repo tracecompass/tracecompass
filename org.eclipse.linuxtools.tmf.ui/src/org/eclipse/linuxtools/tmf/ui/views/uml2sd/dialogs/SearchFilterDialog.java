@@ -251,8 +251,6 @@ public class SearchFilterDialog extends Dialog {
     /**
      * Called when the dialog box ok button is pressed and calls back
      * the appropriate action provider (ISDFilterProvider or ISDFindProvider).
-     *
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
      */
     @Override
     public void okPressed() {

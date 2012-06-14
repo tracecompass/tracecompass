@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2006 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -64,11 +64,11 @@ public class Criteria {
      */
     protected boolean fStopSelected = false;
     /**
-     * The find expression. 
+     * The find expression.
      */
     protected String  fExpression = null;
     /**
-     * The find pattern as regular expression. 
+     * The find pattern as regular expression.
      */
     protected Pattern pattern = null;
 
@@ -84,7 +84,7 @@ public class Criteria {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param other Criteria to create new criteria
      */
     public Criteria (Criteria other) {
@@ -105,7 +105,7 @@ public class Criteria {
 
     /**
      * Returns true if the AsyncMessageReturn is selected, false otherwise.
-     * 
+     *
      * @return true if the AsyncMessageReturn is selected, false otherwise
      */
     public boolean isAsyncMessageReturnSelected() {
@@ -114,7 +114,7 @@ public class Criteria {
 
     /**
      * Returns true if the AsyncMessage is selected, false otherwise.
-     * 
+     *
      * @return true if the AsyncMessage is selected, false otherwise
      */
     public boolean isAsyncMessageSelected() {
@@ -123,7 +123,7 @@ public class Criteria {
 
     /**
      * Returns the text enter by the user.
-     * 
+     *
      * @return the expression text
      */
     public String getExpression() {
@@ -132,17 +132,18 @@ public class Criteria {
 
     /**
      * Returns the regular expression pattern.
-     * 
+     *
      * @return the regular expression pattern
      */
     public Pattern getPattern() {
         return pattern;
     }
-    
+
     /**
      * Sets the regular expression pattern.
-     * 
-     * @param the pattern to set
+     *
+     * @param pattern
+     *            The pattern to set
      */
     public void setPattern(Pattern pattern) {
         this.pattern = pattern;
@@ -150,7 +151,7 @@ public class Criteria {
 
     /**
      * Returns true if the LifeLine is selected, false otherwise.
-     * 
+     *
      * @return true if the LifeLine is selected, false otherwise
      */
     public boolean isLifeLineSelected() {
@@ -159,7 +160,7 @@ public class Criteria {
 
     /**
      * Returns true if the Stop is selected, false otherwise.
-     * 
+     *
      * @return true if the Stop is selected, false otherwise
      */
     public boolean isStopSelected() {
@@ -168,7 +169,7 @@ public class Criteria {
 
     /**
      * Returns true if the SyncMessageReturn is selected, false otherwise.
-     * 
+     *
      * @return true if the SyncMessageReturn is selected, false otherwise
      */
     public boolean isSyncMessageReturnSelected() {
@@ -177,7 +178,7 @@ public class Criteria {
 
     /**
      * Returns true if the SyncMessage is selected, false otherwise.
-     * 
+     *
      * @return true if the SyncMessage is selected, false otherwise
      */
     public boolean isSyncMessageSelected() {
@@ -186,7 +187,7 @@ public class Criteria {
 
     /**
      * Sets the AsyncMessageReturn selection state.
-     * 
+     *
      * @param b true if selected, false otherwise
      */
     public void setAsyncMessageReturnSelected(boolean b) {
@@ -195,7 +196,7 @@ public class Criteria {
 
     /**
      * Sets the AsyncMessage selection state.
-     * 
+     *
      * @param b true if selected, false otherwise
      */
     public void setAsyncMessageSelected(boolean b) {
@@ -204,7 +205,7 @@ public class Criteria {
 
     /**
      * Sets the text entered by the user and compiles the regular expression.
-     * 
+     *
      * @param string the text
      */
     public void setExpression(String string) {
@@ -214,7 +215,7 @@ public class Criteria {
 
     /**
      * Sets the Stop selection state.
-     * 
+     *
      * @param b true if selected, false otherwise
      */
     public void setLifeLineSelected(boolean b) {
@@ -223,7 +224,7 @@ public class Criteria {
 
     /**
      * Set Stop selection state.
-     * 
+     *
      * @param b true if selected, false otherwise
      */
     public void setStopSelected(boolean b) {
@@ -232,7 +233,7 @@ public class Criteria {
 
     /**
      * Sets the SyncMessageReturn selection state.
-     * 
+     *
      * @param b true if selected, false otherwise
      */
     public void setSyncMessageReturnSelected(boolean b) {
@@ -241,7 +242,7 @@ public class Criteria {
 
     /**
      * Sets the SyncMessage selection state.
-     * 
+     *
      * @param b true if selected, false otherwise
      */
     public void setSyncMessageSelected(boolean b) {
@@ -250,7 +251,7 @@ public class Criteria {
 
     /**
      * Returns true if the case sensitive is selected, false otherwise.
-     * 
+     *
      * @return true if the case sensitive is selected, false otherwise
      */
     public boolean isCaseSenstiveSelected() {
@@ -259,7 +260,7 @@ public class Criteria {
 
     /**
      * Set case sensitive selection state.
-     * 
+     *
      * @param b true if selected, false otherwise
      */
     public void setCaseSenstiveSelected(boolean b) {
@@ -270,7 +271,7 @@ public class Criteria {
 
     /**
      * Compares this criteria with a given criteria.
-     *  
+     *
      * @param to The criteria to compare
      * @return usual comparison result (< 0, 0, > 0)
      */
@@ -280,14 +281,14 @@ public class Criteria {
             retVal = getExpression().equals(to.getExpression());
         } else if (to.getExpression() != null) {
             retVal = to.getExpression().equals(getExpression());
-        } 
+        }
         return retVal && isCaseSenstiveSelected() == to.isCaseSenstiveSelected() && isAsyncMessageReturnSelected() == to.isAsyncMessageReturnSelected() && isAsyncMessageSelected() == to.isAsyncMessageSelected()
                 && isLifeLineSelected() == to.isLifeLineSelected() && isStopSelected() == to.isStopSelected() && isSyncMessageReturnSelected() == to.isSyncMessageReturnSelected() && isSyncMessageSelected() == to.isSyncMessageSelected();
     }
 
     /**
      * Saves current criteria attributes in the dialog settings.
-     *  
+     *
      * @param settings The dialog settings
      */
     public void save(DialogSettings settings) {
@@ -303,7 +304,7 @@ public class Criteria {
 
     /**
      * Loads the criteria with values of the dialog settings.
-     * 
+     *
      * @param settings The dialog settings
      */
     public void load(DialogSettings settings) {
@@ -319,7 +320,7 @@ public class Criteria {
 
     /**
      * Gets the summary of supported graph nodes.
-     * 
+     *
      * @param provider A filter provider
      * @param loaderClassName A class loader
      * @return graph node summary
@@ -380,7 +381,7 @@ public class Criteria {
 
     /**
      * Matches given string using compiled pattern based on user expression.
-     * 
+     *
      * @param stringToMatch  A string to match
      * @return true if string matches expression
      */
@@ -401,7 +402,7 @@ public class Criteria {
                     pattern = Pattern.compile(fExpression);
                 }
                 else {
-                    pattern = Pattern.compile(fExpression, Pattern.CASE_INSENSITIVE);   
+                    pattern = Pattern.compile(fExpression, Pattern.CASE_INSENSITIVE);
                 }
             } catch (PatternSyntaxException e) {
                 pattern = null;

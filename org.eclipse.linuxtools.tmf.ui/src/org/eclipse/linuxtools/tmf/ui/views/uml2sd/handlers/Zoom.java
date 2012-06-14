@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -18,8 +18,8 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
@@ -30,10 +30,10 @@ import org.eclipse.ui.IActionBars;
 
 /**
  * Action class implementation for zooming in, out or reset of zoom.
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class Zoom extends Action {
 
@@ -56,7 +56,7 @@ public class Zoom extends Action {
      * The Action ID for no zoominf.
      */
     public final static String NO_ZOOM_ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.NoZoom"; //$NON-NLS-1$
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -79,20 +79,30 @@ public class Zoom extends Action {
     /**
      * The cursor used when zooming in.
      */
-    private Cursor fZoomInCursor;
+    private final Cursor fZoomInCursor;
     /**
      * The cursor used when zooming out.
      */
-    private Cursor fZoomOutCursor;
+    private final Cursor fZoomOutCursor;
 
+    /**
+     * The different zoom actions
+     */
     public static enum ZoomType {
-        ZOOM_NONE, ZOOM_IN, ZOOM_OUT, ZOOM_RESET
-    };
-    
+        /** No zoom information */
+        ZOOM_NONE,
+        /** Zoom in */
+        ZOOM_IN,
+        /** Zoom out */
+        ZOOM_OUT,
+        /** Reset to the default zoom level */
+        ZOOM_RESET
+    }
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    
+
     /**
      * Constructor
      * @param view The view reference
@@ -104,11 +114,11 @@ public class Zoom extends Action {
         fView = view;
 
         // Pre-create zooming cursors
-        fZoomInCursor = new Cursor(Display.getCurrent(), 
-                Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_IN).getImageData(), 
+        fZoomInCursor = new Cursor(Display.getCurrent(),
+                Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_IN).getImageData(),
                 Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
 
-        fZoomOutCursor = new Cursor(Display.getCurrent(), 
+        fZoomOutCursor = new Cursor(Display.getCurrent(),
                 Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_OUT).getImageData(),
                 Activator.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
 
@@ -134,11 +144,11 @@ public class Zoom extends Action {
             setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_HOME_MENU));
             break;
 
+        case ZOOM_NONE:
         default:
-            // ZoomType.NONE
             setText(SDMessages._53);
             setToolTipText(SDMessages._54);
-            setId(NO_ZOOM_ID); 
+            setId(NO_ZOOM_ID);
             setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SELECT_MENU));
             break;
         }
@@ -153,7 +163,7 @@ public class Zoom extends Action {
      */
     @Override
     public void run() {
-        
+
         if ((fView == null) || (fView.getSDWidget() == null)) {
             return;
         }
@@ -211,7 +221,7 @@ public class Zoom extends Action {
 
     /**
      * Set action check state of a view action for a given action ID.
-     * 
+     *
      * @param id The action ID
      * @param checked true to check the action, false to uncheck the action
      */

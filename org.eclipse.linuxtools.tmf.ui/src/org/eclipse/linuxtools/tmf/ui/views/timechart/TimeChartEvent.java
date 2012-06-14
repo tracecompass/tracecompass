@@ -234,39 +234,90 @@ public class TimeChartEvent implements ITimeEvent {
     	fIsSearchMatch = isSearchMatch;
     }
 
+    /**
+     * Set this event's itemized entry.
+     *
+     * @param timeAnalysisEntry
+     *            The entry to set
+     */
     public void setItemizedEntry(TimeChartAnalysisEntry timeAnalysisEntry) {
         fItemizedEntry = timeAnalysisEntry;
     }
 
+    /**
+     * Retrieve this event's itemized entry.
+     *
+     * @return The itemized entry that was previously set
+     */
     public TimeChartAnalysisEntry getItemizedEntry() {
         return fItemizedEntry;
     }
 
+    /**
+     * @return Has this time event been set to itemizing?
+     */
     public boolean isItemizing() {
         return fItemizing;
     }
 
+    /**
+     * Set this event's itemizing flag to true or false.
+     *
+     * @param itemizing
+     *            The new value
+     */
     public void setItemizing(boolean itemizing) {
         fItemizing = itemizing;
     }
 
+    /**
+     * Inner class to define a range in terms of ranks in the trace.
+     *
+     * @version 1.0
+     * @author Patrick Tasse
+     */
     public class RankRange {
         private long firstRank;
         private long lastRank;
 
+        /**
+         * Standard constructor
+         *
+         * @param firstRank
+         *            The first (earliest) rank of the range
+         * @param lastRank
+         *            The last (latest) rank of the range
+         */
         public RankRange(long firstRank, long lastRank) {
             this.firstRank = firstRank;
             this.lastRank = lastRank;
         }
 
+        /**
+         * Retrieve the start rank of this range.
+         *
+         * @return The first rank
+         */
         public long getFirstRank() {
             return firstRank;
         }
 
+        /**
+         * Retrieve the end rank of this range
+         *
+         * @return The end rank
+         */
         public long getLastRank() {
             return lastRank;
         }
 
+        /**
+         * Calculate the minimal distance between two RankRange's
+         *
+         * @param range
+         *            The other range
+         * @return The distance, in "number of events" between the two ranges
+         */
         public long distanceFrom(RankRange range) {
             if (range.lastRank < fFirstRank) {
                 return fFirstRank - range.lastRank;

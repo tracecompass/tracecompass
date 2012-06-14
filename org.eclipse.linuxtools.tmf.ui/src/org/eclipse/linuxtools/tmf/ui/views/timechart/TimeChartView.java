@@ -65,9 +65,12 @@ import org.eclipse.ui.IEditorReference;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TimeChartView extends TmfView implements ITimeGraphRangeListener, ITimeGraphSelectionListener, ITimeGraphTimeListener, IColorSettingsListener,
-        IResourceChangeListener, ITmfEventsFilterListener {
+public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
+        ITimeGraphSelectionListener, ITimeGraphTimeListener,
+        IColorSettingsListener, IResourceChangeListener,
+        ITmfEventsFilterListener {
 
+    /** TimeChartView's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.timechart"; //$NON-NLS-1$
 
     private static final int TIMESTAMP_SCALE = -9;
@@ -86,6 +89,9 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     private final Object fSyncObj = new Object();
     private ITimeGraphPresentationProvider fPresentationProvider;
 
+    /**
+     * Default constructor
+     */
     public TimeChartView() {
         super("Time Chart"); //$NON-NLS-1$
         fDisplayWidth = Display.getDefault().getBounds().width;
@@ -580,6 +586,12 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     // Signal handlers
     // ------------------------------------------------------------------------
 
+    /**
+     * Handler for the Trace Opened signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
         if (fTimeAnalysisEntries == null) {
@@ -608,6 +620,12 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         }
     }
 
+    /**
+     * Handler for the Trace Closed signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
         if (fTimeAnalysisEntries == null) {
@@ -624,6 +642,12 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         }
     }
 
+    /**
+     * Handler for the Trace Selected signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
         if (signal.getSource() != this && fTimeAnalysisEntries != null) {
@@ -637,6 +661,12 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         }
     }
 
+    /**
+     * Handler for the Trace Updated signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void traceUpdated(TmfTraceUpdatedSignal signal) {
         if (fTimeAnalysisEntries == null) {
@@ -652,6 +682,12 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         }
     }
 
+    /**
+     * Handler for the Time Synch signal
+     *
+     * @param signal
+     *            The incoming signal
+     */
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
         final long time = signal.getCurrentTime().normalize(0, TIMESTAMP_SCALE).getValue();

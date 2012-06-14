@@ -18,6 +18,7 @@ import org.eclipse.osgi.util.NLS;
  * @version 1.0
  * @author Bernd Hufmann
  */
+@SuppressWarnings("javadoc")
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.messages"; //$NON-NLS-1$
     public static String TmfUml2SDSyncLoader_ViewName;

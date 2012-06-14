@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -27,8 +27,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
@@ -56,6 +56,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDCollapseP
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDExtendedActionBarProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFindProvider;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDGraphNodeSupporter;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPagingProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPropertiesProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
@@ -80,7 +81,7 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
  * This class is a generic sequence diagram view implementation.
  * </p>
 
- * @version 1.0 
+ * @version 1.0
  * @author sveyrier
  */
 public class SDView extends ViewPart {
@@ -125,19 +126,19 @@ public class SDView extends ViewPart {
      */
     protected ISDPropertiesProvider fSdPropertiesProvider = null;
     /**
-     * Button for executing the next page action.  
+     * Button for executing the next page action.
      */
     protected NextPage fNextPageButton = null;
     /**
-     * Button for executing the previous page action.  
+     * Button for executing the previous page action.
      */
     protected PrevPage fPrevPageButton = null;
     /**
-     * Button for executing the first page page action.  
+     * Button for executing the first page page action.
      */
     protected FirstPage fFirstPageButton = null;
     /**
-     * Button for executing the last page action.  
+     * Button for executing the last page action.
      */
     protected LastPage fLastPageButton = null;
     /**
@@ -145,7 +146,7 @@ public class SDView extends ViewPart {
      */
     protected MenuManager fMenuMgr = null;
     /**
-     * Flag to indicate whether view needs initialization or not. 
+     * Flag to indicate whether view needs initialization or not.
      */
     protected boolean fNeedInit = true;
     /**
@@ -182,7 +183,7 @@ public class SDView extends ViewPart {
 
         // Add this view to the key bindings manager
         KeyBindingsManager.getInstance().add(this.getSite().getId());
-        
+
         createCoolbarContent();
 
         hookContextMenu();
@@ -200,7 +201,7 @@ public class SDView extends ViewPart {
      * Load a blank page that is supposed to explain that a kind of interaction must be chosen.
      */
     protected void loadBlank() {
-        IUml2SDLoader loader = new BlankUml2SdLoader(); 
+        IUml2SDLoader loader = new BlankUml2SdLoader();
         loader.setViewer(this);
         setContentDescription(loader.getTitleString());
     }
@@ -233,7 +234,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the SD widget.
-     * 
+     *
      * @return The SD widget.
      */
     public SDWidget getSDWidget() {
@@ -244,9 +245,9 @@ public class SDView extends ViewPart {
      * Set the find provider for the opened sequence diagram viewer<br>
      * If the provider is not set, the find menu item will not be available in the viewer<br>
      * A find provider is called back when the user perform a find action<br>
-     * The find provider is responsible to move the sequence diagram to the GraphNode which match the 
+     * The find provider is responsible to move the sequence diagram to the GraphNode which match the
      * find criteria as well as to highlight the GraphNode
-     * 
+     *
      * @param provider the search provider
      */
     public void setSDFindProvider(ISDFindProvider provider) {
@@ -260,13 +261,17 @@ public class SDView extends ViewPart {
             KeyBindingsManager.getInstance().setFindEnabled(false);
         }
     }
-    
+
     /**
      * Set the find provider for the opened sequence diagram viewer<br>
-     * If the provider is not set, the find menu item will not be available in the viewer<br>
+     * If the provider is not set, the find menu item will not be available in
+     * the viewer<br>
      * A find provider is called back when the user perform a find action<br>
-     * If the extended find provider is set, it replaces the regular find provider (sdFindProvider).<br>
+     * If the extended find provider is set, it replaces the regular find
+     * provider (sdFindProvider).<br>
+     *
      * @param provider
+     *            The provider to set
      */
     public void setExtendedFindProvider(IExtendedFindProvider provider) {
         fSdExFindProvider = provider;
@@ -282,7 +287,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the extended find provider
-     * 
+     *
      * @return extended find provider.
      */
     public IExtendedFindProvider getExtendedFindProvider() {
@@ -310,7 +315,7 @@ public class SDView extends ViewPart {
      * Set the filter provider for the opened sequence diagram viewer<br>
      * If the provider is not set, the filter menu item will not be available in the viewer<br>
      * A filter provider is called back when the user perform a filter action<br>
-     * 
+     *
      * @param provider the filter provider
      */
     public void setSDFilterProvider(ISDFilterProvider provider) {
@@ -319,10 +324,12 @@ public class SDView extends ViewPart {
         // sdExFilterProvider = null;
         createCoolbarContent();
     }
-    
+
     /**
-     * Sets the extended filter provider for the opend sequence diagram viewer.
+     * Sets the extended filter provider for the opened sequence diagram viewer.
+     *
      * @param provider
+     *            The provider to set
      */
     public void setExtendedFilterProvider(IExtendedFilterProvider provider) {
         fSdExFilterProvider = provider;
@@ -333,7 +340,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the extended find provider.
-     * 
+     *
      * @return The extended find provider.
      */
     public IExtendedFilterProvider getExtendedFilterProvider() {
@@ -341,9 +348,9 @@ public class SDView extends ViewPart {
     }
 
     /**
-     * Register the given provider to support Drag and Drop collapsing. This provider is 
+     * Register the given provider to support Drag and Drop collapsing. This provider is
      * responsible of updating the Frame.
-     * 
+     *
      * @param provider - the provider to register
      */
     public void setCollapsingProvider(ISDCollapseProvider provider) {
@@ -357,7 +364,7 @@ public class SDView extends ViewPart {
      * If the sequence diagram provided (see setFrame) need to be split in many parts, a paging provider must be
      * provided in order to handle page change requested by the user<br>
      * Set a page provider will create the next and previous page buttons in the viewer coolBar
-     * 
+     *
      * @param provider the paging provider
      */
     public void setSDPagingProvider(ISDPagingProvider provider) {
@@ -367,7 +374,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the current page provider for the view
-     * 
+     *
      * @return the paging provider
      */
     public ISDPagingProvider getSDPagingProvider() {
@@ -376,7 +383,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the current find provider for the view
-     * 
+     *
      * @return the find provider
      */
     public ISDFindProvider getSDFindProvider() {
@@ -385,7 +392,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the current filter provider for the view
-     * 
+     *
      * @return the filter provider
      */
     public ISDFilterProvider getSDFilterProvider() {
@@ -395,7 +402,7 @@ public class SDView extends ViewPart {
     /**
      * Set the extended action bar provider for the opened sequence diagram viewer<br>
      * This allow to add programmatically actions in the coolbar and/or in the drop-down menu
-     * 
+     *
      * @param provider the search provider
      */
     public void setSDExtendedActionBarProvider(ISDExtendedActionBarProvider provider) {
@@ -405,7 +412,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the current extended action bar provider for the view
-     * 
+     *
      * @return the extended action bar provider
      */
     public ISDExtendedActionBarProvider getSDExtendedActionBarProvider() {
@@ -414,7 +421,7 @@ public class SDView extends ViewPart {
 
     /**
      * Set the properties view provider for the opened sequence diagram viewer
-     * 
+     *
      * @param provider the properties provider
      */
     public void setSDPropertiesProvider(ISDPropertiesProvider provider) {
@@ -423,7 +430,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the current extended action bar provider for the view.
-     * 
+     *
      * @return the extended action bar provider
      */
     public ISDPropertiesProvider getSDPropertiesProvider() {
@@ -449,7 +456,7 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the context menu manager
-     * 
+     *
      * @return the menu manager
      */
     public MenuManager getMenuManager() {
@@ -458,7 +465,7 @@ public class SDView extends ViewPart {
 
     /**
      * Fills the basic sequence diagram menu and define the dynamic menu item insertion point
-     * 
+     *
      * @param manager the menu manager
      */
     protected void fillContextMenu(IMenuManager manager) {
@@ -494,7 +501,7 @@ public class SDView extends ViewPart {
 
     /**
      * Enables/Disables an action with given name.
-     * 
+     *
      * @param actionName The action name
      * @param state true or false
      */
@@ -517,7 +524,7 @@ public class SDView extends ViewPart {
      * Creates the coolBar icon depending on the actions supported by the Sequence Diagram provider<br>
      * - Navigation buttons are displayed if ISDPovider.HasPaging return true<br>
      * - Navigation buttons are enabled depending on the value return by ISDPovider.HasNext and HasPrev<br>
-     * 
+     *
      * @see ISDGraphNodeSupporter Action support definition
      * @see SDView#setSDFilterProvider(ISDFilterProvider)
      * @see SDView#setSDFindProvider(ISDFindProvider)
@@ -588,7 +595,7 @@ public class SDView extends ViewPart {
             bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", fPrevPageButton); //$NON-NLS-1$
             fPrevPageButton.setEnabled(fSdPagingProvider.hasPrevPage());
             bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", fPrevPageButton); //$NON-NLS-1$
-            
+
             fFirstPageButton = new FirstPage(this);
             bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", fFirstPageButton); //$NON-NLS-1$
             fFirstPageButton.setEnabled(fSdPagingProvider.hasPrevPage());
@@ -604,20 +611,24 @@ public class SDView extends ViewPart {
             Action action = fSdExFilterProvider.getFilterAction();
             if (action != null) {
                 if (action.getId() == null)
+                 {
                     action.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.extendedFilter"); //$NON-NLS-1$
-                if (action.getImageDescriptor() == null)
+                }
+                if (action.getImageDescriptor() == null) {
                     action.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
-                if (action.getText() == null || action.getText().length() == 0)
+                }
+                if (action.getText() == null || action.getText().length() == 0) {
                     action.setText(SDMessages._42);
+                }
                 bar.getMenuManager().prependToGroup("UML2SD_FILTERING", action); //$NON-NLS-1$
                 bar.getToolBarManager().prependToGroup("UML2SD_FILTERING", action); //$NON-NLS-1$
             }
         }
         // Both systems can be used now: commenting out else keyword
         /* else */if (fSdFilterProvider != null) {
-            bar.getMenuManager().appendToGroup("UML2SD_FILTERING", new OpenSDFiltersDialog(this, fSdFilterProvider)); //$NON-NLS-1$	
+            bar.getMenuManager().appendToGroup("UML2SD_FILTERING", new OpenSDFiltersDialog(this, fSdFilterProvider)); //$NON-NLS-1$
             // No longer in the coolbar: commenting out next statement
-            //bar.getToolBarManager().appendToGroup("UML2SD_FILTERING",new OpenSDFiltersDialog(this, sdFilterProvider));	//$NON-NLS-1$	
+            //bar.getToolBarManager().appendToGroup("UML2SD_FILTERING",new OpenSDFiltersDialog(this, sdFilterProvider));	//$NON-NLS-1$
         }
         if (fSdPagingProvider instanceof ISDAdvancedPagingProvider) {
             IContributionItem sdPaging = bar.getMenuManager().find(OpenSDPagesDialog.ID);
@@ -660,7 +671,7 @@ public class SDView extends ViewPart {
      * Updates the view coolbar buttons state according to the value return by: -
      * ISDExtendedActionBarProvider.hasNextPage()<br>
      * - ISDExtendedActionBarProvider.hasPrevPage()<br>
-     * 
+     *
      */
     public void updateCoolBar() {
         if (fSdPagingProvider != null) {
@@ -703,14 +714,14 @@ public class SDView extends ViewPart {
                     ((LastPage) lastPageAction).setEnabled(fSdPagingProvider.hasNextPage());
                 }
             }
-            
+
             updatePagesMenuItem(bar);
         }
     }
 
     /**
      * Enables or disables the Pages... menu item, depending on the number of pages
-     * 
+     *
      * @param bar the bar containing the action
      */
     protected void updatePagesMenuItem(IActionBars bar) {
@@ -730,7 +741,7 @@ public class SDView extends ViewPart {
 
     /**
      * The frame to render (the sequence diagram)
-     * 
+     *
      * @param frame the frame to display
      */
     public void setFrame(Frame frame) {
@@ -739,13 +750,14 @@ public class SDView extends ViewPart {
 
     /**
      * The frame to render (the sequence diagram)
-     * 
+     *
      * @param frame the frame to display
      * @param resetPosition boolean Flag whether to reset the position or not.
      */
     protected void setFrame(Frame frame, boolean resetPosition) {
-        if (fSdWidget == null)
+        if (fSdWidget == null) {
             return;
+        }
 
         if (frame == null) {
             loadBlank();
@@ -793,7 +805,7 @@ public class SDView extends ViewPart {
 
     /**
      * Activate or deactivate the short key command given in parameter (see plugin.xml)
-     * 
+     *
      * @param id the command id defined in the plugin.xml
      * @param value the state value
      */
@@ -814,7 +826,7 @@ public class SDView extends ViewPart {
 
     /**
      * Set the frame from an other thread than the one executing the main loop
-     * 
+     *
      * @param frame The frame to set (and display)
      */
     public void setFrameSync(final Frame frame) {
@@ -835,7 +847,7 @@ public class SDView extends ViewPart {
 
     /**
      * Ensure an object is visible from an other thread than the one executing the main loop
-     * 
+     *
      * @param sm The node to make visible in view
      */
     public void ensureVisibleSync(final GraphNode sm) {
@@ -852,7 +864,7 @@ public class SDView extends ViewPart {
 
     /**
      * Set the frame and ensure an object is visible from an other thread than the one executing the main loop
-     * 
+     *
      * @param sm The node to make visible in view
      * @param frame Frame The frame to set
      */
@@ -873,7 +885,7 @@ public class SDView extends ViewPart {
 
     /**
      * Set the frame and ensure an object is visible
-     * 
+     *
      * @param sm The node to make visible in view
      * @param frame Frame The frame to set
      */
@@ -885,7 +897,7 @@ public class SDView extends ViewPart {
 
     /**
      * Set the frame and ensure an object is visible from an other thread than the one executing the main loop
-     * 
+     *
      * @param frame The frame to set.
      * @param x The x coordinate to make visible.
      * @param y The y coordinate to make visible.
@@ -894,7 +906,7 @@ public class SDView extends ViewPart {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
             return;
         }
-        
+
         getSDWidget().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
@@ -905,7 +917,7 @@ public class SDView extends ViewPart {
 
     /**
      * Set the frame and ensure an object is visible
-     * 
+     *
      * @param frame The frame to set.
      * @param x The x coordinate to make visible.
      * @param y The y coordinate to make visible.
@@ -919,8 +931,8 @@ public class SDView extends ViewPart {
 
     /**
      * Toggle between default and wait cursors from an other thread than the one executing the main loop
-     * 
-     * @param wait <code>true</code> for wait cursor else <code>false</code> for default cursor. 
+     *
+     * @param wait <code>true</code> for wait cursor else <code>false</code> for default cursor.
      */
     public void toggleWaitCursorAsync(final boolean wait) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
@@ -954,8 +966,8 @@ public class SDView extends ViewPart {
 
     /**
      * Return the time compression bar widget
-     * 
-     * @return the time compression bar 
+     *
+     * @return the time compression bar
      */
     public TimeCompressionBar getTimeCompressionBar() {
         return fTimeCompressionBar;
@@ -963,8 +975,8 @@ public class SDView extends ViewPart {
 
     /**
      * Returns the current Frame (the sequence diagram container)
-     * 
-     * @return the current frame 
+     *
+     * @return the current frame
      */
     public Frame getFrame() {
         if (getSDWidget() != null) {
@@ -977,7 +989,7 @@ public class SDView extends ViewPart {
 
     /**
      * Restores the loader for the view based on the view ID.
-     * 
+     *
      * @return boolean <code>true</code> if initialization is needed else <code>false</code>.
      */
     protected boolean restoreLoader() {
@@ -999,7 +1011,7 @@ public class SDView extends ViewPart {
 
     /**
      * Checks if current view is ready to be used.
-     * 
+     *
      * @return boolean <code>true</code> if view is ready else <code>false</code>.
      */
     protected boolean isViewReady() {
@@ -1058,10 +1070,10 @@ public class SDView extends ViewPart {
 
         return obj;
     }
-    
+
     /**
      * Loader for a blank sequence diagram.
-     * 
+     *
      * @version 1.0
      */
     public static class BlankUml2SdLoader implements IUml2SDLoader {
@@ -1093,5 +1105,5 @@ public class SDView extends ViewPart {
         @Override
         public void dispose() {
         }
-    } 
+    }
 }

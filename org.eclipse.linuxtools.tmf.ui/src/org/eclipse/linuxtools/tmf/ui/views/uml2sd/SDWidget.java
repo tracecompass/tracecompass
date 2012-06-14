@@ -85,7 +85,8 @@ import org.eclipse.ui.part.ViewPart;
  * @version 1.0
  * @author sveyrier
  */
-public class SDWidget extends ScrollView implements SelectionListener, IPropertyChangeListener, DisposeListener, ITimeCompressionListener {
+public class SDWidget extends ScrollView implements SelectionListener,
+        IPropertyChangeListener, DisposeListener, ITimeCompressionListener {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -587,7 +588,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * Sets the zoom in mode.
      *
-     * @param The mode value to set.
+     * @param value
+     *            The mode value to set.
      */
     public void setZoomInMode(boolean value) {
         if (value) {
@@ -599,7 +601,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * Sets the zoom out mode.
      *
-     * @param The mode value to set.
+     * @param value
+     *            The mode value to set.
      */
     public void setZoomOutMode(boolean value) {
         if (value) {
@@ -744,7 +747,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * Sets the focus on given graph node (current node).
      *
-     * @param the graph node to focus on.
+     * @param node
+     *            The graph node to focus on.
      */
     public void setFocus(GraphNode node) {
         if (node == null) {
@@ -1115,11 +1119,16 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * Method to print page ranges.
      *
-     * @param i The start page
-     * @param j The end page
-     * @param pd The sequence diagram print dialog
-     * @param context The graphical context
-     * @param pageNum int the current page
+     * @param i
+     *            The start page
+     * @param j
+     *            The end page
+     * @param pd
+     *            The sequence diagram print dialog
+     * @param context
+     *            The graphical context
+     * @param pageNum
+     *            The current page
      */
     public void printPage(int i, int j, SDPrintDialogUI pd, NGC context, int pageNum) {
         fIsPrinting = false;

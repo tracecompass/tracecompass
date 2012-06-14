@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -28,10 +28,10 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
  * For instance, only one frame can be drawn in the View.<br>
  * Lifelines, Messages and Stop which are supposed to represent a Sequence diagram are drawn in a Frame.<br>
  * Only the graph node added to their representing list will be drawn.
- * 
+ *
  * The lifelines are appended along the X axsis when added in a frame.<br>
  * The syncMessages are ordered along the Y axsis depending on the event occurrence they are attached to.<br>
- * 
+ *
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline Lifeline for more event occurence details
  * @author sveyrier
  * @version 1.0
@@ -111,7 +111,7 @@ public class BasicFrame extends GraphNode {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    
+
     /**
      * Creates an empty frame.
      */
@@ -124,9 +124,9 @@ public class BasicFrame extends GraphNode {
     // ------------------------------------------------------------------------
 
     /**
-     * 
+     *
      * Returns the greater event occurence known by the Frame
-     * 
+     *
      * @return the greater event occurrence
      */
     protected int getMaxEventOccurrence() {
@@ -135,7 +135,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Set the greater event occurrence created in GraphNodes included in the frame
-     * 
+     *
      * @param eventOccurrence the new greater event occurrence
      */
     protected void setMaxEventOccurrence(int eventOccurrence) {
@@ -147,7 +147,7 @@ public class BasicFrame extends GraphNode {
      * to set the lifelines drawing order. Also, calling this method two times and assigning only the last given index
      * to a lifeline will increase this lifeline draw spacing (2 times the default spacing) from the last added
      * lifeline.
-     * 
+     *
      * @return a new lifeline index
      */
     protected int getNewHorizontalIndex() {
@@ -156,7 +156,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Returns the current horizontal index
-     * 
+     *
      * @return the current horizontal index
      * @see Frame#getNewHorizontalIndex() for horizontal index description
      */
@@ -228,7 +228,7 @@ public class BasicFrame extends GraphNode {
      * Returns the graph node which contains the point given in parameter for the given graph node list and starting the
      * iteration at the given index<br>
      * WARNING: Only graph nodes with smaller coordinates than the current visible area can be returned.<br>
-     * 
+     *
      * @param x the x coordinate of the point to test
      * @param y the y coordinate of the point to test
      * @param list the list to search in
@@ -268,13 +268,13 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Draw the Frame rectangle
-     * 
+     *
      * @param context the context to draw to
      */
     protected void drawFrame(IGC context) {
-        
+
         ISDPreferences pref = SDViewPref.getInstance();
-        
+
         context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_FRAME));
         context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_FRAME));
 
@@ -324,7 +324,7 @@ public class BasicFrame extends GraphNode {
      * Draws the Frame on the given context.<br>
      * This method start width GraphNodes ordering if needed.<br>
      * After, depending on the visible area, only visible GraphNodes are drawn.<br>
-     * 
+     *
      * @param context the context to draw to
      * @param drawFrame indicate if the frame rectangle need to be redrawn
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#draw(IGC)
@@ -346,7 +346,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Sets the event occurrence spacing (-1 for none)
-     * 
+     *
      * @param space A spacing to set.
      */
     public void forceEventOccurrenceSpacing(int space) {
@@ -355,7 +355,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Return the X coordinates of the frame visible area
-     * 
+     *
      * @return the X coordinates of the frame visible area
      */
     public int getVisibleAreaX() {
@@ -364,7 +364,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Return the frame visible area width
-     * 
+     *
      * @return the frame visible area width
      */
     public int getVisibleAreaWidth() {
@@ -373,7 +373,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Return the frame visible area height
-     * 
+     *
      * @return the frame visible area height
      */
     public int getVisibleAreaHeight() {
@@ -382,7 +382,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Return the X coordinates of the frame visible area
-     * 
+     *
      * @return the X coordinates of the frame visible area
      */
     public int getVisibleAreaY() {
@@ -391,7 +391,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Return the minimum time stored in the frame taking all GraphNodes into account
-     * 
+     *
      * @return the minimum GraphNode time
      */
     public ITmfTimestamp getMinTime() {
@@ -406,16 +406,31 @@ public class BasicFrame extends GraphNode {
         return fMinTime;
     }
 
+    /**
+     * Set the minimum timestamp of the frame.
+     *
+     * @param min
+     *            The minimum timestamp
+     */
     public void setMin(ITmfTimestamp min) {
         fMinTime = min;
         fCustomMinMax = true;
     }
 
+    /**
+     * Set the maximum timestamp of the frame.
+     *
+     * @param max
+     *            The maximum timestamp
+     */
     public void setMax(ITmfTimestamp max) {
         fMaxTime = max;
         fCustomMinMax = true;
     }
 
+    /**
+     * Reset min/max timestamp values to the default ones.
+     */
     public void resetCustomMinMax() {
         fCustomMinMax = false;
         fComputeMinMax = true;
@@ -423,7 +438,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Return the maximum time stored in the frame taking all GraphNodes into account
-     * 
+     *
      * @return the maximum GraphNode time
      */
     public ITmfTimestamp getMaxTime() {
@@ -439,7 +454,7 @@ public class BasicFrame extends GraphNode {
     }
 
     /**
-     * Computes the minimum and maximum time between consecutive messages within the frame. 
+     * Computes the minimum and maximum time between consecutive messages within the frame.
      */
     protected void computeMaxMinTime() {
         if (!fInitSDMin) {
@@ -467,7 +482,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Returns the minimum time between consecutive messages.
-     * 
+     *
      * @return the minimum time between consecutive messages
      */
     public ITmfTimestamp getSDMinTime() {
@@ -477,7 +492,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Returns the maximum time between consecutive messages.
-     * 
+     *
      * @return the maximum time between consecutive messages
      */
     public ITmfTimestamp getSDMaxTime() {
@@ -497,14 +512,14 @@ public class BasicFrame extends GraphNode {
         for (int i = 0; i < timeArray.size() - 1; i++) {
             SDTimeEvent m1 = (SDTimeEvent) timeArray.get(i);
             SDTimeEvent m2 = (SDTimeEvent) timeArray.get(i + 1);
-          
+
             updateMinMax(m1, m2);
         }
     }
 
     /**
      * Updates the minimum and maximum time between consecutive message within the frame based on the given values.
-     * 
+     *
      * @param m1 A first SD time event.
      * @param m2 A second SD time event.
      */
@@ -530,7 +545,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Builds the time array based on the list of graph nodes.
-     * 
+     *
      * @return the time array else empty list.
      */
     protected List<SDTimeEvent> buildTimeArray() {
