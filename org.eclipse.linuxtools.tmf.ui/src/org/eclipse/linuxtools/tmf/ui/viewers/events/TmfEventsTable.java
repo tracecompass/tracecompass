@@ -1072,6 +1072,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
         }
     }
 
+    /**
+     * @since 1.1
+     */
     protected void applyFilter(ITmfFilter filter) {
     	stopFilterThread();
     	stopSearchThread();
