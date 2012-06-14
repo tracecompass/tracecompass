@@ -361,15 +361,14 @@ public class TimeGraphColorScheme {
                 return getColor(BACKGROUND_NAME_SEL_NOFOCUS);
             }
             return getColor(BACKGROUND_NAME);
-        } else {
-            if (selected && focused) {
-                return getColor(BACKGROUND_SEL);
-            }
-            if (selected) {
-                return getColor(BACKGROUND_SEL_NOFOCUS);
-            }
-            return getColor(BACKGROUND);
         }
+        if (selected && focused) {
+            return getColor(BACKGROUND_SEL);
+        }
+        if (selected) {
+            return getColor(BACKGROUND_SEL_NOFOCUS);
+        }
+        return getColor(BACKGROUND);
     }
 
     /**

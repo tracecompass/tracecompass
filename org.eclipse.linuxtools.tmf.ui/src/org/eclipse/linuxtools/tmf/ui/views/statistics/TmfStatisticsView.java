@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
@@ -545,7 +544,7 @@ public class TmfStatisticsView extends TmfView {
                     modelIncomplete(experiment.getName());
                 }
             };
-            ((TmfExperiment<ITmfEvent>) experiment).sendRequest((ITmfDataRequest<ITmfEvent>) fRequest);
+            ((TmfExperiment<ITmfEvent>) experiment).sendRequest(fRequest);
             waitCursor(true);
         }
     }

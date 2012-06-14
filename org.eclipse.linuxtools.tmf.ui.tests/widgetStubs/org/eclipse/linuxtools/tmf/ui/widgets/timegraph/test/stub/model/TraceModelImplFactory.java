@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -20,9 +20,9 @@ public class TraceModelImplFactory {
 	// Data
 	// ========================================================================
 	private int count = 0;
-	private TraceStrings[] traceNames;
+	private final TraceStrings[] traceNames;
 	private static final long msTons = 1000000;
-	private Long timeRef = new Date().getTime() * msTons;
+	private final Long timeRef = new Date().getTime() * msTons;
 
 	// ========================================================================
 	// Constructor
@@ -47,7 +47,7 @@ public class TraceModelImplFactory {
 		}
 		return traceArr;
 	}
-	
+
 	/**
 	 * 5000 Events per Trace.
 	 * @param number
@@ -67,13 +67,13 @@ public class TraceModelImplFactory {
 		return traceArr;
 	}
 
-	private void create5000Events(TraceImpl trace) {
+	private static void create5000Events(TraceImpl trace) {
 		EventImpl event;
 		Long eventTime;
 		int numEvents = 5000;
 		long sTime = trace.getStartTime();
 		long eTime = trace.getEndTime();
-		long duration = (long) ((eTime - sTime)/numEvents);
+		long duration = (eTime - sTime)/numEvents;
 		for (int i = 0; i < numEvents; i++) {
 			eventTime = sTime + (i * duration);
 			// eventTime = timeRef + (5 * (count % 4) + (5 * (int) (i/2) ));
@@ -94,7 +94,7 @@ public class TraceModelImplFactory {
 		long duration = 0;
 		for (int i = 0; i < numEvents; i++) {
 			eventTime = timeRef + msTons * i + (5 * msTons * count) + (5 * i);
-			duration = msTons + i * msTons + (long) ((i % 4));
+			duration = msTons + i * msTons + ((i % 4));
 //			duration = i  + (long) ((i % 4));
 			event = new EventImpl(eventTime, trace, getEventType(i));
 			event.setDuration(duration);
@@ -102,39 +102,54 @@ public class TraceModelImplFactory {
 		}
 	}
 
-	private EventImpl.Type getEventType(int val) {
-		if (EventImpl.Type.ALARM.ordinal() == val)
-			return EventImpl.Type.ALARM;
-		if (EventImpl.Type.ERROR.ordinal() == val)
-			return EventImpl.Type.ERROR;
-		if (EventImpl.Type.EVENT.ordinal() == val)
-			return EventImpl.Type.EVENT;
-		if (EventImpl.Type.INFORMATION.ordinal() == val)
-			return EventImpl.Type.INFORMATION;
-		if (EventImpl.Type.TIMEADJUSTMENT.ordinal() == val)
-			return EventImpl.Type.TIMEADJUSTMENT;
-		if (EventImpl.Type.WARNING.ordinal() == val)
-			return EventImpl.Type.WARNING;
-		if (EventImpl.Type.INFO1.ordinal() == val)
-			return EventImpl.Type.INFO1;
-		if (EventImpl.Type.INFO2.ordinal() == val)
-			return EventImpl.Type.INFO2;
-		if (EventImpl.Type.INFO3.ordinal() == val)
-			return EventImpl.Type.INFO3;
-		if (EventImpl.Type.INFO4.ordinal() == val)
-			return EventImpl.Type.INFO4;
-		if (EventImpl.Type.INFO5.ordinal() == val)
-			return EventImpl.Type.INFO5;
-		if (EventImpl.Type.INFO6.ordinal() == val)
-			return EventImpl.Type.INFO6;
-		if (EventImpl.Type.INFO7.ordinal() == val)
-			return EventImpl.Type.INFO7;
-		if (EventImpl.Type.INFO8.ordinal() == val)
-			return EventImpl.Type.INFO8;
-		if (EventImpl.Type.INFO9.ordinal() == val)
-			return EventImpl.Type.INFO9;
-		return EventImpl.Type.UNKNOWN;
-	}
+    private static EventImpl.Type getEventType(int val) {
+        if (EventImpl.Type.ALARM.ordinal() == val) {
+            return EventImpl.Type.ALARM;
+        }
+        if (EventImpl.Type.ERROR.ordinal() == val) {
+            return EventImpl.Type.ERROR;
+        }
+        if (EventImpl.Type.EVENT.ordinal() == val) {
+            return EventImpl.Type.EVENT;
+        }
+        if (EventImpl.Type.INFORMATION.ordinal() == val) {
+            return EventImpl.Type.INFORMATION;
+        }
+        if (EventImpl.Type.TIMEADJUSTMENT.ordinal() == val) {
+            return EventImpl.Type.TIMEADJUSTMENT;
+        }
+        if (EventImpl.Type.WARNING.ordinal() == val) {
+            return EventImpl.Type.WARNING;
+        }
+        if (EventImpl.Type.INFO1.ordinal() == val) {
+            return EventImpl.Type.INFO1;
+        }
+        if (EventImpl.Type.INFO2.ordinal() == val) {
+            return EventImpl.Type.INFO2;
+        }
+        if (EventImpl.Type.INFO3.ordinal() == val) {
+            return EventImpl.Type.INFO3;
+        }
+        if (EventImpl.Type.INFO4.ordinal() == val) {
+            return EventImpl.Type.INFO4;
+        }
+        if (EventImpl.Type.INFO5.ordinal() == val) {
+            return EventImpl.Type.INFO5;
+        }
+        if (EventImpl.Type.INFO6.ordinal() == val) {
+            return EventImpl.Type.INFO6;
+        }
+        if (EventImpl.Type.INFO7.ordinal() == val) {
+            return EventImpl.Type.INFO7;
+        }
+        if (EventImpl.Type.INFO8.ordinal() == val) {
+            return EventImpl.Type.INFO8;
+        }
+        if (EventImpl.Type.INFO9.ordinal() == val) {
+            return EventImpl.Type.INFO9;
+        }
+        return EventImpl.Type.UNKNOWN;
+    }
 
 	private void loadTraceNameStrings() {
 		traceNames[0] = new TraceStrings();
@@ -176,7 +191,7 @@ public class TraceModelImplFactory {
 		traceNames[9] = new TraceStrings();
 		traceNames[9].name = "TE Log - TATA BSC14";
 		traceNames[9].classNmme = "Board 14, SPO";
-		
+
 		traceNames[10] = new TraceStrings();
 		traceNames[10].name = "INFO 1";
 		traceNames[10].classNmme = "All Boards";
@@ -196,7 +211,7 @@ public class TraceModelImplFactory {
 		traceNames[14] = new TraceStrings();
 		traceNames[14].name = "MISC2";
 		traceNames[14].classNmme = "Board 11";
-		
+
 		traceNames[15] = new TraceStrings();
 		traceNames[15].name = "MISC3";
 		traceNames[15].classNmme = "Board 23";

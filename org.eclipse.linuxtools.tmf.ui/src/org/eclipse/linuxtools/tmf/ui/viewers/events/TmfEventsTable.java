@@ -38,12 +38,12 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
@@ -1603,7 +1603,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
                 final InputDialog dialog = new InputDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
                         Messages.TmfEventsTable_AddBookmarkDialogTitle, Messages.TmfEventsTable_AddBookmarkDialogText,
                         defaultMessage.toString(), null);
-                if (dialog.open() == Dialog.OK) {
+                if (dialog.open() == Window.OK) {
                     final String message = dialog.getValue();
                     try {
                         final IMarker bookmark = bookmarksFile.createMarker(IMarker.BOOKMARK);
@@ -1879,7 +1879,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
      *
      * @param e the exception
      */
-    private void displayException(final Exception e) {
+    private static void displayException(final Exception e) {
         final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         mb.setText(e.getClass().getName());
         mb.setMessage(e.getMessage());

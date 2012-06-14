@@ -312,7 +312,7 @@ public class SearchFilterDialog extends Dialog {
             int size = Math.min(list.size(), MAX_EXPRESSION_LIST);
             String[] temp = new String[size];
             for (int i = 0; i < size; i++) {
-                temp[i] = (String) list.get(i);
+                temp[i] = list.get(i);
             }
             fExpressionList = temp;
             settings.put(EXPRESSION_LIST, fExpressionList);

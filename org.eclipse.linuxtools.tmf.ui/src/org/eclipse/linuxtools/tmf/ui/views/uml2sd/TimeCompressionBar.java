@@ -317,7 +317,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         for (int i = firstVisible; i < fFrame.syncMessageCount(); i = i + messageArraysStep) {
             SyncMessage m = fFrame.getSyncMessage(i);
             if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getEventOccurrence(), (ITimeRange) m);
+                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getEventOccurrence(), m);
                 fNodeList.add(t);
                 if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
                     break;
@@ -332,7 +332,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         for (int i = firstVisible; i < fFrame.syncMessageReturnCount(); i = i + messageArraysStep) {
             SyncMessage m = fFrame.getSyncMessageReturn(i);
             if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getEventOccurrence(), (ITimeRange) m);
+                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getEventOccurrence(), m);
                 fNodeList.add(t);
                 if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
                     break;
@@ -347,9 +347,9 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         for (int i = firstVisible; i < fFrame.asyncMessageCount(); i = i + messageArraysStep) {
             AsyncMessage m = fFrame.getAsyncMessage(i);
             if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getStartOccurrence(), (ITimeRange) m);
+                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getStartOccurrence(), m);
                 fNodeList.add(t);
-                t = new SDTimeEvent(m.getEndTime(), m.getEndOccurrence(), (ITimeRange) m);
+                t = new SDTimeEvent(m.getEndTime(), m.getEndOccurrence(), m);
                 fNodeList.add(t);
                 if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
                     break;
@@ -364,9 +364,9 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         for (int i = firstVisible; i < fFrame.asyncMessageReturnCount(); i = i + messageArraysStep) {
             AsyncMessageReturn m = fFrame.getAsyncMessageReturn(i);
             if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getStartOccurrence(), (ITimeRange) m);
+                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getStartOccurrence(), m);
                 fNodeList.add(t);
-                t = new SDTimeEvent(m.getEndTime(), m.getEndOccurrence(), (ITimeRange) m);
+                t = new SDTimeEvent(m.getEndTime(), m.getEndOccurrence(), m);
                 fNodeList.add(t);
                 if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
                     break;
@@ -392,8 +392,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         }
         gcim = new GC(dbuffer);
         for (int i = 0; i < fNodeList.size() - 1; i++) {
-            SDTimeEvent m1 = (SDTimeEvent) fNodeList.get(i);
-            SDTimeEvent m2 = (SDTimeEvent) fNodeList.get(i + 1);
+            SDTimeEvent m1 = fNodeList.get(i);
+            SDTimeEvent m2 = fNodeList.get(i + 1);
 
             if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
                 BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
@@ -493,9 +493,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             for (int i = 0; i < child.length; i++) {
                 if (child[i].isFocusControl()) {
                     return true;
-                } else {
-                    checkFocusOnChilds(child[i]);
                 }
+                checkFocusOnChilds(child[i]);
             }
         }
         return false;
@@ -511,9 +510,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         for (int i = 0; i < child.length; i++) {
             if (child[i].isFocusControl()) {
                 return true;
-            } else {
-                checkFocusOnChilds(child[i]);
             }
+            checkFocusOnChilds(child[i]);
         }
         return false;
     }
@@ -551,8 +549,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         if (fFrame != null) {
             setFocus(0);
             for (int i = 0; i < fNodeList.size() - 1; i++) {
-                SDTimeEvent m1 = (SDTimeEvent) fNodeList.get(i);
-                SDTimeEvent m2 = (SDTimeEvent) fNodeList.get(i + 1);
+                SDTimeEvent m1 = fNodeList.get(i);
+                SDTimeEvent m2 = fNodeList.get(i + 1);
 
                 if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
                     BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
@@ -719,7 +717,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             colIndex = 0;
         }
         for (int j = 0; j < fListenerList.size(); j++) {
-            ITimeCompressionListener list = (ITimeCompressionListener) fListenerList.get(j);
+            ITimeCompressionListener list = fListenerList.get(j);
             if (localMes1.getEndLifeline() != null) {
                 list.deltaSelected(localMes1.getEndLifeline(), event1, event2 - event1, fColors[colIndex]);
             } else if (localMes2.getStartLifeline() != null) {
@@ -825,8 +823,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         }
         if ((fFrame != null) && (fNextNodeY == 0)) {
             for (int i = 0; i < fNodeList.size() - 1 && i < 1; i++) {
-                SDTimeEvent m1 = (SDTimeEvent) fNodeList.get(i);
-                SDTimeEvent m2 = (SDTimeEvent) fNodeList.get(i + 1);
+                SDTimeEvent m1 = fNodeList.get(i);
+                SDTimeEvent m2 = fNodeList.get(i + 1);
                 if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
                     BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
                     BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
@@ -870,7 +868,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
         if (fLifeline != null) {
             for (int j = 0; j < fListenerList.size(); j++) {
-                ITimeCompressionListener list = (ITimeCompressionListener) fListenerList.get(j);
+                ITimeCompressionListener list = fListenerList.get(j);
                 list.deltaSelected(fLifeline, fLifelineStart, fLifelineNumEvents, fLifelineColor);
             }
         }
@@ -906,8 +904,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         boolean done = false;
         if (fFrame != null) {
             for (int i = 0; i < fNodeList.size() - 1; i++) {
-                SDTimeEvent m1 = (SDTimeEvent) fNodeList.get(i);
-                SDTimeEvent m2 = (SDTimeEvent) fNodeList.get(i + 1);
+                SDTimeEvent m1 = fNodeList.get(i);
+                SDTimeEvent m2 = fNodeList.get(i + 1);
                 if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
                     BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
                     BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
@@ -1007,16 +1005,15 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                         }
                     }
                     for (int j = 0; j < fListenerList.size(); j++) {
-                        ITimeCompressionListener list = (ITimeCompressionListener) fListenerList.get(j);
+                        ITimeCompressionListener list = fListenerList.get(j);
                         list.deltaSelected(fLifeline, fLifelineStart, fLifelineNumEvents, fLifelineColor);
                     }
                     break;
-                } else {
-                    lastM1 = m1;
-                    lastM2 = m2;
-                    lastY1 = m1Y;
-                    lastY2 = m2Y;
                 }
+                lastM1 = m1;
+                lastM2 = m2;
+                lastY1 = m1Y;
+                lastY2 = m2Y;
             }
         }
     }
@@ -1032,8 +1029,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         if (fFrame != null) {
             setFocus(0);
             for (int i = 0; i < fNodeList.size() - 1; i++) {
-                SDTimeEvent m1 = (SDTimeEvent) fNodeList.get(i);
-                SDTimeEvent m2 = (SDTimeEvent) fNodeList.get(i + 1);
+                SDTimeEvent m1 = fNodeList.get(i);
+                SDTimeEvent m2 = fNodeList.get(i + 1);
 
                 if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
                     BaseMessage mes1 = (BaseMessage) m1.getGraphNode();

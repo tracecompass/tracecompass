@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -26,7 +26,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -98,7 +97,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 	 */
 
 	class TreeObject implements IAdaptable {
-		private String name;
+		private final String name;
 		private TreeParent parent;
 
 		public TreeObject(String name) {
@@ -130,7 +129,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 	}
 
 	class TreeParent extends TreeObject {
-		private ArrayList<TreeObject> children;
+		private final ArrayList<TreeObject> children;
 
 		public TreeParent(String name) {
 			super(name);
@@ -157,8 +156,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		}
 	}
 
-	class ViewContentProvider implements IStructuredContentProvider,
-			ITreeContentProvider {
+	class ViewContentProvider implements ITreeContentProvider {
 		private TreeParent invisibleRoot;
 
 		@Override
@@ -172,8 +170,9 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		@Override
 		public Object[] getElements(Object parent) {
 			if (parent.equals(getViewSite())) {
-				if (invisibleRoot == null)
-					initialize();
+				if (invisibleRoot == null) {
+                    initialize();
+                }
 				return getChildren(invisibleRoot);
 			}
 			return getChildren(parent);
@@ -197,8 +196,9 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		@Override
 		public boolean hasChildren(Object parent) {
-			if (parent instanceof TreeParent)
-				return ((TreeParent) parent).hasChildren();
+			if (parent instanceof TreeParent) {
+                return ((TreeParent) parent).hasChildren();
+            }
 			return false;
 		}
 
@@ -238,8 +238,9 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		@Override
 		public Image getImage(Object obj) {
 			String imageKey = ISharedImages.IMG_OBJ_ELEMENT;
-			if (obj instanceof TreeParent)
-				imageKey = ISharedImages.IMG_OBJ_FOLDER;
+			if (obj instanceof TreeParent) {
+                imageKey = ISharedImages.IMG_OBJ_FOLDER;
+            }
 			return PlatformUI.getWorkbench().getSharedImages().getImage(
 					imageKey);
 		}
@@ -347,10 +348,11 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 	private TimeGraphViewer getActiveTsfCtrl() {
 		TimeGraphViewer inFocusViewer = null;
-		if (tsfviewer.isInFocus())
-			inFocusViewer = tsfviewer;
-		else if (tsfviewer2.isInFocus())
-			inFocusViewer = tsfviewer2;
+		if (tsfviewer.isInFocus()) {
+            inFocusViewer = tsfviewer;
+        } else if (tsfviewer2.isInFocus()) {
+            inFocusViewer = tsfviewer2;
+        }
 		return inFocusViewer;
 	}
 
@@ -616,38 +618,36 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
     @Override
 	public void timeRangeUpdated(TimeGraphRangeUpdateEvent event) {
-	    if (event == null) 
-	        return;
-		Object source = event.getSource();
-		if (source == null || !(source instanceof TimeGraphViewer)) {
-			return;
-		}
+        if (event == null) {
+            return;
+        }
+        Object source = event.getSource();
+        if (source == null || !(source instanceof TimeGraphViewer)) {
+            return;
+        }
 
-		if (event instanceof TimeGraphRangeUpdateEvent) {
-			TimeGraphRangeUpdateEvent rEvent = (TimeGraphRangeUpdateEvent) event;
-			TimeGraphViewer rViewer = (TimeGraphViewer) event
-					.getSource();
-			TimeGraphViewer synchViewer = null;
-			// Synchronize viewer selections if Enabled,
-			// make sure the selection does not go in loops
-			if (tsfviewer == rViewer) {
-				synchViewer = tsfviewer2;
-			} else {
-				synchViewer = tsfviewer;
-			}
+        TimeGraphRangeUpdateEvent rEvent = event;
+        TimeGraphViewer rViewer = (TimeGraphViewer) event
+                .getSource();
+        TimeGraphViewer synchViewer = null;
+        // Synchronize viewer selections if Enabled,
+        // make sure the selection does not go in loops
+        if (tsfviewer == rViewer) {
+            synchViewer = tsfviewer2;
+        } else {
+            synchViewer = tsfviewer;
+        }
 
-
-			synchViewer.setSelectVisTimeWindow(rEvent.getStartTime(), rEvent
-					.getEndTime(), source);
-		}
-	}
+        synchViewer.setSelectVisTimeWindow(rEvent.getStartTime(), rEvent
+                .getEndTime(), source);
+    }
 
 	/**
 	 * Obtains the remainder fraction on unit Seconds of the entered value in
 	 * nanoseconds. e.g. input: 1241207054171080214 ns The number of seconds can
 	 * be obtain by removing the last 9 digits: 1241207054 the fractional
 	 * portion of seconds, expressed in ns is: 171080214
-	 * 
+	 *
 	 * @param v
 	 * @return
 	 */

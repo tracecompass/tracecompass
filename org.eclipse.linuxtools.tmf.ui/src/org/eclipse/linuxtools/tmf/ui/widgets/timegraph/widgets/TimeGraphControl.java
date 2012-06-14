@@ -358,7 +358,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         boolean changed = false;
         if (idx < 0) {
             for (idx = 0; idx < _data._expandedItems.length; idx++) {
-                if (((Item) _data._expandedItems[idx])._selected) {
+                if (_data._expandedItems[idx]._selected) {
                     break;
                 }
             }
@@ -577,17 +577,17 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         boolean changed = false;
         int lastSelection = -1;
         for (int i = 0; i < _data._expandedItems.length; i++) {
-            Item item = (Item) _data._expandedItems[i];
+            Item item = _data._expandedItems[i];
             if (item._selected) {
                 lastSelection = i;
                 if ((1 == n) && (i < _data._expandedItems.length - 1)) {
                     item._selected = false;
-                    item = (Item) _data._expandedItems[i + 1];
+                    item = _data._expandedItems[i + 1];
                     item._selected = true;
                     changed = true;
                 } else if ((-1 == n) && (i > 0)) {
                     item._selected = false;
-                    item = (Item) _data._expandedItems[i - 1];
+                    item = _data._expandedItems[i - 1];
                     item._selected = true;
                     changed = true;
                 }
@@ -596,7 +596,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
 
         if (lastSelection < 0 && _data._expandedItems.length > 0) {
-            Item item = (Item) _data._expandedItems[0];
+            Item item = _data._expandedItems[0];
             item._selected = true;
             changed = true;
         }
@@ -704,9 +704,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         } // to allow getting out of single point interval
         long newInterval;
         if (zoomIn) {
-            newInterval = Math.max(Math.round((double) interval * 0.8), _timeProvider.getMinTimeInterval());
+            newInterval = Math.max(Math.round(interval * 0.8), _timeProvider.getMinTimeInterval());
         } else {
-            newInterval = (long) Math.ceil((double) interval * 1.25);
+            newInterval = (long) Math.ceil(interval * 1.25);
         }
         long center = time0 + Math.round(((double) (xPos - nameSpace) / timeSpace * interval));
         long newTime0 = center - Math.round((double) newInterval * (center - time0) / interval);
@@ -747,7 +747,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
         long m = _timeProvider.getMinTimeInterval();
         if ((time1 - time0) < m) {
-            time0 = selTime - (long) ((selTime - _time0) * m / _range);
+            time0 = selTime - (selTime - _time0) * m / _range;
             time1 = time0 + m;
         }
 
@@ -798,7 +798,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     public int getSelectedIndex() {
         int idx = -1;
         for (int i = 0; i < _data._expandedItems.length; i++) {
-            Item item = (Item) _data._expandedItems[i];
+            Item item = _data._expandedItems[i];
             if (item._selected) {
                 idx = i;
                 break;
@@ -810,7 +810,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     boolean toggle(int idx) {
         boolean toggled = false;
         if (idx >= 0 && idx < _data._expandedItems.length) {
-            Item item = (Item) _data._expandedItems[idx];
+            Item item = _data._expandedItems[idx];
             if (item._hasChildren) {
                 item._expanded = !item._expanded;
                 _data.updateExpandedItems();
@@ -853,9 +853,8 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         int nameWidth = _timeProvider.getNameSpace();
         if (x > nameWidth - w && x < nameWidth + w) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     ITimeGraphEntry getEntry(Point pt) {
@@ -890,13 +889,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         boolean changed = false;
         if (addSelection) {
             if (idx >= 0 && idx < _data._expandedItems.length) {
-                Item item = (Item) _data._expandedItems[idx];
+                Item item = _data._expandedItems[idx];
                 changed = (item._selected == false);
                 item._selected = true;
             }
         } else {
             for (int i = 0; i < _data._expandedItems.length; i++) {
-                Item item = (Item) _data._expandedItems[i];
+                Item item = _data._expandedItems[i];
                 if ((i == idx && !item._selected) || (idx == -1 && item._selected)) {
                     changed = true;
                 }
@@ -1049,7 +1048,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         long time1 = _timeProvider.getTime1();
         long selectedTime = _timeProvider.getSelectedTime();
         double pixelsPerNanoSec = (bounds.width - nameSpace <= RIGHT_MARGIN) ? 0 : (double) (bounds.width - nameSpace - RIGHT_MARGIN) / (time1 - time0);
-        int x = bounds.x + nameSpace + (int) ((double) (selectedTime - time0) * pixelsPerNanoSec);
+        int x = bounds.x + nameSpace + (int) ((selectedTime - time0) * pixelsPerNanoSec);
         if (x >= nameSpace && x < bounds.x + bounds.width) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.SELECTED_TIME));
             gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
@@ -1084,7 +1083,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     public void drawItems(Rectangle bounds, ITimeDataProvider timeProvider,
             Item[] items, int topIndex, int nameSpace, GC gc) {
         for (int i = topIndex; i < items.length; i++) {
-            Item item = (Item) items[i];
+            Item item = items[i];
             drawItem(item, bounds, timeProvider, i, nameSpace, gc);
         }
         fTimeGraphProvider.postDrawControl(bounds, gc);
@@ -1911,7 +1910,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             if (idx < 0 || idx >= _expandedItems.length) {
                 return;
             }
-            Item item = (Item) _expandedItems[idx];
+            Item item = _expandedItems[idx];
             if (item._hasChildren && !item._expanded) {
                 item._expanded = true;
                 updateExpandedItems();

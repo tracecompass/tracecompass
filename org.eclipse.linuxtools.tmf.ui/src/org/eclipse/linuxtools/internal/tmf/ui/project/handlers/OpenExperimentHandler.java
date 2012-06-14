@@ -207,7 +207,7 @@ public class OpenExperimentHandler extends AbstractHandler {
         return null;
     }
 
-    private void displayErrorMsg(final String errorMsg) {
+    private static void displayErrorMsg(final String errorMsg) {
         final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         mb.setText(Messages.OpenExperimentHandler_Title);
         mb.setMessage(errorMsg);

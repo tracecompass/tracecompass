@@ -226,9 +226,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
             if (fRefreshBusy) {
                 fRefreshPending = true;
                 return;
-            } else {
-                fRefreshBusy = true;
             }
+            fRefreshBusy = true;
         }
         // Perform the refresh on the UI thread
         Display.getDefault().asyncExec(new Runnable() {
@@ -255,9 +254,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
             if (fRedrawBusy) {
                 fRedrawPending = true;
                 return;
-            } else {
-                fRedrawBusy = true;
             }
+            fRedrawBusy = true;
         }
         final boolean reset = resetTimeIntervals;
         // Perform the refresh on the UI thread

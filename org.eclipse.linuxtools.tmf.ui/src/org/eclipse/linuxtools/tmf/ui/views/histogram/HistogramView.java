@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Composite;
  * <li>the window span (size of the time window of the smaller histogram).
  * </ul>
  * The histograms x-axis show their respective time range.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -267,7 +267,7 @@ public class HistogramView extends TmfView {
 
     /**
      * Returns the time range of the current selected window (base on default time scale).
-     * 
+     *
      * @return the time range of current selected window.
      */
     public TmfTimeRange getTimeRange() {
@@ -370,10 +370,10 @@ public class HistogramView extends TmfView {
     }
 
     /**
-     * Handles experiment range updated signal. Extends histogram according to the new time range. If a 
+     * Handles experiment range updated signal. Extends histogram according to the new time range. If a
      * HistogramRequest is already ongoing, it will be cancelled and a new request with the new range
      * will be issued.
-     * 
+     *
      * @param signal the experiment range updated signal
      */
     @TmfSignalHandler
@@ -423,7 +423,7 @@ public class HistogramView extends TmfView {
     /**
      * Handles the current time updated signal. Sets the current time in the time range
      * histogram as well as the full histogram.
-     * 
+     *
      * @param signal the signal to process
      */
     @TmfSignalHandler

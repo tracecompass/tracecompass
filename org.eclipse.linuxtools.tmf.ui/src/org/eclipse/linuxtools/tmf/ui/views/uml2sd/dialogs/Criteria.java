@@ -370,7 +370,7 @@ public class Criteria {
         StringBuffer ret = new StringBuffer();
         String prefix = "["; //$NON-NLS-1$
         for (Iterator<String> i = list.iterator(); i.hasNext();) {
-            String s = (String) i.next();
+            String s = i.next();
             ret.append(prefix);
             ret.append(s);
             prefix = " " + SDMessages._34 + " "; //$NON-NLS-1$ //$NON-NLS-2$

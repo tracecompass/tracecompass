@@ -18,7 +18,6 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.swt.SWT;
@@ -69,7 +68,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private static final double LOG10_3 = Math.log10(3);
     private static final double LOG10_5 = Math.log10(5);
 
-    private static final Calendar GREGORIAN_CALENDAR = GregorianCalendar.getInstance();
+    private static final Calendar GREGORIAN_CALENDAR = Calendar.getInstance();
 
     private ITimeDataProvider _timeProvider;
     private int _dragState = 0;
@@ -109,7 +108,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     }
 
     private void calcTimeDelta(int width, double pixelsPerNanoSec) {
-        double minDelta = (double) ((pixelsPerNanoSec == 0) ? YEAR_IN_NS : width / pixelsPerNanoSec);
+        double minDelta = (pixelsPerNanoSec == 0) ? YEAR_IN_NS : width / pixelsPerNanoSec;
         long unit = 1;
         if (_timeProvider != null && _timeProvider.isCalendarFormat()) {
             if (minDelta > 6 * MONTH_IN_NS) {
@@ -135,7 +134,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 return;
             }
         }
-        double log = Math.log10((double) minDelta / unit);
+        double log = Math.log10(minDelta / unit);
         long pow10 = (long) log;
         double remainder = log - pow10;
         if (remainder < LOG10_1) {
@@ -266,7 +265,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         }
 
         // draw selected time
-        int x = _rect0.x + (int) ((double)(selectedTime - time0) * pixelsPerNanoSec);
+        int x = _rect0.x + (int) ((selectedTime - time0) * pixelsPerNanoSec);
         if (x >= _rect0.x && x < _rect0.x + _rect0.width) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.SELECTED_TIME));
             gc.drawLine(x, _rect0.y + _rect0.height - 6, x, _rect0.y
@@ -620,7 +619,7 @@ class TimeDrawAbsYear extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = syearformat.format(new Date((long) (time / 1000000)));
+        String stime = syearformat.format(new Date(time / 1000000));
         Utils.drawText(gc, stime, rect, true);
     }
 
@@ -635,7 +634,7 @@ class TimeDrawAbsMonth extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = smonthformat.format(new Date((long) (time / 1000000)));
+        String stime = smonthformat.format(new Date(time / 1000000));
         Utils.drawText(gc, stime, rect, true);
     }
 
@@ -650,13 +649,13 @@ class TimeDrawAbsDay extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = sdayformat.format(new Date((long) (time / 1000000)));
+        String stime = sdayformat.format(new Date(time / 1000000));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
     public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = sdayformatheader.format(new Date((long) (time / 1000000)));
+        String header = sdayformatheader.format(new Date(time / 1000000));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
@@ -675,13 +674,13 @@ class TimeDrawAbsHrs extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = shrsformat.format(new Date((long) (time / 1000000)));
+        String stime = shrsformat.format(new Date(time / 1000000));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
     public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = shrsformatheader.format(new Date((long) (time / 1000000)));
+        String header = shrsformatheader.format(new Date(time / 1000000));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
@@ -700,13 +699,13 @@ class TimeDrawAbsMin extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = sminformat.format(new Date((long) (time / 1000000)));
+        String stime = sminformat.format(new Date(time / 1000000));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
     public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = sminformatheader.format(new Date((long) (time / 1000000)));
+        String header = sminformatheader.format(new Date(time / 1000000));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
@@ -726,13 +725,13 @@ class TimeDrawAbsSec extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date((long) (time / 1000000)));
+        String stime = stimeformat.format(new Date(time / 1000000));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
     public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date((long) (time / 1000000)));
+        String header = stimeformatheader.format(new Date(time / 1000000));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
@@ -751,7 +750,7 @@ class TimeDrawAbsMillisec extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date((long) (time / 1000000)));
+        String stime = stimeformat.format(new Date(time / 1000000));
         String ns = Utils.formatNs(time, Resolution.MILLISEC);
 
         Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
@@ -759,7 +758,7 @@ class TimeDrawAbsMillisec extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date((long) (time / 1000000)));
+        String header = stimeformatheader.format(new Date(time / 1000000));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
@@ -778,14 +777,14 @@ class TimeDrawAbsMicroSec extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date((long) (time / 1000000)));
+        String stime = stimeformat.format(new Date(time / 1000000));
         String micr = Utils.formatNs(time, Resolution.MICROSEC);
         Utils.drawText(gc, stime + "." + micr, rect, true); //$NON-NLS-1$
     }
 
     @Override
     public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date((long) (time / 1000000)));
+        String header = stimeformatheader.format(new Date(time / 1000000));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
@@ -804,14 +803,14 @@ class TimeDrawAbsNanoSec extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date((long) (time / 1000000)));
+        String stime = stimeformat.format(new Date(time / 1000000));
         String ns = Utils.formatNs(time, Resolution.NANOSEC);
         Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
     }
 
     @Override
     public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date((long) (time / 1000000)));
+        String header = stimeformatheader.format(new Date(time / 1000000));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);

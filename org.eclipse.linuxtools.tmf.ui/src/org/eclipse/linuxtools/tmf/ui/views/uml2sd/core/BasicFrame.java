@@ -201,9 +201,8 @@ public class BasicFrame extends GraphNode {
     public int getWidth() {
         if (fHorizontalIndex == 0) {
             return 3 * Metrics.swimmingLaneWidth() + Metrics.LIFELINE_H_MAGIN * 2 - Metrics.FRAME_H_MARGIN - Metrics.LIFELINE_SPACING / 2;
-        } else {
-            return fHorizontalIndex * Metrics.swimmingLaneWidth() + Metrics.LIFELINE_H_MAGIN * 2 + 1 - Metrics.LIFELINE_SPACING;
         }
+        return fHorizontalIndex * Metrics.swimmingLaneWidth() + Metrics.LIFELINE_H_MAGIN * 2 + 1 - Metrics.LIFELINE_SPACING;
     }
 
     /*
@@ -243,7 +242,7 @@ public class BasicFrame extends GraphNode {
             return null;
         }
         for (int i = fromIndex; i < list.size(); i++) {
-            GraphNode node = (GraphNode) list.get(i);
+            GraphNode node = list.get(i);
             // only lifeline list is x ordered
             // Stop browsing the list if the node is outside the visible area
             // all others nodes will be not visible
@@ -467,7 +466,7 @@ public class BasicFrame extends GraphNode {
             return;
         }
         for (int i = 0; i < timeArray.size(); i++) {
-            SDTimeEvent m = (SDTimeEvent) timeArray.get(i);
+            SDTimeEvent m = timeArray.get(i);
 
             if (m.getTime().compareTo(fMaxSDTime, true) > 0) {
                 fMaxSDTime = m.getTime();
@@ -510,8 +509,8 @@ public class BasicFrame extends GraphNode {
             return;
         }
         for (int i = 0; i < timeArray.size() - 1; i++) {
-            SDTimeEvent m1 = (SDTimeEvent) timeArray.get(i);
-            SDTimeEvent m2 = (SDTimeEvent) timeArray.get(i + 1);
+            SDTimeEvent m1 = timeArray.get(i);
+            SDTimeEvent m2 = timeArray.get(i + 1);
 
             updateMinMax(m1, m2);
         }
@@ -557,15 +556,15 @@ public class BasicFrame extends GraphNode {
         List<SDTimeEvent> timeArray = new ArrayList<SDTimeEvent>();
         while (it.hasNext()) {
             String nodeType = it.next();
-            List<GraphNode> list = (List<GraphNode>) fNodes.get(nodeType);
+            List<GraphNode> list = fNodes.get(nodeType);
             for (int i = 0; i < list.size(); i++) {
                 Object timedNode = list.get(i);
                 if ((timedNode instanceof ITimeRange) && ((ITimeRange) timedNode).hasTimeInfo()) {
-                    int event = ((GraphNode) list.get(i)).getStartOccurrence();
+                    int event = list.get(i).getStartOccurrence();
                     ITmfTimestamp time = ((ITimeRange) list.get(i)).getStartTime();
                     SDTimeEvent f = new SDTimeEvent(time, event, (ITimeRange) list.get(i));
                     timeArray.add(f);
-                    if (event != ((GraphNode) list.get(i)).getEndOccurrence()) {
+                    if (event != list.get(i).getEndOccurrence()) {
                         event = ((AsyncMessage) list.get(i)).getEndOccurrence();
                         time = ((ITimeRange) list.get(i)).getEndTime();
                         f = new SDTimeEvent(time, event, (ITimeRange) list.get(i));

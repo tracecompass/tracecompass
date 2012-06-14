@@ -262,7 +262,7 @@ public class Uml2SDTestFacility {
      * @param page number to set
      */
     public void setPage(final int page) {
-        fLoader.pageNumberChanged(page);;
+        fLoader.pageNumberChanged(page);
         fLoader.waitForCompletion();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }

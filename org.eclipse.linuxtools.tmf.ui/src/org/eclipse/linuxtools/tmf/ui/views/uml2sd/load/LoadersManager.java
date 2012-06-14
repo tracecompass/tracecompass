@@ -132,7 +132,7 @@ public class LoadersManager {
      * @param viewId the id of the view
      */
     public void resetLoader(String viewId) {
-        IUml2SDLoader loader = (IUml2SDLoader) fViewLoaderMap.get(viewId);
+        IUml2SDLoader loader = fViewLoaderMap.get(viewId);
         if (loader != null) {
             loader.dispose();
         }
@@ -168,7 +168,7 @@ public class LoadersManager {
         try {
             // Search the view corresponding to the viewId
             if (sdView == null) {
-                IViewReference viewref = (IViewReference) persp.findViewReference(viewId);
+                IViewReference viewref = persp.findViewReference(viewId);
                 if (viewref != null) {
                     sdView = (SDView) viewref.getView(false);
                 }
@@ -237,7 +237,7 @@ public class LoadersManager {
                 try {
                     // Search view corresponding to the viewId
                     SDView sdview = null;
-                    IViewReference viewref = (IViewReference) persp.findViewReference(id);
+                    IViewReference viewref = persp.findViewReference(id);
                     if (viewref != null) {
                         sdview = (SDView) viewref.getView(false);
                     }
@@ -293,7 +293,7 @@ public class LoadersManager {
      * @return List of extension point configuration elements.
      */
     private List<IConfigurationElement> getLoaderConfigurationElements(String viewId) {
-        List<IConfigurationElement> list = (List<IConfigurationElement>) fViewLoadersList.get(viewId);
+        List<IConfigurationElement> list = fViewLoadersList.get(viewId);
         if (list != null) {
             return list;
         }
@@ -329,11 +329,12 @@ public class LoadersManager {
      * @param loaderElements  The list of loader configuration elements
      * @return Extension point configuration element
      */
-    private IConfigurationElement getLoaderConfigurationElement(String loaderClassName, List<IConfigurationElement> loaderElements) {
+    private static IConfigurationElement getLoaderConfigurationElement(
+            String loaderClassName, List<IConfigurationElement> loaderElements) {
         if (loaderClassName != null && loaderClassName.length() > 0) {
             // Find configuration element corresponding to the saved loader
             for (Iterator<IConfigurationElement> i = loaderElements.iterator(); i.hasNext();) {
-                IConfigurationElement ce = (IConfigurationElement) i.next();
+                IConfigurationElement ce = i.next();
                 if (ce.getAttribute("class").equals(loaderClassName)) { //$NON-NLS-1$
                     return ce;
                 }
@@ -349,10 +350,11 @@ public class LoadersManager {
      * @param loaderElements The list of loader configuration elements
      * @return The default extension point configuration element.
      */
-    private IConfigurationElement getDefaultLoader(List<IConfigurationElement> loaderElements) {
+    private static IConfigurationElement getDefaultLoader(
+            List<IConfigurationElement> loaderElements) {
         // Look for a default loader
         for (Iterator<IConfigurationElement> i = loaderElements.iterator(); i.hasNext();) {
-            IConfigurationElement ce = (IConfigurationElement) i.next();
+            IConfigurationElement ce = i.next();
             if (Boolean.valueOf(ce.getAttribute("default")).booleanValue()) { //$NON-NLS-1$
                 return ce;
             }

@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2006 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * Class to add a hot spot marker.
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -52,7 +52,7 @@ public class HotSpot extends GraphNode {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    
+
     /**
      * Default constructor
      */
@@ -66,7 +66,7 @@ public class HotSpot extends GraphNode {
 
     /**
      * Set the marker image.
-     * 
+     *
      * @param img A image to set
      */
     public void setImage(IImage img) {
@@ -123,7 +123,7 @@ public class HotSpot extends GraphNode {
 
     /**
      * Set the lifeline on which the execution occurrence appears.
-     * 
+     *
      * @param occ the parent lifeline
      */
     public void setExecution(BasicExecutionOccurrence occ) {
@@ -133,7 +133,7 @@ public class HotSpot extends GraphNode {
 
     /**
      * Get the lifeline on which the execution occurrence appears.
-     * 
+     *
      * @return - the parent lifeline
      */
     public BasicExecutionOccurrence getExecOcc() {
@@ -141,8 +141,8 @@ public class HotSpot extends GraphNode {
     }
 
     /**
-     * Returns the occurrence number. 
-     * 
+     * Returns the occurrence number.
+     *
      * @return the occurrence number.
      */
     public int getOccurrence() {
@@ -151,7 +151,7 @@ public class HotSpot extends GraphNode {
 
     /**
      * Set the occurrence number.
-     * 
+     *
      * @param occ A number to set.
      */
     public void setOccurrence(int occ) {
@@ -208,7 +208,7 @@ public class HotSpot extends GraphNode {
         int width = getWidth();
         int height = getHeight();
 
-        if (Frame.contains(x, y, width, height, xValue, yValue)) {
+        if (GraphNode.contains(x, y, width, height, xValue, yValue)) {
             return true;
         }
         return false;

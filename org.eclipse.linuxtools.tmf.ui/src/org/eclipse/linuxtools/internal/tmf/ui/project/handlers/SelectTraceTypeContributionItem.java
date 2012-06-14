@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -129,11 +129,12 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
         return list.toArray(new IContributionItem[list.size()]);
     }
 
-    private void addContributionItem(List<IContributionItem> list,
-            String traceBundle, String traceTypeId, String traceIcon, String label, boolean selected,
+    private static void addContributionItem(List<IContributionItem> list,
+            String traceBundle, String traceTypeId, String traceIcon,
+            String label, boolean selected,
             MenuManager subMenu) {
         Map<String, String> params;
-        
+
         params = new HashMap<String, String>();
         params.put(BUNDLE_PARAMETER, traceBundle);
         params.put(TYPE_PARAMETER, traceTypeId);

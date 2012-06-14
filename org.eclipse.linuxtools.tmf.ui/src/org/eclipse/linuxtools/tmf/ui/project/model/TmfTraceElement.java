@@ -43,7 +43,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * Implementation of trace model element representing a trace. It provides methods to instantiate
  * <code>ITmfTrace</code> and <code>ITmfEvent</code> as well as editor ID from the trace type
  * extension definition.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -124,7 +124,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * Constructor. 
+     * Constructor.
      * Creates trace model element under the trace folder.
      * @param name The name of trace
      * @param trace The trace resource.
@@ -134,7 +134,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         this(name, trace, (TmfProjectModelElement) parent);
     }
     /**
-     * Constructor. 
+     * Constructor.
      * Creates trace model element under the experiment folder.
      * @param name The name of trace
      * @param trace The trace resource.
@@ -162,7 +162,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     }
 
     /**
-     * Refreshes the trace type filed by reading the trace type persistent property of the resource 
+     * Refreshes the trace type filed by reading the trace type persistent property of the resource
      * referenece.
      */
     public void refreshTraceType() {
@@ -174,8 +174,8 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     }
 
     /**
-     * Instantiate a <code>ITmfTrace</code> object based on the trace type and the corresponding extension. 
-     * 
+     * Instantiate a <code>ITmfTrace</code> object based on the trace type and the corresponding extension.
+     *
      * @return the <code>ITmfTrace</code> or <code>null</code> for an error
      */
     public ITmfTrace<?> instantiateTrace() {
@@ -210,8 +210,8 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     }
 
     /**
-     * Instantiate a <code>ITmfEvent</code> object based on the trace type and the corresponding extension. 
-     * 
+     * Instantiate a <code>ITmfEvent</code> object based on the trace type and the corresponding extension.
+     *
      * @return the <code>ITmfEvent</code> or <code>null</code> for an error
      */
     public ITmfEvent instantiateEvent() {
@@ -513,7 +513,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         return null;
     }
 
-    private String getCategory(IConfigurationElement ce) {
+    private static String getCategory(IConfigurationElement ce) {
         String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
         if (categoryId != null) {
             IConfigurationElement category = sfTraceCategories.get(categoryId);

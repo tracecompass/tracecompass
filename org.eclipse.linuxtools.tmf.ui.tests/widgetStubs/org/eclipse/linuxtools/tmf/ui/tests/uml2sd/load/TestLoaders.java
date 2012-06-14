@@ -151,7 +151,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
                 }
             }
 
-            for (int i = 0; i < testFrame.lifeLinesCount(); i++)
+            for (int i = 0; i < testFrame.lifeLinesCount(); i++) {
                 if (i > 0) {
                     ExecutionOccurrence occ = new ExecutionOccurrence();
                     occ.setStartOccurrence(testFrame.getSyncMessage(i).getEventOccurrence() + 1);
@@ -159,6 +159,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
                     testFrame.getLifeline(i).addExecution(occ);
                     occ.setName("******************* Execution Occurance TEST ****************");
                 }
+            }
 
             Stop s = new Stop();
             s.setLifeline(testFrame.getLifeline(1));
@@ -204,7 +205,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
                 occ.setEndOccurrence(testFrame.getSyncMessageReturn(i - 1).getEventOccurrence());
                 testFrame.getLifeline(0).addExecution(occ);
             }
-        } 
+        }
         v.setFrame(testFrame);
     }
 
@@ -216,28 +217,33 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
     public boolean find(Criteria toSearch) {
         Frame frame = v.getFrame();
 
-        if (frame == null)
+        if (frame == null) {
             return false;
+        }
         if (findResults == null || findCriteria == null || !findCriteria.compareTo(toSearch)) {
             findResults = new ArrayList<GraphNode>();
             findCriteria = toSearch;
             if (findCriteria.isLifeLineSelected()) {
                 for (int i = 0; i < frame.lifeLinesCount(); i++) {
-                    if (findCriteria.matches(frame.getLifeline(i).getName()))
+                    if (findCriteria.matches(frame.getLifeline(i).getName())) {
                         findResults.add(frame.getLifeline(i));
+                    }
                 }
 
             }
             ArrayList<GraphNode> msgs = new ArrayList<GraphNode>();
             if (findCriteria.isSyncMessageSelected()) {
                 for (int i = 0; i < frame.syncMessageCount(); i++) {
-                    if (findCriteria.matches(frame.getSyncMessage(i).getName()))
+                    if (findCriteria.matches(frame.getSyncMessage(i).getName())) {
                         msgs.add(frame.getSyncMessage(i));
+                    }
                 }
 
-                for (int i = 0; i < frame.syncMessageReturnCount(); i++)
-                    if (findCriteria.matches(frame.getSyncMessageReturn(i).getName()))
+                for (int i = 0; i < frame.syncMessageReturnCount(); i++) {
+                    if (findCriteria.matches(frame.getSyncMessageReturn(i).getName())) {
                         msgs.add(frame.getSyncMessageReturn(i));
+                    }
+                }
 
             }
             // if(msgs.size() > 0) {
@@ -248,13 +254,17 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
 
             msgs = new ArrayList<GraphNode>();
             if (findCriteria.isAsyncMessageSelected()) {
-                for (int i = 0; i < frame.asyncMessageCount(); i++)
-                    if (findCriteria.matches(frame.getAsyncMessage(i).getName()))
+                for (int i = 0; i < frame.asyncMessageCount(); i++) {
+                    if (findCriteria.matches(frame.getAsyncMessage(i).getName())) {
                         msgs.add(frame.getAsyncMessage(i));
+                    }
+                }
 
-                for (int i = 0; i < frame.asyncMessageReturnCount(); i++)
-                    if (findCriteria.matches(frame.getAsyncMessageReturn(i).getName()))
+                for (int i = 0; i < frame.asyncMessageReturnCount(); i++) {
+                    if (findCriteria.matches(frame.getAsyncMessageReturn(i).getName())) {
                         msgs.add(frame.getAsyncMessageReturn(i));
+                    }
+                }
 
             }
             // if(msgs.size() > 0) {
@@ -265,22 +275,21 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
 
             @SuppressWarnings("rawtypes")
             List selection = v.getSDWidget().getSelection();
-            if (selection != null && selection.size() == 1)
+            if (selection != null && selection.size() == 1) {
                 currentFindIndex = findResults.indexOf(selection.get(0)) + 1;
-            else
+            } else {
                 currentFindIndex = 0;
+            }
         } else {
             currentFindIndex++;
         }
         if (findResults.size() > currentFindIndex) {
-            GraphNode current = (GraphNode) findResults.get(currentFindIndex);
+            GraphNode current = findResults.get(currentFindIndex);
             v.getSDWidget().moveTo(current);
             return true;
-        } else {
-            // return notFoundYet(findCriteria); // search in other page
-            return false;
         }
-        // return false;
+        // return notFoundYet(findCriteria); // search in other page
+        return false;
     }
 
     @Override
@@ -348,11 +357,12 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
                 }
             }
 
-            for (int i = 0; i < frame.syncMessageReturnCount(); i++)
+            for (int i = 0; i < frame.syncMessageReturnCount(); i++) {
                 if (filterCriteria.getCriteria().matches(frame.getSyncMessageReturn(i).getName())) {
                     frame.getSyncMessageReturn(i).setVisible(false);
                     found = true;
                 }
+            }
         }
 
         v.getSDWidget().redraw();
@@ -446,8 +456,9 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
 
         @Override
         public void dispose() {
-            if (img != null)
+            if (img != null) {
                 img.dispose();
+            }
         }
 
     }
@@ -456,7 +467,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
     public void firstPage() {
         page = 0;
         createFrame();
-        
+
     }
 
     @Override

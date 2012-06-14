@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Slider;
  * of visible lines in the StyledText control is set to fill the viewer display area.
  * An underlying data model is used to store a cache of event raw text line data.
  * The slider is ratio-based.
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
@@ -604,9 +604,8 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	private int getPreviousCaretOffset(int time) {
 	    if (fStoredCaretPosition[0].time == time) {
 	        return fStoredCaretPosition[1].caretOffset;
-	    } else {
-	        return fStoredCaretPosition[0].caretOffset;
 	    }
+        return fStoredCaretPosition[0].caretOffset;
 	}
 
 	private void updateHighlightedRank() {
@@ -741,6 +740,8 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 }
                 break;
             }
+            default:
+                break;
         }
         //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
         if (e.detail != SWT.NONE) {
@@ -917,6 +918,8 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 }
                 break;
             }
+            default:
+                break;
         }
         //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
         updateHighlightedRank();

@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -26,13 +26,13 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
  * representations (like asynchronous syncMessages) will be responsible to define the missing second eventOccurrence
  * property.<br>
  * <br>
- * 
+ *
  * @see Lifeline Lifeline for more event occurence details
  * @version 1.0
  * @author sveyrier
  */
 public abstract class BaseMessage extends GraphNode {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public abstract class BaseMessage extends GraphNode {
      */
     protected Lifeline fEndLifeline = null;
     /**
-     * The visiblitiy flag. 
+     * The visiblitiy flag.
      */
     protected boolean fVisible = true;
 
@@ -79,20 +79,19 @@ public abstract class BaseMessage extends GraphNode {
              */
             return fEndLifeline.getY() + fEndLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
 
-        } else {
-            /*
-             * UML2 lost message kind
-             */
-            if (fStartLifeline != null) {
-                return fStartLifeline.getY() + fStartLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
-            }
+        }
+        /*
+         * UML2 lost message kind
+         */
+        if (fStartLifeline != null) {
+            return fStartLifeline.getY() + fStartLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
+        }
 
-            /*
-             * UML2 found message kind
-             */
-            if (fEndLifeline != null) {
-                return fEndLifeline.getY() + fEndLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
-            }
+        /*
+         * UML2 found message kind
+         */
+        if (fEndLifeline != null) {
+            return fEndLifeline.getY() + fEndLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
         }
         // return 0 by default
         return 0;
@@ -127,7 +126,7 @@ public abstract class BaseMessage extends GraphNode {
      * <br>
      * This method is typically used to faster execute none graphical operation like tooltip lookup.<br>
      * <br>
-     * 
+     *
      * @param quick true to get an approximative value<br>
      *            false to get the exact x value<br>
      * @return the graph node x coordinate
@@ -172,7 +171,7 @@ public abstract class BaseMessage extends GraphNode {
      * <br>
      * This method is typically used to faster execute none graphical operation like tooltip lookup.<br>
      * <br>
-     * 
+     *
      * @param quick true to get an approximative value<br>
      *            false to get the exact x value
      * @return the graph node width
@@ -238,7 +237,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Sets the visibility value.
-     * 
+     *
      * @param value The visibility to set.
      */
     public void setVisible(boolean value) {
@@ -246,7 +245,7 @@ public abstract class BaseMessage extends GraphNode {
     }
 
     /**
-     * @return the visibility value. 
+     * @return the visibility value.
      */
     public boolean isVisible() {
         return fVisible;
@@ -254,7 +253,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Set the lifeline from which this message has been sent.
-     * 
+     *
      * @param lifeline - the message sender
      */
     public void setStartLifeline(Lifeline lifeline) {
@@ -263,7 +262,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Returns the lifeline from which this message has been sent.
-     * 
+     *
      * @return the message sender
      */
     public Lifeline getStartLifeline() {
@@ -272,7 +271,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Returns the lifeline which has received this message.
-     * 
+     *
      * @return the message receiver
      */
     public Lifeline getEndLifeline() {
@@ -281,7 +280,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Set the lifeline which has receive this message.
-     * 
+     *
      * @param lifeline the message receiver
      */
     public void setEndLifeline(Lifeline lifeline) {
@@ -290,7 +289,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Set the event occurrence when this message occurs.<br>
-     * 
+     *
      * @param occurrence the event occurrence to assign to this message.<br>
      * @see Lifeline Lifeline for more event occurence details
      */
@@ -300,7 +299,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Returns the event occurence when is message occurs.<br>
-     * 
+     *
      * @return the event occurrence assigned to this message.<br>
      * @see Lifeline Lifeline for more event occurence details
      */
@@ -313,7 +312,7 @@ public abstract class BaseMessage extends GraphNode {
      * WARNING: this method will return a valid result only for execution occurrences which are visible in the View.<br>
      * As consequence this method is only used for drawing purpose, especially to determine the exact message x
      * coordinate and width.<br>
-     * 
+     *
      * @see BaseMessage#getX(boolean)
      * @param event the event occurrence to test
      * @return true if occurs on a execution occurrence owned by the sending lifeine, false otherwise
@@ -345,7 +344,7 @@ public abstract class BaseMessage extends GraphNode {
      * WARNING: this method will return a valid result only for execution occurrences which are visible in the View.<br>
      * As consequence this method is only used for drawing purpose, especially to determine the exact message x
      * coordinate and width.<br>
-     * 
+     *
      * @see BaseMessage#getX(boolean)
      * @param event the event occurrence to test
      * @return true if occurs on a execution occurrence owned by the receiving lifeline, false otherwise
@@ -391,35 +390,35 @@ public abstract class BaseMessage extends GraphNode {
              * rectangle width is negative.
              */
             if (getName().length() * Metrics.getAverageCharWidth() > Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH) {
-                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH, Metrics.getMessageFontHeigth(), xValue, yValue)) {
+                if (GraphNode.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH, Metrics.getMessageFontHeigth(), xValue, yValue)) {
                     return true;
                 }
             } else {
-                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, getName().length() * Metrics.getAverageCharWidth(), Metrics.getMessageFontHeigth(), xValue, yValue)) {
+                if (GraphNode.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, getName().length() * Metrics.getAverageCharWidth(), Metrics.getMessageFontHeigth(), xValue, yValue)) {
                     return true;
                 }
             }
 
             // Test if the point is in part 1 of the self message
             // see: "private void drawMessage (NGC context)" method for self message drawing schema
-            if (Frame.contains(x, y - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue)) {
+            if (GraphNode.contains(x, y - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue)) {
                 return true;
             }
 
             // Test if the point is in part 3 of the self message
-            if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, y, Metrics.MESSAGE_SELECTION_TOLERANCE, height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, xValue, yValue)) {
+            if (GraphNode.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, y, Metrics.MESSAGE_SELECTION_TOLERANCE, height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, xValue, yValue)) {
                 return true;
             }
 
             // Test if the point is in part 5 of the self message
-            if (Frame.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue)) {
+            if (GraphNode.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue)) {
                 return true;
             }
 
             // false otherwise
             return false;
         }
-        if (Frame.contains(x, y - tempHeight, width, tempHeight, xValue, yValue)) {
+        if (GraphNode.contains(x, y - tempHeight, width, tempHeight, xValue, yValue)) {
             return true;
         }
         // false otherwise
@@ -428,7 +427,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Method to draw the message using the graphical context.
-     * 
+     *
      * @param context A graphical context to draw in.
      */
     protected void drawMessage(IGC context) {
@@ -628,7 +627,7 @@ public abstract class BaseMessage extends GraphNode {
             }
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNodee#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
@@ -638,7 +637,7 @@ public abstract class BaseMessage extends GraphNode {
         if (!isVisible()) {
             return;
         }
-        
+
         // Draw it selected?*/
         if (isSelected()) {
             ISDPreferences pref = SDViewPref.getInstance();
@@ -670,10 +669,10 @@ public abstract class BaseMessage extends GraphNode {
     /**
      * Determine if two messages are identical. This default implementation considers that overlapping messages with
      * same coordinates are identical.
-     * 
+     *
      * @param message - the message to compare with
      * @return true if identical false otherwise
-     * 
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#isSameAs(org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode)
      */
     @Override
@@ -689,7 +688,7 @@ public abstract class BaseMessage extends GraphNode {
 
     /**
      * Method drawRot.
-     * 
+     *
      * @param x A x coordinate
      * @param y A y coordinate
      * @param w A width

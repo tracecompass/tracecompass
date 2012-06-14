@@ -255,7 +255,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeRangeEndText.setLayoutData(gridData);
     }
 
-    private Font adjustFont(final Composite composite) {
+    private static Font adjustFont(final Composite composite) {
         // Reduce font size for a more pleasing rendering
         final int fontSizeAdjustment = -2;
         final Font font = composite.getFont();
@@ -550,7 +550,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         }
     }
 
-    private void drawDelimiter(final GC imageGC, final Color color, final int height, final int index) {
+    private static void drawDelimiter(final GC imageGC, final Color color,
+            final int height, final int index) {
         imageGC.setBackground(color);
         final int dash = height / 4;
         imageGC.fillRectangle(index, 0 * dash, 1, dash - 1);

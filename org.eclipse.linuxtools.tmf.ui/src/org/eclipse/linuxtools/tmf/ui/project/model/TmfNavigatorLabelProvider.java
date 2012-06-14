@@ -69,7 +69,7 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
         fExperimentIcon = loadIcon(bundle, fExperimentIconFile);
     }
 
-    private Image loadIcon(Bundle bundle, String url) {
+    private static Image loadIcon(Bundle bundle, String url) {
         Activator plugin = Activator.getDefault();
         String key = bundle.getSymbolicName() + "/" + url; //$NON-NLS-1$
         Image icon = plugin.getImageRegistry().get(key);

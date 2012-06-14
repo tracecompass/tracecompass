@@ -85,7 +85,7 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
     public void setSelection(ISelection selection) {
         fCurrentSelection = selection;
         for (int i = 0; i < fListenerList.size(); i++) {
-            ISelectionChangedListener list = (ISelectionChangedListener) fListenerList.get(i);
+            ISelectionChangedListener list = fListenerList.get(i);
             list.selectionChanged(new SelectionChangedEvent(this, fCurrentSelection));
         }
     }

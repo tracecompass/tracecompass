@@ -225,7 +225,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             }
         } catch (final IOException e) {
             Activator.getDefault().logError("Error parsing event. File: " + getPath(), e); //$NON-NLS-1$
-            
+
         }
         context.setLocation(NULL_LOCATION);
         return event;
@@ -306,7 +306,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
         }
     }
 
-    private void readQuote(final StringBuffer buffer, final RandomAccessFile raFile, final char eq) {
+    private static void readQuote(final StringBuffer buffer,
+            final RandomAccessFile raFile, final char eq) {
         try {
             int i;
             while ((i = raFile.read()) != -1) {
@@ -323,7 +324,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
         }
     }
 
-    private void readComment(final StringBuffer buffer, final RandomAccessFile raFile) {
+    private static void readComment(final StringBuffer buffer,
+            final RandomAccessFile raFile) {
         try {
             int numRead = 0;
             int i;

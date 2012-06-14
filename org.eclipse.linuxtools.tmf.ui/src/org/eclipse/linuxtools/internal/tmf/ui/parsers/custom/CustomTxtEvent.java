@@ -54,19 +54,19 @@ public class CustomTxtEvent extends CustomEvent {
                     continue;
                 }
                 String name = column.name;
-                if (column.action == CustomTxtTraceDefinition.ACTION_SET) {
+                if (column.action == CustomTraceDefinition.ACTION_SET) {
                     fData.put(name, value);
-                    if (name.equals(CustomTxtTraceDefinition.TAG_TIMESTAMP)) {
+                    if (name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
                         fData.put(TIMESTAMP_INPUT_FORMAT_KEY, column.format);
                     }
-                } else if (column.action == CustomTxtTraceDefinition.ACTION_APPEND) {
+                } else if (column.action == CustomTraceDefinition.ACTION_APPEND) {
                     String s = fData.get(name);
                     if (s != null) {
                         fData.put(name, s + value);
                     } else {
                         fData.put(name, value);
                     }
-                    if (name.equals(CustomTxtTraceDefinition.TAG_TIMESTAMP)) {
+                    if (name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
                         String timeStampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
                         if (timeStampInputFormat != null) {
                             fData.put(TIMESTAMP_INPUT_FORMAT_KEY, timeStampInputFormat + column.format);
@@ -74,14 +74,14 @@ public class CustomTxtEvent extends CustomEvent {
                             fData.put(TIMESTAMP_INPUT_FORMAT_KEY, column.format);
                         }
                     }
-                } else if (column.action == CustomTxtTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
+                } else if (column.action == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
                     String s = fData.get(name);
                     if (s != null) {
                         fData.put(name, s + " | " + value); //$NON-NLS-1$
                     } else {
                         fData.put(name, value);
                     }
-                    if (name.equals(CustomTxtTraceDefinition.TAG_TIMESTAMP)) {
+                    if (name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
                         String timeStampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
                         if (timeStampInputFormat != null) {
                             fData.put(TIMESTAMP_INPUT_FORMAT_KEY, timeStampInputFormat + " | " + column.format); //$NON-NLS-1$

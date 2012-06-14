@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -34,7 +33,7 @@ import org.eclipse.swt.widgets.Shell;
  * below, a scale to visually locate the value in a time range (usually the minimum an maximum elapsed time in the whole
  * diagram)
  * </p>
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -77,7 +76,7 @@ public class DrawableToolTip implements PaintListener {
      */
     private static int fScaleLength = 100;
     /**
-     * The text to display 
+     * The text to display
      */
     protected String fMessage;
     /**
@@ -91,7 +90,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Creates a drawable tool tip instance.
-     * 
+     *
      * @param parent The parent composite.
      */
     public DrawableToolTip(Composite parent) {
@@ -120,7 +119,7 @@ public class DrawableToolTip implements PaintListener {
     // ------------------------------------------------------------------------
     /**
      * Returns the message to display.
-     * 
+     *
      * @return the message to display.
      */
     public String getText() {
@@ -129,7 +128,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Returns teh current time to display.
-     * 
+     *
      * @return the current time to display
      */
     public String getAccessibleText() {
@@ -138,7 +137,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Returns the horizontal margin.
-     * 
+     *
      * @return the horizontal margin.
      */
     protected static int getHorizontalMargin() {
@@ -147,7 +146,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Sets the horizontal margin.
-     * 
+     *
      * @param margin The margin to set.
      */
     protected static void setHorizontalMargin(int margin) {
@@ -156,7 +155,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Returns the vertical margin.
-     * 
+     *
      * @return the vertical margin.
      */
     protected static int getVerticalMargin() {
@@ -165,7 +164,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Sets the vertical margin.
-     * 
+     *
      * @param margin The margin to set.
      */
     protected static void setVerticalMargin(int margin) {
@@ -174,7 +173,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Returns the text scale margin.
-     * 
+     *
      * @return the text scale margin.
      */
     protected static int getTextScaleMargin() {
@@ -191,7 +190,7 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Returns the scale length.
-     * 
+     *
      * @return the scale length.
      */
     protected static int getScaleLength() {
@@ -200,17 +199,17 @@ public class DrawableToolTip implements PaintListener {
 
     /**
      * Sets the scale length.
-     * 
+     *
      * @param scaleLength The scale length to set.
      */
     protected static void setScaleLength(int scaleLength) {
         fScaleLength = scaleLength;
     }
-    
+
     /**
      * Display the tooltip using the given time range(min,max) the current value and the time unit The tooltip will stay
      * on screen until it is told otherwise
-     * 
+     *
      * @param value the current in the scale
      * @param min the scale min
      * @param max the scale max
@@ -237,10 +236,11 @@ public class DrawableToolTip implements PaintListener {
      * Disposes the system resource used by this kind of toolTips (a colors array essentially)
      */
     public void dispose() {
-        for (int i = 0; i < fColors.length; i++)
+        for (int i = 0; i < fColors.length; i++) {
             fColors[i].dispose();
+        }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
@@ -258,13 +258,13 @@ public class DrawableToolTip implements PaintListener {
         int step = fScaleLength / 10;
 
         // double gr = (max - min) / 10;
-        ITmfTimestamp minMaxdelta = (TmfTimestamp) fMinMaxRange.getEndTime().getDelta(fMinMaxRange.getStartTime());
+        ITmfTimestamp minMaxdelta = fMinMaxRange.getEndTime().getDelta(fMinMaxRange.getStartTime());
         double gr = (minMaxdelta.getValue()) / (double) 10;
 
         // double delta = currentValue-min;
-        ITmfTimestamp delta = (TmfTimestamp) fCurrentValue.getDelta(fMinMaxRange.getStartTime());
+        ITmfTimestamp delta = fCurrentValue.getDelta(fMinMaxRange.getStartTime());
         long absDelta = Math.abs(delta.getValue());
-        
+
         int colIndex = 0;
         if (gr != 0) {
             // colIndex = Math.round((float)(Math.log(1+delta)/gr));

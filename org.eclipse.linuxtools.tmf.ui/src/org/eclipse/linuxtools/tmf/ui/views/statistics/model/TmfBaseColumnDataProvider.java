@@ -77,9 +77,8 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
                 TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) element;
                 if (fFolderLevels.contains(node.getKey())) {
                     return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-                } else {
-                    return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
                 }
+                return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
             }
         }, new ViewerComparator() {
             @Override
@@ -97,9 +96,8 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
                 TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) element;
                 if (!fFolderLevels.contains(node.getKey())) {
                     return Long.toString(node.getValue().nbEvents);
-                } else {
-                    return ""; //$NON-NLS-1$
                 }
+                return ""; //$NON-NLS-1$
             }
         }, new ViewerComparator() {
             @Override
@@ -120,9 +118,8 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
 
                 if (parent == null) {
                     return 0;
-                } else {
-                    return (double) node.getValue().nbEvents / parent.getValue().nbEvents;
                 }
+                return (double) node.getValue().nbEvents / parent.getValue().nbEvents;
             }
         }));
     }

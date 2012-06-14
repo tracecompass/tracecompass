@@ -20,9 +20,9 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
@@ -530,7 +530,7 @@ public class ColorsView extends TmfView {
                     FilterDialog dialog = new FilterDialog(fShell);
                     dialog.setFilter(colorSetting.getFilter());
                     dialog.open();
-                    if (dialog.getReturnCode() == Dialog.OK) {
+                    if (dialog.getReturnCode() == Window.OK) {
                         if (dialog.getFilter() != null) {
                             colorSetting.setFilter(dialog.getFilter());
                             filterText.setText(dialog.getFilter().toString());

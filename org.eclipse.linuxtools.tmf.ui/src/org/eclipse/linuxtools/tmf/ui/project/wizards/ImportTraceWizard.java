@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * The import trace wizard implementation.
@@ -81,7 +82,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         }
 
         setWindowTitle(Messages.ImportTraceWizard_DialogTitle);
-        setDefaultPageImageDescriptor(Activator.imageDescriptorFromPlugin(PLUGIN_ID, ICON_PATH));
+        setDefaultPageImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, ICON_PATH));
         setNeedsProgressMonitor(true);
     }
 
@@ -95,7 +96,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         fTraceImportWizardPage = new ImportTraceWizardPage(fWorkbench, fSelection);
         addPage(fTraceImportWizardPage);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.jface.wizard.Wizard#performFinish()

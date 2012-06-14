@@ -147,9 +147,8 @@ public abstract class AbsTmfStatisticsTree {
         if (path.size() == 1) {
             if (path.equals(ROOT)) {
                 return null;
-            } else {
-                return get(ROOT);
             }
+            return get(ROOT);
         }
         return get(path.subArray(0, path.size() - 1));
     }

@@ -45,8 +45,8 @@ public class TimeEventComparator implements Comparator<SDTimeEvent>, Serializabl
      */
     @Override
     public int compare(SDTimeEvent arg0, SDTimeEvent arg1) {
-        SDTimeEvent t1 = (SDTimeEvent) arg0;
-        SDTimeEvent t2 = (SDTimeEvent) arg1;
+        SDTimeEvent t1 = arg0;
+        SDTimeEvent t2 = arg1;
         if (t1.getEvent() > t2.getEvent()) {
             return 1;
         }

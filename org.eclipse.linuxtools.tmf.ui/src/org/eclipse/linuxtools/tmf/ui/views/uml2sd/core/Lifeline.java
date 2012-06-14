@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -29,10 +29,10 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
  * Event occurrence define the drawing order of graph node along a lifeline. In this lifeline implementation, event
  * occurrences are just integer index. The event occurrences with the same value on different lifelines will correspond
  * the same y coordinate value.
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class Lifeline extends GraphNode {
     // ------------------------------------------------------------------------
@@ -120,7 +120,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Set the lifeline category for this lifeline.
-     * 
+     *
      * @param arrayIndex the index of the category to use
      * @see Frame#setLifelineCategories(LifelineCategories[])
      */
@@ -131,7 +131,7 @@ public class Lifeline extends GraphNode {
     /**
      * Returns the tooltip text for the lifeline. It is the combination between the category name(if any) and the
      * lifeline name
-     * 
+     *
      * @return the tooltip text
      */
     public String getToolTipText() {
@@ -139,18 +139,15 @@ public class Lifeline extends GraphNode {
             LifelineCategories[] categories = fFrame.getLifelineCategories();
             if (fCategory < categories.length) {
                 return categories[fCategory].getName() + " " + getName(); //$NON-NLS-1$
-            } else {
-                return ""; //$NON-NLS-1$
             }
-        } else {
-            return ""; //$NON-NLS-1$
         }
+        return ""; //$NON-NLS-1$
     }
 
     /**
      * Returns the index of the first visible Execution Occurrence in the execution occurrence array.<br>
      * Execution Occurrences are Y ordered in this array
-     * 
+     *
      * @return the first visible Execution Occurrence
      */
     public int getExecOccurrenceDrawIndex() {
@@ -158,14 +155,14 @@ public class Lifeline extends GraphNode {
             return 0;
         }
         if (fIndexes.get(BasicExecutionOccurrence.EXEC_OCC_TAG) != null) {
-            return ((Integer) fIndexes.get(BasicExecutionOccurrence.EXEC_OCC_TAG)).intValue();
+            return fIndexes.get(BasicExecutionOccurrence.EXEC_OCC_TAG).intValue();
         }
         return 0;
     }
 
     /**
      * Set the frame on which this lifeline must be drawn
-     * 
+     *
      * @param parentFrame
      */
     protected void setFrame(Frame parentFrame) {
@@ -180,7 +177,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Returns the frame which this lifeline is drawn
-     * 
+     *
      * @return the Frame
      */
     protected Frame getFrame() {
@@ -189,7 +186,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Set the lifeline position index in the containing frame
-     * 
+     *
      * @param index the lifeline X position
      */
     protected void setIndex(int index) {
@@ -198,7 +195,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Returns the lifeline position in de the containing frame
-     * 
+     *
      * @return the X position
      */
     public int getIndex() {
@@ -210,7 +207,7 @@ public class Lifeline extends GraphNode {
      * greater event created on this lifeline are still valid and usable. This also need to inform the frame of the
      * operation mostly to store in the frame the greater event found in the diagram (used to determine the frame
      * height)
-     * 
+     *
      * @param eventOcc the new current event occurrence
      */
     public void setCurrentEventOccurrence(int eventOcc) {
@@ -222,7 +219,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Returns the last created event occurrence along the lifeline.
-     * 
+     *
      * @return the current event occurrence
      */
     public int getEventOccurrence() {
@@ -231,7 +228,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Creates a new event occurrence along the lifeline.
-     * 
+     *
      * @return the new created event occurrence
      */
     public int getNewEventOccurrence() {
@@ -242,7 +239,7 @@ public class Lifeline extends GraphNode {
     /**
      * Adds the execution occurrence given in parameter to the lifeline.<br>
      * A Execution occurrence is never drawn in the frame instead it is added to a lifeline
-     * 
+     *
      * @param exec the execution occurrence to add
      */
     public void addExecution(BasicExecutionOccurrence exec) {
@@ -266,7 +263,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Returns true if at least one execution occurrence has time info.
-     * 
+     *
      * @return true if at least one execution occurrence has time info
      */
     public boolean hasTimeInfo() {
@@ -275,12 +272,12 @@ public class Lifeline extends GraphNode {
 
     /**
      * Returns the list of execution occurrence on this lifeline.
-     * 
+     *
      * @return the execution occurrence list
      */
     public List<GraphNode> getExecutions() {
         if (fHasChilden) {
-            return (List<GraphNode>) fNodes.get(BasicExecutionOccurrence.EXEC_OCC_TAG);
+            return fNodes.get(BasicExecutionOccurrence.EXEC_OCC_TAG);
         }
         return new ArrayList<GraphNode>();
     }
@@ -299,10 +296,10 @@ public class Lifeline extends GraphNode {
         if (fFrame == null) {
             return false;
         }
-        if (Frame.contains(x, y, width, height, xValue, yValue)) {
+        if (GraphNode.contains(x, y, width, height, xValue, yValue)) {
             return true;
         }
-        if (Frame.contains(x + Metrics.getLifelineWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2, y + height, Metrics.EXECUTION_OCCURRENCE_WIDTH, (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fFrame.getMaxEventOccurrence()
+        if (GraphNode.contains(x + Metrics.getLifelineWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2, y + height, Metrics.EXECUTION_OCCURRENCE_WIDTH, (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fFrame.getMaxEventOccurrence()
                 + Metrics.LIFELINE_VB_MAGIN - 4, xValue, yValue)) {
             return true;
         }
@@ -312,11 +309,11 @@ public class Lifeline extends GraphNode {
 
         if (hMargin >= 2) {
             if (fFrame.getVisibleAreaY() < y - height - hMargin) {
-                if (Frame.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, y - height - hMargin, Metrics.swimmingLaneWidth() - 2, height + 1, xValue, yValue)) {
+                if (GraphNode.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, y - height - hMargin, Metrics.swimmingLaneWidth() - 2, height + 1, xValue, yValue)) {
                     return true;
                 }
             } else {
-                if (Frame.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, fFrame.getVisibleAreaY(), Metrics.swimmingLaneWidth() - 2, height, xValue, yValue)) {
+                if (GraphNode.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, fFrame.getVisibleAreaY(), Metrics.swimmingLaneWidth() - 2, height, xValue, yValue)) {
                     return true;
                 }
             }
@@ -329,7 +326,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Returns the lifeline visibility for the given visible area
-     * 
+     *
      * @param vx The x coordinate of the visible area
      * @param vy The y coordinate of the visible area
      * @param vwidth The width of the visible area
@@ -347,8 +344,8 @@ public class Lifeline extends GraphNode {
     }
 
     /**
-     * Draws the name within the graphical context. 
-     * 
+     * Draws the name within the graphical context.
+     *
      * @param context The graphical context.
      */
     protected void drawName(IGC context) {
@@ -380,15 +377,15 @@ public class Lifeline extends GraphNode {
 
     /**
      * Force the lifeline to be drawn at the given coordinate
-     * 
+     *
      * @param context - the context to draw into
      * @param x - the x coordinate
      * @param y - the y coordinate
      */
     public void draw(IGC context, int x, int y) {
-        
+
         ISDPreferences pref = SDViewPref.getInstance();
-        
+
         // Set the draw color depending if the lifeline must be selected or not
         context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
         if (isSelected()) {
@@ -474,7 +471,7 @@ public class Lifeline extends GraphNode {
 
     /**
      * Draws the select execution occurrence region using the given color
-     * 
+     *
      * @param context the graphical context
      * @param startEvent the region start
      * @param nbEvent the region height
@@ -515,8 +512,9 @@ public class Lifeline extends GraphNode {
      */
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
-        if (getX() > x - Metrics.swimmingLaneWidth())
+        if (getX() > x - Metrics.swimmingLaneWidth()) {
             return true;
+        }
         return false;
     }
 
@@ -538,7 +536,7 @@ public class Lifeline extends GraphNode {
             return null;
         }
         for (int i = getExecOccurrenceDrawIndex(); i < getExecutions().size(); i++) {
-            GraphNode node = (GraphNode) getExecutions().get(i);
+            GraphNode node = getExecutions().get(i);
             if (node.getHeight() < 0) {
                 if (node.getY() + node.getHeight() > vy + vh) {
                     break;

@@ -4,8 +4,8 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.load;
@@ -26,7 +26,7 @@ public class LoadersManagerTest extends TestCase {
     private final static String SDVIEW_WITH_MULTIPLE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders"; //$NON-NLS-1$
     private final static String TEST_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.tests.uml2sd.load.TestLoaders"; //$NON-NLS-1$
     private final static String TMF_UML2SD_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader"; //$NON-NLS-1$
-    
+
     private static final String LOADER_TAG = "uml2SDLoader"; //$NON-NLS-1$
     private static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$
 
@@ -47,9 +47,9 @@ public class LoadersManagerTest extends TestCase {
         try {
 
             /*
-             * Test creation of a loader (one per SD view)  
+             * Test creation of a loader (one per SD view)
              */
-            
+
             // Open view
             // Note this will create the default loader!
             view = (SDView)PlatformUI.getWorkbench()
@@ -59,18 +59,18 @@ public class LoadersManagerTest extends TestCase {
 
             IUml2SDLoader defaultLoader = LoadersManager.getInstance().getCurrentLoader(SDVIEW_WITH_ONE_LOADER, view);
             assertNotNull("testLoaderManager", defaultLoader);
-            
+
             // Test createLoader where loader doesn't exist
             assertNull("testLoaderManager", LoadersManager.getInstance().createLoader("blabla", view));
 
-            // Test createLoader 
+            // Test createLoader
             IUml2SDLoader loader = LoadersManager.getInstance().createLoader(TEST_LOADER_CLASS_NAME, view);
 
             assertNotNull("testLoaderManager", loader);
-            assertEquals("testLoaderManager", "Test Loader", loader.getTitleString()); 
+            assertEquals("testLoaderManager", "Test Loader", loader.getTitleString());
             assertEquals("testLoaderManager", loader, LoadersManager.getInstance().getCurrentLoader(SDVIEW_WITH_ONE_LOADER));
-            
-            // compare loader and default loader. Even if they are the same class, they are different instances 
+
+            // compare loader and default loader. Even if they are the same class, they are different instances
             assertFalse("testLoaderManager", loader==defaultLoader);
 
             // test getCurrentLoader(viewId, view)
@@ -88,7 +88,7 @@ public class LoadersManagerTest extends TestCase {
 
             // Well, this is the only way test which loader is set
             assertEquals("testLoaderManager", "Sequence Diagram - First Page", view.getFrame().getName());
-            
+
             // Test view == null
             assertNull("testLoaderManager", LoadersManager.getInstance().createLoader(TEST_LOADER_CLASS_NAME, null));
 
@@ -96,7 +96,7 @@ public class LoadersManagerTest extends TestCase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(view);
 
             /*
-             * Test creation of loaders with re-uses the same SD view  
+             * Test creation of loaders with re-uses the same SD view
              */
 
             // test that view restores the previous associated loader
@@ -113,24 +113,24 @@ public class LoadersManagerTest extends TestCase {
 
             loader = LoadersManager.getInstance().getCurrentLoader(SDVIEW_WITH_MULTIPLE_LOADER, view);
             assertNotNull("testLoaderManager", loader);
-            assertEquals("testLoaderManager", "Test Loader", loader.getTitleString()); 
+            assertEquals("testLoaderManager", "Test Loader", loader.getTitleString());
             assertEquals("testLoaderManager", loader, LoadersManager.getInstance().getCurrentLoader(SDVIEW_WITH_MULTIPLE_LOADER));
 
-            // Test createLoader for loader with class name TMF_UML2SD_LOADER_CLASS_NAME 
+            // Test createLoader for loader with class name TMF_UML2SD_LOADER_CLASS_NAME
             loader = LoadersManager.getInstance().createLoader(TMF_UML2SD_LOADER_CLASS_NAME, view);
 
             assertNotNull("testLoaderManager", loader);
-            assertEquals("testLoaderManager", "Component Interactions", loader.getTitleString()); 
+            assertEquals("testLoaderManager", "Component Interactions", loader.getTitleString());
             assertEquals("testLoaderManager", loader, LoadersManager.getInstance().getCurrentLoader(SDVIEW_WITH_MULTIPLE_LOADER));
 
             // Verify if the correct loader is stored in the preferences as the current loader for this view
             assertEquals("testLoaderManager", TMF_UML2SD_LOADER_CLASS_NAME, getSavedLoader(SDVIEW_WITH_MULTIPLE_LOADER));
 
-            // Test createLoader for loader with class name TEST_LOADER_CLASS_NAME 
+            // Test createLoader for loader with class name TEST_LOADER_CLASS_NAME
             loader = LoadersManager.getInstance().createLoader(TEST_LOADER_CLASS_NAME, view);
 
             assertNotNull("testLoaderManager", loader);
-            assertEquals("testLoaderManager", "Test Loader", loader.getTitleString()); 
+            assertEquals("testLoaderManager", "Test Loader", loader.getTitleString());
             assertEquals("testLoaderManager", loader, LoadersManager.getInstance().getCurrentLoader(SDVIEW_WITH_MULTIPLE_LOADER));
 
             // Verify if the correct loader is stored in the preferences as the current loader for this view
@@ -150,7 +150,7 @@ public class LoadersManagerTest extends TestCase {
     }
 
     @SuppressWarnings("unused")
-    private void delay(long waitTimeMillis) {
+    private static void delay(long waitTimeMillis) {
         Display display = Display.getCurrent();
         if (display != null) {
             long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
@@ -169,7 +169,7 @@ public class LoadersManagerTest extends TestCase {
         }
     }
 
-    private String getSavedLoader(String viewId) {
+    private static String getSavedLoader(String viewId) {
         IPreferenceStore p = Activator.getDefault().getPreferenceStore();
         return p.getString(LOADER_PREFIX + viewId);
     }

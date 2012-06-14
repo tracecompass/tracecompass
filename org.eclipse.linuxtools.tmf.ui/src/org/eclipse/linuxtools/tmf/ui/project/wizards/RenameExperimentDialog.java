@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Copied and adapted from NewFolderDialog
  *******************************************************************************/
@@ -50,7 +50,7 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
  * Implementation of a dialog box to rename an experiment.
- * <p> 
+ * <p>
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -62,8 +62,8 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
 
 	private final TmfExperimentElement fExperiment;
 	private Text fNewExperimentName;
-    private IContainer fExperimentFolder;
-    private TmfProjectElement fProject;
+    private final IContainer fExperimentFolder;
+    private final TmfProjectElement fProject;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -143,7 +143,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
     }
 
     private void validateNewExperimentName() {
-        
+
     	String name = fNewExperimentName.getText();
         IWorkspace workspace = fExperimentFolder.getWorkspace();
         IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
@@ -152,12 +152,12 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
         	updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
         	return;
         }
-        
+
         if (!nameStatus.isOK()) {
         	updateStatus(nameStatus);
         	return;
         }
-        
+
         IPath path = new Path(name);
         if (fExperimentFolder.getFolder(path).exists() || fExperimentFolder.getFile(path).exists()) {
             updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_ExistingNameError, null));
@@ -187,7 +187,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
         super.create();
         getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.dialogs.SelectionStatusDialog#okPressed()
@@ -219,7 +219,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
-                    IFolder folder = (IFolder) fExperiment.getResource();
+                    IFolder folder = fExperiment.getResource();
                     IFile bookmarksFile = folder.getFile(fExperiment.getName() + '_');
                     IFile newBookmarksFile = folder.getFile(newName + '_');
                     if (bookmarksFile.exists()) {

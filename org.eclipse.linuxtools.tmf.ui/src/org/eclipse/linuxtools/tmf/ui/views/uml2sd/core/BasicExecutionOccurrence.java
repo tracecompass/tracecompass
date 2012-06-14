@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2006 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -21,11 +21,11 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 /**
  * BasicExecutionOccurrence is the UML2 execution occurrence graphical representation. It is attached to one Lifeline,
  * the event occurrence "duration" along the lifeline is defined by two event occurrences
- * 
+ *
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline Lifeline for more event occurence details
- * @version 1.0 
+ * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class BasicExecutionOccurrence extends GraphNode {
 
@@ -42,7 +42,7 @@ public class BasicExecutionOccurrence extends GraphNode {
     // ------------------------------------------------------------------------
 
     /**
-     * The corresponding lifeline. 
+     * The corresponding lifeline.
      */
     protected Lifeline fLifeline = null;
 
@@ -119,7 +119,7 @@ public class BasicExecutionOccurrence extends GraphNode {
         int width = getWidth();
         int height = getHeight();
 
-        if (Frame.contains(x, y, width, height, xValue, yValue)) {
+        if (GraphNode.contains(x, y, width, height, xValue, yValue)) {
             return true;
         }
 
@@ -137,14 +137,13 @@ public class BasicExecutionOccurrence extends GraphNode {
     public String getName() {
         if (super.getName() == null || super.getName().equals("")) { //$NON-NLS-1$
             return fLifeline.getToolTipText();
-        } else {
-            return super.getName();
         }
+        return super.getName();
     }
 
     /**
      * Set the lifeline on which the execution occurrence appears.
-     * 
+     *
      * @param theLifeline - the parent lifeline
      */
     public void setLifeline(Lifeline theLifeline) {
@@ -153,7 +152,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     /**
      * Get the lifeline on which the execution occurrence appears.
-     * 
+     *
      * @return - the parent lifeline
      */
     public Lifeline getLifeline() {
@@ -162,7 +161,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     /**
      * Get the execution start event occurrence
-     * 
+     *
      * @return the start event occurrence to set
      */
     @Override
@@ -172,7 +171,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     /**
      * Set the execution end event occurrence
-     * 
+     *
      * @return the end event occurrence to set
      */
     @Override
@@ -182,7 +181,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     /**
      * Set the execution start event occurrence
-     * 
+     *
      * @param occurrence the start event occurrence to set
      */
     public void setStartOccurrence(int occurrence) {
@@ -191,7 +190,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     /**
      * Set the execution end event occurrence
-     * 
+     *
      * @param occurrence the end event occurrence to set
      */
     public void setEndOccurrence(int occurrence) {
@@ -212,7 +211,7 @@ public class BasicExecutionOccurrence extends GraphNode {
         IColor tempStrokeColor = null;
 
         ISDPreferences pref = SDViewPref.getInstance();
-        
+
         // The execution occurrence is selected
         // if the owning lifeline is selected
         if (fLifeline.isSelected() || isSelected()) {
@@ -242,7 +241,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     /**
      * Rewrite this method in your extension in order to support customized fill colors
-     * 
+     *
      * @param context
      * @return IColor
      */
@@ -261,7 +260,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     /**
      * Rewrite this method in your extension in order to support customized stroke colors
-     * 
+     *
      * @param context
      * @return IColor
      */

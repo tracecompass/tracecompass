@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -52,7 +52,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 public class RenameTraceHandler extends AbstractHandler {
 
 	private TmfTraceElement fTrace = null;
-	
+
 	// ------------------------------------------------------------------------
     // isEnabled
     // ------------------------------------------------------------------------
@@ -62,15 +62,17 @@ public class RenameTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
         ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (selectionProvider == null) {
             return false;
+        }
         ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only selection and that it is an experiment
@@ -96,8 +98,9 @@ public class RenameTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return null;
+        }
 
         // If trace is under an experiment, use the original trace from the traces folder
         fTrace = fTrace.getElementUnderTraceFolder();
@@ -107,8 +110,9 @@ public class RenameTraceHandler extends AbstractHandler {
         TmfTraceFolder traceFolder = (TmfTraceFolder) fTrace.getParent();
         TmfTraceElement oldTrace = fTrace;
         RenameTraceDialog dialog = new RenameTraceDialog(shell, fTrace);
-        if (dialog.open() != Window.OK)
+        if (dialog.open() != Window.OK) {
             return null;
+        }
 
         // Locate the new trace object
         TmfTraceElement newTrace = null;
@@ -122,8 +126,9 @@ public class RenameTraceHandler extends AbstractHandler {
                 }
             }
         }
-        if (newTrace == null)
+        if (newTrace == null) {
             return null;
+        }
 
         List<WorkspaceModifyOperation> removeOps = new ArrayList<WorkspaceModifyOperation>();
         TmfExperimentFolder experimentFolder = newTrace.getProject().getExperimentsFolder();
@@ -132,7 +137,7 @@ public class RenameTraceHandler extends AbstractHandler {
                 if (trace.equals(oldTrace)) {
                     // Create a link to the renamed trace
                     createTraceLink(newTrace, experiment);
-                    
+
                     // Queue the removal of the old trace link
                     removeOps.add(new WorkspaceModifyOperation() {
                         @Override
@@ -154,11 +159,12 @@ public class RenameTraceHandler extends AbstractHandler {
             } catch (RuntimeException exception) {
             }
         }
-        
+
         return null;
     }
 
-    private void createTraceLink(TmfTraceElement trace, final ITmfProjectModelElement experiment) {
+    private static void createTraceLink(TmfTraceElement trace,
+            final ITmfProjectModelElement experiment) {
         try {
             IResource resource = trace.getResource();
             IPath location = resource.getLocation();

@@ -81,7 +81,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG);
+        return fNodes.get(Lifeline.LIFELINE_TAG);
     }
 
     /**
@@ -120,7 +120,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) fNodes.get(SyncMessage.SYNC_MESS_TAG);
+        return fNodes.get(SyncMessage.SYNC_MESS_TAG);
     }
 
     /**
@@ -158,7 +158,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) fNodes.get(AsyncMessage.ASYNC_MESS_TAG);
+        return fNodes.get(AsyncMessage.ASYNC_MESS_TAG);
     }
 
     /**
@@ -196,7 +196,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) fNodes.get(SyncMessageReturn.SYNC_MESS_RET_TAG);
+        return fNodes.get(SyncMessageReturn.SYNC_MESS_RET_TAG);
     }
 
     /**
@@ -234,7 +234,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) fNodes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
+        return fNodes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
     }
 
     /**
@@ -294,7 +294,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return 0;
         } else if (fIndexes.get(Lifeline.LIFELINE_TAG) != null) {
-            return ((Integer) fIndexes.get(Lifeline.LIFELINE_TAG)).intValue();
+            return fIndexes.get(Lifeline.LIFELINE_TAG).intValue();
         }
         return 0;
     }
@@ -308,7 +308,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return 0;
         } else if (fIndexes.get(SyncMessage.SYNC_MESS_TAG) != null) {
-            return ((Integer) fIndexes.get(SyncMessage.SYNC_MESS_TAG)).intValue();
+            return fIndexes.get(SyncMessage.SYNC_MESS_TAG).intValue();
         }
         return 0;
     }
@@ -322,7 +322,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return 0;
         } else if (fIndexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null) {
-            return ((Integer) fIndexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG)).intValue();
+            return fIndexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG).intValue();
         }
         return 0;
     }
@@ -336,7 +336,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return 0;
         } else if (fIndexes.get(AsyncMessage.ASYNC_MESS_TAG) != null) {
-            return ((Integer) fIndexes.get(AsyncMessage.ASYNC_MESS_TAG)).intValue();
+            return fIndexes.get(AsyncMessage.ASYNC_MESS_TAG).intValue();
         }
         return 0;
     }
@@ -350,7 +350,7 @@ public class Frame extends BasicFrame {
         if (!fHasChilden) {
             return 0;
         } else if (fIndexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null) {
-            return ((Integer) fIndexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG)).intValue();
+            return fIndexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG).intValue();
         }
         return 0;
     }
@@ -529,8 +529,8 @@ public class Frame extends BasicFrame {
             return;
         }
         for (int i = 0; i < timeArray.size() - 1; i++) {
-            SDTimeEvent m1 = (SDTimeEvent) timeArray.get(i);
-            SDTimeEvent m2 = (SDTimeEvent) timeArray.get(i + 1);
+            SDTimeEvent m1 = timeArray.get(i);
+            SDTimeEvent m2 = timeArray.get(i + 1);
             if (SDViewPref.getInstance().excludeExternalTime() && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
                 BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
                 BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
@@ -563,17 +563,17 @@ public class Frame extends BasicFrame {
             bounds[0] = null;
             bounds[1] = null;
             for (int i = 0; i < timeArray.size(); i++) {
-                SDTimeEvent m = (SDTimeEvent) timeArray.get(i);
+                SDTimeEvent m = timeArray.get(i);
                 if (m.getTime().compareTo(dateToFind, true) > 0) {
                     bounds[1] = m.getGraphNode();
                     if (i > 0) {
-                        bounds[0] = ((SDTimeEvent) timeArray.get(i - 1)).getGraphNode();
+                        bounds[0] = timeArray.get(i - 1).getGraphNode();
                         return true;
                     }
                     return false;
                 }
             }
-            bounds[0] = ((SDTimeEvent) timeArray.get(timeArray.size() - 1)).getGraphNode();
+            bounds[0] = timeArray.get(timeArray.size() - 1).getGraphNode();
         }
         return false;
     }
@@ -671,9 +671,9 @@ public class Frame extends BasicFrame {
         if (fIndexes.size() == 0) {
             return;
         }
-        int lifeLineDrawIndex = ((Integer) fIndexes.get(Lifeline.LIFELINE_TAG)).intValue();
-        for (int i = lifeLineDrawIndex; i < ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).size(); i = i + lifelineArryStep) {
-            Lifeline toDraw = (Lifeline) ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).get(i);
+        int lifeLineDrawIndex = fIndexes.get(Lifeline.LIFELINE_TAG).intValue();
+        for (int i = lifeLineDrawIndex; i < fNodes.get(Lifeline.LIFELINE_TAG).size(); i = i + lifelineArryStep) {
+            Lifeline toDraw = (Lifeline) fNodes.get(Lifeline.LIFELINE_TAG).get(i);
             if (toDraw.getX() - Metrics.LIFELINE_SPACING / 2 > context.getContentsX() + context.getVisibleWidth()) {
                 break;
             }
@@ -723,8 +723,8 @@ public class Frame extends BasicFrame {
         List<SDTimeEvent> timeArray = super.buildTimeArray();
         fExecutionOccurrencesWithTime = null;
         if (getLifelines() != null) {
-            for (int i = 0; i < ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).size(); i++) {
-                Lifeline lifeline = (Lifeline) ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).get(i);
+            for (int i = 0; i < fNodes.get(Lifeline.LIFELINE_TAG).size(); i++) {
+                Lifeline lifeline = (Lifeline) fNodes.get(Lifeline.LIFELINE_TAG).get(i);
                 if (lifeline.hasTimeInfo() && lifeline.getExecutions() != null) {
                     for (Iterator<GraphNode> j = lifeline.getExecutions().iterator(); j.hasNext();) {
                         GraphNode o = j.next();
@@ -782,7 +782,7 @@ public class Frame extends BasicFrame {
                 event = message.getEventOccurrence();
             }
             for (int i = 0; i < list.size(); i++) {
-                GraphNode node = (GraphNode) list.get(i);
+                GraphNode node = list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
                     if ((syncNode.getEventOccurrence() > event) && (syncNode.getStartLifeline() == lifeline) && !syncNode.isSameAs(message)) {
@@ -805,7 +805,7 @@ public class Frame extends BasicFrame {
                 }
             }
             for (int i = list.size() - 1; i >= 0; i--) {
-                GraphNode node = (GraphNode) list.get(i);
+                GraphNode node = list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
                     if ((syncNode.getEventOccurrence() < event) && (syncNode.getStartLifeline() == lifeline) && !syncNode.isSameAs(message)) {
@@ -842,7 +842,7 @@ public class Frame extends BasicFrame {
                 event = message.getEventOccurrence();
             }
             for (int i = 0; i < list.size(); i++) {
-                GraphNode node = (GraphNode) list.get(i);
+                GraphNode node = list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
                     if ((syncNode.getEventOccurrence() > event) && (syncNode.getEndLifeline() == lifeline) && !syncNode.isSameAs(message)) {
@@ -865,7 +865,7 @@ public class Frame extends BasicFrame {
                 }
             }
             for (int i = list.size() - 1; i >= 0; i--) {
-                GraphNode node = (GraphNode) list.get(i);
+                GraphNode node = list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
                     if ((syncNode.getEventOccurrence() < event) && (syncNode.getEndLifeline() == lifeline) && !syncNode.isSameAs(message)) {
@@ -917,9 +917,8 @@ public class Frame extends BasicFrame {
         if ((node1 != null) && (node2 != null)) {
             if (distanceFromEvent(node1, event) < distanceFromEvent(node2, event)) {
                 return node1;
-            } else {
-                return node2;
             }
+            return node2;
         } else if (node1 != null) {
             return node1;
         } else if (node2 != null) {
@@ -939,10 +938,10 @@ public class Frame extends BasicFrame {
         GraphNode result = null;
         Lifeline lifeline = null;
         if (startMessage != null) {
-            event = ((BaseMessage) startMessage).getEventOccurrence();
-            lifeline = ((BaseMessage) startMessage).getEndLifeline();
+            event = startMessage.getEventOccurrence();
+            lifeline = startMessage.getEndLifeline();
             if (lifeline == null) {
-                lifeline = ((BaseMessage) startMessage).getStartLifeline();
+                lifeline = startMessage.getStartLifeline();
             }
         }
         if (lifeline == null) {
@@ -969,10 +968,10 @@ public class Frame extends BasicFrame {
         GraphNode result = null;
         Lifeline lifeline = null;
         if (startMessage != null) {
-            event = ((BaseMessage) startMessage).getEventOccurrence();
-            lifeline = ((BaseMessage) startMessage).getStartLifeline();
+            event = startMessage.getEventOccurrence();
+            lifeline = startMessage.getStartLifeline();
             if (lifeline == null) {
-                lifeline = ((BaseMessage) startMessage).getEndLifeline();
+                lifeline = startMessage.getEndLifeline();
             }
         }
         if (lifeline == null) {
@@ -998,7 +997,7 @@ public class Frame extends BasicFrame {
     public GraphNode getNextLifelineMessage(Lifeline lifeline, BaseMessage startMessage) {
         int event = 0;
         if (startMessage != null) {
-            event = ((BaseMessage) startMessage).getEventOccurrence();
+            event = startMessage.getEventOccurrence();
         }
         if (lifeline == null) {
             return null;

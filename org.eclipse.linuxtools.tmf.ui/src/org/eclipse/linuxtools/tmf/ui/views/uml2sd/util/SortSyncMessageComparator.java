@@ -58,8 +58,7 @@ public class SortSyncMessageComparator implements Comparator<GraphNode>, Seriali
             } else {
                 return -1;
             }
-        } else {
-            return 0;
         }
+        return 0;
     }
 }

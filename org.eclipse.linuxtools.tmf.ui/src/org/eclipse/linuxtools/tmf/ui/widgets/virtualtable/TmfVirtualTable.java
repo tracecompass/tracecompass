@@ -219,6 +219,8 @@ public class TmfVirtualTable extends Composite {
                 case SWT.MouseWheel:
                     shell.dispose ();
                     break;
+                default:
+                    break;
                 }
             }
         };
@@ -251,35 +253,36 @@ public class TmfVirtualTable extends Composite {
                                 }
                                 if (tooltipProvider == null) {
                                     return;
-                                } else {
-                                    String tooltipText = tooltipProvider.getTooltip(i, item.getData());
-                                    if (tooltipText == null) {
-                                        return;
-                                    }
-                                    tip = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
-                                    tip.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                                    FillLayout layout = new FillLayout();
-                                    layout.marginWidth = 2;
-                                    tip.setLayout(layout);
-                                    label = new Label(tip, SWT.WRAP);
-                                    label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-                                    label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                                    label.setData(TOOLTIP_DATA_KEY, item);
-                                    label.setText(tooltipText);
-
-                                    label.addListener(SWT.MouseExit, labelListener);
-                                    label.addListener(SWT.MouseDown, labelListener);
-                                    label.addListener(SWT.MouseWheel, labelListener);
-                                    Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-                                    Point pt = fTable.toDisplay(bounds.x, bounds.y);
-                                    tip.setBounds(pt.x, pt.y, size.x, size.y);
-                                    tip.setVisible(true);
                                 }
-                                break;
+                                String tooltipText = tooltipProvider.getTooltip(i, item.getData());
+                                if (tooltipText == null) {
+                                    return;
+                                }
+                                tip = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+                                tip.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                                FillLayout layout = new FillLayout();
+                                layout.marginWidth = 2;
+                                tip.setLayout(layout);
+                                label = new Label(tip, SWT.WRAP);
+                                label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+                                label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                                label.setData(TOOLTIP_DATA_KEY, item);
+                                label.setText(tooltipText);
+
+                                label.addListener(SWT.MouseExit, labelListener);
+                                label.addListener(SWT.MouseDown, labelListener);
+                                label.addListener(SWT.MouseWheel, labelListener);
+                                Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                                Point pt = fTable.toDisplay(bounds.x, bounds.y);
+                                tip.setBounds(pt.x, pt.y, size.x, size.y);
+                                tip.setVisible(true);
                             }
                         }
                     }
+                    break;
                 }
+                default:
+                    break;
                 }
             }
         };
@@ -580,6 +583,8 @@ public class TmfVirtualTable extends Composite {
                     refreshTable();
                     break;
                 }
+                default:
+                    break;
                 }
             }
         });
@@ -763,9 +768,8 @@ public class TmfVirtualTable extends Composite {
         int index = fTable.indexOf(ti);
         if (index < fFrozenRowCount) {
             return index;
-        } else {
-            return (index - fFrozenRowCount) + getTopIndex();
         }
+        return (index - fFrozenRowCount) + getTopIndex();
     }
 
     /**
@@ -935,9 +939,8 @@ public class TmfVirtualTable extends Composite {
         }
         if (index < fFrozenRowCount) {
             return index;
-        } else {
-            return (index - fFrozenRowCount) + getTopIndex();
         }
+        return (index - fFrozenRowCount) + getTopIndex();
     }
 
     /**

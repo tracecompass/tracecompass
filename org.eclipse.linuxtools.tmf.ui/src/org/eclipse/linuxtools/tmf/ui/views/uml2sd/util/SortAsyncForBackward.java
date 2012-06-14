@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2006 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -20,19 +20,19 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
 
 /**
- * Asynchronous message comparator. 
- * 
+ * Asynchronous message comparator.
+ *
  * Compares two asyncMessages only taking into account the event occurrence when their
  * appear.<br>
- * 
+ *
  * Used to order the AsyncMessage list insuring that the previous node has both of his ends smaller than the current node
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class SortAsyncForBackward implements Comparator<GraphNode>, Serializable {
-    
+
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
@@ -94,9 +94,8 @@ public class SortAsyncForBackward implements Comparator<GraphNode>, Serializable
             } else {
                 return -1;
             }
-        } else {
-            return 0;
         }
+        return 0;
     }
 
 }

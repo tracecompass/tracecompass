@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -37,7 +37,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
  * The Sequence Diagram preferences page implementation.
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -50,7 +50,7 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
      * Temporary preferences tag
      */
     protected static final String TEMP_TAG = SDViewPref.TEMP_TAG;
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -121,21 +121,21 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         page.setLayoutData(pageLayoutdata);
         page.setLayout(pageLayout);
 
-        fTooltip = new BooleanFieldEditor(SDViewPref.PREF_TOOLTIP, SDMessages._97, page);
+        fTooltip = new BooleanFieldEditor(ISDPreferences.PREF_TOOLTIP, SDMessages._97, page);
         fTooltip.setPreferenceStore(fPreferences.getPreferenceStore());
         fTooltip.load();
 
         // link font with zoom pref
-        fLink = new BooleanFieldEditor(SDViewPref.PREF_LINK_FONT, SDMessages._82, page);
+        fLink = new BooleanFieldEditor(ISDPreferences.PREF_LINK_FONT, SDMessages._82, page);
         fLink.setPreferenceStore(fPreferences.getPreferenceStore());
         fLink.load();
 
-        fNoExternalTime = new BooleanFieldEditor(SDViewPref.PREF_EXCLUDE_EXTERNAL_TIME, SDMessages._83, page);
+        fNoExternalTime = new BooleanFieldEditor(ISDPreferences.PREF_EXCLUDE_EXTERNAL_TIME, SDMessages._83, page);
         fNoExternalTime.setPreferenceStore(fPreferences.getPreferenceStore());
         fNoExternalTime.load();
 
         // use gradient color pref
-        fUseGrad = new BooleanFieldEditor(SDViewPref.PREF_USE_GRADIENT, SDMessages._84, page);
+        fUseGrad = new BooleanFieldEditor(ISDPreferences.PREF_USE_GRADIENT, SDMessages._84, page);
         fUseGrad.setPreferenceStore(fPreferences.getPreferenceStore());
         fUseGrad.load();
 
@@ -150,7 +150,7 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         prefPage.setLayout(prefPageLayout);
 
         // swimLane width pref
-        fLifelineWidth = new IntegerFieldEditor(SDViewPref.PREF_LIFELINE_WIDTH, SDMessages._80, prefPage);
+        fLifelineWidth = new IntegerFieldEditor(ISDPreferences.PREF_LIFELINE_WIDTH, SDMessages._80, prefPage);
         fLifelineWidth.setPreferenceStore(fPreferences.getPreferenceStore());
         fLifelineWidth.setValidRange(119, 500);
         fLifelineWidth.load();
@@ -246,7 +246,7 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         performApply();
         return true;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
@@ -335,7 +335,7 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         fTextColor.store();
 
         String[] fontList = SDViewPref.getFontList();
-        
+
         // set the FontFieldEditor for the new selected graphNode font
         fFont.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + TEMP_TAG);
         fFont.load();
@@ -350,21 +350,21 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         fTextColor.load();
 
         // No Background for message graphNodes
-        if ((fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS)) || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS_RET))
-                || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS)) || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS_RET))) {
+        if ((fontList[fClassItemList.getSelectionIndex()].equals(ISDPreferences.PREF_SYNC_MESS)) || (fontList[fClassItemList.getSelectionIndex()].equals(ISDPreferences.PREF_SYNC_MESS_RET))
+                || (fontList[fClassItemList.getSelectionIndex()].equals(ISDPreferences.PREF_ASYNC_MESS)) || (fontList[fClassItemList.getSelectionIndex()].equals(ISDPreferences.PREF_ASYNC_MESS_RET))) {
             fBackGroundColor.setEnabled(false, fButtonArea);
         } else {
             fBackGroundColor.setEnabled(true, fButtonArea);
         }
 
         // No font used for execution occurrence and global frame
-        if ((fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_EXEC)) || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME))) {
+        if ((fontList[fClassItemList.getSelectionIndex()].equals(ISDPreferences.PREF_EXEC)) || (fontList[fClassItemList.getSelectionIndex()].equals(ISDPreferences.PREF_FRAME))) {
             fTextColor.setEnabled(false, fButtonArea);
         } else {
             fTextColor.setEnabled(true, fButtonArea);
         }
 
-        if (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME)) {
+        if (fontList[fClassItemList.getSelectionIndex()].equals(ISDPreferences.PREF_FRAME)) {
             fFont.setEnabled(false, fButtonArea);
         } else {
             fFont.setEnabled(true, fButtonArea);

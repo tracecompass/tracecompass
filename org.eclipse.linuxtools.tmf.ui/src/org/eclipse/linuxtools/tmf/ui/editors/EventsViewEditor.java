@@ -95,8 +95,9 @@ public class EventsViewEditor extends TmfEditor {
             fTrace = ((TmfEditorInput) input).getTrace();
         } else if (input instanceof IFileEditorInput) {
             fFile = ((IFileEditorInput) input).getFile();
-            if (fFile == null)
+            if (fFile == null) {
                 throw new PartInitException("Invalid IFileEditorInput: " + input); //$NON-NLS-1$
+            }
             final TmfExperiment currentExperiment = TmfExperiment.getCurrentExperiment();
             if ((currentExperiment != null) && fFile.equals(currentExperiment.getBookmarksFile())) {
                 fTrace = currentExperiment;
@@ -106,15 +107,17 @@ public class EventsViewEditor extends TmfEditor {
             }
             try {
                 final String traceTypeId = fFile.getPersistentProperty(TmfCommonConstants.TRACETYPE);
-                if (traceTypeId == null)
+                if (traceTypeId == null) {
                     throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
+                }
                 if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
                     // Special case: experiment bookmark resource
                     final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
                     ncp.getChildren(fFile.getProject()); // force the model to be populated
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
-                    if (project == null)
+                    if (project == null) {
                         throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
+                    }
                     for (final ITmfProjectModelElement projectElement : project.getExperimentsFolder().getChildren()) {
                         final String traceName = fFile.getParent().getName();
                         if (projectElement.getName().equals(traceName)) {
@@ -129,8 +132,9 @@ public class EventsViewEditor extends TmfEditor {
                                 final ITmfTrace trace = traceElement.instantiateTrace();
                                 final ITmfEvent traceEvent = traceElement.instantiateEvent();
                                 if ((trace == null) || (traceEvent == null)) {
-                                    for (int j = 0; j < i; j++)
+                                    for (int j = 0; j < i; j++) {
                                         traces[j].dispose();
+                                    }
                                     throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
                                 }
                                 try {
@@ -160,8 +164,9 @@ public class EventsViewEditor extends TmfEditor {
                             // Instantiate the experiment trace
                             final ITmfTrace trace = traceElement.instantiateTrace();
                             final ITmfEvent traceEvent = traceElement.instantiateEvent();
-                            if ((trace == null) || (traceEvent == null))
+                            if ((trace == null) || (traceEvent == null)) {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
+                            }
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                             } catch (final TmfTraceException e) {
@@ -179,14 +184,15 @@ public class EventsViewEditor extends TmfEditor {
                     final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
                     ncp.getChildren(fFile.getProject()); // force the model to be populated
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
-                    for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren())
+                    for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
                         if (projectElement.getResource().equals(fFile)) {
                             final TmfTraceElement traceElement = (TmfTraceElement) projectElement;
                             // Instantiate the experiment trace
                             final ITmfTrace trace = traceElement.instantiateTrace();
                             final ITmfEvent traceEvent = traceElement.instantiateEvent();
-                            if ((trace == null) || (traceEvent == null))
+                            if ((trace == null) || (traceEvent == null)) {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
+                            }
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                             } catch (final TmfTraceException e) {
@@ -199,6 +205,7 @@ public class EventsViewEditor extends TmfEditor {
                             TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
                             break;
                         }
+                    }
                 }
             } catch (final InvalidRegistryObjectException e) {
                 Activator.getDefault().logError("Error initializing EventsViewEditor", e); //$NON-NLS-1$
@@ -206,10 +213,13 @@ public class EventsViewEditor extends TmfEditor {
                 Activator.getDefault().logError("Error initializing EventsViewEditor", e); //$NON-NLS-1$
             }
             input = new TmfEditorInput(fFile, fTrace);
-        } else
+        } else {
             throw new PartInitException("Invalid IEditorInput: " + input.getClass()); //$NON-NLS-1$
+        }
         if (fTrace == null)
+         {
             throw new PartInitException("Invalid IEditorInput: " + fFile.getName()); //$NON-NLS-1$
+        }
         super.setSite(site);
         super.setInput(input);
     }
@@ -253,14 +263,16 @@ public class EventsViewEditor extends TmfEditor {
                 final EditorPart editorPart = EventsViewEditor.this;
                 final IWorkbenchPage page = editorPart.getEditorSite().getPage();
                 page.closeEditor(editorPart, false);
-                if (page.getEditorReferences().length == 0)
+                if (page.getEditorReferences().length == 0) {
                     page.setEditorAreaVisible(fEditorAreaVisible);
+                }
                 try {
                     final IViewPart viewPart = page.showView(TmfEventsView.ID);
                     if (fGotoMarker != null) {
                         final IGotoMarker adapter = (IGotoMarker) viewPart.getAdapter(IGotoMarker.class);
-                        if (adapter != null)
+                        if (adapter != null) {
                             adapter.gotoMarker(fGotoMarker);
+                        }
                     }
                 } catch (final PartInitException e) {
                     Activator.getDefault().logError("Error setting focus", e); //$NON-NLS-1$
@@ -275,13 +287,14 @@ public class EventsViewEditor extends TmfEditor {
     @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(final Class adapter) {
-        if (IGotoMarker.class.equals(adapter))
+        if (IGotoMarker.class.equals(adapter)) {
             return new IGotoMarker() {
             @Override
             public void gotoMarker(final IMarker marker) {
                 fGotoMarker = marker;
             }
         };
+        }
         return super.getAdapter(adapter);
     }
 

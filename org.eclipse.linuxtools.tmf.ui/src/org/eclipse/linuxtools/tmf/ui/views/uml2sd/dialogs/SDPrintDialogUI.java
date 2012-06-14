@@ -255,7 +255,7 @@ public class SDPrintDialogUI {
             if (fSdView.getContentsHeight() > fSdView.getContentsHeight()) {
                 return (int) (fSdView.getVisibleHeight() / (float) fTest / fSdView.fZoomValue);
             }
-            return (int) (super.getContentsHeight());
+            return super.getContentsHeight();
         }
 
         /*
@@ -267,7 +267,7 @@ public class SDPrintDialogUI {
             if (fSdView.getVisibleWidth() > fSdView.getContentsWidth()) {
                 return (int) (fSdView.getVisibleWidth() / (float) fTest / fSdView.fZoomValue);
             }
-            return (int) (super.getContentsWidth());
+            return super.getContentsWidth();
         }
 
         /*
@@ -1139,20 +1139,20 @@ public class SDPrintDialogUI {
                 Printer printer = new Printer(fPrinterData);
                 if (fSetHPagesNumber.getSelection()) {
                     fNbPages = Integer.valueOf(fHorPagesNum.getText()).intValue();
-                    float z1 = (float) fSdView.getContentsWidth() / (cw);
+                    float z1 = fSdView.getContentsWidth() / cw;
                     float z2 = printer.getClientArea().width / ((float) fSdView.getContentsWidth() / fNbPages);
 
                     fStepY = printer.getClientArea().height / z1 / z2;
                     fStepX = cw / fNbPages;
                 } else if (fSetVPagesNumber.getSelection()) {
                     fNbPages = Integer.valueOf(fVertPagesNum.getText()).intValue();
-                    float z1 = (float) fSdView.getContentsHeight() / (ch);
+                    float z1 = fSdView.getContentsHeight() / ch;
                     float z2 = printer.getClientArea().height / ((float) fSdView.getContentsHeight() / fNbPages);
                     fStepX = printer.getClientArea().width / z1 / z2;
                     fStepY = ch / fNbPages;
                 } else {
                     float z1 = fSdView.getContentsWidth() / (cw);
-                    fStepX = ((float) fSdView.getVisibleWidth() / z1);
+                    fStepX = fSdView.getVisibleWidth() / z1;
                     fNbPages = Math.round(cw / fStepX);
                     if (fNbPages == 0) {
                         fNbPages = 1;
@@ -1160,7 +1160,7 @@ public class SDPrintDialogUI {
                     int pw = printer.getClientArea().width;
                     int ph = printer.getClientArea().height;
                     float z2 = pw / ((float) fSdView.getContentsWidth() / fNbPages);
-                    fStepY = ((float) ph / z1 / z2);
+                    fStepY = ph / z1 / z2;
                 }
             }
         } catch (NumberFormatException e) {
@@ -1235,7 +1235,7 @@ public class SDPrintDialogUI {
             if (fStepX != 0) {
                 row = (int) (cw / fStepX);
                 if (fSetHPagesNumber.getSelection()) {
-                    row = Math.round((float) cw / fStepX);
+                    row = Math.round(cw / fStepX);
                 } else if ((cw % fStepX != 0)) {
                     row++;
                 }
@@ -1257,7 +1257,7 @@ public class SDPrintDialogUI {
             if (fStepY != 0) {
                 line = (int) (ch / fStepY);
                 if (fSetVPagesNumber.getSelection()) {
-                    line = Math.round((float) ch / fStepY);
+                    line = Math.round(ch / fStepY);
                 } else if (ch % fStepY != 0) {
                     line++;
                 }

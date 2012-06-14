@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Mathieu Denis (mathieu.denis@polymtl.ca) - Initial API and Implementation
  *   Bernd Hufmann - Fixed header and warnings
@@ -39,13 +39,13 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
     // ------------------------------------------------------------------------
     private final static String LEVEL_COLUMN = org.eclipse.linuxtools.tmf.ui.views.statistics.Messages.TmfStatisticsView_LevelColumn;
     private final static String EVENTS_COUNT_COLUMN = org.eclipse.linuxtools.tmf.ui.views.statistics.Messages.TmfStatisticsView_NbEventsColumn;
-    
+
     private TmfBaseColumnDataProvider provider;
 
     private String fTestName;
 
     private final String fContext = "UnitTest";
-    
+
     private final String fTypeId1 = "Some type1";
     private final String fTypeId2 = "Some type2";
 
@@ -128,7 +128,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
             assertNotNull("getColumnData", columnData);
             assertNotNull("getColumnData", columnData.getHeader());
             assertNotNull("getColumnData", columnData.getTooltip());
-            
+
             // Testing labelProvider
             ColumnLabelProvider labelProvider = columnData.getLabelProvider();
             if (columnData.getHeader().compareTo(LEVEL_COLUMN) == 0) {
@@ -155,7 +155,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
                 assertNull("getColumnData", percentProvider);
             } else if (columnData.getHeader().compareTo(EVENTS_COUNT_COLUMN) == 0) {
                 double percentage = (double) treeNode1.getValue().nbEvents / parentNode.getValue().nbEvents;
-                assertEquals("getColumnData", (double) percentage, (double) percentProvider.getPercentage(treeNode1));
+                assertEquals("getColumnData", percentage, percentProvider.getPercentage(treeNode1));
             }
         }
     }

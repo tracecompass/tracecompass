@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -21,10 +21,10 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 
 /**
- *  Class to implement that certain signals are sent as well as are sent with correct content. 
+ *  Class to implement that certain signals are sent as well as are sent with correct content.
  */
 public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignalValidator {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -44,13 +44,13 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     // ------------------------------------------------------------------------
     public Uml2SDSignalValidator() {
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     @TmfSignalHandler
     public void synchToTime(TmfTimeSynchSignal signal) {
-        // Set results so that it can be validated in the test case 
+        // Set results so that it can be validated in the test case
         setSignalReceived(true);
         setSourceError(getSource() != signal.getSource());
         setCurrentTimeError(!getCurrentTime().equals(signal.getCurrentTime()));
@@ -58,19 +58,19 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
 
     @TmfSignalHandler
     public void synchToTimeRange(TmfRangeSynchSignal signal) {
-        // Set results so that it can be validated in the test case 
+        // Set results so that it can be validated in the test case
         setSignalReceived(true);
         setSourceError(getSource() != signal.getSource());
         setCurrentTimeError(!getCurrentTime().equals(signal.getCurrentTime()));
         setRangeError(!getCurrentRange().equals(signal.getCurrentRange()));
     }
-    
+
     @TmfSignalHandler
     public void startSynch(TmfStartSynchSignal signal) {
         fSignalDepth++;
-        // make sure that the signal which is send by the loader class is not handled by the loader class 
+        // make sure that the signal which is send by the loader class is not handled by the loader class
         // after receiving it. i.e. it must not trigger a another signal
-        
+
         // Set results so that it can be validated in the test case
         setSignalError(fSignalDepth > 1);
     }
@@ -79,7 +79,7 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     public void endSynch(TmfEndSynchSignal signal) {
         fSignalDepth = fSignalDepth > 0 ? fSignalDepth - 1 : 0;
     }
-    
+
     @Override
     public boolean isSignalReceived() {
         return fIsSignalReceived;
@@ -123,8 +123,8 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     @Override
     public boolean isSignalError() {
         return fIsSignalError;
-    }    
-    
+    }
+
     @Override
     public void setSignalError(boolean fIsSignalError) {
         this.fIsSignalError = fIsSignalError;
@@ -139,7 +139,7 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     public void setSource(Object source) {
         fSource = source;
     }
-    
+
     @Override
     public TmfTimestamp getCurrentTime() {
         return fCurrentTimestamp;
@@ -159,5 +159,5 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     public void setCurrentRange(TmfTimeRange currentRange) {
         fCurrentTimeRange = currentRange == null ? null : new TmfTimeRange(currentRange);
     }
-};
+}
 

@@ -56,7 +56,6 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDCollapseP
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDExtendedActionBarProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFindProvider;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDGraphNodeSupporter;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPagingProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPropertiesProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
@@ -982,9 +981,7 @@ public class SDView extends ViewPart {
         if (getSDWidget() != null) {
             return getSDWidget().getFrame();
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -1003,10 +1000,9 @@ public class SDView extends ViewPart {
         if ((loader != null)) {// &&( LoadersManager.getLoadersManager().getViewer(l)==this)){
             loader.setViewer(this);
             return false;
-        } else {
-            loadBlank();
-            return true;
         }
+        loadBlank();
+        return true;
     }
 
     /**

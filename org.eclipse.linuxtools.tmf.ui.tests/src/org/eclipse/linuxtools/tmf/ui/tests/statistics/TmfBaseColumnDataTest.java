@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Mathieu Denis (mathieu.denis@polymtl.ca)  - Initial design and implementation
  *******************************************************************************/
@@ -84,9 +84,8 @@ public class TmfBaseColumnDataTest extends TestCase {
 
                 if (parent == null) {
                     return 0;
-                } else {
-                    return (double) node.getValue().nbEvents / parent.getValue().nbEvents;
                 }
+                return (double) node.getValue().nbEvents / parent.getValue().nbEvents;
             }
         };
 

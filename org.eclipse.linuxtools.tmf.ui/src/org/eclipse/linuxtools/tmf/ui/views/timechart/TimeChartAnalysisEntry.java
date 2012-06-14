@@ -109,9 +109,8 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
                 if (nestedIterator != null) {
                     if (nestedIterator.hasNext()) {
                         return true;
-                    } else {
-                        nestedIterator = null;
                     }
+                    nestedIterator = null;
                 }
                 long time = (lastTime == -1) ? fStartTime : lastTime;
                 int index = (fReferenceTime == -1) ? 0 : (int) ((time - fReferenceTime) >> fPower);
@@ -123,10 +122,9 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
                                 lastTime = event.getTime() + event.getDuration();
                                 next = event;
                                 return true;
-                            } else {
-                                nestedIterator = event.getItemizedEntry().getTimeEventsIterator(fIteratorStartTime, fIteratorStopTime, fIteratorMaxDuration);
-                                return nestedIterator.hasNext();
                             }
+                            nestedIterator = event.getItemizedEntry().getTimeEventsIterator(fIteratorStartTime, fIteratorStopTime, fIteratorMaxDuration);
+                            return nestedIterator.hasNext();
                         }
                     }
                 }
@@ -189,7 +187,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
                 index = (int) ((time - fReferenceTime) >> fPower);
                 fTraceEvents.setSize((int) index + 1);
             }
-            TimeChartEvent event = (TimeChartEvent) fTraceEvents.get((int) index);
+            TimeChartEvent event = fTraceEvents.get((int) index);
             if (event == null) {
                 fTraceEvents.set((int) index, (TimeChartEvent) timeEvent);
             } else {
@@ -220,7 +218,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
             TimeChartEvent event = fTraceEvents.get(i);
             if (event != null) {
                 index = (int) ((event.getTime() - fReferenceTime) >> fPower);
-                TimeChartEvent mergedEvent = (TimeChartEvent) fTraceEvents.get(index);
+                TimeChartEvent mergedEvent = fTraceEvents.get(index);
                 if (mergedEvent == null) {
                     fTraceEvents.set(index, event);
                 } else {

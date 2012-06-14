@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -71,7 +71,7 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
             // There should be only one item selected as per the plugin.xml
             Object element = sel.getFirstElement();
             List<IResource> resourcesList = new ArrayList<IResource>();
-            
+
             if (element instanceof TmfExperimentElement) {
 
                 TmfExperimentElement trace = (TmfExperimentElement) element;
@@ -87,7 +87,7 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
                 }
 
                 SelectSupplementaryResourcesDialog dialog = new SelectSupplementaryResourcesDialog(window.getShell(), resourcesList.toArray(new IResource[resourcesList.size()]));
-                
+
                 if (dialog.open() != Window.OK) {
                     return null;
                 }
@@ -105,9 +105,7 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
                 IResource resource = trace.getProject().getResource();
                 if (resource != null) {
                     try {
-                        if (resource != null) {
-                            resource.refreshLocal(IResource.DEPTH_INFINITE, null);
-                        }
+                        resource.refreshLocal(IResource.DEPTH_INFINITE, null);
                     } catch (CoreException e) {
                         Activator.getDefault().logError("Error refreshing resource " + resource, e); //$NON-NLS-1$
                     }

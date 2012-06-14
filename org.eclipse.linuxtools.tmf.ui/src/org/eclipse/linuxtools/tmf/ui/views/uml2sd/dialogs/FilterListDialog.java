@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -39,7 +39,7 @@ import org.eclipse.ui.IViewPart;
 /**
  * This is the filters list dialog.<br>
  * It is associated to an SDView and to a ISDFilterProvider.<br>
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -96,7 +96,7 @@ public class FilterListDialog extends Dialog {
 
     /**
      * Standard constructor
-     * 
+     *
      * @param view The view reference
      * @param loader The filter provider implementation
      */
@@ -114,9 +114,9 @@ public class FilterListDialog extends Dialog {
     // ------------------------------------------------------------------------
     /**
      * Adds a criteria to the table
-     * 
+     *
      * @param criteria A criteria to add
-     * @param checked A flag whether criteria is checked (selected) or not 
+     * @param checked A flag whether criteria is checked (selected) or not
      * @param positive A flag whether criteria is for positive filter or not
      * @param loaderClassName A loader class name for the filters
      */
@@ -127,7 +127,7 @@ public class FilterListDialog extends Dialog {
 
     /**
      * Replaces a selected criteria with a new criteria.
-     * 
+     *
      * @param newCriteria A new criteria.
      */
     protected void replaceSelectedCriteria(Criteria newCriteria) {
@@ -195,7 +195,7 @@ public class FilterListDialog extends Dialog {
         });
         if (fFilters != null) {
             for (Iterator<FilterCriteria> i = fFilters.iterator(); i.hasNext();) {
-                FilterCriteria filterCriteria = (FilterCriteria) i.next();
+                FilterCriteria filterCriteria = i.next();
                 addCriteria(filterCriteria.getCriteria(), filterCriteria.isActive(), filterCriteria.isPositive(), filterCriteria.getLoaderClassName());
             }
         }
@@ -249,7 +249,7 @@ public class FilterListDialog extends Dialog {
             public void widgetDefaultSelected(SelectionEvent e) {
                 // Nothing to do
             }
-            
+
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
@@ -298,7 +298,7 @@ public class FilterListDialog extends Dialog {
 
     /**
      * Opens the filter dialog box with given parameter.
-     * 
+     *
      * @param criteria The criteria reference to pass
      * @param action to distinguish between "Update" and "Create"
      * @return the criteria that has been updated or created
@@ -354,7 +354,7 @@ public class FilterListDialog extends Dialog {
 
     /**
      * Sets the list of filters.
-     * 
+     *
      * @param filters The list of filters to set.
      */
     public void setFilters(List<FilterCriteria> filters) {
@@ -363,7 +363,7 @@ public class FilterListDialog extends Dialog {
 
     /**
      * Returns the filters list after editing.
-     * 
+     *
      * @return the filters list after editing
      */
     public List<FilterCriteria> getFilters() {
@@ -376,14 +376,14 @@ public class FilterListDialog extends Dialog {
     protected void loadFiltersCriteria() {
         List<FilterCriteria> globalFilters = getGlobalFilters();
         for (Iterator<FilterCriteria> i = globalFilters.iterator(); i.hasNext();) {
-            FilterCriteria filterCriteria = (FilterCriteria) i.next();
+            FilterCriteria filterCriteria = i.next();
             addCriteria(filterCriteria.getCriteria(), filterCriteria.isActive(), filterCriteria.isPositive(), filterCriteria.getLoaderClassName());
         }
     }
 
     /**
      * Returns the global filters which are saved in the dialog settings..
-     * 
+     *
      * @return the saved global filters
      */
     public static List<FilterCriteria> getGlobalFilters() {
@@ -416,7 +416,7 @@ public class FilterListDialog extends Dialog {
 
     /**
      * Saves the filter criteria in the dialog settings.
-     * 
+     *
      * @param globalFilters A list of filters to save.
      */
     public static void saveFiltersCriteria(List<FilterCriteria> globalFilters) {
@@ -436,11 +436,11 @@ public class FilterListDialog extends Dialog {
         FilterCriteria criteria;
 
         for (int j = 0; j < globalFilters.size(); j++) {
-            if (!(globalFilters.get(j) instanceof FilterCriteria)) {
+            if (globalFilters.get(j) == null) {
                 return;
             }
 
-            criteria = (FilterCriteria) globalFilters.get(j);
+            criteria = globalFilters.get(j);
             DialogSettings subSection = (DialogSettings) section.getSection(FILTERS_LIST_CRITERIA + j);
 
             if (subSection == null) {
@@ -449,7 +449,7 @@ public class FilterListDialog extends Dialog {
             criteria.save(subSection);
         }
     }
-    
+
     /**
      * Deactivates the saved global filters.
      */
@@ -490,9 +490,9 @@ public class FilterListDialog extends Dialog {
 
         /**
          * Constructor
-         * 
+         *
          * @param parent The parent table
-         * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+         * @param isActive <code>true</code> if filter criteria is active else <code>false</code>
          * @param isPositive <code>true</code> for positive filter else <code>false</code>
          * @param loaderClassName The loader class name
          */
@@ -506,9 +506,9 @@ public class FilterListDialog extends Dialog {
 
         /**
          * Constructor
-         * 
+         *
          * @param parent The parent table
-         * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+         * @param isActive <code>true</code> if filter criteria is active else <code>false</code>
          * @param isPositive <code>true</code> for positive filter else <code>false</code>
          * @param loaderClassName The loader class name
          * @param index The table item index
@@ -522,7 +522,7 @@ public class FilterListDialog extends Dialog {
 
         /**
          * Sets the criteria.
-         * 
+         *
          * @param criteria The criteria to set
          */
         public void setCriteria(Criteria criteria) {
@@ -540,7 +540,7 @@ public class FilterListDialog extends Dialog {
 
         /**
          * Returns whether positive filtering is active or not.
-         * 
+         *
          * @return <code>true</code> for positive filter else <code>false</code>
          */
         public boolean isPositive() {
@@ -549,7 +549,7 @@ public class FilterListDialog extends Dialog {
 
         /**
          * Returns the loader class name.
-         * 
+         *
          * @return the loader class name
          */
         public String getLoaderClassName() {

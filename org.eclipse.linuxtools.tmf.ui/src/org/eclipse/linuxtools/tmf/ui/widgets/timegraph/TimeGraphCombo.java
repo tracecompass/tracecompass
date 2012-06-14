@@ -128,27 +128,24 @@ public class TimeGraphCombo extends Composite {
         public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof ITimeGraphEntry) {
                 return contentProvider.getChildren(parentElement);
-            } else {
-                return new Object[0];
             }
+            return new Object[0];
         }
 
         @Override
         public Object getParent(Object element) {
             if (element instanceof ITimeGraphEntry) {
                 return contentProvider.getParent(element);
-            } else {
-                return null;
             }
+            return null;
         }
 
         @Override
         public boolean hasChildren(Object element) {
             if (element instanceof ITimeGraphEntry) {
                 return contentProvider.hasChildren(element);
-            } else {
-                return false;
             }
+            return false;
         }
     }
 
@@ -177,9 +174,8 @@ public class TimeGraphCombo extends Composite {
         public boolean isLabelProperty(Object element, String property) {
             if (element instanceof ITimeGraphEntry) {
                 return labelProvider.isLabelProperty(element, property);
-            } else {
-                return false;
             }
+            return false;
         }
 
         @Override
@@ -191,18 +187,16 @@ public class TimeGraphCombo extends Composite {
         public Image getColumnImage(Object element, int columnIndex) {
             if (element instanceof ITimeGraphEntry) {
                 return labelProvider.getColumnImage(element, columnIndex);
-            } else {
-                return null;
             }
+            return null;
         }
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
             if (element instanceof ITimeGraphEntry) {
                 return labelProvider.getColumnText(element, columnIndex);
-            } else {
-                return null;
             }
+            return null;
         }
 
     }

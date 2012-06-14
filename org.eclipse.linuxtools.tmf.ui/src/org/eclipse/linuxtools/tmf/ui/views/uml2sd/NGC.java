@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -33,8 +33,8 @@ import org.eclipse.swt.widgets.Display;
  * <p>
  * This class implements the graphical context for the sequence diagram widgets.
  * </p>
- * 
- * @version 1.0 
+ *
+ * @version 1.0
  * @author sveyrier
  */
 public class NGC implements IGC {
@@ -42,7 +42,7 @@ public class NGC implements IGC {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     /**
      * The graphical context.
      */
@@ -76,15 +76,15 @@ public class NGC implements IGC {
      */
     protected int fVisibleX;
     /**
-     * The current yx value (view visible height - visible screen bounds) 
+     * The current yx value (view visible height - visible screen bounds)
      */
     protected int yx;
     /**
-     * The current xx value (view visible width - visible screen bounds) 
+     * The current xx value (view visible width - visible screen bounds)
      */
     protected int xx;
     /**
-     * <code>true</code> to draw with focus else <code>false</code>. 
+     * <code>true</code> to draw with focus else <code>false</code>.
      */
     protected boolean fDrawWithFocus = false;
 
@@ -92,15 +92,15 @@ public class NGC implements IGC {
      * The static visible screen bounds.
      */
     private static int fVisibleScreenBounds = 0;
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     /**
      * Default constructor.
-     * 
+     *
      * @param scrollView A sequence diagram view reference.
      * @param gc A graphical context.
      */
@@ -187,7 +187,7 @@ public class NGC implements IGC {
 
     /**
      * Get code for drawings  at given x and y position.
-     * 
+     *
      * @param x The x position
      * @param y The y position.
      * @return A code for top, bottom, right and left
@@ -203,7 +203,7 @@ public class NGC implements IGC {
         } else if (y < fVisibleY) {
             c |= 0x02; // bottom
         }
-        
+
         if (x > xx) {
             c |= 0x04; // right
         } else if (x < fVisibleX) {
@@ -218,11 +218,11 @@ public class NGC implements IGC {
      */
     @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
-        int localX1 = x1; 
-        int localY1 = y1; 
+        int localX1 = x1;
+        int localY1 = y1;
         int localX2 = x2;
         int localY2 = y2;
-        
+
         localX1 = Math.round(localX1 * fView.fZoomValue);
         localY1 = Math.round(localY1 * fView.fZoomValue);
         localX2 = Math.round(localX2 * fView.fZoomValue);
@@ -288,7 +288,7 @@ public class NGC implements IGC {
         int localY = y;
         int localWidth = width;
         int localHeight = height;
-                
+
         localX = Math.round(localX * fView.fZoomValue);
         // Workaround to avoid problems for some special cases (not very nice)
         if (localY != getContentsY()) {
@@ -321,7 +321,7 @@ public class NGC implements IGC {
         }
         fContext.drawRectangle(localX, localY, localWidth, localHeight);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC#drawFocus(int, int, int, int)
@@ -373,10 +373,11 @@ public class NGC implements IGC {
             i++;
             localPoint[i] = fView.contentsToViewY(Math.round(points[i] * fView.fZoomValue));
         }
-        
-        if (validatePolygonHeight(localPoint) <= 0)
+
+        if (validatePolygonHeight(localPoint) <= 0) {
             return;
-        
+        }
+
         fContext.fillPolygon(localPoint);
     }
 
@@ -393,7 +394,7 @@ public class NGC implements IGC {
             i++;
             localPoint[i] = fView.contentsToViewY(Math.round(points[i] * fView.fZoomValue));
         }
-        
+
         if (validatePolygonHeight(localPoint) <= 0) {
             return;
         }
@@ -455,7 +456,7 @@ public class NGC implements IGC {
         int localY = y;
         int localWidth = width;
         int localHeight = height;
-        
+
         localX = Math.round(localX * fView.fZoomValue);
         localY = Math.round(localY * fView.fZoomValue);
         localWidth = Math.round(localWidth * fView.fZoomValue);
@@ -493,14 +494,14 @@ public class NGC implements IGC {
         setForeground(tempColor);
     }
 
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC#textExtent(java.lang.String)
      */
     @Override
     public int textExtent(String name) {
-        return ((Point) (fContext.textExtent(name))).x;
+        return fContext.textExtent(name).x;
     }
 
     /*
@@ -511,7 +512,7 @@ public class NGC implements IGC {
     public void drawText(String string, int x, int y, boolean isTrans) {
         int localX = x;
         int localY = y;
-        
+
         localX = Math.round(localX * fView.fZoomValue);
         localY = Math.round(localY * fView.fZoomValue);
         fContext.drawText(string, fView.contentsToViewX(localX), fView.contentsToViewY(localY), isTrans);
@@ -549,7 +550,7 @@ public class NGC implements IGC {
         int localY = y;
         int localWidth = width;
         int localHeight = height;
-        
+
         localX = Math.round(localX * fView.fZoomValue);
         localY = Math.round(localY * fView.fZoomValue);
         localWidth = Math.round(localWidth * fView.fZoomValue);
@@ -653,7 +654,7 @@ public class NGC implements IGC {
 
     /**
      * Method to draw a text in rectangle. (Linux GTK Workaround)
-     * 
+     *
      * @param string The text to draw.
      * @param x The x position.
      * @param y The y position.
@@ -695,7 +696,7 @@ public class NGC implements IGC {
         if (tx.y > localHeight) {
             return;
         }
-        
+
         // Adjust height and y
         if (y < -fVisibleScreenBounds) {
             localHeight = localHeight + y + fVisibleScreenBounds;
@@ -706,7 +707,7 @@ public class NGC implements IGC {
         } else if (localHeight + y > fView.getVisibleHeight() + fVisibleScreenBounds) {
             localHeight = fView.getVisibleHeight() + fVisibleScreenBounds - y;
         }
-        
+
         if (tx.x <= localWidth) {
             localDrawText(name, x + 1 + (localWidth - tx.x) / 2, y + 1 + (localHeight - tx.y) / 2, trans);
         } else {
@@ -738,7 +739,7 @@ public class NGC implements IGC {
         int localY = yValue;
         int localWidth = width;
         int localHeight = height;
-        
+
         localX = Math.round(localX * fView.fZoomValue);
         localY = Math.round(localY * fView.fZoomValue);
         localWidth = Math.round(localWidth * fView.fZoomValue);
@@ -776,7 +777,7 @@ public class NGC implements IGC {
     public void drawImage(IImage image, int xValue, int yValue, int maxWith, int maxHeight) {
         int localX = xValue;
         int localY = yValue;
-        
+
         Image img = null;
         if (image != null && image.getImage() instanceof Image) {
             img = (Image) image.getImage();
@@ -884,7 +885,7 @@ public class NGC implements IGC {
 
     /**
      * Returns the current font height.
-     * 
+     *
      * @return the current font height.
      */
     protected int getCurrentFontHeight() {
@@ -929,7 +930,7 @@ public class NGC implements IGC {
     public float getZoom() {
         if (fView != null) {
             return fView.fZoomValue;
-        } 
+        }
         return 1;
     }
 
@@ -977,10 +978,10 @@ public class NGC implements IGC {
     public void setDrawTextWithFocusStyle(boolean focus) {
         fDrawWithFocus = focus;
     }
-    
+
     /**
      * Returns the screen bounds.
-     * 
+     *
      * @return the screen bounds.
      */
     protected static int getVscreenBounds() {
@@ -989,20 +990,20 @@ public class NGC implements IGC {
 
     /**
      * Sets the visible screen bounds.
-     * 
+     *
      * @param vBounds the screen bounds.
      */
     protected static void setVscreenBounds(int vBounds) {
         fVisibleScreenBounds = vBounds;
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
-    
+
     /**
      * Validates the polygon height
-     * 
+     *
      * @param localPoint array of points
      * @return height
      */
@@ -1011,7 +1012,7 @@ public class NGC implements IGC {
         int max = 0;
         int min = Integer.MAX_VALUE;
         while (i < localPoint.length) {
-            max = Math.abs(localPoint[i]) > Math.abs(max) ? localPoint[i] : max; 
+            max = Math.abs(localPoint[i]) > Math.abs(max) ? localPoint[i] : max;
             min = Math.abs(localPoint[i]) < Math.abs(min) ? localPoint[i] : min;
             i+=2;
         }

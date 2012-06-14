@@ -136,7 +136,9 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         return null;
     }
 
-    private boolean propagateProperties(TmfTraceElement trace, String bundleName, String traceType, String iconUrl) throws CoreException {
+    private static boolean propagateProperties(TmfTraceElement trace,
+            String bundleName, String traceType, String iconUrl)
+            throws CoreException {
 
         IResource svResource = trace.getResource();
         String svBundleName = svResource.getPersistentProperty(TmfCommonConstants.TRACEBUNDLE);
@@ -172,13 +174,14 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         return true;
     }
 
-    private void setProperties(IResource resource, String bundleName, String traceType, String iconUrl) throws CoreException {
+    private static void setProperties(IResource resource, String bundleName,
+            String traceType, String iconUrl) throws CoreException {
         resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
         resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
     }
 
-    private boolean validateTraceType(TmfTraceElement trace) {
+    private static boolean validateTraceType(TmfTraceElement trace) {
         IProject project = trace.getProject().getResource();
         ITmfTrace<?> tmfTrace = null;
         try {

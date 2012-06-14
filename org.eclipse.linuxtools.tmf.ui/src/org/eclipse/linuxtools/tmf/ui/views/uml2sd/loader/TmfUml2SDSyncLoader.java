@@ -549,6 +549,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             return Messages.TmfUml2SDSyncLoader_CategoryLifeline;
          case ISDGraphNodeSupporter.SYNCMESSAGE:
              return Messages.TmfUml2SDSyncLoader_CategoryMessage;
+        default:
+            break;
         }
         return ""; //$NON-NLS-1$
     }
@@ -621,11 +623,10 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 GraphNode current = fFindResults.get(fCurrentFindIndex);
                 fView.getSDWidget().moveTo(current);
                 return true;
-            } else {
-                fFindResults = null;
-                fCurrentFindIndex =0;
-                return findInNextPages(fFindCriteria); // search in other page
             }
+            fFindResults = null;
+            fCurrentFindIndex =0;
+            return findInNextPages(fFindCriteria); // search in other page
         } finally {
             fLock.unlock();
         }
@@ -1314,7 +1315,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 }
                 else {
                     // String was not found
-                    status = new Status(Status.WARNING, Activator.PLUGIN_ID, Messages.TmfUml2SDSyncLoader_SearchNotFound);
+                    status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, Messages.TmfUml2SDSyncLoader_SearchNotFound);
                 }
                 setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             }

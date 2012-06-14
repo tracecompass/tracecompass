@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -15,9 +15,10 @@ package org.eclipse.linuxtools.internal.tmf.ui.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTraceDefinition;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
@@ -50,7 +51,7 @@ public class ManageCustomParsersDialog extends Dialog {
     Button deleteButton;
     Button importButton;
     Button exportButton;
-    
+
     public ManageCustomParsersDialog(Shell parent) {
         super(parent);
         setShellStyle(SWT.RESIZE | SWT.MAX | getShellStyle());
@@ -63,7 +64,7 @@ public class ManageCustomParsersDialog extends Dialog {
     protected Control createDialogArea(Composite parent) {
         getShell().setText(Messages.ManageCustomParsersDialog_DialogHeader);
         getShell().setImage(image);
-        
+
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setLayout(new GridLayout(2, false));
 
@@ -73,13 +74,13 @@ public class ManageCustomParsersDialog extends Dialog {
         lcgl.marginHeight = 0;
         lcgl.marginWidth = 0;
         listContainer.setLayout(lcgl);
-        
+
         Composite radioContainer = new Composite(listContainer, SWT.NONE);
         GridLayout rcgl = new GridLayout(2, true);
         rcgl.marginHeight = 0;
         rcgl.marginWidth = 0;
         radioContainer.setLayout(rcgl);
-        
+
         txtButton = new Button(radioContainer, SWT.RADIO);
         txtButton.setText(Messages.ManageCustomParsersDialog_TextButtonLabel);
         txtButton.setSelection(true);
@@ -90,7 +91,7 @@ public class ManageCustomParsersDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
                 fillParserList();
             }});
-        
+
         xmlButton = new Button(radioContainer, SWT.RADIO);
         xmlButton.setText("XML"); //$NON-NLS-1$
         xmlButton.addSelectionListener(new SelectionListener(){
@@ -100,7 +101,7 @@ public class ManageCustomParsersDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
                 fillParserList();
             }});
-        
+
         parserList = new List(listContainer, SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         parserList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         parserList.addSelectionListener(new SelectionListener(){
@@ -118,7 +119,7 @@ public class ManageCustomParsersDialog extends Dialog {
                     exportButton.setEnabled(true);
                 }
             }});
-        
+
         Composite buttonContainer = new Composite(composite, SWT.NULL);
         buttonContainer.setLayout(new GridLayout());
         buttonContainer.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
@@ -139,12 +140,12 @@ public class ManageCustomParsersDialog extends Dialog {
                 }
                 if (dialog != null) {
                     dialog.open();
-                    if (dialog.getReturnCode() == Dialog.OK) {
+                    if (dialog.getReturnCode() == Window.OK) {
                         fillParserList();
                     }
                 }
             }});
-        
+
         editButton = new Button(buttonContainer, SWT.PUSH);
         editButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         editButton.setText(Messages.ManageCustomParsersDialog_EditButtonLabel);
@@ -164,7 +165,7 @@ public class ManageCustomParsersDialog extends Dialog {
                 }
                 if (dialog != null) {
                     dialog.open();
-                    if (dialog.getReturnCode() == Dialog.OK) {
+                    if (dialog.getReturnCode() == Window.OK) {
                         fillParserList();
                     }
                 }
@@ -194,7 +195,7 @@ public class ManageCustomParsersDialog extends Dialog {
             }});
 
         new Label(buttonContainer, SWT.NONE); // filler
-        
+
         importButton = new Button(buttonContainer, SWT.PUSH);
         importButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         importButton.setText(Messages.ManageCustomParsersDialog_ImportButtonLabel);

@@ -368,7 +368,8 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
      * @param children
      *            the current children
      */
-    private void customizeTmfElements(Object[] elements, Set<Object> children) {
+    private static void customizeTmfElements(Object[] elements,
+            Set<Object> children) {
         if (elements != null && children != null) {
             for (Object element : elements) {
                 if (element instanceof ITmfProjectModelElement) {

@@ -1,11 +1,11 @@
 /*******************************************************************************
 * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -190,18 +190,19 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         return (ok ? Status.OK_STATUS : Status.CANCEL_STATUS);
     }
 
-    
+
     /**
      * Drop a trace by copying a resource in a target experiment
-     * 
+     *
      * @param sourceTrace the source trace element to copy
      * @param targetExperiment the target experiment
      * @return true if successful
      */
-    private boolean drop(TmfTraceElement sourceTrace, TmfExperimentElement targetExperiment) {
-        
+    private static boolean drop(TmfTraceElement sourceTrace,
+            TmfExperimentElement targetExperiment) {
+
         IResource sourceResource = sourceTrace.getResource();
-        
+
         if (drop(sourceResource, targetExperiment)) {
             IFolder destinationSupplementaryFolder = targetExperiment.getTraceSupplementaryFolder(sourceResource.getName());
             if (!destinationSupplementaryFolder.exists()) {
@@ -211,15 +212,16 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         }
         return false;
     }
-    
+
     /**
      * Drop a trace by copying a resource in a target experiment
-     * 
+     *
      * @param sourceResource the source resource
      * @param targetExperiment the target experiment
      * @return true if successful
      */
-    private boolean drop(IResource sourceResource, TmfExperimentElement targetExperiment) {
+    private static boolean drop(IResource sourceResource,
+            TmfExperimentElement targetExperiment) {
         boolean doit = true;
 
         //Use local variable to avoid parameter assignment
@@ -267,12 +269,12 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
     /**
      * Drop a trace by copying it's a trace element in a trace folder
-     * 
+     *
      * @param sourceTrace the source trace
      * @param traceFolder the target trace folder
      * @return true if successful
      */
-    private boolean drop(TmfTraceElement sourceTrace, TmfTraceFolder traceFolder) {
+    private static boolean drop(TmfTraceElement sourceTrace, TmfTraceFolder traceFolder) {
         IResource sourceResource = sourceTrace.getResource();
         if (drop(sourceResource, traceFolder)) {
             IFolder destinationSupplementaryFolder = traceFolder.getTraceSupplementaryFolder(sourceResource.getName());
@@ -284,12 +286,12 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
     /**
      * Drop a trace by copying a resource in a trace folder
-     * 
+     *
      * @param sourceResource the source resource
      * @param traceFolder the target trace folder
      * @return true if successful
      */
-    private boolean drop(IResource sourceResource, TmfTraceFolder traceFolder) {
+    private static boolean drop(IResource sourceResource, TmfTraceFolder traceFolder) {
         boolean doit = true;
 
         for (TmfTraceElement trace : traceFolder.getTraces()) {
@@ -311,17 +313,17 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         }
         return false;
     }
-    
+
     /**
      * Drop a trace by importing a path in a target experiment
-     * 
+     *
      * @param path the source path
      * @param targetExperiment the target experiment
      * @return true if successful
      */
-    private boolean drop(Path path, TmfExperimentElement targetExperiment) {
+    private static boolean drop(Path path, TmfExperimentElement targetExperiment) {
         boolean doit = true;
-        
+
         // Use local variable to avoid parameter assignment
         Path pathToUse = path;
 
@@ -362,12 +364,12 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
     /**
      * Drop a trace by importing a path in a trace folder
-     * 
+     *
      * @param path the source path
      * @param traceFolder the target trace folder
      * @return true if successful
      */
-    private boolean drop(Path path, TmfTraceFolder traceFolder) {
+    private static boolean drop(Path path, TmfTraceFolder traceFolder) {
         boolean doit = true;
         for (TmfTraceElement trace : traceFolder.getTraces()) {
             if (trace.getName().equals(path.lastSegment())) {
@@ -384,11 +386,11 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
     /**
      * Import a trace to the trace folder
-     * 
+     *
      * @param resource the trace folder resource
      * @param path the path to the trace to import
      */
-    private void importTrace(IFolder resource, Path path) {
+    private static void importTrace(IFolder resource, Path path) {
         IPath containerPath = resource.getFullPath();
         File file = new File(path.toString());
         File source = file.getParentFile();
@@ -414,15 +416,15 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         } catch (InterruptedException e) {
             displayException(e);
         }
-    } 
+    }
 
     /**
      * Create a link to the actual trace and set the trace type
-     * 
+     *
      * @param parentFolder the parent folder
      * @param resource the resource
      */
-    private void createLink(IFolder parentFolder, IResource resource) {
+    private static void createLink(IFolder parentFolder, IResource resource) {
         IPath location = resource.getLocation();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
@@ -443,7 +445,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
             } else {
                 IFile file = parentFolder.getFile(resource.getName());
-                
+
                 if (workspace.validateLinkLocation(file, location).isOK()) {
                     file.createLink(location, IResource.REPLACE, null);
                     setProperties(file, bundleName, traceType, iconUrl, supplFolder);
@@ -459,7 +461,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
     /**
      * Cleanup bookmarks file in copied trace
      */
-    private void cleanupBookmarks(IPath path) {
+    private static void cleanupBookmarks(IPath path) {
         IFolder folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(path);
         if (folder.exists()) {
             try {
@@ -476,15 +478,17 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
     /**
      * Set the trace persistent properties
-     * 
+     *
      * @param resource the trace resource
      * @param bundleName the bundle name
      * @param traceType the trace type
      * @param iconUrl the icon URL
-     * @param supplFolder the directory of the directory for supplementary information or null to ignore the property 
+     * @param supplFolder the directory of the directory for supplementary information or null to ignore the property
      * @throws CoreException
      */
-    private void setProperties(IResource resource, String bundleName, String traceType, String iconUrl, String supplFolder) throws CoreException {
+    private static void setProperties(IResource resource, String bundleName,
+            String traceType, String iconUrl, String supplFolder)
+            throws CoreException {
         resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
         resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
@@ -493,10 +497,10 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
     /**
      * Display an exception in a message box
-     * 
+     *
      * @param e the exception
      */
-    private void displayException(Exception e) {
+    private static void displayException(Exception e) {
         MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         mb.setText(e.getClass().getName());
         mb.setMessage(e.getMessage());

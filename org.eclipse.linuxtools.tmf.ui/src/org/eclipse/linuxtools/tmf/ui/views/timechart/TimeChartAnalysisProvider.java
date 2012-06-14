@@ -82,7 +82,7 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
         }
     }
 
-    private void drawBookmark(Rectangle r, GC gc) {
+    private static void drawBookmark(Rectangle r, GC gc) {
         gc.setForeground(BOOKMARK_OUTER_COLOR);
         gc.drawLine(r.x - 1, r.y - 2, r.x - 1, r.y + 2);
         gc.drawLine(r.x + 1, r.y - 2, r.x + 1, r.y + 2);
@@ -95,7 +95,7 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
         gc.drawPoint(r.x + 1, r.y + 3);
     }
 
-    private void drawSearchMatch(Rectangle r, GC gc) {
+    private static void drawSearchMatch(Rectangle r, GC gc) {
         gc.setForeground(SEARCH_MATCH_COLOR);
         gc.drawPoint(r.x, r.y + r.height);
         gc.drawLine(r.x - 1, r.y + r.height + 1, r.x + 1, r.y + r.height + 1);

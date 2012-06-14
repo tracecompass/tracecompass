@@ -355,15 +355,20 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     /**
-     * Get the events table for an experiment.
-     * If all traces in the experiment are of the same type,
-     * use the extension point specified event table
-     * @param experiment the experiment
-     * @param parent the parent Composite
-     * @param cacheSize the event table cache size
+     * Get the events table for an experiment. If all traces in the experiment
+     * are of the same type, use the extension point specified event table
+     *
+     * @param experiment
+     *            the experiment
+     * @param parent
+     *            the parent Composite
+     * @param cacheSize
+     *            the event table cache size
      * @return an events table of the appropriate type
      */
-    private TmfEventsTable getExperimentEventsTable(final TmfExperiment<?> experiment, final Composite parent, final int cacheSize) {
+    private static TmfEventsTable getExperimentEventsTable(
+            final TmfExperiment<?> experiment, final Composite parent,
+            final int cacheSize) {
         TmfEventsTable eventsTable = null;
         String commonTraceType = null;
         try {

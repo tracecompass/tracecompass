@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * Implementation of a wizard page for selecting trace for an experiment.
  * <p>
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -178,14 +178,15 @@ public class SelectTracesWizardPage extends WizardPage {
     /**
      * Create a link to the actual trace and set the trace type
      */
-    private void createLink(IFolder experiment, TmfTraceElement trace, IResource resource, IPath location) {
+    private static void createLink(IFolder experiment, TmfTraceElement trace,
+            IResource resource, IPath location) {
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
             Map<QualifiedName, String> properties = trace.getResource().getPersistentProperties();
             String bundleName = properties.get(TmfCommonConstants.TRACEBUNDLE);
             String traceType = properties.get(TmfCommonConstants.TRACETYPE);
             String iconUrl = properties.get(TmfCommonConstants.TRACEICON);
-            
+
             if (resource instanceof IFolder) {
                 IFolder folder = experiment.getFolder(trace.getName());
                 if (workspace.validateLinkLocation(folder, location).isOK()) {
@@ -209,7 +210,8 @@ public class SelectTracesWizardPage extends WizardPage {
         }
     }
 
-    private void setProperties(IResource resource, String bundleName, String traceType, String iconUrl) throws CoreException {
+    private static void setProperties(IResource resource, String bundleName,
+            String traceType, String iconUrl) throws CoreException {
         resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
         resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
@@ -222,8 +224,9 @@ public class SelectTracesWizardPage extends WizardPage {
         Vector<TmfTraceElement> traces = new Vector<TmfTraceElement>();
         Object[] selection = fCheckboxTableViewer.getCheckedElements();
         for (Object sel : selection) {
-            if (sel instanceof TmfTraceElement)
+            if (sel instanceof TmfTraceElement) {
                 traces.add((TmfTraceElement) sel);
+            }
         }
         TmfTraceElement[] result = new TmfTraceElement[traces.size()];
         traces.toArray(result);

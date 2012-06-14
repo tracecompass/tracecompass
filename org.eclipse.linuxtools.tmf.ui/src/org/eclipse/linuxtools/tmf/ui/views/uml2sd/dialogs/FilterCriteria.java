@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -20,10 +20,10 @@ import org.eclipse.jface.dialogs.DialogSettings;
 
 /**
  * A filter criteria is a criteria that can be activated or not, positive or not.
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class FilterCriteria {
 
@@ -35,11 +35,11 @@ public class FilterCriteria {
      */
     protected static final String ACTIVE = "active"; //$NON-NLS-1$
     /**
-     * The property value for positive filter. 
+     * The property value for positive filter.
      */
     protected static final String POSITIVE = "positive"; //$NON-NLS-1$
     /**
-     * The filter loader class name property. 
+     * The filter loader class name property.
      */
     protected static final String LOADERCLASSNAME = "loaderClassName"; //$NON-NLS-1$
 
@@ -47,7 +47,7 @@ public class FilterCriteria {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The criteria reference.  
+     * The criteria reference.
      */
     protected Criteria fCriteria;
     /**
@@ -68,9 +68,9 @@ public class FilterCriteria {
     // ------------------------------------------------------------------------
     /**
      * Standard constructor
-     * 
+     *
      * @param criteria A criteria reference
-     * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+     * @param isActive <code>true</code> if filter criteria is active else <code>false</code>
      * @param isPositive  <code>true</code> for positive filter else <code>false</code>
      */
     public FilterCriteria(Criteria criteria, boolean isActive, boolean isPositive) {
@@ -79,9 +79,9 @@ public class FilterCriteria {
 
     /**
      * Constructor
-     * 
+     *
      * @param criteria A criteria reference
-     * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+     * @param isActive <code>true</code> if filter criteria is active else <code>false</code>
      * @param isPositive  <code>true</code> for positive filter else <code>false</code>
      * @param loaderClassName A loader class name
      */
@@ -140,7 +140,7 @@ public class FilterCriteria {
 
     /**
      * Returns the criteria reference.
-     * 
+     *
      * @return the criteria reference
      */
     public Criteria getCriteria() {
@@ -149,7 +149,7 @@ public class FilterCriteria {
 
     /**
      * Sets the active flag.
-     * 
+     *
      * @param isActive A active value.
      */
     public void setActive(boolean isActive) {
@@ -158,7 +158,7 @@ public class FilterCriteria {
 
     /**
      * Returns whether filter criteria is active or not.
-     * 
+     *
      * @return whether filter criteria is active or not.
      */
     public boolean isActive() {
@@ -167,7 +167,7 @@ public class FilterCriteria {
 
     /**
      * Sets filter is for positive filtering or not.
-     * 
+     *
      * @param isPositive The value to set.
      */
     public void setPositive(boolean isPositive) {
@@ -176,7 +176,7 @@ public class FilterCriteria {
 
     /**
      * Returns whether the filter si for positive filtering or not.
-     * 
+     *
      * @return Returns the positive.
      */
     public boolean isPositive() {
@@ -185,7 +185,7 @@ public class FilterCriteria {
 
     /**
      * Sets the loader class name for this filter.
-     * 
+     *
      * @param loaderClassName The loader class name to set
      */
     public void setLoaderClassName(String loaderClassName) {
@@ -194,7 +194,7 @@ public class FilterCriteria {
 
     /**
      * Returns the class loader name.
-     * 
+     *
      * @return the class loader name.
      */
     public String getLoaderClassName() {
@@ -203,7 +203,7 @@ public class FilterCriteria {
 
     /**
      * Finds a filter criteria within a  list of criteria.
-     * 
+     *
      * @param what The filter to find
      * @param list A list of filter criteria
      * @return The found filter criteria or null
@@ -212,7 +212,7 @@ public class FilterCriteria {
         if (what != null && list != null) {
             try {
                 for (Iterator<FilterCriteria> i = list.iterator(); i.hasNext();) {
-                    FilterCriteria fc = (FilterCriteria) i.next();
+                    FilterCriteria fc = i.next();
                     if (what.compareTo(fc)) {
                         return fc;
                     }
@@ -226,7 +226,7 @@ public class FilterCriteria {
 
     /**
      * Compares this filter criteria with a given criteria.
-     * 
+     *
      * @param to The filter criteria to compare.
      * @return usual comparison result (< 0, 0, > 0)
      */
@@ -244,7 +244,7 @@ public class FilterCriteria {
 
     /**
      * Saves current criteria attributes in the dialog settings.
-     *  
+     *
      * @param settings The dialog settings
      */
     public void save(DialogSettings settings) {
@@ -262,7 +262,7 @@ public class FilterCriteria {
 
     /**
      * Loads the criteria with values of the dialog settings.
-     * 
+     *
      * @param settings The dialog settings
      */
     public void load(DialogSettings settings) {

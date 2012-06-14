@@ -74,15 +74,17 @@ public class OpenTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         final IWorkbenchPart part = page.getActivePart();
         final ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (selectionProvider == null) {
             return false;
+        }
         final ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only one selection and that it is a trace
@@ -91,8 +93,9 @@ public class OpenTraceHandler extends AbstractHandler {
             final TreeSelection sel = (TreeSelection) selection;
             // There should be only one item selected as per the plugin.xml
             final Object element = sel.getFirstElement();
-            if (element instanceof TmfTraceElement)
+            if (element instanceof TmfTraceElement) {
                 fTrace = (TmfTraceElement) element;
+            }
         }
 
         // We only enable opening from the Traces folder for now
@@ -109,12 +112,14 @@ public class OpenTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return null;
+        }
 
         // Check that the trace is valid
-        if (fTrace == null)
+        if (fTrace == null) {
             return null;
+        }
 
         // If trace is under an experiment, use the original trace from the traces folder
         fTrace = fTrace.getElementUnderTraceFolder();
@@ -139,9 +144,9 @@ public class OpenTraceHandler extends AbstractHandler {
 
         final IResource resource = fTrace.getResource();
         IFile file = null;
-        if (resource instanceof IFile)
+        if (resource instanceof IFile) {
             file = (IFile) resource;
-        else if (resource instanceof IFolder)
+        } else if (resource instanceof IFolder) {
             try {
                 final IFile bookmarksFile = fTrace.getProject().getTracesFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
                 if (!bookmarksFile.exists()) {
@@ -152,18 +157,21 @@ public class OpenTraceHandler extends AbstractHandler {
 
                 final IFolder folder = (IFolder) resource;
                 file = folder.getFile(fTrace.getName() + '_');
-                if (!file.exists())
+                if (!file.exists()) {
                     file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
+                }
                 file.setHidden(true);
-                if (usesEditor)
+                if (usesEditor) {
                     file.setPersistentProperty(TmfCommonConstants.TRACETYPE, fTrace.getTraceType());
-                else
+                } else {
                     file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfTrace.class.getCanonicalName());
+                }
             } catch (final CoreException e) {
                 Activator.getDefault().logError("Error opening trace " + fTrace.getName(), e); //$NON-NLS-1$
             }
+        }
 
-        if (usesEditor)
+        if (usesEditor) {
             try {
                 final IEditorInput editorInput = new TmfEditorInput(file, trace);
                 final IWorkbench wb = PlatformUI.getWorkbench();
@@ -175,13 +183,14 @@ public class OpenTraceHandler extends AbstractHandler {
                     activePage.activate(editor);
                 } else {
                     activePage.openEditor(editorInput, editorId);
-                    if (resource instanceof IFile)
+                    if (resource instanceof IFile) {
                         IDE.setDefaultEditor((IFile) resource, editorId);
+                    }
                 }
             } catch (final PartInitException e) {
                 Activator.getDefault().logError("Error opening trace " + fTrace.getName(), e); //$NON-NLS-1$
             }
-        else {
+        } else {
             // Create the experiment
             final ITmfTrace[] traces = new ITmfTrace[] { trace };
             final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
@@ -194,7 +203,7 @@ public class OpenTraceHandler extends AbstractHandler {
         return null;
     }
 
-    private void displayErrorMsg(final String errorMsg) {
+    private static void displayErrorMsg(final String errorMsg) {
         final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         mb.setText(Messages.OpenTraceHandler_Title);
         mb.setMessage(errorMsg);

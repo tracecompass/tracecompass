@@ -141,15 +141,15 @@ public abstract class GraphNode {
             }
         }
 
-        List<GraphNode> fNodeList = (List<GraphNode>) fForwardNodes.get(nodeToAdd.getArrayId());
+        List<GraphNode> fNodeList = fForwardNodes.get(nodeToAdd.getArrayId());
         List<GraphNode> bNodeList = null;
         if (fBackwardNodes != null) {
-            bNodeList = (List<GraphNode>) fBackwardNodes.get(nodeToAdd.getArrayId());
+            bNodeList = fBackwardNodes.get(nodeToAdd.getArrayId());
         }
         if (fNodeList != null && fNodeList.size() > 0) {
             // check if the nodes are added y ordered
             // if not, tag the list to sort it later (during draw)
-            GraphNode node = (GraphNode) fNodeList.get(fNodeList.size() - 1);
+            GraphNode node = fNodeList.get(fNodeList.size() - 1);
             Comparator<GraphNode> fcomp = nodeToAdd.getComparator();
             Comparator<GraphNode> bcomp = nodeToAdd.getBackComparator();
             if ((fcomp != null) && (fcomp.compare(node, nodeToAdd) > 0)) {
@@ -376,8 +376,8 @@ public abstract class GraphNode {
         GraphNode node = null;
         while (it.hasNext()) {
             Object nodeType = it.next();
-            List<GraphNode> list = (List<GraphNode>) fNodes.get(nodeType);
-            int index = ((Integer) fIndexes.get(nodeType)).intValue();
+            List<GraphNode> list = fNodes.get(nodeType);
+            int index = fIndexes.get(nodeType).intValue();
             node = getNodeFromListAt(x, y, list, index);
             if (toReturn == null) {
                 toReturn = node;
@@ -430,12 +430,12 @@ public abstract class GraphNode {
         Iterator<String> it = fNodes.keySet().iterator();
         while (it.hasNext()) {
             Object nodeType = it.next();
-            List<GraphNode> nodesList = (List<GraphNode>) fNodes.get(nodeType);
+            List<GraphNode> nodesList = fNodes.get(nodeType);
             if (nodesList == null || nodesList.isEmpty()) {
                 return null;
             }
             for (int i = 0; i < nodesList.size(); i++) {
-                GraphNode node = (GraphNode) nodesList.get(i);
+                GraphNode node = nodesList.get(i);
                 int nw = node.getWidth();
                 int nh = node.getHeight();
                 int nx = node.getX();
@@ -469,7 +469,7 @@ public abstract class GraphNode {
             return null;
         }
         for (int i = fromIndex; i < list.size(); i++) {
-            GraphNode node = (GraphNode) list.get(i);
+            GraphNode node = list.get(i);
             if (node.contains(x, y)) {
                 return node;
             }
@@ -517,12 +517,12 @@ public abstract class GraphNode {
         while (it.hasNext()) {
             String nodeType = it.next();
             int direction = 1;
-            int drawIndex = ((Integer) fIndexes.get(nodeType)).intValue();
+            int drawIndex = fIndexes.get(nodeType).intValue();
             /*
              * if (x==0) { drawIndex = 0; indexes.put(nodeType,new Integer(drawIndex)); }
              */
-            if ((fNodes.get(nodeType) != null) && (((List<GraphNode>) fNodes.get(nodeType)).size() > 1)) {
-                if (((GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex)).positiveDistanceToPoint(x, y)) {
+            if ((fNodes.get(nodeType) != null) && (fNodes.get(nodeType).size() > 1)) {
+                if (fNodes.get(nodeType).get(drawIndex).positiveDistanceToPoint(x, y)) {
                     direction = -1;
                 }
 
@@ -531,24 +531,24 @@ public abstract class GraphNode {
                 }
 
                 if ((direction == -1) && (fBackwardNodes.get(nodeType) != null)) {
-                    GraphNode currentNode = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex);
-                    drawIndex = Arrays.binarySearch(((List<GraphNode>) fBackwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>) fBackwardNodes.get(nodeType)).size()]),
-                            ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex), currentNode.getBackComparator());
-                    fNodes.put(nodeType, (List<GraphNode>) fBackwardNodes.get(nodeType));
+                    GraphNode currentNode = fNodes.get(nodeType).get(drawIndex);
+                    drawIndex = Arrays.binarySearch(fBackwardNodes.get(nodeType).toArray(new GraphNode[fBackwardNodes.get(nodeType).size()]),
+                            fNodes.get(nodeType).get(drawIndex), currentNode.getBackComparator());
+                    fNodes.put(nodeType, fBackwardNodes.get(nodeType));
                     if (drawIndex < 0) {
                         drawIndex = 0;
                         direction = 1;
                     } else {
-                        fNodes.put(nodeType, (List<GraphNode>) fBackwardNodes.get(nodeType));
+                        fNodes.put(nodeType, fBackwardNodes.get(nodeType));
                     }
                 }
                 GraphNode prev = null;
 
-                for (int i = drawIndex; i < ((List<GraphNode>) fNodes.get(nodeType)).size() && i >= 0; i = i + direction) {
+                for (int i = drawIndex; i < fNodes.get(nodeType).size() && i >= 0; i = i + direction) {
                     drawIndex = i;
                     fIndexes.put(nodeType, Integer.valueOf(i));
 
-                    GraphNode currentNode = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(i);
+                    GraphNode currentNode = fNodes.get(nodeType).get(i);
 
                     if (prev == null) {
                         prev = currentNode;
@@ -562,15 +562,15 @@ public abstract class GraphNode {
                         sort = fBackwardSort;
                     }
 
-                    if (i < ((List<GraphNode>) fNodes.get(nodeType)).size() - 1) {
-                        GraphNode next = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(i + 1);
+                    if (i < fNodes.get(nodeType).size() - 1) {
+                        GraphNode next = fNodes.get(nodeType).get(i + 1);
 
                         if ((comp != null) && (comp.compare(currentNode, next) > 0)) {
                             sort.put(nodeType, Boolean.TRUE);
                         }
                     }
                     if (direction == 1) {
-                        if (((GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(i)).positiveDistanceToPoint(x, y)) {
+                        if (fNodes.get(nodeType).get(i).positiveDistanceToPoint(x, y)) {
                             break;
                         }
                     } else {
@@ -594,10 +594,10 @@ public abstract class GraphNode {
                 fNodes.put(nodeType, fForwardNodes.get(nodeType));
                 if ((fBackwardNodes.get(nodeType) != null) && (direction == -1)) {
                     // nodes.put(nodeType,fnodes.get(nodeType));
-                    int index = ((Integer) fIndexes.get(nodeType)).intValue();
-                    List<GraphNode> list = (List<GraphNode>) fNodes.get(nodeType);
-                    List<GraphNode> backList = (List<GraphNode>) fBackwardNodes.get(nodeType);
-                    GraphNode currentNode = (GraphNode) (backList.get(index));
+                    int index = fIndexes.get(nodeType).intValue();
+                    List<GraphNode> list = fNodes.get(nodeType);
+                    List<GraphNode> backList = fBackwardNodes.get(nodeType);
+                    GraphNode currentNode = (backList.get(index));
                     if (index > 0) {
                         index = Arrays.binarySearch(list.toArray(new GraphNode[list.size()]), backList.get(index), currentNode.getComparator());
                         if (index < 0) {
@@ -607,8 +607,8 @@ public abstract class GraphNode {
                     }
                 }
 
-                for (int i = drawIndex; i < ((List<GraphNode>) fNodes.get(nodeType)).size() && i >= 0; i++) {
-                    GraphNode toDraw = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(i);
+                for (int i = drawIndex; i < fNodes.get(nodeType).size() && i >= 0; i++) {
+                    GraphNode toDraw = fNodes.get(nodeType).get(i);
                     toDraw.updateIndex(x, y, width, height);
                     if (!toDraw.isVisible(x, y, width, height)) {
                         break;
@@ -643,10 +643,10 @@ public abstract class GraphNode {
         Iterator<String> it = fForwardSort.keySet().iterator();
         while (it.hasNext()) {
             String nodeType = it.next();
-            boolean sort = ((Boolean) fForwardSort.get(nodeType)).booleanValue();
+            boolean sort = fForwardSort.get(nodeType).booleanValue();
             if (sort) {
-                GraphNode[] temp = ((List<GraphNode>) fForwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>)fForwardNodes.get(nodeType)).size()]);
-                GraphNode node = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(0);
+                GraphNode[] temp = fForwardNodes.get(nodeType).toArray(new GraphNode[fForwardNodes.get(nodeType).size()]);
+                GraphNode node = fNodes.get(nodeType).get(0);
                 Arrays.sort(temp, node.getComparator());
                 fForwardSort.put(nodeType, Boolean.FALSE);
                 fNodes.put(nodeType, Arrays.asList(temp));
@@ -660,10 +660,10 @@ public abstract class GraphNode {
         Iterator<String> it2 = fBackwardSort.keySet().iterator();
         while (it2.hasNext()) {
             String nodeType = it2.next();
-            boolean sort = ((Boolean) fBackwardSort.get(nodeType)).booleanValue();
+            boolean sort = fBackwardSort.get(nodeType).booleanValue();
             if (sort) {
-                GraphNode[] temp = ((List<GraphNode>) fBackwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>) fBackwardNodes.get(nodeType)).size()]);
-                GraphNode node = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(0);
+                GraphNode[] temp = fBackwardNodes.get(nodeType).toArray(new GraphNode[fBackwardNodes.get(nodeType).size()]);
+                GraphNode node = fNodes.get(nodeType).get(0);
                 Arrays.sort(temp, node.getBackComparator());
                 fBackwardSort.put(nodeType, Boolean.FALSE);
                 fBackwardNodes.put(nodeType, Arrays.asList(temp));
@@ -687,10 +687,10 @@ public abstract class GraphNode {
         while (it3.hasNext()) {
             count = 0;
             Object nodeType = it3.next();
-            GraphNode node = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(0);
+            GraphNode node = fNodes.get(nodeType).get(0);
             context.setFont(SDViewPref.getInstance().getFont(node.fPrefId));
-            int index = ((Integer) fIndexes.get(nodeType)).intValue();
-            count = drawNodes(context, (List<GraphNode>) fNodes.get(nodeType), index, arrayStep);
+            int index = fIndexes.get(nodeType).intValue();
+            count = drawNodes(context, fNodes.get(nodeType), index, arrayStep);
             if (TmfUiTracer.isDisplayTraced()) {
                 TmfUiTracer.traceDisplay(count + " " + nodeType + " drawn, starting from index " + index + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
@@ -721,13 +721,13 @@ public abstract class GraphNode {
             return 0;
         }
 
-        GraphNode node = (GraphNode) list.get(0);
+        GraphNode node = list.get(0);
         context.setFont(SDViewPref.getInstance().getFont(node.fPrefId));
         Comparator<GraphNode> comparator = node.getComparator();
         for (int i = startIndex; i < list.size(); i = i + step) {
-            GraphNode toDraw = (GraphNode) list.get(i);
+            GraphNode toDraw = list.get(i);
             if (i < list.size() - 1) {
-                GraphNode next = (GraphNode) list.get(i + 1);
+                GraphNode next = list.get(i + 1);
                 if ((comparator != null) && (comparator.compare(toDraw, next) > 0)) {
                     fForwardSort.put(next.getArrayId(), Boolean.TRUE);
                 }

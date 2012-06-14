@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2006 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -23,11 +23,11 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 /**
  * ExecutionOccurrence is the UML2 execution occurrence graphical representation. It is a BasicExecutionOccurrence on
  * which you can customize fill and/or.
- * 
+ *
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline Lifeline for more event occurence details
- * @version 1.0 
+ * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITimeRange {
 
@@ -35,7 +35,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * Set the red, green and blue value of the optional color to be used for filling the execution occurrence. 
+     * Set the red, green and blue value of the optional color to be used for filling the execution occurrence.
      */
     protected int[] fFillRGB;
     /**
@@ -51,7 +51,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     protected IImage fEllipsesImage;
     /**
-     *  The start time stamp. 
+     *  The start time stamp.
      */
     protected ITmfTimestamp fStartTime;
     /**
@@ -59,7 +59,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     protected ITmfTimestamp fEndTime;
     /**
-     * Flag to indicate whether time information is available or not. 
+     * Flag to indicate whether time information is available or not.
      */
     protected boolean fHasTimeInfo;
 
@@ -83,7 +83,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * Set the red, green and blue value of the optional color to be used for filling the execution occurrence.
-     * 
+     *
      * @param red A value for red.
      * @param green A green value for green.
      * @param blue A value blue.
@@ -97,7 +97,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * Set the red, green and blue value of the optional color to be used for drawing the execution occurrence
-     * 
+     *
      * @param red A value for red.
      * @param green A green value for green.
      * @param blue A value blue.
@@ -111,7 +111,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * Set the corresponding image.
-     * 
+     *
      * @param image A image to set.
      */
     public void setImage(IImage image) {
@@ -120,7 +120,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * Set the top ellipses image.
-     * 
+     *
      * @param image A image to set.
      */
     public void setTopEllipsesImage(IImage image) {
@@ -129,7 +129,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * Set the time when the execution occurrence starts.
-     * 
+     *
      * @param time the time when the execution occurrence starts
      */
     public void setStartTime(ITmfTimestamp time) {
@@ -142,7 +142,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * Set the time when the execution occurrence ends.
-     * 
+     *
      * @param time the time when the execution occurrence ends
      */
     public void setEndTime(ITmfTimestamp time) {
@@ -216,9 +216,8 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
                 context.setBackground(tempFillColor);
             }
             return tempFillColor;
-        } else {
-            return super.setUnselectedFillColor(context);
         }
+        return super.setUnselectedFillColor(context);
     }
 
     /*
@@ -231,8 +230,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
             IColor tempStrokeColor = context.createColor(fStrokeRGB[0], fStrokeRGB[1], fStrokeRGB[2]);
             context.setForeground(tempStrokeColor);
             return tempStrokeColor;
-        } else {
-            return super.setUnselectedStrokeColor(context);
         }
+        return super.setUnselectedStrokeColor(context);
     }
 }

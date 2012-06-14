@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -35,8 +35,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -66,20 +66,20 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     private static final String ACTION_ATTRIBUTE = Messages.CustomTxtTraceDefinition_action;
     private static final String FORMAT_ATTRIBUTE = Messages.CustomTxtTraceDefinition_format;
     private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomTxtTraceDefinition_outputColumn;
-    
+
     public List<InputLine> inputs;
 
     public CustomTxtTraceDefinition() {
         this("", new ArrayList<InputLine>(0), new ArrayList<OutputColumn>(0), ""); //$NON-NLS-1$ //$NON-NLS-2$
-    };
-    
+    }
+
     public CustomTxtTraceDefinition(String logtype, List<InputLine> inputs, List<OutputColumn> outputs, String timeStampOutputFormat) {
         this.definitionName = logtype;
         this.inputs = inputs;
         this.outputs = outputs;
         this.timeStampOutputFormat = timeStampOutputFormat;
     }
-    
+
     public static class InputLine {
         public List<InputData> columns;
         public Cardinality cardinality;
@@ -89,31 +89,31 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         public int level;
         public InputLine nextInput;
         public List<InputLine> childrenInputs;
-        
-        public InputLine() {};
-        
+
+        public InputLine() {}
+
         public InputLine(Cardinality cardinality, String regex, List<InputData> columns) {
             this.cardinality = cardinality;
             this.regex = regex;
             this.columns = columns;
         }
-        
+
         public void setRegex(String regex) {
             this.regex = regex;
             this.pattern = null;
         }
-        
+
         public String getRegex() {
             return regex;
         }
-        
+
         public Pattern getPattern() throws PatternSyntaxException {
             if (pattern == null) {
                 pattern = Pattern.compile(regex);
             }
             return pattern;
         }
-        
+
         public void addChild(InputLine input) {
             if (childrenInputs == null) {
                 childrenInputs = new ArrayList<InputLine>(1);
@@ -166,7 +166,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
             columns.add(column);
         }
-        
+
         public List<InputLine> getNextInputs(Map<InputLine, Integer> countMap) {
             List<InputLine> nextInputs = new ArrayList<InputLine>();
             InputLine next = nextInput;
@@ -189,11 +189,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
             return nextInputs;
         }
-        
+
         public int getMinCount() {
             return cardinality.min;
         }
-        
+
         public int getMaxCount() {
             return cardinality.max;
         }
@@ -202,22 +202,22 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         public String toString() {
             return regex + " " + cardinality; //$NON-NLS-1$
         }
-        
+
     }
 
     public static class InputData {
         public String name;
         public int action;
         public String format;
-        
-        public InputData() {};
-        
+
+        public InputData() {}
+
         public InputData(String name, int action, String format) {
             this.name = name;
             this.action = action;
             this.format = format;
         }
-        
+
         public InputData(String name, int action) {
             this.name = name;
             this.action = action;
@@ -229,11 +229,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         public final static Cardinality ONE = new Cardinality(1, 1);
         public final static Cardinality ONE_OR_MORE = new Cardinality(1, INF);
         public final static Cardinality ZERO_OR_ONE = new Cardinality(0, 1);
-        public final static Cardinality ZERO_OR_MORE = new Cardinality(0, INF); 
-        
-        private int min;
-        private int max;
-        
+        public final static Cardinality ZERO_OR_MORE = new Cardinality(0, INF);
+
+        private final int min;
+        private final int max;
+
         public Cardinality(int min, int max) {
             this.min = min;
             this.max = max;
@@ -267,23 +267,25 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             if (obj == null) {
                 return false;
             }
-            if (!(obj instanceof Cardinality)) return false;
+            if (!(obj instanceof Cardinality)) {
+                return false;
+            }
             Cardinality other = (Cardinality) obj;
             return (this.min == other.min && this.max == other.max);
         }
     }
-    
+
     @Override
 	public void save() {
         save(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
     }
-    
+
     @Override
 	public void save(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            
+
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
             	@Override
@@ -305,7 +307,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
                 }});
-            
+
             Document doc = null;
             File file = new File(path);
             if (file.canRead()) {
@@ -320,7 +322,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
 
             Element root = doc.getDocumentElement();
-            
+
             NodeList nodeList = root.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -333,7 +335,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             Element definitionElement = doc.createElement(DEFINITION_ELEMENT);
             root.appendChild(definitionElement);
             definitionElement.setAttribute(NAME_ATTRIBUTE, definitionName);
-            
+
             Element formatElement = doc.createElement(TIME_STAMP_OUTPUT_FORMAT_ELEMENT);
             definitionElement.appendChild(formatElement);
             formatElement.appendChild(doc.createTextNode(timeStampOutputFormat));
@@ -351,7 +353,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                     outputColumnElement.setAttribute(NAME_ATTRIBUTE, output.name);
                 }
             }
-            
+
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
@@ -360,7 +362,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
             String xmlString = result.getWriter().toString();
-            
+
             FileWriter writer = new FileWriter(file);
             writer.write(xmlString);
             writer.close();
@@ -381,12 +383,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
     private Element createInputLineElement(InputLine inputLine, Document doc) {
         Element inputLineElement = doc.createElement(INPUT_LINE_ELEMENT);
-        
+
         Element cardinalityElement = doc.createElement(CARDINALITY_ELEMENT);
         inputLineElement.appendChild(cardinalityElement);
         cardinalityElement.setAttribute(MIN_ATTRIBUTE, Integer.toString(inputLine.cardinality.min));
         cardinalityElement.setAttribute(MAX_ATTRIBUTE, Integer.toString(inputLine.cardinality.max));
-        
+
         Element regexElement = doc.createElement(REGEX_ELEMENT);
         inputLineElement.appendChild(regexElement);
         regexElement.appendChild(doc.createTextNode(inputLine.regex));
@@ -402,20 +404,20 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 }
             }
         }
-        
+
         if (inputLine.childrenInputs != null) {
             for (InputLine childInputLine : inputLine.childrenInputs) {
                 inputLineElement.appendChild(createInputLineElement(childInputLine, doc));
             }
         }
-        
+
         return inputLineElement;
     }
-    
+
     public static CustomTxtTraceDefinition[] loadAll() {
         return loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
     }
-    
+
     public static CustomTxtTraceDefinition[] loadAll(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -529,13 +531,15 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         }
         return null;
     }
-    
+
     public static CustomTxtTraceDefinition extractDefinition(Element definitionElement) {
         CustomTxtTraceDefinition def = new CustomTxtTraceDefinition();
-        
+
         def.definitionName = definitionElement.getAttribute(NAME_ATTRIBUTE);
-        if (def.definitionName == null) return null;
-        
+        if (def.definitionName == null) {
+            return null;
+        }
+
         NodeList nodeList = definitionElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
@@ -593,7 +597,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         }
         return inputLine;
     }
-    
+
     public static void delete(String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -638,7 +642,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                     root.removeChild(node);
                 }
             }
-            
+
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
@@ -647,7 +651,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
             String xmlString = result.getWriter().toString();
-            
+
             FileWriter writer = new FileWriter(file);
             writer.write(xmlString);
             writer.close();

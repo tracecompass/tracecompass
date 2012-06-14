@@ -299,11 +299,11 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         int messageMaxWidth = Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH;
         int nameWidth = getName().length() * Metrics.getAverageCharWidth();
         if (getName().length() * Metrics.getAverageCharWidth() > messageMaxWidth) {
-            if (Frame.contains(getX(), getY() - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), messageMaxWidth, Metrics.getMessageFontHeigth(), x, y)) {
+            if (GraphNode.contains(getX(), getY() - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), messageMaxWidth, Metrics.getMessageFontHeigth(), x, y)) {
                 return true;
             }
         } else {
-            if (Frame.contains(getX() + (messageMaxWidth - nameWidth) / 2, getY() + getHeight() / 2 - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), nameWidth, Metrics.getMessageFontHeigth(), x, y)) {
+            if (GraphNode.contains(getX() + (messageMaxWidth - nameWidth) / 2, getY() + getHeight() / 2 - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), nameWidth, Metrics.getMessageFontHeigth(), x, y)) {
                 return true;
             }
         }

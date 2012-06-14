@@ -160,7 +160,7 @@ public class TimeGraphTooltipHandler {
                     Map<String, String> eventAddOns = _utilImp.getEventHoverToolTipInfo(threadEvent);
                     if (eventAddOns != null) {
                         for (Iterator<String> iter = eventAddOns.keySet().iterator(); iter.hasNext();) {
-                            String message = (String) iter.next();
+                            String message = iter.next();
                             addItem(message, eventAddOns.get(message));
                         }
                     }
@@ -169,15 +169,13 @@ public class TimeGraphTooltipHandler {
                     long eventDuration = -1;
                     long eventEndTime = -1;
 
-                    if (threadEvent != null) {
-                        eventStartTime = threadEvent.getTime();
-                        eventDuration = threadEvent.getDuration();
-                        if (eventDuration < 0 && nextEvent != null) {
-                            eventEndTime = nextEvent.getTime();
-                            eventDuration = eventEndTime - eventStartTime;
-                        } else {
-                            eventEndTime = eventStartTime + eventDuration;
-                        }
+                    eventStartTime = threadEvent.getTime();
+                    eventDuration = threadEvent.getDuration();
+                    if (eventDuration < 0 && nextEvent != null) {
+                        eventEndTime = nextEvent.getTime();
+                        eventDuration = eventEndTime - eventStartTime;
+                    } else {
+                        eventEndTime = eventStartTime + eventDuration;
                     }
 
                     // TODO: Check if we need "format"
@@ -249,7 +247,7 @@ public class TimeGraphTooltipHandler {
         });
     }
 
-    private void setHoverLocation(Shell shell, Point position) {
+    private static void setHoverLocation(Shell shell, Point position) {
         Rectangle displayBounds = shell.getDisplay().getBounds();
         Rectangle shellBounds = shell.getBounds();
         shellBounds.x = Math.max(Math.min(position.x, displayBounds.width

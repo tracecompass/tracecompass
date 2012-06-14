@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -23,17 +23,17 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * Default implementation of the IImage interface.
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class ImageImpl implements IImage {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-   
+
     /**
      * The image reference
      */
@@ -44,7 +44,7 @@ public class ImageImpl implements IImage {
     // ------------------------------------------------------------------------
     /**
      * Default constructor.
-     * 
+     *
      * @param file A file name of image file.
      */
     public ImageImpl(String file) {
@@ -53,7 +53,7 @@ public class ImageImpl implements IImage {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param image THe image to copy
      */
     public ImageImpl(Image image) {
@@ -65,7 +65,7 @@ public class ImageImpl implements IImage {
     // ------------------------------------------------------------------------
     /**
      * Returns Image object from file name.
-     * 
+     *
      * @param name File name of image file
      * @return image object or <code>null</code>
      */
@@ -95,11 +95,11 @@ public class ImageImpl implements IImage {
 
     /**
      * Returns Image object from file name.
-     * 
+     *
      * @param name File name of image file
      * @return image object or <code>null</code>
      */
-    private Image createResourceImage(String name) {
+    private static Image createResourceImage(String name) {
         try {
             URL BASIC_URL = new URL("platform", "localhost", "plugin");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             URL url = new URL(BASIC_URL, "plugin/org.eclipse.linuxtools.tmf.ui/icons/" + name);//$NON-NLS-1$

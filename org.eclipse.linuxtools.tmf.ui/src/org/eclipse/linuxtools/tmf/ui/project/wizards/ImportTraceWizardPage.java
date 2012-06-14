@@ -291,7 +291,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         };
     }
 
-    private void populateChildren(FileSystemElement parent) {
+    private static void populateChildren(FileSystemElement parent) {
         // Do not re-populate if the job was done already...
         FileSystemStructureProvider provider = FileSystemStructureProvider.INSTANCE;
         if (parent.getFolders().size() == 0 && parent.getFiles().size() == 0) {
@@ -454,7 +454,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         return getSourceDirectory(directoryNameField.getText());
     }
 
-    private File getSourceDirectory(String path) {
+    private static File getSourceDirectory(String path) {
         File sourceDirectory = new File(getSourceDirectoryName(path));
         if (!sourceDirectory.exists() || !sourceDirectory.isDirectory()) {
             return null;
@@ -463,7 +463,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         return sourceDirectory;
     }
 
-    private String getSourceDirectoryName(String sourceName) {
+    private static String getSourceDirectoryName(String sourceName) {
         IPath result = new Path(sourceName.trim());
         if (result.getDevice() != null && result.segmentCount() == 0) {
             result = result.addTrailingSeparator();
@@ -537,7 +537,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         return results[0];
     }
 
-    private FileSystemElement createRootElement(Object fileSystemObject, IImportStructureProvider provider) {
+    private static FileSystemElement createRootElement(Object fileSystemObject,
+            IImportStructureProvider provider) {
 
         boolean isContainer = provider.isFolder(fileSystemObject);
         String elementLabel = provider.getLabel(fileSystemObject);

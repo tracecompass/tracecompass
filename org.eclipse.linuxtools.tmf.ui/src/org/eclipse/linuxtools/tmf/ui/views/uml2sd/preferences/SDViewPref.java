@@ -246,7 +246,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     @Override
     public IColor getForeGroundColor(String prefName) {
         if ((fForeColorPref.get(prefName + FORE_COLOR_POSTFIX) != null) && (fForeColorPref.get(prefName + FORE_COLOR_POSTFIX) instanceof ColorImpl)) {
-            return (IColor) fForeColorPref.get(prefName + FORE_COLOR_POSTFIX);
+            return fForeColorPref.get(prefName + FORE_COLOR_POSTFIX);
         }
         return ColorImpl.getSystemColor(SWT.COLOR_BLACK);
     }
@@ -258,7 +258,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     @Override
     public IColor getBackGroundColor(String prefName) {
         if ((fBackColorPref.get(prefName + BACK_COLOR_POSTFIX) != null) && (fBackColorPref.get(prefName + BACK_COLOR_POSTFIX) instanceof ColorImpl)) {
-            return (IColor) fBackColorPref.get(prefName + BACK_COLOR_POSTFIX);
+            return fBackColorPref.get(prefName + BACK_COLOR_POSTFIX);
         }
         return ColorImpl.getSystemColor(SWT.COLOR_WHITE);
     }
@@ -270,7 +270,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     @Override
     public IColor getFontColor(String prefName) {
         if ((fTextColorPref.get(prefName + TEXT_COLOR_POSTFIX) != null) && (fTextColorPref.get(prefName + TEXT_COLOR_POSTFIX) instanceof ColorImpl)) {
-            return (IColor) fTextColorPref.get(prefName + TEXT_COLOR_POSTFIX);
+            return fTextColorPref.get(prefName + TEXT_COLOR_POSTFIX);
         }
         return ColorImpl.getSystemColor(SWT.COLOR_BLACK);
     }
@@ -305,8 +305,8 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      */
     @Override
     public IFont getFont(String prefName) {
-        if ((fFontPref.get(prefName) != null) && (fFontPref.get(prefName) instanceof IFont)) {
-            return (IFont) fFontPref.get(prefName);
+        if (fFontPref.get(prefName) != null) {
+            return fFontPref.get(prefName);
         }
         return FontImpl.getSystemFont();
     }
@@ -375,32 +375,32 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
         for (int i = 0; i < FONT_LIST.length; i++) {
             FontData fontData = PreferenceConverter.getFontData(fPrefStore, FONT_LIST[i]);
-            if ((fFontPref.get(FONT_LIST[i]) != null) && (fFontPref.get(FONT_LIST[i]) instanceof IFont)) {
-                ((IFont) fFontPref.get(FONT_LIST[i])).dispose();
+            if (fFontPref.get(FONT_LIST[i]) != null) {
+                fFontPref.get(FONT_LIST[i]).dispose();
             }
             fFontPref.put(FONT_LIST[i], new FontImpl(display, fontData));
         }
 
         for (int i = 0; i < PREF_BACK_COLOR_LIST.length; i++) {
             RGB rgb = PreferenceConverter.getColor(fPrefStore, PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX);
-            if ((fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX) != null) && (fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX) instanceof IColor)) {
-                ((IColor) fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX)).dispose();
+            if (fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX) != null) {
+                fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX).dispose();
             }
             fBackColorPref.put(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX, new ColorImpl(display, rgb.red, rgb.green, rgb.blue));
         }
 
         for (int i = 0; i < PREF_FORE_COLOR_LIST.length; i++) {
             RGB rgb = PreferenceConverter.getColor(fPrefStore, PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX);
-            if ((fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX) != null) && (fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX) instanceof IColor)) {
-                ((IColor) fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX)).dispose();
+            if (fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX) != null) {
+                fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX).dispose();
             }
             fForeColorPref.put(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX, new ColorImpl(display, rgb.red, rgb.green, rgb.blue));
         }
 
         for (int i = 0; i < PREF_TEXT_COLOR_LIST.length; i++) {
             RGB rgb = PreferenceConverter.getColor(fPrefStore, PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX);
-            if ((fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX) != null) && (fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX) instanceof IColor)) {
-                ((IColor) fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX)).dispose();
+            if (fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX) != null) {
+                fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX).dispose();
             }
             fTextColorPref.put(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX, new ColorImpl(display, rgb.red, rgb.green, rgb.blue));
         }

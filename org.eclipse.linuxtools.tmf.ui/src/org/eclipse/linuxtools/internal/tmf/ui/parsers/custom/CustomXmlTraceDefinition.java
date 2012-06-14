@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -32,8 +32,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -63,12 +63,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     private static final String ACTION_ATTRIBUTE = Messages.CustomXmlTraceDefinition_action;
     private static final String FORMAT_ATTRIBUTE = Messages.CustomXmlTraceDefinition_format;
     private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomXmlTraceDefinition_outputColumn;
-    
+
     public InputElement rootInputElement;
 
     public CustomXmlTraceDefinition() {
         this("", null, new ArrayList<OutputColumn>(), ""); //$NON-NLS-1$ //$NON-NLS-2$
-    };
+    }
 
     public CustomXmlTraceDefinition(String logtype, InputElement rootElement, List<OutputColumn> outputs, String timeStampOutputFormat) {
         this.definitionName = logtype;
@@ -87,9 +87,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         public InputElement parentElement;
         public InputElement nextElement;
         public List<InputElement> childElements;
-        
-        public InputElement() {};
-        
+
+        public InputElement() {}
+
         public InputElement(String elementName, boolean logEntry, String inputName, int inputAction, String inputFormat, List<InputAttribute> attributes) {
             this.elementName = elementName;
             this.logEntry = logEntry;
@@ -98,7 +98,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             this.inputFormat = inputFormat;
             this.attributes = attributes;
         }
-        
+
         public void addAttribute(InputAttribute attribute) {
             if (attributes == null) {
                 attributes = new ArrayList<InputAttribute>(1);
@@ -157,9 +157,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         public String inputName;
         public int inputAction;
         public String inputFormat;
-        
-        public InputAttribute() {};
-        
+
+        public InputAttribute() {}
+
         public InputAttribute(String attributeName, String inputName, int inputAction, String inputFormat) {
             this.attributeName = attributeName;
             this.inputName = inputName;
@@ -172,13 +172,13 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     public void save() {
         save(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
     }
-    
+
 	@Override
     public void save(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            
+
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
                 @Override
@@ -200,7 +200,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 				public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
                 }});
-            
+
             Document doc = null;
             File file = new File(path);
             if (file.canRead()) {
@@ -215,7 +215,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
 
             Element root = doc.getDocumentElement();
-            
+
             NodeList nodeList = root.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -228,7 +228,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Element definitionElement = doc.createElement(DEFINITION_ELEMENT);
             root.appendChild(definitionElement);
             definitionElement.setAttribute(NAME_ATTRIBUTE, definitionName);
-            
+
             Element formatElement = doc.createElement(TIME_STAMP_OUTPUT_FORMAT_ELEMENT);
             definitionElement.appendChild(formatElement);
             formatElement.appendChild(doc.createTextNode(timeStampOutputFormat));
@@ -244,7 +244,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                     outputColumnElement.setAttribute(NAME_ATTRIBUTE, output.name);
                 }
             }
-            
+
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
@@ -253,7 +253,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
             String xmlString = result.getWriter().toString();
-            
+
             FileWriter writer = new FileWriter(file);
             writer.write(xmlString);
             writer.close();
@@ -271,11 +271,11 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
     }
-    
+
     private Element createInputElementElement(InputElement inputElement, Document doc) {
         Element inputElementElement = doc.createElement(INPUT_ELEMENT_ELEMENT);
         inputElementElement.setAttribute(NAME_ATTRIBUTE, inputElement.elementName);
-        
+
         if (inputElement.logEntry) {
             inputElementElement.setAttribute(LOG_ENTRY_ATTRIBUTE, Boolean.toString(inputElement.logEntry));
         }
@@ -304,20 +304,20 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 }
             }
         }
-        
+
         if (inputElement.childElements != null) {
             for (InputElement childInputElement : inputElement.childElements) {
                 inputElementElement.appendChild(createInputElementElement(childInputElement, doc));
             }
         }
-        
+
         return inputElementElement;
     }
-    
+
     public static CustomXmlTraceDefinition[] loadAll() {
         return loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
     }
-    
+
     public static CustomXmlTraceDefinition[] loadAll(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -431,13 +431,15 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         }
         return null;
     }
-    
+
     public static CustomXmlTraceDefinition extractDefinition(Element definitionElement) {
         CustomXmlTraceDefinition def = new CustomXmlTraceDefinition();
-        
+
         def.definitionName = definitionElement.getAttribute(NAME_ATTRIBUTE);
-        if (def.definitionName == null) return null;
-        
+        if (def.definitionName == null) {
+            return null;
+        }
+
         NodeList nodeList = definitionElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
@@ -503,7 +505,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         }
         return inputElement;
     }
-    
+
     public static void delete(String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -548,7 +550,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                     root.removeChild(node);
                 }
             }
-            
+
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
@@ -557,7 +559,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
             String xmlString = result.getWriter().toString();
-            
+
             FileWriter writer = new FileWriter(file);
             writer.write(xmlString);
             writer.close();

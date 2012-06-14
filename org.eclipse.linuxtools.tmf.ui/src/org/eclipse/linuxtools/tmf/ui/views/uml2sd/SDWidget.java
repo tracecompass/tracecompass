@@ -515,7 +515,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
         for (int i = 0; i < list.size(); i++) {
             if (!fSelectedNodeList.contains(list.get(i))) {
                 fSelectedNodeList.add(list.get(i));
-                ((GraphNode) list.get(i)).setSelected(true);
+                list.get(i).setSelected(true);
             }
         }
         StructuredSelection selection = new StructuredSelection(fSelectedNodeList);
@@ -543,8 +543,8 @@ public class SDWidget extends ScrollView implements SelectionListener,
     public void removeSelection(List<GraphNode> list) {
         fSelectedNodeList.removeAll(list);
         for (int i = 0; i < list.size(); i++) {
-            ((GraphNode) list.get(i)).setSelected(false);
-            ((GraphNode) list.get(i)).setFocused(false);
+            list.get(i).setSelected(false);
+            list.get(i).setFocused(false);
         }
         StructuredSelection selection = new StructuredSelection(fSelectedNodeList);
         fSelProvider.setSelection(selection);
@@ -555,8 +555,8 @@ public class SDWidget extends ScrollView implements SelectionListener,
      */
     public void clearSelection() {
         for (int i = 0; i < fSelectedNodeList.size(); i++) {
-            ((GraphNode) fSelectedNodeList.get(i)).setSelected(false);
-            ((GraphNode) fSelectedNodeList.get(i)).setFocused(false);
+            fSelectedNodeList.get(i).setSelected(false);
+            fSelectedNodeList.get(i).setFocused(false);
         }
         fCurrentGraphNode = null;
         fSelectedNodeList.clear();
@@ -700,7 +700,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
             fOverView = new Image(getDisplay(), rect.width, rect.height);
             GC gcim = new GC(fOverView);
             NGC context = new NGC(this, gcim);
-            context.setBackground(SDViewPref.getInstance().getBackGroundColor(SDViewPref.PREF_FRAME));
+            context.setBackground(SDViewPref.getInstance().getBackGroundColor(ISDPreferences.PREF_FRAME));
             fFrame.draw(context);
             setContentsPos(backX, backY);
             gcim.dispose();
@@ -984,16 +984,16 @@ public class SDWidget extends ScrollView implements SelectionListener,
 
         // Set the metrics to use for lifeline text and message text
         // using the Graphical Context
-        Metrics.setLifelineFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
-        Metrics.setLifelineFontWidth(context.getFontWidth(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
+        Metrics.setLifelineFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE)));
+        Metrics.setLifelineFontWidth(context.getFontWidth(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE)));
         Metrics.setLifelineWidth(SDViewPref.getInstance().getLifelineWidth());
         Metrics.setFrameFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_FRAME_NAME)));
         Metrics.setLifelineHeaderFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE_HEADER)));
 
-        int syncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS));
-        int syncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS_RET));
-        int asyncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_ASYNC_MESS));
-        int asyncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_ASYNC_MESS_RET));
+        int syncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_SYNC_MESS));
+        int syncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_SYNC_MESS_RET));
+        int asyncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_ASYNC_MESS));
+        int asyncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_ASYNC_MESS_RET));
 
         int messageFontHeight = 0;
         if (syncMessFontH > syncMessRetFontH) {
@@ -1008,7 +1008,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
             messageFontHeight = asyncMessRetFontH;
         }
         Metrics.setMessageFontHeight(messageFontHeight);
-        context.setFont(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE));
+        context.setFont(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE));
 
         int width = Math.round((fFrame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * fZoomValue);
         int height = Math.round((fFrame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * fZoomValue);
@@ -1144,7 +1144,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
         fFrame.draw(context);
 
         fZoomValue = pageNumFontZoom;
-        context.setFont(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE));
+        context.setFont(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE));
         String currentPageNum = String.valueOf(pageNum);
         int ii = context.textExtent(currentPageNum);
         int jj = context.getCurrentFontHeight();
@@ -1178,9 +1178,8 @@ public class SDWidget extends ScrollView implements SelectionListener,
             for (int i = 0; i < child.length; i++) {
                 if (child[i].isFocusControl()) {
                     return true;
-                } else {
-                    checkFocusOnChilds(child[i]);
                 }
+                checkFocusOnChilds(child[i]);
             }
         }
         return false;
@@ -1312,16 +1311,16 @@ public class SDWidget extends ScrollView implements SelectionListener,
 
         // Set the metrics to use for lifeline text and message text
         // using the Graphical Context
-        Metrics.setLifelineFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
-        Metrics.setLifelineFontWidth(context.getFontWidth(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
+        Metrics.setLifelineFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE)));
+        Metrics.setLifelineFontWidth(context.getFontWidth(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE)));
         Metrics.setLifelineWidth(SDViewPref.getInstance().getLifelineWidth());
         Metrics.setFrameFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_FRAME_NAME)));
         Metrics.setLifelineHeaderFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE_HEADER)));
 
-        int syncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS));
-        int syncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS_RET));
-        int asyncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_ASYNC_MESS));
-        int asyncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_ASYNC_MESS_RET));
+        int syncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_SYNC_MESS));
+        int syncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_SYNC_MESS_RET));
+        int asyncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_ASYNC_MESS));
+        int asyncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_ASYNC_MESS_RET));
 
         int messageFontHeight = 0;
         if (syncMessFontH > syncMessRetFontH) {
@@ -1336,7 +1335,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
             messageFontHeight = asyncMessRetFontH;
         }
         Metrics.setMessageFontHeight(messageFontHeight);
-        context.setFont(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE));
+        context.setFont(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE));
 
         int width = (int) ((fFrame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * fZoomValue);
         int height = (int) ((fFrame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * fZoomValue);
@@ -1352,7 +1351,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
 
         fFrame.draw(context);
         if (fDragAndDrop != null) {
-            Lifeline node = (Lifeline) fDragAndDrop;
+            Lifeline node = fDragAndDrop;
             boolean isSelected = fDragAndDrop.isSelected();
             boolean hasFocus = fDragAndDrop.hasFocus();
             node.setSelected(false);
@@ -1505,9 +1504,8 @@ public class SDWidget extends ScrollView implements SelectionListener,
         for (int i = 0; i < child.length; i++) {
             if (child[i].isFocusControl()) {
                 return true;
-            } else {
-                checkFocusOnChilds(child[i]);
             }
+            checkFocusOnChilds(child[i]);
         }
         return false;
     }
@@ -1718,20 +1716,20 @@ public class SDWidget extends ScrollView implements SelectionListener,
                 int rx = Math.round(node.getX() * fZoomValue);
                 if (rx <= event.x && Math.round(rx + (node.getWidth() * fZoomValue)) >= event.x) {
                     if ((fCollapseProvider != null) && (fDragAndDrop != node)) {
-                        fCollapseProvider.collapseTwoLifelines((Lifeline) fDragAndDrop, node);
+                        fCollapseProvider.collapseTwoLifelines(fDragAndDrop, node);
                     }
                 } else if (rx < event.x) {
-                    fFrame.insertLifelineAfter((Lifeline) fDragAndDrop, node);
+                    fFrame.insertLifelineAfter(fDragAndDrop, node);
                     if (node.getIndex() < fFrame.lifeLinesCount()) {
-                        Lifeline temp[] = { (Lifeline) fDragAndDrop, fFrame.getLifeline(node.getIndex()) };
+                        Lifeline temp[] = { fDragAndDrop, fFrame.getLifeline(node.getIndex()) };
                         fReorderList.add(temp);
                     } else {
-                        Lifeline temp[] = { (Lifeline) fDragAndDrop, null };
+                        Lifeline temp[] = { fDragAndDrop, null };
                         fReorderList.add(temp);
                     }
                 } else {
-                    fFrame.insertLifelineBefore((Lifeline) fDragAndDrop, node);
-                    Lifeline temp[] = { (Lifeline) fDragAndDrop, node };
+                    fFrame.insertLifelineBefore(fDragAndDrop, node);
+                    Lifeline temp[] = { fDragAndDrop, node };
                     fReorderList.add(temp);
                 }
             }
@@ -1883,10 +1881,9 @@ public class SDWidget extends ScrollView implements SelectionListener,
             gc.fillRectangle(0, 0, getVisibleWidth(), getVisibleHeight());
             gc.dispose();
             return;
-        } else {
-//            Frame.setUserPref(SDViewPref.getInstance());
-            SDViewPref.getInstance();
         }
+        // Frame.setUserPref(SDViewPref.getInstance());
+        SDViewPref.getInstance();
 
         Rectangle area = getClientArea();
         Image dbuffer = getDrawBuffer();
@@ -2012,7 +2009,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
             fOverView = new Image(getDisplay(), r.width, r.height);
             GC gcim = new GC(fOverView);
             NGC context = new NGC(this, gcim);
-            context.setBackground(SDViewPref.getInstance().getBackGroundColor(SDViewPref.PREF_FRAME));
+            context.setBackground(SDViewPref.getInstance().getBackGroundColor(ISDPreferences.PREF_FRAME));
             fFrame.draw(context);
             setContentsPos(backX, backY);
             gcim.dispose();

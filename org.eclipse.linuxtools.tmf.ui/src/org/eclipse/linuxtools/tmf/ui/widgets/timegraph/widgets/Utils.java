@@ -422,9 +422,8 @@ public class Utils {
         Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator();
         if (iterator != null && iterator.hasNext()) {
             return iterator.next();
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -450,7 +449,7 @@ public class Utils {
         ITimeEvent prevEvent = null;
 
         while (iterator.hasNext()) {
-            nextEvent = (ITimeEvent) iterator.next();
+            nextEvent = iterator.next();
             long nextStartTime = nextEvent.getTime();
 
             if (nextStartTime > time) {
@@ -466,15 +465,13 @@ public class Utils {
         if (n == -1) { //previous
             if (currEvent != null && currEvent.getTime() + currEvent.getDuration() >= time) {
                 return prevEvent;
-            } else {
-                return currEvent;
             }
+            return currEvent;
         } else if (n == 0) { //current
             if (currEvent != null && currEvent.getTime() + currEvent.getDuration() >= time) {
                 return currEvent;
-            } else {
-                return null;
             }
+            return null;
         } else if (n == 1) { //next
             return nextEvent;
         } else if (n == 2) { //current or previous when in empty space
@@ -540,7 +537,6 @@ public class Utils {
      *            expects.
      * @return The mangled string of types
      */
-    @SuppressWarnings("nls")
     static public String getTypeSignature(String type) {
         int dim = 0;
         for (int j = 0; j < type.length(); j++) {
@@ -557,27 +553,27 @@ public class Utils {
          {
             sig.append("[");                 //$NON-NLS-1$
         }
-        if (type.equals("boolean")) {
-            sig.append("Z");                 //$NON-NLS-1$
-        } else if (type.equals("byte")) {
-            sig.append("B");                 //$NON-NLS-1$
-        } else if (type.equals("char")) {
-            sig.append("C");                 //$NON-NLS-1$
-        } else if (type.equals("short")) {
-            sig.append("S");                 //$NON-NLS-1$
-        } else if (type.equals("int")) {
-            sig.append("I");                 //$NON-NLS-1$
-        } else if (type.equals("long")) {
-            sig.append("J");                 //$NON-NLS-1$
-        } else if (type.equals("float")) {
-            sig.append("F");                 //$NON-NLS-1$
-        } else if (type.equals("double")) {
-            sig.append("D");                 //$NON-NLS-1$
-        } else if (type.equals("void")) {
-            sig.append("V");                 //$NON-NLS-1$
+        if (type.equals("boolean")) { //$NON-NLS-1$
+            sig.append('Z');
+        } else if (type.equals("byte")) { //$NON-NLS-1$
+            sig.append('B');
+        } else if (type.equals("char")) { //$NON-NLS-1$
+            sig.append('C');
+        } else if (type.equals("short")) { //$NON-NLS-1$
+            sig.append('S');
+        } else if (type.equals("int")) { //$NON-NLS-1$
+            sig.append('I');
+        } else if (type.equals("long")) { //$NON-NLS-1$
+            sig.append('J');
+        } else if (type.equals("float")) { //$NON-NLS-1$
+            sig.append('F');
+        } else if (type.equals("double")) { //$NON-NLS-1$
+            sig.append('D');
+        } else if (type.equals("void")) { //$NON-NLS-1$
+            sig.append('V');
         }
         else {
-            sig.append("L").append(type.replace('.', '/')).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+            sig.append('L').append(type.replace('.', '/')).append(';');
         }
         return sig.toString();
     }

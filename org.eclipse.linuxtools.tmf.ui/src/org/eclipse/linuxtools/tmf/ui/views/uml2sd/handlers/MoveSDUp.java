@@ -61,7 +61,7 @@ public class MoveSDUp extends Action {
         super();
         setId(ID);
         setActionDefinitionId(ID);
-        fView = ((SDView) view);
+        fView = view;
     }
 
     // ------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public class MoveSDUp extends Action {
         if (fView == null) {
             return;
         }
-        SDWidget viewer = ((SDView) fView).getSDWidget();
+        SDWidget viewer = fView.getSDWidget();
 
         if (viewer != null) {
             viewer.scrollBy(0, -viewer.getVisibleHeight());
