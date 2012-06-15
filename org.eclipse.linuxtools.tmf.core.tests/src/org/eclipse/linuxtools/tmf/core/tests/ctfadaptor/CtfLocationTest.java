@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Matthew Khouzam - Initial generation with CodePro tools
+ *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
 import static org.junit.Assert.assertEquals;
@@ -11,75 +24,86 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * The class <code>CtfLocationTest</code> contains tests for the class <code>{@link CtfLocation}</code>.
+ * The class <code>CtfLocationTest</code> contains tests for the class
+ * <code>{@link CtfLocation}</code>.
  *
- * @generatedBy CodePro at 03/05/12 2:29 PM
  * @author ematkho
- * @version $Revision: 1.0 $
+ * @version 1.0
  */
 public class CtfLocationTest {
+
+    private CtfLocation fixture;
+
+    /**
+     * Launch the test.
+     *
+     * @param args
+     *            the command line arguments
+     */
+    public static void main(String[] args) {
+        new org.junit.runner.JUnitCore().run(CtfLocationTest.class);
+    }
+
+    /**
+     * Perform pre-test initialization.
+     */
+    @Before
+    public void setUp() {
+        fixture = new CtfLocation(Long.valueOf(1));
+        fixture.setLocation(Long.valueOf(1));
+    }
+
+    /**
+     * Perform post-test clean-up.
+     */
+    @After
+    public void tearDown() {
+        // Add additional tear down code here
+    }
+
+
     /**
      * Run the CtfLocation(Long) constructor test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testCtfLocation_1() {
+    public void testCtfLocation_long() {
         Long location = Long.valueOf(1);
-
         CtfLocation result = new CtfLocation(location);
 
-        // add additional test code here
         assertNotNull(result);
         assertEquals(Long.valueOf(1), result.getLocation());
     }
 
     /**
      * Run the CtfLocation(ITmfTimestamp) constructor test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testCtfLocation_2() {
+    public void testCtfLocation_timestamp() {
         ITmfTimestamp timestamp = new TmfTimestamp();
-
         CtfLocation result = new CtfLocation(timestamp);
 
-        // add additional test code here
         assertNotNull(result);
         assertEquals(new Long(0L), result.getLocation());
     }
 
     /**
      * Run the CtfLocation clone() method test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testClone_1() {
-        CtfLocation fixture = new CtfLocation(Long.valueOf(1));
-        fixture.setLocation(Long.valueOf(1));
-
+    public void testClone() {
         CtfLocation result = fixture.clone();
 
-        // add additional test code here
         assertNotNull(result);
         assertEquals(Long.valueOf(1), result.getLocation());
     }
 
     /**
      * Run the Long getLocation() method test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testGetLocation_1() {
-        CtfLocation fixture = new CtfLocation(Long.valueOf(1));
-        fixture.setLocation(Long.valueOf(1));
-
+    public void testGetLocation() {
         Long result = fixture.getLocation();
 
-        // add additional test code here
         assertNotNull(result);
         assertEquals("1", result.toString()); //$NON-NLS-1$
         assertEquals((byte) 1, result.byteValue());
@@ -92,60 +116,28 @@ public class CtfLocationTest {
 
     /**
      * Run the void setLocation(Long) method test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testSetLocation_1() {
-        CtfLocation fixture = new CtfLocation(Long.valueOf(1));
-        fixture.setLocation(Long.valueOf(1));
+    public void testSetLocation() {
         Long location = Long.valueOf(1);
-
         fixture.setLocation(location);
-
-        // add additional test code here
     }
 
+    /**
+     * Test the toString() method with a valid location.
+     */
     @Test
-    public void testToString1(){
-        CtfLocation fixture = new CtfLocation(new Long(1337L));
-        assertEquals("CtfLocation: 1337",fixture.toString()); //$NON-NLS-1$
+    public void testToString_valid(){
+        CtfLocation fixture2 = new CtfLocation(new Long(1337L));
+        assertEquals("CtfLocation: 1337",fixture2.toString()); //$NON-NLS-1$
     }
 
+    /**
+     * Test the toString() method with an invalid location.
+     */
     @Test
-    public void testToString2(){
-        CtfLocation fixture = new CtfLocation(new Long(-1L));
-        assertEquals("CtfLocation: INVALID",fixture.toString()); //$NON-NLS-1$
-    }
-
-    /**
-     * Perform pre-test initialization.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Before
-    public void setUp() {
-        // add additional set up code here
-    }
-
-    /**
-     * Perform post-test clean-up.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
-    }
-
-    /**
-     * Launch the test.
-     *
-     * @param args the command line arguments
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfLocationTest.class);
+    public void testToString_invalid(){
+        CtfLocation fixture2 = new CtfLocation(new Long(-1L));
+        assertEquals("CtfLocation: INVALID",fixture2.toString()); //$NON-NLS-1$
     }
 }

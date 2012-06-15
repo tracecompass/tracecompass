@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Matthew Khouzam - Initial generation with CodePro tools
+ *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
 import org.junit.runner.JUnitCore;
@@ -9,29 +22,27 @@ import org.junit.runners.Suite;
  * of the tests within its package as well as within any subpackages of its
  * package.
  *
- * @generatedBy CodePro at 03/05/12 2:29 PM
  * @author ematkho
- * @version $Revision: 1.0 $
+ * @version 1.0
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    CtfTmfContentTest.class,
-    CtfTmfTimestampTest.class,
-    CtfTmfEventFieldTest.class,
-    CtfTmfEventTypeTest.class,
     CtfIteratorTest.class,
     CtfLocationTest.class,
-    CtfTmfTraceTest.class,
+    CtfTmfContentTest.class,
+    CtfTmfEventFieldTest.class,
     CtfTmfEventTest.class,
+    CtfTmfEventTypeTest.class,
+    CtfTmfTimestampTest.class,
+    CtfTmfTraceTest.class
 })
 public class TestAll {
 
     /**
      * Launch the test.
      *
-     * @param args the command line arguments
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
+     * @param args
+     *            the command line arguments
      */
     public static void main(String[] args) {
         JUnitCore.runClasses(new Class[] { TestAll.class });

@@ -1,7 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Matthew Khouzam - Initial generation with CodePro tools
+ *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
@@ -12,29 +27,53 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * The class <code>CtfTmfTimestampTest</code> contains tests for the class <code>{@link CtfTmfTimestamp}</code>.
+ * The class <code>CtfTmfTimestampTest</code> contains tests for the class
+ * <code>{@link CtfTmfTimestamp}</code>.
  *
- * @generatedBy CodePro at 03/05/12 2:29 PM
  * @author ematkho
- * @version $Revision: 1.0 $
+ * @version 1.0
  */
 public class CtfTmfTimestampTest {
+
+    private CtfTmfTimestamp fixture;
+
+    /**
+     * Launch the test.
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        new org.junit.runner.JUnitCore().run(CtfTmfTimestampTest.class);
+    }
+
+    /**
+     * Perform pre-test initialization.
+     */
+    @Before
+    public void setUp() {
+        fixture = new CtfTmfTimestamp(1L);
+        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
+    }
+
+    /**
+     * Perform post-test clean-up.
+     */
+    @After
+    public void tearDown() {
+        // Add additional tear down code here
+    }
+
+
     /**
      * Run the CtfTmfTimestamp(long) constructor test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testCtfTmfTimestamp()
-        throws Exception {
+    public void testCtfTmfTimestamp() {
         long timestamp = 1L;
 
         CtfTmfTimestamp result = new CtfTmfTimestamp(timestamp);
         result.setType(TimestampType.NANOS);
 
-        // add additional test code here
         assertNotNull(result);
         assertEquals("1 ns", result.toString()); //$NON-NLS-1$
         assertEquals(0, result.getPrecision());
@@ -44,148 +83,36 @@ public class CtfTmfTimestampTest {
 
 
     /**
-     * Run the boolean equals(Object) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
+     * Run the boolean equals(Object) method test with another identical object.
      */
     @Test
-    public void testEquals_1()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
+    public void testEquals_same() {
         CtfTmfTimestamp obj = new CtfTmfTimestamp(1L);
         obj.setType(CtfTmfTimestamp.TimestampType.DAY);
 
         boolean result = fixture.equals(obj);
-
-        // add additional test code here
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     /**
-     * Run the boolean equals(Object) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
+     * Run the boolean equals(Object) method test, with an empty object.
      */
     @Test
-    public void testEquals_2()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
+    public void testEquals_empty() {
         Object obj = new Object();
 
         boolean result = fixture.equals(obj);
-
-        // add additional test code here
-        assertEquals(false, result);
-    }
-
-    /**
-     * Run the boolean equals(Object) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testEquals_3()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
-        Object obj = new Object();
-
-        boolean result = fixture.equals(obj);
-
-        // add additional test code here
-        assertEquals(false, result);
-    }
-
-    /**
-     * Run the boolean equals(Object) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testEquals_4()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
-        CtfTmfTimestamp obj = new CtfTmfTimestamp(1L);
-        obj.setType(CtfTmfTimestamp.TimestampType.DAY);
-
-        boolean result = fixture.equals(obj);
-
-        // add additional test code here
-        assertEquals(true, result);
-    }
-
-    /**
-     * Run the boolean equals(Object) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testEquals_5()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
-        CtfTmfTimestamp obj = new CtfTmfTimestamp(1L);
-        obj.setType(CtfTmfTimestamp.TimestampType.DAY);
-
-        boolean result = fixture.equals(obj);
-
-        // add additional test code here
-        assertEquals(true, result);
+        assertFalse(result);
     }
 
     /**
      * Run the ITmfTimestamp getDelta(ITmfTimestamp) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testGetDelta_1()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
+    public void testGetDelta() {
         ITmfTimestamp ts = new TmfTimestamp();
-
         ITmfTimestamp result = fixture.getDelta(ts);
 
-        // add additional test code here
-        assertNotNull(result);
-        assertEquals(0, result.getPrecision());
-        assertEquals(-9, result.getScale());
-        assertEquals(1L, result.getValue());
-    }
-
-    /**
-     * Run the ITmfTimestamp getDelta(ITmfTimestamp) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testGetDelta_2()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
-        ITmfTimestamp ts = new TmfTimestamp();
-
-        ITmfTimestamp result = fixture.getDelta(ts);
-
-        // add additional test code here
         assertNotNull(result);
         assertEquals(0, result.getPrecision());
         assertEquals(-9, result.getScale());
@@ -194,20 +121,11 @@ public class CtfTmfTimestampTest {
 
     /**
      * Run the CtfTmfTimestamp.TimestampType getType() method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testGetType_1()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
-
+    public void testGetType() {
         CtfTmfTimestamp.TimestampType result = fixture.getType();
 
-        // add additional test code here
         assertNotNull(result);
         assertEquals("DAY", result.name()); //$NON-NLS-1$
         assertEquals("DAY", result.toString()); //$NON-NLS-1$
@@ -216,173 +134,68 @@ public class CtfTmfTimestampTest {
 
     /**
      * Run the int hashCode() method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testHashCode_1()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
-
+    public void testHashCode() {
         int result = fixture.hashCode();
-
-        // add additional test code here
         assertEquals(1012115, result);
     }
 
     /**
      * Run the int hashCode() method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testHashCode_2()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
+    public void testHashCode_nullType() {
         fixture.setType(null);
-
         int result = fixture.hashCode();
-
-        // add additional test code here
         assertEquals(944663, result);
     }
 
     /**
      * Run the void setType(TimestampType) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testSetType_1()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
+    public void testSetType() {
         CtfTmfTimestamp.TimestampType value = CtfTmfTimestamp.TimestampType.DAY;
-
         fixture.setType(value);
-
-        // add additional test code here
     }
 
     /**
      * Run the String toString() method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testToString_1()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
+    public void testToString_ns() {
         fixture.setType(CtfTmfTimestamp.TimestampType.NANOS);
-
         String result = fixture.toString();
-
-        // add additional test code here
         assertEquals("1 ns", result); //$NON-NLS-1$
     }
 
     /**
      * Run the String toString() method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testToString_2()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
+    public void testToString_s() {
         fixture.setType(CtfTmfTimestamp.TimestampType.SECONDS);
-
         String result = fixture.toString();
-
-        // add additional test code here
         assertEquals("1.0E-9 s", result); //$NON-NLS-1$
     }
 
     /**
      * Run the String toString() method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testToString_3()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
-        fixture.setType(CtfTmfTimestamp.TimestampType.DAY);
-
+    public void testToString_day() {
         String result = fixture.toString();
-
-        // add additional test code here
         assertEquals("19:00:00.000000001", result); //$NON-NLS-1$
     }
 
     /**
      * Run the String toString() method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Test
-    public void testToString_4()
-        throws Exception {
-        CtfTmfTimestamp fixture = new CtfTmfTimestamp(1L);
+    public void testToString_full() {
         fixture.setType(CtfTmfTimestamp.TimestampType.FULL_DATE);
-
         String result = fixture.toString();
-
-        // add additional test code here
         assertEquals("1969-12-31 19:00:00.000000001", result); //$NON-NLS-1$
-    }
-
-    /**
-     * Perform pre-test initialization.
-     *
-     * @throws Exception
-     *         if the initialization fails for some reason
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Before
-    public void setUp()
-        throws Exception {
-        // add additional set up code here
-    }
-
-    /**
-     * Perform post-test clean-up.
-     *
-     * @throws Exception
-     *         if the clean-up fails for some reason
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @After
-    public void tearDown()
-        throws Exception {
-        // Add additional tear down code here
-    }
-
-    /**
-     * Launch the test.
-     *
-     * @param args the command line arguments
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfTmfTimestampTest.class);
     }
 }

@@ -7,14 +7,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   William Bourque (wbourque@gmail.com) - Initial API and implementation
+ *   William Bourque <wbourque@gmail.com> - Initial API and implementation
+ *   Matthew Khouzam - Update to CtfTmf trace and events
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -22,63 +23,61 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
-@SuppressWarnings("nls")
+/**
+ * Benchmark the event request subsystem of TMF.
+ */
 public class RequestBenchmark extends TmfEventRequest<CtfTmfEvent> {
 
     @SuppressWarnings("unchecked")
-    public RequestBenchmark(final Class<? extends ITmfEvent> dataType,
+    private RequestBenchmark(final Class<? extends ITmfEvent> dataType,
             final TmfTimeRange range, final int nbRequested) {
         super((Class<CtfTmfEvent>) dataType, range, nbRequested, 1);
     }
 
     // Path of the trace
-    public static final String TRACE_PATH = "../org.eclipse.linuxtools.ctf.core.tests/traces/kernel";
+    private static final String TRACE_PATH = "../org.eclipse.linuxtools.ctf.core.tests/traces/kernel"; //$NON-NLS-1$
 
-    // *** Change this to run several time over the same trace
-    public static final int NB_OF_PASS = 100;
-
-    // *** Change this to true to parse all the events in the trace
-    // Otherwise, events are just read
-    public final boolean PARSE_EVENTS = true;
+    // Change this to run several time over the same trace
+    private static final int NB_OF_PASS = 100;
 
     // Work variables
-    static int nbEvent = 0;
-    static int nbPassDone = 0;
-    static TmfExperiment<CtfTmfEvent> fExperiment = null;
-    static Vector<Double> benchs = new Vector<Double>();
+    private static int nbEvent = 0;
+    private static TmfExperiment<CtfTmfEvent> fExperiment = null;
+    private static Vector<Double> benchs = new Vector<Double>();
 
+    /**
+     * Run the benchmark
+     *
+     * @param args
+     *            The command-line arguments
+     */
     public static void main(final String[] args) {
 
         try {
-            // OUr experiment will contains ONE trace
+            /* Our experiment will contains ONE trace */
             @SuppressWarnings("unchecked")
-            final
-            ITmfTrace<CtfTmfEvent>[] traces = new ITmfTrace[1];
+            final ITmfTrace<CtfTmfEvent>[] traces = new ITmfTrace[1];
             traces[0] = new CtfTmfTrace();
             traces[0].initTrace(null, TRACE_PATH, CtfTmfEvent.class);
-            // Create our new experiment
-            fExperiment = new TmfExperiment<CtfTmfEvent>(CtfTmfEvent.class, "Headless", traces);
+            /* Create our new experiment */
+            fExperiment = new TmfExperiment<CtfTmfEvent>(CtfTmfEvent.class, "Headless", traces); //$NON-NLS-1$
 
-            // Create a new time range from -infinity to +infinity
-            // That way, we will get "everything" in the trace
-            final CtfTmfTimestamp ts1 = new CtfTmfTimestamp(Long.MIN_VALUE);
-            final CtfTmfTimestamp ts2 = new CtfTmfTimestamp(Long.MAX_VALUE);
-            final TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
-
-            // We will issue a request for each "pass".
-            // TMF will then process them synchonously
+            /*
+             * We will issue a request for each "pass". TMF will then process
+             * them synchronously.
+             */
             RequestBenchmark request = null;
             for (int x = 0; x < NB_OF_PASS; x++) {
-                request = new RequestBenchmark(CtfTmfEvent.class, tmpRange,
-                        Integer.MAX_VALUE);
+                request = new RequestBenchmark(CtfTmfEvent.class,
+                        TmfTimeRange.ETERNITY, Integer.MAX_VALUE);
                 fExperiment.sendRequest(request);
-                nbPassDone++;
             }
             prev = System.nanoTime();
         } catch (final NullPointerException e) {
-            // Silently dismiss Null pointer exception
-            // The only way to "finish" the threads in TMF is by crashing them
-            // with null
+            /*
+             * Silently dismiss Null pointer exception The only way to "finish"
+             * the threads in TMF is by crashing them with null.
+             */
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -106,10 +105,10 @@ public class RequestBenchmark extends TmfEventRequest<CtfTmfEvent> {
         benchs.add(val);
         if (benchs.size() == NB_OF_PASS) {
             try {
-                System.out.println("Nb events : " + nbEvent2);
+                System.out.println("Nb events : " + nbEvent2); //$NON-NLS-1$
 
                 for (final double value : benchs) {
-                    System.out.print(value + ", ");
+                    System.out.print(value + ", "); //$NON-NLS-1$
                 }
                 fExperiment.sendRequest(null);
 

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Matthew Khouzam - Initial generation with CodePro tools
+ *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
 import static org.junit.Assert.assertEquals;
@@ -25,9 +38,8 @@ import org.junit.Test;
  * The class <code>CtfTmfEventFieldTest</code> contains tests for the class
  * <code>{@link CtfTmfEventField}</code>.
  *
- * @generatedBy CodePro at 03/05/12 2:29 PM
  * @author ematkho
- * @version $Revision: 1.0 $
+ * @version 1.0
  */
 public class CtfTmfEventFieldTest {
 
@@ -40,94 +52,23 @@ public class CtfTmfEventFieldTest {
     private static final String INT = "int"; //$NON-NLS-1$
     private static final String NAME = "test"; //$NON-NLS-1$
 
-    /**
-     * Run the CtfTmfEventField parseField(Definition,String) method test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testParseField_1() {
-        FloatDefinition fieldDef = (FloatDefinition) fixture
-                .lookupDefinition(FLOAT);
-        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, "_"+NAME); //$NON-NLS-1$
-        String result2 =CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test=9.551467814359616E-38"); //$NON-NLS-1$
-    }
+    private StructDefinition fixture;
 
     /**
-     * Run the CtfTmfEventField parseField(Definition,String) method test.
+     * Launch the test.
      *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
+     * @param args
+     *            the command line arguments
      */
-    @Test
-    public void testParseField_2() {
-        CtfTmfEventField result = CtfTmfEventField.parseField(
-                fixture.lookupArray(ARRAY), NAME);
-        String result2 =CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test={ 2, 2}"); //$NON-NLS-1$
+    public static void main(String[] args) {
+        new org.junit.runner.JUnitCore().run(CtfTmfEventFieldTest.class);
     }
-
-    /**
-     * Run the CtfTmfEventField parseField(Definition,String) method test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testParseField_3() {
-        Definition fieldDef = fixture.lookupDefinition(INT);
-        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        String result2 =CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test=2"); //$NON-NLS-1$
-    }
-
-    /**
-     * Run the CtfTmfEventField parseField(Definition,String) method test.
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testParseField_4() {
-        Definition fieldDef = fixture.lookupDefinition(SEQ);
-        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        String result2 =CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test={ 2, 2}"); //$NON-NLS-1$
-    }
-
-    /**
-     * Run the CtfTmfEventField parseField(Definition,String) method test.
-     *
-     * @throws Exception
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
-     */
-    @Test
-    public void testParseField_5() {
-        Definition fieldDef = fixture.lookupDefinition(STR);
-        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        String result2 =CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test="); //$NON-NLS-1$
-    }
-
-    @Test
-    public void testClone() {
-        Definition fieldDef = fixture.lookupDefinition(STR);
-        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        assertNotNull(result.clone());
-    }
-
-
-    StructDefinition fixture;
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws Exception
-     *             if the initialization fails for some reason
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         StructDeclaration sDec = new StructDeclaration(1l);
         StringDeclaration strDec = new StringDeclaration();
         IntegerDeclaration intDec = new IntegerDeclaration(8, false, 8,
@@ -156,26 +97,75 @@ public class CtfTmfEventFieldTest {
 
     /**
      * Perform post-test clean-up.
-     *
-     * @throws Exception
-     *             if the clean-up fails for some reason
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
      */
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         // Add additional tear down code here
     }
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     *
-     * @generatedBy CodePro at 03/05/12 2:29 PM
+     * Run the CtfTmfEventField parseField(Definition,String) method test.
      */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfTmfEventFieldTest.class);
+    @Test
+    public void testParseField_float() {
+        FloatDefinition fieldDef;
+        fieldDef = (FloatDefinition) fixture.lookupDefinition(FLOAT);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, "_"+NAME); //$NON-NLS-1$
+        String result2 = CtfTmfEventField.copyFrom(result).toString();
+        assertEquals( result2, "test=9.551467814359616E-38"); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test.
+     */
+    @Test
+    public void testParseField_array() {
+        CtfTmfEventField result;
+        result = CtfTmfEventField.parseField(fixture.lookupArray(ARRAY), NAME);
+        String result2 = CtfTmfEventField.copyFrom(result).toString();
+        assertEquals( result2, "test={ 2, 2}"); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test.
+     */
+    @Test
+    public void testParseField_int() {
+        Definition fieldDef = fixture.lookupDefinition(INT);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        String result2 =CtfTmfEventField.copyFrom(result).toString();
+        assertEquals( result2, "test=2"); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test.
+     */
+    @Test
+    public void testParseField_sequence() {
+        Definition fieldDef = fixture.lookupDefinition(SEQ);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        String result2 =CtfTmfEventField.copyFrom(result).toString();
+        assertEquals( result2, "test={ 2, 2}"); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test.
+     */
+    @Test
+    public void testParseField_string() {
+        Definition fieldDef = fixture.lookupDefinition(STR);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        String result2 =CtfTmfEventField.copyFrom(result).toString();
+        assertEquals( result2, "test="); //$NON-NLS-1$
+    }
+
+    /**
+     * Test the clone() method.
+     */
+    @Test
+    public void testClone() {
+        Definition fieldDef = fixture.lookupDefinition(STR);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        assertNotNull(result.clone());
     }
 }

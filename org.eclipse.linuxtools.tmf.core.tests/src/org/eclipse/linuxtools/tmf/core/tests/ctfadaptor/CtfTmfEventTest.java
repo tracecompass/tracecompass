@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Matthew Khouzam - Initial generation with CodePro tools
+ *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -15,8 +28,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * The class <code>CTFEventTest</code> contains tests for the class
- * <code>{@link CTFEvent}</code>.
+ * The class <code>CtfTmfEventTest</code> contains tests for the class
+ * <code>{@link CtfTmfEvent}</code>.
  *
  * @author ematkho
  * @version $Revision: 1.0 $
@@ -38,7 +51,8 @@ public class CtfTmfEventTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws FileNotFoundException
+     * @throws TmfTraceException
+     *             If the test trace is not found
      */
     @Before
     public void setUp() throws TmfTraceException {
@@ -140,6 +154,9 @@ public class CtfTmfEventTest {
         assertEquals(-1L, result);
     }
 
+    /**
+     * Test the clone method
+     */
     @Test
     public void testClone() {
         CtfTmfEvent other = CtfTmfEvent.getNullEvent().clone();
@@ -174,8 +191,11 @@ public class CtfTmfEventTest {
         assertEquals(-1L, result);
     }
 
+    /**
+     * Test the getters for the channel name, reference, source and type.
+     */
     @Test
-    public void testRankTraceRefSourceType() {
+    public void testGetters() {
         long rank = fixture.getRank();
         CtfTmfTrace trace = fixture.getTrace();
         String channelName = fixture.getChannelName();
@@ -190,6 +210,9 @@ public class CtfTmfEventTest {
         assertEquals(type.toString(), "lttng_statedump_vm_map"); //$NON-NLS-1$
     }
 
+    /**
+     * Test the toString() method
+     */
     @Test
     public void testToString() {
         String s = fixture.getContent().toString();

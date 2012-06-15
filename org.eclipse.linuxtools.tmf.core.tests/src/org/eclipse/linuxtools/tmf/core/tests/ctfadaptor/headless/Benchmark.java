@@ -9,6 +9,7 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
 import java.util.Vector;
@@ -18,14 +19,20 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 
+/**
+ * Test and benchmark reading a CTF LTTng kernel trace.
+ *
+ * @author Matthew Khouzam
+ */
 public class Benchmark {
 
     /**
-     * @param args
+     * Run the benchmark.
+     *
+     * @param args The command-line arguments
      */
-    @SuppressWarnings("nls")
     public static void main(final String[] args) {
-        final String TRACE_PATH = "testfiles/kernel";
+        final String TRACE_PATH = "testfiles/kernel"; //$NON-NLS-1$
         final int NUM_LOOPS = 100;
 
         // Change this to enable text output
@@ -61,9 +68,9 @@ public class Benchmark {
                     nbEvent++;
                     if (USE_TEXT) {
 
-                        System.out.println("Event " + traceReader.getRank() + " Time "
-                                + current.getTimestamp().toString() + " type " + current.getEventName()
-                                + " on CPU " + current.getSource() + " " + current.getContent().toString()) ;
+                        System.out.println("Event " + traceReader.getRank() + " Time " //$NON-NLS-1$ //$NON-NLS-2$
+                                + current.getTimestamp().toString() + " type " + current.getEventName() //$NON-NLS-1$
+                                + " on CPU " + current.getSource() + " " + current.getContent().toString()) ; //$NON-NLS-1$ //$NON-NLS-2$
                     }
                     traceReader.advance();
                     current = traceReader.getCurrentEvent();
@@ -74,16 +81,16 @@ public class Benchmark {
             final double time = (stop - start) / (double) nbEvent;
             benchs.add(time);
         }
-        System.out.println("");
+        System.out.println(""); //$NON-NLS-1$
         double avg = 0;
         for (final Double val : benchs) {
             avg += val;
         }
         avg /= benchs.size();
-        System.out.println("Time to read = " + avg + " events/ns");
+        System.out.println("Time to read = " + avg + " events/ns"); //$NON-NLS-1$ //$NON-NLS-2$
         for (final Double val : benchs) {
             System.out.print(val);
-            System.out.print(", ");
+            System.out.print(", "); //$NON-NLS-1$
         }
 
     }
