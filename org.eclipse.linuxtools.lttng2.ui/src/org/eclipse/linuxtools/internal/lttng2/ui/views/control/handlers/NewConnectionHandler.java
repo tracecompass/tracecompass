@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012 Ericsson and others
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,9 +7,13 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors: 
- *   Bernd Hufmann - Initial API and implementation
+ *   Bernd Hufmann               - Initial API and implementation
+ *   Anna Dushistova(Montavista) - [382684] Allow reusing already defined connections that have Files and Shells subsystems
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -25,6 +29,8 @@ import org.eclipse.rse.core.IRSESystemType;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
+import org.eclipse.rse.core.subsystems.ISubSystem;
+import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -74,7 +80,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         IRSESystemType sysType = RSECorePlugin.getTheCoreRegistry().getSystemTypeById(TRACE_CONTROL_SYSTEM_TYPE);
         
         // get all hosts for this system type
-        IHost[] hosts = registry.getHostsBySystemType(sysType);
+        IHost[] hosts = getSuitableHosts();
 
         // Open dialog box for the node name and address
         final INewConnectionDialog dialog = TraceControlDialogFactory.getInstance().getNewConnectionDialog();
@@ -136,6 +142,28 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         }
         return null;
     }
+
+
+	private IHost[] getSuitableHosts() {
+		//need shells and files
+		ArrayList<IHost> result = new ArrayList<IHost>();
+		ArrayList<IHost> shellConnections = new ArrayList<IHost>(Arrays.asList(RSECorePlugin.getTheSystemRegistry()
+				.getHostsBySubSystemConfigurationCategory("shells"))); //$NON-NLS-1$
+
+		for(IHost connection:shellConnections){
+			if(!connection.getSystemType().isLocal()){
+				ISubSystem[] subSystems = connection.getSubSystems();
+				for (int i = 0; i < subSystems.length; i++) {
+					if (subSystems[i] instanceof IFileServiceSubSystem){
+						result.add(connection);
+						break;
+					}
+				}
+			}
+		}
+		
+		return (IHost[]) result.toArray(new IHost[result.size()]);
+	}
 
 
     /*
