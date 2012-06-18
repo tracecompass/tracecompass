@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
@@ -214,6 +216,13 @@ public class StateHistorySystem extends StateSystem implements
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2, long resolution) throws TimeRangeException,
             AttributeNotFoundException {
+        return queryHistoryRange(attributeQuark, t1, t2, resolution, new NullProgressMonitor());
+    }
+
+    @Override
+    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
+            long t1, long t2, long resolution, IProgressMonitor monitor) throws TimeRangeException,
+            AttributeNotFoundException {
         List<ITmfStateInterval> intervals;
         ITmfStateInterval currentInterval;
         long ts, tEnd;
@@ -241,6 +250,9 @@ public class StateHistorySystem extends StateSystem implements
          */
         for (ts = t1; (currentInterval.getEndTime() != -1) && (ts < tEnd);
                 ts += resolution) {
+            if (monitor.isCanceled()) {
+                return intervals;
+            }
             if (ts <= currentInterval.getEndTime()) {
                 continue;
             }

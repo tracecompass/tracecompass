@@ -75,6 +75,11 @@ public class ResourcesView extends TmfView {
     /** Initial time range */
     private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
 
+    /**
+     * Redraw state enum
+     */
+    private enum State { IDLE, BUSY, PENDING };
+
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
@@ -108,6 +113,12 @@ public class ResourcesView extends TmfView {
 
     // The zoom thread
     private ZoomThread fZoomThread;
+
+    // The redraw state used to prevent unnecessary queuing of display runnables
+    private State fRedrawState = State.IDLE;
+
+    // The redraw synchronization object
+    final private Object fSyncObj = new Object();
 
     // ------------------------------------------------------------------------
     // Classes
@@ -246,9 +257,9 @@ public class ResourcesView extends TmfView {
                             entry.setZoomedEventList(zoomedEventList);
                         }
                     }
+                    redraw();
                 }
             }
-            redraw();
         }
 
         public void cancel() {
@@ -509,7 +520,7 @@ public class ResourcesView extends TmfView {
         try {
             if (entry.getType().equals(Type.CPU)) {
                 int statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
-                List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution);
+                List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution, monitor);
                 eventList = new ArrayList<ITimeEvent>(statusIntervals.size());
                 long lastEndTime = -1;
                 for (ITmfStateInterval statusInterval : statusIntervals) {
@@ -532,7 +543,7 @@ public class ResourcesView extends TmfView {
                     }
                 }
             } else if (entry.getType().equals(Type.IRQ)) {
-                List<ITmfStateInterval> irqIntervals = ssq.queryHistoryRange(quark, startTime, endTime - 1, resolution);
+                List<ITmfStateInterval> irqIntervals = ssq.queryHistoryRange(quark, startTime, endTime - 1, resolution, monitor);
                 eventList = new ArrayList<ITimeEvent>(irqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
@@ -558,7 +569,7 @@ public class ResourcesView extends TmfView {
                     lastEndTime = time + duration;
                 }
             } else if (entry.getType().equals(Type.SOFT_IRQ)) {
-                List<ITmfStateInterval> softIrqIntervals = ssq.queryHistoryRange(quark, startTime, endTime - 1, resolution);
+                List<ITmfStateInterval> softIrqIntervals = ssq.queryHistoryRange(quark, startTime, endTime - 1, resolution, monitor);
                 eventList = new ArrayList<ITimeEvent>(softIrqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
@@ -622,6 +633,14 @@ public class ResourcesView extends TmfView {
 
 
     private void redraw() {
+        synchronized (fSyncObj) {
+            if (fRedrawState == State.IDLE) {
+                fRedrawState = State.BUSY;
+            } else {
+                fRedrawState = State.PENDING;
+                return;
+            }
+        }
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -630,6 +649,14 @@ public class ResourcesView extends TmfView {
                 }
                 fTimeGraphViewer.getControl().redraw();
                 fTimeGraphViewer.getControl().update();
+                synchronized (fSyncObj) {
+                    if (fRedrawState == State.PENDING) {
+                        fRedrawState = State.IDLE;
+                        redraw();
+                    } else {
+                        fRedrawState = State.IDLE;
+                    }
+                }
             }
         });
     }

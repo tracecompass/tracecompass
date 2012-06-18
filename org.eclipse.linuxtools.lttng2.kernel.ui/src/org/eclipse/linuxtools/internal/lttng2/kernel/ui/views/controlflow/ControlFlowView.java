@@ -101,6 +101,11 @@ public class ControlFlowView extends TmfView {
             TRACE_COLUMN
     };
 
+    /**
+     * Redraw state enum
+     */
+    private enum State { IDLE, BUSY, PENDING };
+
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
@@ -137,6 +142,12 @@ public class ControlFlowView extends TmfView {
 
     // A comparator class
     private final ControlFlowEntryComparator fControlFlowEntryComparator = new ControlFlowEntryComparator();
+
+    // The redraw state used to prevent unnecessary queuing of display runnables
+    private State fRedrawState = State.IDLE;
+
+    // The redraw synchronization object
+    final private Object fSyncObj = new Object();
 
     // ------------------------------------------------------------------------
     // Classes
@@ -278,7 +289,6 @@ public class ControlFlowView extends TmfView {
                 }
                 zoom(entry, fMonitor);
             }
-            redraw();
         }
 
         private void zoom(ControlFlowEntry entry, IProgressMonitor monitor) {
@@ -290,6 +300,7 @@ public class ControlFlowView extends TmfView {
                     entry.setZoomedEventList(zoomedEventList);
                 }
             }
+            redraw();
             for (ControlFlowEntry child : entry.getChildren()) {
                 if (fMonitor.isCanceled()) {
                     return;
@@ -667,7 +678,7 @@ public class ControlFlowView extends TmfView {
         List<ITimeEvent> eventList = null;
         try {
             int statusQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.STATUS);
-            List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution);
+            List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution, monitor);
             eventList = new ArrayList<ITimeEvent>(statusIntervals.size());
             long lastEndTime = -1;
             for (ITmfStateInterval statusInterval : statusIntervals) {
@@ -727,6 +738,14 @@ public class ControlFlowView extends TmfView {
     }
 
     private void redraw() {
+        synchronized (fSyncObj) {
+            if (fRedrawState == State.IDLE) {
+                fRedrawState = State.BUSY;
+            } else {
+                fRedrawState = State.PENDING;
+                return;
+            }
+        }
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -735,6 +754,14 @@ public class ControlFlowView extends TmfView {
                 }
                 fTimeGraphCombo.redraw();
                 fTimeGraphCombo.update();
+                synchronized (fSyncObj) {
+                    if (fRedrawState == State.PENDING) {
+                        fRedrawState = State.IDLE;
+                        redraw();
+                    } else {
+                        fRedrawState = State.IDLE;
+                    }
+                }
             }
         });
     }
