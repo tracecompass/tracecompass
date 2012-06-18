@@ -179,8 +179,8 @@ public class StreamInputReader {
                     .getCurrentPacket();
             if (prevPacket != null) {
                 goToNextPacket();
-//                final StreamInputPacketIndexEntry currentPacket = this.packetReader
-//                        .getCurrentPacket();
+                @SuppressWarnings("unused")
+                final StreamInputPacketIndexEntry currentPacket = this.packetReader.getCurrentPacket();
             }
         }
 
@@ -298,7 +298,8 @@ public class StreamInputReader {
          */
         final int len = this.streamInput.getIndex().getEntries().size();
 
-//        StreamInputPacketIndexEntry entry = null;
+        @SuppressWarnings("unused")
+        StreamInputPacketIndexEntry entry = null;
         /*
          * Go to beginning of trace.
          */
