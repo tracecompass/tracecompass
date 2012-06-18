@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon - Initial implementation
  *   Michel Dagenais (michel.dagenais@polymtl.ca) - Reference C implementation, used with permission
@@ -53,7 +53,6 @@ import org.eclipse.linuxtools.internal.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.internal.lttng.ui.views.controlflow.evProcessor.FlowEventToHandlerFactory;
 import org.eclipse.linuxtools.internal.lttng.ui.views.controlflow.model.FlowModelFactory;
 import org.eclipse.linuxtools.internal.lttng.ui.views.controlflow.model.FlowTimeRangeViewerProvider;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
@@ -88,14 +87,14 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  */
 /**
  * @author alvaro
- * 
+ *
  */
 public class ControlFlowView extends AbsTimeUpdateView implements
 		ITmfTimeSelectionListener, ITmfTimeScaleSelectionListener,
 		ITmfTimeFilterSelectionListener {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.controlflow"; //$NON-NLS-1$
-    
+
 	// ========================================================================
 	// Table data
 	// ========================================================================
@@ -139,7 +138,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	private Action zoomFilter;
 
 	private ViewProcessFilter tableFilter = null;
-	
+
 	private TmfTimeRange initTimeRange = TmfTimeRange.NULL_RANGE;
 
 	private static final Object FILLER = new Object();
@@ -316,7 +315,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 */
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.tmf.ui.views.TmfView#createPartControl(org.eclipse
 	 * .swt.widgets.Composite)
@@ -423,7 +422,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		hookContextMenu();
 		contributeToActionBars();
 
-		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+		TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
 			TmfTimeRange experimentTRange = experiment.getTimeRange();
 
@@ -431,7 +430,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				// send request and received the adjusted time used
 				TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this,
 						experimentTRange);
-	
+
 				// initialize widget time boundaries and filtering parameters
 				modelUpdateInit(experimentTRange, adjustedTimeRange, this);
 			}
@@ -692,7 +691,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * tsfTmProcessSelEvent
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent
@@ -712,7 +711,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.
 	 * ITmfTimeScaleSelectionListener
 	 * #tsfTmProcessTimeScaleEvent(org.eclipse.linuxtools
@@ -735,7 +734,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#displayModel
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
@@ -747,13 +746,15 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			final long startBoundTime, final long endBoundTime,
 			final boolean updateTimeBounds, final long startVisibleWindow,
 			final long endVisibleWindow, final Object source) {
-		
+
 		if(tableViewer != null) {
 			final Table table = tableViewer.getTable();
-			
+
 			// Ignore update if widget is disposed
-			if (table.isDisposed()) return;
-			
+			if (table.isDisposed()) {
+                return;
+            }
+
 			Display display = table.getDisplay();
 
 			// Perform the updates on the UI thread)
@@ -827,7 +828,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	/**
 	 * Registers as listener of time selection from other views
-	 * 
+	 *
 	 * @param signal
 	 */
 	@Override
@@ -839,7 +840,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	/**
 	 * Annotation Registers as listener of time range selection from other views
 	 * The implementation handles the entry of the signal.
-	 * 
+	 *
 	 * @param signal
 	 */
 	@TmfSignalHandler
@@ -857,7 +858,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getEventProcessor()
 	 */
@@ -870,8 +871,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * @param signal
 	 */
 	@TmfSignalHandler
-	public void experimentSelected(
-			TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
+	public void experimentSelected(TmfExperimentSelectedSignal signal) {
 		if (signal != null) {
 			TmfTimeRange experimentTRange = signal.getExperiment()
 					.getTimeRange();
@@ -881,7 +881,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				// prepare time intervals in widget
 				modelUpdateInit(experimentTRange, experimentTRange, signal
 						.getSource());
-	
+
 				// request initial data
 				initialExperimentDataRequest(signal
 						.getSource(), experimentTRange);
@@ -942,14 +942,14 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		initTimeRange = initTimeWindow;
 		return initTimeWindow;
 	}
-	
+
 	/*
 	 * SWT doesn't seem to report correctly the table item height, at least in
 	 * the case of KDE.
-	 * 
+	 *
 	 * This method provides an adjustment term according to the desktop session.
-	 * 
-	 * @return Height adjustment 
+	 *
+	 * @return Height adjustment
 	 */
 	private int getTableItemHeightAdjustement() {
 		int ajustement = 0;
@@ -966,7 +966,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getParamsUpdater()
 	 */
@@ -977,7 +977,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getItemContainer()
 	 */
@@ -991,7 +991,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getProviderId()
 	 */
 	@Override
-	protected int getProviderId() { 
-	    return LttngCoreProviderFactory.CONTROL_FLOW_LTTNG_SYTH_EVENT_PROVIDER; 
+	protected int getProviderId() {
+	    return LttngCoreProviderFactory.CONTROL_FLOW_LTTNG_SYTH_EVENT_PROVIDER;
 	}
 }

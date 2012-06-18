@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
  * Dummy test trace. Use in conjunction with LTTngEventParserStub.
  */
 @SuppressWarnings("nls")
-public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventParser<LttngEvent> {
+public class LTTngTraceStub extends TmfTrace implements ITmfEventParser {
 
     // ========================================================================
     // Attributes
@@ -45,7 +45,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
     private final RandomAccessFile fTrace;
 
     // The associated event parser
-    private final ITmfEventParser<LttngEvent> fParser;
+    private final ITmfEventParser fParser;
 
     // ========================================================================
     // Constructors

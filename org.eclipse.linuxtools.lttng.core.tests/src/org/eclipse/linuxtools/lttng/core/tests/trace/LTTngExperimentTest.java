@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -47,14 +47,14 @@ public class LTTngExperimentTest extends TestCase {
     private static final TmfTimestamp  fStartTime = new LttngTimestamp(13589759412128L);
     private static final TmfTimestamp  fEndTime   = new LttngTimestamp(13589906758692L);
 
-    private static ITmfTrace<LttngEvent>[] fTestTraces;
+    private static ITmfTrace[] fTestTraces;
     private static TestExperiment fExperiment;
 
     // ------------------------------------------------------------------------
     // Helper class
     // ------------------------------------------------------------------------
 
-    private static class TestExperiment extends TmfExperiment<LttngEvent> {
+    private static class TestExperiment extends TmfExperiment {
         public TestExperiment() {
             super(LttngEvent.class, EXPERIMENT, fTestTraces, 1000);
             getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
@@ -65,8 +65,7 @@ public class LTTngExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
-    private synchronized static ITmfTrace<LttngEvent>[] setupTrace(final String path) {
+    private synchronized static ITmfTrace[] setupTrace(final String path) {
         if (fTestTraces == null) {
             fTestTraces = new ITmfTrace[1];
             try {

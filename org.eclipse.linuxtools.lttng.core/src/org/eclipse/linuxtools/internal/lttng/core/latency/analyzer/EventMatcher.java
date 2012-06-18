@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse
  * Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Philippe Sawicki (INF4990.A2010@gmail.com)   - Initial API and implementation
  *   Mathieu Denis    (mathieu.denis55@gmail.com) - Refactored code
  *******************************************************************************/
@@ -22,13 +22,14 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.util.EventsPair;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * <b><u>EventMatcher</u></b>
  * <p>
  * Event matching class. Saves events in a list and returns the previously saved event if the currently processed one is
  * its response, so that the latency can be computed by subtracting their respective timestamps.
- * 
+ *
  * @author Philippe Sawicki
  */
 public class EventMatcher {
@@ -36,7 +37,7 @@ public class EventMatcher {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     /**
      * Class instance (Singleton pattern).
      */
@@ -45,16 +46,16 @@ public class EventMatcher {
     /**
      * Stack abstraction, used to save the events in a list.
      */
-    private StackWrapper fStack;
+    private final StackWrapper fStack;
 
     /**
      * Match table, associates a request class to a response class.
      */
-    private HashMap<String, String> fMatch;
+    private final HashMap<String, String> fMatch;
     /**
      * Inverse match table, associates a response class to a request class.
      */
-    private HashMap<String, String> fInverseMatch;
+    private final HashMap<String, String> fInverseMatch;
 
     /**
      * The number of events processed.
@@ -64,7 +65,7 @@ public class EventMatcher {
      * The number of events matched.
      */
     private int fMatchedEvents;
-	
+
 	/**
 	 * Event types identification Strings.
 	 */
@@ -177,7 +178,7 @@ public class EventMatcher {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-	
+
     /**
      * Private constructor to defeat instantiation (Singleton pattern).
      */
@@ -201,8 +202,9 @@ public class EventMatcher {
      * @return An instance to the EventMatcher class (Singleton pattern).
      */
     public static EventMatcher getInstance() {
-        if (fInstance == null)
+        if (fInstance == null) {
             fInstance = new EventMatcher();
+        }
         return fInstance;
     }
 
@@ -221,11 +223,11 @@ public class EventMatcher {
     public int getNBMatchedEvents() {
         return fMatchedEvents;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
     /**
      * Releases the instance to the EventMatcher class.
      */
@@ -268,14 +270,15 @@ public class EventMatcher {
      *         request associated with this response, or the event to identify was a request that was added to the
      *         list).
      */
-    public LttngEvent process(LttngEvent event) {
+    public LttngEvent process(ITmfEvent ev) {
+        LttngEvent event = (LttngEvent) ev;
         fProcessedEvents++;
 
         String markerName = event.getMarkerName();
         if (fMatch.containsKey(markerName)) {
             String startEventType = fMatch.get(markerName);
             Stack<LttngEvent> events = fStack.getStackOf(startEventType);
-            
+
             if (events != null) {
                 for (int i = events.size() - 1; i >= 0; i--) {
                     LttngEvent request = events.get(i);
@@ -367,10 +370,10 @@ public class EventMatcher {
 
     /**
      * Removes a matched pair based on the their type.
-     * 
+     *
      * <b>Note :</b> For now, only the pair's end type is used, since a type can only be either one start or one end.
      * This function takes both types to account for the future, if a pairing process ever becomes more complex.
-     * 
+     *
      * @param startType
      *            The type of the pair's start type.
      * @param endType

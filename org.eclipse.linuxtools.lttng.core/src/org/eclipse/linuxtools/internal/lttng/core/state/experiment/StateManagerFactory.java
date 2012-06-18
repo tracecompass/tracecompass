@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
  * @author alvaro
- * 
+ *
  */
 public class StateManagerFactory {
     // ========================================================================
@@ -49,7 +49,7 @@ public class StateManagerFactory {
      * @param experiment
      * @return
      */
-    public static LTTngTreeNode getManager(ITmfTrace<?> rtrace, LTTngTreeNode experiment) {
+    public static LTTngTreeNode getManager(ITmfTrace rtrace, LTTngTreeNode experiment) {
 
         // Validate
         if (rtrace == null) {
@@ -68,7 +68,7 @@ public class StateManagerFactory {
             return managerNode;
         }
 
-//		LttngTraceState traceModel = 
+//		LttngTraceState traceModel =
 //		StateModelFactory.getStateEntryInstance();
         StateTraceManager manager = null;
 
@@ -92,7 +92,7 @@ public class StateManagerFactory {
 
     /**
      * Provide the State trace set manager
-     * 
+     *
      * @return
      */
     public static IStateExperimentManager getExperimentManager() {
@@ -101,13 +101,14 @@ public class StateManagerFactory {
 
     /**
      * Remove previously registered managers
-     * 
+     *
      * @param traceUniqueId
      */
-    public static void removeManager(ITmfTrace<?> rtrace, LTTngTreeNode rexperiment) {
-        if (rtrace ==  null || rexperiment == null)
+    public static void removeManager(ITmfTrace rtrace, LTTngTreeNode rexperiment) {
+        if (rtrace ==  null || rexperiment == null) {
             return;
-        if (rexperiment.getValue() instanceof TmfExperiment<?>) {
+        }
+        if (rexperiment.getValue() instanceof TmfExperiment) {
             LTTngTreeNode childToremove = rexperiment.getChildByName(rtrace.getName());
             if (childToremove != null) {
                 rexperiment.removeChild(childToremove);

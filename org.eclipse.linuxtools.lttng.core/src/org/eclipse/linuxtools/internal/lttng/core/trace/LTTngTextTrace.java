@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
-public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<LttngEvent> {
+public class LTTngTextTrace extends TmfTrace implements ITmfEventParser {
     private LttngTimestamp                  eventTimestamp   = null;
     private String                          eventSource      = null;
     private LttngEventType                  eventType        = null;
@@ -73,13 +73,13 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
         currentLttngEvent = new TextLttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference);
         eventContent.setEvent(currentLttngEvent);
 
-        if ( positionToFirstEvent() == false )
+        if ( positionToFirstEvent() == false ) {
             throw new IOException("Fail to position to the beginning of the trace"); //$NON-NLS-1$
-        else {
+        } else {
             setCacheSize(1000);
             ITmfContext context = new TmfContext(new TmfLocation<Long>(0L), 0);
             getIndexer().updateIndex(context, new LttngTimestamp(0L));
-            setParser((ITmfEventParser<LttngEvent>) this);
+            setParser(this);
 
             final Long endTime = currentLttngEvent.getTimestamp().getValue();
             positionToFirstEvent();
@@ -133,8 +133,9 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
     private void skipToPosition(final TmfLocation<Long> skip) {
         try {
             long skipPosition = skip.getLocation();
-            if ( skipPosition < 0 )
+            if ( skipPosition < 0 ) {
                 skipPosition = 0L;
+            }
 
 //            if ( showDebug == true ) {
 //                System.out.println("skipToPosition(Long skipPosition)"); //$NON-NLS-1$
@@ -144,7 +145,9 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
             positionToFirstEvent();
             final long nbSkipped = br.skip(skipPosition);
             if ( nbSkipped != skipPosition)
+             {
                 throw new IOException("Too few characters skipped, positionning failed! (skipToPosition)"); //$NON-NLS-1$
+            }
 
             nbCharRead = skipPosition;
         }
@@ -156,11 +159,13 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
     @Override
     @SuppressWarnings("unchecked")
     public TmfContext seekEvent(ITmfLocation<?> location) {
-        if (location == null)
+        if (location == null) {
             location = new TmfLocation<Long>(0L);
+        }
 
-        if (!((TmfLocation<Long>) location).getLocation().equals(nbCharRead))
+        if (!((TmfLocation<Long>) location).getLocation().equals(nbCharRead)) {
             skipToPosition((TmfLocation<Long>) location);
+        }
 
         final TmfContext tmpTraceContext =  new TmfContext(location, 0L);
 
@@ -209,8 +214,9 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
                 // -1 is the skip the end of line (\n)
                 nbCharRead += (tmpContent.length()+1);
 
-                if ( (currentLttngEvent != null) && (currentLttngEvent.getContent().getMapContent() != null) )
+                if ( (currentLttngEvent != null) && (currentLttngEvent.getContent().getMapContent() != null) ) {
                     currentLttngEvent.getContent().emptyContent();
+                }
 
                 // Tracefile and marker are first in the file
                 // Sound like :
@@ -304,8 +310,9 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
                 tmpCpu = Long.parseLong( tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim() );
 
                 // Set the cpu number of trace if we found a "new" cpu
-                if ( cpuNumber < (tmpCpu + 1) )
+                if ( cpuNumber < (tmpCpu + 1) ) {
                     cpuNumber = (int)(tmpCpu+1);
+                }
 
 
                 // The last field is the parsed content
@@ -368,8 +375,9 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
 
                 // We now have what we need for the type
                 final String tmpTypeKey = tracefile + "/" + tmpCpu + "/" + marker; //$NON-NLS-1$ //$NON-NLS-2$
-                if ( traceTypes.get(tmpTypeKey) == null )
+                if ( traceTypes.get(tmpTypeKey) == null ) {
                     traceTypes.put(tmpTypeKey, new LttngEventType(tracefile, tmpCpu, marker, 0, fieldsMap.keySet().toArray(new String[fieldsMap.size()] )) );
+                }
 
                 currentLttngEvent.setContent(eventContent);
                 currentLttngEvent.setType(traceTypes.get(tmpTypeKey));
@@ -385,7 +393,9 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
         catch (final Exception e) {
             System.out.println("Pos is :" + nbCharRead); //$NON-NLS-1$
             if ( tmpContent != null )
+             {
                 System.out.println("Erroneous content is :" + tmpContent); //$NON-NLS-1$
+            }
 
             tmpContent = null;
             e.printStackTrace();
@@ -425,7 +435,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
 // Redefine event to override method we know won't work with a Text tracefile
 class TextLttngEvent extends LttngEvent {
 
-    public TextLttngEvent(	final TmfTrace<LttngEvent> parent,
+    public TextLttngEvent(final TmfTrace parent,
             final LttngTimestamp timestamp,
             final String source,
             final LttngEventType type,
@@ -435,10 +445,9 @@ class TextLttngEvent extends LttngEvent {
         super(parent, timestamp, source, type, content, reference, null);
     }
 
-    @SuppressWarnings("unchecked")
     public TextLttngEvent(final TextLttngEvent oldEvent) {
         this(
-                (TmfTrace<LttngEvent>) oldEvent.getTrace(),
+                (TmfTrace) oldEvent.getTrace(),
                 (LttngTimestamp)oldEvent.getTimestamp(),
                 oldEvent.getSource(),
                 oldEvent.getType(),

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Yann N. Dauphin    (dhaemon@gmail.com)    - Implementation
  *   Francois Chouinard (fchouinard@gmail.com) - Initial API
@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.internal.lttng.core.control.LttngCoreProviderFactory;
-import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.internal.lttng.core.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.AbsEventToHandlerResolver;
@@ -42,7 +41,6 @@ import org.eclipse.linuxtools.internal.lttng.ui.views.statistics.evProcessor.Sta
 import org.eclipse.linuxtools.internal.lttng.ui.views.statistics.model.KernelStatisticsData;
 import org.eclipse.linuxtools.internal.lttng.ui.views.statistics.model.StatisticsTreeNode;
 import org.eclipse.linuxtools.internal.lttng.ui.views.statistics.model.StatisticsTreeRootFactory;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
@@ -68,7 +66,7 @@ import org.eclipse.ui.PlatformUI;
  * <b><u>StatisticsView</u></b>
  * <p>
  * The Statistics View displays statistics for traces.
- * 
+ *
  * It is implemented according to the MVC pattern. - The model is a
  * StatisticsTreeNode built by the State Manager. - The view is built with a
  * TreeViewer. - The controller that keeps model and view synchronised is an
@@ -93,24 +91,24 @@ public class StatisticsView extends AbsTimeUpdateView {
 	private final String ELAPSED_TIME_COLUMN_TIP = Messages.StatisticsView_ElapsedTimeTip;
 
 	// Level for which statistics should not be displayed.
-    private Set<Integer> folderLevels = new HashSet<Integer>(Arrays
-	            .asList(new Integer[] { KernelStatisticsData.HEADER_CPUS_INT, 
-	                                    KernelStatisticsData.HEADER_EVENT_TYPES_INT, 
-	                                    KernelStatisticsData.HEADER_FUNCTIONS_INT, 
-	                                    KernelStatisticsData.HEADER_MODES_INT, 
-	                                    KernelStatisticsData.HEADER_PROCESSES_INT, 
+    private final Set<Integer> folderLevels = new HashSet<Integer>(Arrays
+	            .asList(new Integer[] { KernelStatisticsData.HEADER_CPUS_INT,
+	                                    KernelStatisticsData.HEADER_EVENT_TYPES_INT,
+	                                    KernelStatisticsData.HEADER_FUNCTIONS_INT,
+	                                    KernelStatisticsData.HEADER_MODES_INT,
+	                                    KernelStatisticsData.HEADER_PROCESSES_INT,
 	                                    KernelStatisticsData.HEADER_SUBMODES_INT }));
 
 	// Levels for which sub-levels should not contain time-related statistics.
-	private Set<Integer> levelsWithEmptyTime = new HashSet<Integer>(Arrays
+	private final Set<Integer> levelsWithEmptyTime = new HashSet<Integer>(Arrays
 	            .asList(new Integer[] { KernelStatisticsData.HEADER_EVENT_TYPES_INT }));
 
-	private DecimalFormat decimalFormat = new DecimalFormat("0.#########"); //$NON-NLS-1$
+	private final DecimalFormat decimalFormat = new DecimalFormat("0.#########"); //$NON-NLS-1$
 
 	private Cursor fwaitCursor = null;
 
 	private static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
-	
+
 	// Used to draw bar charts in columns.
 	private interface ColumnPercentageProvider {
 		public double getPercentage(StatisticsTreeNode node);
@@ -158,7 +156,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	};
 
 	// List that will be used to create the table.
-	private ColumnData[] columnDataList = new ColumnData[] {
+	private final ColumnData[] columnDataList = new ColumnData[] {
 			new ColumnData(LEVEL_COLUMN, 200, SWT.LEFT, LEVEL_COLUMN_TIP,
 					new ColumnLabelProvider() {
 						@Override
@@ -189,7 +187,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 						public int compare(Viewer viewer, Object e1, Object e2) {
 							StatisticsTreeNode n1 = (StatisticsTreeNode) e1;
 							StatisticsTreeNode n2 = (StatisticsTreeNode) e2;
-							
+
 //							return n1.getKey().compareTo(n2.getKey());
 							return n1.compareTo(n2);
 						}
@@ -289,13 +287,13 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	/**
 	 * Adapter TreeViewers can use to interact with StatisticsTreeNode objects.
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider
 	 */
 	private static class TreeContentProvider implements ITreeContentProvider {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang
 		 * .Object)
@@ -307,7 +305,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang
 		 * .Object)
@@ -319,7 +317,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang
 		 * .Object)
@@ -331,7 +329,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.eclipse.jface.viewers.IStructuredContentProvider#getElements(
 		 * java.lang.Object)
@@ -343,7 +341,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
 		@Override
@@ -352,7 +350,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse
 		 * .jface.viewers.Viewer, java.lang.Object, java.lang.Object)
@@ -374,7 +372,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
 	 * .Composite)
@@ -485,14 +483,13 @@ public class StatisticsView extends AbsTimeUpdateView {
 		treeViewer.getTree().setSortDirection(SWT.DOWN);
 
 		// Read current data if any available
-		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+		TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
-			
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			TmfExperimentSelectedSignal<?> signal = new TmfExperimentSelectedSignal(this, experiment);
+
+			TmfExperimentSelectedSignal signal = new TmfExperimentSelectedSignal(this, experiment);
 			fRequestData = true;
 			experimentSelected(signal);
-			
+
 		} else {
 			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}
@@ -511,7 +508,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
@@ -519,7 +516,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		treeViewer.getTree().setFocus();
 	}
 
-	
+
 	/*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getInputChangedRefresh()
@@ -539,7 +536,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#waitCursor
 	 * (boolean)
@@ -581,8 +578,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 				// @Override
 				@Override
 				public void run() {
-					if (!treeViewer.getTree().isDisposed())
-						treeViewer.refresh();
+					if (!treeViewer.getTree().isDisposed()) {
+                        treeViewer.refresh();
+                    }
 				}
 			});
 		}
@@ -591,28 +589,31 @@ public class StatisticsView extends AbsTimeUpdateView {
 	@Override
 	public void modelInputChanged(ILttngSyntEventRequest request, boolean complete) {
 		// Ignore update if disposed
-		if (treeViewer.getTree().isDisposed()) return;
-		
+		if (treeViewer.getTree().isDisposed()) {
+            return;
+        }
+
 		if(TraceDebug.isSV() && complete) {
 		    // print results
 
-		    TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+		    TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
 		    if(experiment != null) {
 		        StatisticsTreeNode node = StatisticsTreeRootFactory.getStatTreeRoot(experiment.getName());
 		        printRecursively(node);
 
 		    }
 		}
-		
+
 		treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 			// @Override
 			@Override
 			public void run() {
-				if (!treeViewer.getTree().isDisposed())
-					treeViewer.refresh();
+				if (!treeViewer.getTree().isDisposed()) {
+                    treeViewer.refresh();
+                }
 			}
 		});
-		
+
 		if (complete) {
 			synchronized (fStatisticsUpdateSyncObj) {
 				fStatisticsUpdateBusy = false;
@@ -638,7 +639,7 @@ public class StatisticsView extends AbsTimeUpdateView {
             Collections.sort(childreen);
 
             for (Iterator<StatisticsTreeNode> iterator = childreen.iterator(); iterator.hasNext();) {
-                StatisticsTreeNode statisticsTreeNode = (StatisticsTreeNode) iterator.next();
+                StatisticsTreeNode statisticsTreeNode = iterator.next();
                 printRecursively(statisticsTreeNode);
             }
         }
@@ -647,7 +648,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * modelIncomplete
 	 * (org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest)
@@ -661,9 +662,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 	 * @param signal
 	 */
 	@TmfSignalHandler
-	public void experimentSelected(TmfExperimentSelectedSignal<? extends ITmfEvent> signal) {
+	public void experimentSelected(TmfExperimentSelectedSignal signal) {
 		if (signal != null) {
-			TmfExperiment<?> experiment = signal.getExperiment();
+			TmfExperiment experiment = signal.getExperiment();
 			String experimentName =  experiment.getName();
 
 			if (StatisticsTreeRootFactory.containsTreeRoot(experimentName)) {
@@ -672,9 +673,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 				@SuppressWarnings("rawtypes")
                 ITmfTrace[] traces = experiment.getTraces();
-				
+
 				LTTngTreeNode expNode = StateManagerFactory.getExperimentManager().getSelectedExperiment();
-				
+
 				// check if there is partial data loaded in the experiment
 				int numTraces = experiment.getTraces().length;
 				int numNodeTraces = experimentTreeNode.getNbChildren();
@@ -732,10 +733,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 	/**
 	 * @param signal
 	 */
-	@SuppressWarnings("unchecked")
 	@TmfSignalHandler
 	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-		TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
+		TmfExperiment experiment = signal.getExperiment();
 		// validate
 		if (! experiment.equals(TmfExperiment.getCurrentExperiment())) {
 			return;
@@ -748,7 +748,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	/**
 	 * @param experiment
 	 */
-	private void requestData(TmfExperiment<?> experiment, TmfTimeRange range, boolean clearingData) {
+	private void requestData(TmfExperiment experiment, TmfTimeRange range, boolean clearingData) {
 		if (experiment != null) {
 			synchronized (fStatisticsUpdateSyncObj) {
 				if (fStatisticsUpdateBusy) {
@@ -774,7 +774,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#displayModel
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
@@ -789,7 +789,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getParamsUpdater()
 	 */
@@ -804,13 +804,13 @@ public class StatisticsView extends AbsTimeUpdateView {
 		// Not applicable to statistics view
 		return null;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getProviderId()
 	 */
 	@Override
-	protected int getProviderId() { 
-	    return LttngCoreProviderFactory.STATISTICS_LTTNG_SYTH_EVENT_PROVIDER; 
+	protected int getProviderId() {
+	    return LttngCoreProviderFactory.STATISTICS_LTTNG_SYTH_EVENT_PROVIDER;
 	}
 }

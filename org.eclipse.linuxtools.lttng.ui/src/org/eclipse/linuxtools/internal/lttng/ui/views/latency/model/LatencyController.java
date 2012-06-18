@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -25,17 +25,17 @@ import org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramDataModel;
  * <p>
  */
 public class LatencyController {
-   
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     private static LatencyController fInstance = null;
-    
+
     private LatencyEventRequest fEventRequest;
-    
-    private TmfEventProvider<?> fProvider;
-    
+
+    private TmfEventProvider fProvider;
+
     private final ListenerList fModels;
 
     // ------------------------------------------------------------------------
@@ -55,19 +55,18 @@ public class LatencyController {
         }
         return fInstance;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
     /**
      * Refresh all registered models
-     * 
+     *
      * @param provider - TmfEventProvider to request data from
      * @param timeRange - time range of request
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void refreshModels(TmfEventProvider<?> provider, TmfTimeRange timeRange) {
+    public void refreshModels(TmfEventProvider provider, TmfTimeRange timeRange) {
         // save provider
         fProvider = provider;
         if (fProvider != null) {
@@ -94,12 +93,12 @@ public class LatencyController {
      */
     public void clear() {
         Object models[] = fModels.getListeners();
-        
+
         for (int i = 0; i < models.length; i++) {
             ((IBaseDistributionModel)models[i]).clear();
         }
     }
-    
+
     /**
      * Dispose of controller
      */
@@ -109,7 +108,7 @@ public class LatencyController {
         }
         fProvider = null;
     }
-    
+
     /**
      * Register given model.
      * @param model - model to register
@@ -117,19 +116,19 @@ public class LatencyController {
     public void registerModel(IBaseDistributionModel model) {
         fModels.add(model);
     }
-    
+
     /**
      * Deregister given model.
-     * 
+     *
      * @param model - model to deregister
      */
     public void deregisterModel(IBaseDistributionModel model) {
         fModels.remove(model);
     }
-    
+
     /**
      * Handle data of event request and pass it information to the registered models
-     * 
+     *
      * @param eventCount - event count
      * @param timestamp - start timestamp of latency calculation
      * @param latency - latency value (startTimestamp - endTimestamp)
@@ -162,19 +161,19 @@ public class LatencyController {
     public void handleCancel() {
         clear();
     }
-    
+
     /**
      * Set event provider for refresh.
-     * 
+     *
      * @param provider
      */
-    public void setEventProvider(TmfEventProvider<?> provider) {
+    public void setEventProvider(TmfEventProvider provider) {
         fProvider = provider;
     }
-    
+
     /**
      * Set current event time in model(s).
-     * 
+     *
      * @param timestamp
      */
     public void setCurrentEventTime(long timestamp) {

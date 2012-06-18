@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *   Bernd Hufmann - Bug fixes
@@ -31,8 +31,8 @@ import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.ITimeAnalys
 import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
 import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.TmfTimeSelectionEvent;
 import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
@@ -55,9 +55,9 @@ import org.eclipse.swt.widgets.Display;
  * be triggered from different sources e.g. opening a file as well as a new
  * selected time window
  * </p>
- * 
+ *
  * @author alvaro
- * 
+ *
  */
 public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatusListener {
 
@@ -82,7 +82,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	private LttngSyntEventRequest fCurrentRequest = null;
 
 	protected LttngSyntheticEventProvider fProvider = LttngCoreProviderFactory.getEventProvider(getProviderId());
-	
+
 	// ========================================================================
 	// Constructor
 	// ========================================================================
@@ -94,12 +94,12 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	// ========================================================================
 	// Methods
 	// ========================================================================
-	
+
 	/**
-	 * Returns the number of events after which the relevant display will 
+	 * Returns the number of events after which the relevant display will
 	 * be refreshed
-	 * 
-	 * @return  
+	 *
+	 * @return
 	 */
 	protected Long getInputChangedRefresh() {
 	    return INPUT_CHANGED_REFRESH;
@@ -110,16 +110,16 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
      * @param experimentDisposedSignal
      */
     @TmfSignalHandler
-    public void experimentDisposed(TmfExperimentDisposedSignal<? extends TmfEvent> experimentDisposedSignal) {
+    public void experimentDisposed(TmfExperimentDisposedSignal experimentDisposedSignal) {
         if (experimentDisposedSignal.getExperiment() != TmfExperiment.getCurrentExperiment()) {
             return;
         }
         fProvider.conditionallyCancelRequests();
     }
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
 	 * processingStarted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
@@ -152,7 +152,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
 	 * processingCompleted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
@@ -193,12 +193,13 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 	/**
 	 * Registers as listener of time selection from other views
-	 * 
+	 *
 	 * @param signal
 	 */
 	public void synchToTime(TmfTimeSynchSignal signal) {
-        if (signal == null)
-	        return;
+        if (signal == null) {
+            return;
+        }
 		if (synch) {
 			Object source = signal.getSource();
 			if (source != null && source != this) {
@@ -208,7 +209,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 					// Check for GUI thread
 					if (Display.getCurrent() != null) {
 						// GUI thread - execute update right away.
-						
+
 						// Internal value is expected in nano seconds.
 						long selectedTime = signal.getCurrentTime().getValue();
 						if (tsfviewer != null) {
@@ -218,13 +219,13 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 						    Long savedSelTime = paramUpdater.getSelectedTime();
 						    if ((savedSelTime == null) || (savedSelTime != selectedTime)) {
 					            // Update the parameter updater to save the selected time
-					            paramUpdater.setSelectedTime(selectedTime);   
+					            paramUpdater.setSelectedTime(selectedTime);
 					        }
 						}
 					} else {
 						// Perform the updates on the UI thread
-						
-						// We need to clone the timestamp in the signal so that it won't be overwritten duo to multipe thread access 
+
+						// We need to clone the timestamp in the signal so that it won't be overwritten duo to multipe thread access
 						final TmfTimeSynchSignal savedSignal = new TmfTimeSynchSignal(signal.getSource(), signal.getCurrentTime().clone());
 						tsfviewer.getControl().getDisplay().asyncExec(new Runnable() {
 							@Override
@@ -243,19 +244,20 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * Process the reception of time window adjustment in this view if the
 	 * source of the update is not this view.
-	 * 
+	 *
 	 * @param signal
 	 * @param clearingData
 	 */
 	public void synchToTimeRange(TmfRangeSynchSignal signal, boolean clearingData) {
-	    if (signal == null)
-	         return;
+	    if (signal == null) {
+            return;
+        }
 		if (synch) {
 			Object source = signal.getSource();
 			if (source != null && source != this) {
 				// Internal value is expected in nano seconds.
 				TmfTimeRange trange = signal.getCurrentRange();
-				TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+				TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
 				if (experiment == null) {
 					TraceDebug.debug("Current selected experiment is null"); //$NON-NLS-1$
 					return;
@@ -271,7 +273,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * Trigger time synchronisation to other views this method shall be called
 	 * when a check has been performed to note that an actual change of time has
 	 * been performed vs a pure re-selection of the same time
-	 * 
+	 *
 	 * @param time
 	 * @param source
 	 */
@@ -286,7 +288,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * Common implementation of ITmfTimeSelectionListener, not used by all the
 	 * views extending this abstract class
-	 * 
+	 *
 	 * @param event
 	 */
 	protected void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
@@ -318,7 +320,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * Common implementation of ITmfTimeScaleSelectionListener, not used by all
 	 * the views extending this abstract class
-	 * 
+	 *
 	 * @param event
 	 */
 	protected void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
@@ -353,15 +355,15 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
             // upon this notification
 
 		    // Note that this has to be done outside the synchronized statement
-		    // because otherwise we could end-up in a deadlock if a ongoing 
+		    // because otherwise we could end-up in a deadlock if a ongoing
 		    // request needs to be canceled.
-            synchTimeRangeNotification(trange, selectedTime, source);		    
+            synchTimeRangeNotification(trange, selectedTime, source);
 		}
 	}
 
 	/**
 	 * Inform registered listeners about the new time range
-	 * 
+	 *
 	 * @param trange
 	 * @param selectedTime
 	 * @param source
@@ -378,7 +380,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @param zoomedTRange
 	 * @param experimentTRange
 	 * @param clearingData
-	 * @param execType 
+	 * @param execType
 	 */
 	public void eventRequest(TmfTimeRange zoomedTRange, TmfTimeRange experimentTRange, boolean clearingData, ExecutionType execType) {
 
@@ -395,7 +397,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @param nbRequested
 	 * @param startTime
 	 * @param clearingData
-	 * @param execType 
+	 * @param execType
 	 */
 	public void eventRequest(long offset, TmfTimeRange range, boolean clearingData, ExecutionType execType) {
 
@@ -410,7 +412,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 //	/**
 //	 * @param zoomedTRange
 //	 * @param experimentTRange
-//	 * @param execType 
+//	 * @param execType
 //	 */
 //	public void dataRequest(TmfTimeRange zoomedTRange,
 //			TmfTimeRange experimentTRange, boolean clearingData) {
@@ -425,11 +427,11 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 	/**
 	 * send data request directly e.g. doesn't use a queue
-	 * 
+	 *
 	 * @param requestTrange
 	 * @param listener
 	 * @param experimentTRange
-	 * @param execType 
+	 * @param execType
 	 * @param processor
 	 * @return
 	 */
@@ -445,16 +447,16 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 		fProvider.conditionallyCancelRequests();
 		fCurrentRequest = new LttngSyntEventRequest(
 				requestTrange, offset, nbRequested,
-				LttngConstants.DEFAULT_BLOCK_SIZE, this, experimentTRange, getEventProcessor(), 
+				LttngConstants.DEFAULT_BLOCK_SIZE, this, experimentTRange, getEventProcessor(),
 				TmfExperiment.getCurrentExperiment().getName(), execType) {
-	
+
 			Long fCount = getSynEventCount();
 			ITransEventProcessor processor = getProcessor();
 			ITmfTimestamp frunningTimeStamp;
-	
+
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see
 			 * org.eclipse.linuxtools.lttng.request.LttngSyntEventRequest#handleData
 			 * ()
@@ -464,12 +466,12 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 //			@Override
 //			public void handleData() {
 //				LttngSyntheticEvent[] result = getData();
-//	
+//
 //				TmfEvent evt = (result.length > 0) ? result[0] : null;
 ////				handleDataCount++;
 
 			@Override
-			public void handleData(LttngSyntheticEvent event) {
+			public void handleData(ITmfEvent event) {
 				super.handleData(event);
 				if (event != null) {
 //					handleDataValidCount++;
@@ -488,7 +490,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 					        if ((fCount != 0) && (fCount % getInputChangedRefresh() == 0)) {
 					            // send partial update
 					            modelInputChanged(this, false);
-  
+
 					            if (TraceDebug.isDEBUG()) {
 					                frunningTimeStamp = event.getTimestamp();
 					                TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -510,7 +512,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 				    }
 				}
 			}
-	
+
 			public void handleRequestStarted() {
 				notifyStarting();
 			}
@@ -522,7 +524,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 //				}
 				super.done();
 			}
-	
+
 			@Override
 			public void handleCompleted() {
 				super.handleCompleted();
@@ -539,7 +541,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 				}
 			}
 		};
-	
+
 		// send the request to TMF
 		fCurrentRequest.startRequestInd(fProvider);
 		fCurrentRequest.setclearDataInd(clearingData);
@@ -549,7 +551,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * Returns an initial smaller window to allow the user to select the area of
 	 * interest
-	 * 
+	 *
 	 * @param experimentTRange
 	 * @return
 	 */
@@ -571,7 +573,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * Request the Time Analysis widget to enable or disable the wait cursor
 	 * e.g. data request in progress or data request completed
-	 * 
+	 *
 	 * @param waitInd
 	 */
 	protected void waitCursor(final boolean waitInd) {
@@ -592,7 +594,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 	/**
 	 * View preparation to override the current local information
-	 * 
+	 *
 	 * @param timeRange
 	 *            - new total time range e.g. Experiment level
 	 * @param clearAllData
@@ -630,7 +632,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 	/**
 	 * Initialize the model and view before reloading items
-	 * 
+	 *
 	 * @param boundaryRange
 	 * @param visibleRange
 	 * @param source
@@ -671,7 +673,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * Actions taken by the view to refresh its widget(s) with the updated data
 	 * model
-	 * 
+	 *
 	 * @param request
 	 * @param complete
 	 *            true: yes, false: partial update
@@ -775,14 +777,14 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 	/**
 	 * The request was stopped, the data is incomplete
-	 * 
+	 *
 	 * @param request
 	 */
 	protected abstract void modelIncomplete(ILttngSyntEventRequest request);
 
 	/**
 	 * Returns the Event processor instance related to a specific view
-	 * 
+	 *
 	 * @return
 	 */
 	protected abstract ITransEventProcessor getEventProcessor();
@@ -790,7 +792,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * To be overridden by some sub-classes although may not be needed in some
 	 * e.g. statistics view
-	 * 
+	 *
 	 * @param items
 	 * @param startBoundTime
 	 * @param endBoundTime
@@ -808,22 +810,22 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * To be overridden by some sub-classes although may not be needed in some
 	 * e.g. statistics view
-	 * 
+	 *
 	 * @return
 	 */
 	protected abstract ParamsUpdater getParamsUpdater();
 
 	/**
 	 * Returns the model's item container
-	 * 
+	 *
 	 * @return
 	 */
 	protected abstract ItemContainer<?> getItemContainer();
 
 	/**
 	 * Returns LTTng Synthetic Provider ID used for current view
-	 * 
-	 * @return  
+	 *
+	 * @return
 	 */
 	protected abstract int getProviderId();
 }

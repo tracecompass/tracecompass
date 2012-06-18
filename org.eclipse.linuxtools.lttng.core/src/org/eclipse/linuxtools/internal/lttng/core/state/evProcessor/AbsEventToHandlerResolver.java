@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@ail.com) - Initial API and implementation
  * 	 Michel Dagenais (michel.dagenais@polymtl.ca) - Reference C implementation, used with permission
@@ -19,11 +19,11 @@ import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent;
 import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * @author alvaro
- * 
+ *
  */
 public abstract class AbsEventToHandlerResolver implements
 		IEventToHandlerResolver, ITransEventProcessor {
@@ -75,7 +75,7 @@ public abstract class AbsEventToHandlerResolver implements
 					reset();
 					return false;
 				}
-	
+
 				case BEFORE: {
 					processor = getBeforeProcessor(eventType);
 					// increment event count only for one sequence indicator,
@@ -84,30 +84,30 @@ public abstract class AbsEventToHandlerResolver implements
 					incrementBeforeEventCount();
 					break;
 				}
-	
+
 				case UPDATE: {
 					processor = getStateUpdaterProcessor(eventType);
 					incrementStateUpdateCount();
 					break;
 				}
-	
+
 				case AFTER: {
 					processor = getAfterProcessor(eventType);
 					break;
 				}
-				
+
 				case ENDREQ: {
 					processor = getfinishProcessor();
 					TraceDebug.debug("EndRequest satus received:"); //$NON-NLS-1$
 					break;
 				}
-					
+
 				default:
 					// Nothing to do
 					break;
 
 			}
-			
+
 			// For BEFORE/UPDATE/AFTER
 			// TODO: Implement filter of events not associated to this trace
 			// Make sure the event received is associated to this trace
@@ -133,14 +133,14 @@ public abstract class AbsEventToHandlerResolver implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.state.evProcessor.IBaseEventProcessor#process
 	 * (org.eclipse.linuxtools.tmf.event.TmfEvent,
 	 * org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
 	@Override
-	public void process(TmfEvent tmfEvent, LttngTraceState traceSt) {
+	public void process(ITmfEvent tmfEvent, LttngTraceState traceSt) {
 		if (tmfEvent == null) {
 			return;
 		}
@@ -158,7 +158,7 @@ public abstract class AbsEventToHandlerResolver implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IBaseEventProcessor#
 	 * getEventsNotHandled()
 	 */
@@ -168,7 +168,7 @@ public abstract class AbsEventToHandlerResolver implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor#
 	 * getEventCount()
 	 */
@@ -179,7 +179,7 @@ public abstract class AbsEventToHandlerResolver implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor#
 	 * getStateUpdateCount()
 	 */
@@ -190,7 +190,7 @@ public abstract class AbsEventToHandlerResolver implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor#
 	 * getFilteredOutEventCount()
 	 */

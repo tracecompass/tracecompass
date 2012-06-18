@@ -1,12 +1,12 @@
 package org.eclipse.linuxtools.lttng.core.tests.headless;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -45,17 +45,18 @@ public class LttngTraceTest {
 
 
         // Work variables
-        TmfTrace<LttngEvent> tmptrace = null;
+        TmfTrace tmptrace = null;
         LttngEvent tmpevent = null;
         ITmfContext tmpContext = null;
         Long nbEvent = 0L;
 
         try {
             // ** Use TextTrace (slow!) if it was asked
-            if ( USE_TEXT_TRACE )
+            if ( USE_TEXT_TRACE ) {
                 tmptrace = new LTTngTextTrace(null, TRACE_PATH, true);
-            else
+            } else {
                 tmptrace = new LTTngTrace(null, TRACE_PATH, null, true, true);
+            }
 
             final LttngTimestamp tmpTime = new LttngTimestamp(0L);
             tmpContext = new TmfContext(new LttngLocation(0L), 0);
@@ -73,8 +74,9 @@ public class LttngTraceTest {
                     tmpevent = (LttngEvent)tmptrace.getNext(tmpContext);
 
                     // Parse the events if it was asked
-                    if ( (tmpevent != null) && (PARSE_EVENTS) )
+                    if ( (tmpevent != null) && (PARSE_EVENTS) ) {
                         tmpevent.getContent().getFields();
+                    }
 
                     nbEvent++;
                 }

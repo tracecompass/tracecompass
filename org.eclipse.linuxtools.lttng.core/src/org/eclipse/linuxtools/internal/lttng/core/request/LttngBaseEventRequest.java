@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *   Marc Dumais (marc.dumais@ericsson.com) - Fix for 316455 (first part)
@@ -23,11 +23,11 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
  * This class is an extension of Tmf Event Request which includes specific
  * references i.e. a status listener to indicate the start and end of the
  * request
- * 
+ *
  * @author alvaro
- * 
+ *
  */
-public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> {
+public abstract class LttngBaseEventRequest extends TmfEventRequest {
 
 	// ========================================================================
 	// Data
@@ -55,7 +55,7 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 */
 	public LttngBaseEventRequest(TmfTimeRange range, ITmfTimestamp dispatchTime, long offset, int nbEvents,
 			int maxBlockSize, ITmfDataRequest.ExecutionType execType) {
-		super(LttngEvent.class, range, (int) offset, nbEvents, maxBlockSize, execType);		
+		super(LttngEvent.class, range, (int) offset, nbEvents, maxBlockSize, execType);
 		fDispatchTime = dispatchTime;
 	}
 
@@ -71,12 +71,12 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	/**
 	 * Trigger the start to process this request right after the notification to
 	 * the interested listeners
-	 * 
+	 *
 	 * @param experiment
 	 * @param broadcast
 	 *            true: All views, false: only to registered listeners
 	 */
-	public void startRequestInd(TmfExperiment<LttngEvent> experiment,
+	public void startRequestInd(TmfExperiment experiment,
 			boolean broadcast) {
 		// trigger the start to process this request
 		experiment.sendRequest(this);
@@ -109,7 +109,7 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	/**
 	 * Returns indication - clearing of all existing data model is required e.g
 	 * from the selection of a new experiment
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isclearDataInd() {
@@ -122,5 +122,5 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	public ITmfTimestamp getDispatchTime() {
 		return fDispatchTime;
 	}
-	
+
 }

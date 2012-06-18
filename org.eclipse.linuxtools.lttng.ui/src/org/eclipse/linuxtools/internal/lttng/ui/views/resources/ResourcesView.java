@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Alvaro Sanchez-Leon - Initial implementation
  * 	 Michel Dagenais (michel.dagenais@polymtl.ca) - Reference C implementation, used with permission
  *******************************************************************************/
@@ -34,7 +34,6 @@ import org.eclipse.linuxtools.internal.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.internal.lttng.ui.views.resources.evProcessor.ResourcesEventToHandlerFactory;
 import org.eclipse.linuxtools.internal.lttng.ui.views.resources.model.ResourceModelFactory;
 import org.eclipse.linuxtools.internal.lttng.ui.views.resources.model.ResourcesTimeRangeViewerProvider;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
@@ -56,7 +55,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * @author alvaro
- * 
+ *
  */
 public class ResourcesView extends AbsTimeUpdateView implements
 		ITmfTimeSelectionListener, ITmfTimeScaleSelectionListener {
@@ -141,7 +140,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 //			timeSpaceWidth = -timeSpaceWidth;
 //		}
 
-		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+		TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
 			TmfTimeRange experimentTRange = experiment.getTimeRange();
 			if (!experimentTRange.equals(TmfTimeRange.NULL_RANGE)) {
@@ -385,7 +384,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * tsfTmProcessSelEvent
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent
@@ -399,7 +398,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.
 	 * ITmfTimeScaleSelectionListener
 	 * #tsfTmProcessTimeScaleEvent(org.eclipse.linuxtools
@@ -412,7 +411,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#displayModel
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
@@ -423,10 +422,12 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	public void displayModel(final ITmfTimeAnalysisEntry[] items, final long startBoundTime,
 			final long endBoundTime, final boolean updateTimeBounds, final long startVisibleWindow,
 			final long endVisibleWindow, final Object source) {
-		
+
 		// Return if disposed
-		if ((tsfviewer == null) || (tsfviewer.getControl().isDisposed())) return;
-		
+		if ((tsfviewer == null) || (tsfviewer.getControl().isDisposed())) {
+            return;
+        }
+
 		Display display = tsfviewer.getControl().getDisplay();
 		display.asyncExec(new Runnable() {
 			@Override
@@ -455,7 +456,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	/**
 	 * Registers as listener of time selection from other tmf views
-	 * 
+	 *
 	 * @param signal
 	 */
 	@Override
@@ -467,7 +468,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	/**
 	 * Annotation Registers as listener of time range selection from other views
 	 * The implementation handles the entry of the signal.
-	 * 
+	 *
 	 * @param signal
 	 */
 	@TmfSignalHandler
@@ -485,7 +486,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getEventProcessor()
 	 */
@@ -498,7 +499,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * @param signal
 	 */
 	@TmfSignalHandler
-	public void experimentSelected(TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
+	public void experimentSelected(TmfExperimentSelectedSignal signal) {
 		if (signal != null) {
 			TmfTimeRange experimentTRange = signal.getExperiment().getTimeRange();
 
@@ -567,7 +568,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getParamsUpdater()
 	 */
@@ -578,7 +579,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getItemContainer()
 	 */
@@ -586,13 +587,13 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	protected ItemContainer<?> getItemContainer() {
 		return ResourceModelFactory.getResourceContainer();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getProviderId()
 	 */
 	@Override
-    protected int getProviderId() { 
-        return LttngCoreProviderFactory.RESOURCE_LTTNG_SYTH_EVENT_PROVIDER; 
+    protected int getProviderId() {
+        return LttngCoreProviderFactory.RESOURCE_LTTNG_SYTH_EVENT_PROVIDER;
     }
 }

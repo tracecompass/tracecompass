@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -13,17 +13,17 @@ package org.eclipse.linuxtools.lttng.core.tests.state.resource;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.internal.lttng.core.state.resource.ILTTngStateResource.GlobalStateMode;
 import org.eclipse.linuxtools.internal.lttng.core.state.resource.ILttngStateContext;
 import org.eclipse.linuxtools.internal.lttng.core.state.resource.LTTngStateResource;
-import org.eclipse.linuxtools.internal.lttng.core.state.resource.ILTTngStateResource.GlobalStateMode;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * For inherited methods see: LTTngTreeNodeTest
- * 
+ *
  * @author alvaro
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class LTTngStateResourceTest extends TestCase {
@@ -66,14 +66,14 @@ public class LTTngStateResourceTest extends TestCase {
 		node40 = new LTTngStateResource(40L, node30, "node40", context, this);
 		node50 = new LTTngStateResource(50L, node40, "node50", context, this);
 		node60 = new LTTngStateResource(60L, node50, "node60", context, this);
-		
+
 		//Adding first children
 		node10.addChild(node20);
 		node20.addChild(node30);
 		node30.addChild(node40);
 		node40.addChild(node50);
 		node50.addChild(node60);
-		
+
 		//create additional nodes
 		node15 = new LTTngStateResource(15L, node10, "node15", context, this);
 		node25 = new LTTngStateResource(25L, node20, "node25", context, this);
@@ -82,7 +82,7 @@ public class LTTngStateResourceTest extends TestCase {
 		node55 = new LTTngStateResource(55L, node50, "node55", context, this);
 		node65 = new LTTngStateResource(65L, node60, "node65", context, this);
 		node67 = new LTTngStateResource(67L, node60, "node67", context, this);
-		
+
 		// Add more children to instances
 		node10.addChild(node15);
 		node20.addChild(node25);
@@ -105,7 +105,7 @@ public class LTTngStateResourceTest extends TestCase {
 			}
 
 			@Override
-			public ITmfTrace<?> getTraceIdRef() {
+			public ITmfTrace getTraceIdRef() {
 				return null;
 			}
 
@@ -128,7 +128,7 @@ public class LTTngStateResourceTest extends TestCase {
 			public String getExperimentName() {
 				return "Test Experiment";
 			}
-			
+
 			@Override
             public long getIdentifier() {
                 return 0;
@@ -182,7 +182,7 @@ public class LTTngStateResourceTest extends TestCase {
 		assertEquals("waitfork", node60.getStateMode().getInName());
 
 	}
-	
+
 	/**
 	 * Test method for
 	 * {@link org.eclipse.linuxtools.internal.lttng.core.state.resource.LTTngStateResource#getContext()}

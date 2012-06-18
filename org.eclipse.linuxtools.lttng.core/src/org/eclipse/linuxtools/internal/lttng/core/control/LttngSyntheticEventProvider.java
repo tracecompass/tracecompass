@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *   Marc Dumais (marc.dumais@ericsson.com) - Fix for 316455 (first part)
@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
-import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent.SequenceInd;
@@ -32,6 +31,7 @@ import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.state.StateE
 import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.internal.lttng.core.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
@@ -47,9 +47,9 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
  * @author alvaro
- * 
+ *
  */
-public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSyntheticEvent> {
+public class LttngSyntheticEventProvider extends TmfEventProvider {
 
 	// ========================================================================
 	// Data
@@ -58,7 +58,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	public static final int NB_EVENTS  = 1;
 	public static final int QUEUE_SIZE = 1; // lttng specific, one event at a time
 
-	private ITmfDataRequest<LttngSyntheticEvent> fmainRequest = null;
+	private ITmfDataRequest fmainRequest = null;
     private LttngBaseEventRequest fSubRequest = null;
 
 	private final List<IStateTraceManager> fEventProviderRequests = new Vector<IStateTraceManager>();
@@ -66,12 +66,12 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	private final LttngSyntheticEvent fStatusEvent;
 	volatile boolean startIndSent = false;
 	private LTTngTreeNode fExperiment = null;
-	private ITransEventProcessor fstateUpdateProcessor = StateEventToHandlerFactory.getInstance();
+	private final ITransEventProcessor fstateUpdateProcessor = StateEventToHandlerFactory.getInstance();
 	private boolean waitForRequest = false;
 	long dispatchTime = 0L;
 	long dispatchIndex = 0L;
 	long eventIndex;
-	private final Map<ITmfTrace<?>, LttngTraceState> traceToTraceStateModel = new HashMap<ITmfTrace<?>, LttngTraceState>();
+	private final Map<ITmfTrace, LttngTraceState> traceToTraceStateModel = new HashMap<ITmfTrace, LttngTraceState>();
 
 	private boolean fIsExperimentNotified = false;
 
@@ -80,7 +80,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	// ========================================================================
 	/**
 	 * Accessibility to package - use factory instead of this constructor
-	 * 
+	 *
 	 * @param type
 	 */
 	LttngSyntheticEventProvider(Class<LttngSyntheticEvent> type) {
@@ -104,10 +104,10 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized ITmfContext armRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
+	public synchronized ITmfContext armRequest(final ITmfDataRequest request) {
 		// validate
 		// make sure we have the right type of request
-		if (!(request instanceof ITmfEventRequest<?>)) {
+		if (!(request instanceof ITmfEventRequest)) {
 			request.cancel();
 			TraceDebug.debug("Request is not an instance of ITmfEventRequest"); //$NON-NLS-1$
 			return null;
@@ -132,23 +132,23 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		fmainRequest = request;
 
 		// define event data handling
-		ITmfEventRequest<LttngSyntheticEvent> eventRequest = (ITmfEventRequest<LttngSyntheticEvent>) fmainRequest;
+		ITmfEventRequest eventRequest = (ITmfEventRequest) fmainRequest;
 		TmfTimeRange reqWindow = eventRequest.getRange();
 
 		TraceDebug.debug("Main Synthethic event request started on thread:  " + Thread.currentThread().getName()); //$NON-NLS-1$
 
-		TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) fExperiment.getValue();
+		TmfExperiment experiment = (TmfExperiment) fExperiment.getValue();
 		experiment.startSynch(new TmfStartSynchSignal(0));
-		
+
 		TmfTimeRange adjustedRange = reqWindow;
 		long adjustedIndex = eventRequest.getIndex();
 		int nbRequested = eventRequest.getNbRequested();
-				
+
 		// Figure-out if we need to increase the range of the request:  if some
-		// checkpoints are before the beginning of the range, increase the 
-		// range to catch them.   We will then exercise the state system of 
+		// checkpoints are before the beginning of the range, increase the
+		// range to catch them.   We will then exercise the state system of
 		// those traces until the requested beginning time range, discarding
-		// the unrequested data.   		
+		// the unrequested data.
 		IStateTraceManager traceManager;
 		Iterator<IStateTraceManager> iter = fEventProviderRequests.iterator();
 		// For each traceManager in the current experiment...
@@ -182,8 +182,8 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 					if (nbRequested < TmfDataRequest.ALL_DATA) {
 						nbRequested += (eventRequest.getIndex() - adjustedIndex);
 					}
-				}	
-			}		
+				}
+			}
 			// Save which trace state model corresponds to current trace
 			traceToTraceStateModel.put(traceManager.getStateTrace(), traceManager.getStateModel());
 		}
@@ -200,11 +200,11 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.linuxtools.lttng.control.LttngEventRequest#handleData()
 			 */
 			@Override
-			public void handleData(LttngEvent event) {
+			public void handleData(ITmfEvent event) {
 				super.handleData(event);
 				if (event != null) {
 				    synchronized (LttngSyntheticEventProvider.this) {
@@ -212,7 +212,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 				        if ((fmainRequest == null) || (fmainRequest.isCompleted()) ) {
 				            TraceDebug.debug("fmainRequest was canceled. Ignoring event " + event); //$NON-NLS-1$
 				            return;
-				        } 
+				        }
 
 				        handleIncomingData(event);
 				    }
@@ -223,7 +223,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleCompleted()
 			 */
 			@Override
@@ -235,18 +235,18 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 			/**
 			 * Trigger the Analysis and sequential control of the events.
-			 * 
+			 *
 			 * @param e
 			 */
-			private void handleIncomingData(LttngEvent e) {
+			private void handleIncomingData(ITmfEvent e) {
 				long eventTime = e.getTimestamp().getValue();
 
-				ITmfTrace<?> inTrace = e.getTrace();
+				ITmfTrace inTrace = e.getTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
-				
+
 				// queue the new event data
 				updateSynEvent(e);
-				
+
 				// If time at or above requested time, update application
 				if (eventTime >= dispatchTime && eventIndex >= dispatchIndex) {
 					// Before update
@@ -275,21 +275,21 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			/**
 			 * Create a synthetic event from the received new reference, if
 			 * the reference is the same there is no need for a new instance
-			 * 
+			 *
 			 * if this is the first event for this request, call start
 			 * handler
-			 * 
+			 *
 			 * @param e
 			 * @return
 			 */
-			private LttngSyntheticEvent updateSynEvent(LttngEvent e) {
+			private LttngSyntheticEvent updateSynEvent(ITmfEvent e) {
 				if ((syntheticEvent == null) || (syntheticEvent.getBaseEvent() != e)) {
 					syntheticEvent = new LttngSyntheticEvent(e);
 				}
 
-				ITmfTrace<?> inTrace = e.getTrace();
+				ITmfTrace inTrace = e.getTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
-				
+
 				// Trace model needed by application handlers
 				syntheticEvent.setTraceModel(traceModel);
 
@@ -305,7 +305,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		};
 
 		// start request
-		TmfExperiment<LttngEvent> provider = (TmfExperiment<LttngEvent>) fExperiment.getValue();
+		TmfExperiment provider = (TmfExperiment) fExperiment.getValue();
 		provider.sendRequest(fSubRequest);
 
 		// notify LTTngEvent provider that all requests were sent
@@ -350,7 +350,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
             fmainRequest.handleData(finishEvent);
 	    }
-	    
+
         if(isSuccess) {
             // Finish main request
             fmainRequest.done();
@@ -358,13 +358,13 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
         else {
             // Cancel main request
             fmainRequest.cancel();
-            
+
         }
 	}
 
 	/**
 	 * Reset provider to a state ready to begin thread execution
-	 * 
+	 *
 	 * @param experimentNode
 	 */
 	public synchronized void reset(LTTngTreeNode experimentNode) {
@@ -390,13 +390,14 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 	/**
 	 * Point to a new experiment reference
-	 * 
+	 *
 	 * @param experiment
 	 */
 	private synchronized void updateExperimentNode(LTTngTreeNode experiment) {
-	    if (experiment == null)
-	        return;
-		if (experiment.getValue() instanceof TmfExperiment<?>) {
+	    if (experiment == null) {
+            return;
+        }
+		if (experiment.getValue() instanceof TmfExperiment) {
 			fExperiment = experiment;
 		} else {
 			TraceDebug.debug("Experiment received is not instance of TmfExperiment: " //$NON-NLS-1$
@@ -406,17 +407,16 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.tmf.component.TmfDataProvider#sendRequest(org.
 	 * eclipse.linuxtools.tmf.request.TmfDataRequest)
 	 */
 	@Override
-	public void sendRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
+	public void sendRequest(final ITmfDataRequest request) {
 	    synchronized (this) {
 	        if (!fIsExperimentNotified) {
-	            @SuppressWarnings("unchecked")
-	            TmfExperiment<LttngSyntheticEvent> experiment = (TmfExperiment<LttngSyntheticEvent>) TmfExperiment.getCurrentExperiment();
+	            TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
 	            if (experiment != null) {
 	                experiment.notifyPendingRequest(true);
 	                fIsExperimentNotified = true;
@@ -462,7 +462,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	 */
 	public synchronized void conditionallyCancelRequests() {
 	    if ((fSubRequest != null) && (!fSubRequest.isCompleted())) {
-	    	
+
 	    	TraceDebug.debug("Canceling synthethic event request!"); //$NON-NLS-1$
 
 	        // This will also cancel the fmainRequest
@@ -474,7 +474,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	}
 
 	@Override
-	protected void queueBackgroundRequest(ITmfDataRequest<LttngSyntheticEvent> request, int blockSize, boolean indexing) {
+	protected void queueBackgroundRequest(ITmfDataRequest request, int blockSize, boolean indexing) {
 		// do not split background synthetic requests
 		queueRequest(request);
 	}

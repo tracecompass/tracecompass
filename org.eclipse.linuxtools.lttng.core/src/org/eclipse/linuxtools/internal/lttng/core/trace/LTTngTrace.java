@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -65,7 +66,7 @@ class LTTngTraceException extends LttngException {
  * LTTng trace implementation. It accesses the C trace handling library
  * (seeking, reading and parsing) through the JNI component.
  */
-public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<LttngEvent> {
+public class LTTngTrace extends TmfTrace implements ITmfEventParser {
 
     public final static boolean PRINT_DEBUG = false;
     public final static boolean UNIQUE_EVENT = true;
@@ -115,9 +116,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         return false;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public synchronized void initTrace(final IResource resource, final String path, final Class<LttngEvent> eventType)
+    public synchronized void initTrace(final IResource resource,
+            final String path, final Class<? extends ITmfEvent> eventType)
             throws TmfTraceException {
         super.initialize(resource, path, eventType);
         setIndexer(new TmfCheckpointIndexer(this, getCacheSize()));
@@ -125,7 +126,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
     }
 
     @Override
-    protected synchronized void initialize(final IResource resource, final String path, final Class<LttngEvent> eventType)
+    protected synchronized void initialize(final IResource resource,
+            final String path, final Class<? extends ITmfEvent> eventType)
             throws TmfTraceException {
         try {
             if (resource != null) {
@@ -159,7 +161,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
 
-        setParser((ITmfEventParser<LttngEvent>) this);
+        setParser(this);
         setCacheSize(CHECKPOINT_PAGE_SIZE);
  
         initializeStreamingMonitor();
@@ -196,10 +198,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
             @Override
             public void run() {
                 while (!fExecutor.isShutdown()) {
-                    final TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+                    final TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
                     if (experiment != null) {
                         @SuppressWarnings("rawtypes")
-                        final TmfEventRequest request = new TmfEventRequest<TmfEvent>(TmfEvent.class,
+                        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class,
                                 TmfTimeRange.ETERNITY, 0, ExecutionType.FOREGROUND) {
 
                             @Override

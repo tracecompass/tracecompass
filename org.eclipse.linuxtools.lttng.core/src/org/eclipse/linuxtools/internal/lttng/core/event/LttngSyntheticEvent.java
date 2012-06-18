@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -13,11 +13,12 @@ package org.eclipse.linuxtools.internal.lttng.core.event;
 
 import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 /**
  * @author alvaro
- * 
+ *
  */
 public class LttngSyntheticEvent extends LttngEvent {
 
@@ -53,9 +54,9 @@ public class LttngSyntheticEvent extends LttngEvent {
 	/**
 	 * @param baseEvent
 	 */
-	public LttngSyntheticEvent(LttngEvent baseEvent) {
+	public LttngSyntheticEvent(ITmfEvent baseEvent) {
 		super(baseEvent);
-		this.baseEvent = baseEvent;
+		this.baseEvent = (LttngEvent) baseEvent;
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * @param reference
 	 * @param lttEvent
 	 */
-	public LttngSyntheticEvent(TmfTrace<LttngEvent> parent,
+	public LttngSyntheticEvent(TmfTrace parent,
 			LttngTimestamp timestamp, String source,
 			LttngEventType type, LttngEventContent content,
 			String reference, JniEvent lttEvent) {
@@ -121,28 +122,27 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/**
 	 * /* (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent#getTrace()
 	 */
-	@SuppressWarnings("unchecked")
     @Override
-   public TmfTrace<LttngEvent> getTrace() {
+   public TmfTrace getTrace() {
 		if (baseEvent != null) {
-			return (TmfTrace<LttngEvent>) baseEvent.getTrace();
+			return (TmfTrace) baseEvent.getTrace();
 		} else {
-			return (TmfTrace<LttngEvent>) super.getTrace();
+			return (TmfTrace) super.getTrace();
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#setParentTrace(org.eclipse
 	 * .linuxtools.tmf.trace.TmfTrace)
 	 */
 	@Override
-	public void setParentTrace(TmfTrace<LttngEvent> parentTrace) {
+	public void setParentTrace(TmfTrace parentTrace) {
 		if (baseEvent != null) {
 			baseEvent.setParentTrace(parentTrace);
 		} else {
@@ -152,7 +152,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getChannelName()
 	 */
 	@Override
@@ -166,7 +166,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getCpuId()
 	 */
 	@Override
@@ -180,7 +180,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getMarkerName()
 	 */
 	@Override
@@ -194,7 +194,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getContent()
 	 */
 	@Override
@@ -208,7 +208,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#setContent(org.eclipse.
 	 * linuxtools.lttng.event.LttngEventContent)
@@ -224,7 +224,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getType()
 	 */
 	@Override
@@ -238,7 +238,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#setType(org.eclipse.linuxtools
 	 * .lttng.event.LttngEventType)
@@ -254,7 +254,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#updateJniEventReference
 	 * (org.eclipse.linuxtools.lttng.jni.JniEvent)
@@ -270,7 +270,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#convertEventTmfToJni()
 	 */
 	@Override
@@ -284,7 +284,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#toString()
 	 */
 	@Override

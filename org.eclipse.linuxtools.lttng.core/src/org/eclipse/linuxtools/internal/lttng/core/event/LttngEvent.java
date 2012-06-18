@@ -1,6 +1,7 @@
 package org.eclipse.linuxtools.internal.lttng.core.event;
 
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
@@ -18,7 +19,7 @@ public class LttngEvent extends TmfEvent {
 
     // Reference to the JNI JniEvent. Should only be used INTERNALLY
     private JniEvent jniEventReference = null;
-    
+
     // Parameter-less constructor
     public LttngEvent() {
         super();
@@ -28,14 +29,14 @@ public class LttngEvent extends TmfEvent {
     /**
      * Constructor with parameters.
      * <p>
-     * 
+     *
      * @param timestamp The timestamp of this event
      * @param source The source of this event
      * @param type The type of this event
      * @param content The content of this event
      * @param reference The reference of this event
      * @param lttEvent A reference to a valid JniEvent object
-     * 
+     *
      * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp
      * @see org.eclipse.linuxtools.tmf.core.event.TmfEventSource
      * @see org.eclipse.linuxtools.internal.lttng.core.event.LttngEventType
@@ -43,7 +44,7 @@ public class LttngEvent extends TmfEvent {
      * @see org.eclipse.linuxtools.lttng.core.event.LttngEventReference
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
-    public LttngEvent(TmfTrace<LttngEvent> parent, LttngTimestamp timestamp, String source, LttngEventType type, LttngEventContent content,
+    public LttngEvent(TmfTrace parent, LttngTimestamp timestamp, String source, LttngEventType type, LttngEventContent content,
             String reference, JniEvent lttEvent)
     {
         super(parent, timestamp, source, type, content, reference);
@@ -54,34 +55,33 @@ public class LttngEvent extends TmfEvent {
     /**
      * Copy constructor.
      * <p>
-     * 
+     *
      * @param oldEvent Event we want to copy from.
      */
-    @SuppressWarnings("unchecked")
-    public LttngEvent(LttngEvent oldEvent) {
-        this(	
-        		(TmfTrace<LttngEvent>) oldEvent.getTrace(),
-        		(LttngTimestamp)oldEvent.getTimestamp(), 
-        		oldEvent.getSource(), 
-        		(LttngEventType)oldEvent.getType(), 
-        		(LttngEventContent)oldEvent.getContent(), 
-        		oldEvent.getReference(), 
-        		oldEvent.jniEventReference
+    public LttngEvent(ITmfEvent oldEvent) {
+        this(
+        		(TmfTrace) oldEvent.getTrace(),
+        		(LttngTimestamp)oldEvent.getTimestamp(),
+        		oldEvent.getSource(),
+        		(LttngEventType)oldEvent.getType(),
+        		(LttngEventContent)oldEvent.getContent(),
+        		oldEvent.getReference(),
+        		((LttngEvent) oldEvent).jniEventReference
         	);
     }
     /**
      * Set a new parent trace for this event
-     * 
+     *
      * @param parentTrace The new parent
      */
-    public void setParentTrace(TmfTrace<LttngEvent> parentTrace) {
+    public void setParentTrace(TmfTrace parentTrace) {
         super.setTrace(parentTrace);
 	}
-    
-    
+
+
 	/**
      * Return the channel name of this event.<p>
-     * 
+     *
      * @return Channel (tracefile) for this event
      */
     public String getChannelName() {
@@ -91,7 +91,7 @@ public class LttngEvent extends TmfEvent {
     /**
      * Cpu id number of this event.
      * <p>
-     * 
+     *
      * @return CpuId
      */
     public long getCpuId() {
@@ -101,7 +101,7 @@ public class LttngEvent extends TmfEvent {
     /**
      * Marker name of this event.
      * <p>
-     * 
+     *
      * @return Marker name
      */
     public String getMarkerName() {
@@ -111,7 +111,7 @@ public class LttngEvent extends TmfEvent {
     /**
      * Marker id of this event.
      * <p>
-     * 
+     *
      * @return Marker id
      */
     public int getMarkerId() {
@@ -144,12 +144,12 @@ public class LttngEvent extends TmfEvent {
     /**
      * Set a new JniReference for this event.
      * <p>
-     * 
+     *
      * Note : Reference is used to get back to the Jni during event parsing and
      * need to be consistent.
-     * 
+     *
      * @param newJniEventReference New reference
-     * 
+     *
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public synchronized void updateJniEventReference(JniEvent newJniEventReference) {
@@ -159,13 +159,13 @@ public class LttngEvent extends TmfEvent {
     /**
      * Convert this event into a Jni JniEvent.
      * <p>
-     * 
+     *
      * Note : Some verifications are done to make sure the event is still valid
      * on the Jni side before conversion.<br>
      * If it is not the case, null will be returned.
-     * 
+     *
      * @return The converted JniEvent
-     * 
+     *
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public synchronized JniEvent convertEventTmfToJni() {
