@@ -200,7 +200,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
      */
     @Override
     public String getWildcard() {
-        return "\"" + fWildcard + "\"";  //$NON-NLS-1$//$NON-NLS-2$
+        return fWildcard;
     }
 
     /*

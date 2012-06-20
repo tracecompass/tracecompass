@@ -523,13 +523,15 @@ public class LTTngControlService implements ILttngControlService {
             command.append(LTTngControlServiceConstants.OPTION_ALL);
         } else {
 
+            StringBuffer eventNameParameter = new StringBuffer();
             for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
                 String event = iterator.next();
-                command.append(event);
+                eventNameParameter.append(event);
                 if (iterator.hasNext()) {
-                    command.append(',');
+                    eventNameParameter.append(',');
                 }
             }
+            command.append(formatParameter(eventNameParameter.toString()));
         }
 
         if (isKernel) {
@@ -656,18 +658,20 @@ public class LTTngControlService implements ILttngControlService {
         if (eventNames == null) {
             command.append(LTTngControlServiceConstants.OPTION_ALL);
         } else {
-            // no events to enable
+            // no events to disable
             if (eventNames.isEmpty()) {
                 return;
             }
 
+            StringBuffer eventNameParameter = new StringBuffer();
             for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
                 String event = iterator.next();
-                command.append(event);
+                eventNameParameter.append(event);
                 if (iterator.hasNext()) {
-                    command.append(',');
+                    eventNameParameter.append(',');
                 }
             }
+            command.append(formatParameter(eventNameParameter.toString()));
         }
 
         if (isKernel) {
@@ -811,7 +815,7 @@ public class LTTngControlService implements ILttngControlService {
      *            - output array
      * @return - the formatted output
      */
-    protected String formatOutput(ICommandResult result) {
+    public static String formatOutput(ICommandResult result) {
         if ((result == null) || result.getOutput() == null || result.getOutput().length == 0) {
             return ""; //$NON-NLS-1$
         }
@@ -1070,7 +1074,7 @@ public class LTTngControlService implements ILttngControlService {
             StringBuffer newString = new StringBuffer();
             newString.append(parameter);
 
-            if (parameter.contains(" ")) { //$NON-NLS-1$
+            if (parameter.contains(" ") || parameter.contains("*")) { //$NON-NLS-1$ //$NON-NLS-2$
                 newString.insert(0, "\""); //$NON-NLS-1$
                 newString.append("\""); //$NON-NLS-1$
             }

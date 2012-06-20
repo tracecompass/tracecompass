@@ -15,7 +15,9 @@ import java.util.regex.Matcher;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCommandLogger;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferences;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandResult;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.ICommandShell;
 
@@ -72,7 +74,17 @@ public class LTTngControlServiceFactory {
      */
     public ILttngControlService getLttngControlService(ICommandShell shell) throws ExecutionException {
         // get the version
-        ICommandResult result = shell.executeCommand(LTTngControlServiceConstants.CONTROL_COMMAND + LTTngControlServiceConstants.COMMAND_VERSION, new NullProgressMonitor());
+        String command = LTTngControlServiceConstants.CONTROL_COMMAND + LTTngControlServiceConstants.COMMAND_VERSION;
+
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            ControlCommandLogger.log(command);
+        }
+
+        ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
+
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            ControlCommandLogger.log(LTTngControlService.formatOutput(result));
+        }
 
         if ((result != null) && (result.getResult() == 0) && (result.getOutput().length >= 1) && (!LTTngControlServiceConstants.ERROR_PATTERN.matcher(result.getOutput()[0]).matches())) {
             int index = 0;
