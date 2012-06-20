@@ -53,6 +53,7 @@ public class LTTngControlServiceTest extends TestCase {
 
     private static final String SCEN_LTTNG_NOT_INSTALLED = "LttngNotInstalled";
     private static final String SCEN_LTTNG_VERSION = "LttngVersion";
+    private static final String SCEN_LTTNG_VERSION_WITH_PROMPT = "LttngVersionWithPrompt";
     private static final String SCEN_LTTNG_UNSUPPORTED_VERSION = "LttngUnsupportedVersion";
     private static final String SCEN_LTTNG_NO_VERSION = "LttngNoVersion";
     private static final String SCEN_NO_SESSION_AVAILABLE = "NoSessionAvailable";
@@ -64,6 +65,7 @@ public class LTTngControlServiceTest extends TestCase {
     private static final String SCEN_GET_UST_PROVIDER1 = "GetUstProvider1";
     private static final String SCEN_GET_UST_PROVIDER2 = "GetUstProvider2";
     private static final String SCEN_CREATE_SESSION1 = "CreateSession1";
+    private static final String SCEN_CREATE_SESSION_WITH_PROMPT = "CreateSessionWithPrompt";
     private static final String SCEN_CREATE_SESSION_VARIANTS = "CreateSessionVariants";
     private static final String SCEN_DESTROY_SESSION1 = "DestroySession1";
     private static final String SCEN_CHANNEL_HANDLING = "ChannelHandling";
@@ -133,6 +135,17 @@ public class LTTngControlServiceTest extends TestCase {
         }
     }
 
+    public void testVersionWithPrompt() {
+        try {
+            fShell.setScenario(SCEN_LTTNG_VERSION_WITH_PROMPT);
+            ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
+            assertNotNull(service);
+            assertEquals("2.0.0", service.getVersion());
+        } catch (ExecutionException e) {
+            fail("Exeption thrown " + e);
+        }
+    }
+    
     public void testUnsupportedVersion() {
         try {
             fShell.setScenario(SCEN_LTTNG_UNSUPPORTED_VERSION);
@@ -444,6 +457,25 @@ public class LTTngControlServiceTest extends TestCase {
         }
     }
 
+    public void testCreateSessionWithPrompt() {
+        try {
+            // First line has the shell prompt before the command output 
+            // This can happen in a real application if the command line is not echoed by the shell.
+            fShell.setScenario(SCEN_CREATE_SESSION_WITH_PROMPT);
+
+            // First line has no shell prompt before the output
+            ISessionInfo info = fService.createSession("mysession2", null, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession2", info.getName());
+            assertNotNull(info.getSessionPath());
+            assertTrue(info.getSessionPath().contains("mysession2"));
+            assertEquals(TraceSessionState.INACTIVE, info.getSessionState());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    
     public void testCreateSessionVariants() {
 
         fShell.setScenario(SCEN_CREATE_SESSION_VARIANTS);

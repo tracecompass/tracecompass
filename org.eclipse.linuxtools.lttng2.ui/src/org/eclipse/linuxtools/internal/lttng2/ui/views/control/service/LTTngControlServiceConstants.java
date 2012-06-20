@@ -200,7 +200,7 @@ public class LTTngControlServiceConstants {
     /**
      * Pattern to match the version.
      */
-    public final static Pattern VERSION_PATTERN = Pattern.compile("\\s*lttng\\s+version\\s+(\\d+\\.\\d+\\.\\d+).*"); //$NON-NLS-1$
+    public final static Pattern VERSION_PATTERN = Pattern.compile(".*lttng\\s+version\\s+(\\d+\\.\\d+\\.\\d+).*"); //$NON-NLS-1$
     /**
      * Pattern to match for error output
      */
@@ -300,7 +300,7 @@ public class LTTngControlServiceConstants {
     /**
      * Pattern to match for session information (lttng create <session name>)
      */
-    public final static Pattern CREATE_SESSION_NAME_PATTERN = Pattern.compile("\\s*Session\\s+(.*)\\s+created\\."); //$NON-NLS-1$
+    public final static Pattern CREATE_SESSION_NAME_PATTERN = Pattern.compile(".*Session\\s+(.*)\\s+created\\."); //$NON-NLS-1$
     /**
      * Pattern to match for session path information (lttng create <session name>)
      */
