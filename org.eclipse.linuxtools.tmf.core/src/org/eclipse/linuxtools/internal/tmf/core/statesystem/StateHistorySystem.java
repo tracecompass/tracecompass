@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier2;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**
@@ -43,7 +44,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  *
  */
 public class StateHistorySystem extends StateSystem implements
-        IStateSystemBuilder {
+        IStateSystemBuilder, IStateSystemQuerier2 {
 
     /**
      * In addition, a state "history" system has a storage back-end from which
