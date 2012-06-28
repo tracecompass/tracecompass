@@ -62,8 +62,8 @@ public class CommandShell implements ICommandShell {
     /** Default command separator */
     public final static char CMD_SEPARATOR = ';';
 
-    // /** Default timeout value used for executing commands, in milliseconds */
-    private final static int DEFAULT_TIMEOUT_VALUE = 150000; // in milliseconds
+    /** Default timeout value used for executing commands, in milliseconds */
+    private final static int DEFAULT_TIMEOUT_VALUE = 15000;
 
     // ------------------------------------------------------------------------
     // Attributes
