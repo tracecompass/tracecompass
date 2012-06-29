@@ -30,7 +30,6 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -48,8 +47,8 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class TimeGraphTooltipHandler {
 
-    private final Shell _tipShell;
-    private final Table _tipTable;
+    private Shell _tipShell;
+    private Table _tipTable;
     private Point _tipPosition;
     private final ITimeDataProvider _timeDataProvider;
     ITimeGraphPresentationProvider _utilImp = null;
@@ -58,7 +57,7 @@ public class TimeGraphTooltipHandler {
      * Standard constructor
      *
      * @param parent
-     *            The parent composite object
+     *            The parent shell (unused, can be null)
      * @param rUtilImpl
      *            The presentation provider
      * @param timeProv
@@ -66,21 +65,23 @@ public class TimeGraphTooltipHandler {
      */
     public TimeGraphTooltipHandler(Shell parent, ITimeGraphPresentationProvider rUtilImpl,
             ITimeDataProvider timeProv) {
-        final Display display = parent.getDisplay();
 
         this._utilImp = rUtilImpl;
         this._timeDataProvider = timeProv;
+    }
+
+    private void createTooltipShell(Shell parent) {
+        final Display display = parent.getDisplay();
+        if (_tipShell != null && ! _tipShell.isDisposed()) {
+            _tipShell.dispose();
+        }
         _tipShell = new Shell(parent, SWT.ON_TOP | SWT.TOOL);
         GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 2;
         gridLayout.marginWidth = 2;
         gridLayout.marginHeight = 2;
         _tipShell.setLayout(gridLayout);
-        GridData data = new GridData(GridData.BEGINNING, GridData.BEGINNING,
-                true, true);
-        _tipShell.setLayoutData(data);
-        _tipShell.setBackground(display
-                .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+        _tipShell.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 
         _tipTable = new Table(_tipShell, SWT.NONE);
         new TableColumn(_tipTable, SWT.NONE);
@@ -92,8 +93,26 @@ public class TimeGraphTooltipHandler {
         _tipTable.setHeaderVisible(false);
         _tipTable.setLinesVisible(false);
 
-        // tipTable.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
-        // | GridData.VERTICAL_ALIGN_CENTER));
+        _tipTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                _tipShell.dispose();
+            }
+        });
+
+        _tipTable.addMouseTrackListener(new MouseTrackAdapter() {
+            @Override
+            public void mouseExit(MouseEvent e) {
+                _tipShell.dispose();
+            }
+        });
+
+        _tipTable.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void mouseMove(MouseEvent e) {
+                _tipShell.dispose();
+            }
+        });
     }
 
     /**
@@ -103,12 +122,11 @@ public class TimeGraphTooltipHandler {
      *            The control object to use
      */
     public void activateHoverHelp(final Control control) {
-        //FIXME: remove old listeners
         control.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
-                if (_tipShell.isVisible()) {
-                    _tipShell.setVisible(false);
+                if (_tipShell != null && ! _tipShell.isDisposed()) {
+                    _tipShell.dispose();
                 }
             }
         });
@@ -116,8 +134,8 @@ public class TimeGraphTooltipHandler {
         control.addMouseMoveListener(new MouseMoveListener() {
             @Override
             public void mouseMove(MouseEvent e) {
-                if (_tipShell.isVisible()) {
-                    _tipShell.setVisible(false);
+                if (_tipShell != null && ! _tipShell.isDisposed()) {
+                    _tipShell.dispose();
                 }
             }
         });
@@ -125,8 +143,11 @@ public class TimeGraphTooltipHandler {
         control.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseExit(MouseEvent e) {
-                if (_tipShell.isVisible()) {
-                    _tipShell.setVisible(false);
+                if (_tipShell != null && ! _tipShell.isDisposed()) {
+                    Point pt = control.toDisplay(e.x, e.y);
+                    if (! _tipShell.getBounds().contains(pt)) {
+                        _tipShell.dispose();
+                    }
                 }
             }
 
@@ -136,28 +157,41 @@ public class TimeGraphTooltipHandler {
                 line.setText(1, value);
             }
 
-            private void fillValues(Point pt, TimeGraphControl threadStates, ITimeGraphEntry entry) {
+            private void fillValues(Point pt, TimeGraphControl timeGraphControl, ITimeGraphEntry entry) {
                 if (entry == null) {
                     return;
                 }
                 if (entry.hasTimeEvents()) {
-                    ITimeEvent threadEvent = Utils.findEvent(entry, threadStates.getTimeAtX(pt.x), 2);
-                    ITimeEvent nextEvent = Utils.findEvent(entry, threadStates.getTimeAtX(pt.x), 1);
+                    long currPixelTime = timeGraphControl.getTimeAtX(pt.x);
+                    long nextPixelTime = timeGraphControl.getTimeAtX(pt.x + 1);
+                    if (nextPixelTime == currPixelTime) {
+                        nextPixelTime++;
+                    }
+                    ITimeEvent currEvent = Utils.findEvent(entry, currPixelTime, 0);
+                    ITimeEvent nextEvent = Utils.findEvent(entry, currPixelTime, 1);
+
+                    // if there is no current event at the start of the current pixel range,
+                    // or if the current event starts before the current pixel range,
+                    // use the next event as long as it starts within the current pixel range
+                    if (currEvent == null || currEvent.getTime() < currPixelTime) {
+                        if (nextEvent != null && nextEvent.getTime() < nextPixelTime) {
+                            currEvent = nextEvent;
+                        }
+                    }
+
                     // state name
                     addItem(_utilImp.getStateTypeName(), entry.getName());
-                    if (threadEvent == null) {
+                    if (currEvent == null) {
                         return;
                     }
-                    // thread state
-                    String state = _utilImp.getEventName(threadEvent);
+                    // state
+                    String state = _utilImp.getEventName(currEvent);
                     if (state != null) {
                         addItem(Messages.TmfTimeTipHandler_TRACE_STATE, state);
                     }
 
-                    // This block receives a
-                    // list of <String, String> values to be added to the tip
-                    // table
-                    Map<String, String> eventAddOns = _utilImp.getEventHoverToolTipInfo(threadEvent);
+                    // This block receives a list of <String, String> values to be added to the tip table
+                    Map<String, String> eventAddOns = _utilImp.getEventHoverToolTipInfo(currEvent);
                     if (eventAddOns != null) {
                         for (Iterator<String> iter = eventAddOns.keySet().iterator(); iter.hasNext();) {
                             String message = iter.next();
@@ -169,8 +203,8 @@ public class TimeGraphTooltipHandler {
                     long eventDuration = -1;
                     long eventEndTime = -1;
 
-                    eventStartTime = threadEvent.getTime();
-                    eventDuration = threadEvent.getDuration();
+                    eventStartTime = currEvent.getTime();
+                    eventDuration = currEvent.getDuration();
                     if (eventDuration < 0 && nextEvent != null) {
                         eventEndTime = nextEvent.getTime();
                         eventDuration = eventEndTime - eventStartTime;
@@ -178,13 +212,8 @@ public class TimeGraphTooltipHandler {
                         eventEndTime = eventStartTime + eventDuration;
                     }
 
-                    // TODO: Check if we need "format"
-                    //					TimeFormat format = TimeFormat.RELATIVE;
                     Resolution res = Resolution.NANOSEC;
                     if (_timeDataProvider.isCalendarFormat()) {
-                        //						format = TimeFormat.ABSOLUTE; // Absolute format
-                        //														// (calendar)
-                        // Add Date
                         addItem(Messages.TmfTimeTipHandler_TRACE_DATE, eventStartTime > -1 ?
                                 Utils.formatDate(eventStartTime)
                                 : "?"); //$NON-NLS-1$
@@ -229,10 +258,11 @@ public class TimeGraphTooltipHandler {
             @Override
             public void mouseHover(MouseEvent event) {
                 Point pt = new Point(event.x, event.y);
-                TimeGraphControl threadStates = (TimeGraphControl) event.widget;
-                ITimeGraphEntry entry = threadStates.getEntry(pt);
+                TimeGraphControl timeGraphControl = (TimeGraphControl) event.widget;
+                createTooltipShell(timeGraphControl.getShell());
+                ITimeGraphEntry entry = timeGraphControl.getEntry(pt);
                 _tipTable.remove(0, _tipTable.getItemCount() - 1);
-                fillValues(pt, threadStates, entry);
+                fillValues(pt, timeGraphControl, entry);
                 if (_tipTable.getItemCount() == 0) {
                     return;
                 }
@@ -250,10 +280,16 @@ public class TimeGraphTooltipHandler {
     private static void setHoverLocation(Shell shell, Point position) {
         Rectangle displayBounds = shell.getDisplay().getBounds();
         Rectangle shellBounds = shell.getBounds();
-        shellBounds.x = Math.max(Math.min(position.x, displayBounds.width
-                - shellBounds.width), 0);
-        shellBounds.y = Math.max(Math.min(position.y + 16, displayBounds.height
-                - shellBounds.height), 0);
+        if (position.x + shellBounds.width + 16 > displayBounds.width && position.x - shellBounds.width - 16 >= 0) {
+            shellBounds.x = position.x - shellBounds.width - 16;
+        } else {
+            shellBounds.x = Math.max(Math.min(position.x + 16, displayBounds.width - shellBounds.width), 0);
+        }
+        if (position.y + shellBounds.height + 16 > displayBounds.height && position.y - shellBounds.height - 16 >= 0) {
+            shellBounds.y = position.y - shellBounds.height - 16;
+        } else {
+            shellBounds.y = Math.max(Math.min(position.y + 16, displayBounds.height - shellBounds.height), 0);
+        }
         shell.setBounds(shellBounds);
     }
 

@@ -874,13 +874,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         x -= nameWidth;
         int timeWidth = size.x - nameWidth - RIGHT_MARGIN;
         if (x >= 0 && size.x >= nameWidth) {
-            if (time1 - time0 > timeWidth) {
-                // get the last possible time represented by the pixel position
-                // by taking the time of the next pixel position minus 1 nanosecond
-                hitTime = time0 + (long) ((time1 - time0) * ((double) (x + 1) / timeWidth)) - 1;
-            } else {
-                hitTime = time0 + Math.round((time1 - time0) * ((double) x / timeWidth));
-            }
+            hitTime = time0 + Math.round((time1 - time0) * ((double) x / timeWidth));
         }
         return hitTime;
     }
@@ -1048,7 +1042,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         long time1 = _timeProvider.getTime1();
         long selectedTime = _timeProvider.getSelectedTime();
         double pixelsPerNanoSec = (bounds.width - nameSpace <= RIGHT_MARGIN) ? 0 : (double) (bounds.width - nameSpace - RIGHT_MARGIN) / (time1 - time0);
-        int x = bounds.x + nameSpace + (int) ((selectedTime - time0) * pixelsPerNanoSec);
+        int x = bounds.x + nameSpace + (int) Math.round((selectedTime - time0) * pixelsPerNanoSec);
         if (x >= nameSpace && x < bounds.x + bounds.width) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.SELECTED_TIME));
             gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);

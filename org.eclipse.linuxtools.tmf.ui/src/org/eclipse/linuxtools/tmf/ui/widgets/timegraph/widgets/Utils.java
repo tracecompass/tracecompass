@@ -473,7 +473,10 @@ public class Utils {
             }
             return null;
         } else if (n == 1) { //next
-            return nextEvent;
+            if (nextEvent != null && nextEvent.getTime() > time) {
+                return nextEvent;
+            }
+            return null;
         } else if (n == 2) { //current or previous when in empty space
             return currEvent;
         }

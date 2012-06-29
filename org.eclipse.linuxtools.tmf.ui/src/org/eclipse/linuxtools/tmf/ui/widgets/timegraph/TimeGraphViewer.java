@@ -370,7 +370,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             _time1 = _time1_;
         }
         if (_time1 - _time0 < _minTimeInterval) {
-            _time1 = _time0 + _minTimeInterval;
+            _time1 = Math.min(_time1_, _time0 + _minTimeInterval);
         }
     }
 
@@ -622,7 +622,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             }
         }
         if (_time1 - _time0 < _minTimeInterval) {
-            _time1 = _time0 + _minTimeInterval;
+            _time1 = Math.min(_time1_, _time0 + _minTimeInterval);
         }
         _stateCtrl.adjustScrolls();
         _stateCtrl.redraw();
