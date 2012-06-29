@@ -245,6 +245,8 @@ public class TmfStatisticsView extends TmfView {
             fWaitCursor.dispose();
         }
 
+        // Make sure there is no request running before removing the statistics tree
+        cancelOngoingRequest();
         // clean the model
         TmfStatisticsTreeRootFactory.removeAll();
     }
@@ -500,12 +502,12 @@ public class TmfStatisticsView extends TmfView {
             // Preparation of the event request
             fRequest = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, timeRange, index, TmfDataRequest.ALL_DATA, getIndexPageSize(), ExecutionType.BACKGROUND) {
 
+                private final AbsTmfStatisticsTree statisticsData = TmfStatisticsTreeRootFactory.getStatTree(getTreeID(experiment.getName()));
+
                 @Override
                 public void handleData(ITmfEvent data) {
                     super.handleData(data);
                     if (data != null) {
-                        AbsTmfStatisticsTree statisticsData = TmfStatisticsTreeRootFactory.getStatTree(getTreeID(experiment.getName()));
-
                         final String traceName = data.getTrace().getName();
                         ITmfExtraEventInfo extraInfo = new ITmfExtraEventInfo() {
                             @Override
