@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   William Bourque - Initial API and implementation
  *   Francois Chouinard - Cleanup and refactoring
@@ -19,10 +19,10 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * Bunch of conversion utilities.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
- * <p>
+ *         <p>
  */
 public abstract class HistogramUtils {
 
@@ -34,8 +34,9 @@ public abstract class HistogramUtils {
      * Format a long representing nanoseconds into a string of the form
      * "[seconds].[nanoseconds]" with the appropriate zero-padding.
      * <p>
-     * 
-     * @param ns the timestamp in nanoseconds
+     *
+     * @param ns
+     *            the timestamp in nanoseconds
      * @return the formatted string
      */
     public static String nanosecondsToString(long ns) {
@@ -45,7 +46,8 @@ public abstract class HistogramUtils {
         int length = time.length();
         if (time.length() > 9) {
             // Just insert the decimal dot
-            time = time.substring(0, length - 9) + "." + time.substring(length - 9); //$NON-NLS-1$
+            time = time.substring(0, length - 9)
+                    + "." + time.substring(length - 9); //$NON-NLS-1$
             return time;
         }
 
@@ -60,8 +62,9 @@ public abstract class HistogramUtils {
     /**
      * Convert a string representing a time to the corresponding long.
      * <p>
-     * 
-     * @param time the string to convert
+     *
+     * @param time
+     *            the string to convert
      * @return the corresponding nanoseconds value
      */
     public static long stringToNanoseconds(String time) {
@@ -72,27 +75,39 @@ public abstract class HistogramUtils {
         try {
             int dot = buffer.indexOf("."); //$NON-NLS-1$
 
-            // Prepend a "." if none was found (assume ns)
+            // if no . was found, assume ns
             if (dot == -1) {
-                buffer.insert(0, "."); //$NON-NLS-1$
-                dot = 0;
+                // nanoseconds are the base unit.
+                if (time.length() > 9) {
+                    long nanos = Long
+                            .parseLong(time.substring(time.length() - 9));
+                    long secs = Long.parseLong(time.substring(0,
+                            time.length() - 9));
+                    result = (secs * 1000000000) + nanos;
+                } else {
+                    result = Long.parseLong(time);
+                }
+
+            } else {
+                // Zero-pad the string for nanoseconds
+                for (int i = buffer.length() - dot - 1; i < 9; i++) {
+                    buffer.append("0"); //$NON-NLS-1$
+                }
+
+                // Remove the extra decimals if present
+                int nbDecimals = buffer.substring(dot + 1).length();
+                if (nbDecimals > 9) {
+                    buffer.delete(buffer.substring(0, dot + 1 + 9).length(),
+                            buffer.length());
+                }
+
+                // Do the conversion
+                long seconds = (dot > 0) ? Long.parseLong(buffer.substring(0,
+                        dot)) : 0;
+                seconds = Math.abs(seconds);
+                long nanosecs = Long.parseLong(buffer.substring(dot + 1));
+                result = (seconds * 1000000000) + nanosecs;
             }
-
-            // Zero-pad the string for nanoseconds
-            for (int i = buffer.length() - dot - 1; i < 9; i++)
-                buffer.append("0"); //$NON-NLS-1$
-
-            // Remove the extra decimals if present
-            int nbDecimals = buffer.substring(dot + 1).length();
-            if (nbDecimals > 9)
-                buffer.delete(buffer.substring(0, dot + 1 + 9).length(), buffer.length());
-
-            // Do the conversion
-            long seconds = (dot > 0) ? Long.parseLong(buffer.substring(0, dot)) : 0;
-            seconds = Math.abs(seconds);
-            long nanosecs = Long.parseLong(buffer.substring(dot + 1));
-            result = seconds * 1000000000 + nanosecs;
-
         } catch (NumberFormatException e) {
             // TODO: Find something interesting to say
         }
@@ -103,10 +118,12 @@ public abstract class HistogramUtils {
     /**
      * Calculate the width of a String.
      * <p>
-     * 
-     * @param parent The control used as reference
-     * @param text The Text to measure
-     * 
+     *
+     * @param parent
+     *            The control used as reference
+     * @param text
+     *            The Text to measure
+     *
      * @return The result size
      */
     public static int getTextSizeInControl(Composite parent, String text) {

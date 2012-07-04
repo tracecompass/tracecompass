@@ -1,15 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   William Bourque - Initial API and implementation
  *   Yuriy Vashchuk - GUI reorganisation, simplification and some related code improvements.
- *   Yuriy Vashchuk - Histograms optimisation.   
+ *   Yuriy Vashchuk - Histograms optimisation.
  *   Yuriy Vashchuk - Histogram Canvas Heritage correction
  *   Francois Chouinard - Cleanup and refactoring
  *   Francois Chouinard - Moved from LTTng to TMF
@@ -114,10 +114,10 @@ public class HistogramView extends TmfView {
 
     @Override
     public void dispose() {
-        if (fTimeRangeRequest != null && !fTimeRangeRequest.isCompleted()) {
+        if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
             fTimeRangeRequest.cancel();
         }
-        if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
+        if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
         }
         fFullTraceHistogram.dispose();
@@ -246,8 +246,9 @@ public class HistogramView extends TmfView {
 
         // Load the experiment if present
         fCurrentExperiment = (TmfExperiment<ITmfEvent>) TmfExperiment.getCurrentExperiment();
-        if (fCurrentExperiment != null)
+        if (fCurrentExperiment != null) {
             loadExperiment();
+        }
     }
 
     @Override
@@ -326,21 +327,26 @@ public class HistogramView extends TmfView {
     public synchronized void updateTimeRange(long newDuration) {
         if (fCurrentExperiment != null) {
             long delta = newDuration - fWindowSpan;
-            long newStartTime = fWindowStartTime + delta / 2;
+            long newStartTime = fWindowStartTime + (delta / 2);
             setNewRange(newStartTime, newDuration);
         }
     }
 
     private void setNewRange(long startTime, long duration) {
-        if (startTime < fExperimentStartTime)
+        if (startTime < fExperimentStartTime) {
             startTime = fExperimentStartTime;
+        }
 
         long endTime = startTime + duration;
+        if( endTime < startTime ) {
+            endTime = fExperimentEndTime;
+            startTime = fExperimentStartTime;
+        }
         if (endTime > fExperimentEndTime) {
             endTime = fExperimentEndTime;
-            if (endTime - duration > fExperimentStartTime)
+            if ((endTime - duration) > fExperimentStartTime) {
                 startTime = endTime - duration;
-            else {
+            } else {
                 startTime = fExperimentStartTime;
             }
         }
@@ -508,7 +514,7 @@ public class HistogramView extends TmfView {
     }
 
     private void sendTimeRangeRequest(long startTime, long endTime) {
-        if (fTimeRangeRequest != null && !fTimeRangeRequest.isCompleted()) {
+        if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
             fTimeRangeRequest.cancel();
         }
         TmfTimestamp startTS = new TmfTimestamp(startTime, TIME_SCALE);
@@ -524,7 +530,7 @@ public class HistogramView extends TmfView {
     }
 
     private void sendFullRangeRequest(TmfTimeRange fullRange) {
-        if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
+        if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
         }
         int cacheSize = fCurrentExperiment.getCacheSize();
