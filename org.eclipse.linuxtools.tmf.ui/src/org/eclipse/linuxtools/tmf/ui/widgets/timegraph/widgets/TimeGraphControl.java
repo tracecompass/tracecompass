@@ -490,78 +490,6 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         return sel;
     }
 
-
-    // TODO select implementation for selectTrace
-//    public void selectTrace(int n) {
-//        if (n != 1 && n != -1)
-//            return;
-//        boolean changed = false;
-//        int lastSelection = -1;
-//        for (int i = 0; i < _data._expandedItems.length; i++) {
-//            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[i];
-//            if (item._selected) {
-//                lastSelection = i;
-//                if (1 == n && i < _data._expandedItems.length - 1) {
-//                    item._selected = false;
-//                    if (item._hasChildren) {
-//                        _data.expandItem(i);
-//                        fireTreeEvent(item._trace, item._expanded);
-//                    }
-//                    item = (TimeGraphItem) _data._expandedItems[i + 1];
-//                    if (item._hasChildren) {
-//                        _data.expandItem(i + 1);
-//                        fireTreeEvent(item._trace, item._expanded);
-//                        item = (TimeGraphItem) _data._expandedItems[i + 2];
-//                    }
-//                    item._selected = true;
-//                    changed = true;
-//                } else if (-1 == n && i > 0) {
-//                    i--;
-//                    TimeGraphItem prevItem = (TimeGraphItem) _data._expandedItems[i];
-//                    if (prevItem._hasChildren) {
-//                        if (prevItem._expanded) {
-//                            if (i > 0) {
-//                                i--;
-//                                prevItem = (TimeGraphItem) _data._expandedItems[i];
-//                            }
-//                        }
-//                        if (!prevItem._expanded) {
-//                            _data.expandItem(i);
-//                            fireTreeEvent(prevItem._trace, prevItem._expanded);
-//                            prevItem = (TimeGraphItem) _data._expandedItems[i + prevItem.children.size()];
-//                            item._selected = false;
-//                            prevItem._selected = true;
-//                            changed = true;
-//                        }
-//                    } else {
-//                        item._selected = false;
-//                        prevItem._selected = true;
-//                        changed = true;
-//                    }
-//                }
-//                break;
-//            }
-//        }
-//        if (lastSelection < 0 && _data._expandedItems.length > 0) {
-//            TimeGraphItem item = (TimeGraphItem) _data._expandedItems[0];
-//            if (item._hasChildren) {
-//                _data.expandItem(0);
-//                fireTreeEvent(item._trace, item._expanded);
-//                item = (TimeGraphItem) _data._expandedItems[1];
-//                item._selected = true;
-//                changed = true;
-//            } else {
-//                item._selected = true;
-//                changed = true;
-//            }
-//        }
-//        if (changed) {
-//            ensureVisibleItem(-1, false);
-//            redraw();
-//            fireSelectionChanged();
-//        }
-//    }
-
     /**
      * Enable/disable one of the traces in the model
      *
@@ -874,7 +802,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         x -= nameWidth;
         int timeWidth = size.x - nameWidth - RIGHT_MARGIN;
         if (x >= 0 && size.x >= nameWidth) {
-            hitTime = time0 + Math.round((time1 - time0) * ((double) x / timeWidth));
+            if (time1 - time0 > timeWidth) {
+                // nanosecond smaller than one pixel: use the first integer nanosecond of this pixel's time range
+                hitTime = time0 + (long) Math.ceil((time1 - time0) * ((double) x / timeWidth));
+            } else {
+                // nanosecond greater than one pixel: use the nanosecond that covers this pixel start position
+                hitTime = time0 + (long) Math.floor((time1 - time0) * ((double) x / timeWidth));
+            }
         }
         return hitTime;
     }
@@ -1042,7 +976,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         long time1 = _timeProvider.getTime1();
         long selectedTime = _timeProvider.getSelectedTime();
         double pixelsPerNanoSec = (bounds.width - nameSpace <= RIGHT_MARGIN) ? 0 : (double) (bounds.width - nameSpace - RIGHT_MARGIN) / (time1 - time0);
-        int x = bounds.x + nameSpace + (int) Math.round((selectedTime - time0) * pixelsPerNanoSec);
+        int x = bounds.x + nameSpace + (int) ((selectedTime - time0) * pixelsPerNanoSec);
         if (x >= nameSpace && x < bounds.x + bounds.width) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.SELECTED_TIME));
             gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
@@ -1897,17 +1831,6 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 for (Item child : item.children) {
                     refreshExpanded(expandedItemList, child);
                 }
-            }
-        }
-
-        public void expandItem(int idx) {
-            if (idx < 0 || idx >= _expandedItems.length) {
-                return;
-            }
-            Item item = _expandedItems[idx];
-            if (item._hasChildren && !item._expanded) {
-                item._expanded = true;
-                updateExpandedItems();
             }
         }
 
