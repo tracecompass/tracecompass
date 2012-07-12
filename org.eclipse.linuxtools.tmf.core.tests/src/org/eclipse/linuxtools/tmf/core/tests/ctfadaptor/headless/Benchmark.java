@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
 import java.util.Vector;
 
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfLightweightContext;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 
@@ -38,11 +38,6 @@ public class Benchmark {
         // Change this to enable text output
         final boolean USE_TEXT = true;
 
-//        try {
-//            System.in.read();
-//        } catch (final IOException e1) {
-//            e1.printStackTrace();
-//        }
         // Work variables
         Long nbEvent = 0L;
         final Vector<Double> benchs = new Vector<Double>();
@@ -60,7 +55,7 @@ public class Benchmark {
 
             start = System.nanoTime();
             if (nbEvent != -1) {
-                final CtfIterator traceReader = (CtfIterator) trace.seekEvent(0);
+                final CtfTmfLightweightContext traceReader = (CtfTmfLightweightContext) trace.seekEvent(0);
 
                 start = System.nanoTime();
                 CtfTmfEvent current = traceReader.getCurrentEvent();
@@ -68,11 +63,15 @@ public class Benchmark {
                     nbEvent++;
                     if (USE_TEXT) {
 
-                        System.out.println("Event " + traceReader.getRank() + " Time " //$NON-NLS-1$ //$NON-NLS-2$
+                        System.out.println("Event " + nbEvent + " Time " //$NON-NLS-1$ //$NON-NLS-2$
                                 + current.getTimestamp().toString() + " type " + current.getEventName() //$NON-NLS-1$
                                 + " on CPU " + current.getSource() + " " + current.getContent().toString()) ; //$NON-NLS-1$ //$NON-NLS-2$
                     }
-                    traceReader.advance();
+                    // advance the trace to the next event.
+                    boolean hasMore = traceReader.advance();
+                    if( hasMore ){
+                        // you can know the trace has more events.
+                    }
                     current = traceReader.getCurrentEvent();
                 }
             }
@@ -94,17 +93,5 @@ public class Benchmark {
         }
 
     }
-
-//    /**
-//     * @param timestamp
-//     *            the timestamp in UTC to convert to nanoseconds.
-//     * @return formatted string.
-//     */
-//    private static String formatDate(final long timestamp) {
-//        final Date d = new Date(timestamp / 1000000);
-//        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss."); //$NON-NLS-1$
-//        final String output = df.format(d) + (timestamp % 1000000000);
-//        return output;
-//    }
 
 }
