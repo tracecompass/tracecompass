@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -870,7 +871,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             if (ok && traceTypeOK && !traceType.equals("")) { //$NON-NLS-1$
                 // Tag the selected traces with their type
                 List<String> files = new ArrayList<String>(fileSystemObjects.keySet());
-                Collections.sort(files);
+                Collections.sort(files, new Comparator<String>() {
+                    @Override
+                    public int compare(String o1, String o2) {
+                        String v1 = o1 + File.separatorChar;
+                        String v2 = o2 + File.separatorChar;
+                        return v1.compareTo(v2);
+                    }
+                });
                 // After sorting, traces correspond to the unique prefixes
                 String prefix = null;
                 for (int i = 0; i < files.size(); i++) {
@@ -913,8 +921,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         for (Entry<String, File> entry : fileSystemObjects.entrySet()) {
             fileList.add(entry.getValue());
         }
-        Collections.sort(fileList);
-
+        Collections.sort(fileList, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                String v1 = o1.getAbsolutePath() + File.separatorChar;
+                String v2 = o2.getAbsolutePath() + File.separatorChar;
+                return v1.compareTo(v2);
+            }
+        });
 
         // Perform a distinct import operation for everything that has the same prefix
         // (distinct prefixes correspond to traces - we don't want to re-create parent structures)
