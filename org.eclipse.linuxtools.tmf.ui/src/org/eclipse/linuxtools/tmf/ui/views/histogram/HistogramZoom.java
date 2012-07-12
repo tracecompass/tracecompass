@@ -159,14 +159,11 @@ public class HistogramZoom implements MouseWheelListener {
     // MouseWheelListener
     // ------------------------------------------------------------------------
 
-    private long fMouseTimestamp = 0;
-
     @Override
     public synchronized void mouseScrolled(MouseEvent event) {
         if (fScrollCounter == null) {
             fScrollCounter = new MouseScrollCounter(this);
             fScrollCounter.start();
-            fMouseTimestamp = fHistogram.getTimestamp(event.x);
         }
         fScrollCounter.incrementMouseScroll(event.count);
     }
@@ -178,9 +175,8 @@ public class HistogramZoom implements MouseWheelListener {
         // Compute the new time range
         long requestedRange = (nbClicks > 0) ? Math.round(ZOOM_FACTOR * fRangeDuration) : (long) Math.ceil(fRangeDuration * (1.0 / ZOOM_FACTOR));
 
-        // Perform a proportional zoom wrt the mouse position
-        double ratio = ((double) (fMouseTimestamp - fRangeStartTime)) / fRangeDuration;
-        long requestedStart = validateStart(fRangeStartTime + (long) ((fRangeDuration - requestedRange) * ratio));
+        // Distribute delta and adjust for boundaries
+        long requestedStart = validateStart(fRangeStartTime + (long) ((fRangeDuration - requestedRange) / 2));
         long requestedEnd = validateEnd(requestedStart, requestedStart + requestedRange);
         requestedStart = validateStart(requestedEnd - requestedRange);
 
