@@ -13,6 +13,8 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -63,6 +65,20 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
         long value = HistogramUtils.stringToNanoseconds(stringValue);
 
         if (getValue() != value) {
+            // Make sure that the new time is within range
+            TmfExperiment<?> exp = TmfExperiment.getCurrentExperiment();
+            if (exp != null) {
+                TmfTimeRange range = exp.getTimeRange();
+                long startTime = range.getStartTime().getValue();
+                long endTime = range.getEndTime().getValue();
+                if (value < startTime) {
+                    value = startTime;
+                } else if (value > endTime) {
+                    value = endTime;
+                }
+            }
+
+            // Set and propagate
             setValue(value);
             fParentView.updateCurrentEventTime(value);
         }
