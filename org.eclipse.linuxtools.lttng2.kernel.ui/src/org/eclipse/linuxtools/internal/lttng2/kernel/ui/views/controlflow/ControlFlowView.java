@@ -434,7 +434,7 @@ public class ControlFlowView extends TmfView {
      */
     @TmfSignalHandler
     public void synchToTime(final TmfTimeSynchSignal signal) {
-        if (signal.getSource() == this || fSelectedExperiment == null) {
+        if (signal.getSource() == this || fSelectedExperiment == null || fSelectedExperiment.getTraces() == null) {
             return;
         }
         final long time = signal.getCurrentTime().normalize(0, -9).getValue();
@@ -534,7 +534,7 @@ public class ControlFlowView extends TmfView {
     @TmfSignalHandler
     public void stateSystemBuildCompleted (final TmfStateSystemBuildCompleted signal) {
         final TmfExperiment<?> selectedExperiment = fSelectedExperiment;
-        if (selectedExperiment == null) {
+        if (selectedExperiment == null || selectedExperiment.getTraces() == null) {
             return;
         }
         for (ITmfTrace<?> trace : selectedExperiment.getTraces()) {
