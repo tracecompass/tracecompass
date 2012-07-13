@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -116,7 +115,7 @@ public class DeleteTraceHandler extends AbstractHandler {
                 try {
                     IPath path = resource.getLocation();
                     if (path != null && (trace.getParent() instanceof TmfTraceFolder)) {
-                        String location = path.toFile().getCanonicalPath();
+                        String location = path.toString();
                         TmfExperimentFolder experimentFolder = trace.getProject().getExperimentsFolder();
 
                         // Propagate the removal to traces
@@ -143,8 +142,6 @@ public class DeleteTraceHandler extends AbstractHandler {
                     // Refresh the project
                     trace.getProject().refresh();
 
-                } catch (IOException e) {
-                    Activator.getDefault().logError("Error deleting trace: " + trace.getName(), e); //$NON-NLS-1$
                 } catch (CoreException e) {
                     Activator.getDefault().logError("Error deleting trace: " + trace.getName(), e); //$NON-NLS-1$
                 }
