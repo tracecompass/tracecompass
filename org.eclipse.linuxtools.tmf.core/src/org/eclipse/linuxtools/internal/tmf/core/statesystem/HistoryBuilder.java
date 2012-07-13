@@ -183,14 +183,17 @@ public class HistoryBuilder extends TmfComponent {
     }
 
     void close(boolean deleteFiles) {
+        TmfSignal doneSig;
+
         sci.dispose();
         if (deleteFiles) {
             hb.removeFiles();
+            /* We won't broadcast the signal if the request was cancelled */
+        } else {
+            /* Broadcast the signal saying the history is done building */
+            doneSig = new TmfStateSystemBuildCompleted(this, sci.getTrace());
+            TmfSignalManager.dispatchSignal(doneSig);
         }
-
-        /* Broadcast the signal saying the history is done building */
-        TmfSignal doneSig = new TmfStateSystemBuildCompleted(this, sci.getTrace());
-        TmfSignalManager.dispatchSignal(doneSig);
 
         TmfSignalManager.deregister(this);
     }
