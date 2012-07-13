@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
@@ -23,9 +23,9 @@ import java.nio.channels.FileChannel;
  * contains all the methods and descriptors to handle reading/writing to the
  * tree-file on disk and all the caching mechanisms. Every HistoryTree should
  * contain 1 and only 1 HT_IO element.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 class HT_IO {
 
@@ -34,14 +34,14 @@ class HT_IO {
 
     /* Fields related to the file I/O */
     private final File historyTreeFile;
-    private FileInputStream fis;
-    private FileOutputStream fos;
-    private FileChannel fcIn;
-    private FileChannel fcOut;
+    private final FileInputStream fis;
+    private final FileOutputStream fos;
+    private final FileChannel fcIn;
+    private final FileChannel fcOut;
 
     /**
      * Standard constructor
-     * 
+     *
      * @param tree
      * @param newFile
      *            Are we creating a new file from scratch?
@@ -80,7 +80,7 @@ class HT_IO {
     /**
      * Generic "read node" method, which checks if the node is in memory first,
      * and if it's not it goes to disk to retrieve it.
-     * 
+     *
      * @param seqNumber
      *            Sequence number of the node we want
      * @return The wanted node in object form
@@ -157,6 +157,13 @@ class HT_IO {
     }
 
     synchronized void deleteFile() {
+        try {
+            fis.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         if(!historyTreeFile.delete()) {
             /* We didn't succeed in deleting the file */
             //TODO log it?
@@ -166,7 +173,7 @@ class HT_IO {
     /**
      * Seek the given FileChannel to the position corresponding to the node that
      * has seqNumber
-     * 
+     *
      * @param seqNumber
      * @throws IOException
      */
