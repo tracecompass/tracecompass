@@ -33,6 +33,22 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 public abstract class CtfTmfEventField implements ITmfEventField {
 
     // ------------------------------------------------------------------------
+    // Class attributes
+    // ------------------------------------------------------------------------
+
+    /** @since 1.1 */
+    protected static final int FIELDTYPE_INTEGER = 0;
+
+    /** @since 1.1 */
+    protected static final int FIELDTYPE_STRING = 1;
+
+    /** @since 1.1 */
+    protected static final int FIELDTYPE_INTEGER_ARRAY = 2;
+
+    /** @since 1.1 */
+    protected static final int FIELDTYPE_FLOAT = 3;
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
@@ -148,13 +164,13 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      */
     public static CtfTmfEventField copyFrom(CtfTmfEventField other) {
         switch (other.getFieldType()) {
-        case 0:
+        case FIELDTYPE_INTEGER:
             return new CTFIntegerField(((CTFIntegerField) other).getValue(), other.name);
-        case 1:
+        case FIELDTYPE_STRING:
             return new CTFStringField(((CTFStringField) other).getValue(), other.name);
-        case 2:
+        case FIELDTYPE_INTEGER_ARRAY:
             return new CTFIntegerArrayField(((CTFIntegerArrayField) other).getValue(), other.name);
-        case 3:
+        case FIELDTYPE_FLOAT:
             return new CTFFloatField(((CTFFloatField) other).getValue(), other.name);
         default:
             return null;
@@ -243,7 +259,7 @@ final class CTFIntegerField extends CtfTmfEventField {
 
     @Override
     public int getFieldType() {
-        return 0;
+        return FIELDTYPE_INTEGER;
     }
 
     @Override
@@ -282,7 +298,7 @@ final class CTFStringField extends CtfTmfEventField {
 
     @Override
     public int getFieldType() {
-        return 1;
+        return FIELDTYPE_STRING;
     }
 
     @Override
@@ -322,7 +338,7 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
 
     @Override
     public int getFieldType() {
-        return 2;
+        return FIELDTYPE_INTEGER_ARRAY;
     }
 
     @Override
@@ -369,7 +385,7 @@ final class CTFFloatField extends CtfTmfEventField {
 
     @Override
     public int getFieldType() {
-        return 3;
+        return FIELDTYPE_FLOAT;
     }
 
     @Override
