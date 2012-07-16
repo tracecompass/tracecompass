@@ -33,6 +33,9 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Default constructor
+     */
     public TmfEventProvider() {
         super();
     }
@@ -42,14 +45,38 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
         super.init(name, type);
     }
 
-    public TmfEventProvider(String name, Class<T> type) {
+    /**
+     * Standard constructor
+     *
+     * @param name
+     *            The name of the provider
+     * @param type
+     *            The type of handled events
+     */
+   public TmfEventProvider(String name, Class<T> type) {
         super(name, type);
     }
 
+    /**
+     * Standard constructor which also sets the queue size
+     *
+     * @param name
+     *            The name of the provider
+     * @param type
+     *            The type of handled events
+     * @param queueSize
+     *            The size of the queue
+     */
     public TmfEventProvider(String name, Class<T> type, int queueSize) {
         super(name, type, queueSize);
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param other
+     *            The other TmfEventProvider to copy
+     */
     public TmfEventProvider(TmfEventProvider<T> other) {
         super(other);
     }

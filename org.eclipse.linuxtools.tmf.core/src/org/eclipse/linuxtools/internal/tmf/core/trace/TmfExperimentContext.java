@@ -56,7 +56,10 @@ public class TmfExperimentContext extends TmfContext {
     // ------------------------------------------------------------------------
 
     /**
+     * Standard constructor
+     *
      * @param contexts
+     *            The matching context for each trace in the experiment
      */
     public TmfExperimentContext(final ITmfContext[] contexts) {
         super();
@@ -82,7 +85,10 @@ public class TmfExperimentContext extends TmfContext {
     }
 
     /**
+     * Copy constructor
+     *
      * @param other
+     *            The experiment context to copy
      */
     public TmfExperimentContext(final TmfExperimentContext other) {
         this(other.cloneContexts());
@@ -127,18 +133,40 @@ public class TmfExperimentContext extends TmfContext {
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * Get the trace contexts composing this experiment context.
+     *
+     * @return The array of trace contexts
+     */
     public ITmfContext[] getContexts() {
         return fContexts;
     }
 
+    /**
+     * Get the trace events located at this experiment context's location.
+     *
+     * @return The array of trace events
+     */
     public ITmfEvent[] getEvents() {
         return fEvents;
     }
 
+    /**
+     * Get the index of the trace that was last read (so the trace whose
+     * current context will match this experiment's).
+     *
+     * @return The index of the trace
+     */
     public int getLastTrace() {
         return fLastTraceRead;
     }
 
+    /**
+     * Set the last trace read index
+     *
+     * @param newIndex
+     *            The new value to assign
+     */
     public void setLastTrace(final int newIndex) {
         fLastTraceRead = newIndex;
     }

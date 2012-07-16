@@ -51,7 +51,10 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     // Constants
     // ------------------------------------------------------------------------
 
+    /** Default amount of events per request "chunk" */
     public static final int DEFAULT_BLOCK_SIZE = 50000;
+
+    /** Default size of the queue */
     public static final int DEFAULT_QUEUE_SIZE = 1000;
 
     // ------------------------------------------------------------------------
@@ -75,6 +78,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * Default constructor
+     */
     public TmfDataProvider() {
         super();
         fQueueSize = DEFAULT_QUEUE_SIZE;
@@ -82,6 +88,14 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
         fExecutor = new TmfRequestExecutor();
     }
 
+    /**
+     * Initialize this data provider
+     *
+     * @param name
+     *            Name of the provider
+     * @param type
+     *            The type of events that will be handled
+     */
     public void init(String name, Class<T> type) {
         super.init(name);
         fType = type;
@@ -102,11 +116,25 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
         init(name, type);
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param other
+     *            The other object to copy
+     */
     public TmfDataProvider(TmfDataProvider<T> other) {
         this();
         init(other.getName(), other.fType);
     }
 
+    /**
+     * Standard constructor. Instantiate and initialize at the same time.
+     *
+     * @param name
+     *            Name of the provider
+     * @param type
+     *            The type of events that will be handled
+     */
     public TmfDataProvider(String name, Class<T> type) {
         this(name, type, DEFAULT_QUEUE_SIZE);
     }
@@ -123,10 +151,20 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * Get the queue size of this provider
+     *
+     * @return The size of the queue
+     */
     public int getQueueSize() {
         return fQueueSize;
     }
 
+    /**
+     * Get the event type this provider handles
+     *
+     * @return The type of ITmfEvent
+     */
     public Class<?> getType() {
         return fType;
     }
@@ -146,9 +184,6 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
         }
     }
 
-    /**
-     * This method queues the coalesced requests.
-     */
     @Override
     public void fireRequest() {
         synchronized (fLock) {
@@ -165,9 +200,10 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     }
 
     /**
-     * Increments/decrements the pending requests counters and fires the request if necessary (counter == 0). Used for
-     * coalescing requests accross multiple TmfDataProvider.
-     * 
+     * Increments/decrements the pending requests counters and fires the request
+     * if necessary (counter == 0). Used for coalescing requests accross
+     * multiple TmfDataProvider.
+     *
      * @param isIncrement
      */
     @Override
@@ -432,6 +468,12 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     // Signal handlers
     // ------------------------------------------------------------------------
 
+    /**
+     * Handler for the start synch signal
+     *
+     * @param signal
+     *            Incoming signal
+     */
     @TmfSignalHandler
     public void startSynch(TmfStartSynchSignal signal) {
         synchronized (fLock) {
@@ -439,6 +481,12 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
         }
     }
 
+    /**
+     * Handler for the end synch signal
+     *
+     * @param signal
+     *            Incoming signal
+     */
     @TmfSignalHandler
     public void endSynch(TmfEndSynchSignal signal) {
         synchronized (fLock) {

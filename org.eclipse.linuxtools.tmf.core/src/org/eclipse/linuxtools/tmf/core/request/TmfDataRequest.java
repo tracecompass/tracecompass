@@ -76,10 +76,10 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     // Constants
     // ------------------------------------------------------------------------
 
-    // The default maximum number of events per chunk
+    /** The default maximum number of events per chunk */
     public static final int DEFAULT_BLOCK_SIZE = 1000;
 
-    // The request count for all the events
+    /** The request count for all the events */
     public static final int ALL_DATA = Integer.MAX_VALUE;
 
     private static int fRequestNumber = 0;
@@ -430,6 +430,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * To suspend the client thread until the request starts (or is canceled).
      * 
      * @throws InterruptedException
+     *             If the thread was interrupted while waiting
      */
     public void waitForStart() throws InterruptedException {
         while (!fRequestRunning) {
@@ -438,9 +439,11 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     }
 
     /**
-     * To suspend the client thread until the request completes (or is canceled).
-     * 
+     * To suspend the client thread until the request completes (or is
+     * canceled).
+     *
      * @throws InterruptedException
+     *             If the thread was interrupted while waiting
      */
     @Override
     public void waitForCompletion() throws InterruptedException {

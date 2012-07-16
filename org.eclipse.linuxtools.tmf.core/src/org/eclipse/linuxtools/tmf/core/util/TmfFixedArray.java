@@ -41,7 +41,6 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      * @param newLength Length of the copy to be returned.
      * @return A new array consisting of the elements specified.
      */
-    @SuppressWarnings("unchecked")
     private static <E> E[] copyOf(final E[] array, int newLength) {
         E[] result = (E[])Array.newInstance(array.getClass().getComponentType(), newLength); // Is it useful to use newInstance?
         System.arraycopy(array, 0, result, 0, Math.min(array.length, newLength));
@@ -55,7 +54,6 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      * @param newType Type of the array to be returned.
      * @return A new array consisting of the elements specified.
      */
-    @SuppressWarnings("unchecked")
     private static <E, U> E[] copyOf(final U[] array, int newLength, Class<? extends E[]> newType) {
         E[] result = (E[])Array.newInstance(newType.getComponentType(), newLength);
         System.arraycopy(array, 0, result, 0, Math.min(array.length, newLength));
@@ -69,7 +67,6 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      * @param end Ending position of the range, exclusive.
      * @return A new array consisting of the elements specified. The length of the new array is equal to end-start
      */
-    @SuppressWarnings("unchecked")
     private static <E> E[] copyOfRange(final E[] array, int start, int end) {
         E[] result = (E[])Array.newInstance(array.getClass().getComponentType(), end - start);
         System.arraycopy(array, start, result, 0, end - start);
@@ -238,7 +235,6 @@ public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAcc
      * @see java.util.AbstractCollection#toArray(T[])
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <E> E[] toArray(E[] array)
     {
         if(array.length < fArray.length) {

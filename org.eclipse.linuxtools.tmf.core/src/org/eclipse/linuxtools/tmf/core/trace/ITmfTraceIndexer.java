@@ -33,27 +33,39 @@ public interface ITmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> {
      * intervals to indicate its progress.
      * <p>
      * <b>Example 1</b>: Index a whole trace asynchronously
+     *
      * <pre>
      * trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, false);
      * </pre>
+     *
      * <b>Example 2</b>: Index a whole trace synchronously
+     *
      * <pre>
      * trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
      * </pre>
+     *
      * <b>Example 3</b>: Index a trace asynchronously, starting at rank 100
+     *
      * <pre>
      * trace.getIndexer().buildIndex(100, TmfTimeRange.ETERNITY, false);
      * </pre>
-     * <b>Example 4</b>: Index a trace asynchronously, starting at rank 100 for events between
-     * T1 and T2 (inclusive). This is used for incremental indexing.
+     *
+     * <b>Example 4</b>: Index a trace asynchronously, starting at rank 100 for
+     * events between T1 and T2 (inclusive). This is used for incremental
+     * indexing.
+     *
      * <pre>
      * TmfTimeRange range = new TmfTimeRange(T1, T2);
      * trace.getIndexer().buildIndex(100, range, false);
      * </pre>
      *
-     * @param offset The offset of the first event to consider
-     * @param range The time range to consider
+     * @param offset
+     *            The offset of the first event to consider
+     * @param range
+     *            The time range to consider
      * @param waitForCompletion
+     *            Should we block the calling thread until the build is
+     *            complete?
      */
     public void buildIndex(long offset, TmfTimeRange range, boolean waitForCompletion);
 
@@ -68,8 +80,8 @@ public interface ITmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> {
     /**
      * Adds an entry to the trace index.
      *
-     * @param context
-     * @param timestamp
+     * @param context The trace context to save
+     * @param timestamp The timestamp matching this context
      */
     public void updateIndex(ITmfContext context, ITmfTimestamp timestamp);
 

@@ -16,19 +16,22 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventTypeManager;
 
 /**
- * The CTF extension of the TMF event type 
- * 
+ * The CTF extension of the TMF event type
+ *
  * @version 1.0
  * @author Matthew khouzam
  */
 public class CtfTmfEventType extends TmfEventType {
 
     private static final String CONTEXT_ID = "Ctf Event"; //$NON-NLS-1$
+
     /**
      * Constructor for CtfTmfEventType.
-     * @param contextId String
-     * @param eventName String
-     * @param content ITmfEventField
+     *
+     * @param eventName
+     *            String
+     * @param content
+     *            ITmfEventField
      */
     public CtfTmfEventType(String eventName, ITmfEventField content) {
         super(CONTEXT_ID, eventName, content);
@@ -36,6 +39,7 @@ public class CtfTmfEventType extends TmfEventType {
 
     /**
      * Method toString.
+     *
      * @return String
      */
     @Override
@@ -45,7 +49,9 @@ public class CtfTmfEventType extends TmfEventType {
 
     /**
      * gets the event type for an event name
-     * @param eventName the event name
+     *
+     * @param eventName
+     *            the event name
      * @return the event type
      */
     public static CtfTmfEventType get(String eventName){

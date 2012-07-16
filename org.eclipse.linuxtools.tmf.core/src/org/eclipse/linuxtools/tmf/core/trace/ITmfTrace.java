@@ -133,7 +133,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param resource the trace resource
      * @param path the trace path
      * @param type the trace event type
-     * @throws TmfTraceException
+     * @throws TmfTraceException If we couldn't open the trace
      */
     public void initTrace(IResource resource, String path, Class<T> type) throws TmfTraceException;
 

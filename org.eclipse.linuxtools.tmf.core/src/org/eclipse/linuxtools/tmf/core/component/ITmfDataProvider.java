@@ -35,7 +35,20 @@ public interface ITmfDataProvider<T extends ITmfEvent> extends ITmfComponent {
      */
     public void sendRequest(ITmfDataRequest<T> request);
 
+    /**
+     * Queue the coalesced requests.
+     */
     public void fireRequest();
+
+    /**
+     * Increments/decrements the pending requests counters and fires the request
+     * if necessary (counter == 0). Used for coalescing requests across multiple
+     * TmfDataProvider's.
+     *
+     * @param isIncrement
+     *            Should we increment (true) or decrement (false) the pending
+     *            counter
+     */
     public void notifyPendingRequest(boolean isIncrement);
 
     /**

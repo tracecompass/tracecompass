@@ -52,7 +52,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
      * Full constructor
      * 
      * @param timestamp the checkpoint timestamp
-     * @param location the corresponding trace location
+     * @param context the corresponding trace location
      */
     public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfContext context) {
         fTimestamp = timestamp;

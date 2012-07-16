@@ -166,6 +166,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * Copy constructor
      *
      * @param trace the original trace
+     * @throws TmfTraceException Should not happen usually
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public TmfTrace(final TmfTrace<T> trace) throws TmfTraceException {

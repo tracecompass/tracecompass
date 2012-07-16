@@ -523,7 +523,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     /**
      * Signal handler for the TmfExperimentSelectedSignal signal
      *
-     * @param signal
+     * @param signal The incoming signal
      */
     @TmfSignalHandler
     public void experimentSelected(final TmfExperimentSelectedSignal<T> signal) {
@@ -537,7 +537,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     /**
      * Signal handler for the TmfEndSynchSignal signal
      *
-     * @param signal
+     * @param signal The incoming signal
      */
     @TmfSignalHandler
     public void endSync(final TmfEndSynchSignal signal) {
@@ -550,7 +550,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     /**
      * Signal handler for the TmfTraceUpdatedSignal signal
      *
-     * @param signal
+     * @param signal The incoming signal
      */
     @TmfSignalHandler
     public void traceUpdated(final TmfTraceUpdatedSignal signal) {
@@ -562,7 +562,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     /**
      * Signal handler for the TmfExperimentRangeUpdatedSignal signal
      *
-     * @param signal
+     * @param signal The incoming signal
      */
     @TmfSignalHandler
     public void experimentRangeUpdated(final TmfExperimentRangeUpdatedSignal signal) {

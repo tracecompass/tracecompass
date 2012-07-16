@@ -64,9 +64,11 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
      * the StreamInputReader).
      *
      * @param eventDef
-
-     * @param fileName String
-     * @param originTrace CtfTmfTrace
+     *            CTF EventDefinition object corresponding to this trace event
+     * @param fileName
+     *            The path to the trace file
+     * @param originTrace
+     *            The trace from which this event originates
      */
     public CtfTmfEvent(EventDefinition eventDef, String fileName,
             CtfTmfTrace originTrace) {
@@ -100,8 +102,8 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
      * mess, and put them into something ITmfEventField can cope with.
      *
      * @param eventDef
-
-     * @return CtfTmfEventField[]
+     *            CTF EventDefinition to read
+     * @return CtfTmfEventField[] The array of fields that were read
      */
     public static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
         List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
@@ -127,6 +129,7 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
      * Copy constructor
      *
      * @param other
+     *            CtfTmfEvent to copy
      */
     public CtfTmfEvent(CtfTmfEvent other) {
         this.fTrace = other.getTrace();

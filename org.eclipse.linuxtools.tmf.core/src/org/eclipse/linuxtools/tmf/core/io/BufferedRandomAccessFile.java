@@ -36,14 +36,55 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 	long real_pos = 0;
 	StringBuilder sb = new StringBuilder();
 
+    /**
+     * Constructor using the default buffer size
+     *
+     * @param name
+     *            File path. This is passed as-is to the RandomeAccessFile's
+     *            constructor.
+     * @param mode
+     *            File open mode ("r", "rw", etc.). This is passed as-is to
+     *            RandomAccessFile's constructor.
+     * @throws IOException
+     *             If the file was not found or couldn't be opened with the
+     *             request permissions
+     */
 	public BufferedRandomAccessFile(String name, String mode) throws IOException {
 		this(name, mode, DEFAULT_BUF_SIZE);
 	}
 
+    /**
+     * Constructor using the default buffer size
+     *
+     * @param file
+     *            File object. This is passed as-is to the RandomeAccessFile's
+     *            constructor.
+     * @param mode
+     *            File open mode ("r", "rw", etc.). This is passed as-is to
+     *            RandomAccessFile's constructor.
+     * @throws IOException
+     *             If the file was not found or couldn't be opened with the
+     *             request permissions
+     */
 	public BufferedRandomAccessFile(File file, String mode) throws IOException {
 		this(file, mode, DEFAULT_BUF_SIZE);
 	}
 
+    /**
+     * Standard constructor.
+     *
+     * @param name
+     *            File path. This is passed as-is to the RandomeAccessFile's
+     *            constructor.
+     * @param mode
+     *            File open mode ("r", "rw", etc.). This is passed as-is to
+     *            RandomAccessFile's constructor.
+     * @param bufsize
+     *            Buffer size to use, in bytes
+     * @throws IOException
+     *             If the file was not found or couldn't be opened with the
+     *             request permissions
+     */
 	public BufferedRandomAccessFile(String name, String mode, int bufsize) throws IOException {
 	    super(name, mode);
 	    invalidate();
@@ -51,6 +92,21 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 	    buffer = new byte[BUF_SIZE];
     }
 
+    /**
+     * Standard constructor.
+     *
+     * @param file
+     *            File object. This is passed as-is to the RandomeAccessFile's
+     *            constructor.
+     * @param mode
+     *            File open mode ("r", "rw", etc.). This is passed as-is to
+     *            RandomAccessFile's constructor.
+     * @param bufsize
+     *            Buffer size to use, in bytes
+     * @throws IOException
+     *             If the file was not found or couldn't be opened with the
+     *             request permissions
+     */
 	public BufferedRandomAccessFile(File file, String mode, int bufsize) throws IOException {
 	    super(file, mode);
 	    invalidate();
@@ -107,6 +163,14 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 		}
 	}
 
+    /**
+     * Read the next line from the buffer (ie, until the next '\n'). The bytes
+     * are interpreted as UTF-8 characters.
+     *
+     * @return The String that was read
+     * @throws IOException
+     *             If we failed reading the file
+     */
 	public final String getNextLine() throws IOException {
 		String str = null;
 		if (buf_end - buf_pos <= 0) {

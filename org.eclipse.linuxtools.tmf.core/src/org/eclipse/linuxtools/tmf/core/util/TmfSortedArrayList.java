@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -16,18 +16,18 @@ import java.util.ArrayList;
 
 /**
  * Implementation of a sorted array list.
- * 
+ *
  * @version 1.0
- * @Francois Chouinard
+ * @author Francois Chouinard
  */
 
 public class TmfSortedArrayList<T> extends ArrayList<T> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Inserts a new value in the list according to its sorted position.  
-     * 
-     * @param value A value to insert 
+     * Inserts a new value in the list according to its sorted position.
+     *
+     * @param value A value to insert
      */
     @SuppressWarnings("unchecked")
     public void insertSorted(T value) {
