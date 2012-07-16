@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
@@ -402,6 +403,32 @@ public class TmfStatisticsView extends TmfView {
         requestData(experiment, signal.getRange());
     }
 
+    /**
+     * Handles the experiment updated signal. This will detect new events
+     * in case the indexing is not coalesced with a statistics request.
+     * @param signal The experiment updated signal
+     *
+     * @since 1.1
+     */
+    @TmfSignalHandler
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+        TmfExperiment<?> experiment = signal.getExperiment();
+        if (! experiment.equals(TmfExperiment.getCurrentExperiment())) {
+            return;
+        }
+
+        int nbEvents = 0;
+        for (TmfStatisticsTreeNode node : ((TmfStatisticsTreeNode) fTreeViewer.getInput()).getChildren()) {
+            nbEvents += (int) node.getValue().nbEvents;
+        }
+
+        // In the normal case, the statistics request is coalesced with indexing
+        // and the number of events are the same, there is nothing to do.
+        // But if its not the case, trigger a new request to count the new events.
+        if (nbEvents < experiment.getNbEvents()) {
+            requestData(experiment, experiment.getTimeRange());
+        }
+    }
 
     /**
      * Return the size of the request when performing background request.
@@ -567,6 +594,7 @@ public class TmfStatisticsView extends TmfView {
         synchronized (fStatisticsUpdateSyncObj) {
             fStatisticsUpdateBusy = false;
             fStatisticsUpdatePending = false;
+            fStatisticsUpdateRange = null;
         }
     }
 
@@ -580,7 +608,9 @@ public class TmfStatisticsView extends TmfView {
         synchronized (fStatisticsUpdateSyncObj) {
             if (fStatisticsUpdateBusy) {
                 fStatisticsUpdatePending = true;
-                fStatisticsUpdateRange = timeRange;
+                if (fStatisticsUpdateRange == null || timeRange.getEndTime().compareTo(fStatisticsUpdateRange.getEndTime()) > 0) {
+                    fStatisticsUpdateRange = timeRange;
+                }
                 return true;
             }
             fStatisticsUpdateBusy = true;
@@ -597,6 +627,7 @@ public class TmfStatisticsView extends TmfView {
             if (fStatisticsUpdatePending) {
                 fStatisticsUpdatePending = false;
                 requestData(TmfExperiment.getCurrentExperiment(), fStatisticsUpdateRange);
+                fStatisticsUpdateRange = null;
             }
         }
     }
