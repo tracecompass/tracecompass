@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
@@ -203,14 +204,16 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fMaxNbEventsText.setLayoutData(gridData);
 
         // Histogram itself
+        Composite canvasComposite = new Composite(composite, SWT.BORDER);
         gridData = new GridData();
         gridData.horizontalSpan = 2;
         gridData.verticalSpan = 2;
         gridData.horizontalAlignment = SWT.FILL;
         gridData.verticalAlignment = SWT.FILL;
         gridData.grabExcessHorizontalSpace = true;
-        fCanvas = new Canvas(composite, SWT.BORDER | SWT.DOUBLE_BUFFERED);
-        fCanvas.setLayoutData(gridData);
+        canvasComposite.setLayoutData(gridData);
+        canvasComposite.setLayout(new FillLayout());
+        fCanvas = new Canvas(canvasComposite, SWT.DOUBLE_BUFFERED);
 
         // Y-axis min event (always 0...)
         gridData = new GridData();
@@ -528,7 +531,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             imageGC.setBackground(fHistoBarColor);
             final int limit = width < scaledData.fWidth ? width : scaledData.fWidth;
             for (int i = 1; i < limit; i++) {
-                final int value = (int) (scaledData.fData[i] * scaledData.fScalingFactor);
+                final int value = (int) Math.ceil(scaledData.fData[i] * scaledData.fScalingFactor);
                 imageGC.fillRectangle(i, height - value, 1, value);
             }
 

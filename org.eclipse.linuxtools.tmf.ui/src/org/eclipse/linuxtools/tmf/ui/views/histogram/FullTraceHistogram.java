@@ -190,7 +190,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         int left = (int) ((fRangeStartTime - fDataModel.getFirstBucketTime()) / bucketSpan);
         int right = left + rangeWidth;
         int center = (left + right) / 2;
-        int height = fCanvas.getSize().y - 2;
+        int height = fCanvas.getSize().y;
 
         // Draw the selection window
         imageGC.setForeground(fTimeRangeColor);
