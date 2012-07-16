@@ -33,18 +33,12 @@ public class ActivatorTest extends TestCase {
     // JUnit
     // ------------------------------------------------------------------------
 
-    /**
-     * @throws java.lang.Exception
-     */
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    public static void setUpBeforeClass() {
     }
 
-    /**
-     * @throws java.lang.Exception
-     */
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {
+    public static void tearDownAfterClass() {
     }
 
     /**

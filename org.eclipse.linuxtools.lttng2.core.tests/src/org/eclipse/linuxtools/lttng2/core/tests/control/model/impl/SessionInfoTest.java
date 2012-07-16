@@ -234,7 +234,7 @@ public class SessionInfoTest extends TestCase {
         assertTrue("equals", channel1.equals(channel3));
     }
 
-    public void testEqualsNull() throws Exception {
+    public void testEqualsNull() {
         assertTrue("equals", !fSessionInfo1.equals(null));
         assertTrue("equals", !fSessionInfo2.equals(null));
     }

@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 
@@ -24,11 +24,11 @@ import org.eclipse.ui.views.properties.IPropertySource;
  * <p>
  * Implementation of the UST provider component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class UstProviderComponent extends TraceControlComponent {
-    
+
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
@@ -36,7 +36,7 @@ public class UstProviderComponent extends TraceControlComponent {
      * Path to icon file for this component.
      */
     public static final String USTL_PROVIDER_ICON_FILE = "icons/obj16/targets.gif"; //$NON-NLS-1$
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -44,15 +44,15 @@ public class UstProviderComponent extends TraceControlComponent {
      * The UST provider information.
      */
     private IUstProviderInfo fProviderInfo = null;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * Constructor 
+     * Constructor
      * @param name - the name of the component.
      * @param parent - the parent of this component.
-     */    
+     */
     public UstProviderComponent(String name, ITraceControlComponent parent) {
         super(name, parent);
         setImage(USTL_PROVIDER_ICON_FILE);
@@ -64,7 +64,7 @@ public class UstProviderComponent extends TraceControlComponent {
     // Accessors
     // ------------------------------------------------------------------------
     /**
-     * Sets the UST provider information to the given value. 
+     * Sets the UST provider information to the given value.
      * @param providerInfo - the provider information to set
      */
     public void setUstProvider(IUstProviderInfo providerInfo) {
@@ -77,7 +77,7 @@ public class UstProviderComponent extends TraceControlComponent {
         }
         setName(getName() + " [PID=" + fProviderInfo.getPid() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
     }
-    
+
     /**
      * @return the process ID of the UST provider.
      */
@@ -97,19 +97,18 @@ public class UstProviderComponent extends TraceControlComponent {
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
      */
-    @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class adapter) {
         if (adapter == IPropertySource.class) {
             return new UstProviderPropertySource(this);
         }
         return null;
-    } 
- 
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
+
 }
 
 

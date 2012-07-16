@@ -221,11 +221,11 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
 
                     if (domain != null) {
                         fChannels = domain.getChannels();
-                        String items[] = new String[fChannels.length];
-                        for (int i = 0; i < items.length; i++) {
-                            items[i] = String.valueOf(fChannels[i].getName());
+                        String selectionItems[] = new String[fChannels.length];
+                        for (int i = 0; i < selectionItems.length; i++) {
+                            selectionItems[i] = String.valueOf(fChannels[i].getName());
                         }
-                        fChannelsCombo.setItems(items);
+                        fChannelsCombo.setItems(selectionItems);
                         fChannelsCombo.setEnabled(fChannels.length > 0);
                     } else { 
                         fChannelsCombo.setItems(new String[0]);

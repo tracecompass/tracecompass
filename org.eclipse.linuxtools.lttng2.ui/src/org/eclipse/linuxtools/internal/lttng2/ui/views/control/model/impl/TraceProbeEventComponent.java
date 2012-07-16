@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
@@ -22,31 +22,31 @@ import org.eclipse.ui.views.properties.IPropertySource;
  * <p>
  * Implementation of the trace channel component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceProbeEventComponent extends TraceEventComponent {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * Constructor 
+     * Constructor
      * @param name - the name of the component.
      * @param parent - the parent of this component.
-     */    
+     */
     public TraceProbeEventComponent(String name, ITraceControlComponent parent) {
         super(name, parent);
         fEventInfo = new ProbeEventInfo(name);
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -63,12 +63,11 @@ public class TraceProbeEventComponent extends TraceEventComponent {
         }
         throw new IllegalArgumentException("Invalid type passed. Only class of type ProbeEventInfo allowed:\n" + eventInfo.getClass()); //$NON-NLS-1$
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
      */
-    @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class adapter) {
         if (adapter == IPropertySource.class) {
@@ -115,7 +114,7 @@ public class TraceProbeEventComponent extends TraceEventComponent {
     public void setSymbol(String symbol) {
         getEventInfo().setSymbol(symbol);
     }
-    
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------

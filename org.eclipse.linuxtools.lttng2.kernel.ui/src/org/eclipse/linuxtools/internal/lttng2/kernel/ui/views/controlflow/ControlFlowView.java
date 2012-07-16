@@ -105,7 +105,7 @@ public class ControlFlowView extends TmfView {
     /**
      * Redraw state enum
      */
-    private enum State { IDLE, BUSY, PENDING };
+    private enum State { IDLE, BUSY, PENDING }
 
     // ------------------------------------------------------------------------
     // Fields

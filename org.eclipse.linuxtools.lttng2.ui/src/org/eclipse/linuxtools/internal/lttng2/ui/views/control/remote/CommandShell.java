@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated using Executor Framework
  **********************************************************************/
@@ -35,7 +35,7 @@ import org.eclipse.rse.services.shells.IShellService;
 
 /**
  * <p>
- * Implementation of remote command execution using RSE's shell service. 
+ * Implementation of remote command execution using RSE's shell service.
  * </p>
  *
  * @author Patrick Tasse
@@ -49,16 +49,16 @@ public class CommandShell implements ICommandShell {
 
     /** Sub-string to be echo'ed when running command in shell, used to indicate that the command has finished running */
     public final static String DONE_MARKUP_STRING = "--RSE:donedonedone:--"; //$NON-NLS-1$
-    
-    /** Sub-string to be echoed when running a command in shell. */ 
+
+    /** Sub-string to be echoed when running a command in shell. */
     public final static String BEGIN_END_TAG = "BEGIN-END-TAG:"; //$NON-NLS-1$
-    
+
     /** Command delimiter for shell */
     public final static String CMD_DELIMITER = "\n"; //$NON-NLS-1$
 
     /** Shell "echo" command */
     public final static String SHELL_ECHO_CMD = " echo "; //$NON-NLS-1$
-    
+
     /** Default command separator */
     public final static char CMD_SEPARATOR = ';';
 
@@ -72,14 +72,21 @@ public class CommandShell implements ICommandShell {
     private IHostShell fHostShell = null;
     private BufferedReader fInputBufferReader = null;
     private BufferedReader fErrorBufferReader = null;
-    private ExecutorService fExecutor = Executors.newFixedThreadPool(1);
+    private final ExecutorService fExecutor = Executors.newFixedThreadPool(1);
     private boolean fIsConnected = false;
-    private Random fRandom = new Random(System.currentTimeMillis());;
+    private final Random fRandom = new Random(System.currentTimeMillis());
     private int fReturnValue;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    /**
+     * Create a new command shell
+     *
+     * @param proxy
+     *            The RSE proxy for this shell
+     */
     public CommandShell(IRemoteSystemProxy proxy) {
         fProxy = proxy;
     }
@@ -141,7 +148,7 @@ public class CommandShell implements ICommandShell {
                 @Override
                 public CommandResult call() throws IOException, CancellationException {
                     final ArrayList<String> result = new ArrayList<String>();
-                    
+
                     synchronized (fHostShell) {
                         // Initialize return value which will be updated in isAliasEchoResult()
                         fReturnValue = 0;
@@ -149,24 +156,24 @@ public class CommandShell implements ICommandShell {
                         int startAlias = fRandom.nextInt();
                         int endAlias = fRandom.nextInt();
                         fHostShell.writeToShell(formatShellCommand(command, startAlias, endAlias));
-                        
+
                         String nextLine;
                         boolean isStartFound = false;
                         while ((nextLine = fInputBufferReader.readLine()) != null) {
 
                             if (monitor.isCanceled()) {
                                 flushInput();
-                                throw new CancellationException(); 
+                                throw new CancellationException();
                             }
 
-                            // check if line contains echoed start alias 
+                            // check if line contains echoed start alias
                             if (isAliasEchoResult(nextLine, startAlias, true)) {
                                 isStartFound = true;
                                 continue;
                             }
 
-                            // check if line contains is the end mark-up. This will retrieve also 
-                            // the return value of the actual command. 
+                            // check if line contains is the end mark-up. This will retrieve also
+                            // the return value of the actual command.
                             if (isAliasEchoResult(nextLine, endAlias, false)) {
                                 break;
                             }
@@ -186,11 +193,11 @@ public class CommandShell implements ICommandShell {
                             result.add(nextLine);
                         }
 
-                        // Read any left over output 
+                        // Read any left over output
                         flushInput();
-                        
+
                         // Read error stream output when command failed.
-                        if (fReturnValue != 0) { 
+                        if (fReturnValue != 0) {
                             while(fErrorBufferReader.ready()) {
                                 if ((nextLine = fErrorBufferReader.readLine()) != null)  {
                                     result.add(nextLine);
@@ -235,20 +242,20 @@ public class CommandShell implements ICommandShell {
 
     /**
      * Format the command to be sent into the shell command with start and end marker strings.
-     * The start marker is need to know when the actual command output starts. The end marker 
+     * The start marker is need to know when the actual command output starts. The end marker
      * string is needed so we can tell that end of output has been reached.
-     * 
-     * @param cmd The actual command 
+     *
+     * @param cmd The actual command
      * @param startAlias The command alias for start marker
      * @param endAlias The command alias for end marker
      * @return formatted command string
      */
-    private String formatShellCommand(String cmd, int startAlias, int endAlias) {
+    private static String formatShellCommand(String cmd, int startAlias, int endAlias) {
         if (cmd == null || cmd.equals("")) { //$NON-NLS-1$
             return cmd;
         }
         StringBuffer formattedCommand = new StringBuffer();
-        // Make multi-line command. 
+        // Make multi-line command.
         // Wrap actual command with start marker and end marker to wrap actual command.
         formattedCommand.append(getEchoCmd(startAlias));
         formattedCommand.append(CMD_DELIMITER);
@@ -258,31 +265,31 @@ public class CommandShell implements ICommandShell {
         formattedCommand.append(CMD_DELIMITER);
         return formattedCommand.toString();
     }
-    
+
     /**
      * Creates a echo command line in the format: echo <start tag> <alias> <end tag> $?
-     * 
+     *
      * @param alias The command alias integer to be included in the echoed message.
      * @return the echo command line
      */
-    private String getEchoCmd(int alias) {
+    private static String getEchoCmd(int alias) {
         return SHELL_ECHO_CMD + getEchoResult(alias) + "$?"; //$NON-NLS-1$
     }
 
     /**
-     * Creates the expected result for a given command alias: 
+     * Creates the expected result for a given command alias:
      * <start tag> <alias> <end tag> $?
-     * 
+     *
      * @param alias The command alias integer to be included in the echoed message.
      * @return the expected echo result
      */
-    private String getEchoResult(int alias) {
+    private static String getEchoResult(int alias) {
         return BEGIN_END_TAG + String.valueOf(alias) + DONE_MARKUP_STRING;
     }
-    
+
     /**
      * Verifies if given command line contains a command alias echo result.
-     *  
+     *
      * @param line The output line to test.
      * @param alias The command alias
      * @param checkReturnValue <code>true</code> to retrieve command result (previous command) <code>false</code>
@@ -300,32 +307,35 @@ public class CommandShell implements ICommandShell {
                 }
             }
             return true;
-        } else {
-            int index = line.indexOf(expected);
-            if (index > 0) {
-                if (line.indexOf(SHELL_ECHO_CMD) == -1) {
-                    return true;
-                }
+        }
+        int index = line.indexOf(expected);
+        if (index > 0) {
+            if (line.indexOf(SHELL_ECHO_CMD) == -1) {
+                return true;
             }
         }
 
         return false;
     }
-    
+
     /**
-     * Verifies if output line is an echo of the given command line. If the output line is longer then
-     * the maximum line lengths (e.g. for ssh), the shell adds a line break character. This
-     * method takes this in consideration by comparing the command line without any whitespaces. 
-     * 
-     * @param line The output line to verify
-     * @param cmd The command executed
-     * @return <code>true</code> if it's an echoed command line else <code>false</code>
+     * Verifies if output line is an echo of the given command line. If the
+     * output line is longer then the maximum line lengths (e.g. for ssh), the
+     * shell adds a line break character. This method takes this in
+     * consideration by comparing the command line without any whitespaces.
+     *
+     * @param line
+     *            The output line to verify
+     * @param cmd
+     *            The command executed
+     * @return <code>true</code> if it's an echoed command line else
+     *         <code>false</code>
      */
     @SuppressWarnings("nls")
-    private boolean isCommandEcho(String line, String cmd) {
+    private static boolean isCommandEcho(String line, String cmd) {
         String s1 = line.replaceAll("\\s","");
         String s2 = cmd.replaceAll("\\s","");
-        s2 = s2.replaceAll("(\\*)", "(\\\\*)"); 
+        s2 = s2.replaceAll("(\\*)", "(\\\\*)");
         String patternStr = ".*(" + s2 +")$";
         return s1.matches(patternStr);
     }

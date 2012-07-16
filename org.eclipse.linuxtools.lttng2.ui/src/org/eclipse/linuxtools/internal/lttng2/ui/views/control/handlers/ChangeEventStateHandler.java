@@ -105,13 +105,13 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
 
                             for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
                                 // Enable/disable all selected channels which are disabled
-                                TraceEventComponent event = iterator.next();
+                                TraceEventComponent traceEvent = iterator.next();
 
                                 // Workaround for wildcard handling in lttng-tools
-                                if ("*".equals(event.getName())) { //$NON-NLS-1$
+                                if ("*".equals(traceEvent.getName())) { //$NON-NLS-1$
                                     isAll = true;
                                 } else {
-                                    eventNames.add(event.getName());
+                                    eventNames.add(traceEvent.getName());
                                 }
                             }
                             if (isAll) {

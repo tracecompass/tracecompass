@@ -93,8 +93,8 @@ public class AssignEventHandler extends BaseControlViewHandler {
                         List<BaseEventComponent> events = param.getEvents();
                         // Create list of event names
                         for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
-                            BaseEventComponent event = iterator.next();
-                            eventNames.add(event.getName());
+                            BaseEventComponent baseEvent = iterator.next();
+                            eventNames.add(baseEvent.getName());
                         }
 
                         TraceChannelComponent channel = dialog.getChannel();

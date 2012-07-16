@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson and others
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann               - Initial API and implementation
  *   Anna Dushistova(Montavista) - [382684] Allow reusing already defined connections that have Files and Shells subsystems
  **********************************************************************/
@@ -40,7 +40,7 @@ import org.eclipse.ui.PlatformUI;
  * <p>
  * Command handler for creation new connection for trace control.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class NewConnectionHandler extends BaseControlViewHandler {
@@ -49,7 +49,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
     // Constants
     // ------------------------------------------------------------------------
     /**
-     * The trace control system type defined for LTTng version 2.0 and later. 
+     * The trace control system type defined for LTTng version 2.0 and later.
      */
     public final static String TRACE_CONTROL_SYSTEM_TYPE = "org.eclipse.linuxtools.internal.lttng2.ui.control.systemType"; //$NON-NLS-1$
 
@@ -57,7 +57,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The parent trace control component the new node will be added to. 
+     * The parent trace control component the new node will be added to.
      */
     private ITraceControlComponent fRoot = null;
 
@@ -75,10 +75,10 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         }
 
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
-        
+
         // get system type definition for LTTng 2.x connection
         IRSESystemType sysType = RSECorePlugin.getTheCoreRegistry().getSystemTypeById(TRACE_CONTROL_SYSTEM_TYPE);
-        
+
         // get all hosts for this system type
         IHost[] hosts = getSuitableHosts();
 
@@ -91,7 +91,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
             return null;
         }
 
-        String hostName = dialog.getConnectionName(); 
+        String hostName = dialog.getConnectionName();
         String hostAddress = dialog.getHostName();
 
         // get the singleton RSE registry
@@ -111,7 +111,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
                 host = registry.createHost(
                         sysType,       //System Type Name
                         hostName,      //Connection name
-                        hostAddress,   //IP Address        
+                        hostAddress,   //IP Address
                         "Connection to Host"); //description //$NON-NLS-1$
             }
             catch (Exception e) {
@@ -121,7 +121,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
                 return null;
             }
         }
-        
+
         if (host != null) {
             fLock.lock();
             try {
@@ -143,28 +143,27 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         return null;
     }
 
+    private static IHost[] getSuitableHosts() {
+        // need shells and files
+        ArrayList<IHost> result = new ArrayList<IHost>();
+        ArrayList<IHost> shellConnections = new ArrayList<IHost>(
+                Arrays.asList(RSECorePlugin.getTheSystemRegistry()
+                        .getHostsBySubSystemConfigurationCategory("shells"))); //$NON-NLS-1$
 
-	private IHost[] getSuitableHosts() {
-		//need shells and files
-		ArrayList<IHost> result = new ArrayList<IHost>();
-		ArrayList<IHost> shellConnections = new ArrayList<IHost>(Arrays.asList(RSECorePlugin.getTheSystemRegistry()
-				.getHostsBySubSystemConfigurationCategory("shells"))); //$NON-NLS-1$
+        for (IHost connection : shellConnections) {
+            if (!connection.getSystemType().isLocal()) {
+                ISubSystem[] subSystems = connection.getSubSystems();
+                for (int i = 0; i < subSystems.length; i++) {
+                    if (subSystems[i] instanceof IFileServiceSubSystem) {
+                        result.add(connection);
+                        break;
+                    }
+                }
+            }
+        }
 
-		for(IHost connection:shellConnections){
-			if(!connection.getSystemType().isLocal()){
-				ISubSystem[] subSystems = connection.getSubSystems();
-				for (int i = 0; i < subSystems.length; i++) {
-					if (subSystems[i] instanceof IFileServiceSubSystem){
-						result.add(connection);
-						break;
-					}
-				}
-			}
-		}
-		
-		return (IHost[]) result.toArray(new IHost[result.size()]);
-	}
-
+        return result.toArray(new IHost[result.size()]);
+    }
 
     /*
      * (non-Javadoc)
@@ -172,7 +171,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
      */
     @Override
     public boolean isEnabled() {
-        
+
         // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
@@ -182,11 +181,11 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         ITraceControlComponent root = null;
 
         // no need to verify part because it has been already done in getWorkbenchPage()
-        IWorkbenchPart part = page.getActivePart(); 
+        IWorkbenchPart part = page.getActivePart();
         root = ((ControlView) part).getTraceControlRoot();
-        
+
         boolean isEnabled = root != null;
-        
+
         fLock.lock();
         try {
             fRoot = null;
@@ -196,7 +195,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         } finally {
             fLock.unlock();
         }
-        
+
         return isEnabled;
     }
 }

@@ -95,12 +95,12 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
 
                         Job addJob = new Job(Messages.TraceControl_AddContextJob) {
                             @Override
-                            protected IStatus run(IProgressMonitor monitor) {
+                            protected IStatus run(IProgressMonitor monitor2) {
                                 Exception error = null;
 
                                 try {
                                     List<String> contextNames = dialog.getContexts();
-                                    addContexts(param, contextNames, monitor);
+                                    addContexts(param, contextNames, monitor2);
 
                                 } catch (ExecutionException e) {
                                     error = e;

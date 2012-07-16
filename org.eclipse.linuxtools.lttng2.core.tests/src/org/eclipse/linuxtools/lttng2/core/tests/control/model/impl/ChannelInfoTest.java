@@ -305,7 +305,7 @@ public class ChannelInfoTest extends TestCase {
         assertTrue("equals", channel1.equals(channel3));
     }
 
-    public void testEqualsNull() throws Exception {
+    public void testEqualsNull() {
         assertTrue("equals", !fChannelInfo1.equals(null));
         assertTrue("equals", !fChannelInfo2.equals(null));
     }

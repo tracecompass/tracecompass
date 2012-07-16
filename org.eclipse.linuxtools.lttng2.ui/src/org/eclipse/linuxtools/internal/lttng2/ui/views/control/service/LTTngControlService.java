@@ -811,7 +811,7 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * Formats the output string as single string.
      *
-     * @param output
+     * @param result
      *            - output array
      * @return - the formatted output
      */

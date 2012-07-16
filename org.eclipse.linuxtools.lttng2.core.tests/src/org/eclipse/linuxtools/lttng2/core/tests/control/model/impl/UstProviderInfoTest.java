@@ -207,7 +207,7 @@ public class UstProviderInfoTest extends TestCase {
         assertTrue("equals", UstProvider1.equals(UstProvider3));
     }
 
-    public void testEqualsNull() throws Exception {
+    public void testEqualsNull() {
         assertTrue("equals", !fUstProviderInfo1.equals(null));
         assertTrue("equals", !fUstProviderInfo2.equals(null));
     }
