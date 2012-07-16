@@ -23,19 +23,29 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 public class TmfTraceSelectedSignal extends TmfSignal {
 
     private final ITmfTrace<?> fTrace;
-    
+
+    /**
+     * Constructor
+     *
+     * @param source
+     *            Object sending this signal
+     * @param trace
+     *            The trace that was selected
+     */
     public TmfTraceSelectedSignal(Object source, ITmfTrace<?> trace) {
         super(source);
         fTrace = trace;
     }
 
+    /**
+     * @return The trace referred to by this signal
+     */
     public ITmfTrace<?> getTrace() {
         return fTrace;
     }
 
     @Override
-    @SuppressWarnings("nls")
     public String toString() {
-        return "[TmfTraceSelectedSignal (" + fTrace.getName() + ")]";
+        return "[TmfTraceSelectedSignal (" + fTrace.getName() + ")]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

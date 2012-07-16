@@ -26,17 +26,35 @@ public class TmfExperimentRangeUpdatedSignal extends TmfSignal {
 
 	private final TmfExperiment<? extends ITmfEvent> fExperiment;
 	private final TmfTimeRange fTimeRange;
-	
-	public TmfExperimentRangeUpdatedSignal(Object source, TmfExperiment<? extends ITmfEvent> experiment, TmfTimeRange range) { // , ITmfTrace trace) {
-		super(source);
-		fExperiment = experiment;
-		fTimeRange = range;
-	}
 
+    /**
+     * Constructor
+     *
+     * @param source
+     *            Object sending this signal
+     * @param experiment
+     *            Experiment whose range was updated
+     * @param range
+     *            The new time range of the experiment
+     */
+    public TmfExperimentRangeUpdatedSignal(Object source,
+            TmfExperiment<? extends ITmfEvent> experiment, TmfTimeRange range) {
+            // , ITmfTrace trace) {
+        super(source);
+        fExperiment = experiment;
+        fTimeRange = range;
+    }
+
+	/**
+	 * @return The experiment
+	 */
 	public TmfExperiment<? extends ITmfEvent> getExperiment() {
 		return fExperiment;
 	}
 
+	/**
+	 * @return The time range
+	 */
 	public TmfTimeRange getRange() {
 		return fTimeRange;
 	}

@@ -24,12 +24,23 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 public class TmfExperimentDisposedSignal<T extends ITmfEvent> extends TmfSignal {
 
 	private final TmfExperiment<T> fExperiment;
-	
+
+    /**
+     * Constructor
+     *
+     * @param source
+     *            Object sending this signal
+     * @param experiment
+     *            Experiment that was disposed
+     */
 	public TmfExperimentDisposedSignal(Object source, TmfExperiment<T> experiment) {
 		super(source);
 		fExperiment = experiment;
 	}
 
+    /**
+     * @return Reference to the disposed experiment concerning this signal
+     */
 	public TmfExperiment<? extends ITmfEvent> getExperiment() {
 		return fExperiment;
 	}

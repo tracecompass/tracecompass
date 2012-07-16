@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.internal.tmf.core.Tracer;
  * 
  * @version 1.0
  * @author Francois Chouinard
-+ */
+ */
 public class TmfSignalManager {
 
 	// The set of event listeners and their corresponding handler methods.
@@ -50,22 +50,46 @@ public class TmfSignalManager {
 		}
 	}
 
-	public static synchronized void register(Object listener) {
-		Method[] methods = getSignalHandlerMethods(listener);
-		if (methods.length > 0)
-			fListeners.put(listener, methods);
-	}
+    /**
+     * Register an object to the signal manager. This object can then implement
+     * handler methods, marked with @TmfSignalHandler and with the expected
+     * signal type as parameter.
+     *
+     * @param listener
+     *            The object that will be notified of new signals
+     */
+    public static synchronized void register(Object listener) {
+        Method[] methods = getSignalHandlerMethods(listener);
+        if (methods.length > 0) {
+            fListeners.put(listener, methods);
+        }
+    }
 
+    /**
+     * Register an object to the signal manager as a "VIP" listener. All VIP
+     * listeners will all receive the signal before the manager moves on to the
+     * lowly, non-VIP listeners.
+     *
+     * @param listener
+     *            The object that will be notified of new signals
+     */
     public static synchronized void registerVIP(Object listener) {
         Method[] methods = getSignalHandlerMethods(listener);
         if (methods.length > 0)
             fVIPListeners.put(listener, methods);
     }
 
-	public static synchronized void deregister(Object listener) {
-		fVIPListeners.remove(listener);
+    /**
+     * De-register a listener object from the signal manager. This means that
+     * its @TmfSignalHandler methods will no longer be called.
+     *
+     * @param listener
+     *            The object to de-register
+     */
+    public static synchronized void deregister(Object listener) {
+        fVIPListeners.remove(listener);
         fListeners.remove(listener);
-	}
+    }
 
 	/**
 	 * Returns the list of signal handlers in the listener. Signal handler name

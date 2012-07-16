@@ -25,7 +25,12 @@ public class TmfStateSystemBuildCompleted extends TmfSignal {
     private ITmfTrace<?> fTrace;
     
     /**
+     * Constructor
+     *
      * @param source
+     *            Object sending this signal
+     * @param trace
+     *            The state system of which trace just finished building
      */
     public TmfStateSystemBuildCompleted(Object source, ITmfTrace<?> trace) {
         super(source);
@@ -33,7 +38,7 @@ public class TmfStateSystemBuildCompleted extends TmfSignal {
     }
 
     /**
-     * @param source
+     * @return The trace referred to by this signal
      */
     public ITmfTrace<?> getTrace() {
         return fTrace;
@@ -43,9 +48,8 @@ public class TmfStateSystemBuildCompleted extends TmfSignal {
      * @see java.lang.Object#toString()
      */
     @Override
-    @SuppressWarnings("nls")
     public String toString() {
-        return "[TmfStateSystemBuildCompleted (" + fTrace.toString() + ")]";
+        return "[TmfStateSystemBuildCompleted (" + fTrace.toString() + ")]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }

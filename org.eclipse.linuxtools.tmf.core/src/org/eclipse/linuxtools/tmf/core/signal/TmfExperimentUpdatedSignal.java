@@ -24,15 +24,26 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 public class TmfExperimentUpdatedSignal extends TmfSignal {
 
 	private final TmfExperiment<? extends ITmfEvent> fExperiment;
-	
-	public TmfExperimentUpdatedSignal(Object source, TmfExperiment<? extends ITmfEvent> experiment) {
-		super(source);
-		fExperiment = experiment;
-	}
 
-	public TmfExperiment<? extends ITmfEvent> getExperiment() {
-		return fExperiment;
-	}
+    /**
+     * Constructor
+     *
+     * @param source
+     *            Object sending this signal
+     * @param experiment
+     *            The experiment that was updated
+     */
+    public TmfExperimentUpdatedSignal(Object source, TmfExperiment<? extends ITmfEvent> experiment) {
+        super(source);
+        fExperiment = experiment;
+    }
+
+    /**
+     * @return The experiment
+     */
+    public TmfExperiment<? extends ITmfEvent> getExperiment() {
+        return fExperiment;
+    }
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
