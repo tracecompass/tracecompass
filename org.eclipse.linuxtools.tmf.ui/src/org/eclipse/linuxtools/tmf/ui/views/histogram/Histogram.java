@@ -614,12 +614,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     }
 
     private String formatToolTipLabel(final int index) {
-        long startTime = fScaledData.getBucketStartTime(fScaledData.fCurrentBucket);
+        long startTime = fScaledData.getBucketStartTime(index);
         // negative values are possible if time values came into the model in decreasing order
         if (startTime < 0) {
             startTime = 0;
         }
-        final long endTime = fScaledData.getBucketEndTime(fScaledData.fCurrentBucket);
+        final long endTime = fScaledData.getBucketEndTime(index);
         final int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
 
         final StringBuffer buffer = new StringBuffer();
