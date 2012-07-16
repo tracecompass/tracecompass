@@ -102,8 +102,9 @@ public abstract class CtfTmfEventField implements ITmfEventField {
 
         /* Determine the Definition type */
         if (fieldDef instanceof IntegerDefinition) {
-            field = new CTFIntegerField(
-                    ((IntegerDefinition) fieldDef).getValue(), fieldName);
+            IntegerDefinition intDef = (IntegerDefinition) fieldDef;
+            int base = intDef.getDeclaration().getBase();
+            field = new CTFIntegerField(intDef.getValue(), fieldName, base);
 
         } else if (fieldDef instanceof StringDefinition) {
             field = new CTFStringField(
@@ -146,6 +147,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
                 field = new CTFIntegerArrayField(values, fieldName);
             }
             /* Add other Sequence types here */
+
         } else if (fieldDef instanceof FloatDefinition){
             FloatDefinition floatDef = (FloatDefinition) fieldDef;
             field = new CTFFloatField( floatDef.getValue(), fieldName);
@@ -165,7 +167,8 @@ public abstract class CtfTmfEventField implements ITmfEventField {
     public static CtfTmfEventField copyFrom(CtfTmfEventField other) {
         switch (other.getFieldType()) {
         case FIELDTYPE_INTEGER:
-            return new CTFIntegerField(((CTFIntegerField) other).getValue(), other.name);
+            CTFIntegerField intOther = (CTFIntegerField) other;
+            return new CTFIntegerField(intOther.getValue(), intOther.name, intOther.getBase());
         case FIELDTYPE_STRING:
             return new CTFStringField(((CTFStringField) other).getValue(), other.name);
         case FIELDTYPE_INTEGER_ARRAY:
@@ -242,6 +245,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
 final class CTFIntegerField extends CtfTmfEventField {
 
     private final long longValue;
+    private final int base;
 
     /**
      * A CTF "IntegerDefinition" can be an integer of any byte size, so in the
@@ -252,9 +256,19 @@ final class CTFIntegerField extends CtfTmfEventField {
      * @param name
      *            The name of this field
      */
-    CTFIntegerField(long longValue, String name) {
+    CTFIntegerField(long longValue, String name, int base) {
         super(name);
         this.longValue = longValue;
+        this.base = base;
+    }
+
+    /**
+     * Return the integer's base. (Not made public until it's needed.)
+     *
+     * @return The base, usually 10 or 16.
+     */
+    int getBase() {
+        return base;
     }
 
     @Override
@@ -269,7 +283,32 @@ final class CTFIntegerField extends CtfTmfEventField {
 
     @Override
     public String toString() {
-        return name + '=' + longValue;
+        StringBuilder sb = new StringBuilder(name);
+        sb.append('=');
+
+        /* Format the number correctly according to the integer's base */
+        switch (base) {
+        case 2:
+            sb.append("0b"); //$NON-NLS-1$
+            sb.append(Long.toBinaryString(longValue));
+            break;
+        case 8:
+            sb.append('0');
+            sb.append(Long.toOctalString(longValue));
+            break;
+        case 10:
+            sb.append(longValue);
+            break;
+        case 16:
+            sb.append("0x"); //$NON-NLS-1$
+            sb.append(Long.toHexString(longValue));
+            break;
+        default:
+            /* Non-standard base, we'll just print it as a decimal number */
+            sb.append(longValue);
+            break;
+        }
+        return sb.toString();
     }
 }
 
