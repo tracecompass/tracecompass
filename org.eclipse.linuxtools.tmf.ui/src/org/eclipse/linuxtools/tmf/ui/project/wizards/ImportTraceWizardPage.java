@@ -883,7 +883,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 String prefix = null;
                 for (int i = 0; i < files.size(); i++) {
                     File file = fileSystemObjects.get(files.get(i));
-                    String name = file.getAbsolutePath();
+                    String name = file.getAbsolutePath() + File.separatorChar;
                     if (fTargetFolder != null && (prefix == null || !name.startsWith(prefix))) {
                         prefix = name; // new prefix
                         IResource resource = fTargetFolder.findMember(file.getName());
@@ -941,9 +941,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             List<File> subList = new ArrayList<File>();
             subList.add(resource);
             if (resource.isDirectory()) {
-                String prefix = resource.getAbsolutePath();
+                String prefix = resource.getAbsolutePath() + File.separatorChar;
                 boolean hasSamePrefix = true;
-                for (int j = i; j < fileList.size() && hasSamePrefix; j++) {
+                for (int j = i + 1; j < fileList.size() && hasSamePrefix; j++) {
                     File res = fileList.get(j);
                     hasSamePrefix = res.getAbsolutePath().startsWith(prefix);
                     if (hasSamePrefix) {
