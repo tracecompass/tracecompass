@@ -587,7 +587,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         fTraceTypes.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                validateSourceGroup();
+                updateWidgetEnablements();
             }
 
             @Override
