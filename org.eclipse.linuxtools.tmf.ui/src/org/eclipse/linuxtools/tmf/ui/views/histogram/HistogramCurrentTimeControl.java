@@ -69,8 +69,8 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
             TmfExperiment<?> exp = TmfExperiment.getCurrentExperiment();
             if (exp != null) {
                 TmfTimeRange range = exp.getTimeRange();
-                long startTime = range.getStartTime().getValue();
-                long endTime = range.getEndTime().getValue();
+                long startTime = range.getStartTime().normalize(0, -9).getValue();
+                long endTime = range.getEndTime().normalize(0, -9).getValue();
                 if (value < startTime) {
                     value = startTime;
                 } else if (value > endTime) {

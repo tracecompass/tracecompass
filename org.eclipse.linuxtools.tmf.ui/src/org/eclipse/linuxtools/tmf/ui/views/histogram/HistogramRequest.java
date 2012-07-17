@@ -83,7 +83,7 @@ public class HistogramRequest extends TmfEventRequest<ITmfEvent> {
     public void handleData(ITmfEvent event) {
         super.handleData(event);
         if (event != null) {
-            long timestamp = event.getTimestamp().getValue();
+            long timestamp = event.getTimestamp().normalize(0, -9).getValue();
             fHistogram.countEvent(getNbRead(), timestamp);
         }
     }
