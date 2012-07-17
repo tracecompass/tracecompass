@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 2011, 2012 Ericsson
+ * Copyright (c) 2009, 2010, 2011, 2012 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Got rid of dependency on internal platform class
  *   Francois Chouinard - Complete re-design
+ *   Anna Dushistova(Montavista) - [383047] NPE while importing a CFT trace
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
@@ -53,6 +54,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefin
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -893,10 +895,13 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                                 resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, traceBundle);
                                 resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
                                 resource.setPersistentProperty(TmfCommonConstants.TRACEICON, traceIcon);
-                                for (TmfTraceElement traceElement : TmfProjectRegistry.getProject(resource.getProject()).getTracesFolder().getTraces()) {
-                                    if (traceElement.getName().equals(resource.getName())) {
-                                        traceElement.refreshTraceType();
-                                        break;
+                                TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject());
+                                if (tmfProject != null) {
+                                    for (TmfTraceElement traceElement : tmfProject.getTracesFolder().getTraces()) {
+                                        if (traceElement.getName().equals(resource.getName())) {
+                                            traceElement.refreshTraceType();
+                                            break;
+                                        }
                                     }
                                 }
                             } catch (CoreException e) {
