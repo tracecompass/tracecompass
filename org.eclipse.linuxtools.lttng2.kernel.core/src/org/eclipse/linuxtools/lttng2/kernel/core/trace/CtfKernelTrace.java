@@ -17,6 +17,8 @@ import java.io.File;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
@@ -47,11 +49,23 @@ public class CtfKernelTrace extends CtfTmfTrace {
 
     @Override
     public boolean validate(final IProject project, final String path) {
-        if (!super.validate(project, path)) {
+        CTFTrace temp;
+        /*
+         * Make sure the trace is openable as a CTF trace. We do this here
+         * instead of calling super.validate() to keep the reference to "temp".
+         */
+        try {
+            temp = new CTFTrace(path);
+        } catch (CTFReaderException e) {
             return false;
         }
-        /* Add extra checks specific to kernel traces here */
-        return true;
+
+        /* Make sure the domain is "kernel" in the trace's env vars */
+        String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
+        if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
+            return true;
+        }
+        return false;
     }
 
     @Override
