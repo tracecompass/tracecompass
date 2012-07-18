@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,10 +8,10 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Added tests to check offsets
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.request;
-
 
 import junit.framework.TestCase;
 
@@ -21,8 +21,6 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
 
 /**
- * <b><u>TmfCoalescedDataRequestTest</u></b>
- * <p>
  * Test suite for the TmfCoalescedDataRequest class.
  */
 @SuppressWarnings({ "nls" })
@@ -502,11 +500,7 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	        assertTrue ("handleCompleted", crFlags[0]);
 	        assertFalse("handleSuccess",   crFlags[1]);
 	        assertFalse("handleFailure",   crFlags[2]);
-	        assertTrue ("handleCancel",   crFlags[3]);
+	        assertTrue ("handleCancel",    crFlags[3]);
 	    }
-
-	// ------------------------------------------------------------------------
-	// waitForCompletion
-	// ------------------------------------------------------------------------
 
 }

@@ -424,10 +424,6 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	}
 
 	// ------------------------------------------------------------------------
-	// waitForCompletion
-	// ------------------------------------------------------------------------
-
-	// ------------------------------------------------------------------------
 	// Coalescing
 	// ------------------------------------------------------------------------
 
@@ -467,21 +463,22 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
     private static class TmfTestTriggerSignal extends TmfSignal {
     	public final boolean forceCancel;
-		public TmfTestTriggerSignal(Object source, boolean cancel) {
+    	public final long fIndex;
+		public TmfTestTriggerSignal(Object source, long index, boolean cancel) {
 			super(source);
 			forceCancel = cancel;
-
+			fIndex = index;
 		}
     }
 
-    @SuppressWarnings("unchecked")
 	@TmfSignalHandler
+    @SuppressWarnings("unchecked")
     public void trigger(final TmfTestTriggerSignal signal) {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
 
         requestedEvents1 = new Vector<TmfEvent>();
-        request1 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        request1 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
         	int nbRead = 0;
             @Override
             public void handleData(TmfEvent event) {
@@ -496,7 +493,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         };
 
         requestedEvents2 = new Vector<TmfEvent>();
-        request2 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        request2 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(TmfEvent event) {
         		super.handleData(event);
@@ -507,7 +504,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         };
 
         requestedEvents3 = new Vector<TmfEvent>();
-        request3 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        request3 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(TmfEvent event) {
         		super.handleData(event);
@@ -523,41 +520,50 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         providers[0].sendRequest(request3);
     }
 
-    public void testCoalescedRequest() throws Exception {
+    public void runCoalescedRequest(long startIndex) throws Exception {
 
-		fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
+        fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
 
-    	TmfSignalManager.register(this);
-		TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, false);
-    	TmfSignalManager.dispatchSignal(signal);
+        TmfSignalManager.register(this);
+        TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, startIndex, false);
+        TmfSignalManager.dispatchSignal(signal);
 
         request1.waitForCompletion();
         request2.waitForCompletion();
         request3.waitForCompletion();
 
-        assertEquals("Request1: nbEvents", NB_EVENTS, requestedEvents1.size());
-        assertTrue  ("Request1: isCompleted", request1.isCompleted());
-        assertFalse ("Request1: isCancelled", request1.isCancelled());
+        try {
+            assertEquals("Request1: nbEvents", NB_EVENTS - startIndex, requestedEvents1.size());
+            assertTrue  ("Request1: isCompleted", request1.isCompleted());
+            assertFalse ("Request1: isCancelled", request1.isCancelled());
 
-        assertEquals("Request2: nbEvents", NB_EVENTS, requestedEvents2.size());
-        assertTrue  ("Request2: isCompleted", request2.isCompleted());
-        assertFalse ("Request2: isCancelled", request2.isCancelled());
+            assertEquals("Request2: nbEvents", NB_EVENTS - startIndex, requestedEvents2.size());
+            assertTrue  ("Request2: isCompleted", request2.isCompleted());
+            assertFalse ("Request2: isCancelled", request2.isCancelled());
 
-        assertEquals("Request3: nbEvents", NB_EVENTS, requestedEvents3.size());
-        assertTrue  ("Request3: isCompleted", request3.isCompleted());
-        assertFalse ("Request3: isCancelled", request3.isCancelled());
+            assertEquals("Request3: nbEvents", NB_EVENTS - startIndex, requestedEvents3.size());
+            assertTrue  ("Request3: isCompleted", request3.isCompleted());
+            assertFalse ("Request3: isCancelled", request3.isCancelled());
 
-        // Ensure that we have distinct events.
-        // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < NB_EVENTS; i++) {
-            assertEquals("Distinct events", i+1, requestedEvents1.get(i).getTimestamp().getValue());
-            assertEquals("Distinct events", i+1, requestedEvents2.get(i).getTimestamp().getValue());
-            assertEquals("Distinct events", i+1, requestedEvents3.get(i).getTimestamp().getValue());
+            // Ensure that we have distinct events.
+            // Don't go overboard: we are not validating the stub!
+            for (int i = 0; i < NB_EVENTS - startIndex; i++) {
+                assertEquals("Distinct events", i + 1 + startIndex, requestedEvents1.get(i).getTimestamp().getValue());
+                assertEquals("Distinct events", i + 1 + startIndex, requestedEvents2.get(i).getTimestamp().getValue());
+                assertEquals("Distinct events", i + 1 + startIndex, requestedEvents3.get(i).getTimestamp().getValue());
+            }
         }
+        finally {
+            TmfSignalManager.deregister(this);
+            fTrace.dispose();
+            fTrace = null;
+        }
+    }
 
-        TmfSignalManager.deregister(this);
-        fTrace.dispose();
-        fTrace = null;
+    public void testCoalescedRequest() throws Exception {
+        runCoalescedRequest(0);
+        runCoalescedRequest(1);
+        runCoalescedRequest(5);
     }
 
 	public void testCancelCoalescedRequest() throws Exception {
@@ -565,7 +571,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 		fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
 
     	TmfSignalManager.register(this);
-		TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, true);
+		TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, 0, true);
     	TmfSignalManager.dispatchSignal(signal);
 
         request1.waitForCompletion();
@@ -595,5 +601,9 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         fTrace.dispose();
         fTrace = null;
     }
+
+    // ------------------------------------------------------------------------
+    // 
+    // ------------------------------------------------------------------------
 
 }
