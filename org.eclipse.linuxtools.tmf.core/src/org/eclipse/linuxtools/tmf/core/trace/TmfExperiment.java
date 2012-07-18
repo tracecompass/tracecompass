@@ -461,6 +461,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
 
         final Thread thread = new Thread("Streaming Monitor for experiment " + getName()) { //$NON-NLS-1$
             private ITmfTimestamp safeTimestamp = null;
+            private ITmfTimestamp lastSafeTimestamp = null;
             private TmfTimeRange timeRange = null;
 
             @Override
@@ -477,8 +478,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
                                 endTimestamp = trace.getEndTime();
                             }
                         }
-                        if (safeTimestamp != null && safeTimestamp.compareTo(getTimeRange().getEndTime(), false) > 0) {
+                        if (safeTimestamp != null && (lastSafeTimestamp == null || safeTimestamp.compareTo(lastSafeTimestamp, false) > 0)) {
                             timeRange = new TmfTimeRange(startTimestamp, safeTimestamp);
+                            lastSafeTimestamp = safeTimestamp;
                         } else {
                             timeRange = null;
                         }
