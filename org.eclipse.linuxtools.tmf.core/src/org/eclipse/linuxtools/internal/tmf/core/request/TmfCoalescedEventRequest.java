@@ -215,7 +215,7 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
             } else {
                 if (request instanceof TmfEventRequest<?>) {
                     TmfEventRequest<T> req = (TmfEventRequest<T>) request;
-                    if (!req.isCompleted() && (getNbRead() > request.getIndex())) {
+                    if (!req.isCompleted() && (getIndex() + getNbRead() > request.getIndex())) {
                         ITmfTimestamp ts = data.getTimestamp();
                         if (req.getRange().contains(ts)) {
                             if (req.getDataType().isInstance(data)) {
