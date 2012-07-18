@@ -134,7 +134,7 @@ public class CtfTmfEventFieldTest {
         Definition fieldDef = fixture.lookupDefinition(INT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         String result2 =CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test=2"); //$NON-NLS-1$
+        assertEquals( result2, "test=02"); //$NON-NLS-1$
     }
 
     /**
