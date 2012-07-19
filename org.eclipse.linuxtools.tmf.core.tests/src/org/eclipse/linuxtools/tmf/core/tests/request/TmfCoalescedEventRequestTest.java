@@ -429,7 +429,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "A-Test-10K";
-    private static final int    NB_EVENTS   = 10000;
+    private static final int    NB_EVENTS   = 5000;
     private static final int    BLOCK_SIZE  = 100;
 
     // Initialize the test trace
@@ -476,6 +476,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
     public void trigger(final TmfTestTriggerSignal signal) {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
+        final long REQUEST_OFFSET = 1000;
 
         requestedEvents1 = new Vector<TmfEvent>();
         request1 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
@@ -493,7 +494,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         };
 
         requestedEvents2 = new Vector<TmfEvent>();
-        request2 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
+        request2 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex + REQUEST_OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(TmfEvent event) {
         		super.handleData(event);
@@ -504,7 +505,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         };
 
         requestedEvents3 = new Vector<TmfEvent>();
-        request3 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
+        request3 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, signal.fIndex + 2 * REQUEST_OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(TmfEvent event) {
         		super.handleData(event);
@@ -533,24 +534,24 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         request3.waitForCompletion();
 
         try {
-            assertEquals("Request1: nbEvents", NB_EVENTS - startIndex, requestedEvents1.size());
+            assertEquals("Request1: nbEvents", NB_EVENTS, requestedEvents1.size());
             assertTrue  ("Request1: isCompleted", request1.isCompleted());
             assertFalse ("Request1: isCancelled", request1.isCancelled());
 
-            assertEquals("Request2: nbEvents", NB_EVENTS - startIndex, requestedEvents2.size());
+            assertEquals("Request2: nbEvents", NB_EVENTS, requestedEvents2.size());
             assertTrue  ("Request2: isCompleted", request2.isCompleted());
             assertFalse ("Request2: isCancelled", request2.isCancelled());
 
-            assertEquals("Request3: nbEvents", NB_EVENTS - startIndex, requestedEvents3.size());
+            assertEquals("Request3: nbEvents", NB_EVENTS, requestedEvents3.size());
             assertTrue  ("Request3: isCompleted", request3.isCompleted());
             assertFalse ("Request3: isCancelled", request3.isCancelled());
 
             // Ensure that we have distinct events.
             // Don't go overboard: we are not validating the stub!
-            for (int i = 0; i < NB_EVENTS - startIndex; i++) {
-                assertEquals("Distinct events", i + 1 + startIndex, requestedEvents1.get(i).getTimestamp().getValue());
-                assertEquals("Distinct events", i + 1 + startIndex, requestedEvents2.get(i).getTimestamp().getValue());
-                assertEquals("Distinct events", i + 1 + startIndex, requestedEvents3.get(i).getTimestamp().getValue());
+            for (int i = 0; i < NB_EVENTS; i++) {
+                assertEquals("Distinct events", i + 1 + request1.getIndex(), requestedEvents1.get(i).getTimestamp().getValue());
+                assertEquals("Distinct events", i + 1 + request2.getIndex(), requestedEvents2.get(i).getTimestamp().getValue());
+                assertEquals("Distinct events", i + 1 + request3.getIndex(), requestedEvents3.get(i).getTimestamp().getValue());
             }
         }
         finally {
@@ -592,9 +593,12 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub!
+        for (int i = 0; i < BLOCK_SIZE; i++) {
+            assertEquals("Distinct events", i + 1 + request1.getIndex(), requestedEvents1.get(i).getTimestamp().getValue());
+        }
         for (int i = 0; i < NB_EVENTS; i++) {
-            assertEquals("Distinct events", i+1, requestedEvents2.get(i).getTimestamp().getValue());
-            assertEquals("Distinct events", i+1, requestedEvents3.get(i).getTimestamp().getValue());
+            assertEquals("Distinct events", i + 1 + request2.getIndex(), requestedEvents2.get(i).getTimestamp().getValue());
+            assertEquals("Distinct events", i + 1 + request3.getIndex(), requestedEvents3.get(i).getTimestamp().getValue());
         }
 
         TmfSignalManager.deregister(this);

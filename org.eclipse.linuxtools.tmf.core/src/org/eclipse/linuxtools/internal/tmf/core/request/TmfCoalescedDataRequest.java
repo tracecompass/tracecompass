@@ -212,25 +212,25 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     // ------------------------------------------------------------------------
 
     @Override
-	public void handleData(T data) {
-		super.handleData(data);
-    	// Don't call sub-requests handleData() unless this is a
-		// TmfCoalescedDataRequest; extended classes should call
-		// the sub-requests handleData().
-		if (getClass() == TmfCoalescedDataRequest.class) {
-		    long index = getIndex() + getNbRead();
-	    	for (ITmfDataRequest<T> request : fRequests) {
-	    	    if (!request.isCompleted()) {
+    public void handleData(T data) {
+        super.handleData(data);
+        // Don't call sub-requests handleData() unless this is a
+        // TmfCoalescedDataRequest; extended classes should call
+        // the sub-requests handleData().
+        if (getClass() == TmfCoalescedDataRequest.class) {
+            long index = getIndex() + getNbRead() - 1;
+            for (ITmfDataRequest<T> request : fRequests) {
+                if (!request.isCompleted()) {
                     if (request.getDataType().isInstance(data)) {
                         long start = request.getIndex();
-                        long end = start + request.getNbRequested() - 1;
+                        long end = start + request.getNbRequested();
                         if (index >= start && index < end) {
                             request.handleData(data);
                         }
                     }
-	    	    }
-	    	}
-		}
+                }
+            }
+        }
     }
 
     @Override
