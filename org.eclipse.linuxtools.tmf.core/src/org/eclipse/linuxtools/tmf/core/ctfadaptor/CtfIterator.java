@@ -17,10 +17,10 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 /**
  * The CTF trace reader iterator.
- * 
+ *
  * It doesn't reserve a file handle, so many iterators can be used without worries
  * of I/O errors or resource exhaustion.
- * 
+ *
  * @version 1.0
  * @author Matthew Khouzam
  */
@@ -118,7 +118,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext, Comparab
         final long offsetTimestamp = timestamp
                 - this.getTrace().getOffset();
         if (offsetTimestamp < 0) {
-            ret = super.seek(timestamp);
+            ret = super.seek(0L);
         } else {
             ret = super.seek(offsetTimestamp);
         }
