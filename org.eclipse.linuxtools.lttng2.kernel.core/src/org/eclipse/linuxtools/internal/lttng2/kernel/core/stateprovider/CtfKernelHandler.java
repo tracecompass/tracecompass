@@ -2,19 +2,17 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
@@ -31,9 +29,9 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**
  * This is the reference "state provider" for LTTng 2.0 kernel traces.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 class CtfKernelHandler implements Runnable {
 
@@ -41,13 +39,6 @@ class CtfKernelHandler implements Runnable {
     private IStateSystemBuilder ss;
 
     private CtfTmfEvent currentEvent;
-
-    /*
-     * We can keep handles to some Attribute Nodes so these don't need to be
-     * re-found (re-hashed Strings etc.) every new event
-     */
-    List<Integer> currentCPUNodes;
-    List<Integer> currentThreadNodes;
 
     /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
     private final HashMap<String, Integer> knownEventNames;
@@ -61,8 +52,6 @@ class CtfKernelHandler implements Runnable {
     CtfKernelHandler(BlockingQueue<CtfTmfEvent> eventsQueue) {
         assert (eventsQueue != null);
         this.inQueue = eventsQueue;
-        currentCPUNodes = new ArrayList<Integer>();
-        currentThreadNodes = new ArrayList<Integer>();
 
         knownEventNames = fillEventNames();
     }
@@ -113,34 +102,28 @@ class CtfKernelHandler implements Runnable {
     }
 
     private void processEvent(CtfTmfEvent event) {
-        currentEvent = event;
-        ITmfEventField content = event.getContent();
-        String eventName = event.getEventName();
-
-        long ts = event.getTimestamp().getValue();
         int quark;
         ITmfStateValue value;
-        Integer eventCpu = event.getCPU();
-        Integer currentCPUNode, currentThreadNode;
 
-        /* Adjust the current nodes Vectors if we see a new CPU in an event */
-        if (eventCpu >= currentCPUNodes.size()) {
-            /* We need to add this node to the vector */
-            for (Integer i = currentCPUNodes.size(); i < eventCpu + 1; i++) {
-                quark = ss.getQuarkRelativeAndAdd(cpusNode, i.toString());
-                currentCPUNodes.add(quark);
+        currentEvent = event;
 
-                quark = ss.getQuarkRelativeAndAdd(threadsNode, Attributes.UNKNOWN);
-                currentThreadNodes.add(quark);
-            }
-        }
-
-        currentCPUNode = currentCPUNodes.get(eventCpu);
-        currentThreadNode = currentThreadNodes.get(eventCpu);
-        assert (currentCPUNode != null);
-        assert (currentThreadNode != null);
+        final ITmfEventField content = event.getContent();
+        final String eventName = event.getEventName();
+        final long ts = event.getTimestamp().getValue();
 
         try {
+            /* Shortcut for the "current CPU" attribute node */
+            final Integer currentCPUNode = ss.getQuarkRelativeAndAdd(cpusNode, String.valueOf(event.getCPU()));
+
+            /*
+             * Shortcut for the "current thread" attribute node. It requires
+             * querying the current CPU's current thread.
+             */
+            quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
+            value = ss.queryOngoingState(quark);
+            int thread = value.unboxInt();
+            final Integer currentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, String.valueOf(thread));
+
             /*
              * Feed event to the history system if it's known to cause a state
              * transition.
@@ -275,9 +258,6 @@ class CtfKernelHandler implements Runnable {
 
                 Integer formerThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString());
                 Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, nextTid.toString());
-
-                /* Update the currentThreadNodes pointer */
-                currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
                 /* Set the status of the process that got scheduled out. */
                 quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
@@ -531,9 +511,9 @@ class CtfKernelHandler implements Runnable {
     /**
      * Similar logic as above, but to set the CPU's status when it's coming out
      * of an interruption.
-     * @throws AttributeNotFoundException 
-     * @throws StateValueTypeException 
-     * @throws TimeRangeException 
+     * @throws AttributeNotFoundException
+     * @throws StateValueTypeException
+     * @throws TimeRangeException
      */
     private void cpuExitInterrupt(long ts, int currentCpuNode, int currentThreadNode)
             throws StateValueTypeException, AttributeNotFoundException,
