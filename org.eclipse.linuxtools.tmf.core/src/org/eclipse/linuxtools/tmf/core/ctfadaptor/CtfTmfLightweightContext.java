@@ -27,38 +27,40 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 public class CtfTmfLightweightContext implements ITmfContext {
 
     // -------------------------------------------
-    // Constants
-    // -------------------------------------------
-    private static final int MAX_COLLISIONS = 10;
-
-    // -------------------------------------------
     // Fields
     // -------------------------------------------
     private CtfLocation curLocation;
     private long curRank;
-    private int collisions;
 
-    private CtfIterator fSeeker;
-    final private ArrayList<CtfIterator> fIteratorPool;
-    private ListIterator<CtfIterator> fCurrentIterator;
+    private final CtfTmfTrace fTrace;
 
     // -------------------------------------------
     // Constructor
     // -------------------------------------------
     /**
+     * Deprecated, use CtfTmfLightweightContext( CtfTmfTrace please )
      *
      * @param iters
      *            the shared iterator pool.
      * @param pos
      *            the iterator position.
      */
+    @Deprecated
     public CtfTmfLightweightContext(ArrayList<CtfIterator> iters,
             ListIterator<CtfIterator> pos) {
-        fIteratorPool = iters;
-        fCurrentIterator = pos;
-        fSeeker = getIterator();
-        curLocation = new CtfLocation((Long)null);
-        collisions = 0;
+        fTrace = iters.get(0).getCtfTmfTrace();
+        curLocation = new CtfLocation((Long) null);
+    }
+
+    /**
+     *
+     * @param ctfTmfTrace
+     *            the parent trace
+     * @since 1.1
+     */
+    public CtfTmfLightweightContext(CtfTmfTrace ctfTmfTrace) {
+        fTrace = ctfTmfTrace;
+        curLocation = new CtfLocation((Long) null);
     }
 
     // -------------------------------------------
@@ -83,7 +85,7 @@ public class CtfTmfLightweightContext implements ITmfContext {
     @Override
     public void setLocation(ITmfLocation<? extends Comparable<?>> location) {
         curLocation = (CtfLocation) location;
-        updateLocation();
+        getIterator().seek(curLocation.getLocation());
     }
 
     @Override
@@ -105,21 +107,21 @@ public class CtfTmfLightweightContext implements ITmfContext {
 
     /**
      * Gets the current event. Wrapper to help CtfTmfTrace
+     *
      * @return The event or null
      */
     public synchronized CtfTmfEvent getCurrentEvent() {
-        updateLocation();
-        return fSeeker.getCurrentEvent();
+        return getIterator().getCurrentEvent();
     }
 
     /**
      * Advances to a the next event. Wrapper to help CtfTmfTrace
+     *
      * @return success or not
      */
     public synchronized boolean advance() {
-        updateLocation();
-        boolean retVal = fSeeker.advance();
-        CtfTmfEvent currentEvent = fSeeker.getCurrentEvent();
+        boolean retVal = getIterator().advance();
+        CtfTmfEvent currentEvent = getIterator().getCurrentEvent();
         if (currentEvent != null) {
             curLocation.setLocation(currentEvent.getTimestampValue());
         } else {
@@ -136,14 +138,14 @@ public class CtfTmfLightweightContext implements ITmfContext {
 
     /**
      * Seeks to a given timestamp. Wrapper to help CtfTmfTrace
-     * @param timestamp desired timestamp
+     *
+     * @param timestamp
+     *            desired timestamp
      * @return success or not
      */
     public synchronized boolean seek(final long timestamp) {
         curLocation.setLocation(timestamp);
-        collisions = 0;
-        fSeeker = getIterator();
-        return updateLocation();
+        return getIterator().seek(timestamp);
     }
 
     /*
@@ -153,8 +155,7 @@ public class CtfTmfLightweightContext implements ITmfContext {
      */
     @Override
     public CtfTmfLightweightContext clone() {
-        CtfTmfLightweightContext ret = new CtfTmfLightweightContext(
-                fIteratorPool, fCurrentIterator);
+        CtfTmfLightweightContext ret = new CtfTmfLightweightContext(fTrace);
         ret.curLocation = curLocation.clone();
         ret.curRank = curRank;
         return ret;
@@ -164,40 +165,12 @@ public class CtfTmfLightweightContext implements ITmfContext {
     // Private helpers
     // -------------------------------------------
     /**
-     * This updates the position of an iterator to the location(curLocation)
-     * Since the iterators are in a pool to not exhaust the number of file
-     * pointers some of them can be shared. This means there can be collisions
-     * between contexts fighting over the same resource. A heuristic is applied
-     * that if there are MAX_COLLISIONS collisions in a row, the iterator is
-     * changed for the next one in the iterator pool.
+     * Get iterator, called every time to get an iterator, no local copy is
+     * stored so that there is no need to "update"
      *
-     * @return true if the location is correct.
-     */
-    private synchronized boolean updateLocation() {
-        if (!curLocation.getLocation().equals(
-                (fSeeker.getLocation().getLocation()))) {
-            collisions++;
-            if (collisions > MAX_COLLISIONS) {
-                fSeeker = getIterator();
-                collisions = 0;
-            }
-            fSeeker.setRank(curRank);
-            return fSeeker.seek(curLocation.getLocation());
-        }
-        collisions = 0;
-        return true;
-    }
-
-    /**
-     * gets the next iterator in a pool.
-     *
-     * @return
+     * @return an iterator
      */
     private CtfIterator getIterator() {
-        if (!fCurrentIterator.hasNext()) {
-            fCurrentIterator = fIteratorPool.listIterator(0);
-        }
-        return fCurrentIterator.next();
+        return CtfIteratorManager.getIterator(fTrace, this);
     }
-
 }
