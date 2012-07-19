@@ -540,7 +540,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      * Select an event
      *
      * @param n
-     *            1 to enable, -1 to disable
+     *            1 for next event, -1 for previous event
      */
     public void selectEvent(int n) {
         if (null == _timeProvider) {
@@ -571,6 +571,11 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 // but not beyond the end of the trace
                 if (nextTime > endTime) {
                     nextTime = endTime;
+                }
+            } else if (n == -1) {
+                // for previous event go to its end time unless we were already there
+                if (nextEvent.getTime() + nextEvent.getDuration() < selectedTime) {
+                    nextTime = nextEvent.getTime() + nextEvent.getDuration();
                 }
             }
             _timeProvider.setSelectedTimeNotify(nextTime, true);
