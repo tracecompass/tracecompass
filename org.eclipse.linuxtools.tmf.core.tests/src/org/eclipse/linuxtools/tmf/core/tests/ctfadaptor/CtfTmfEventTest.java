@@ -216,6 +216,6 @@ public class CtfTmfEventTest {
     @Test
     public void testToString() {
         String s = fixture.getContent().toString();
-        assertEquals("pid=1922, inode=917738, flags=134217845, end=3074342912, start=3074334720, pgoff=0", s); //$NON-NLS-1$
+        assertEquals("pid=1922, inode=917738, flags=0x8000075, end=0xb73ec000, start=0xb73ea000, pgoff=0", s); //$NON-NLS-1$
     }
 }
