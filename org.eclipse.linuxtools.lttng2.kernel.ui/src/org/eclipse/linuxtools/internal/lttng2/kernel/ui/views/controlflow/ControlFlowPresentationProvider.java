@@ -12,13 +12,15 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
@@ -98,12 +100,38 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-        Map<String, String> retMap = new HashMap<String, String>();
+        Map<String, String> retMap = new LinkedHashMap<String, String>();
         if (event instanceof ControlFlowEvent) {
+            ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
+            IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+            int tid = entry.getThreadId();
+
+            try {
+                //Find every CPU first, then get the current thread
+                int cpusQuark = ssq.getQuarkAbsolute(Attributes.CPUS);
+                List<Integer> cpuQuarks = ssq.getSubAttributes(cpusQuark, false);
+                for (Integer cpuQuark : cpuQuarks) {
+                    int currentThreadQuark = ssq.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
+                    ITmfStateInterval interval = ssq.querySingleState(event.getTime(), currentThreadQuark);
+                    if (!interval.getStateValue().isNull()) {
+                        ITmfStateValue state = interval.getStateValue();
+                        int currentThreadId = state.unboxInt();
+                        if (tid == currentThreadId) {
+                            retMap.put(Messages.ControlFlowView_attributeCpuName, ssq.getAttributeName(cpuQuark));
+                            break;
+                        }
+                    }
+                }
+
+            } catch (AttributeNotFoundException e) {
+                e.printStackTrace();
+            } catch (TimeRangeException e) {
+                e.printStackTrace();
+            } catch (StateValueTypeException e) {
+                e.printStackTrace();
+            }
             int status = ((ControlFlowEvent) event).getStatus();
             if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
-                ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-                IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
                 try {
                     int syscallQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
                     ITmfStateInterval value = ssq.querySingleState(event.getTime(), syscallQuark);
