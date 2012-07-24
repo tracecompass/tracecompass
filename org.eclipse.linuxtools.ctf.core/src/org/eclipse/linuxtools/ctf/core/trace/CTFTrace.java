@@ -64,6 +64,10 @@ public class CTFTrace implements IDefinitionScope {
     // Attributes
     // ------------------------------------------------------------------------
 
+    private static final String OFFSET = "offset"; //$NON-NLS-1$
+
+
+
     /*
      * (non-Javadoc)
      *
@@ -695,7 +699,11 @@ public class CTFTrace implements IDefinitionScope {
         if (clocks.size() == 1) {
             if (singleClock == null) {
                 singleClock = clocks.get(clocks.keySet().toArray()[0]);
-                singleOffset = (Long) getClock().getProperty("offset"); //$NON-NLS-1$
+                if (singleClock.getProperty(OFFSET) != null) {
+                    singleOffset = (Long) getClock().getProperty(OFFSET);
+                } else {
+                    singleClock.addAttribute(OFFSET, 0);
+                }
             }
             return singleClock;
         }
