@@ -57,8 +57,6 @@ public class StreamInputReader {
 
     private CTFTraceReader parent;
 
-    @SuppressWarnings("unused")
-    private final long prevIndex;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -77,8 +75,6 @@ public class StreamInputReader {
          * Get the iterator on the packet index.
          */
         this.packetIndex = 0;
-
-        this.prevIndex = 0;
         /*
          * Make first packet the current one.
          */
