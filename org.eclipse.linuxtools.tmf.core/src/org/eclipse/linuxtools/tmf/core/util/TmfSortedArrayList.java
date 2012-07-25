@@ -17,6 +17,8 @@ import java.util.ArrayList;
 /**
  * Implementation of a sorted array list.
  *
+ * @param <T> The array element type
+ *
  * @version 1.0
  * @author Francois Chouinard
  */

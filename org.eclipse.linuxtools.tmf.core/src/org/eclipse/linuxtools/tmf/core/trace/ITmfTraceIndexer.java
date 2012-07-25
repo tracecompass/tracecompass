@@ -19,6 +19,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 /**
  * The generic trace indexer in TMF with support for incremental indexing.
  *
+ * @param <T> The trace event type
+ *
  * @version 1.0
  * @author Francois Chouinard
  *

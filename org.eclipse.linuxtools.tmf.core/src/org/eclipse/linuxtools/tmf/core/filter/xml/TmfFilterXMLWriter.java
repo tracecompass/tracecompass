@@ -51,7 +51,8 @@ public class TmfFilterXMLWriter {
 	 * The XMLParser constructor
 	 *
      * @param root The tree root
-   	 * @throws ParserConfigurationException
+   	 * @throws ParserConfigurationException if a DocumentBuilder
+     *   cannot be created which satisfies the configuration requested.
 	 */
 	public TmfFilterXMLWriter(final ITmfFilterTreeNode root) throws ParserConfigurationException {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

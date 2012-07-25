@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -41,7 +41,9 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * implement the hooks (initializeContext() and getNext()).
  * <p>
  * TODO: Add support for providing multiple data types.
- * 
+ *
+ * @param <T> The provider event type
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -201,10 +203,12 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
     /**
      * Increments/decrements the pending requests counters and fires the request
-     * if necessary (counter == 0). Used for coalescing requests accross
-     * multiple TmfDataProvider.
+     * if necessary (counter == 0). Used for coalescing requests across multiple
+     * TmfDataProvider's.
      *
      * @param isIncrement
+     *            Should we increment (true) or decrement (false) the pending
+     *            counter
      */
     @Override
     public void notifyPendingRequest(boolean isIncrement) {
@@ -266,10 +270,11 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     // ------------------------------------------------------------------------
 
     private void dispatchRequest(final ITmfDataRequest<T> request) {
-        if (request.getExecType() == ExecutionType.FOREGROUND)
+        if (request.getExecType() == ExecutionType.FOREGROUND) {
             queueRequest(request);
-        else
+        } else {
             queueBackgroundRequest(request, request.getBlockSize(), true);
+        }
     }
 
     protected void queueRequest(final ITmfDataRequest<T> request) {
@@ -283,7 +288,7 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
         // Process the request
         TmfThread thread = new TmfThread(request.getExecType()) {
-            
+
             @Override
             public void run() {
 
@@ -307,9 +312,11 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                     // Get the ordered events
                     T data = getNext(context);
                     if (Tracer.isRequestTraced())
+                     {
                         Tracer.traceRequest(request, "read first event"); //$NON-NLS-1$
+                    }
                     while (data != null && !isCompleted(request, data, nbRead)) {
-                        if (fLogData) { 
+                        if (fLogData) {
                             Tracer.traceEvent(provider, request, data);
                         }
                         if (request.getDataType().isInstance(data)) {
@@ -323,7 +330,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
                         }
                     }
                     if (Tracer.isRequestTraced())
+                     {
                         Tracer.traceRequest(request, "COMPLETED"); //$NON-NLS-1$
+                    }
 
                     if (request.isCancelled()) {
                         request.cancel();
@@ -347,7 +356,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
         };
 
         if (Tracer.isRequestTraced())
+         {
             Tracer.traceRequest(request, "QUEUED"); //$NON-NLS-1$
+        }
         fExecutor.execute(thread);
 
     }
@@ -437,7 +448,7 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     /**
      * Initialize the provider based on the request. The context is provider
      * specific and will be updated by getNext().
-     * 
+     *
      * @param request
      * @return an application specific context; null if request can't be serviced
      */
@@ -446,7 +457,7 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 //    /**
 //     * Return the next event based on the context supplied. The context
 //     * will be updated for the subsequent read.
-//     * 
+//     *
 //     * @param context the trace read context (updated)
 //     * @return the event referred to by context
 //     */
@@ -454,7 +465,7 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
     /**
      * Checks if the data meets the request completion criteria.
-     * 
+     *
      * @param request the request
      * @param data the data to verify
      * @param nbRead the number of events read so far

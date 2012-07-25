@@ -19,31 +19,45 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * Filter node for the event match operation
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
+@SuppressWarnings("javadoc")
 public class TmfFilterNode extends TmfFilterTreeNode {
 
-	public static final String NODE_NAME = "FILTER"; //$NON-NLS-1$
+    public static final String NODE_NAME = "FILTER"; //$NON-NLS-1$
 	public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
 	String fFilterName;
 
+	/**
+	 * @param filterName the filter name
+	 */
 	public TmfFilterNode(String filterName) {
 		super(null);
 		fFilterName = filterName;
 	}
 
+	/**
+	 * @param parent the parent node
+     * @param filterName the filter name
+	 */
 	public TmfFilterNode(ITmfFilterTreeNode parent, String filterName) {
 		super(parent);
 		fFilterName = filterName;
 	}
 
+	/**
+	 * @return the filer name
+	 */
 	public String getFilterName() {
 		return fFilterName;
 	}
 
+	/**
+	 * @param filterName the filer name
+	 */
 	public void setFilterName(String filterName) {
 		fFilterName = filterName;
 	}

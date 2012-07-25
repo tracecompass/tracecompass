@@ -35,11 +35,11 @@ public class TmfFilterXMLParser {
     /**
      * The XMLParser constructor
      *
-     * @param uri
-     *            The XML file to parse
+     * @param uri The XML file to parse
+     * @throws SAXException  SAX exception
+     * @throws IOException  IO exception
      */
-    public TmfFilterXMLParser(final String uri) throws SAXException,
-            IOException {
+    public TmfFilterXMLParser(final String uri) throws SAXException, IOException {
 
         SAXParserFactory m_parserFactory = null;
         m_parserFactory = SAXParserFactory.newInstance();

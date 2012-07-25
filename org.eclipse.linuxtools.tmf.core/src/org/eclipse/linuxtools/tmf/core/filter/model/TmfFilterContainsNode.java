@@ -23,10 +23,11 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
+@SuppressWarnings("javadoc")
 public class TmfFilterContainsNode extends TmfFilterTreeNode {
 
 	public static final String NODE_NAME = "CONTAINS"; //$NON-NLS-1$
-	public static final String NOT_ATTR = "not"; //$NON-NLS-1$
+    public static final String NOT_ATTR = "not"; //$NON-NLS-1$
 	public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
 	public static final String VALUE_ATTR = "value"; //$NON-NLS-1$
 	public static final String IGNORECASE_ATTR = "ignorecase"; //$NON-NLS-1$
@@ -37,39 +38,66 @@ public class TmfFilterContainsNode extends TmfFilterTreeNode {
 	private String fValueUpperCase;
 	private boolean fIgnoreCase = false;
 
+	/**
+	 * @param parent the parent node
+	 */
 	public TmfFilterContainsNode(ITmfFilterTreeNode parent) {
 		super(parent);
 	}
 
+	/**
+	 * @return the NOT state
+	 */
 	public boolean isNot() {
 		return fNot;
 	}
 
+	/**
+	 * @param not the NOT state
+	 */
 	public void setNot(boolean not) {
 		this.fNot = not;
 	}
 
+	/**
+	 * @return the field name
+	 */
 	public String getField() {
 		return fField;
 	}
 
+	/**
+	 * @param field the field name
+	 */
 	public void setField(String field) {
 		this.fField = field;
 	}
 
+	/**
+	 * @return the contains value
+	 */
 	public String getValue() {
 		return fValue;
 	}
 
+	/**
+	 * @param value the contains value
+	 */
 	public void setValue(String value) {
 		this.fValue = value;
 		fValueUpperCase = value.toUpperCase();
 	}
 
+	/**
+	 * @return the ignoreCase state
+	 */
 	public boolean isIgnoreCase() {
 		return fIgnoreCase;
 	}
 
+	/**
+	 * @param ignoreCase the ignoreCase state
+	 */
 	public void setIgnoreCase(boolean ignoreCase) {
 		this.fIgnoreCase = ignoreCase;
 	}

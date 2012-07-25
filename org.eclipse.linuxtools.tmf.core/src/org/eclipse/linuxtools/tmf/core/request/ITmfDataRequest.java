@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -16,7 +16,9 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * The TMF data request
- * 
+ *
+ * @param <T> The request data type
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -26,7 +28,19 @@ public interface ITmfDataRequest<T extends ITmfEvent> {
 	// Constants
 	// ------------------------------------------------------------------------
 
-    public enum ExecutionType { BACKGROUND, FOREGROUND }
+    /**
+     * The request execution type/priority
+     */
+    public enum ExecutionType {
+        /**
+         * Backgroung, long-running, lower priority request
+         */
+        BACKGROUND,
+        /**
+         * Foreground, short-running, high priority request
+         */
+        FOREGROUND
+    }
 
 	// ------------------------------------------------------------------------
 	// Accessors
@@ -68,33 +82,74 @@ public interface ITmfDataRequest<T extends ITmfEvent> {
     public int getNbRead();
 
 	// ------------------------------------------------------------------------
-	// Request state
+	// Request state predicates
 	// ------------------------------------------------------------------------
 
+    /**
+     * @return true if the request is still active
+     */
     public boolean isRunning();
+
+    /**
+     * @return true if the request is completed
+     */
     public boolean isCompleted();
+
+    /**
+     * @return true if the request has failed
+     */
     public boolean isFailed();
+
+    /**
+     * @return true if the request was cancelled
+     */
     public boolean isCancelled();
 
 	// ------------------------------------------------------------------------
 	// Data handling
 	// ------------------------------------------------------------------------
 
+    /**
+     * Process the piece of data
+     *
+     * @param data the data to process
+     */
     public void handleData(T data);
 
 	// ------------------------------------------------------------------------
-	// Request handling
+	// Request notifications
 	// ------------------------------------------------------------------------
 
+    /**
+     * Request processing start notification
+     */
     public void handleStarted();
+
+    /**
+     * Request processing completion notification
+     */
     public void handleCompleted();
+
+    /**
+     * Request successful completion notification
+     */
     public void handleSuccess();
+
+    /**
+     * Request failure notification
+     */
     public void handleFailure();
+
+    /**
+     * Request cancellation notification
+     */
     public void handleCancel();
 
     /**
      * To suspend the client thread until the request completes
      * (or is canceled).
+     *
+     * @throws InterruptedException thrown if the request was cancelled
      */
     public void waitForCompletion() throws InterruptedException;
 
@@ -102,8 +157,23 @@ public interface ITmfDataRequest<T extends ITmfEvent> {
 	// Request state modifiers
 	// ------------------------------------------------------------------------
 
+    /**
+     * Put the request in the running state
+     */
     public void start();
+
+    /**
+     * Put the request in the completed state
+     */
     public void done();
+
+    /**
+     * Put the request in the failed completed state
+     */
     public void fail();
+
+    /**
+     * Put the request in the cancelled completed state
+     */
     public void cancel();
 }

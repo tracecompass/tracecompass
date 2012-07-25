@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -16,43 +16,41 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 
 /**
- * <b><u>TmfDataRequestStub</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * @param <T> The event type
  */
 public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
 
     /**
      * Default constructor
-     * 
-     * @param dataType
+     *
+     * @param dataType the request data type
      */
     public TmfDataRequestStub(final Class<T> dataType) {
         super(dataType);
     }
 
     /**
-     * @param dataType
-     * @param index
+     * @param dataType the request data type
+     * @param index the initial event index
      */
     public TmfDataRequestStub(final Class<T> dataType, final int index) {
         super(dataType, index);
     }
 
     /**
-     * @param dataType
-     * @param index
-     * @param nbRequested
+     * @param dataType the request data type
+     * @param index the initial event index
+     * @param nbRequested the number of events requested
      */
     public TmfDataRequestStub(final Class<T> dataType, final int index, final int nbRequested) {
         super(dataType, index, nbRequested);
     }
 
     /**
-     * @param dataType
-     * @param index
-     * @param nbRequested
-     * @param blockSize
+     * @param dataType the request data type
+     * @param index the initial event index
+     * @param nbRequested the number of events requested
+     * @param blockSize the event block size
      */
     public TmfDataRequestStub(final Class<T> dataType, final int index, final int nbRequested, final int blockSize) {
         super(dataType, index, nbRequested, blockSize);

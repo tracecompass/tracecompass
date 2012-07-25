@@ -38,6 +38,8 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
  * TmfExperiment presents a time-ordered, unified view of a set of ITmfTrace:s
  * that are part of a tracing experiment.
  *
+ * @param <T> The experiment event type
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -85,21 +87,19 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     // ------------------------------------------------------------------------
 
     /**
-     * @param type
-     * @param id
-     * @param traces
-     * @throws TmfTraceException
+     * @param type the event type
+     * @param id the experiment id
+     * @param traces the experiment set of traces
      */
     public TmfExperiment(final Class<T> type, final String id, final ITmfTrace<T>[] traces) {
         this(type, id, traces, DEFAULT_INDEX_PAGE_SIZE);
     }
 
     /**
-     * @param type
-     * @param id
-     * @param traces
-     * @param indexPageSize
-     * @throws TmfTraceException
+     * @param type the event type
+     * @param path the experiment path
+     * @param traces the experiment set of traces
+     * @param indexPageSize the experiment index page size
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public TmfExperiment(final Class<T> type, final String path, final ITmfTrace<T>[] traces, final int indexPageSize) {

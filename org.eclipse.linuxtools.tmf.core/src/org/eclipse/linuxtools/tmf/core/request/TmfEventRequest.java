@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -18,7 +18,9 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
  * An extension of TmfDataRequest for timestamped events.
- * 
+ *
+ * @param <T> The request event type
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -37,7 +39,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request all the events of a given type (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      */
     public TmfEventRequest(Class<T> dataType) {
@@ -47,7 +49,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request all the events of a given type (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param priority the requested execution priority
      */
@@ -58,7 +60,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request all the events of a given type for the given time range (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      */
@@ -69,7 +71,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request all the events of a given type for the given time range (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      * @param priority the requested execution priority
@@ -81,7 +83,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request 'n' events of a given type from the given time range (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      * @param nbRequested the number of events requested
@@ -89,11 +91,11 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
         this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
-    
+
     /**
      * Request 'n' events of a given type for the given time range (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      * @param nbRequested the number of events requested
@@ -102,11 +104,11 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType priority) {
         this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, priority);
     }
-    
+
     /**
      * Request 'n' events of a given type for the given time range (high priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      * @param nbRequested the number of events requested
@@ -119,7 +121,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request 'n' events of a given type for the given time range (high priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      * @param index the index of the first event to retrieve
@@ -133,7 +135,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request 'n' events of a given type for the given time range (given priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      * @param nbRequested the number of events requested
@@ -147,7 +149,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * Request 'n' events of a given type for the given time range (given priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param range the time range of the requested events
      * @param index the index of the first event to retrieve
@@ -163,9 +165,9 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
             String type = getClass().getName();
             type = type.substring(type.lastIndexOf('.') + 1);
             @SuppressWarnings("nls")
-            String message = "CREATED " 
-                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") 
-                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested() 
+            String message = "CREATED "
+                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)")
+                    + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
             Tracer.traceRequest(this, message);
@@ -191,7 +193,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * this method is called by the event provider to set the index corresponding
      * to the time range start time once it is known
-     * 
+     *
      * @param index the start index
      */
     @Override
@@ -221,7 +223,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
+		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName()
 			+ "," + getRange() + "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
     }
 

@@ -23,15 +23,19 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
+@SuppressWarnings("javadoc")
 public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 
-	public static final String NODE_NAME = "EVENTTYPE"; //$NON-NLS-1$
+    public static final String NODE_NAME = "EVENTTYPE"; //$NON-NLS-1$
 	public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
 	public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
 	private String fType;
 	private String fName;
 
+	/**
+	 * @param parent the parent node
+	 */
 	public TmfFilterEventTypeNode(ITmfFilterTreeNode parent) {
 		super(parent);
 	}
@@ -41,18 +45,30 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 		return NODE_NAME;
 	}
 
+	/**
+	 * @return the event type
+	 */
 	public String getEventType() {
 		return fType;
 	}
 
+	/**
+	 * @param type the event type
+	 */
 	public void setEventType(String type) {
 		this.fType = type;
 	}
 
+	/**
+	 * @return TBD
+	 */
 	public String getName() {
 		return fName;
 	}
 
+	/**
+	 * @param name TBD
+	 */
 	public void setName(String name) {
 		this.fName = name;
 	}

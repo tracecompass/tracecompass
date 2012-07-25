@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Trace Model 1.0
@@ -32,7 +32,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * </ul>
  * Concrete ITmfTrace classes have to provide a parameter-less constructor and
  * an initialization method (<i>initTrace</i>) if they are to be opened from
- * the Project View. Also, a validation method (<i>validate</i>) has to be 
+ * the Project View. Also, a validation method (<i>validate</i>) has to be
  * provided to ensure that the trace is of the correct type.
  * <p>
  * A trace can be accessed simultaneously from multiple threads by various
@@ -92,16 +92,18 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  *         super.handleCompleted();
  *     }
  * };
- * 
+ *
  * fTrace.handleRequest(request);
  * if (youWant) {
  *     request.waitForCompletion();
- * } 
+ * }
  * </pre>
- * 
+ *
+ * @param <T> The trace event type
+ *
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  * @see ITmfContext
  * @see ITmfEvent
  * @see ITmfTraceIndexer
@@ -129,7 +131,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * <p>
      * Typically, the parameterless constructor will provide the block size
      * and its associated parser and indexer.
-     * 
+     *
      * @param resource the trace resource
      * @param path the trace path
      * @param type the trace event type
@@ -139,10 +141,10 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
     /**
      * Validate that the trace is of the correct type.
-     * 
+     *
      * @param project the eclipse project
      * @param path the trace path
-     * 
+     *
      * @return true if trace is valid
      */
     public boolean validate(IProject project, String path);
@@ -211,7 +213,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
     /**
      * Returns the ratio (proportion) corresponding to the specified location.
-     * 
+     *
      * @param location a trace specific location
      * @return a floating-point number between 0.0 (beginning) and 1.0 (end)
      */
@@ -243,7 +245,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * <p>
      * If the requested rank is beyond the last trace event, the context
      * returned will yield a null event if used in a subsequent read.
-     * 
+     *
      * @param rank the event rank
      * @return a context which can later be used to read the corresponding event
      */
@@ -259,7 +261,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * <p>
      * If the requested timestamp is beyond the last trace event, the context
      * returned will yield a null event if used in a subsequent read.
-     * 
+     *
      * @param timestamp the timestamp of desired event
      * @return a context which can later be used to read the corresponding event
      */
@@ -272,7 +274,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * The notion of ratio (0.0 <= r <= 1.0) is trace specific and left
      * voluntarily vague. Typically, it would refer to the event proportional
      * rank (arguably more intuitive) or timestamp in the trace file.
-     * 
+     *
      * @param ratio the proportional 'rank' in the trace
      * @return a context which can later be used to read the corresponding event
      */

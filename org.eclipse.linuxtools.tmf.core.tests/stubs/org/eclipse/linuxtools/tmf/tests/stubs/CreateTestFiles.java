@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -53,7 +53,7 @@ public class CreateTestFiles {
     // ========================================================================
 
     /**
-     * @param args
+     * @param args unused
      */
     public static void main(final String[] args) {
 
@@ -63,7 +63,7 @@ public class CreateTestFiles {
             e.printStackTrace();
         }
 
-        for (int i = 0; i < FILE_SIZES.length; i++)
+        for (int i = 0; i < FILE_SIZES.length; i++) {
             try {
                 createTestFile("testfiles" + File.separator + "O-" + FILE_NAMES[i], FILE_SIZES[i], true,  true);
                 createTestFile("testfiles" + File.separator + "E-" + FILE_NAMES[i], FILE_SIZES[i], true,  false);
@@ -71,6 +71,7 @@ public class CreateTestFiles {
             } catch (final FileNotFoundException e) {
             } catch (final IOException e) {
             }
+        }
 
         System.out.println("Done.");
     }
@@ -101,8 +102,9 @@ public class CreateTestFiles {
             out.writeUTF("Source-" + sourceIndex);  // Source
             out.writeUTF("Type-"   + typeIndex);    // Type
             out.writeInt(i + 1);                    // Reference (event #)
-            for (int j = 0; j < typeIndex; j++)
+            for (int j = 0; j < typeIndex; j++) {
                 out.writeUTF("Field-" + sourceIndex + "-" + j);
+            }
         }
         out.flush();
         out.close();

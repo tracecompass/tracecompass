@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -21,46 +21,68 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * Filter node for the regex match
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  */
+@SuppressWarnings("javadoc")
 public class TmfFilterMatchesNode extends TmfFilterTreeNode {
 
-	public static final String NODE_NAME = "MATCHES"; //$NON-NLS-1$
+    public static final String NODE_NAME = "MATCHES"; //$NON-NLS-1$
 	public static final String NOT_ATTR = "not"; //$NON-NLS-1$
 	public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
 	public static final String REGEX_ATTR = "regex"; //$NON-NLS-1$
-	
+
 	private boolean fNot = false;
 	private String fField;
 	private String fRegex;
 	private Pattern fPattern;
-	
+
+	/**
+	 * @param parent the parent node
+	 */
 	public TmfFilterMatchesNode(ITmfFilterTreeNode parent) {
 		super(parent);
 	}
 
+	/**
+	 * @return the NOT state
+	 */
 	public boolean isNot() {
 		return fNot;
 	}
-	
+
+	/**
+	 * @param not the NOT state
+	 */
 	public void setNot(boolean not) {
 		this.fNot = not;
 	}
-	
+
+	/**
+	 * @return the field name
+	 */
 	public String getField() {
 		return fField;
 	}
 
+	/**
+	 * @param field the field name
+	 */
 	public void setField(String field) {
 		this.fField = field;
 	}
 
+	/**
+	 * @return the regular expression
+	 */
 	public String getRegex() {
 		return fRegex;
 	}
 
+	/**
+	 * @param regex the regular expression
+	 */
 	public void setRegex(String regex) {
 		this.fRegex = regex;
 		try {
@@ -107,7 +129,11 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
 		clone.setRegex(fRegex);
 		return clone;
 	}
-	
+
+	/**
+	 * @param pattern the rough regex pattern
+	 * @return the compliant regex
+	 */
 	public static String regexFix(String pattern) {
 		// if the pattern does not contain one of the expressions .* !^
 		// (at the beginning) $ (at the end), then a .* is added at the

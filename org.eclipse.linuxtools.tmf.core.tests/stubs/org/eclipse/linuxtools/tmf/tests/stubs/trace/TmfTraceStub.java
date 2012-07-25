@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -57,10 +57,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     // Constructors
     // ------------------------------------------------------------------------
 
-    /**
-     * @param path
-     * @throws FileNotFoundException
-     */
     public TmfTraceStub() {
         super();
         setParser(new TmfEventParserStub(this));
@@ -273,9 +269,11 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     public double getLocationRatio(ITmfLocation<?> location) {
         fLock.lock();
         try {
-            if (fTrace != null)
-                if (location.getLocation() instanceof Long)
+            if (fTrace != null) {
+                if (location.getLocation() instanceof Long) {
                     return (double) ((Long) location.getLocation()) / fTrace.length();
+                }
+            }
         } catch (final IOException e) {
             e.printStackTrace();
         } finally {
@@ -288,8 +286,9 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     public TmfLocation<Long> getCurrentLocation() {
         fLock.lock();
         try {
-            if (fTrace != null)
+            if (fTrace != null) {
                 return new TmfLocation<Long>(fTrace.getFilePointer());
+            }
         } catch (final IOException e) {
             e.printStackTrace();
         } finally {

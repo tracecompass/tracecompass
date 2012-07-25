@@ -25,13 +25,15 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  */
 public class TmfEmptyTraceStub extends TmfTraceStub {
 
+    /**
+     *
+     */
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     /**
-     * @param path
-     * @throws FileNotFoundException
+     *
      */
     public TmfEmptyTraceStub() {
         super();

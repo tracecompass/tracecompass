@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
  * with cancel().
  * <p>
  * Typical usage:
- * 
+ *
  * <pre>
  * <code><i>TmfTimeWindow range = new TmfTimewindow(...);
  * TmfDataRequest&lt;DataType[]&gt; request = new TmfDataRequest&lt;DataType[]&gt;(DataType.class, 0, NB_EVENTS, BLOCK_SIZE) {
@@ -59,14 +59,16 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
  * fProcessor.process(request, true);
  * </i></code>
  * </pre>
- * 
+ *
  * TODO: Consider decoupling from "time range", "rank", etc and for the more generic notion of "criteria". This would
  * allow to extend for "time range", etc instead of providing specialized constructors. This also means removing the
  * criteria info from the data structure (with the possible exception of fNbRequested). The nice thing about it is that
  * it would prepare us well for the coming generation of analysis tools.
- * 
+ *
  * TODO: Implement request failures (codes, etc...)
- * 
+ *
+ * @param <T> The request data type
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -117,7 +119,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request all the events of a given type (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      */
     public TmfDataRequest(Class<T> dataType) {
@@ -127,7 +129,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request all the events of a given type (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param priority the requested execution priority
      */
@@ -138,7 +140,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request all the events of a given type from the given index (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      */
@@ -149,7 +151,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request all the events of a given type from the given index (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param priority the requested execution priority
@@ -161,7 +163,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request 'n' events of a given type from the given index (high priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -173,7 +175,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request 'n' events of a given type from the given index (given priority)
      * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -186,7 +188,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request 'n' events of a given type from the given index (high priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -199,7 +201,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Request 'n' events of a given type from the given index (given priority).
      * Events are returned in blocks of the given size.
-     * 
+     *
      * @param dataType the requested data type
      * @param index the index of the first event to retrieve
      * @param nbRequested the number of events requested
@@ -224,8 +226,8 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
             String type = getClass().getName();
             type = type.substring(type.lastIndexOf('.') + 1);
             @SuppressWarnings("nls")
-            String message = "CREATED " 
-                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") 
+            String message = "CREATED "
+                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)")
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " DataType=" + getDataType().getSimpleName();
             Tracer.traceRequest(this, message);
@@ -338,7 +340,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
 
     /**
      * this method is called by the event provider to set the index corresponding to the time range start time
-     * 
+     *
      * @param index
      *            the start time index
      */
@@ -353,7 +355,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     /**
      * Handle incoming data, one event at a time i.e. this method is invoked
      * for every data item obtained by the request.
-     * 
+     *
      * - Data items are received in the order they appear in the stream
      * - Called by the request processor, in its execution thread, every time
      *   a block of data becomes available.
@@ -362,7 +364,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * - Original data items are disposed of on return i.e. keep a reference
      *   (or a copy) if some persistence is needed between invocations.
      * - When there is no more data, done() is called.
-     * 
+     *
      * @param data a piece of data
      */
     @Override
@@ -375,16 +377,18 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     @Override
     public void handleStarted() {
         if (Tracer.isRequestTraced())
+         {
             Tracer.traceRequest(this, "STARTED"); //$NON-NLS-1$
+        }
     }
 
     /**
      * Handle the completion of the request. It is called when there is no
      * more data available either because:
-     * - the request completed normally 
-     * - the request failed 
+     * - the request completed normally
+     * - the request failed
      * - the request was canceled
-     * 
+     *
      * As a convenience, handleXXXX methods are provided. They are meant to be
      * overridden by the application if it needs to handle these conditions.
      */
@@ -405,30 +409,38 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
             handleSuccess();
         }
         if (Tracer.isRequestTraced())
+         {
             Tracer.traceRequest(this, "COMPLETED (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
     }
 
     @Override
     public void handleSuccess() {
         if (Tracer.isRequestTraced())
+         {
             Tracer.traceRequest(this, "SUCCEEDED"); //$NON-NLS-1$
+        }
     }
 
     @Override
     public void handleFailure() {
         if (Tracer.isRequestTraced())
+         {
             Tracer.traceRequest(this, "FAILED"); //$NON-NLS-1$
+        }
     }
 
     @Override
     public void handleCancel() {
         if (Tracer.isRequestTraced())
+         {
             Tracer.traceRequest(this, "CANCELLED"); //$NON-NLS-1$
+        }
     }
 
     /**
      * To suspend the client thread until the request starts (or is canceled).
-     * 
+     *
      * @throws InterruptedException
      *             If the thread was interrupted while waiting
      */

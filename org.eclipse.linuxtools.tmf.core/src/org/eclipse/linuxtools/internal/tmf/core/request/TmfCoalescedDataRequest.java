@@ -21,6 +21,8 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 /**
  * The TMF coalesced data request
  *
+ * @param <T> The request data type
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
