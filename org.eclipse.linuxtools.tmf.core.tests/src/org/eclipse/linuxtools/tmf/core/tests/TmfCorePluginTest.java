@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -30,7 +30,7 @@ public class TmfCorePluginTest extends TestCase {
 
 	// Plug-in instantiation
 	static final Activator fPlugin = new Activator();
-	
+
 	// ------------------------------------------------------------------------
     // Housekeping
 	// ------------------------------------------------------------------------
@@ -56,11 +56,17 @@ public class TmfCorePluginTest extends TestCase {
     // Test cases
 	// ------------------------------------------------------------------------
 
-	public void testTmfCorePluginId() throws Exception {
+	/**
+	 *
+	 */
+	public void testTmfCorePluginId() {
 		assertEquals("Plugin ID", "org.eclipse.linuxtools.tmf.core", Activator.PLUGIN_ID);
 	}
 
-	public void testGetDefault() throws Exception {
+	/**
+	 *
+	 */
+	public void testGetDefault() {
 		Activator plugin = Activator.getDefault();
 		assertEquals("getDefault()", plugin, fPlugin);
 	}

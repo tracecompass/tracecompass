@@ -78,13 +78,11 @@ public class CtfTmfLightweightContextTest {
      * Context fuzzer. Use an amount of contexts greater than the size of the
      * iterator cache and have them access the trace in parallel.
      *
-     * @throws TmfTraceException
-     *             Would fail the test
      * @throws InterruptedException
      *             Would fail the test
      */
     @Test
-    public void testTooManyContexts() throws TmfTraceException, InterruptedException {
+    public void testTooManyContexts() throws InterruptedException {
         final int lwcCount = 101;
         double increment = (end - begin) / lwcCount;
         final ArrayList<Long> vals = new ArrayList<Long>();

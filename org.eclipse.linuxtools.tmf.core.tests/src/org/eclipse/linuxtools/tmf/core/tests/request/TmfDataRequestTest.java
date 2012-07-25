@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
  * <p>
  * Test suite for the TmfDataRequest class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls","javadoc"})
 public class TmfDataRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------
@@ -43,6 +43,9 @@ public class TmfDataRequestTest extends TestCase {
 	// Housekeeping
 	// ------------------------------------------------------------------------
 
+    /**
+     * @param name the test name
+     */
 	public TmfDataRequestTest(String name) {
 		super(name);
 	}
@@ -164,7 +167,7 @@ public class TmfDataRequestTest extends TestCase {
 	// equals
 	// ------------------------------------------------------------------------
 
-	public void testEqualsReflexivity() throws Exception {
+	public void testEqualsReflexivity() {
         assertTrue("equals", fRequest1.equals(fRequest1));
         assertTrue("equals", fRequest2.equals(fRequest2));
 
@@ -172,7 +175,7 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("equals", fRequest2.equals(fRequest1));
 	}
 
-	public void testEqualsSymmetry() throws Exception {
+	public void testEqualsSymmetry() {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1));
 
@@ -182,13 +185,13 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("equals", fRequest3.equals(fRequest2));
 	}
 
-	public void testEqualsTransivity() throws Exception {
+	public void testEqualsTransivity() {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1c));
         assertTrue("equals", fRequest1.equals(fRequest1c));
 	}
 
-	public void testEqualsNull() throws Exception {
+	public void testEqualsNull() {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));
 	}
@@ -197,7 +200,7 @@ public class TmfDataRequestTest extends TestCase {
 	// hashCode
 	// ------------------------------------------------------------------------
 
-	public void testHashCode() throws Exception {
+	public void testHashCode() {
         assertTrue("hashCode", fRequest1.hashCode() == fRequest1.hashCode());
         assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
 		assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());

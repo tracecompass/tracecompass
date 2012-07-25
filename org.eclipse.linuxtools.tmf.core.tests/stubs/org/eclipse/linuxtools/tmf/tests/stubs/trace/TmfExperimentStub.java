@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
  * Implement me. Please.
  * <p>
  */
+@SuppressWarnings("javadoc")
 public class TmfExperimentStub<T extends ITmfEvent> extends TmfExperiment<TmfEvent> {
 
     public TmfExperimentStub(String name, ITmfTrace<TmfEvent>[] traces, int blockSize) {

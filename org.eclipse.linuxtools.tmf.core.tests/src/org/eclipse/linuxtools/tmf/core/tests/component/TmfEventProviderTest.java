@@ -40,6 +40,9 @@ public class TmfEventProviderTest extends TestCase {
     TmfEventProviderStub fEventProvider;
     TmfSyntheticEventProviderStub fSyntheticEventProvider;
 
+    /**
+     * @param name the test anme
+     */
     public TmfEventProviderTest(String name) {
         super(name);
     }
@@ -62,7 +65,9 @@ public class TmfEventProviderTest extends TestCase {
     // getProviders (more a sanity check than a test)
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
+    /**
+     *
+     */
     public void testGetProviders() {
 
         // There should be 2 TmfEvent providers: a TmfTraceStub and a
@@ -85,7 +90,9 @@ public class TmfEventProviderTest extends TestCase {
     // getSyntheticEvent
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
+    /**
+     *
+     */
     public void testGetPlainEvents() {
 
         final int BLOCK_SIZE = 100;
@@ -123,7 +130,9 @@ public class TmfEventProviderTest extends TestCase {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     *
+     */
     public void testCancelRequests() {
 
         final int BLOCK_SIZE = 100;
@@ -232,7 +241,6 @@ public class TmfEventProviderTest extends TestCase {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static void getSyntheticData(final TmfTimeRange range,
             final int nbEvents, final int blockSize) throws InterruptedException {
 
@@ -269,6 +277,9 @@ public class TmfEventProviderTest extends TestCase {
         }
     }
 
+    /**
+     *
+     */
     // The following tests are the same but for the size of the requested blocks
     // with regards to the size of the TmfSyntheticEventProviderStub block
     public void testGetSyntheticEvents_EqualBlockSizes() {
@@ -280,6 +291,9 @@ public class TmfEventProviderTest extends TestCase {
         }
     }
 
+    /**
+     *
+     */
     public void testGetSyntheticEvents_SmallerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         try {
@@ -289,6 +303,9 @@ public class TmfEventProviderTest extends TestCase {
         }
     }
 
+    /**
+     *
+     */
     public void testGetSyntheticEvents_LargerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         try {
@@ -298,6 +315,9 @@ public class TmfEventProviderTest extends TestCase {
         }
     }
 
+    /**
+     *
+     */
     public void testGetSyntheticEvents_TimeRange() {
         TmfTimestamp start = new TmfTimestamp(1, (byte) -3, 0);
         TmfTimestamp end = new TmfTimestamp(1000, (byte) -3, 0);
@@ -337,7 +357,9 @@ public class TmfEventProviderTest extends TestCase {
     // getProviders (more a sanity check than a test)
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
+    /**
+     *
+     */
     public void testGetProviders2() {
 
         // There should be 2 TmfEvent providers: a TmfTraceStub and a

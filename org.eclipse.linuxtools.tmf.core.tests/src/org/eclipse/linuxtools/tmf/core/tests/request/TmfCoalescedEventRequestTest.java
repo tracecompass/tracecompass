@@ -45,7 +45,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
  * <p>
  * Test suite for the TmfCoalescedEventRequest class.
  */
-@SuppressWarnings({ "nls" })
+@SuppressWarnings({"nls","javadoc"})
 public class TmfCoalescedEventRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------
@@ -69,6 +69,9 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	// Housekeeping
 	// ------------------------------------------------------------------------
 
+    /**
+     * @param name the test name
+     */
 	public TmfCoalescedEventRequestTest(String name) {
 		super(name);
 	}
@@ -192,7 +195,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	// equals
 	// ------------------------------------------------------------------------
 
-	public void testEqualsReflexivity() throws Exception {
+	public void testEqualsReflexivity() {
         assertTrue("equals", fRequest1.equals(fRequest1));
         assertTrue("equals", fRequest2.equals(fRequest2));
 
@@ -200,7 +203,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         assertFalse("equals", fRequest2.equals(fRequest1));
 	}
 
-	public void testEqualsSymmetry() throws Exception {
+	public void testEqualsSymmetry() {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1));
 
@@ -210,18 +213,18 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         assertFalse("equals", fRequest3.equals(fRequest2));
 	}
 
-	public void testEqualsTransivity() throws Exception {
+	public void testEqualsTransivity() {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1c));
         assertTrue("equals", fRequest1.equals(fRequest1c));
 	}
 
-	public void testEqualsNull() throws Exception {
+	public void testEqualsNull() {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));
 	}
 
-	public void testEqualsSuper() throws Exception {
+	public void testEqualsSuper() {
 		TmfCoalescedDataRequest<TmfEvent> dataRequest1 = new TmfCoalescedDataRequest<TmfEvent>(
 				fRequest1.getDataType(), fRequest1.getIndex(), fRequest1.getNbRequested());
 		TmfCoalescedDataRequest<TmfEvent> dataRequest2 = new TmfCoalescedDataRequest<TmfEvent>(
@@ -239,7 +242,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	// hashCode
 	// ------------------------------------------------------------------------
 
-	public void testHashCode() throws Exception {
+	public void testHashCode() {
         assertTrue("hashCode", fRequest1.hashCode() == fRequest1.hashCode());
         assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
 		assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
@@ -265,7 +268,8 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	// isCompatible
 	// ------------------------------------------------------------------------
 
-	public void testIsCompatible() {
+	@SuppressWarnings("hiding")
+    public void testIsCompatible() {
 		TmfCoalescedEventRequest<TmfEvent> coalescedRequest = new TmfCoalescedEventRequest<TmfEvent>(TmfEvent.class, range1, 100, 200);
 		TmfEventRequest<TmfEvent> request1 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
 		TmfEventRequest<TmfEvent> request2 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range2, 100, 200);
@@ -280,6 +284,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
     // addEvent
     // ------------------------------------------------------------------------
 
+    @SuppressWarnings("hiding")
     public void testAddEvent1() {
         TmfCoalescedEventRequest<TmfEvent> coalescedRequest = new TmfCoalescedEventRequest<TmfEvent>(TmfEvent.class, range1, 0, 2147483647, 200, ExecutionType.FOREGROUND);
         TmfEventRequest<TmfEvent> request1 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 0, 2147483647, 200);
@@ -297,6 +302,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
     }
 
+    @SuppressWarnings("hiding")
     public void testAddEvent2() {
         TmfCoalescedEventRequest<TmfEvent> coalescedRequest = new TmfCoalescedEventRequest<TmfEvent>(TmfEvent.class, range1, 1, 2147483647, 200, ExecutionType.FOREGROUND);
         TmfEventRequest<TmfEvent> request1 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 1, 2147483647, 200);
@@ -472,7 +478,6 @@ public class TmfCoalescedEventRequestTest extends TestCase {
     }
 
 	@TmfSignalHandler
-    @SuppressWarnings("unchecked")
     public void trigger(final TmfTestTriggerSignal signal) {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
@@ -521,7 +526,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         providers[0].sendRequest(request3);
     }
 
-    public void runCoalescedRequest(long startIndex) throws Exception {
+    public void runCoalescedRequest(long startIndex) throws InterruptedException {
 
         fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
 
@@ -561,13 +566,13 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         }
     }
 
-    public void testCoalescedRequest() throws Exception {
+    public void testCoalescedRequest() throws InterruptedException {
         runCoalescedRequest(0);
         runCoalescedRequest(1);
         runCoalescedRequest(5);
     }
 
-	public void testCancelCoalescedRequest() throws Exception {
+	public void testCancelCoalescedRequest() throws InterruptedException {
 
 		fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
 
@@ -607,7 +612,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // 
+    //
     // ------------------------------------------------------------------------
 
 }

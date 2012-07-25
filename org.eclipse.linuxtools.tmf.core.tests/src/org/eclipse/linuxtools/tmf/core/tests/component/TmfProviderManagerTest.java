@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -28,6 +28,9 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 @SuppressWarnings({ "nls" })
 public class TmfProviderManagerTest extends TestCase {
 
+	/**
+	 * @param name the test anme
+	 */
 	public TmfProviderManagerTest(String name) {
 		super(name);
 	}
@@ -45,8 +48,8 @@ public class TmfProviderManagerTest extends TestCase {
 	// ------------------------------------------------------------------------
 	// Dummy Providers
 	// ------------------------------------------------------------------------
-	
-	public class TestProvider1 extends TmfDataProvider<TmfEvent> {
+
+	private class TestProvider1 extends TmfDataProvider<TmfEvent> {
 		public TestProvider1(Class<TmfEvent> type) {
 			super("TestProvider1", type);
 		}
@@ -64,7 +67,7 @@ public class TmfProviderManagerTest extends TestCase {
 		}
 	}
 
-	public class TestProvider2 extends TmfDataProvider<TmfEvent> {
+	private class TestProvider2 extends TmfDataProvider<TmfEvent> {
 		public TestProvider2(Class<TmfEvent> type) {
 			super("TestProvider2", type);
 		}
@@ -82,13 +85,14 @@ public class TmfProviderManagerTest extends TestCase {
 		}
 	}
 
-	public class TmfEvent3 extends TmfEvent {
-		public TmfEvent3(TmfEvent3 other) {
+	private class TmfEvent3 extends TmfEvent {
+		@SuppressWarnings("unused")
+        public TmfEvent3(TmfEvent3 other) {
 			super(other);
 		}
 	}
 
-	public class TestProvider3 extends TmfDataProvider<TmfEvent3> {
+	private class TestProvider3 extends TmfDataProvider<TmfEvent3> {
 		public TestProvider3(Class<TmfEvent3> type) {
 			super("TestProvider3", type);
 		}
@@ -110,7 +114,9 @@ public class TmfProviderManagerTest extends TestCase {
 	// register/dispose
 	// ------------------------------------------------------------------------
 
-	@SuppressWarnings("unchecked")
+	/**
+	 *
+	 */
 	public void testRegister_0() {
 		TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
 		assertEquals("getProviders", 0, providers.length);
@@ -119,7 +125,9 @@ public class TmfProviderManagerTest extends TestCase {
 		assertEquals("getProviders", 0, providers.length);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 *
+	 */
 	public void testRegister_Unregister_1() {
 
 		// Register a single provider
@@ -143,7 +151,9 @@ public class TmfProviderManagerTest extends TestCase {
 		assertEquals("getProviders", 0, providers.length);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 *
+	 */
 	public void testRegister_Unregister_2() {
 
 		// Register 2 providers, same data type
@@ -196,7 +206,9 @@ public class TmfProviderManagerTest extends TestCase {
 		assertEquals("getProviders", 0, providers.length);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 *
+	 */
 	public void testRegister_Unregister_3() {
 
 		// Register 3 providers, mixed data types
@@ -291,7 +303,9 @@ public class TmfProviderManagerTest extends TestCase {
 		assertEquals("getProviders", 0, providers.length);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 *
+	 */
 	public void testGetProvider() {
 
 		// Register 3 providers, mixed data types

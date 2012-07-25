@@ -41,7 +41,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 /**
  * Test suite for the TmfCheckpointIndexTest class.
  */
-@SuppressWarnings({ "nls" })
+@SuppressWarnings({"nls","javadoc"})
 public class TmfExperimentCheckpointIndexTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -62,7 +62,10 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    public TmfExperimentCheckpointIndexTest(final String name) throws Exception {
+    /**
+     * @param name the test name
+     */
+    public TmfExperimentCheckpointIndexTest(final String name) {
         super(name);
     }
 
@@ -112,7 +115,8 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     // Verify checkpoints
     // ------------------------------------------------------------------------
 
-    public void testTmfTraceIndexing() throws Exception {
+    @SuppressWarnings("null")
+    public void testTmfTraceIndexing() {
         assertEquals("getCacheSize",   BLOCK_SIZE, fExperiment.getCacheSize());
         assertEquals("getTraceSize",   NB_EVENTS,  fExperiment.getNbEvents());
         assertEquals("getRange-start", 1,          fExperiment.getTimeRange().getStartTime().getValue());
@@ -146,7 +150,8 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
     // Streaming
     // ------------------------------------------------------------------------
 
-    public void testGrowingIndex() throws Exception {
+    @SuppressWarnings("null")
+    public void testGrowingIndex() {
 
         ITmfTrace<TmfEvent>[] testTraces = new TmfTraceStub[2];
         try {

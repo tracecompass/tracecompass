@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adjusted for new Event Model
@@ -128,6 +128,9 @@ public class TmfEventTest extends TestCase {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     *
+     */
     public void testDefaultConstructor() {
         final ITmfEvent event = new TmfEvent();
         assertNull("getTrace", event.getTrace());
@@ -139,6 +142,9 @@ public class TmfEventTest extends TestCase {
         assertNull("getReference", event.getReference());
     }
 
+    /**
+     *
+     */
     public void testFullConstructor() {
         assertNull("getTrace", fEvent1.getTrace());
         assertEquals("getRank", 0, fEvent1.getRank());
@@ -157,6 +163,9 @@ public class TmfEventTest extends TestCase {
         assertEquals("getReference", fReference2, fEvent2.getReference());
     }
 
+    /**
+     *
+     */
     public void testNoRankConstructor() {
         final TmfEvent event = new TmfEvent(null, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertNull("getTrace", event.getTrace());
@@ -168,6 +177,9 @@ public class TmfEventTest extends TestCase {
         assertEquals("getReference", fReference1, event.getReference());
     }
 
+    /**
+     *
+     */
     public void testConstructorWithTrace() {
         final ITmfTrace<TmfEvent> trace = openTrace();
         final TmfEvent event = new TmfEvent(trace, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
@@ -181,6 +193,9 @@ public class TmfEventTest extends TestCase {
         trace.dispose();
     }
 
+    /**
+     *
+     */
     public void testTmfEventCopy() {
         final TmfEvent event = new TmfEvent(fEvent1);
         assertNull("getTrace", event.getTrace());
@@ -192,7 +207,10 @@ public class TmfEventTest extends TestCase {
         assertEquals("getReference", fReference1, event.getReference());
     }
 
-    public void testEventCopy2() throws Exception {
+    /**
+     *
+     */
+    public void testEventCopy2() {
         try {
             new TmfEvent(null);
             fail("null copy");
@@ -264,6 +282,9 @@ public class TmfEventTest extends TestCase {
         return trace;
     }
 
+    /**
+     *
+     */
     public void testSetTrace() {
         final ITmfTrace<TmfEvent> trace = setupTrace();
         assertNotNull(trace);
@@ -280,6 +301,9 @@ public class TmfEventTest extends TestCase {
         trace.dispose();
     }
 
+    /**
+     *
+     */
     public void testSetRank() {
         final TestEvent event = new TestEvent(fEvent1);
         assertEquals("setRank", 0, event.getRank());
@@ -294,6 +318,9 @@ public class TmfEventTest extends TestCase {
         assertEquals("setRank", 0, event.getRank());
     }
 
+    /**
+     *
+     */
     public void testSetTimestamp() {
         final TestEvent event = new TestEvent(fEvent1);
         assertEquals("setTimestamp", fTimestamp1, event.getTimestamp());
@@ -308,6 +335,9 @@ public class TmfEventTest extends TestCase {
         assertEquals("setTimestamp", fTimestamp1, event.getTimestamp());
     }
 
+    /**
+     *
+     */
     public void testSetSource() {
         final TestEvent event = new TestEvent(fEvent1);
         assertEquals("setSource", fSource, event.getSource());
@@ -323,6 +353,9 @@ public class TmfEventTest extends TestCase {
         assertEquals("setContent", fSource, event.getSource());
     }
 
+    /**
+     *
+     */
     public void testSetType() {
         final TestEvent event = new TestEvent(fEvent1);
         assertEquals("setType", fType, event.getType());
@@ -341,6 +374,9 @@ public class TmfEventTest extends TestCase {
         assertEquals("setType", fType, event.getType());
     }
 
+    /**
+     *
+     */
     public void testSetContent() {
         final TestEvent event = new TestEvent(fEvent1);
         assertEquals("setContent", fContent1, event.getContent());
@@ -355,6 +391,9 @@ public class TmfEventTest extends TestCase {
         assertEquals("setContent", fContent1, event.getContent());
     }
 
+    /**
+     *
+     */
     public void testSetReference() {
         final TestEvent event = new TestEvent(fEvent1);
         assertEquals("setReference", fReference1, event.getReference());
@@ -373,7 +412,7 @@ public class TmfEventTest extends TestCase {
     // clone
     // ------------------------------------------------------------------------
 
-    public static class MyEvent extends TmfEvent {
+    private static class MyEvent extends TmfEvent {
 
         @Override
         public boolean equals(final Object other) {
@@ -385,7 +424,10 @@ public class TmfEventTest extends TestCase {
         }
     }
 
-    public void testClone1() throws Exception {
+    /**
+     *
+     */
+    public void testClone1() {
         final ITmfEvent clone = fEvent1.clone();
 
         assertTrue("clone", fEvent1.clone().equals(fEvent1));
@@ -395,7 +437,10 @@ public class TmfEventTest extends TestCase {
         assertEquals("clone", clone, fEvent1);
     }
 
-    public void testClone2() throws Exception {
+    /**
+     *
+     */
+    public void testClone2() {
         final TmfEvent event = new MyEvent();
         final TmfEvent clone = event.clone();
 
@@ -410,7 +455,10 @@ public class TmfEventTest extends TestCase {
     // hashCode
     // ------------------------------------------------------------------------
 
-    public void testHashCode() throws Exception {
+    /**
+     *
+     */
+    public void testHashCode() {
         TmfEvent event1 = new TmfEvent();
         TmfEvent event2 = new TmfEvent();
 
@@ -435,7 +483,10 @@ public class TmfEventTest extends TestCase {
     // equals
     // ------------------------------------------------------------------------
 
-    public void testEqualsReflexivity() throws Exception {
+    /**
+     *
+     */
+    public void testEqualsReflexivity() {
         assertTrue("equals", fEvent1.equals(fEvent1));
         assertTrue("equals", fEvent2.equals(fEvent2));
 
@@ -443,7 +494,10 @@ public class TmfEventTest extends TestCase {
         assertFalse("equals", fEvent2.equals(fEvent1));
     }
 
-    public void testEqualsSymmetry() throws Exception {
+    /**
+     *
+     */
+    public void testEqualsSymmetry() {
         final TmfEvent event1 = new TmfEvent(fEvent1);
         final TmfEvent event2 = new TmfEvent(fEvent2);
 
@@ -454,7 +508,10 @@ public class TmfEventTest extends TestCase {
         assertTrue("equals", fEvent2.equals(event2));
     }
 
-    public void testEqualsTransivity() throws Exception {
+    /**
+     *
+     */
+    public void testEqualsTransivity() {
         final TmfEvent event1 = new TmfEvent(fEvent1);
         final TmfEvent event2 = new TmfEvent(fEvent1);
         final TmfEvent event3 = new TmfEvent(fEvent1);
@@ -464,17 +521,26 @@ public class TmfEventTest extends TestCase {
         assertTrue("equals", event1.equals(event3));
     }
 
-    public void testEqualsNull() throws Exception {
+    /**
+     *
+     */
+    public void testEqualsNull() {
         assertFalse("equals", fEvent1.equals(null));
         assertFalse("equals", fEvent2.equals(null));
     }
 
-    public void testNonEqualClasses() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualClasses() {
         assertFalse("equals", fEvent1.equals(fEvent1.getType()));
         assertFalse("equals", fEvent1.equals(null));
     }
 
-    public void testNonEqualTraces() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualTraces() {
         final ITmfTrace<TmfEvent> trace1 = openTrace();
         final ITmfTrace<TmfEvent> trace2 = openTrace();
 
@@ -495,7 +561,10 @@ public class TmfEventTest extends TestCase {
         trace2.dispose();
     }
 
-    public void testNonEqualRanks() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualRanks() {
         final TmfEvent event1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         TmfEvent event2 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertTrue("equals", event1.equals(event2));
@@ -506,7 +575,10 @@ public class TmfEventTest extends TestCase {
         assertFalse("equals", event2.equals(event1));
     }
 
-    public void testNonEqualTimestamps() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualTimestamps() {
         final TmfEvent event1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         TmfEvent event2 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertTrue("equals", event1.equals(event2));
@@ -521,7 +593,10 @@ public class TmfEventTest extends TestCase {
         assertFalse("equals", event2.equals(event1));
     }
 
-    public void testNonEqualSources() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualSources() {
         final TmfEvent event1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         TmfEvent event2 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertTrue("equals", event1.equals(event2));
@@ -536,7 +611,10 @@ public class TmfEventTest extends TestCase {
         assertFalse("equals", event2.equals(event1));
     }
 
-    public void testNonEqualTypes() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualTypes() {
         final TmfEvent event1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         TmfEvent event2 = new TmfEvent(null, 0, fTimestamp1, fSource, fType,  fContent1, fReference1);
         assertTrue("equals", event1.equals(event2));
@@ -555,7 +633,10 @@ public class TmfEventTest extends TestCase {
         assertFalse("equals", event2.equals(event1));
     }
 
-    public void testNonEqualContents() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualContents() {
         final TmfEvent event1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         TmfEvent event2 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertTrue("equals", event1.equals(event2));
@@ -570,7 +651,10 @@ public class TmfEventTest extends TestCase {
         assertFalse("equals", event2.equals(event1));
     }
 
-    public void testNonEqualReferences() throws Exception {
+    /**
+     *
+     */
+    public void testNonEqualReferences() {
         final TmfEvent event1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         TmfEvent event2 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertTrue("equals", event1.equals(event2));
@@ -589,6 +673,9 @@ public class TmfEventTest extends TestCase {
     // toString
     // ------------------------------------------------------------------------
 
+    /**
+     *
+     */
     public void testToString() {
         final String expected1 = "TmfEvent [fTimestamp=" + fTimestamp1 + ", fTrace=null, fRank=0, fSource=" + fSource
                 + ", fType=" + fType + ", fContent=" + fContent1 + ", fReference=" + fReference1 + "]";
