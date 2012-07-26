@@ -20,6 +20,15 @@ package org.eclipse.linuxtools.ctf.core.event.types;
  */
 public abstract class SimpleDatatypeDefinition extends Definition {
 
+    /**
+     * Create a new SimpleDatatypeDefinition
+     *
+     * @param definitionScope
+     *            The scope of this definition
+     * @param fieldName
+     *            The name of the field matching this definition in the parent
+     *            scope
+     */
     public SimpleDatatypeDefinition(IDefinitionScope definitionScope,
             String fieldName) {
         super(definitionScope, fieldName);
