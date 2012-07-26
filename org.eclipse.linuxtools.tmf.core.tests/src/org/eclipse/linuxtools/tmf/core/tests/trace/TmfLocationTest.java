@@ -116,7 +116,7 @@ public class TmfLocationTest extends TestCase {
         }
     }
 
-    private static class MyCloneableClass implements Cloneable, Comparable<MyCloneableClass> {
+    public static class MyCloneableClass implements Cloneable, Comparable<MyCloneableClass> {
         private String fName;
 
         public MyCloneableClass(String name) {
