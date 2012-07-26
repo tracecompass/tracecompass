@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis <mathieu.denis@polymtl.ca>  - Implementation and Initial API
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Implementation and Initial API
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
@@ -40,31 +40,37 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
      * Contains the list of the columns
      */
     protected List<TmfBaseColumnData> fColumnData = null;
+
     /**
      * Level column names
      */
     protected final static String LEVEL_COLUMN = Messages.TmfStatisticsView_LevelColumn;
+
     /**
      * Number of events column names
      */
     protected final static String EVENTS_COUNT_COLUMN = Messages.TmfStatisticsView_NbEventsColumn;
+
     /**
      * Level column tooltips
      */
     protected final static String LEVEL_COLUMN_TIP = Messages.TmfStatisticsView_LevelColumnTip;
+
     /**
      * Number of events column tooltips
      */
     protected final static String EVENTS_COUNT_COLUMN_TIP = Messages.TmfStatisticsView_NbEventsTip;
+
     /**
      * Level for which statistics should not be displayed.
      */
     protected Set<String> fFolderLevels = new HashSet<String>(Arrays.asList(new String[] { "Event Types" })); //$NON-NLS-1$
+
     /**
      * Create basic columns to represent the statistics data
      */
     public TmfBaseColumnDataProvider() {
-        // List that will be used to create the table.
+        /* List that will be used to create the table. */
         fColumnData = new Vector<TmfBaseColumnData>();
         fColumnData.add(new TmfBaseColumnData(LEVEL_COLUMN, 200, SWT.LEFT, LEVEL_COLUMN_TIP, new ColumnLabelProvider() {
             @Override

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis (mathieu.denis@polymtl.ca)  - Initial design and implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial design and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.util;
@@ -20,11 +20,10 @@ import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 
 /**
  * <b><u>TmfFixedArrayTest</u></b>
- * <p>
+ *
  * Implement me. Please.
- * <p>
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings({ "nls", "javadoc" })
 public class TmfFixedArrayTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -45,7 +44,8 @@ public class TmfFixedArrayTest extends TestCase {
         fString4 = "Fourth String";
         fString5 = "Fifth String";
         fFixedArray1 = new TmfFixedArray<String>(fString1, fString2, fString3);
-        fFixedArray2 = new TmfFixedArray<String>(); // Empty array at the beginning
+        // Empty array at the beginning
+        fFixedArray2 = new TmfFixedArray<String>();
     }
 
     @Override
@@ -70,8 +70,7 @@ public class TmfFixedArrayTest extends TestCase {
         try {
             fFixedArray2.get(0);
             fail();
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             // Success
         }
     }
@@ -140,12 +139,11 @@ public class TmfFixedArrayTest extends TestCase {
         assertTrue("append", fString4.equals(fixedArray.get(3)));
     }
 
-
     @SuppressWarnings("unchecked")
     public void testAppendFixedArray() {
         TmfFixedArray<String> fixedArrayToAppend1 = new TmfFixedArray<String>(fString4);
         TmfFixedArray<String> fixedArrayToAppend2 = new TmfFixedArray<String>(fString5);
-        TmfFixedArray<String> fixedArray         = new TmfFixedArray<String>();
+        TmfFixedArray<String> fixedArray          = new TmfFixedArray<String>();
 
         fixedArray = fixedArray.append(fFixedArray1, fixedArrayToAppend1);
         assertEquals("append", 4, fixedArray.size());
@@ -179,7 +177,7 @@ public class TmfFixedArrayTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testToArray() {
-        String[] expected1 = {fString1, fString2, fString3};
+        String[] expected1 = { fString1, fString2, fString3 };
         assertTrue("toArray", Arrays.equals(expected1, fFixedArray1.toArray()));
 
         String[] expected2 = {};
@@ -197,7 +195,7 @@ public class TmfFixedArrayTest extends TestCase {
         fFixedArray1.toArray(stringBigArray);
         assertNull("toArrayArg", stringBigArray[3]);
 
-        TmfFixedArray<Object> fFixedArrayObject  = new TmfFixedArray<Object>(fString1);
+        TmfFixedArray<Object> fFixedArrayObject = new TmfFixedArray<Object>(fString1);
         stringArray = fFixedArrayObject.toArray(new String[0]);
         assertTrue("toArrayArg", stringArray[0].equals(fString1));
     }

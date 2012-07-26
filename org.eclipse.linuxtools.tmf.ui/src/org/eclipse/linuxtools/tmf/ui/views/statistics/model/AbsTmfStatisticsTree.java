@@ -23,28 +23,27 @@ import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 
 /**
- * <h4>Base class for the statistics storage.</h4>
- * <p>
- * It allow to implement a tree structure while avoiding the need to run through
- * the tree each time you need to add a node at a given place.
- * </p>
+ * Base class for the statistics storage. It allow to implement a tree structure
+ * while avoiding the need to run through the tree each time you need to add a
+ * node at a given place.
  *
- *  @version 1.0
- *  @author Mathieu Denis
+ * @version 1.0
+ * @author Mathieu Denis
  */
 public abstract class AbsTmfStatisticsTree {
 
     /**
-     * <h4>String builder used to merge string with more efficacy.</h4>
+     * String builder used to merge string with more efficiency.
      */
     protected static final StringBuilder fBuilder = new StringBuilder();
+
     /**
-     * <h4>Identification of the root.</h4>
+     * Identification of the root.
      */
     public static final TmfFixedArray<String> ROOT = new TmfFixedArray<String>("root"); //$NON-NLS-1$
 
     /**
-     * <h4>Function to merge many string with more efficacy.</h4>
+     * Function to merge many string with more efficiency.
      *
      * @param strings
      *            Strings to merge.
@@ -55,26 +54,22 @@ public abstract class AbsTmfStatisticsTree {
         for (String s : strings) {
             fBuilder.append(s);
         }
-                return fBuilder.toString();
+        return fBuilder.toString();
     }
 
     /**
-     * <h4>Define what child a node can have.</h4>
-     * <p>
-     * The management and usage of this map is done by subclass.
-     * </p>
-     * <p>
-     * HashSet are always faster than TreeSet.
-     * </p>
+     * Define what children a node can have. The management and usage of this map
+     * is done by subclasses. HashSet are always faster than TreeSet for String keys.
      */
     protected Map<String, Set<String>> fKeys;
+
     /**
-     * <h4>The nodes in the tree.</f4>
+     * The nodes in the tree.
      */
     protected HashMap<TmfFixedArray<String>, TmfStatisticsTreeNode> fNodes;
 
     /**
-     * <h4>Constructor.</h4>
+     * Constructor.
      */
     public AbsTmfStatisticsTree() {
         fNodes = new HashMap<TmfFixedArray<String>, TmfStatisticsTreeNode>();
@@ -82,7 +77,7 @@ public abstract class AbsTmfStatisticsTree {
     }
 
     /**
-     * <h4>Get a node.</h4>
+     * Get a node.
      *
      * @param path
      *            Path to the node.
@@ -93,7 +88,7 @@ public abstract class AbsTmfStatisticsTree {
     }
 
     /**
-     * <h4>Get the children of a node.</h4>
+     * Get the children of a node.
      *
      * @param path
      *            Path to the node.
@@ -102,7 +97,8 @@ public abstract class AbsTmfStatisticsTree {
     public abstract Collection<TmfStatisticsTreeNode> getChildren(final TmfFixedArray<String> path);
 
     /**
-     * <h4>Get every children of a node, even if it doesn't have any registered events, as opposed to getChildren</h4>
+     * Get every children of a node, even if it doesn't have any registered
+     * events, as opposed to getChildren
      *
      * @param path
      *            Path to the node.
@@ -111,7 +107,7 @@ public abstract class AbsTmfStatisticsTree {
     public abstract Collection<TmfStatisticsTreeNode> getAllChildren(final TmfFixedArray<String> path);
 
     /**
-     * <h4>Get the map of existing elements of path classified by parent.</h4>
+     * Get the map of existing elements of path classified by parent.
      *
      * @return The map.
      */
@@ -120,7 +116,7 @@ public abstract class AbsTmfStatisticsTree {
     }
 
     /**
-     * <h4>Get or create a node.</h4>
+     * Get or create a node.
      *
      * @param path
      *            Path to the node.
@@ -137,7 +133,7 @@ public abstract class AbsTmfStatisticsTree {
     }
 
     /**
-     * <h4>Get the parent of a node.</h4>
+     * Get the parent of a node.
      *
      * @param path
      *            Path to the node.
@@ -154,10 +150,10 @@ public abstract class AbsTmfStatisticsTree {
     }
 
     /**
-     * <h4>Increase any kind of counter.</h4>
-     * <p>
-     * This method must be implemented by subclass.
-     * </p>
+     * Increase any kind of counter.
+     *
+     * This method must be implemented by subclasses.
+     *
      * @param event
      *            Current event.
      * @param extraInfo
@@ -168,10 +164,10 @@ public abstract class AbsTmfStatisticsTree {
     public abstract void increase(ITmfEvent event, ITmfExtraEventInfo extraInfo, int values);
 
     /**
-     * <h4>Register an event.</h4>
-     * <p>
-     * This method must be implemented by subclass.
-     * </p>
+     * Register an event.
+     *
+     * This method must be implemented by subclasses.
+     *
      * @param event
      *            Current event.
      * @param extraInfo
@@ -180,11 +176,10 @@ public abstract class AbsTmfStatisticsTree {
     public abstract void registerEvent(ITmfEvent event, ITmfExtraEventInfo extraInfo);
 
     /**
-     * <h4>Register that a new node was created.</h4>
-     * <p>
+     * Register that a new node was created.
+     *
      * Must make sure the {@link #getChildren(TmfFixedArray)} on the parent node
      * will return the newly created node.
-     * </p>
      *
      * @param path
      *            Path of the new node.
@@ -192,10 +187,9 @@ public abstract class AbsTmfStatisticsTree {
     protected abstract void registerName(final TmfFixedArray<String> path);
 
     /**
-     * <h4>Reset a node.</h4>
-     * <p>
+     * Reset a node.
+     *
      * Work recursively.
-     * </p>
      *
      * @param path
      *            Path to the node.

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis      (mathieu.denis@polymtl.ca)  - Initial API and Implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
@@ -34,21 +34,19 @@ import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     /**
-     * <h4>Header for the event types categories.</h4>
+     * Header for the event types categories.
      */
     public static final String HEADER_EVENT_TYPES = Messages.TmfStatisticsData_EventTypes;
 
     /**
-     * <h4>Indicate that it's a value.</h4>
-     * <p>
+     * Indicate that it's a value.
+     *
      * Used when checking the possible child node for a node.
-     * </p>
-     * *
-     * <p>
+     *
      * It differentiate a category of a value by being appended to a value.
-     * </p>
      */
     protected static final String NODE = "z"; //$NON-NLS-1$
+
     /**
      * Root node key.
      */
@@ -82,6 +80,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#getChildren(org.eclipse.linuxtools.tmf.util.TmfFixedArray)
      */
     @Override
@@ -119,6 +118,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#getAllChildren(org.eclipse.linuxtools.tmf.util.TmfFixedArray)
      */
     @Override
@@ -154,7 +154,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     }
 
     /**
-     * <h4>Get the event types paths.</h4>
+     * Get the event types paths.
      *
      * @param event
      *            Event to get the path for.
@@ -175,7 +175,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     }
 
     /**
-     * <h4>Get the standard paths for an event.</h4>
+     * Get the standard paths for an event.
      *
      * @param event
      *            Event to get the path for.
@@ -193,6 +193,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#increase(org.eclipse.linuxtools.tmf.event.TmfEvent, org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfEventInfo, int)
      */
     @Override
@@ -202,6 +203,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#registerEvent(org.eclipse.linuxtools.tmf.event.TmfEvent, org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfEventInfo)
      */
     @Override
@@ -219,8 +221,8 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#registerName
-     * (org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfFixedArray)
+     *
+     * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.AbsTmfStatisticsTree#registerName(org.eclipse.linuxtools.tmf.core.util.TmfFixedArray)
      */
     @Override
     protected void registerName(TmfFixedArray<String> path) {

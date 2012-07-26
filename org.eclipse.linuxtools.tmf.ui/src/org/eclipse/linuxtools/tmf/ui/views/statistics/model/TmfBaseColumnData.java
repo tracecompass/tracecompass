@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis      (mathieu.denis@polymtl.ca)  - Initial Implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial Implementation
  *   Bernd Hufmann - Added Annotations
  *******************************************************************************/
 
@@ -28,26 +28,33 @@ public class TmfBaseColumnData implements ITmfStatisticsColumnData {
      * Name of the column.
      */
     protected final String fHeader;
+
     /**
      * Width of the column.
      */
     protected final int fWidth;
+
     /**
      * Alignment of the column.
      */
     protected final int fAlignment;
+
     /**
      * Tooltip of the column.
      */
     protected final String fTooltip;
+
     /**
-     * Adapts a StatisticsTreeNode into the content of it's corresponding cell for that column.
+     * Adapts a StatisticsTreeNode into the content of it's corresponding cell
+     * for that column.
      */
     protected final ColumnLabelProvider fLabelProvider;
+
     /**
      * Used to sort elements of this column. Can be null.
      */
     protected final ViewerComparator fComparator;
+
     /**
      * Used to draw bar charts in this column. Can be null.
      */

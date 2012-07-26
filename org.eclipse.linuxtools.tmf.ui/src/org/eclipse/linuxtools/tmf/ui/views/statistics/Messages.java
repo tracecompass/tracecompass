@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis      (mathieu.denis@polymtl.ca)  - Initial API and Implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics;

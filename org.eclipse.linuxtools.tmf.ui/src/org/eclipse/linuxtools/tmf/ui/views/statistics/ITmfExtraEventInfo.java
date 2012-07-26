@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis (mathieu.denis@polymtl.ca)  - Initial design and implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial design and implementation
  *   Bernd Hufmann - Changed interface and class name
  *******************************************************************************/
 
@@ -24,6 +24,7 @@ public interface ITmfExtraEventInfo {
 
     /**
      * Returns the trace name.
+     *
      * @return the name of the trace.
      */
     public String getTraceName();
