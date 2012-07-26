@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
@@ -24,9 +24,9 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 /**
  * The interval component, which will be contained in a node of the History
  * Tree.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
 
@@ -42,7 +42,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
 
     /**
      * Standard constructor
-     * 
+     *
      * @param intervalStart
      * @param intervalEnd
      * @param attribute
@@ -65,7 +65,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
     /**
      * Reader constructor. Builds the interval using an already-allocated
      * ByteBuffer, which normally comes from a NIO FileChannel.
-     * 
+     *
      * @param buffer
      *            The ByteBuffer from which to read the information
      * @throws IOException
@@ -149,7 +149,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
      * Antagonist of the previous constructor, write the Data entry
      * corresponding to this interval in a ByteBuffer (mapped to a block in the
      * history-file, hopefully)
-     * 
+     *
      * @param buffer
      *            The already-allocated ByteBuffer corresponding to a SHT Node
      * @param endPosOfStringEntry
@@ -248,7 +248,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
 
     /**
      * Total serialized size of this interval
-     * 
+     *
      * @return
      */
     int getIntervalSize() {
@@ -296,8 +296,19 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
     @Override
     public String toString() {
         /* Only for debug, should not be externalized */
-        return '[' + start + ", " + end + ']' + //$NON-NLS-1$
-                ", attribute = " + attribute + //$NON-NLS-1$
-                ", value = " + sv.toString(); //$NON-NLS-1$
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        sb.append(start);
+        sb.append(", "); //$NON-NLS-1$
+        sb.append(end);
+        sb.append(']');
+
+        sb.append(", attribute = "); //$NON-NLS-1$
+        sb.append(attribute);
+
+        sb.append(", value = "); //$NON-NLS-1$
+        sb.append(sv.toString());
+
+        return sb.toString();
     }
 }
