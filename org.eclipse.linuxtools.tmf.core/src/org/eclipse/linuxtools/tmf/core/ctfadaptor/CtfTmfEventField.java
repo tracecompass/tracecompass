@@ -37,16 +37,16 @@ public abstract class CtfTmfEventField implements ITmfEventField {
     // Class attributes
     // ------------------------------------------------------------------------
 
-    /** @since 1.1 */
+    /** @since 1.2 */
     protected static final int FIELDTYPE_INTEGER = 0;
 
-    /** @since 1.1 */
+    /** @since 1.2 */
     protected static final int FIELDTYPE_STRING = 1;
 
-    /** @since 1.1 */
+    /** @since 1.2 */
     protected static final int FIELDTYPE_INTEGER_ARRAY = 2;
 
-    /** @since 1.1 */
+    /** @since 1.2 */
     protected static final int FIELDTYPE_FLOAT = 3;
 
     // ------------------------------------------------------------------------
