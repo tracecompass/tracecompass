@@ -17,7 +17,7 @@ import org.eclipse.osgi.util.NLS;
 /**
  * Messages file for statistics view strings.
  *
- * @version 1.0
+ * @version 2.0
  * @author Mathieu Denis
  */
 public class Messages extends NLS {
@@ -38,6 +38,16 @@ public class Messages extends NLS {
      * Number of events column tool tip.
      */
     public static String TmfStatisticsView_NbEventsTip;
+    /**
+     * Partial number of events column.
+     * @since 2.0
+     */
+    public static String TmfStatisticsView_NbEventsTimeRangeColumn;
+    /**
+     * Partial number of events column tool tip.
+     * @since 2.0
+     */
+    public static String TmfStatisticsView_NbEventsTimeRangeTip;
     /**
      * String for unknown trace name.
      */

@@ -83,12 +83,12 @@ public class TmfBaseColumnDataTest extends TestCase {
                 TmfStatisticsTreeNode parent = node;
                 do {
                     parent = parent.getParent();
-                } while (parent != null && parent.getValue().nbEvents == 0);
+                } while (parent != null && parent.getValue().getTotal() == 0);
 
                 if (parent == null) {
                     return 0;
                 }
-                return (double) node.getValue().nbEvents / parent.getValue().nbEvents;
+                return (double) node.getValue().getTotal() / parent.getValue().getTotal();
             }
         };
 

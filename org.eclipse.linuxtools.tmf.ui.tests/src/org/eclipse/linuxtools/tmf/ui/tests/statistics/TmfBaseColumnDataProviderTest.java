@@ -164,7 +164,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
             if (columnData.getHeader().compareTo(LEVEL_COLUMN) == 0) {
                 assertNull("getColumnData", percentProvider);
             } else if (columnData.getHeader().compareTo(EVENTS_COUNT_COLUMN) == 0) {
-                double percentage = (double) treeNode1.getValue().nbEvents / parentNode.getValue().nbEvents;
+                double percentage = (double) treeNode1.getValue().getTotal() / parentNode.getValue().getTotal();
                 assertEquals("getColumnData", percentage, percentProvider.getPercentage(treeNode1));
             }
         }
