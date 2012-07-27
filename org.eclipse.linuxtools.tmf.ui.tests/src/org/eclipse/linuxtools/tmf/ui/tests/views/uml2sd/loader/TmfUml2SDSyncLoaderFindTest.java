@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -25,8 +25,13 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.Criteria;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDGraphNodeSupporter;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfSyncMessage;
 
+/**
+ * Search Test Cases.
+ *
+ * @author Bernd Hufmann
+ */
 public class TmfUml2SDSyncLoaderFindTest extends TestCase {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -39,7 +44,7 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
     final static private int                 TC_002_END_OCCURRANCE   = TC_002_START_OCCURRANCE;
     final static private String              TC_002_START_LIFELINE   = IUml2SDTestConstants.FIRST_PLAYER_NAME;
     final static private String              TC_002_END_LIFELINE     = IUml2SDTestConstants.MASTER_PLAYER_NAME;
-   
+
     // Test case 003 expected values
     final static private Uml2SDTestTimestamp TC_003_TIME_VALUE       = new Uml2SDTestTimestamp(9788642113228L);
     final static private String              TC_003_MESSAGE_NAME     = "GAME_REPLY"; //$NON-NLS-1$
@@ -48,16 +53,16 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
     final static private int                 TC_003_END_OCCURRANCE   = TC_003_START_OCCURRANCE;
     final static private String              TC_003_START_LIFELINE   = IUml2SDTestConstants.MASTER_PLAYER_NAME;
     final static private String              TC_003_END_LIFELINE     = IUml2SDTestConstants.FIRST_PLAYER_NAME;
-    
+
     // Test case 004 expected values
     final static private Uml2SDTestTimestamp TC_004_TIME_VALUE       = new Uml2SDTestTimestamp(9791893030834L);
     final static private String              TC_004_MESSAGE_NAME     = "GAME_REQUEST"; //$NON-NLS-1$
     final static private int                 TC_004_PAGE_VALUE       = 4;
     final static private int                 TC_004_START_OCCURRANCE = 19;
     final static private int                 TC_004_END_OCCURRANCE   = TC_004_START_OCCURRANCE;
-    final static private String              TC_004_START_LIFELINE   = IUml2SDTestConstants.SECOND_PLAYER_NAME; 
+    final static private String              TC_004_START_LIFELINE   = IUml2SDTestConstants.SECOND_PLAYER_NAME;
     final static private String              TC_004_END_LIFELINE     = IUml2SDTestConstants.MASTER_PLAYER_NAME;
-    
+
     // Test case 005 expected values
     final static private int                 TC_005_PAGE_VALUE       = 0;
     final static private String              TC_005_LIFELINE_NAME    = IUml2SDTestConstants.FIRST_PLAYER_NAME;
@@ -71,19 +76,22 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
 
     // ------------------------------------------------------------------------
     // Static methods
-    // ------------------------------------------------------------------------ 
+    // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new Uml2SDTestSetup(new TestSuite(TmfUml2SDSyncLoaderFindTest.class));
     }
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     */
     public TmfUml2SDSyncLoaderFindTest() {
     }
 
@@ -103,14 +111,17 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         fFacility = null;
         super.tearDown();
     }
-    
+
+    /**
+     * Main method with test cases.
+     */
     @SuppressWarnings("nls")
     public void testFindHandling() {
         fTmfComponent = new Uml2SDSignalValidator();
 
         /*
          * Test Case: 001
-         * Description: Verify the ISDGraphNodeSupporter implementation  
+         * Description: Verify the ISDGraphNodeSupporter implementation
          * Verified Methods: loader.isNodeSupported(), loader.getNodeName()
          * Expected result: Correct values are returned, i.e. only lifelines and sync. messages are supported
          */
@@ -127,12 +138,12 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         assertEquals("getNodeName", "", fFacility.getLoader().getNodeName(ISDGraphNodeSupporter.ASYNCMESSAGE, null));
         assertEquals("getNodeName", "", fFacility.getLoader().getNodeName(ISDGraphNodeSupporter.ASYNCMESSAGERETURN, null));
         assertEquals("getNodeName", "", fFacility.getLoader().getNodeName(ISDGraphNodeSupporter.STOP, null));
-        
+
         fFacility.getLoader().cancel();
-        
+
         /*
          * Test Case: 002
-         * Description: Verify 1st message find within page  
+         * Description: Verify 1st message find within page
          * Verified Methods: loader.find(), loader.moveToMessage()
          * Expected result: Correct message is selected
          */
@@ -145,9 +156,9 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         fTmfComponent.setCurrentTime(TC_002_TIME_VALUE);
         fTmfComponent.setCurrentRange(null); // not used
         fTmfComponent.setSignalReceived(false);
-        
+
         fFacility.getLoader().find(criteria);
-        // Wait for the selection to finish - needed due to new platform behavior in Juno   
+        // Wait for the selection to finish - needed due to new platform behavior in Juno
 	    fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertTrue("find", fTmfComponent.isSignalReceived());
         assertFalse("find", fTmfComponent.isSignalError());
@@ -166,10 +177,10 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         assertEquals("find", TC_002_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("find", TC_002_START_LIFELINE, msg.getStartLifeline().getName());
         assertEquals("find", TC_002_END_LIFELINE, msg.getEndLifeline().getName());
-        
+
         /*
          * Test Case: 003
-         * Description: Verify 2nd message find within page  
+         * Description: Verify 2nd message find within page
          * Verified Methods: loader.find(), loader.moveToMessage()
          * Expected result: Correct message is selected
          */
@@ -177,9 +188,9 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_003_TIME_VALUE);
         fTmfComponent.setCurrentRange(null); // not used
-        
+
         fTmfComponent.setSignalReceived(false);
-        
+
         fFacility.getLoader().find(criteria);
         // Wait for the selection to finish - needed due to new platform behavior in Juno
 		fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
@@ -203,7 +214,7 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
 
         /*
          * Test Case: 004
-         * Description: Verify 1st message across page  
+         * Description: Verify 1st message across page
          * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
          * Expected result: Correct message is selected
          */
@@ -211,9 +222,9 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_004_TIME_VALUE);
         fTmfComponent.setCurrentRange(new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH)); // not used
-        
+
         fTmfComponent.setSignalReceived(false);
-        
+
         fFacility.getLoader().find(criteria);
         fFacility.waitForJobs(); // find across pages uses a job
         // to make sure pageRequest has been started before calling waitforCompletion()
@@ -242,14 +253,14 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         // cancel find and go back to first page
         fFacility.getLoader().cancel();
         fFacility.firstPage();
-        
+
         /*
          * Test Case: 005
-         * Description: Verify find of lifeline within page  
+         * Description: Verify find of lifeline within page
          * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
          * Expected result: Correct message is selected
          */
-        criteria = new Criteria();  
+        criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.FIRST_PLAYER_NAME);
         fFacility.getLoader().find(criteria);
@@ -263,24 +274,24 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         assertTrue(selection.get(0) instanceof Lifeline);
         Lifeline lifeline = (Lifeline) selection.get(0);
         assertEquals("find", TC_005_LIFELINE_NAME, lifeline.getName());
-        
+
         /*
          * Test Case: 006
-         * Description: Verify lifeline across page  
+         * Description: Verify lifeline across page
          * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
          * Expected result: Correct message is selected
          */
-        criteria = new Criteria();  
+        criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.SECOND_PLAYER_NAME);
-        
+
         fFacility.getLoader().find(criteria);
         fFacility.waitForJobs(); // find across pages uses a job
         // to make sure pageRequest has been started before calling waitforCompletion()
-        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY); 
+        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
-        
+
         assertEquals("find", TC_006_PAGE_VALUE, fFacility.getLoader().currentPage());
         selection = fFacility.getSdView().getSDWidget().getSelection();
         assertNotNull(selection);
@@ -288,26 +299,26 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         assertTrue(selection.get(0) instanceof Lifeline);
         lifeline = (Lifeline) selection.get(0);
         assertEquals("find", TC_006_LIFELINE_NAME, lifeline.getName());
-        
-        
+
+
         // cancel find and go back to first page
         fFacility.getLoader().cancel();
         fFacility.firstPage();
-        
+
         /*
          * Test Case: 007
-         * Description: Verify cancel ongoing search job   
+         * Description: Verify cancel ongoing search job
          * Verified Methods: loader.find(), loader.find()
          * Expected result: Cancelled find
          */
-        criteria = new Criteria();  
+        criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.SECOND_PLAYER_NAME);
-        
+
         fFacility.getLoader().find(criteria);
         fFacility.delay(200); // to make sure job was started
         fFacility.getLoader().cancel();
-        
+
         assertEquals("find", 0, fFacility.getLoader().currentPage()); // we are still at the first page
         fTmfComponent.dispose();
     }

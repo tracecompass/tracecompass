@@ -1056,7 +1056,6 @@ public class SDView extends ViewPart {
      * (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
      */
-    @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class adapter) {
         Object obj = super.getAdapter(adapter);

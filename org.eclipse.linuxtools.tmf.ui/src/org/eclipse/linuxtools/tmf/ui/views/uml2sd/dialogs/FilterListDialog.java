@@ -386,11 +386,13 @@ public class FilterListDialog extends Dialog {
      *
      * @return the saved global filters
      */
+
     public static List<FilterCriteria> getGlobalFilters() {
         DialogSettings settings = (DialogSettings) Activator.getDefault().getDialogSettings().getSection(FILTERS_LIST_CRITERIA);
         int i = 0;
         DialogSettings section = null;
         int size = 0;
+        List<FilterCriteria> globalFilters = new ArrayList<FilterCriteria>();
         if (settings != null) {
             try {
                 size = settings.getInt(FILTERS_LIST_SIZE);
@@ -399,16 +401,14 @@ public class FilterListDialog extends Dialog {
                 size = 0;
             }
             section = (DialogSettings) settings.getSection(FILTERS_LIST_CRITERIA + i);
-        }
 
-        List<FilterCriteria> globalFilters = new ArrayList<FilterCriteria>();
-
-        while ((section != null) && (i < size)) {
-            FilterCriteria criteria = new FilterCriteria();
-            criteria.setCriteria(new Criteria());
-            criteria.load(section);
-            globalFilters.add(criteria);
-            section = (DialogSettings) settings.getSection(FILTERS_LIST_CRITERIA + (++i));
+            while ((section != null) && (i < size)) {
+                FilterCriteria criteria = new FilterCriteria();
+                criteria.setCriteria(new Criteria());
+                criteria.load(section);
+                globalFilters.add(criteria);
+                section = (DialogSettings) settings.getSection(FILTERS_LIST_CRITERIA + (++i));
+            }
         }
 
         return globalFilters;

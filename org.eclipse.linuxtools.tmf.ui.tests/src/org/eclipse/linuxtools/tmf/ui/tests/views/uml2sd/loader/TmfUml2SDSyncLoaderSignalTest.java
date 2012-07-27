@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -20,6 +20,12 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
 
+/**
+ * Test cases for signal handling.
+ *
+ * @author Bernd Hufmann
+ *
+ */
 public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -30,19 +36,22 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
 
     // ------------------------------------------------------------------------
     // Static methods
-    // ------------------------------------------------------------------------ 
+    // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new Uml2SDTestSetup(new TestSuite(TmfUml2SDSyncLoaderSignalTest.class));
     }
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     */
     public TmfUml2SDSyncLoaderSignalTest() {
     }
 
@@ -62,10 +71,13 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
         fFacility = null;
         super.tearDown();
     }
-    
+
+    /**
+     * Main method with test cases.
+     */
     @SuppressWarnings("nls")
     public void testSignalHandling() {
-        
+
         TmfTimeRange range = new TmfTimeRange(new Uml2SDTestTimestamp(9789689220871L), new Uml2SDTestTimestamp(9789773881426L));
         // Get range window for tests below
         TmfTimestamp rangeWindow = (TmfTimestamp) range.getEndTime().getDelta(range.getStartTime());
@@ -78,13 +90,13 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
 
         /*
          * Test Case: 001
-         * Description: Verify that time range signal is send with correct values when going to first page  
+         * Description: Verify that time range signal is send with correct values when going to first page
          * Verified Methods: broadcast()
          * Expected result: Time range sync signal is sent with correct range and current time.
          */
         currentTime = new Uml2SDTestTimestamp(9788641608418L);
         range = new TmfTimeRange(currentTime, new Uml2SDTestTimestamp(currentTime.getValue() + rangeWindow.getValue()));
-        
+
         fTmfComponent.setSignalError(false);
         fTmfComponent.setSignalReceived(false);
         fTmfComponent.setCurrentTimeError(false);
@@ -102,10 +114,10 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isCurrentTimeError());
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isSourceError());
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isRangeError());
-        
+
         /*
          * Test Case: 002
-         * Description: Verify that time sync signal is sent correctly after selection   
+         * Description: Verify that time sync signal is sent correctly after selection
          * Verified Methods: loader.broadcast(), testSelectionChanged
          * Expected result: Time sync signal is sent with correct current time.
          */
@@ -129,7 +141,7 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
         assertFalse("TmfTimeSynchSignal", fTmfComponent.isSourceError());
 
         fTmfComponent.setSignalReceived(false);
-        
+
         fTmfComponent.dispose();
     }
 }

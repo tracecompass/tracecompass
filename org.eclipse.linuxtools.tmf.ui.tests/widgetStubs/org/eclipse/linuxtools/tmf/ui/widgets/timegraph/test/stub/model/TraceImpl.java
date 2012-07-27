@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -17,7 +17,7 @@ import java.util.Vector;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
-@SuppressWarnings("nls")
+@SuppressWarnings({"javadoc", "nls"})
 public class TraceImpl implements ITimeGraphEntry {
     // ========================================================================
     // Data
@@ -89,7 +89,7 @@ public class TraceImpl implements ITimeGraphEntry {
     }
 
     @Override
-    public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long maxDuration) {
+    public Iterator<ITimeEvent> getTimeEventsIterator(long aStartTime, long aStopTime, long maxDuration) {
         return traceEvents.iterator();
     }
 

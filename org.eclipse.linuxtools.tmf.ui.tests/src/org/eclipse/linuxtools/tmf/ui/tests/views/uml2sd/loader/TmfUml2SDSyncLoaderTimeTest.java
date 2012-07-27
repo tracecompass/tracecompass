@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -24,6 +24,12 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfSyncMessage;
 
+/**
+ * Test cases for time synchronization handling.
+ *
+ * @author Bernd Hufmann
+ *
+ */
 public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -37,7 +43,7 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
     final static private int                 TC_001_END_OCCURRANCE   = TC_001_START_OCCURRANCE;
     final static private String              TC_001_START_LIFELINE   = IUml2SDTestConstants.MASTER_PLAYER_NAME;
     final static private String              TC_001_END_LIFELINE     = IUml2SDTestConstants.FIRST_PLAYER_NAME;
-    
+
     // Test case 002 expected values
     final static private Uml2SDTestTimestamp TC_002_TIME_VALUE       = new Uml2SDTestTimestamp(9789689830722L);
     final static private String              TC_002_MESSAGE_NAME     = "PAUSE_GAME_REQUEST"; //$NON-NLS-1$
@@ -46,29 +52,29 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
     final static private int                 TC_002_END_OCCURRANCE   = TC_002_START_OCCURRANCE;
     final static private String              TC_002_START_LIFELINE   = IUml2SDTestConstants.FIRST_PLAYER_NAME;
     final static private String              TC_002_END_LIFELINE     = IUml2SDTestConstants.MASTER_PLAYER_NAME;
-    
+
     // Test case 003 expected values
     final static private Uml2SDTestTimestamp TC_003_TIME_VALUE       = new Uml2SDTestTimestamp(9790750000000L);
     final static private int                 TC_003_PAGE_VALUE       = 4;
 
     // Test case 004 expected values
     final static private int                 TC_004_PAGE_VALUE       = 0;
-    
+
     // Test case 005 expected values
     final static private int                 TC_005_PAGE_VALUE       = IUml2SDTestConstants.TOTAL_NUMBER_OF_PAGES - 1;
-    
+
     // Test case 006 expected values
     final static private Uml2SDTestTimestamp TC_006_TIME_VALUE       = new Uml2SDTestTimestamp(9792420661655L);
     final static private int                 TC_006_PAGE_VALUE       = 4;
     final static private int                 TC_006_START_OCCURRANCE = IUml2SDTestConstants.MAX_MESSEAGES_PER_PAGE;
     final static private int                 TC_006_END_OCCURRANCE   = TC_006_START_OCCURRANCE;
-  
+
     // Test case 007 expected values
     final static private Uml2SDTestTimestamp TC_007_TIME_VALUE       = new Uml2SDTestTimestamp(9792420756010L);
     final static private int                 TC_007_PAGE_VALUE       = 5;
     final static private int                 TC_007_START_OCCURRANCE = 1;
     final static private int                 TC_007_END_OCCURRANCE   = TC_007_START_OCCURRANCE;
-    
+
     // Test case 008 expected values
     final static private Uml2SDTestTimestamp TC_008_TIME_VALUE       = new Uml2SDTestTimestamp(9788642228395L);
     final static private int                 TC_008_PAGE_VALUE       = 0;
@@ -80,7 +86,7 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
     final static private int                 TC_009_PAGE_VALUE       = 1;
     final static private Uml2SDTestTimestamp TC_009_START_TIME_VALUE = TC_009_TIME_VALUE;
     final static private Uml2SDTestTimestamp TC_009_END_TIME_VALUE   = new Uml2SDTestTimestamp(9789773881426L);
-    
+
     private Uml2SDTestFacility fFacility;
 
     // ------------------------------------------------------------------------
@@ -89,15 +95,18 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new Uml2SDTestSetup(new TestSuite(TmfUml2SDSyncLoaderTimeTest.class));
     }
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     */
     public TmfUml2SDSyncLoaderTimeTest() {
     }
 
@@ -118,12 +127,15 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         fFacility = null;
         super.tearDown();
     }
-    
+
+    /**
+     * Main method with test cases.
+     */
     @SuppressWarnings("nls")
     public void testTimeHandling() {
         /*
          * Test Case: 001
-         * Description: Verify synchToTime (exact time in page), selection of message in page  
+         * Description: Verify synchToTime (exact time in page), selection of message in page
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToMessageInPage()
          * Expected result: Correct message is selected.
          */
@@ -142,10 +154,10 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         assertEquals("synchToTime", TC_001_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("synchToTime", TC_001_START_LIFELINE, msg.getStartLifeline().getName());
         assertEquals("synchToTime", TC_001_END_LIFELINE, msg.getEndLifeline().getName());
-        
+
         /*
          * Test Case: 002
-         * Description: Verify synchToTime (exact time outside of page), selection of message in page  
+         * Description: Verify synchToTime (exact time outside of page), selection of message in page
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage()
          * Expected result: Correct message is selected.
          */
@@ -165,10 +177,10 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         assertEquals(TC_002_START_LIFELINE, msg.getStartLifeline().getName());
         assertEquals(TC_002_END_LIFELINE, msg.getEndLifeline().getName());
 
-        
+
         /*
          * Test Case: 003
-         * Description: Verify synchToTime (timestamp doesn't exist in trace), no selection of message in page  
+         * Description: Verify synchToTime (timestamp doesn't exist in trace), no selection of message in page
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage()
          * Expected result: Move to correct page, currentTime is updated so that focus on the currentTime, but no selection.
          */
@@ -182,10 +194,10 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         selection = fFacility.getSdView().getSDWidget().getSelection();
         assertNotNull("synchToTime", selection);
         assertEquals("synchToTime", 0, selection.size());
-        
+
         /*
          * Test Case: 004
-         * Description: Verify synchToTime (timestamp < experiment time range start)  
+         * Description: Verify synchToTime (timestamp < experiment time range start)
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage()
          * Expected result: Move to first page, focus on the beginning of the page, but no selection.
          */
@@ -196,10 +208,10 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         selection = fFacility.getSdView().getSDWidget().getSelection();
         assertNotNull("synchToTime", selection);
         assertEquals("synchToTime", 0, selection.size());
-        
+
         /*
          * Test Case: 005
-         * Description: Verify synchToTime (timestamp > experiment time range end)  
+         * Description: Verify synchToTime (timestamp > experiment time range end)
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage()
          * Expected result: Move to last page, focus on the end of the page, but no selection.
          */
@@ -213,7 +225,7 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
 
         /*
          * Test Case: 006
-         * Description: Verify synchToTime (timestamp of last message in page)  
+         * Description: Verify synchToTime (timestamp of last message in page)
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage(), loader.moveToMessageInPage()
          * Expected result: Move to correct page, selection of last message in page.
          */
@@ -227,10 +239,10 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         msg = (TmfSyncMessage) selection.get(0);
         assertEquals("synchToTime", TC_006_START_OCCURRANCE, msg.getStartOccurrence());
         assertEquals("synchToTime", TC_006_END_OCCURRANCE, msg.getEndOccurrence());
-        
+
         /*
         * Test Case: 007
-        * Description: Verify synchToTime (timestamp of first message in page)  
+        * Description: Verify synchToTime (timestamp of first message in page)
         * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage()
         * Expected result: Move to correct page, selection of last message in page.
         */
@@ -247,7 +259,7 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
 
         /*
         * Test Case: 008
-        * Description: Verify time range signal (start, end time and current time are in same  page)  
+        * Description: Verify time range signal (start, end time and current time are in same  page)
         * Verified Methods: loader.synchToTimeRange(), loader.moveToMessage(), loader.moveToMessageInPage()
         * Expected result: Move to correct page(=page of start time of range), set focus on start time of range, but no selection of message.
         */
@@ -264,10 +276,10 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         // We actually don't want something to be selected!!!
         assertNotNull("synchToTimeRange", selection);
         assertEquals("synchToTimeRange", 0, selection.size());
-        
+
         /*
          * Test Case: 009
-         * Description: Verify time range signal (start and end time are across 2 pages)  
+         * Description: Verify time range signal (start and end time are across 2 pages)
          * Verified Methods: loader.synchToTimeRange(), loader.moveToMessage(), loader.moveToPage()
          * Expected result: Move to correct page (=page of start time of range), set focus on start time of range, but no selection of message.
          */
@@ -282,6 +294,6 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         // We actually don't want something to be selected!!!
         assertNotNull("synchToTimeRange", selection);
         assertEquals("synchToTimeRange", 0, selection.size());
-        
+
     }
 }

@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -30,10 +30,10 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessageReturn;
 
 /**
  * Action Class implementation to move to selected message
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class MoveToMessage extends Action {
 
@@ -62,10 +62,10 @@ public class MoveToMessage extends Action {
     public MoveToMessage() {
         this(null);
     }
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param view a sequence diagram view reference
      */
     public MoveToMessage(SDView view) {
@@ -99,7 +99,6 @@ public class MoveToMessage extends Action {
         ISelectionProvider selProvider = sdWidget.getSelectionProvider();
         ISelection sel = selProvider.getSelection();
         Object selectedNode = null;
-        @SuppressWarnings("unchecked")
         Iterator<Object> it = ((StructuredSelection) sel).iterator();
         while (it.hasNext()) {
             Object node = it.next();
@@ -131,7 +130,7 @@ public class MoveToMessage extends Action {
 
     /**
      * Sets the active SD view.
-     * 
+     *
      * @param view The SD view.
      */
     public void setView(SDView view) {

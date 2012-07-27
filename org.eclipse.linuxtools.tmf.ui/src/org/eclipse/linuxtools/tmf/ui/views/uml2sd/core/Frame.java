@@ -1091,7 +1091,7 @@ public class Frame extends BasicFrame {
             if ((e.getStartOccurrence() < exec.fStartEventOccurrence) && (result == null)) {
                 result = e;
             }
-            if ((e.getStartOccurrence() < exec.fStartEventOccurrence) && (e.getStartOccurrence() >= result.getEndOccurrence())) {
+            if ((e.getStartOccurrence() < exec.fStartEventOccurrence) && (result != null) && (e.getStartOccurrence() >= result.getEndOccurrence())) {
                 result = e;
             }
         }
@@ -1122,7 +1122,7 @@ public class Frame extends BasicFrame {
             if ((e.getStartOccurrence() > exec.fStartEventOccurrence) && (result == null)) {
                 result = e;
             }
-            if ((e.getStartOccurrence() > exec.fStartEventOccurrence) && (e.getStartOccurrence() <= result.getEndOccurrence())) {
+            if ((e.getStartOccurrence() > exec.fStartEventOccurrence) && (result != null) && (e.getStartOccurrence() <= result.getEndOccurrence())) {
                 result = e;
             }
         }

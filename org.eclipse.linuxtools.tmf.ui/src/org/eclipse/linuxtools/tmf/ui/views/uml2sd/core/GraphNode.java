@@ -167,7 +167,7 @@ public abstract class GraphNode {
         fNodeList.add(nodeToAdd);
         fNodes.put(nodeToAdd.getArrayId(), fNodeList);
         fForwardNodes.put(nodeToAdd.getArrayId(), fNodeList);
-        if (nodeToAdd.getBackComparator() != null) {
+        if ((bNodeList != null) && (nodeToAdd.getBackComparator() != null)) {
             bNodeList.add(nodeToAdd);
             fBackwardNodes.put(nodeToAdd.getArrayId(), bNodeList);
         }

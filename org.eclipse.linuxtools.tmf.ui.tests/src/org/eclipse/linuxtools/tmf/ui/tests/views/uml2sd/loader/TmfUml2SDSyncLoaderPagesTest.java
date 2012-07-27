@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -15,6 +15,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+/**
+ * Test cases for pages handling.
+ *
+ * @author Bernd Hufmann
+ *
+ */
 public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -24,11 +30,11 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
 
     // ------------------------------------------------------------------------
     // Static methods
-    // ------------------------------------------------------------------------ 
+    // ------------------------------------------------------------------------
 
     /**
      * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class 
+     * @return Test setup class
      */
     public static Test suite() {
         return new Uml2SDTestSetup(new TestSuite(TmfUml2SDSyncLoaderPagesTest.class));
@@ -37,6 +43,9 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     */
     public TmfUml2SDSyncLoaderPagesTest() {
     }
 
@@ -58,8 +67,11 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
         super.tearDown();
     }
 
+    /**
+     * Main method with test cases.
+     */
     public void testPageHandling() {
-        
+
         verifyPagesCount();
         verifyNextPage();
         verifyPrevPage();
@@ -68,9 +80,9 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
         verifyPageNumberChanged();
 
     }
-    
+
      private void verifyPagesCount() {
-        
+
         /*
          * Test Case: 001
          * Description: Test number of pages.
@@ -79,19 +91,19 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
          */
         assertEquals(IUml2SDTestConstants.TOTAL_NUMBER_OF_PAGES, fFacility.getLoader().pagesCount());
     }
-    
+
     private void verifyNextPage() {
         // assuming we are at the first page
 
         /*
          * Test Case: 002
          * Description: Tests next page feature.
-         * Verified Methods: loader.nextPage(), loader.fillCurrentPage(), loader.pagesCount(), 
-         *                   loader.hasNextPage(), loader.hasPrevPage(), 
-         *                   frame.syncMessagesCount, frame.lifeLinesCount  
+         * Verified Methods: loader.nextPage(), loader.fillCurrentPage(), loader.pagesCount(),
+         *                   loader.hasNextPage(), loader.hasPrevPage(),
+         *                   frame.syncMessagesCount, frame.lifeLinesCount
          * Expected result: Expected values are return.
          */
-        
+
         for(int i = 0; i < IUml2SDTestConstants.TOTAL_NUMBER_OF_PAGES-2; i++) {
             fFacility.nextPage();
 
@@ -102,7 +114,7 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
                 verifyPage(i+1, IUml2SDTestConstants.MAX_MESSEAGES_PER_PAGE, true, true);
             }
         }
- 
+
         // Last Page
         fFacility.nextPage();
         verifyPage(IUml2SDTestConstants.TOTAL_NUMBER_OF_PAGES - 1, IUml2SDTestConstants.NUM_MESSAGES_OF_LAST_PAGE, false, true);
@@ -113,7 +125,7 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
         } catch (Exception e) {
             fail();
         }
-        
+
         fFacility.firstPage();
     }
 
@@ -124,9 +136,9 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
         /*
          * Test Case: 003
          * Description: Test previous page feature.
-         * Verified Methods: loader.prevPage(), loader.fillCurrentPage(), loader.pagesCount(), 
+         * Verified Methods: loader.prevPage(), loader.fillCurrentPage(), loader.pagesCount(),
          *                   loader.hasNextPage(), loader.hasPrevPage(),
-         *                   frame.syncMessagesCount, frame.lifeLinesCount  
+         *                   frame.syncMessagesCount, frame.lifeLinesCount
          * Expected result: Expected values are return.
          */
 
@@ -140,10 +152,11 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
 
         for(int i = IUml2SDTestConstants.TOTAL_NUMBER_OF_PAGES-2; i > 0; i--) {
             fFacility.prevPage();
-            if (i == IUml2SDTestConstants.PAGE_OF_ALL_LIFELINES)
+            if (i == IUml2SDTestConstants.PAGE_OF_ALL_LIFELINES) {
                 verifyPage(i, IUml2SDTestConstants.MAX_MESSEAGES_PER_PAGE, true, true, IUml2SDTestConstants.NUM_OF_ALL_LIFELINES);
-            else
+            } else {
                 verifyPage(i, IUml2SDTestConstants.MAX_MESSEAGES_PER_PAGE, true, true);
+            }
         }
 
         fFacility.prevPage();
@@ -162,12 +175,12 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
         /*
          * Test Case: 004
          * Description: Test first page feature.
-         * Verified Methods: loader.firstPage(), loader.fillCurrentPage(), loader.pagesCount(), 
+         * Verified Methods: loader.firstPage(), loader.fillCurrentPage(), loader.pagesCount(),
          *                   loader.hasNextPage(), loader.hasPrevPage(),
-         *                   frame.syncMessagesCount, frame.lifeLinesCount  
+         *                   frame.syncMessagesCount, frame.lifeLinesCount
          * Expected result: Expected values are return.
          */
-        
+
         // First Page
         fFacility.firstPage();
         verifyPage(0, IUml2SDTestConstants.MAX_MESSEAGES_PER_PAGE, true, false);
@@ -179,7 +192,7 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
          * Test Case: 005
          * Description: Test last page feature.
          * Verified Methods: loader.lastPage(), loader.pagesCount(), loader.hasNextPage(), loader.hasPrevPage()
-         *                   frame.syncMessagesCount, frame.lifeLinesCount  
+         *                   frame.syncMessagesCount, frame.lifeLinesCount
          * Expected result: Expected values are return.
          */
         fFacility.lastPage();
@@ -188,13 +201,13 @@ public class TmfUml2SDSyncLoaderPagesTest extends TestCase {
     }
 
     private void verifyPageNumberChanged() {
-        
+
         /*
          * Test Case: 006
          * Description: Test move to any page feature.
-         * Verified Methods: loader.pageNumberChanged(), loader.fillCurrentPage(), loader.pagesCount(), 
+         * Verified Methods: loader.pageNumberChanged(), loader.fillCurrentPage(), loader.pagesCount(),
          *                   loader.hasNextPage(), loader.hasPrevPage(),
-         *                   frame.syncMessagesCount, frame.lifeLinesCount  
+         *                   frame.syncMessagesCount, frame.lifeLinesCount
          * Expected result: Expected values are return.
          */
 

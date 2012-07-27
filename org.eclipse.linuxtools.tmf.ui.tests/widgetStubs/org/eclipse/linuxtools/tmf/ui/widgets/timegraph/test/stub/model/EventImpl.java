@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
@@ -14,6 +14,10 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
+/**
+ * ITimeEvent implementation for test purposes.
+ */
+@SuppressWarnings("javadoc")
 public class EventImpl implements ITimeEvent {
 	// ========================================================================
 	// Data
@@ -22,9 +26,9 @@ public class EventImpl implements ITimeEvent {
 
 	private long time = 0;
 	private ITimeGraphEntry trace = null;
-	private Type myType = Type.UNKNOWN; 
-	private long duration; 
-	
+	private Type myType = Type.UNKNOWN;
+	private long duration;
+
 	// ========================================================================
 	// Constructor
 	// ========================================================================
@@ -33,7 +37,7 @@ public class EventImpl implements ITimeEvent {
 		this.trace = trace;
 		this.myType = type;
 	}
-	
+
 	// ========================================================================
 	// Methods
 	// ========================================================================
@@ -52,7 +56,7 @@ public class EventImpl implements ITimeEvent {
 	public void setTrace(ITimeGraphEntry trace) {
 		this.trace = trace;
 	}
-	
+
 	@Override
 	public long getTime() {
 		return time;

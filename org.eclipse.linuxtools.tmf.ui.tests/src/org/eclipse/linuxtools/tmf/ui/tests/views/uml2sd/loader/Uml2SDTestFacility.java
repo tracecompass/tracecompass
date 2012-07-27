@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
@@ -44,6 +44,8 @@ import org.osgi.framework.FrameworkUtil;
 /**
  *  Singleton class to facilitate the test cases. Creates UML2SD view and loader objects as well as provides
  *  utility methods for interacting with the loader/view.
+ *
+ *  @author Bernd Hufmann
  */
 public class Uml2SDTestFacility {
 
@@ -69,6 +71,9 @@ public class Uml2SDTestFacility {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+    /**
+     * @return the singleton instance.
+     */
     public synchronized static Uml2SDTestFacility getInstance() {
         if (fInstance == null) {
             fInstance = new Uml2SDTestFacility();
@@ -157,7 +162,7 @@ public class Uml2SDTestFacility {
 
     /**
      * Sleeps current thread or GUI thread for a given time.
-     * @param waitTimeMillis
+     * @param waitTimeMillis time in milliseconds to wait
      */
     public void delay(final long waitTimeMillis) {
         final Display display = Display.getCurrent();
@@ -268,7 +273,7 @@ public class Uml2SDTestFacility {
     }
 
     /**
-     * @see org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.impl.selectExperiment(boolean)
+     * @see org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader.Uml2SDTestFacility#selectExperiment(boolean)
      */
     public void selectExperiment() {
         this.selectExperiment(true);

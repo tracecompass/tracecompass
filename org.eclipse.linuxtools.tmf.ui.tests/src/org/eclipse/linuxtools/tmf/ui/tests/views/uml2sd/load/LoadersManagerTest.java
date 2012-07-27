@@ -20,6 +20,9 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
+/**
+ *  Test cases class to test loader manager of UML2SD extension point.
+ */
 public class LoadersManagerTest extends TestCase {
 
     private final static String SDVIEW_WITH_ONE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader"; //$NON-NLS-1$
@@ -40,6 +43,9 @@ public class LoadersManagerTest extends TestCase {
         super.tearDown();
     }
 
+    /**
+     * Tests of loader manager singleton class.
+     */
     @SuppressWarnings("nls")
     public void testLoaderManager() {
 
