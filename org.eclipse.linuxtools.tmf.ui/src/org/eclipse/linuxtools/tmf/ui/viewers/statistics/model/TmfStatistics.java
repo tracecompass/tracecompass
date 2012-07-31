@@ -10,7 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Intial API and Implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
+package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
 /**
  * Primitive container for Statistics data
@@ -22,15 +22,19 @@ package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
  * another for the number of events in the selected time range
  *
  * @version 2.0
+ * @version 2.0
+ * @since 2.0
  * @author Mathieu Denis
  */
 public class TmfStatistics {
+
     /**
      * Total number of events.
      *
      * @since 2.0
      */
     protected long fNbEvents = 0;
+
     /**
      * Number of events within a time range (Partial event count).
      *

@@ -10,7 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics;
+package org.eclipse.linuxtools.tmf.ui.viewers.statistics;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -19,39 +19,49 @@ import org.eclipse.osgi.util.NLS;
  *
  * @version 2.0
  * @author Mathieu Denis
+ * @since 2.0
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.statistics.messages"; //$NON-NLS-1$
+
+    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.viewers.statistics.messages"; //$NON-NLS-1$
+
     /**
      * Level column name
      */
     public static String TmfStatisticsView_LevelColumn;
+
     /**
      * Level column tool tip.
      */
     public static String TmfStatisticsView_LevelColumnTip;
+
     /**
      * Number of events column name.
      */
     public static String TmfStatisticsView_NbEventsColumn;
+
     /**
      * Number of events column tool tip.
      */
     public static String TmfStatisticsView_NbEventsTip;
+
     /**
      * Partial number of events column.
      * @since 2.0
      */
     public static String TmfStatisticsView_NbEventsTimeRangeColumn;
+
     /**
      * Partial number of events column tool tip.
      * @since 2.0
      */
     public static String TmfStatisticsView_NbEventsTimeRangeTip;
+
     /**
      * String for unknown trace name.
      */
     public static String TmfStatisticsView_UnknownTraceName;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

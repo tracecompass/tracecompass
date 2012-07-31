@@ -11,14 +11,15 @@
  *   Bernd Hufmann - Changed interface and class name
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics;
+package org.eclipse.linuxtools.tmf.ui.viewers.statistics;
 
 /**
  * This interface provides an extension for updating the data model and to pass
  * along more information beside events.
  *
- * @version 1.0
+ * @version 2.0
  * @author Mathieu Denis
+ * @since 2.0
  */
 public interface ITmfExtraEventInfo {
 

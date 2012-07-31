@@ -17,8 +17,11 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.AbsTmfStatisticsTree;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsTreeRootFactory;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.ITmfExtraEventInfo;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.Messages;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeRootFactory;
 
 /**
  * Class for the TMF event requests specific to the statistics view.
@@ -30,6 +33,11 @@ class TmfStatisticsRequest extends TmfEventRequest {
      * Reference to the statistics viewer that sent the request
      */
     private final TmfStatisticsView fSender;
+
+    /**
+     * The viewer that displays the statistics data
+     */
+    private TmfStatisticsViewer fViewer;
 
     /**
      * The experiment for which to send the request
@@ -63,11 +71,12 @@ class TmfStatisticsRequest extends TmfEventRequest {
      *            Is this for a global statistics request (true), or a partial
      *            one (false)?
      */
-    TmfStatisticsRequest(TmfStatisticsView sender, TmfExperiment experiment, TmfTimeRange range, long index, ExecutionType prio, boolean global) {
+    TmfStatisticsRequest(TmfStatisticsView sender, TmfStatisticsViewer viewer, TmfExperiment experiment, TmfTimeRange range, long index, ExecutionType prio, boolean global) {
         super(ITmfEvent.class, range, index, TmfDataRequest.ALL_DATA, sender.getIndexPageSize(), prio);
-        String treeID = sender.getTreeID(experiment.getName());
+        String treeID = viewer.getTreeID(experiment.getName());
 
         fSender = sender;
+        fViewer = viewer;
         fExperiment = experiment;
         fGlobal = global;
         fStatisticsData = TmfStatisticsTreeRootFactory.getStatTree(treeID);
@@ -94,7 +103,7 @@ class TmfStatisticsRequest extends TmfEventRequest {
             }
             fStatisticsData.increase(data, extraInfo, 1);
             // Refresh view
-            if ((getNbRead() % fSender.getInputChangedRefresh()) == 0) {
+            if ((getNbRead() % fViewer.getInputChangedRefresh()) == 0) {
                 fSender.modelInputChanged(false);
             }
         }
@@ -105,7 +114,7 @@ class TmfStatisticsRequest extends TmfEventRequest {
         super.handleSuccess();
         fSender.modelInputChanged(true);
         if (fGlobal) {
-            fSender.waitCursor(false);
+            fViewer.waitCursor(false);
         }
     }
 

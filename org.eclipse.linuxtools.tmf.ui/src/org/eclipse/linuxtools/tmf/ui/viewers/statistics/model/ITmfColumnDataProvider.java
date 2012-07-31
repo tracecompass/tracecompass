@@ -10,7 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
+package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
 import java.util.List;
 
@@ -19,8 +19,9 @@ import java.util.List;
  * <code>TmfStatisticsView</code> uses classes implementing this interface to
  * define the columns in the statistics tree viewer.
  *
- * @version 1.0
+ * @version 2.0
  * @author Mathieu Denis
+ * @since 2.0
  */
 public interface ITmfColumnDataProvider {
 

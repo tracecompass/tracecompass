@@ -12,7 +12,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Re-design for new stats structure (2)
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
+package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
 import java.util.Collection;
 
@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
  * the path from the root to this node.
  *
  * @version 2.0
+ * @since 2.0
  * @author Mathieu Denis
  */
 public class TmfStatisticsTreeNode {

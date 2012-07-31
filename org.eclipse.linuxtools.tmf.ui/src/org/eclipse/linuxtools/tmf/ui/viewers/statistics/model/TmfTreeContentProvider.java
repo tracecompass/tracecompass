@@ -10,7 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
+package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -18,11 +18,13 @@ import org.eclipse.jface.viewers.Viewer;
 /**
  * Adapter TreeViewers can use to interact with StatisticsTreeNode objects.
  *
- * @version 1.0
+ * @version 2.0
+ * @since 2.0
  * @author Mathieu Denis
  * @see org.eclipse.jface.viewers.ITreeContentProvider
  */
 public class TmfTreeContentProvider implements ITreeContentProvider {
+
     /*
      * (non-Javadoc)
      *

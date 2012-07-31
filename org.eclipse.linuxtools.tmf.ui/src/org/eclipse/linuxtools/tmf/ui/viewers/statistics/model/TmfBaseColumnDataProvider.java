@@ -10,7 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Implementation and Initial API
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
+package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,8 +21,8 @@ import java.util.Vector;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.Messages;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.Messages;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
@@ -33,6 +33,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @version 2.0
  * @author Mathieu Denis
+ * @since 2.0
  */
 public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
 

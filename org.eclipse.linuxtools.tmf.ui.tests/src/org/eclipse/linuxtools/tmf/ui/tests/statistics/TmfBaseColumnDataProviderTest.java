@@ -24,13 +24,13 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.Messages;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseColumnData;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseColumnDataProvider;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseStatisticsTree;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsTreeNode;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.ITmfExtraEventInfo;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.Messages;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
 
 /**
  * TmfBaseColumnDataProvider test cases.
@@ -41,8 +41,8 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
-    private final static String LEVEL_COLUMN = org.eclipse.linuxtools.tmf.ui.views.statistics.Messages.TmfStatisticsView_LevelColumn;
-    private final static String EVENTS_COUNT_COLUMN = org.eclipse.linuxtools.tmf.ui.views.statistics.Messages.TmfStatisticsView_NbEventsColumn;
+    private final static String LEVEL_COLUMN = org.eclipse.linuxtools.tmf.ui.viewers.statistics.Messages.TmfStatisticsView_LevelColumn;
+    private final static String EVENTS_COUNT_COLUMN = org.eclipse.linuxtools.tmf.ui.viewers.statistics.Messages.TmfStatisticsView_NbEventsColumn;
 
     private TmfBaseColumnDataProvider provider;
 

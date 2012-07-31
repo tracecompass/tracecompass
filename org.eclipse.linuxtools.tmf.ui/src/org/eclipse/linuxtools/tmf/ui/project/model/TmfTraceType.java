@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Platform;
 
 /**
  * Utility class for accessing TMF trace type extensions from the platform's extensions registry.
- * 
+ *
  * @version 1.0
  * @author Patrick Tasse
  *
@@ -41,13 +41,19 @@ public class TmfTraceType {
      */
     public static final String TYPE_ELEM = "type"; //$NON-NLS-1$
     /**
-     * Extension point element 'Default editor' 
+     * Extension point element 'Default editor'
      */
     public static final String DEFAULT_EDITOR_ELEM = "defaultEditor"; //$NON-NLS-1$
     /**
      * Extension point element 'Events table type'
      */
     public static final String EVENTS_TABLE_TYPE_ELEM = "eventsTableType"; //$NON-NLS-1$
+    /**
+     * Extension point element 'Statistics viewer type'
+     *
+     * @since 2.0
+     */
+    public static final String STATISTICS_VIEWER_ELEM = "statisticsViewerType"; //$NON-NLS-1$
 
     /**
      *  Extension point attribute 'ID'
@@ -95,10 +101,10 @@ public class TmfTraceType {
     }
 
     /**
-     * Retrieves all configuration elements from the platform extension registry 
+     * Retrieves all configuration elements from the platform extension registry
      * for the trace type extension.
-     * 
-     * @return an array of trace type configuration elements 
+     *
+     * @return an array of trace type configuration elements
      */
     public static IConfigurationElement[] getTypeElements() {
         IConfigurationElement[] elements = Platform.getExtensionRegistry()
