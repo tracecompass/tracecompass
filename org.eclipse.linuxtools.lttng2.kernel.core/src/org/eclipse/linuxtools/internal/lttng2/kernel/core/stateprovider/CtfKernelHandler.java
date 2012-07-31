@@ -368,15 +368,50 @@ class CtfKernelHandler implements Runnable {
             }
                 break;
 
-            // FIXME In CTF it's as "syscall_exec". Will have to be adapted.
-            // case LTT_EVENT_EXEC:
-            // filename = new String((byte[]) event.getField(0));
-            //
-            // /* Change the Exec_name of the process */
-            // quark = ss.getQuarkRelativePath(true, currentThreadNode,
-            // "Exec_name");
-            // ss.modifyAttribute(ts, filename, quark);
-            // break;
+            case 11: // "lttng_statedump_process_state":
+            /* Fields:
+             * int32 type, int32 mode, int32 pid, int32 submode, int32 vpid,
+             * int32 ppid, int32 tid, string name, int32 status, int32 vtid */
+            {
+                Integer tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
+                int ppid = ((Long) content.getField(LttngStrings.PPID).getValue()).intValue();
+                int status = ((Long) content.getField(LttngStrings.STATUS).getValue()).intValue();
+                String name = (String) content.getField(LttngStrings.NAME).getValue();
+                /*
+                 * "mode" could be interesting too, but it doesn't seem to be
+                 * populated with anything relevant for now.
+                 */
+
+                int curThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString());
+
+                /* Set the process' name */
+                quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.EXEC_NAME);
+                if (ss.queryOngoingState(quark).isNull()) {
+                    /* If the value didn't exist previously, set it */
+                    value = TmfStateValue.newValueString(name);
+                    ss.modifyAttribute(ts, value, quark);
+                }
+
+                /* Set the process' PPID */
+                quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.PPID);
+                if (ss.queryOngoingState(quark).isNull()) {
+                    value = TmfStateValue.newValueInt(ppid);
+                    ss.modifyAttribute(ts, value, quark);
+                }
+
+                /* Set the process' status */
+                quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.STATUS);
+                if (ss.queryOngoingState(quark).isNull()) {
+                    /*"5" here means "LTTNG_WAIT" in the LTTng kernel tracer */
+                    if (status == 5) {
+                        value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT);
+                    } else {
+                        value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_UNKNOWN);
+                    }
+                    ss.modifyAttribute(ts, value, quark);
+                }
+            }
+                break;
 
             default:
             /* Other event types not covered by the main switch */
@@ -475,6 +510,7 @@ class CtfKernelHandler implements Runnable {
         map.put(LttngStrings.SCHED_PROCESS_FORK, 8);
         map.put(LttngStrings.SCHED_PROCESS_EXIT, 9);
         map.put(LttngStrings.SCHED_PROCESS_FREE, 10);
+        map.put(LttngStrings.STATEDUMP_PROCESS_STATE, 11);
 
         return map;
     }

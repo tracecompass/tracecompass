@@ -31,6 +31,7 @@ public class StateValues {
     public static final int CPU_STATUS_SOFTIRQ = 4;
 
     /* Process status */
+    public static final int PROCESS_STATUS_UNKNOWN = 0;
     public static final int PROCESS_STATUS_WAIT = 1;
     public static final int PROCESS_STATUS_RUN_USERMODE = 2;
     public static final int PROCESS_STATUS_RUN_SYSCALL = 3;
