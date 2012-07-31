@@ -94,6 +94,11 @@ public class StateSystem implements IStateSystemBuilder {
     }
 
     @Override
+    public boolean isLastAttribute(int quark) {
+        return (quark == getNbAttributes() - 1) ? true : false;
+    }
+
+    @Override
     public String getAttributeName(int attributeQuark) {
         return attributeTree.getAttributeName(attributeQuark);
     }
