@@ -189,7 +189,7 @@ public class StreamInput implements IDefinitionScope {
          * The BitBuffer to extract data from the StreamInput
          */
         BitBuffer bitBuffer = new BitBuffer();
-        bitBuffer.order(this.getStream().getTrace().getByteOrder());
+        bitBuffer.setByteOrder(this.getStream().getTrace().getByteOrder());
 
         /*
          * Create the definitions we need to read the packet headers + contexts
@@ -223,7 +223,7 @@ public class StreamInput implements IDefinitionScope {
         long fileSize = getStreamSize();
         if (currentPos < fileSize) {
             BitBuffer bitBuffer = new BitBuffer();
-            bitBuffer.order(this.getStream().getTrace().getByteOrder());
+            bitBuffer.setByteOrder(this.getStream().getTrace().getByteOrder());
             StreamInputPacketIndexEntry packetIndex = new StreamInputPacketIndexEntry(
                     currentPos);
             createPacketIndexEntry(fileSize, currentPos, packetIndex,
