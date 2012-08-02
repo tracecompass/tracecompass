@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem;
@@ -28,14 +28,14 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  * The Transient State is used to build intervals from punctual state changes. It
  * contains a "state info" vector similar to the "current state", except here we
  * also record the start time of every state stored in it.
- * 
+ *
  * We can then build StateInterval's, to be inserted in the State History when
  * we detect state changes : the "start time" of the interval will be the
  * recorded time we have here, and the "end time" will be the timestamp of the
  * new state-changing event we just read.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 class TransientState {
 
@@ -84,7 +84,7 @@ class TransientState {
     /**
      * Return the "ongoing" value for a given attribute as a dummy interval
      * whose end time = -1 (since we don't know its real end time yet).
-     * 
+     *
      * @param quark
      * @throws AttributeNotFoundException
      */
@@ -108,10 +108,10 @@ class TransientState {
      * Batch method of changeOngoingStateValue(), updates the complete
      * ongoingStateInfo in one go. BE VERY CAREFUL WITH THIS! Especially with
      * the sizes of both arrays.
-     * 
+     *
      * Note that the new ongoingStateInfo will be a shallow copy of
      * newStateInfo, so that last one must be already instantiated and all.
-     * 
+     *
      * @param newStateInfo
      *            The List of StateValues to replace the old ongoingStateInfo
      *            one.
@@ -146,10 +146,10 @@ class TransientState {
      * Ask if the state information about attribute 'quark' at time 'time' is
      * present in the Builder as it is right now. If it's not, it's either in
      * the History Tree, or not in the system at all.
-     * 
+     *
      * Note that this method does not return the value itself (we don't even
      * look for it, we can know by just looking at the timestamp)
-     * 
+     *
      * @param time
      *            The timestamp to look for
      * @param quark
@@ -164,7 +164,7 @@ class TransientState {
     /**
      * This is the lower-level method that will be called by the
      * StateHistorySystem (with already-built StateValues and timestamps)
-     * 
+     *
      * @param index
      *            The index in the vectors (== the quark of the attribute)
      * @param value
@@ -173,28 +173,28 @@ class TransientState {
      *            The timestamp associated with this state change
      * @throws TimeRangeException
      * @throws AttributeNotFoundException
-     * @throws StateValueTypeException 
+     * @throws StateValueTypeException
      */
     synchronized void processStateChange(long eventTime,
             ITmfStateValue value, int index) throws TimeRangeException,
             AttributeNotFoundException, StateValueTypeException {
         assert (this.isActive);
-        
+
         byte expectedSvType = stateValueTypes.get(index);
         checkValidAttribute(index);
-        
-        /* 
+
+        /*
          * Make sure the state value type we're inserting is the same as the
          * one registered for this attribute.
          */
         if (expectedSvType == -1) {
-            /* 
+            /*
              * The value hasn't been used yet, set it to the value
              * we're currently inserting (which might be null/-1 again).
              */
             stateValueTypes.set(index, value.getType());
         } else if ((value.getType() != -1) && (value.getType() != expectedSvType)) {
-            /* 
+            /*
              * We authorize inserting null values in any type of attribute,
              * but for every other types, it needs to match our expectations!
              */
@@ -233,7 +233,7 @@ class TransientState {
 
     /**
      * Run a "get state at time" query on the Transient State only.
-     * 
+     *
      * @param stateInfo
      *            The stateInfo object in which we will put our relevant
      *            information
@@ -270,10 +270,10 @@ class TransientState {
         assert (this.isActive);
 
         for (int i = 0; i < ongoingStateInfo.size(); i++) {
-            if (ongoingStateStartTimes.get(i) == endTime) {
+            if (ongoingStateStartTimes.get(i) >= endTime) {
                 /*
-                 * Handle this rare case where trace end == timetamp of last
-                 * state change
+                 * Handle the cases where trace end >= timetamp of last state
+                 * change. This can happen when inserting "future" changes.
                  */
                 continue;
             }
@@ -300,7 +300,7 @@ class TransientState {
 
     /**
      * Simply returns if this Transient State is currently being used or not
-     * 
+     *
      * @return
      */
     boolean isActive() {
@@ -313,7 +313,7 @@ class TransientState {
 
     /**
      * Debugging method that prints the contents of both 'ongoing...' vectors
-     * 
+     *
      * @param writer
      */
     void debugPrint(PrintWriter writer) {
