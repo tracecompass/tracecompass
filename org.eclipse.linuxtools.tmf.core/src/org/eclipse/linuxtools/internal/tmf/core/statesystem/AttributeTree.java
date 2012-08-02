@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem;
@@ -24,9 +24,9 @@ import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
  * The Attribute Tree is the /proc-like filesystem used to organize attributes.
  * Each node of this tree is both like a file and a directory in the
  * "file system".
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 final class AttributeTree {
 
@@ -39,7 +39,7 @@ final class AttributeTree {
 
     /**
      * Standard constructor, create a new empty Attribute Tree
-     * 
+     *
      * @param ss
      *            The StateSystem to which this AT is attached
      */
@@ -52,7 +52,7 @@ final class AttributeTree {
     /**
      * "Existing file" constructor Builds a attribute tree from a "mapping file"
      * or mapping section previously saved somewhere.
-     * 
+     *
      * @param ss
      *            StateSystem to which this AT is attached
      * @param fis
@@ -133,7 +133,7 @@ final class AttributeTree {
     /**
      * Tell the Attribute Tree to write itself somewhere. The passed
      * FileOutputStream defines where (which file/position).
-     * 
+     *
      * @param fos
      *            Where to write. Make sure it's seeked at the right position
      *            you want.
@@ -199,7 +199,7 @@ final class AttributeTree {
      * Return the number of attributes this system as seen so far. Note that
      * this also equals the integer value (quark) the next added attribute will
      * have.
-     * 
+     *
      * @return
      */
     int getNbAttributes() {
@@ -208,13 +208,13 @@ final class AttributeTree {
 
     /**
      * This is the version to specifically add missing attributes.
-     * 
+     *
      * If 'numericalNode' is true, all the new attributes created will be of
      * type 'NumericalNode' instead of 'AlphaNumNode'. Be careful with this, if
      * you do not want ALL added attributes to be numerical, call this function
      * first with 'false' to create the parent nodes, then call it again to make
      * sure only the final node is numerical.
-     * 
+     *
      * @throws AttributeNotFoundException
      */
     int getQuarkDontAdd(int startingNodeQuark, String... subPath)
@@ -280,7 +280,7 @@ final class AttributeTree {
                             attributeList.size());
                     prevNode.addSubAttribute(nextNode);
                     attributeList.add(nextNode);
-                    ss.transState.addEmptyEntry();
+                    ss.addEmptyAttribute();
                 }
                 prevNode = nextNode;
             }
@@ -299,7 +299,7 @@ final class AttributeTree {
 
     /**
      * Returns the sub-attributes of the quark passed in parameter
-     * 
+     *
      * @param attributeQuark
      * @param recursive
      * @return
