@@ -60,14 +60,6 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndex;
  */
 public class CTFTrace implements IDefinitionScope {
 
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    private static final String OFFSET = "offset"; //$NON-NLS-1$
-
-
-
     /*
      * (non-Javadoc)
      *
@@ -115,6 +107,11 @@ public class CTFTrace implements IDefinitionScope {
      * Packet header structure declaration
      */
     private StructDeclaration packetHeaderDecl = null;
+
+    /**
+     * The clock of the trace
+     */
+    private CTFClock singleClock;
 
     /**
      * Packet header structure definition
@@ -627,7 +624,8 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         /*
-         * If the stream we try to add has the null key, it must be the onl         * one. Thus, if the streams container is not empty, it is not valid.
+         * If the stream we try to add has the null key, it must be the only
+         * one. Thus, if the streams container is not empty, it is not valid.
          */
         if ((stream.getId() == null) && (streams.size() != 0)) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
@@ -687,23 +685,18 @@ public class CTFTrace implements IDefinitionScope {
         return clocks.get(name);
     }
 
-    private CTFClock singleClock;
-    private long singleOffset;
+
+
 
     /**
-     * gets the clock if there is only one. (this is 100% of the use cases as of June 2012)
+     * gets the clock if there is only one. (this is 100% of the use cases as of
+     * June 2012)
+     *
      * @return the clock
      */
     public final CTFClock getClock() {
         if (clocks.size() == 1) {
-            if (singleClock == null) {
-                singleClock = clocks.get(clocks.keySet().toArray()[0]);
-                if (singleClock.getProperty(OFFSET) != null) {
-                    singleOffset = (Long) getClock().getProperty(OFFSET);
-                } else {
-                    singleClock.addAttribute(OFFSET, 0);
-                }
-            }
+            singleClock = clocks.get(clocks.keySet().iterator().next());
             return singleClock;
         }
         return null;
@@ -711,13 +704,86 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * gets the time offset of a clock with respect to UTC in nanoseconds
+     *
      * @return the time offset of a clock with respect to UTC in nanoseconds
      */
     public final long getOffset() {
         if (getClock() == null) {
             return 0;
         }
-        return singleOffset;
+        return singleClock.getClockOffset();
+    }
+
+    /**
+     * gets the time offset of a clock with respect to UTC in nanoseconds
+     *
+     * @return the time offset of a clock with respect to UTC in nanoseconds
+     */
+    private final double getTimeScale() {
+        if (getClock() == null) {
+            return 1.0;
+        }
+        return singleClock.getClockScale();
+    }
+
+    /**
+     * Does the trace need to time scale?
+     *
+     * @return if the trace is in ns or cycles.
+     */
+    private final boolean clockNeedsScale() {
+        if (getClock() == null) {
+            return false;
+        }
+        return singleClock.isClockScaled();
+    }
+
+    /**
+     * the inverse clock for returning to a scale.
+     *
+     * @return 1.0 / scale
+     */
+    private final double getInverseTimeScale() {
+        if (getClock() == null) {
+            return 1.0;
+        }
+        return singleClock.getClockAntiScale();
+    }
+
+    /**
+     * @param cycles
+     *            clock cycles since boot
+     * @return time in nanoseconds UTC offset
+     */
+    public long timestampCyclesToNanos(long cycles) {
+        long retVal = cycles + getOffset();
+        /*
+         * this fix is since quite often the offset will be > than 53 bits and
+         * therefore the conversion will be lossy
+         */
+        if (clockNeedsScale()) {
+            retVal = (long) (retVal * getTimeScale());
+        }
+        return retVal;
+    }
+
+    /**
+     * @param nanos
+     *            time in nanoseconds UTC offset
+     * @return clock cycles since boot.
+     */
+    public long timestampNanoToCycles(long nanos) {
+        long retVal;
+        /*
+         * this fix is since quite often the offset will be > than 53 bits and
+         * therefore the conversion will be lossy
+         */
+        if (clockNeedsScale()) {
+            retVal = (long) (nanos * getInverseTimeScale());
+        } else {
+            retVal = nanos;
+        }
+        return retVal - getOffset();
     }
 
     /**
