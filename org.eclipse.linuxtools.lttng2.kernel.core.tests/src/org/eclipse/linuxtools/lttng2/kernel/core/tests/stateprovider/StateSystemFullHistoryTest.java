@@ -225,7 +225,7 @@ public class StateSystemFullHistoryTest {
         List<ITmfStateInterval> intervals;
 
         quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        intervals = ssq.queryHistoryRange(quark, time1, time2, resolution);
+        intervals = ssq.queryHistoryRange(quark, time1, time2, resolution, null);
         assertEquals(126, intervals.size()); /* Number of context switches! */
         assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
         assertEquals(1331668248815698779L, intervals.get(100).getEndTime());

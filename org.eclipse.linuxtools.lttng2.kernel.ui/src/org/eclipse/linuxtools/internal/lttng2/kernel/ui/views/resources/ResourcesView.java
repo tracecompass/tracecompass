@@ -40,7 +40,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier2;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
@@ -507,7 +506,7 @@ public class ResourcesView extends TmfView {
     private static List<ITimeEvent> getEventList(ResourcesEntry entry,
             long startTime, long endTime, long resolution, boolean includeNull,
             IProgressMonitor monitor) {
-        IStateSystemQuerier2 ssq = (IStateSystemQuerier2) entry.getTrace().getStateSystem();
+        IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
         startTime = Math.max(startTime, ssq.getStartTime());
         endTime = Math.min(endTime, ssq.getCurrentEndTime() + 1);
         if (endTime <= startTime) {

@@ -28,7 +28,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier2;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
@@ -45,7 +44,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  * @author alexmont
  *
  */
-public class StateSystem implements IStateSystemBuilder, IStateSystemQuerier2{
+public class StateSystem implements IStateSystemBuilder {
 
     /* References to the inner structures */
     private final AttributeTree attributeTree;
@@ -521,18 +520,15 @@ public class StateSystem implements IStateSystemBuilder, IStateSystemQuerier2{
 
     @Override
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
-            long t1, long t2, long resolution) throws TimeRangeException,
-            AttributeNotFoundException {
-        return queryHistoryRange(attributeQuark, t1, t2, resolution, new NullProgressMonitor());
-    }
-
-    @Override
-    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
-            long t1, long t2, long resolution, IProgressMonitor monitor) throws TimeRangeException,
-            AttributeNotFoundException {
+            long t1, long t2, long resolution, IProgressMonitor monitor)
+            throws TimeRangeException, AttributeNotFoundException {
         List<ITmfStateInterval> intervals;
         ITmfStateInterval currentInterval;
         long ts, tEnd;
+
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
 
         /* Make sure the time range makes sense */
         if (t2 < t1 || resolution <= 0) {
