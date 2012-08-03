@@ -37,6 +37,7 @@ public abstract class LttngStrings {
     public static final String SCHED_PROCESS_FORK = "sched_process_fork";
     public static final String SCHED_PROCESS_EXIT = "sched_process_exit";
     public static final String SCHED_PROCESS_FREE = "sched_process_free";
+    public static final String STATEDUMP_PROCESS_STATE = "lttng_statedump_process_state";
 
     public static final String SYSCALL_PREFIX = "sys_";
     public static final String COMPAT_SYSCALL_PREFIX = "compat_sys_";
@@ -44,7 +45,10 @@ public abstract class LttngStrings {
     /* Field names */
     public static final String IRQ = "irq";
     public static final String COMM = "comm";
+    public static final String NAME = "name";
     public static final String TID = "tid";
+    public static final String PPID = "ppid";
+    public static final String STATUS = "status";
     public static final String VEC = "vec";
     public static final String PREV_COMM = "prev_comm";
     public static final String PREV_TID = "prev_tid";
