@@ -42,12 +42,12 @@
               <tasks>
                 <delete includeemptydirs="false">
                   <fileset
-                    dir="/var/www/technology/linuxtools/lttng/update-nightly/">
+                    dir="${lttngPackageDestination}">
                     <include name="**" />
                   </fileset>
                 </delete>
                 <copy includeemptydirs="false"
-                  todir="/var/www/technology/linuxtools/lttng/update-nightly/">
+                  todir="${lttngPackageDestination}">
                   <fileset dir="target/repository">
                     <include name="**" />
                   </fileset>
