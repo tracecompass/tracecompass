@@ -80,7 +80,6 @@
   <profile>
     <id>lttngTests</id>
       <modules>
-        <module>org.eclipse.linuxtools.lttng.core.tests</module>
         <module>org.eclipse.linuxtools.lttng2.core.tests</module>
       </modules>
   </profile>
@@ -129,13 +128,7 @@
     <module>org.eclipse.linuxtools.tmf.ui</module>
     <module>org.eclipse.linuxtools.tmf.ui.tests</module>
 
-    <module>org.eclipse.linuxtools.lttng</module>
-    <module>org.eclipse.linuxtools.lttng.core</module>
-    <!-- <module>org.eclipse.linuxtools.lttng.core.tests</module> activated by the lttngTests package -->
     <module>org.eclipse.linuxtools.lttng.help</module>
-    <module>org.eclipse.linuxtools.lttng.jni</module>
-    <module>org.eclipse.linuxtools.lttng.ui</module>
-    <module>org.eclipse.linuxtools.lttng.ui.tests</module>
 
     <module>org.eclipse.linuxtools.lttng2</module>
     <module>org.eclipse.linuxtools.lttng2.core</module>
