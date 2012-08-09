@@ -119,8 +119,9 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param nbRequested the number of events requested
      * @param blockSize the number of events per block
      */
+    @SuppressWarnings("unchecked")
     public TmfCoalescedDataRequest(Class<T> dataType, long index, int nbRequested, int blockSize) {
-        super(dataType, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
+        super((Class<T>) ITmfEvent.class, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
     /**
@@ -133,8 +134,9 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
+    @SuppressWarnings("unchecked")
     public TmfCoalescedDataRequest(Class<T> dataType, long index, int nbRequested, int blockSize, ExecutionType priority) {
-        super(dataType, index, nbRequested, blockSize, priority);
+        super((Class<T>) ITmfEvent.class, index, nbRequested, blockSize, priority);
     }
 
     // ------------------------------------------------------------------------
