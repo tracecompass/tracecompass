@@ -569,18 +569,17 @@ public class CTFTrace implements IDefinitionScope {
                 }
             }
 
-            /* Read stream ID */
-            // TODO: it hasn't been checked that the stream_id field exists and
-            // is an unsigned
-            // integer
-            IntegerDefinition streamIDDef = (IntegerDefinition) packetHeaderDef
-                    .lookupDefinition("stream_id"); //$NON-NLS-1$
-            assert (streamIDDef != null);
+            /* Read the stream ID */
+            Definition streamIDDef = packetHeaderDef.lookupDefinition("stream_id"); //$NON-NLS-1$
 
-            long streamID = streamIDDef.getValue();
+            if (streamIDDef instanceof IntegerDefinition) { //this doubles as a null check
+                long streamID = ((IntegerDefinition) streamIDDef).getValue();
+                stream = streams.get(streamID);
+            } else {
+                /* No stream_id in the packet header */
+                stream = streams.get(null);
+            }
 
-            /* Get the stream to which this trace file belongs to */
-            stream = streams.get(streamID);
         } else {
             /* No packet header, we suppose there is only one stream */
             stream = streams.get(null);
