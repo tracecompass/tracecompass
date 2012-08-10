@@ -24,7 +24,7 @@ package org.eclipse.linuxtools.tmf.ui.viewers.statistics;
 public interface ITmfExtraEventInfo {
 
     /**
-     * Returns the trace name.
+     * Returns the name of the trace.
      *
      * @return the name of the trace.
      */

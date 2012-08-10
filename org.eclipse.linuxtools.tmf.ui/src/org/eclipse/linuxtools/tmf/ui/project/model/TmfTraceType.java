@@ -15,8 +15,12 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 
 /**
  * Utility class for accessing TMF trace type extensions from the platform's extensions registry.
@@ -98,6 +102,46 @@ public class TmfTraceType {
             }
         }
         return ""; //$NON-NLS-1$
+    }
+
+    /**
+     * Retrieves and instantiates an element's object based on his plug-in
+     * definition for a specific trace type.
+     *
+     * The element's object is instantiated using its 0-argument constructor.
+     *
+     * @param resource
+     *            The resource where to find the information about the trace
+     *            properties
+     * @param element
+     *            The name of the element to find under the trace type
+     *            definition
+     * @return a new Object based on his definition in plugin.xml, or null if no
+     *         definition was found
+     * @since 2.0
+     */
+    public static Object getTraceTypeElement(IResource resource, String element) {
+        try {
+            if (resource != null) {
+                String traceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
+                /*
+                 * Search in the configuration if there is any viewer specified
+                 * for this kind of trace type.
+                 */
+                for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+                    if (ce.getAttribute(TmfTraceType.ID_ATTR).equals(traceType)) {
+                        IConfigurationElement[] viewerCE = ce.getChildren(element);
+                        if (viewerCE.length != 1) {
+                            break;
+                        }
+                        return viewerCE[0].createExecutableExtension(TmfTraceType.CLASS_ATTR);
+                    }
+                }
+            }
+        } catch (CoreException e) {
+            Activator.getDefault().logError("Error creating the element from the resource", e); //$NON-NLS-1$
+        }
+        return null;
     }
 
     /**

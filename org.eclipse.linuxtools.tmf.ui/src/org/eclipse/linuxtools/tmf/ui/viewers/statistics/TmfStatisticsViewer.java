@@ -19,6 +19,16 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.ITmfColumnDataProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
@@ -32,7 +42,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -46,12 +55,37 @@ import org.eclipse.swt.widgets.Listener;
  * @version 2.0
  * @since 2.0
  */
-public class TmfStatisticsViewer extends TmfComponent {
+public class TmfStatisticsViewer extends TmfViewer {
 
     /**
-     * Refresh frequency
+     * The initial window span (in nanoseconds)
      */
-    protected static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
+    public static final long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
+
+    /**
+     * Timestamp scale (nanosecond)
+     */
+    public static final byte TIME_SCALE = -9;
+
+    /**
+     * Default PAGE_SIZE for background requests.
+     */
+    protected static final int PAGE_SIZE = 50000;
+
+    /**
+     * Refresh frequency.
+     */
+    protected final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
+
+    /**
+     * Stores the request to the experiment
+     */
+    protected TmfStatisticsRequest fRequest = null;
+
+    /**
+     * Stores the ranged request to the experiment
+     */
+    protected TmfStatisticsRequest fRequestRange = null;
 
     /**
      * The actual tree viewer to display
@@ -59,7 +93,40 @@ public class TmfStatisticsViewer extends TmfComponent {
     protected TreeViewer fTreeViewer;
 
     /**
-     * View instance counter (for multiple statistic views)
+     * The statistics tree linked to this viewer
+     */
+    protected AbsTmfStatisticsTree fStatisticsData;
+
+    /**
+     * Update synchronization parameter (used for streaming): Update busy
+     * indicator.
+     */
+    protected boolean fStatisticsUpdateBusy = false;
+
+    /**
+     * Update synchronization parameter (used for streaming): Update pending
+     * indicator.
+     */
+    protected boolean fStatisticsUpdatePending = false;
+
+    /**
+     * Update synchronization parameter (used for streaming): Pending Update
+     * time range.
+     */
+    protected TmfTimeRange fStatisticsUpdateRange = null;
+
+    /**
+     * Update synchronization object.
+     */
+    protected final Object fStatisticsUpdateSyncObj = new Object();
+
+    /**
+     * Indicates to process all events
+     */
+    private boolean fProcessAll;
+
+    /**
+     * View instance counter (for multiple statistics views)
      */
     private static int fCountInstance = 0;
 
@@ -69,23 +136,294 @@ public class TmfStatisticsViewer extends TmfComponent {
     private int fInstanceNb;
 
     /**
+     * The trace that is displayed by this viewer
+     */
+    private ITmfTrace fTrace;
+
+    /**
      * Object to store the cursor while waiting for the experiment to load
      */
     private Cursor fWaitCursor = null;
 
     /**
-     * Default constructor
+     * Counts the number of times waitCursor() has been called. It avoids
+     * removing the waiting cursor, since there may be multiple requests running
+     * at the same time.
+     */
+    private int fWaitCursorCount = 0;
+
+    /**
+     * Tells to send a time range request when the experiment gets updated.
+     */
+    private boolean fSendRangeRequest = true;
+
+    /**
+     * Empty constructor. To be used in conjunction with
+     * {@link TmfStatisticsViewer#init(Composite, String, ITmfTrace)}
+     */
+    public TmfStatisticsViewer() {
+        super();
+    }
+
+    /**
+     * Create a basic statistics viewer. To be used in conjunction with
+     * {@link TmfStatisticsViewer#init(Composite, String, ITmfTrace)}
      *
      * @param parent
-     *            The parent of this viewer
+     *            The parent composite that will hold the viewer
+     * @param viewerName
+     *            The name that will be assigned to this viewer
+     * @param trace
+     *            The trace that is displayed by this viewer
+     * @see TmfComponent
      */
-    public TmfStatisticsViewer(Composite parent) {
+    public TmfStatisticsViewer(Composite parent, String viewerName, ITmfTrace trace) {
+        init(parent, viewerName, trace);
+    }
+
+    /**
+     * Initialize the statistics viewer.
+     *
+     * @param parent
+     *            The parent component of the viewer.
+     * @param viewerName
+     *            The name to give to the viewer.
+     * @param trace
+     *            The trace that will be displayed by the viewer.
+     */
+    public void init(Composite parent, String viewerName, ITmfTrace trace) {
+        super.init(parent, viewerName);
         // Increment a counter to make sure the tree ID is unique.
         fCountInstance++;
         fInstanceNb = fCountInstance;
+        fTrace = trace;
 
+        // The viewer will process all events if he is assigned to the experiment
+        fProcessAll = (trace instanceof TmfExperiment);
+
+        initContent(parent);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.linuxtools.tmf.core.component.TmfComponent#dispose()
+     */
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (fWaitCursor != null) {
+            fWaitCursor.dispose();
+        }
+        /*
+         * Make sure there is no request running before removing the statistics
+         * tree
+         */
+        cancelOngoingRequest(fRequestRange);
+        cancelOngoingRequest(fRequest);
+    }
+
+    /**
+     * Handles the signal about new experiment range.
+     *
+     * @param signal
+     *            The experiment range updated signal
+     */
+    @TmfSignalHandler
+    public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+        TmfExperiment experiment = signal.getExperiment();
+        // validate
+        if (!experiment.equals(TmfExperiment.getCurrentExperiment())) {
+            return;
+        }
+
+        // Sends the time range request only once in this method.
+        if (fSendRangeRequest) {
+            fSendRangeRequest = false;
+            // Calculate the selected time range to request
+            long startTime = signal.getRange().getStartTime().normalize(0, TIME_SCALE).getValue();
+            TmfTimestamp startTS = new TmfTimestamp(startTime, TIME_SCALE);
+            TmfTimestamp endTS = new TmfTimestamp(startTime + INITIAL_WINDOW_SPAN, TIME_SCALE);
+            TmfTimeRange timeRange = new TmfTimeRange(startTS, endTS);
+
+            requestTimeRangeData(experiment, timeRange);
+        }
+        requestData(experiment, signal.getRange());
+    }
+
+    /**
+     * Handles the experiment updated signal. This will detect new events in
+     * case the indexing is not coalesced with a statistics request.
+     *
+     * @param signal
+     *            The experiment updated signal
+     */
+    @TmfSignalHandler
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+        TmfExperiment experiment = signal.getExperiment();
+        if (!experiment.equals(TmfExperiment.getCurrentExperiment())) {
+            return;
+        }
+
+        long nbEvents = 0;
+        if (fRequest != null) {
+            nbEvents = fRequest.getLastEventIndex();
+        }
+        /*
+         * In the normal case, the statistics request is coalesced with indexing
+         * and the number of events are the same, there is nothing to do. But if
+         * it's not the case, trigger a new request to count the new events.
+         */
+        if (nbEvents < experiment.getNbEvents()) {
+            requestData(experiment, experiment.getTimeRange());
+        }
+    }
+
+    /**
+     * * Handles the time range updated signal. It updates the time range
+     * statistics.
+     *
+     * @param signal
+     *            Contains the information about the new selected time range.
+     */
+    @TmfSignalHandler
+    public void timeRangeUpdated(TmfRangeSynchSignal signal) {
+        /*
+         * It is possible that the time range changes while a request is
+         * processing.
+         */
+        cancelOngoingRequest(fRequestRange);
+
+        requestTimeRangeData(TmfExperiment.getCurrentExperiment(), signal.getCurrentRange());
+    }
+
+    /*
+     * Returns the primary control associated with this viewer.
+     *
+     * @return the SWT control which displays this viewer's content
+     */
+    @Override
+    public Control getControl() {
+        return fTreeViewer.getControl();
+    }
+
+    /**
+     * Get the input of the viewer.
+     *
+     * @return an object representing the input of the statistics viewer.
+     */
+    public Object getInput() {
+        return fTreeViewer.getInput();
+    }
+
+    /**
+     * Return the size of the request when performing background request.
+     *
+     * @return the block size for background request.
+     */
+    public int getPageSize() {
+        return PAGE_SIZE;
+    }
+
+    /**
+     * Return the number of events to receive before a refresh of the viewer is
+     * performed.
+     *
+     * @return the input refresh rate
+     */
+    public long getRefreshRate() {
+        return STATS_INPUT_CHANGED_REFRESH;
+    }
+
+    /**
+     * This method can be overridden to implement another way of representing
+     * the statistics data and to retrieve the information for display.
+     *
+     * @return a TmfStatisticsData object.
+     */
+    public AbsTmfStatisticsTree getStatisticData() {
+        if (fStatisticsData == null) {
+            fStatisticsData = new TmfBaseStatisticsTree();
+        }
+        return fStatisticsData;
+    }
+
+    /**
+     * Returns a unique ID based on name to be associated with the statistics
+     * tree for this viewer. For a same name, it will always return the same ID.
+     *
+     * @return a unique statistics tree ID.
+     */
+    public String getTreeID() {
+        return getName() + fInstanceNb;
+    }
+
+    @Override
+    public void refresh() {
+        final Control viewerControl = getControl();
+        // Ignore update if disposed
+        if (viewerControl.isDisposed()) {
+            return;
+        }
+
+        viewerControl.getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (!viewerControl.isDisposed()) {
+                    fTreeViewer.refresh();
+                }
+            }
+        });
+    }
+
+    /**
+     * Focus on the statistics tree of the viewer
+     */
+    public void setFocus() {
+        fTreeViewer.getTree().setFocus();
+    }
+
+    /**
+     * Sets or clears the input for this viewer.
+     *
+     * @param input
+     *            The input of this viewer, or <code>null</code> if none
+     */
+    public void setInput(TmfStatisticsTreeNode input) {
+        resetUpdateSynchronization();
+        fTreeViewer.setInput(input);
+    }
+
+    /**
+     * Cancels the request if it is not already completed
+     *
+     * @param request
+     *            The request to be canceled
+     */
+    protected void cancelOngoingRequest(ITmfDataRequest request) {
+        if (request != null && !request.isCompleted()) {
+            request.cancel();
+        }
+    }
+
+    /**
+     * This method can be overridden to change the representation of the data in
+     * the columns.
+     *
+     * @return an object implementing ITmfBaseColumnDataProvider.
+     */
+    protected ITmfColumnDataProvider getColumnDataProvider() {
+        return new TmfBaseColumnDataProvider();
+    }
+
+    /**
+     * Initialize the content that will be drawn in this viewer
+     *
+     * @param parent
+     *            The parent of the control to create
+     */
+    protected void initContent(Composite parent) {
         final List<TmfBaseColumnData> columnDataList = getColumnDataProvider().getColumnData();
-        parent.setLayout(new FillLayout());
 
         fTreeViewer = new TreeViewer(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         fTreeViewer.setContentProvider(new TmfTreeContentProvider());
@@ -187,137 +525,215 @@ public class TmfStatisticsViewer extends TmfComponent {
     }
 
     /**
-     * Refreshes this viewer completely with information freshly obtained from
-     * this viewer's model.
-     */
-    public void refresh() {
-        fTreeViewer.refresh();
-    }
-
-    /*
-     * (non-Javadoc)
+     * Tells if the viewer is listening to a trace from the selected experiment.
      *
-     * @see org.eclipse.linuxtools.tmf.core.component.TmfComponent#dispose()
+     * @param traceName
+     *            The trace that the viewer may be listening
+     * @return true if the viewer is listening to the trace, false otherwise
      */
-    @Override
-    public void dispose() {
-        if (fWaitCursor != null) {
-            fWaitCursor.dispose();
+    protected boolean isListeningTo(String traceName) {
+        if (fProcessAll || traceName.equals(fTrace.getName())) {
+            return true;
         }
-        fTreeViewer.getControl().dispose();
-        super.dispose();
-        // clean the model
-        TmfStatisticsTreeRootFactory.removeAll();
+        return false;
     }
 
     /**
-     * Focus on the statistics tree of the viewer
-     */
-    public void setFocus() {
-        fTreeViewer.getTree().setFocus();
-    }
-
-    /**
-     * Sets or clears the input for this viewer.
+     * Called when an experiment request has been completed successfully.
      *
-     * @param input
-     *            The input of this viewer, or <code>null</code> if none
+     * @param global
+     *            Tells if the request is a global or time range (partial)
+     *            request.
      */
-    public void setInput(TmfStatisticsTreeNode input) {
-        fTreeViewer.setInput(input);
+    protected void modelComplete(boolean global) {
+        refresh();
+        waitCursor(false);
+        if (global) {
+            sendPendingUpdate();
+        }
     }
 
     /**
-     * Returns the quantity of data to retrieve before a refresh of the view is
-     * performed
+     * Called when an experiment request has failed or has been cancelled.
      *
-     * @return the quantity of data to retrieve before a refresh of the view is
-     *         performed.
+     * @param isGlobalRequest
+     *            Tells if the request is a global or time range (partial)
+     *            request.
      */
-    public long getInputChangedRefresh() {
-        return STATS_INPUT_CHANGED_REFRESH;
+    protected void modelIncomplete(boolean isGlobalRequest) {
+        if (isGlobalRequest) {  // Clean the global statistics
+            /*
+             * The data is invalid and shall be removed to refresh upon next
+             * selection
+             */
+            Object input = getInput();
+            if (input instanceof TmfStatisticsTreeNode) {
+                TmfStatisticsTreeRootFactory.removeStatTreeRoot(getTreeID());
+            }
+            resetUpdateSynchronization();
+            sendPendingUpdate();
+        } else {    // Clean the partial statistics
+            resetTimeRangeValue();
+        }
+        refresh();
+        waitCursor(false);
     }
 
     /**
-     * This method can be overridden to implement another way to represent the
-     * statistics data and to retrieve the information for display.
+     * Sends the request to the experiment for the whole trace
      *
-     * @return a TmfStatisticsData object.
+     * @param experiment
+     *            The experiment used to send the request
+     * @param range
+     *            The range to request to the experiment
      */
-    public AbsTmfStatisticsTree getStatisticData() {
-        return new TmfBaseStatisticsTree();
+    protected void requestData(TmfExperiment experiment, TmfTimeRange range) {
+        // Check if an update is already ongoing
+        if (checkUpdateBusy(range)) {
+            return;
+        }
+
+        long index = 0;
+        /*
+         * Sets the index to the last event retrieved from the experiment during
+         * the last request.
+         */
+        if (fRequest != null) {
+            index = fRequest.getLastEventIndex();
+        }
+
+        fRequest = new TmfStatisticsRequest(this, range, index, true);
+        waitCursor(true);
+        experiment.sendRequest(fRequest);
     }
 
     /**
-     * Get the input of the viewer
+     * Sends the time range request from the experiment
      *
-     * @return an object representing the input of the statistics viewer
+     * @param experiment
+     *            The experiment used to send the request
+     * @param range
+     *            The range to request to the experiment
      */
-    public Object getInput() {
-        return fTreeViewer.getInput();
+    protected void requestTimeRangeData(TmfExperiment experiment, TmfTimeRange range) {
+        resetTimeRangeValue();
+        fRequestRange = new TmfStatisticsRequest(this, range, 0, false);
+        waitCursor(true);
+        experiment.sendRequest(fRequestRange);
     }
 
     /**
-     * Returns the primary control associated with this viewer.
-     *
-     * @return the SWT control which displays this viewer's content
+     * Resets the number of events within the time range
      */
-    public Control getControl() {
-        return fTreeViewer.getControl();
+    protected void resetTimeRangeValue() {
+        TmfStatisticsTreeNode treeModelRoot = TmfStatisticsTreeRootFactory.getStatTreeRoot(getTreeID());
+        if (treeModelRoot != null && treeModelRoot.hasChildren()) {
+            treeModelRoot.resetTimeRangeValue();
+        }
     }
 
     /**
      * When the experiment is loading the cursor will be different so the user
-     * know the processing is not finished yet.
+     * knows that the processing is not finished yet.
      *
-     * @param waitInd
+     * Calls to this method are stacked.
+     *
+     * @param waitRequested
      *            Indicates if we need to show the waiting cursor, or the
-     *            default one
+     *            default one.
      */
-    public void waitCursor(final boolean waitInd) {
+    protected void waitCursor(final boolean waitRequested) {
         if ((fTreeViewer == null) || (fTreeViewer.getTree().isDisposed())) {
             return;
         }
 
+        boolean needsUpdate = false;
         Display display = fTreeViewer.getControl().getDisplay();
-        if (fWaitCursor == null) {
-            fWaitCursor = new Cursor(display, SWT.CURSOR_WAIT);
-        }
-
-        // Perform the updates on the UI thread
-        display.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if ((fTreeViewer != null)
-                        && (!fTreeViewer.getTree().isDisposed())) {
-                    Cursor cursor = null; /* indicates default */
-                    if (waitInd) {
-                        cursor = fWaitCursor;
-                    }
-                    fTreeViewer.getControl().setCursor(cursor);
+        if (waitRequested) {
+            fWaitCursorCount++;
+            if (fWaitCursor == null) { // The cursor hasn't been initialized yet
+                fWaitCursor = new Cursor(display, SWT.CURSOR_WAIT);
+            }
+            if (fWaitCursorCount == 1) { // The cursor is not in waiting mode
+                needsUpdate = true;
+            }
+        } else {
+            if (fWaitCursorCount > 0) { // The cursor is in waiting mode
+                fWaitCursorCount--;
+                if (fWaitCursorCount == 0) { // No more reason to wait
+                    // Put back the default cursor
+                    needsUpdate = true;
                 }
             }
-        });
+        }
+
+        if (needsUpdate) {
+            // Performs the updates on the UI thread
+            display.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if ((fTreeViewer != null)
+                            && (!fTreeViewer.getTree().isDisposed())) {
+                        Cursor cursor = null; // indicates default
+                        if (waitRequested) {
+                            cursor = fWaitCursor;
+                        }
+                        fTreeViewer.getControl().setCursor(cursor);
+                    }
+                }
+            });
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Methods reserved for the streaming functionality
+    // ------------------------------------------------------------------------
+
+    /**
+     * Resets update synchronization information
+     */
+    protected void resetUpdateSynchronization() {
+        synchronized (fStatisticsUpdateSyncObj) {
+            fStatisticsUpdateBusy = false;
+            fStatisticsUpdatePending = false;
+            fStatisticsUpdateRange = null;
+        }
     }
 
     /**
-     * Constructs the ID based on the experiment name and the instance number
+     * Checks if statistics update is ongoing. If it is ongoing, the new time
+     * range is stored as pending
      *
-     * @param name
-     *            The name of the trace to show in the view
-     * @return a view ID
+     * @param timeRange
+     *            - new time range
+     * @return true if statistic update is ongoing else false
      */
-    public String getTreeID(String name) {
-        return name + fInstanceNb;
+    protected boolean checkUpdateBusy(TmfTimeRange timeRange) {
+        synchronized (fStatisticsUpdateSyncObj) {
+            if (fStatisticsUpdateBusy) {
+                fStatisticsUpdatePending = true;
+                if (fStatisticsUpdateRange == null
+                        || timeRange.getEndTime().compareTo(fStatisticsUpdateRange.getEndTime()) > 0) {
+                    fStatisticsUpdateRange = timeRange;
+                }
+                return true;
+            }
+            fStatisticsUpdateBusy = true;
+            return false;
+        }
     }
 
     /**
-     * This method can be overridden to change the representation of the data in
-     * the columns.
-     *
-     * @return an object implementing ITmfBaseColumnDataProvider.
+     * Sends pending request (if any)
      */
-    protected ITmfColumnDataProvider getColumnDataProvider() {
-        return new TmfBaseColumnDataProvider();
+    protected void sendPendingUpdate() {
+        synchronized (fStatisticsUpdateSyncObj) {
+            fStatisticsUpdateBusy = false;
+            if (fStatisticsUpdatePending) {
+                fStatisticsUpdatePending = false;
+                requestData(TmfExperiment.getCurrentExperiment(), fStatisticsUpdateRange);
+                fStatisticsUpdateRange = null;
+            }
+        }
     }
 }

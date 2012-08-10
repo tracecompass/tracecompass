@@ -35,6 +35,38 @@ public class Messages extends NLS {
      */
     public static String TmfStatisticsData_EventTypes;
 
+    /**
+     * Level column name
+     */
+    public static String TmfStatisticsView_LevelColumn;
+
+    /**
+     * Level column tool tip.
+     */
+    public static String TmfStatisticsView_LevelColumnTip;
+
+    /**
+     * Number of events column name.
+     */
+    public static String TmfStatisticsView_NbEventsColumn;
+
+    /**
+     * Number of events column tool tip.
+     */
+    public static String TmfStatisticsView_NbEventsTip;
+
+    /**
+     * Partial number of events column.
+     * @since 2.0
+     */
+    public static String TmfStatisticsView_NbEventsTimeRangeColumn;
+
+    /**
+     * Partial number of events column tool tip.
+     * @since 2.0
+     */
+    public static String TmfStatisticsView_NbEventsTimeRangeTip;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

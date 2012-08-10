@@ -41,8 +41,8 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
-    private final static String LEVEL_COLUMN = org.eclipse.linuxtools.tmf.ui.viewers.statistics.Messages.TmfStatisticsView_LevelColumn;
-    private final static String EVENTS_COUNT_COLUMN = org.eclipse.linuxtools.tmf.ui.viewers.statistics.Messages.TmfStatisticsView_NbEventsColumn;
+    private final static String LEVEL_COLUMN = Messages.TmfStatisticsView_LevelColumn;
+    private final static String EVENTS_COUNT_COLUMN = Messages.TmfStatisticsView_NbEventsColumn;
 
     private TmfBaseColumnDataProvider provider;
 
