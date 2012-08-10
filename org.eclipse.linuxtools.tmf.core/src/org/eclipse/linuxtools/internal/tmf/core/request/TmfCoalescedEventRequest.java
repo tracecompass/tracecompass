@@ -146,7 +146,7 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
      * @param priority the requested execution priority
      */
     public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
-        super(dataType, index, nbRequested, blockSize, priority);
+        super(ITmfEvent.class, index, nbRequested, blockSize, priority);
         fRange = range;
 
         if (Tracer.isRequestTraced()) {
