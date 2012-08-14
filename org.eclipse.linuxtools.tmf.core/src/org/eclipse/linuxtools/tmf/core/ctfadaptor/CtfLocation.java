@@ -31,14 +31,13 @@ public class CtfLocation implements ITmfLocation<CtfLocationData>, Cloneable {
     public static final CtfLocationData INVALID_LOCATION = new CtfLocationData(-1, -1);
 
     /**
-     * Copy constructor
+     * Constructor for CtfLocation. Uses a default index of 0.
      *
-     * @param location
-     *            Other location to copy
-     * @since 2.0
+     * @param timestamp
+     *            The timestamp of this location
      */
-    public CtfLocation(CtfLocationData location) {
-        setLocation(location);
+    public CtfLocation(ITmfTimestamp timestamp) {
+        setLocation(new CtfLocationData(timestamp.getValue(), 0));
     }
 
     /**
@@ -55,14 +54,14 @@ public class CtfLocation implements ITmfLocation<CtfLocationData>, Cloneable {
     }
 
     /**
-     * Constructor for CtfLocation. Uses a default index of 0.
+     * Copy constructor
      *
-     * @param timestamp
-     *            The timestamp of this location
+     * @param location
+     *            Other location to copy
+     * @since 2.0
      */
-    @Deprecated
-    public CtfLocation(ITmfTimestamp timestamp) {
-        setLocation(new CtfLocationData(timestamp.getValue(), 0));
+    public CtfLocation(CtfLocationData location) {
+        setLocation(location);
     }
 
     /**
