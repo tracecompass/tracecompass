@@ -67,7 +67,7 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
 
     protected int fQueueSize = DEFAULT_QUEUE_SIZE;
     protected BlockingQueue<ITmfEvent> fDataQueue;
-    protected TmfRequestExecutor fExecutor;
+    private TmfRequestExecutor fExecutor;
 
     private int fSignalDepth = 0;
     private final Object fLock = new Object();
@@ -468,6 +468,26 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
      */
     public boolean isCompleted(ITmfDataRequest request, ITmfEvent data, int nbRead) {
         return request.isCompleted() || nbRead >= request.getNbRequested();
+    }
+
+    // ------------------------------------------------------------------------
+    // Pass-through's to the request executor
+    // ------------------------------------------------------------------------
+
+    /**
+     * @return the shutdown state (i.e. if it is accepting new requests)
+     * @since 2.0
+     */
+    protected boolean executorIsShutdown() {
+        return fExecutor.isShutdown();
+    }
+
+    /**
+     * @return the termination state
+     * @since 2.0
+     */
+    protected boolean executorIsTerminated() {
+        return fExecutor.isTerminated();
     }
 
     // ------------------------------------------------------------------------

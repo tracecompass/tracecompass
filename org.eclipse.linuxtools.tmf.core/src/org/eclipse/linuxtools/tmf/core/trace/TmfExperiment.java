@@ -461,7 +461,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
 
             @Override
             public void run() {
-                while (!fExecutor.isShutdown()) {
+                while (!executorIsShutdown()) {
                     if (!getIndexer().isIndexing()) {
                         ITmfTimestamp startTimestamp = TmfTimestamp.BIG_CRUNCH;
                         ITmfTimestamp endTimestamp = TmfTimestamp.BIG_BANG;
