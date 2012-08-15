@@ -140,6 +140,7 @@ public class TmfBaseStatisticsDataTest extends TestCase {
         TmfStatisticsTreeNode temp;
         while (iterChild.hasNext()) {
             temp = iterChild.next();
+            assertEquals(0, fStatsData.getChildren(temp.getPath()).size());
             if (keyExpected.contains(temp.getKey())) {
                 keyExpected.removeElement(temp.getKey());
             } else {
@@ -188,6 +189,7 @@ public class TmfBaseStatisticsDataTest extends TestCase {
         TmfStatisticsTreeNode temp;
         while (iterChild.hasNext()) {
             temp = iterChild.next();
+            assertEquals(0, fStatsData.getAllChildren(temp.getPath()).size());
             if (keyExpected.contains(temp.getKey())) {
                 keyExpected.removeElement(temp.getKey());
             } else {

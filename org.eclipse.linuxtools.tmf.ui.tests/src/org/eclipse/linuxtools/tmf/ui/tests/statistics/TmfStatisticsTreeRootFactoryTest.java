@@ -53,7 +53,7 @@ public class TmfStatisticsTreeRootFactoryTest extends TestCase {
     }
 
     /**
-     * Test adding of statistics tree root.
+     * Adding of statistics tree root.
      */
     public void addStatsTreeRoot() {
         fStatisticsData1 = new TmfBaseStatisticsTree();
@@ -62,6 +62,38 @@ public class TmfStatisticsTreeRootFactoryTest extends TestCase {
         TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData1);
         TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey2, fStatisticsData2);
         TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey2, fStatisticsData3);
+    }
+
+    /**
+     * Clean the statistics tree
+     */
+    public void removeStatsTreeRoot() {
+        TmfStatisticsTreeRootFactory.removeAll();
+    }
+
+    /**
+     * Test adding of statistics tree root. It should not throw exceptions
+     */
+    public void testaddStatsTreeRoot() {
+        removeStatsTreeRoot();
+
+        try {
+            TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, null);
+            TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, fStatisticsData1);
+            TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, null);
+            assertNull(TmfStatisticsTreeRootFactory.getStatTreeRoot(fDataKey1));
+
+            TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData1);
+            assertSame(fStatisticsData1, TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
+
+            // Overwriting the value
+            TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData2);
+            assertSame(fStatisticsData2, TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
+
+            // Success
+        } catch(Exception e) {
+            fail("AddStatsTreeRoot");
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -119,6 +151,9 @@ public class TmfStatisticsTreeRootFactoryTest extends TestCase {
         assertNull("removeStatTreeRoot", TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
 
         try {
+            // Trying to remove the same branch from the tree.
+            TmfStatisticsTreeRootFactory.removeStatTreeRoot(fDataKey1);
+
             TmfStatisticsTreeRootFactory.removeStatTreeRoot(null);
             // Success
         } catch (Exception e) {

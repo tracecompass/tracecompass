@@ -86,7 +86,7 @@ public class TmfStatisticsTreeNode {
     }
 
     /**
-     * Get the children of this node.
+     * Gets every children of this node even if no event has been registered for a node.
      *
      * @return Direct children of this node.
      */
