@@ -40,23 +40,32 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
 public class StreamInputPacketReader implements IDefinitionScope {
 
     // ------------------------------------------------------------------------
-    // Constants
+    // Attributes
     // ------------------------------------------------------------------------
 
-    /**
-     * Reference to the index entry of the current packet.
-     */
-    private StreamInputPacketIndexEntry currentPacket = null;
+    /** BitBuffer used to read the trace file. */
+    private final BitBuffer bitBuffer;
 
-    /**
-     * BitBuffer used to read the trace file.
-     */
-    private final BitBuffer bitBuffer = new BitBuffer();
-
-    /**
-     * StreamInputReader that uses this StreamInputPacketReader.
-     */
+    /** StreamInputReader that uses this StreamInputPacketReader. */
     private final StreamInputReader streamInputReader;
+
+    /** Trace packet header. */
+    private final StructDefinition tracePacketHeaderDef;
+
+    /** Stream packet context definition. */
+    private final StructDefinition streamPacketContextDef;
+
+    /** Stream event header definition. */
+    private final StructDefinition streamEventHeaderDef;
+
+    /** Stream event context definition.*/
+    private final StructDefinition streamEventContextDef;
+
+    /** Maps event ID to event definitions. */
+    private final HashMap<Long, EventDefinition> events;
+
+    /** Reference to the index entry of the current packet. */
+    private StreamInputPacketIndexEntry currentPacket = null;
 
     /**
      * Last timestamp recorded.
@@ -66,45 +75,16 @@ public class StreamInputPacketReader implements IDefinitionScope {
      */
     private long lastTimestamp = 0;
 
-    /**
-     * Trace packet header.
-     */
-    private StructDefinition tracePacketHeaderDef = null;
-
-    /**
-     * Stream packet context definition.
-     */
-    private StructDefinition streamPacketContextDef = null;
-
-    /**
-     * Stream event header definition.
-     */
-    private StructDefinition streamEventHeaderDef = null;
-
-    /**
-     * Stream event context definition.
-     */
-    private StructDefinition streamEventContextDef = null;
-
-    /**
-     * Maps event ID to event definitions.
-     */
-    private final HashMap<Long, EventDefinition> events;
-
-    /**
-     * CPU id of current packet.
-     */
+    /** CPU id of current packet. */
     private int currentCpu = 0;
 
-    /**
-     * number of lost events in this packet
-     */
+    /** number of lost events in this packet */
     private int lostSoFar;
 
     private int lostEventsInThisPacket;
 
     // ------------------------------------------------------------------------
-    // Attributes
+    // Constructors
     // ------------------------------------------------------------------------
 
     /**
@@ -116,24 +96,56 @@ public class StreamInputPacketReader implements IDefinitionScope {
     public StreamInputPacketReader(StreamInputReader streamInputReader) {
         this.streamInputReader = streamInputReader;
 
-        /*
-         * Set the BitBuffer's byte order.
-         */
-        getBitBuffer().setByteOrder(streamInputReader.getByteOrder());
+        /* Set the BitBuffer's byte order. */
+        bitBuffer = new BitBuffer();
+        bitBuffer.setByteOrder(streamInputReader.getByteOrder());
 
-        events = streamInputReader.getStreamInput().getStream().getTrace()
-                .getEventDefs(streamInputReader.getStreamInput());
-        /*
-         * Create definitions needed to read the events.
-         */
-        createDefinitions();
-
+        events = streamInputReader.getStreamInput().getStream().getTrace().getEventDefs(streamInputReader.getStreamInput());
         lostSoFar = 0;
-    }
 
-    // ------------------------------------------------------------------------
-    // Constructors
-    // ------------------------------------------------------------------------
+        /* Create trace packet header definition. */
+        final Stream currentStream = streamInputReader.getStreamInput().getStream();
+        StructDeclaration tracePacketHeaderDecl = currentStream.getTrace().getPacketHeader();
+        if (tracePacketHeaderDecl != null) {
+            tracePacketHeaderDef = tracePacketHeaderDecl.createDefinition(this, "trace.packet.header"); //$NON-NLS-1$
+        } else {
+            tracePacketHeaderDef = null;
+        }
+
+        /* Create stream packet context definition. */
+        StructDeclaration streamPacketContextDecl = currentStream.getPacketContextDecl();
+        if (streamPacketContextDecl != null) {
+            streamPacketContextDef = streamPacketContextDecl.createDefinition(this, "stream.packet.context"); //$NON-NLS-1$
+        } else {
+            streamPacketContextDef = null;
+        }
+
+        /* Create stream event header definition. */
+        StructDeclaration streamEventHeaderDecl = currentStream.getEventHeaderDecl();
+        if (streamEventHeaderDecl != null) {
+            streamEventHeaderDef = streamEventHeaderDecl.createDefinition(this, "stream.event.header"); //$NON-NLS-1$
+        } else {
+            streamEventHeaderDef = null;
+        }
+
+        /* Create stream event context definition. */
+        StructDeclaration streamEventContextDecl = currentStream.getEventContextDecl();
+        if (streamEventContextDecl != null) {
+            streamEventContextDef = streamEventContextDecl.createDefinition(this, "stream.event.context"); //$NON-NLS-1$
+        } else {
+            streamEventContextDef = null;
+        }
+
+        /* Create event definitions */
+        Collection<EventDeclaration> eventDecls = streamInputReader.getStreamInput().getStream().getEvents().values();
+
+        for (EventDeclaration event : eventDecls) {
+            if (!events.containsKey(event.getId())) {
+                EventDefinition eventDef = event.createDefinition(streamInputReader);
+                events.put(event.getId(), eventDef);
+            }
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates
@@ -176,75 +188,6 @@ public class StreamInputPacketReader implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     /**
-     * Creates definitions needed to read events (stream-defined and
-     * event-defined).
-     */
-    private void createDefinitions() {
-        /*
-         * Create trace packet header definition.
-         */
-        final Stream currentStream = getStreamInputReader().getStreamInput()
-                .getStream();
-        StructDeclaration tracePacketHeaderDecl = currentStream.getTrace()
-                .getPacketHeader();
-        if (tracePacketHeaderDecl != null) {
-            setTracePacketHeaderDef(tracePacketHeaderDecl.createDefinition(
-                    this, "trace.packet.header")); //$NON-NLS-1$
-        }
-
-        /*
-         * Create stream packet context definition.
-         */
-        StructDeclaration streamPacketContextDecl = currentStream
-                .getPacketContextDecl();
-        if (streamPacketContextDecl != null) {
-            setStreamPacketContextDef(streamPacketContextDecl.createDefinition(
-                    this, "stream.packet.context")); //$NON-NLS-1$
-        }
-
-        /*
-         * Create stream event header definition.
-         */
-        StructDeclaration streamEventHeaderDecl = currentStream
-                .getEventHeaderDecl();
-        if (streamEventHeaderDecl != null) {
-            setStreamEventHeaderDef(streamEventHeaderDecl.createDefinition(
-                    this, "stream.event.header")); //$NON-NLS-1$
-        }
-
-        /*
-         * Create stream event context definition.
-         */
-        StructDeclaration streamEventContextDecl = currentStream
-                .getEventContextDecl();
-        if (streamEventContextDecl != null) {
-            setStreamEventContextDef(streamEventContextDecl.createDefinition(
-                    this, "stream.event.context")); //$NON-NLS-1$
-        }
-
-        createEventDefinitions();
-    }
-
-    /**
-     * Creates definitions needed to read the event. (event-defined).
-     */
-    private void createEventDefinitions() {
-        Collection<EventDeclaration> eventDecls = getStreamInputReader()
-                .getStreamInput().getStream().getEvents().values();
-
-        /*
-         * Create definitions for each event.
-         */
-        for (EventDeclaration event : eventDecls) {
-            if (!events.containsKey(event.getId())) {
-                EventDefinition eventDef = event
-                        .createDefinition(getStreamInputReader());
-                events.put(event.getId(), eventDef);
-            }
-        }
-    }
-
-    /**
      * Changes the current packet to the given one.
      *
      * @param currentPacket
@@ -259,9 +202,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
              */
             MappedByteBuffer bb = null;
             try {
-                bb = getStreamInputReader()
-                        .getStreamInput()
-                        .getFileChannel()
+                bb = streamInputReader.getStreamInput().getFileChannel()
                         .map(MapMode.READ_ONLY,
                                 this.currentPacket.getOffsetBytes(),
                                 (this.currentPacket.getPacketSizeBits() + 7) / 8);
@@ -273,20 +214,20 @@ public class StreamInputPacketReader implements IDefinitionScope {
                 e.printStackTrace();
             }
 
-            getBitBuffer().setByteBuffer(bb);
+            bitBuffer.setByteBuffer(bb);
 
             /*
              * Read trace packet header.
              */
-            if (getTracePacketHeaderDef() != null) {
-                getTracePacketHeaderDef().read(getBitBuffer());
+            if (tracePacketHeaderDef != null) {
+                tracePacketHeaderDef.read(bitBuffer);
             }
 
             /*
              * Read stream packet context.
              */
             if (getStreamPacketContextDef() != null) {
-                getStreamPacketContextDef().read(getBitBuffer());
+                getStreamPacketContextDef().read(bitBuffer);
 
                 /* Read CPU ID */
                 if (this.getCurrentPacket().getTarget() != null) {
@@ -305,7 +246,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
              */
             lastTimestamp = currentPacket.getTimestampBegin();
         } else {
-            getBitBuffer().setByteBuffer(null);
+            bitBuffer.setByteBuffer(null);
 
             lastTimestamp = 0;
         }
@@ -318,8 +259,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
      */
     public boolean hasMoreEvents() {
         if (currentPacket != null) {
-            return getBitBuffer().position() < currentPacket
-                    .getContentSizeBits();
+            return bitBuffer.position() < currentPacket.getContentSizeBits();
         }
         return false;
     }
@@ -338,15 +278,14 @@ public class StreamInputPacketReader implements IDefinitionScope {
         long timestamp = 0;
 
         if (lostEventsInThisPacket > lostSoFar) {
-            EventDefinition eventDef = EventDeclaration.getLostEventDeclaration().createDefinition(
-                    streamInputReader);
+            EventDefinition eventDef = EventDeclaration.getLostEventDeclaration().createDefinition(streamInputReader);
             eventDef.setTimestamp(this.lastTimestamp);
             ++lostSoFar;
             return eventDef;
         }
 
-        final StructDefinition sehd = getStreamEventHeaderDef();
-        final BitBuffer currentBitBuffer = getBitBuffer();
+        final StructDefinition sehd = streamEventHeaderDef;
+        final BitBuffer currentBitBuffer = bitBuffer;
 
         /* Read the stream event header. */
         if (sehd != null) {
@@ -360,31 +299,32 @@ public class StreamInputPacketReader implements IDefinitionScope {
 
             /* Get the timestamp from the event header (may be overridden later on) */
             Definition timestampDef = sehd.lookupInteger("timestamp"); //$NON-NLS-1$
+            if (timestampDef instanceof IntegerDefinition) {
+                timestamp = calculateTimestamp((IntegerDefinition) timestampDef);
+            } // else timestamp remains 0
 
             /* Check for the variant v. */
-            VariantDefinition variantDef = (VariantDefinition) sehd.lookupDefinition("v"); //$NON-NLS-1$
-            if (variantDef != null) {
+            Definition variantDef = sehd.lookupDefinition("v"); //$NON-NLS-1$
+            if (variantDef instanceof VariantDefinition) {
 
                 /* Get the variant current field */
-                StructDefinition variantCurrentField = (StructDefinition) variantDef.getCurrentField();
+                StructDefinition variantCurrentField = (StructDefinition) ((VariantDefinition) variantDef).getCurrentField();
 
                 /*
                  * Try to get the id field in the current field of the variant.
                  * If it is present, it overrides the previously read event id.
                  */
-                IntegerDefinition idIntegerDef = (IntegerDefinition) variantCurrentField.lookupDefinition("id"); //$NON-NLS-1$
-                if (idIntegerDef != null) {
-                    eventID = idIntegerDef.getValue();
+                Definition idIntegerDef = variantCurrentField.lookupDefinition("id"); //$NON-NLS-1$
+                if (idIntegerDef instanceof IntegerDefinition) {
+                    eventID = ((IntegerDefinition) idIntegerDef).getValue();
                 }
 
-                /* Get the timestamp. */
+                /* Get the timestamp. This would overwrite any previous timestamp definition */
                 timestampDef = variantCurrentField.lookupDefinition("timestamp"); //$NON-NLS-1$
+                if (timestampDef instanceof IntegerDefinition) {
+                    timestamp = calculateTimestamp((IntegerDefinition) timestampDef);
+                }
             }
-
-            /* Calculate the event timestamp. */
-            if (timestampDef instanceof IntegerDefinition) {
-                timestamp = calculateTimestamp((IntegerDefinition) timestampDef);
-            } // else timestamp remains 0
         }
 
         /* Read the stream event context. */
@@ -465,89 +405,5 @@ public class StreamInputPacketReader implements IDefinitionScope {
     public Definition lookupDefinition(String lookupPath) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /**
-     * Gets the stream event context definition (see CTF specs)
-     *
-     * @return the definition of the stream event context (the form not the
-     *         content)
-     */
-    public StructDefinition getStreamEventContextDef() {
-        return this.streamEventContextDef;
-    }
-
-    /**
-     * Sets the stream event context definition
-     *
-     * @param streamEventContextDef
-     *            The stream event context definition
-     */
-    public void setStreamEventContextDef(StructDefinition streamEventContextDef) {
-        this.streamEventContextDef = streamEventContextDef;
-    }
-
-    /**
-     * Gets the stream event header definition
-     *
-     * @return the stream event header definition
-     */
-    public StructDefinition getStreamEventHeaderDef() {
-        return this.streamEventHeaderDef;
-    }
-
-    /**
-     * Sets the stream event header definition
-     *
-     * @param streamEventHeaderDef
-     *            the stream event header definition
-     */
-    public void setStreamEventHeaderDef(StructDefinition streamEventHeaderDef) {
-        this.streamEventHeaderDef = streamEventHeaderDef;
-    }
-
-    /**
-     * Sets the stream packet context definition
-     *
-     * @param streamPacketContextDef
-     *            the stream packet context definition
-     */
-    public void setStreamPacketContextDef(
-            StructDefinition streamPacketContextDef) {
-        this.streamPacketContextDef = streamPacketContextDef;
-    }
-
-    /**
-     * Gets the trace packet header definition
-     *
-     * @return the trace packet header definition
-     */
-    public StructDefinition getTracePacketHeaderDef() {
-        return this.tracePacketHeaderDef;
-    }
-
-    /**
-     * Sets the trace packet header definition
-     *
-     * @param tracePacketHeaderDef
-     *            the trace packet header definition
-     */
-    public void setTracePacketHeaderDef(StructDefinition tracePacketHeaderDef) {
-        this.tracePacketHeaderDef = tracePacketHeaderDef;
-    }
-
-    /**
-     * @return the parent stream input reader
-     */
-    public StreamInputReader getStreamInputReader() {
-        return this.streamInputReader;
-    }
-
-    /**
-     *
-     * @return THe bit buffer that reads the file.
-     */
-    public BitBuffer getBitBuffer() {
-        return bitBuffer;
     }
 }
