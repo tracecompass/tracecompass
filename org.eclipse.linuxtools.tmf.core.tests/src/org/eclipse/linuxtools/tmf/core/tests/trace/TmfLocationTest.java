@@ -68,10 +68,10 @@ public class TmfLocationTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testTmfLocation() {
-        assertNull("TmfLocation", fLocation1.getLocation());
-        assertEquals("TmfLocation", aString, fLocation2.getLocation());
-        assertEquals("TmfLocation", aLong, fLocation3.getLocation());
-        assertEquals("TmfLocation", aTimestamp, fLocation4.getLocation());
+        assertNull("TmfLocation", fLocation1.getLocationData());
+        assertEquals("TmfLocation", aString, fLocation2.getLocationData());
+        assertEquals("TmfLocation", aLong, fLocation3.getLocationData());
+        assertEquals("TmfLocation", aTimestamp, fLocation4.getLocationData());
     }
 
     public void testTmfLocationCopy() {
@@ -80,10 +80,10 @@ public class TmfLocationTest extends TestCase {
         TmfLocation<Long> location3 = new TmfLocation<Long>(fLocation3);
         TmfLocation<ITmfTimestamp> location4 = new TmfLocation<ITmfTimestamp>(fLocation4);
 
-        assertNull("TmfLocation", location1.getLocation());
-        assertEquals("TmfLocation", aString, location2.getLocation());
-        assertEquals("TmfLocation", aLong, location3.getLocation());
-        assertEquals("TmfLocation", aTimestamp, location4.getLocation());
+        assertNull("TmfLocation", location1.getLocationData());
+        assertEquals("TmfLocation", aString, location2.getLocationData());
+        assertEquals("TmfLocation", aLong, location3.getLocationData());
+        assertEquals("TmfLocation", aTimestamp, location4.getLocationData());
     }
 
     // ------------------------------------------------------------------------
@@ -102,15 +102,15 @@ public class TmfLocationTest extends TestCase {
             assertEquals("clone", fLocation3, location3);
             assertEquals("clone", fLocation4, location4);
 
-            assertEquals("clone", fLocation1.getLocation(), location1.getLocation());
-            assertEquals("clone", fLocation2.getLocation(), location2.getLocation());
-            assertEquals("clone", fLocation3.getLocation(), location3.getLocation());
-            assertEquals("clone", fLocation4.getLocation(), location4.getLocation());
+            assertEquals("clone", fLocation1.getLocationData(), location1.getLocationData());
+            assertEquals("clone", fLocation2.getLocationData(), location2.getLocationData());
+            assertEquals("clone", fLocation3.getLocationData(), location3.getLocationData());
+            assertEquals("clone", fLocation4.getLocationData(), location4.getLocationData());
 
-            assertNull("clone", location1.getLocation());
-            assertEquals("clone", aString, location2.getLocation());
-            assertEquals("clone", aLong, location3.getLocation());
-            assertEquals("clone", aTimestamp, location4.getLocation());
+            assertNull("clone", location1.getLocationData());
+            assertEquals("clone", aString, location2.getLocationData());
+            assertEquals("clone", aLong, location3.getLocationData());
+            assertEquals("clone", aTimestamp, location4.getLocationData());
         } catch (InternalError e) {
             fail("clone()");
         }
@@ -182,8 +182,8 @@ public class TmfLocationTest extends TestCase {
             TmfLocation<MyCloneableClass> clone = location.clone();
 
             assertEquals("clone", location, clone);
-            assertEquals("clone", location.getLocation(), clone.getLocation());
-            assertEquals("clone", myClass, location.getLocation());
+            assertEquals("clone", location.getLocationData(), clone.getLocationData());
+            assertEquals("clone", myClass, location.getLocationData());
         } catch (InternalError e) {
             fail("clone a cloneable class");
         }

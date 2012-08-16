@@ -30,7 +30,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
     // Attributes
     // ------------------------------------------------------------------------
 
-    private L fLocation;
+    private L fLocationData;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -46,10 +46,10 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
     /**
      * Standard constructor.
      *
-     * @param location the trace location
+     * @param locationData the trace location
      */
-    public TmfLocation(final L location) {
-        fLocation = location;
+    public TmfLocation(final L locationData) {
+        fLocationData = locationData;
     }
 
     /**
@@ -58,19 +58,19 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
      * @param location the original location
      */
     public TmfLocation(final TmfLocation<L> location) {
-        fLocation = location.fLocation;
+        fLocationData = location.fLocationData;
     }
 
     // ------------------------------------------------------------------------
     // Getters
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocation()
+    /**
+     * @since 2.0
      */
     @Override
-    public L getLocation() {
-        return fLocation;
+    public L getLocationData() {
+        return fLocationData;
     }
 
     // ------------------------------------------------------------------------
@@ -86,13 +86,13 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
         TmfLocation<L> clone = null;
         try {
             clone = (TmfLocation<L>) super.clone();
-            if (fLocation != null) {
-                final Class<?> clazz = fLocation.getClass();
+            if (fLocationData != null) {
+                final Class<?> clazz = fLocationData.getClass();
                 final Method method = clazz.getMethod("clone", new Class[0]); //$NON-NLS-1$
-                final Object copy = method.invoke(this.fLocation, new Object[0]);
-                clone.fLocation = (L) copy;
+                final Object copy = method.invoke(this.fLocationData, new Object[0]);
+                clone.fLocationData = (L) copy;
             } else {
-                clone.fLocation = null;
+                clone.fLocationData = null;
             }
         } catch (final CloneNotSupportedException e) {
         } catch (final NoSuchMethodException e) {
@@ -113,7 +113,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fLocation != null) ? fLocation.hashCode() : 0);
+        result = prime * result + ((fLocationData != null) ? fLocationData.hashCode() : 0);
         return result;
     }
 
@@ -133,11 +133,11 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
             return false;
         }
         final TmfLocation<L> other = (TmfLocation<L>) obj;
-        if (fLocation == null) {
-            if (other.fLocation != null) {
+        if (fLocationData == null) {
+            if (other.fLocationData != null) {
                 return false;
             }
-        } else if (!fLocation.equals(other.fLocation)) {
+        } else if (!fLocationData.equals(other.fLocationData)) {
             return false;
         }
         return true;
@@ -146,7 +146,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfLocation [fLocation=" + fLocation + "]";
+        return "TmfLocation [fLocation=" + fLocationData + "]";
     }
 
 }

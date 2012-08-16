@@ -101,8 +101,8 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
         try {
             if (location == null) {
                 fFile.seek(0);
-            } else if (location.getLocation() instanceof Long) {
-                fFile.seek((Long) location.getLocation());
+            } else if (location.getLocationData() instanceof Long) {
+                fFile.seek((Long) location.getLocationData());
             }
             String line;
             final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
@@ -154,8 +154,8 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
             return 0;
         }
         try {
-            if (location.getLocation() instanceof Long) {
-                return (double) ((Long) location.getLocation()) / fFile.length();
+            if (location.getLocationData() instanceof Long) {
+                return (double) ((Long) location.getLocationData()) / fFile.length();
             }
         } catch (final IOException e) {
             Activator.getDefault().logError("Error getting location ration. File: " + getPath(), e); //$NON-NLS-1$
@@ -195,15 +195,15 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
         }
 
         final CustomXmlTraceContext context = (CustomXmlTraceContext) tmfContext;
-        if (!(context.getLocation().getLocation() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
+        if (!(context.getLocation().getLocationData() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
             return null;
         }
 
         CustomXmlEvent event = null;
         try {
-            if (fFile.getFilePointer() != (Long)context.getLocation().getLocation() + 1)
+            if (fFile.getFilePointer() != (Long)context.getLocation().getLocationData() + 1)
             {
-                fFile.seek((Long)context.getLocation().getLocation() + 1); // +1 is for the <
+                fFile.seek((Long)context.getLocation().getLocationData() + 1); // +1 is for the <
             }
             final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
             readElement(elementBuffer, fFile);

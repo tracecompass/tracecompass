@@ -223,7 +223,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
                     long loc  = 0;
                     long rank = 0;
                     if (location != null) {
-                        loc = ((TmfLocation<Long>) location).getLocation();
+                        loc = ((TmfLocation<Long>) location).getLocationData();
                         rank = ITmfContext.UNKNOWN_RANK;
                     }
                     if (loc != fTrace.getFilePointer()) {
@@ -271,8 +271,8 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
         fLock.lock();
         try {
             if (fTrace != null) {
-                if (location.getLocation() instanceof Long) {
-                    return (double) ((Long) location.getLocation()) / fTrace.length();
+                if (location.getLocationData() instanceof Long) {
+                    return (double) ((Long) location.getLocationData()) / fTrace.length();
                 }
             }
         } catch (final IOException e) {

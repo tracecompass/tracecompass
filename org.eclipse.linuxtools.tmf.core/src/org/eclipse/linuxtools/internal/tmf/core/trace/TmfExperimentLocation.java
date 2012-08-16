@@ -52,7 +52,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
      * @param location the other experiment location
      */
     public TmfExperimentLocation(TmfExperimentLocation location) {
-        this(location.getLocation());
+        this(location.getLocationData());
     }
 
     // ------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
     @Override
     public TmfExperimentLocation clone() {
 //        super.clone(); // To keep FindBugs happy
-        TmfLocationArray array = getLocation();
+        TmfLocationArray array = getLocationData();
         TmfLocationArray clones = array.clone();
         return new TmfExperimentLocation(clones);
     }
@@ -81,7 +81,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        ITmfLocation<? extends Comparable<?>>[] locations = getLocation().getLocations();
+        ITmfLocation<? extends Comparable<?>>[] locations = getLocationData().getLocations();
         for (ITmfLocation<?> location : locations) {
             result.append("[" + location + "]");
         }

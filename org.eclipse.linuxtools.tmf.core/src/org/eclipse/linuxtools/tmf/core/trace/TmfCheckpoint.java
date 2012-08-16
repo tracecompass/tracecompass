@@ -133,8 +133,8 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(final ITmfCheckpoint other) {
         if (fTimestamp == null || other.getTimestamp() == null) {
-            final Comparable location1 = getLocation().getLocation();
-            final Comparable location2 = other.getLocation().getLocation();
+            final Comparable location1 = getLocation().getLocationData();
+            final Comparable location2 = other.getLocation().getLocationData();
             return location1.compareTo(location2);
         }
         return fTimestamp.compareTo(other.getTimestamp(), false);
