@@ -197,7 +197,7 @@ public class LTTngTrace extends TmfTrace implements ITmfEventParser {
             @SuppressWarnings({ "unchecked", "restriction" })
             @Override
             public void run() {
-                while (!fExecutor.isShutdown()) {
+                while (!executorIsShutdown()) {
                     final TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
                     if (experiment != null) {
                         @SuppressWarnings("rawtypes")
