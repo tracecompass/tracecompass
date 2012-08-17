@@ -321,25 +321,21 @@ public class StateSystem implements IStateSystemBuilder {
         }
 
         stackDepth++;
-        subAttributeQuark = getQuarkRelativeAndAdd(attributeQuark,
-                stackDepth.toString());
+        subAttributeQuark = getQuarkRelativeAndAdd(attributeQuark, stackDepth.toString());
 
-        modifyAttribute(t, TmfStateValue.newValueInt(stackDepth),
-                attributeQuark);
+        modifyAttribute(t, TmfStateValue.newValueInt(stackDepth), attributeQuark);
         modifyAttribute(t, value, subAttributeQuark);
     }
 
     @Override
-    public void popAttribute(long t, int attributeQuark)
+    public ITmfStateValue popAttribute(long t, int attributeQuark)
             throws AttributeNotFoundException, TimeRangeException,
             StateValueTypeException {
-        Integer stackDepth;
-        int subAttributeQuark;
-        ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
+        ITmfStateValue previousSV = queryOngoingState(attributeQuark);
 
         if (previousSV.isNull()) {
             /* Same as if stackDepth == 0, see below */
-            return;
+            return null;
         }
         if (previousSV.getType() != 0) {
             /*
@@ -349,7 +345,7 @@ public class StateSystem implements IStateSystemBuilder {
             throw new StateValueTypeException();
         }
 
-        stackDepth = previousSV.unboxInt();
+        Integer stackDepth = previousSV.unboxInt();
 
         if (stackDepth == 0) {
             /*
@@ -358,7 +354,7 @@ public class StateSystem implements IStateSystemBuilder {
              * the corresponding syscall_entry in the trace. Just ignore
              * silently.
              */
-            return;
+            return null;
         }
 
         if (stackDepth < 0) {
@@ -369,13 +365,13 @@ public class StateSystem implements IStateSystemBuilder {
         }
 
         /* The attribute should already exist... */
-        subAttributeQuark = getQuarkRelative(attributeQuark,
-                stackDepth.toString());
+        int subAttributeQuark = getQuarkRelative(attributeQuark, stackDepth.toString());
+        ITmfStateValue poppedValue = queryOngoingState(subAttributeQuark);
 
         stackDepth--;
-        modifyAttribute(t, TmfStateValue.newValueInt(stackDepth),
-                attributeQuark);
+        modifyAttribute(t, TmfStateValue.newValueInt(stackDepth), attributeQuark);
         removeAttribute(t, subAttributeQuark);
+        return poppedValue;
     }
 
     @Override
