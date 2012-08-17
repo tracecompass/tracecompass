@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
@@ -238,6 +239,35 @@ public interface IStateSystemQuerier {
      */
     public ITmfStateInterval querySingleState(long t, int attributeQuark)
             throws AttributeNotFoundException, TimeRangeException;
+
+    /**
+     * Convenience method to query attribute stacks (created with
+     * pushAttribute()/popAttribute()). This will return the interval that is
+     * currently at the top of the stack, or 'null' if that stack is currently
+     * empty. It works similarly to querySingleState().
+     *
+     * To retrieve the other values in a stack, you can query the sub-attributes
+     * manually.
+     *
+     * @param t
+     *            The timestamp of the query
+     * @param stackAttributeQuark
+     *            The top-level stack-attribute (that was the target of
+     *            pushAttribute() at creation time)
+     * @return The interval that was at the top of the stack, or 'null' if the
+     *         stack was empty.
+     * @throws StateValueTypeException
+     *             If the target attribute is not a valid stack attribute (if it
+     *             has a string value for example)
+     * @throws AttributeNotFoundException
+     *             If the attribute was simply not found
+     * @throws TimeRangeException
+     *             If the given timestamp is invalid
+     * @since 2.0
+     */
+    public ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
+            throws StateValueTypeException, AttributeNotFoundException,
+            TimeRangeException;
 
     /**
      * Return a list of state intervals, containing the "history" of a given

@@ -484,6 +484,28 @@ public class StateSystem implements IStateSystemBuilder {
     }
 
     @Override
+    public ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
+            throws StateValueTypeException, AttributeNotFoundException,
+            TimeRangeException {
+        Integer curStackDepth = querySingleState(t, stackAttributeQuark).getStateValue().unboxInt();
+
+        if (curStackDepth == -1) {
+            /* There is nothing stored in this stack at this moment */
+            return null;
+        } else if (curStackDepth < -1 || curStackDepth == 0) {
+            /*
+             * This attribute is an integer attribute, but it doesn't seem like
+             * it's used as a stack-attribute...
+             */
+            throw new StateValueTypeException();
+        }
+
+        int subAttribQuark = getQuarkRelative(stackAttributeQuark, curStackDepth.toString());
+        ITmfStateInterval ret = querySingleState(t, subAttribQuark);
+        return ret;
+    }
+
+    @Override
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2) throws TimeRangeException,
             AttributeNotFoundException {
