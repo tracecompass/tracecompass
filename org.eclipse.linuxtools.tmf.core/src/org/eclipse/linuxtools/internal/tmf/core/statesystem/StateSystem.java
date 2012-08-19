@@ -331,13 +331,19 @@ public class StateSystem implements IStateSystemBuilder {
     public ITmfStateValue popAttribute(long t, int attributeQuark)
             throws AttributeNotFoundException, TimeRangeException,
             StateValueTypeException {
+        /* These are the state values of the stack-attribute itself */
         ITmfStateValue previousSV = queryOngoingState(attributeQuark);
 
         if (previousSV.isNull()) {
-            /* Same as if stackDepth == 0, see below */
+            /*
+             * Trying to pop an empty stack. This often happens at the start of
+             * traces, for example when we see a syscall_exit, without having
+             * the corresponding syscall_entry in the trace. Just ignore
+             * silently.
+             */
             return null;
         }
-        if (previousSV.getType() != 0) {
+        if (previousSV.getType() != ITmfStateValue.TYPE_INTEGER) {
             /*
              * The existing value was a string, this doesn't look like a valid
              * stack attribute.
@@ -347,30 +353,31 @@ public class StateSystem implements IStateSystemBuilder {
 
         Integer stackDepth = previousSV.unboxInt();
 
-        if (stackDepth == 0) {
-            /*
-             * Trying to pop an empty stack. This often happens at the start of
-             * traces, for example when we see a syscall_exit, without having
-             * the corresponding syscall_entry in the trace. Just ignore
-             * silently.
-             */
-            return null;
-        }
-
-        if (stackDepth < 0) {
+        if (stackDepth <= 0) {
             /* This on the other hand should not happen... */
-            String message = "A top-level stack attribute " + //$NON-NLS-1$
-                    "cannot have a negative integer value."; //$NON-NLS-1$
+            /* the case where == -1 was handled previously by .isNull() */
+            String message = "A top-level stack attribute cannot " + //$NON-NLS-1$
+                    "have a value of 0 or less (except -1/null)."; //$NON-NLS-1$
             throw new StateValueTypeException(message);
         }
 
-        /* The attribute should already exist... */
+        /* The attribute should already exist at this point */
         int subAttributeQuark = getQuarkRelative(attributeQuark, stackDepth.toString());
         ITmfStateValue poppedValue = queryOngoingState(subAttributeQuark);
 
-        stackDepth--;
-        modifyAttribute(t, TmfStateValue.newValueInt(stackDepth), attributeQuark);
+        /* Update the state value of the stack-attribute */
+        ITmfStateValue nextSV;
+        if (--stackDepth == 0 ) {
+            /* Jump over "0" and store -1 (a null state value) */
+            nextSV = TmfStateValue.nullValue();
+        } else {
+            nextSV = TmfStateValue.newValueInt(stackDepth);
+        }
+        modifyAttribute(t, nextSV, attributeQuark);
+
+        /* Delete the sub-attribute that contained the user's state value */
         removeAttribute(t, subAttributeQuark);
+
         return poppedValue;
     }
 
