@@ -563,13 +563,9 @@ public class TmfStatisticsViewer extends TmfViewer {
     protected void modelIncomplete(boolean isGlobalRequest) {
         if (isGlobalRequest) {  // Clean the global statistics
             /*
-             * The data is invalid and shall be removed to refresh upon next
-             * selection
+             * No need to reset the global number of events, since the index of
+             * the last requested event is known.
              */
-            Object input = getInput();
-            if (input instanceof TmfStatisticsTreeNode) {
-                TmfStatisticsTreeRootFactory.removeStatTreeRoot(getTreeID());
-            }
             resetUpdateSynchronization();
             sendPendingUpdate();
         } else {    // Clean the partial statistics
