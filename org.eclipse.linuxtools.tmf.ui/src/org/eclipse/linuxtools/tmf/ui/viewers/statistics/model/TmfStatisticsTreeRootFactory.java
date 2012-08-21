@@ -76,15 +76,15 @@ public class TmfStatisticsTreeRootFactory {
      *            trace.
      * @param statsData
      *            The information about the trace
+     * @return The newly created root node of the trace statistics tree, or null if something went wrong
      */
-    public static void addStatsTreeRoot(String traceUniqueId, AbsTmfStatisticsTree statsData) {
+    public static TmfStatisticsTreeNode addStatsTreeRoot(String traceUniqueId, AbsTmfStatisticsTree statsData) {
         if (traceUniqueId == null || statsData == null) {
-            return;
+            return null;
         }
-
         fTreeInstances.put(traceUniqueId, statsData);
         // if called for the first time, create the root node
-        statsData.getOrCreate(AbsTmfStatisticsTree.ROOT);
+        return statsData.getOrCreate(AbsTmfStatisticsTree.ROOT);
     }
 
     /**

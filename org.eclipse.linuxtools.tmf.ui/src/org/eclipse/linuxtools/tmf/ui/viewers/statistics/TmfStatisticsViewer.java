@@ -51,6 +51,8 @@ import org.eclipse.swt.widgets.Listener;
 /**
  * A basic viewer to display statistics in the statistics view.
  *
+ * It is linked to a single ITmfTrace until its disposal.
+ *
  * @author Mathieu Denis
  * @version 2.0
  * @since 2.0
@@ -202,6 +204,7 @@ public class TmfStatisticsViewer extends TmfViewer {
         fProcessAll = (trace instanceof TmfExperiment);
 
         initContent(parent);
+        initInput();
     }
 
     /*
@@ -221,6 +224,9 @@ public class TmfStatisticsViewer extends TmfViewer {
          */
         cancelOngoingRequest(fRequestRange);
         cancelOngoingRequest(fRequest);
+
+        // Clean the model
+        TmfStatisticsTreeRootFactory.removeStatTreeRoot(getTreeID());
     }
 
     /**
@@ -384,17 +390,6 @@ public class TmfStatisticsViewer extends TmfViewer {
     }
 
     /**
-     * Sets or clears the input for this viewer.
-     *
-     * @param input
-     *            The input of this viewer, or <code>null</code> if none
-     */
-    public void setInput(TmfStatisticsTreeNode input) {
-        resetUpdateSynchronization();
-        fTreeViewer.setInput(input);
-    }
-
-    /**
      * Cancels the request if it is not already completed
      *
      * @param request
@@ -522,6 +517,63 @@ public class TmfStatisticsViewer extends TmfViewer {
         fTreeViewer.setComparator(columnDataList.get(0).getComparator());
         fTreeViewer.getTree().setSortColumn(fTreeViewer.getTree().getColumn(0));
         fTreeViewer.getTree().setSortDirection(SWT.DOWN);
+    }
+
+    /**
+     * Initializes the input for the tree viewer.
+     *
+     * @param input
+     *            The input of this viewer, or <code>null</code> if none
+     */
+    protected void initInput() {
+        String treeID = getTreeID();
+        TmfStatisticsTreeNode experimentTreeNode;
+        if (TmfStatisticsTreeRootFactory.containsTreeRoot(treeID)) {
+            // The experiment root is already present
+            experimentTreeNode = TmfStatisticsTreeRootFactory.getStatTreeRoot(treeID);
+
+            // Checks if the trace is already in the statistics tree.
+            int numNodeTraces = experimentTreeNode.getNbChildren();
+
+            int numTraces = 1;
+            ITmfTrace[] trace = { fTrace };
+            // For experiment, gets all the traces within it
+            if (fTrace instanceof TmfExperiment) {
+                TmfExperiment experiment = (TmfExperiment) fTrace;
+                numTraces = experiment.getTraces().length;
+                trace = experiment.getTraces();
+            }
+
+            if (numTraces == numNodeTraces) {
+                boolean same = true;
+                /*
+                 * Checks if the experiment contains the same traces as when
+                 * previously selected.
+                 */
+                for (int i = 0; i < numTraces; i++) {
+                    String traceName = trace[i].getName();
+                    if (!experimentTreeNode.containsChild(traceName)) {
+                        same = false;
+                        break;
+                    }
+                }
+
+                if (same) {
+                    // No need to reload data, all traces are already loaded
+                    fTreeViewer.setInput(experimentTreeNode);
+                    return;
+                }
+                // Clears the old content to start over
+                experimentTreeNode.reset();
+            }
+        } else {
+            // Creates a new tree
+            experimentTreeNode = TmfStatisticsTreeRootFactory.addStatsTreeRoot(treeID, getStatisticData());
+        }
+
+        // Sets the input to a clean data model
+        fTreeViewer.setInput(experimentTreeNode);
+        resetUpdateSynchronization();
     }
 
     /**
