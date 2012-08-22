@@ -214,6 +214,12 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser{
             currentLocation.setLocation(getEndTime().getValue() + 1, 0L);
         }
         context.setLocation(currentLocation);
+        if (location == null) {
+            CtfTmfEvent event = getIterator(this, context).getCurrentEvent();
+            if (event != null) {
+                currentLocation.setLocation(event.getTimestampValue(), 0);
+            }
+        }
         if(context.getRank() != 0) {
             context.setRank(ITmfContext.UNKNOWN_RANK);
         }
