@@ -161,6 +161,8 @@ public class TmfStatisticsTreeNode {
      * Resets the number of events in the time range. It doesn't remove any node
      * and doesn't modify the global event count.
      *
+     * Works recursively.
+     *
      * @since 2.0
      */
     public void resetTimeRangeValue() {

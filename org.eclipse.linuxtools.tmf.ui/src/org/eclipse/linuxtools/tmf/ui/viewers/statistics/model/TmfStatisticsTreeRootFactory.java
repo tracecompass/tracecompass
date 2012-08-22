@@ -38,7 +38,7 @@ public class TmfStatisticsTreeRootFactory {
      *
      * @param traceUniqueId
      *            Unique ID for the trace
-     * @return the corresponding trace statistics tree
+     * @return The root node of the corresponding trace statistics tree
      */
     public static TmfStatisticsTreeNode getStatTreeRoot(String traceUniqueId) {
 

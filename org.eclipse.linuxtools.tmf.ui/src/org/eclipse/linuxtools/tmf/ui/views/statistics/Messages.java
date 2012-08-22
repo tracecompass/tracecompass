@@ -26,11 +26,6 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.statistics.messages"; //$NON-NLS-1$
 
     /**
-     * String for unknown trace name.
-     */
-    public static String TmfStatisticsView_UnknownTraceName;
-
-    /**
      * String for the global tab name
      * @since 2.0
      */

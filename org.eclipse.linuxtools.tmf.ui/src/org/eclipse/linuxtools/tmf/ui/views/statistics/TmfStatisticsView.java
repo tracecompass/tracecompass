@@ -193,7 +193,7 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Creates the statistics viewers for all traces in the experiment and
-     * popupale a viewer folder. Each viewer is placed in a different tab and
+     * populates a viewer folder. Each viewer is placed in a different tab and
      * the first one is selected automatically.
      *
      * It uses the extension point that defines the statistics viewer to build
@@ -215,7 +215,7 @@ public class TmfStatisticsView extends TmfView {
         TmfStatisticsViewer globalViewer = new TmfStatisticsViewer();
         if (fExperiment != null) {
             // Shows the name of the experiment in the global tab
-            globalViewer.init( folder, Messages.TmfStatisticsView_GlobalTabName + " - " + fExperiment.getName(), fExperiment); //$NON-NLS-1$
+            globalViewer.init(folder, Messages.TmfStatisticsView_GlobalTabName + " - " + fExperiment.getName(), fExperiment); //$NON-NLS-1$
             fStatsViewers.addTab(globalViewer, Messages.TmfStatisticsView_GlobalTabName, defaultStyle);
 
             String traceName;

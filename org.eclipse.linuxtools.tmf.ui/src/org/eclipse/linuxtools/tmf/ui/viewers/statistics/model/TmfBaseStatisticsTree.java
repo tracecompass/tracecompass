@@ -217,8 +217,6 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected TmfFixedArray<String>[] getTypePaths(ITmfEvent event, ITmfExtraEventInfo extraInfo) {
         String trace = extraInfo.getTraceName();
-        // String type = event.getType().getTypeId(); // Add too much
-        // informations
         String type = event.getType().toString();
 
         TmfFixedArray[] paths = { new TmfFixedArray<String>(trace, HEADER_EVENT_TYPES, type) };
