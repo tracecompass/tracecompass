@@ -163,8 +163,16 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * (org.eclipse.linuxtools.tmf.core.event.ITmfEvent, org.eclipse.linuxtools.tmf.ui.viewers.statistics.ITmfExtraEventInfo, int)
      */
     @Override
-    public void increase(ITmfEvent event, ITmfExtraEventInfo extraInfo, int values) {
-        // Do nothing
+    public void registerEvent(ITmfEvent event, ITmfExtraEventInfo extraInfo, int values) {
+        TmfFixedArray<String>[] paths = getNormalPaths(event, extraInfo);
+        for (TmfFixedArray<String> path : paths) {
+            getOrCreate(path).getValue().incrementTotal(values);
+        }
+
+        paths = getTypePaths(event, extraInfo);
+        for (TmfFixedArray<String> path : paths) {
+            getOrCreate(path).getValue().incrementTotal(values);
+        }
     }
 
     /*
@@ -183,6 +191,19 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         paths = getTypePaths(event, extraInfo);
         for (TmfFixedArray<String> path : paths) {
             getOrCreate(path).getValue().incrementTotal();
+        }
+    }
+
+    @Override
+    public void registerEventInTimeRange(ITmfEvent event, ITmfExtraEventInfo extraInfo, int qty) {
+        TmfFixedArray<String>[] paths = getNormalPaths(event, extraInfo);
+        for (TmfFixedArray<String> path : paths) {
+            getOrCreate(path).getValue().incrementPartial(qty);
+        }
+
+        paths = getTypePaths(event, extraInfo);
+        for (TmfFixedArray<String> path : paths) {
+            getOrCreate(path).getValue().incrementPartial(qty);
         }
     }
 

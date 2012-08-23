@@ -127,6 +127,11 @@ public class TmfStatisticsViewer extends TmfViewer {
      */
     protected final Object fStatisticsRangeUpdateSyncObj = new Object();
 
+    /*
+     * The trace that is displayed by this viewer
+     */
+    protected ITmfTrace fTrace;
+
     /**
      * Indicates to process all events
      */
@@ -141,11 +146,6 @@ public class TmfStatisticsViewer extends TmfViewer {
      * Number of this instance. Used as an instance ID.
      */
     private int fInstanceNb;
-
-    /**
-     * The trace that is displayed by this viewer
-     */
-    private ITmfTrace fTrace;
 
     /**
      * Object to store the cursor while waiting for the experiment to load
