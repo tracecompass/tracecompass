@@ -143,6 +143,7 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
 
         /* Copy the fields over */
         this.fContent = (CtfTmfContent) other.fContent.clone();
+        this.fTimestamp = other.fTimestamp.clone();
     }
 
     /**
