@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Event Model 1.0
@@ -22,10 +22,10 @@ import java.util.Map;
  * <p>
  * Non-value fields are structural (i.e. used to represent the event structure
  * including optional fields) while the valued fields are actual event fields.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  * @see ITmfEvent
  * @see ITmfEventType
  */
@@ -55,7 +55,7 @@ public class TmfEventField implements ITmfEventField, Cloneable {
 
     /**
      * Constructor for a structural field
-     * 
+     *
      * @param name the event field id
      * @param fields the list of subfields
      */
@@ -65,7 +65,7 @@ public class TmfEventField implements ITmfEventField, Cloneable {
 
     /**
      * Constructor for a terminal field (no subfields)
-     * 
+     *
      * @param name the event field id
      * @param value the event field value
      */
@@ -75,7 +75,7 @@ public class TmfEventField implements ITmfEventField, Cloneable {
 
     /**
      * Full constructor
-     * 
+     *
      * @param name the event field id
      * @param value the event field value
      * @param fields the list of subfields
@@ -92,7 +92,7 @@ public class TmfEventField implements ITmfEventField, Cloneable {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param field the other event field
      */
     public TmfEventField(final TmfEventField field) {
@@ -193,7 +193,7 @@ public class TmfEventField implements ITmfEventField, Cloneable {
 
     /**
      * Create a root field from a list of labels.
-     * 
+     *
      * @param labels the list of labels
      * @return the (flat) root list
      */
@@ -289,9 +289,43 @@ public class TmfEventField implements ITmfEventField, Cloneable {
      * @see java.lang.Object#toString()
      */
     @Override
-    @SuppressWarnings("nls")
     public String toString() {
-        return "TmfEventField [fFieldId=" + fName + ", fValue=" + fValue + "]";
+        StringBuilder ret = new StringBuilder();
+        if (fName.equals(ITmfEventField.ROOT_FIELD_ID)) {
+            /*
+             * If this field is a top-level "field container", we will print its
+             * sub-fields directly.
+             */
+            appendSubFields(ret);
+
+        } else {
+            /* The field has its own values */
+            ret.append(fName);
+            ret.append('=');
+            ret.append(fValue);
+
+            if (fFields != null && fFields.length > 0) {
+                /*
+                 * In addition to its own name/value, this field also has
+                 * sub-fields.
+                 */
+                ret.append(" ["); //$NON-NLS-1$
+                appendSubFields(ret);
+                ret.append(']');
+            }
+        }
+        return ret.toString();
+    }
+
+    private void appendSubFields(StringBuilder sb) {
+        ITmfEventField field;
+        for (int i = 0; i < getFields().length; i++) {
+            field = getFields()[i];
+            if (i != 0) {
+                sb.append(", ");//$NON-NLS-1$
+            }
+            sb.append(field.toString());
+        }
     }
 
 }
