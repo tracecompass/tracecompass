@@ -28,7 +28,6 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.viewers.ITmfViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeRootFactory;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.widgets.tabsview.TmfViewerFolder;
 import org.eclipse.swt.SWT;
@@ -193,8 +192,6 @@ public class TmfStatisticsView extends TmfView {
     public void dispose() {
         super.dispose();
         fStatsViewers.dispose();
-        // clean the model
-        TmfStatisticsTreeRootFactory.removeAll();
     }
 
     /*
