@@ -78,17 +78,19 @@ public class TmfStatisticsTreeRootFactoryTest extends TestCase {
         removeStatsTreeRoot();
 
         try {
-            TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, null);
-            TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, fStatisticsData1);
-            TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, null);
+            assertNull(TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, null));
+            assertNull(TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, fStatisticsData1));
+            assertNull(TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, null));
             assertNull(TmfStatisticsTreeRootFactory.getStatTreeRoot(fDataKey1));
 
-            TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData1);
+            TmfStatisticsTreeNode returnRootNode = TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData1);
             assertSame(fStatisticsData1, TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
+            assertSame(fStatisticsData1.get(AbsTmfStatisticsTree.ROOT), returnRootNode);
 
             // Overwriting the value
-            TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData2);
+            returnRootNode = TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData2);
             assertSame(fStatisticsData2, TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
+            assertSame(fStatisticsData2.get(AbsTmfStatisticsTree.ROOT), returnRootNode);
 
             // Success
         } catch(Exception e) {
