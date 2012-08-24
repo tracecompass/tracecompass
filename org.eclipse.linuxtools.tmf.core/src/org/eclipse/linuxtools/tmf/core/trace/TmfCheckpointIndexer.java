@@ -175,19 +175,10 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
         fIndexingRequest = new TmfEventRequest<ITmfEvent>(ITmfEvent.class,
                 range, offset, TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
         {
-            private ITmfTimestamp startTime = null;
-            private ITmfTimestamp lastTime = null;
-
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 if (event != null) {
-                    final ITmfTimestamp timestamp = event.getTimestamp();
-                    if (startTime == null) {
-                        startTime = timestamp.clone();
-                    }
-                    lastTime = timestamp.clone();
-
                     // Update the trace status at regular intervals
                     if ((getNbRead() % fCheckpointInterval) == 0) {
                         updateTraceStatus();
@@ -208,8 +199,8 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             }
 
             private void updateTraceStatus() {
-                if (getNbRead() != 0) {
-                    signalNewTimeRange(startTime, lastTime);
+                if (fTrace.getNbEvents() > 0) {
+                    signalNewTimeRange(fTrace.getStartTime(), fTrace.getEndTime());
                 }
             }
         };
