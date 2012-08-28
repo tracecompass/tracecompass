@@ -180,10 +180,20 @@ public class TimeGraphTooltipHandler {
                     }
 
                     // state name
-                    addItem(_utilImp.getStateTypeName(), entry.getName());
+                    String stateTypeName = _utilImp.getStateTypeName(entry);
+                    String entryName = entry.getName();
+                    if (stateTypeName == null) {
+                        stateTypeName = _utilImp.getStateTypeName();
+                    }
+
+                    if (!entryName.isEmpty()) {
+                        addItem(stateTypeName, entry.getName());
+                    }
+
                     if (currEvent == null) {
                         return;
                     }
+
                     // state
                     String state = _utilImp.getEventName(currEvent);
                     if (state != null) {

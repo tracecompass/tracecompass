@@ -97,7 +97,15 @@ public class TimeGraphLegend extends TitleAreaDialog {
 
     private void createStatesGroup(Composite composite) {
         Group gs = new Group(composite, SWT.NONE);
-        gs.setText(provider.getStateTypeName() + " " + Messages.TmfTimeLegend_StateTypeName); //$NON-NLS-1$
+        String stateTypeName = provider.getStateTypeName();
+        StringBuffer buffer = new StringBuffer();
+        if (!stateTypeName.isEmpty()) {
+            buffer.append(stateTypeName);
+            buffer.append(" "); //$NON-NLS-1$
+        }
+        buffer.append(Messages.TmfTimeLegend_StateTypeName);
+        gs.setText(buffer.toString());
+
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gs.setLayoutData(gd);
 

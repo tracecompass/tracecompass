@@ -49,6 +49,14 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         return Messages.TmfTimeLegend_TRACE_STATES;
     }
 
+    /**
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTypeName(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry)
+     * @since 2.0
+     */
+    @Override
+    public String getStateTypeName(ITimeGraphEntry entry) {
+        return null;
+    }
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTable()

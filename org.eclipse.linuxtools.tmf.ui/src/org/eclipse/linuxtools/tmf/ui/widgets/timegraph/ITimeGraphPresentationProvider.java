@@ -35,6 +35,17 @@ public interface ITimeGraphPresentationProvider {
      */
     public String getStateTypeName();
 
+   /**
+    * Returns the name of state type depending on the given entry.
+    * Note that this overwrites the name which is return by getStateTypeName().
+    *
+    * @param entry
+    *           the entry
+    * @return the name of state type depending on the given entry or null.
+    * @since 2.0
+    */
+   public String getStateTypeName(ITimeGraphEntry entry);
+
     /**
      * Returns table of states with state name to state color relationship.
      *
