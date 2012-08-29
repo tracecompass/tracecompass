@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c)  2011 Ericsson and others.
- * All rights reserved. This program and the accompanying materials 
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * $Id: CommonUIImages.java,v 1.6 2010/05/05 12:32:31 paules Exp $
- * 
+ *
  * Contributors:
  *     Bernd Hufmann - initial API and implementation
  *******************************************************************************/
@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.internal.tmf.ui;
 
 @SuppressWarnings("nls")
 public interface ITmfImageConstants {
-    
+
     public static final String ICONS_PATH = "icons/"; //$NON-NLS-1$
 
     /* elcl16 */
@@ -38,6 +38,7 @@ public interface ITmfImageConstants {
 //    public static final String IMG_UI_PREV_ITEM = ICONS_PATH + "elcl16/prev_item.gif";
     public static final String IMG_UI_NEXT_ITEM = IMG_UI_NEXT_PAGE;
     public static final String IMG_UI_PREV_ITEM = IMG_UI_PREV_PAGE;
+    public static final String IMG_UI_PIN_VIEW = ICONS_PATH + "elcl16/pin_view.gif";
 
     /* eview16 */
     public static final String IMG_UI_SEQ_DIAGRAM_OBJ = ICONS_PATH + "eview16/sequencediagram_view.gif";
