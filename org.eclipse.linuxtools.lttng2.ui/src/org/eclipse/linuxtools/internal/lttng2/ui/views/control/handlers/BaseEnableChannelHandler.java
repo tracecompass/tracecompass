@@ -87,6 +87,7 @@ abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
 
             final IEnableChannelDialog dialog =  TraceControlDialogFactory.getInstance().getEnableChannelDialog();
             dialog.setDomainComponent(getDomain(param));
+            dialog.setHasKernel(param.getSession().hasKernelProvider());
 
             if (dialog.open() != Window.OK) {
                 return null;

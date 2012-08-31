@@ -177,7 +177,7 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals(3, providers.length);
 
         // ------------------------------------------------------------------------
-        // Verify UstProviderComponent
+        // Verify KernelProviderComponent
         // ------------------------------------------------------------------------
         KernelProviderComponent kernelProvider = (KernelProviderComponent) providers[0];
 

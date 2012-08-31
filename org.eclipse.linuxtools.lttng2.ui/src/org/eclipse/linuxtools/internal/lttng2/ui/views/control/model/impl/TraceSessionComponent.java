@@ -192,6 +192,15 @@ public class TraceSessionComponent extends TraceControlComponent {
         return ((TraceSessionGroup)getParent()).getTargetNode();
     }
 
+    /**
+     * Returns whether the kernel provider is available or not
+     * @return <code>true</code> if kernel provide is available or <code>false</code>
+     */
+    public boolean hasKernelProvider() {
+        List<ITraceControlComponent> providerGroups = getTargetNode().getChildren(TraceProviderGroup.class);
+        return (!providerGroups.isEmpty() ? ((TraceProviderGroup) providerGroups.get(0)).hasKernelProvider() : false);
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
