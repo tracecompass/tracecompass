@@ -26,7 +26,7 @@ public class LTTngControlServiceConstants {
     // Version constants
     // ------------------------------------------------------------------------
     /**
-     * Constant for the LTTng toolchain version
+     * Constant for the LTTng toolchain version 2.0
      */
     public final static String LTTNG_MAJOR_VERSION_2_0 = "2.0"; //$NON-NLS-1$
 
@@ -317,5 +317,8 @@ public class LTTngControlServiceConstants {
      * Pattern to match introduction line of context list.
      */
     public final static Pattern ADD_CONTEXT_HELP_CONTEXTS_END_LINE = Pattern.compile("\\s*Example.*"); //$NON-NLS-1$
-
+    /**
+     * Pattern to match error line if no kernel tracer is available or installed.
+     */
+    public final static Pattern LIST_KERNEL_NO_KERNEL_PROVIDER_PATTERN = Pattern.compile("\\s*Error:\\s+Unable\\s+to\\s+list\\s+kernel\\s+events.*"); //$NON-NLS-1$;
 }

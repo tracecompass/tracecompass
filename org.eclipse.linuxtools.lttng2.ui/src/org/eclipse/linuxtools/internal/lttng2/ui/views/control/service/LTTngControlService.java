@@ -226,12 +226,30 @@ public class LTTngControlService implements ILttngControlService {
     @Override
     public List<IBaseEventInfo> getKernelProvider(IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_LIST_KERNEL);
-        ICommandResult result = executeCommand(command.toString(), monitor);
+        ICommandResult result = executeCommand(command.toString(), monitor, false);
+
+        List<IBaseEventInfo> events = new ArrayList<IBaseEventInfo>();
+
+        if (result.getOutput() != null) {
+            // Ignore the following 2 cases:
+            // Spawning a session daemon
+            // Error: Unable to list kernel events
+            // or:
+            // Error: Unable to list kernel events
+
+            if ((result.getOutput().length == 1) && (LTTngControlServiceConstants.LIST_KERNEL_NO_KERNEL_PROVIDER_PATTERN.matcher(result.getOutput()[0]).matches()) ||
+               ((result.getOutput().length > 1) && (LTTngControlServiceConstants.LIST_KERNEL_NO_KERNEL_PROVIDER_PATTERN.matcher(result.getOutput()[1]).matches()))) {
+                return events;
+            }
+        }
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command.toString() + "\n" + formatOutput(result)); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
         // Kernel events:
         // -------------
         // sched_kthread_stop (type: tracepoint)
-        List<IBaseEventInfo> events = new ArrayList<IBaseEventInfo>();
         getProviderEventInfo(result.getOutput(), 0, events);
         return events;
     }
@@ -1185,7 +1203,7 @@ public class LTTngControlService implements ILttngControlService {
             ControlCommandLogger.log(formatOutput(result));
         }
 
-        if (isError(result)) {
+        if (checkForError && isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError
                     + " " + command.toString() + "\n" + formatOutput(result)); //$NON-NLS-1$ //$NON-NLS-2$
         }

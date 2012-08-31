@@ -41,6 +41,8 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
     private static final String NO_STREAM = "No stream"; //$NON-NLS-1$
     private static final String EMPTY_CTF_EVENT_NAME = "Empty CTF event"; //$NON-NLS-1$
 
+    /** Prefix for Context information stored as CtfTmfEventfield */
+    private static final String CONTEXT_FIELD_PREFIX = "context."; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -119,6 +121,24 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
             curFieldDef = entry.getValue();
             curField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
             fields.add(curField);
+        }
+
+        /* Add context information as CtfTmfEventField */
+        StructDefinition structContext = eventDef.getContext();
+        if (structContext != null) {
+            definitions = structContext.getDefinitions();
+            String curContextName;
+            Definition curContextDef;
+            CtfTmfEventField curContext;
+            it = definitions.entrySet().iterator();
+            while(it.hasNext()) {
+                Entry<String, Definition> entry = it.next();
+                /* Prefix field name to */
+                curContextName = CONTEXT_FIELD_PREFIX + entry.getKey();
+                curContextDef = entry.getValue();
+                curContext = CtfTmfEventField.parseField(curContextDef, curContextName);
+                fields.add(curContext);
+            }
         }
 
         return fields.toArray(new CtfTmfEventField[fields.size()]);

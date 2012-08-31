@@ -62,6 +62,8 @@ public class LTTngControlServiceTest extends TestCase {
     private static final String SCEN_GET_SESSION_GARBAGE_OUT = "GetSessionGarbageOut";
     private static final String SCEN_GET_SESSION1 = "GetSession1";
     private static final String SCEN_GET_KERNEL_PROVIDER1 = "GetKernelProvider1";
+    private static final String SCEN_LIST_WITH_NO_KERNEL1 = "ListWithNoKernel1";
+    private static final String SCEN_LIST_WITH_NO_KERNEL2 = "ListWithNoKernel2";
     private static final String SCEN_GET_UST_PROVIDER1 = "GetUstProvider1";
     private static final String SCEN_GET_UST_PROVIDER2 = "GetUstProvider2";
     private static final String SCEN_CREATE_SESSION1 = "CreateSession1";
@@ -145,7 +147,7 @@ public class LTTngControlServiceTest extends TestCase {
             fail("Exeption thrown " + e);
         }
     }
-    
+
     public void testUnsupportedVersion() {
         try {
             fShell.setScenario(SCEN_LTTNG_UNSUPPORTED_VERSION);
@@ -375,6 +377,35 @@ public class LTTngControlServiceTest extends TestCase {
         }
     }
 
+    public void testGetKernelProviderNoKernel1() {
+        try {
+            fShell.setScenario(SCEN_LIST_WITH_NO_KERNEL1);
+            List<IBaseEventInfo> events = fService.getKernelProvider(new NullProgressMonitor());
+
+            // Verify event info
+            assertNotNull(events);
+            assertEquals(0, events.size());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    public void testGetKernelProviderNoKernel2() {
+        try {
+            fShell.setScenario(SCEN_LIST_WITH_NO_KERNEL2);
+            List<IBaseEventInfo> events = fService.getKernelProvider(new NullProgressMonitor());
+
+            // Verify event info
+            assertNotNull(events);
+            assertEquals(0, events.size());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+
     public void testGetUstProvider() {
         try {
             fShell.setScenario(SCEN_GET_UST_PROVIDER1);
@@ -459,7 +490,7 @@ public class LTTngControlServiceTest extends TestCase {
 
     public void testCreateSessionWithPrompt() {
         try {
-            // First line has the shell prompt before the command output 
+            // First line has the shell prompt before the command output
             // This can happen in a real application if the command line is not echoed by the shell.
             fShell.setScenario(SCEN_CREATE_SESSION_WITH_PROMPT);
 
@@ -475,7 +506,7 @@ public class LTTngControlServiceTest extends TestCase {
         }
     }
 
-    
+
     public void testCreateSessionVariants() {
 
         fShell.setScenario(SCEN_CREATE_SESSION_VARIANTS);

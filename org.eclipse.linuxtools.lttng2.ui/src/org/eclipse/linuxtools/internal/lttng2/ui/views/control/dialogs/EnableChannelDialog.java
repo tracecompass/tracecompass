@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Text;
  * <p>
  * Dialog box for collecting channel information when enabling a channel (which will be created).
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableChannelDialog extends Dialog implements IEnableChannelDialog {
@@ -47,7 +47,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
     /**
      * The icon file for this dialog box.
      */
-    public static final String ENABLE_CHANNEL_ICON_FILE = "icons/elcl16/add_button.gif"; //$NON-NLS-1$ 
+    public static final String ENABLE_CHANNEL_ICON_FILE = "icons/elcl16/add_button.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -97,12 +97,12 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
      */
     private Button fUstButton = null;
     /**
-     * The parent domain component where the channel node should be added. 
+     * The parent domain component where the channel node should be added.
      * Null in case of creation on session level.
      */
     private TraceDomainComponent fDomain = null;
     /**
-     * Common verify listener for numeric text input.  
+     * Common verify listener for numeric text input.
      */
     private VerifyListener fVerifyListener = null;
     /**
@@ -110,9 +110,13 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
      */
     private IChannelInfo fChannelInfo = null;
     /**
-     * Output domain information. True in case of Kernel domain. False for UST.     
+     * Output domain information. True in case of Kernel domain. False for UST.
      */
     private boolean fIsKernel;
+    /**
+     *  Flag which indicates whether Kernel domain is available or not
+     */
+    private boolean fHasKernel;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -172,6 +176,21 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         return fIsKernel;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableChannelDialog#setHasKernel(boolean)
+     */
+    @Override
+    public void setHasKernel(boolean hasKernel) {
+        if (fDomain != null) {
+            fIsKernel = fDomain.isKernel();
+        } else {
+            fIsKernel = hasKernel;
+        }
+
+        fHasKernel = hasKernel;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -192,23 +211,23 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
      */
     @Override
     protected Control createDialogArea(Composite parent) {
-        
+
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, true);
-        fDialogComposite.setLayout(layout); 
+        fDialogComposite.setLayout(layout);
 
         Label channelNameLabel = new Label(fDialogComposite, SWT.RIGHT);
         channelNameLabel.setText(Messages.TraceControl_EnableChannelNameLabel);
         fChannelNameText = new Text(fDialogComposite, SWT.NONE);
         fChannelNameText.setToolTipText(Messages.TraceControl_EnableChannelNameTooltip);
-        
+
         Label subBufferSizeLabel = new Label(fDialogComposite, SWT.RIGHT);
         subBufferSizeLabel.setText(Messages.TraceControl_SubBufferSizePropertyName);
         fSubBufferSizeText = new Text(fDialogComposite, SWT.NONE);
         fSubBufferSizeText.setToolTipText(Messages.TraceControl_EnableChannelSubBufferSizeTooltip);
         fSubBufferSizeText.addVerifyListener(fVerifyListener);
-        
+
         Label numSubBufferLabel = new Label(fDialogComposite, SWT.RIGHT);
         numSubBufferLabel.setText(Messages.TraceControl_NbSubBuffersPropertyName);
         fNumberOfSubBuffersText = new Text(fDialogComposite, SWT.NONE);
@@ -230,13 +249,13 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         Group discardModeGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         discardModeGroup.setText(Messages.TraceControl_EnableChannelDiscardModeGroupName);
         layout = new GridLayout(2, true);
-        discardModeGroup.setLayout(layout); 
+        discardModeGroup.setLayout(layout);
 
         fDiscardModeButton = new  Button(discardModeGroup, SWT.RADIO);
         fDiscardModeButton.setText(Messages.TraceControl_EnableChannelDiscardModeLabel);
         fDiscardModeButton.setToolTipText(Messages.TraceControl_EnableChannelDiscardModeTooltip);
         fDiscardModeButton.setSelection(true);
-        
+
         fOverwriteModeButton = new Button(discardModeGroup, SWT.RADIO);
         fOverwriteModeButton.setText(Messages.TraceControl_EnableChannelOverwriteModeLabel);
         fOverwriteModeButton.setToolTipText(Messages.TraceControl_EnableChannelOverwriteModeTooltip);
@@ -245,8 +264,8 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         fDomainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fDomainGroup.setText(Messages.TraceControl_DomainDisplayName);
         layout = new GridLayout(2, true);
-        fDomainGroup.setLayout(layout); 
-        
+        fDomainGroup.setLayout(layout);
+
         fKernelButton = new Button(fDomainGroup, SWT.RADIO);
         fKernelButton.setText(Messages.TraceControl_KernelDomainDisplayName);
         fKernelButton.setSelection(fIsKernel);
@@ -254,7 +273,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         fUstButton.setText(Messages.TraceControl_UstDisplayName);
         fUstButton.setSelection(!fIsKernel);
 
-        if (fDomain != null) {
+        if ((fDomain != null) || (!fHasKernel)) {
             fKernelButton.setEnabled(false);
             fUstButton.setEnabled(false);
         }
@@ -266,7 +285,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         fDiscardModeButton.setLayoutData(data);
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
         fOverwriteModeButton.setLayoutData(data);
-        
+
         data = new GridData(GridData.FILL, GridData.CENTER, false, false, 3, 1);
         fDomainGroup.setLayoutData(data);
 
@@ -274,7 +293,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         fKernelButton.setLayoutData(data);
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
         fUstButton.setLayoutData(data);
-        
+
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 2;
 
@@ -335,7 +354,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         // validation successful -> call super.okPressed()
         super.okPressed();
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
