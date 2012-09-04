@@ -104,7 +104,7 @@ public class Messages extends NLS {
     public static String TmfTimeGraphViewer_ZoomInActionToolTipText;
     public static String TmfTimeGraphViewer_ZoomOutActionNameText;
     public static String TmfTimeGraphViewer_ZoomOutActionToolTipText;
-    
+
     public static String ColorsView_AddActionToolTipText;
     public static String ColorsView_BackgroundButtonText;
     public static String ColorsView_BackgroundDialogText;
@@ -250,6 +250,9 @@ public class Messages extends NLS {
     public static String FilterViewer_TypeLabel;
     public static String FilterViewer_ValueHint;
     public static String FilterViewer_ValueLabel;
+
+    public static String TmfView_PinActionNameText;
+    public static String TmfView_PinActionToolTipText;
 
     static {
         // initialize resource bundle
