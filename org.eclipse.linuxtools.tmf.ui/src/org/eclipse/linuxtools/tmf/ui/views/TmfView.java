@@ -35,7 +35,7 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	private final String fName;
 	/**
 	 * Action class for pinning of TmfView.
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	protected PinTmfViewAction fPinAction;
 
@@ -91,7 +91,7 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * For example, this flag can be used to ignore time synchronization signals from other TmfViews.
      *
      * @return pin flag
-     * @since 1.2
+     * @since 2.0
      */
     public boolean isPinned() {
         return ((fPinAction != null) && (fPinAction.isChecked()));
@@ -101,7 +101,7 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * Method adds a pin action to the TmfView. The pin action allows to toggle the <code>fIsPinned</code> flag.
      * For example, this flag can be used to ignore time synchronization signals from other TmfViews.
      *
-     * @since 1.2
+     * @since 2.0
      */
     protected void contributePinActionToToolBar() {
         if (fPinAction == null) {
