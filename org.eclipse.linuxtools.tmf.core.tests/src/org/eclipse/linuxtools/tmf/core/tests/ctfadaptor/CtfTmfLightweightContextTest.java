@@ -98,7 +98,7 @@ public class CtfTmfLightweightContextTest {
                     fixture.getNext(lwc);
                     synchronized(fixture){
                         if (lwc.getCurrentEvent() != null) {
-                            vals.add(lwc.getCurrentEvent().getTimestampValue());
+                            vals.add(lwc.getCurrentEvent().getTimestamp().getValue());
                         }
                         tooManyContexts.add(lwc);
                     }

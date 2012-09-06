@@ -125,7 +125,7 @@ public class CtfTmfLightweightContext implements ITmfContext {
         CtfTmfEvent currentEvent = getIterator().getCurrentEvent();
 
         if (currentEvent != null) {
-            final long timestampValue = currentEvent.getTimestampValue();
+            final long timestampValue = currentEvent.getTimestamp().getValue();
             if (curLocationData.getTimestamp() == timestampValue) {
                 curLocation.setLocation(timestampValue, curLocationData.getIndex() + 1);
             } else {

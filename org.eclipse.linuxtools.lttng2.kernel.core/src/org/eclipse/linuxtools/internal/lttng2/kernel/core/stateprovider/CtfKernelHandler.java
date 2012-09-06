@@ -71,7 +71,7 @@ class CtfKernelHandler implements Runnable {
 
         try {
             event = inQueue.take();
-            while (event.getTimestampValue() != -1) {
+            while (event.getTimestamp().getValue() != -1) {
                 processEvent(event);
                 event = inQueue.take();
             }
