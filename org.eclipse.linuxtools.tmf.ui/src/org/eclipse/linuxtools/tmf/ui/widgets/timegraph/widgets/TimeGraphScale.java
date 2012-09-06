@@ -282,7 +282,10 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         if (_timeProvider != null && _timeProvider.isCalendarFormat()) {
             time = floorToCalendar(time0, _timeDelta);
         } else {
-            time = (long) (Math.ceil((double) time0 / _timeDelta) * _timeDelta);
+            time = (time0 / _timeDelta) * _timeDelta;
+            if (time != time0) {
+                time += _timeDelta;
+            }
         }
 
         int y = _rect0.y + _rect0.height;
@@ -386,22 +389,11 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 numDigits += 6;
             }
         } else {
-            // Calculate the number of digits to represent the minutes provided
-            long min = (long) ((time1 * 1E-9) / 60); // to sec then to minutes
-            String strMinutes = String.valueOf(min);
-            // 11:222
-            if (strMinutes != null) {
-                numDigits += strMinutes.length();
-            } else {
-                numDigits += 2;
-            }
-            if (timeRange < 10000) {
-                // 11:222:333:444__
-                numDigits += 8;
-            } else if (timeRange < 10000000) {
-                // 11:222:333__
-                numDigits += 4;
-            }
+            long sec = time1 / 1000000000;
+            numDigits = Long.toString(sec).length();
+            int thousandGroups = (numDigits - 1) / 3;
+            numDigits += thousandGroups;
+            numDigits += 12; // .000 000 000
         }
 
         return numDigits;
@@ -509,9 +501,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 }
 
 abstract class TimeDraw {
-    static String S   = ":"  ; //$NON-NLS-1$
-    static String S0  = ":0" ; //$NON-NLS-1$
-    static String S00 = ":00"; //$NON-NLS-1$
+    static String S   = ""  ; //$NON-NLS-1$
+    static String S0  = "0" ; //$NON-NLS-1$
+    static String S00 = "00"; //$NON-NLS-1$
     protected static final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss");          //$NON-NLS-1$
     protected static final SimpleDateFormat stimeformatheader = new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
     protected static final SimpleDateFormat sminformat = new SimpleDateFormat("HH:mm");              //$NON-NLS-1$
@@ -523,12 +515,27 @@ abstract class TimeDraw {
     protected static final SimpleDateFormat smonthformat = new SimpleDateFormat("yyyy MMM");         //$NON-NLS-1$
     protected static final SimpleDateFormat syearformat = new SimpleDateFormat("yyyy");              //$NON-NLS-1$
 
+    static String sep(long n) {
+        StringBuilder retVal = new StringBuilder();
+        String s = Long.toString(n);
+        for (int i = 0; i < s.length(); i++) {
+            int pos = s.length() - i - 1;
+            retVal.append(s.charAt(i));
+            if (pos % 3 == 0 && pos != 0) {
+                retVal.append(' ');
+            }
+        }
+        return retVal.toString();
+    }
+
     static String pad(long n) {
-        String s = S;
+        String s;
         if (n < 10) {
             s = S00;
         } else if (n < 100) {
             s = S0;
+        } else {
+            s = S;
         }
         return s + n;
     }
@@ -549,7 +556,7 @@ class TimeDrawSec extends TimeDraw {
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
         time /= 1000000000;
-        Utils.drawText(gc, time + "", rect, true); //$NON-NLS-1$
+        Utils.drawText(gc, sep(time), rect, true); //$NON-NLS-1$
     }
 
     @Override
@@ -559,14 +566,14 @@ class TimeDrawSec extends TimeDraw {
 }
 
 class TimeDrawMillisec extends TimeDraw {
-    static String _hint = "s:ms"; //$NON-NLS-1$
+    static String _hint = "0.000"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
         time /= 1000000;
         long ms = time % 1000;
         time /= 1000;
-        Utils.drawText(gc, time + pad(ms), rect, true);
+        Utils.drawText(gc, sep(time) + "." + pad(ms), rect, true); //$NON-NLS-1$
     }
 
     @Override
@@ -576,7 +583,7 @@ class TimeDrawMillisec extends TimeDraw {
 }
 
 class TimeDrawMicrosec extends TimeDraw {
-    static String _hint = "s:ms:mcs"; //$NON-NLS-1$
+    static String _hint = "0.000 000"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -585,7 +592,7 @@ class TimeDrawMicrosec extends TimeDraw {
         time /= 1000;
         long ms = time % 1000;
         time /= 1000;
-        Utils.drawText(gc, time + pad(ms) + pad(mcs), rect, true);
+        Utils.drawText(gc, sep(time) + "." + pad(ms) + " " + pad(mcs), rect, true); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
@@ -595,7 +602,7 @@ class TimeDrawMicrosec extends TimeDraw {
 }
 
 class TimeDrawNanosec extends TimeDraw {
-    static String _hint = "s:ms:mcs:ns"; //$NON-NLS-1$
+    static String _hint = "0.000 000 000"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -605,7 +612,7 @@ class TimeDrawNanosec extends TimeDraw {
         time /= 1000;
         long ms = time % 1000;
         time /= 1000;
-        Utils.drawText(gc, time + pad(ms) + pad(mcs) + pad(ns), rect, true);
+        Utils.drawText(gc, sep(time) + "." + pad(ms) + " " + pad(mcs) + " " + pad(ns), rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override
