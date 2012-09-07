@@ -90,7 +90,7 @@ public class CtfTmfTrace extends TmfTrace<CtfTmfEvent> implements ITmfEventParse
             /* Set the start and (current) end times for this trace */
             ctx = new CtfTmfLightweightContext(this);
             ctx.setLocation(new CtfLocation(0L));
-            if(ctx.getLocation().equals(CtfIterator.NULL_LOCATION)) {
+            if((ctx.getLocation().equals(CtfIterator.NULL_LOCATION)) || (ctx.getCurrentEvent() == null)) {
                 /* Handle the case where the trace is empty */
                 this.setStartTime(TmfTimestamp.BIG_BANG);
             } else {
