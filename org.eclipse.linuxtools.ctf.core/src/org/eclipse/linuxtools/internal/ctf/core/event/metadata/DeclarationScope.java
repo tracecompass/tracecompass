@@ -308,4 +308,33 @@ public class DeclarationScope {
         }
     }
 
+
+    /**
+     * Get all the type names of this scope.
+     *
+     * @return The type names
+     */
+    public String[] getTypeNames() {
+        String[] keys = new String[types.keySet().size()];
+        return types.keySet().toArray(keys);
+    }
+
+    /**
+     * Replace a type with a new one.
+     *
+     * @param name
+     *            The name of the type
+     * @param newType
+     *            The type
+     * @throws ParseException
+     *             If the type does not exist.
+     */
+    public void replaceType(String name, IDeclaration newType) throws ParseException{
+        if (types.containsKey(name)) {
+            types.put(name, newType);
+        } else {
+            throw new ParseException("Trace does not contain type: " + name); //$NON-NLS-1$
+        }
+    }
+
 }
