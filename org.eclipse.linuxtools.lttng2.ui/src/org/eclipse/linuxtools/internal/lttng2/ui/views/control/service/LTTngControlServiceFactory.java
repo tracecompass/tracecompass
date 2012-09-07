@@ -90,10 +90,11 @@ public class LTTngControlServiceFactory {
             int index = 0;
             while (index < result.getOutput().length) {
                 String line = result.getOutput()[index];
-                Matcher matcher = LTTngControlServiceConstants.VERSION_PATTERN.matcher(line);
-                if (matcher.matches()) {
-                    String version = matcher.group(1).trim();
-                    if (version.startsWith(LTTngControlServiceConstants.LTTNG_MAJOR_VERSION_2_0)) {
+                Matcher versionMatcher = LTTngControlServiceConstants.VERSION_PATTERN.matcher(line);
+                if (versionMatcher.matches()) {
+                    String version = versionMatcher.group(1).trim();
+                    Matcher matcher = LTTngControlServiceConstants.VERSION_2_PATTERN.matcher(version);
+                    if (matcher.matches()) {
                         LTTngControlService service = new LTTngControlService(shell);
                         service.setVersion(version);
                         return service;
