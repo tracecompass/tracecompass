@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
@@ -20,7 +20,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * <p>
  * Property source implementation for the target node component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TargetNodePropertySource extends BasePropertySource {
@@ -41,7 +41,12 @@ public class TargetNodePropertySource extends BasePropertySource {
      */
     public static final String TARGET_NODE_STATE_PROPERTY_ID = "target.node.state"; //$NON-NLS-1$
     /**
-     *  The node name property name. 
+     * The node version property ID.
+     */
+    public static final String TARGET_NODE_VERSION_PROPERTY_ID = "target.node.version"; //$NON-NLS-1$
+
+    /**
+     *  The node name property name.
      */
     public static final String TARGET_NODE_NAME_PROPERTY_NAME = Messages.TraceControl_HostNamePropertyName;
     /**
@@ -52,15 +57,19 @@ public class TargetNodePropertySource extends BasePropertySource {
      * The state address property name.
      */
     public static final String TARGET_NODE_STATE_PROPERTY_NAME = Messages.TraceControl_StatePropertyName;
-    
+    /**
+     * The node version property name.
+     */
+    public static final String TARGET_NODE_VERSION_PROPERTY_NAME = Messages.TraceControl_VersionPropertyName;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The node component which this property source is for. 
+     * The node component which this property source is for.
      */
     private final TargetNodeComponent fTargetNode;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -71,7 +80,7 @@ public class TargetNodePropertySource extends BasePropertySource {
     public TargetNodePropertySource(TargetNodeComponent component) {
         fTargetNode = component;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -84,7 +93,8 @@ public class TargetNodePropertySource extends BasePropertySource {
         return new IPropertyDescriptor[] {
                 new TextPropertyDescriptor(TARGET_NODE_NAME_PROPERTY_ID, TARGET_NODE_NAME_PROPERTY_NAME),
                 new TextPropertyDescriptor(TARGET_NODE_ADDRESS_PROPERTY_ID, TARGET_NODE_ADDRESS_PROPERTY_NAME),
-                new TextPropertyDescriptor(TARGET_NODE_STATE_PROPERTY_ID, TARGET_NODE_STATE_PROPERTY_NAME)};
+                new TextPropertyDescriptor(TARGET_NODE_STATE_PROPERTY_ID, TARGET_NODE_STATE_PROPERTY_NAME),
+                new TextPropertyDescriptor(TARGET_NODE_VERSION_PROPERTY_ID, TARGET_NODE_VERSION_PROPERTY_NAME)};
     }
 
     /*
@@ -101,6 +111,9 @@ public class TargetNodePropertySource extends BasePropertySource {
         }
         if (TARGET_NODE_STATE_PROPERTY_ID.equals(id)) {
             return fTargetNode.getTargetNodeState().name();
+        }
+        if (TARGET_NODE_VERSION_PROPERTY_ID.equals(id)) {
+            return fTargetNode.getNodeVersion();
         }
         return null;
     }

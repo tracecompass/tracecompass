@@ -201,6 +201,7 @@ final public class Messages extends NLS {
     public static String TraceControl_EventTypePropertyName;
     public static String TraceControl_LogLevelPropertyName;
     public static String TraceControl_StatePropertyName;
+    public static String TraceControl_VersionPropertyName;
     public static String TraceControl_DomainNamePropertyName;
     public static String TraceControl_ChannelNamePropertyName;
     public static String TraceControl_OverwriteModePropertyName;

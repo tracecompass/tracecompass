@@ -131,7 +131,7 @@ public class LTTngControlServiceTest extends TestCase {
             fShell.setScenario(SCEN_LTTNG_VERSION);
             ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
             assertNotNull(service);
-            assertEquals("2.0.0", service.getVersion());
+            assertEquals("2.1.0", service.getVersion());
         } catch (ExecutionException e) {
             fail("Exeption thrown " + e);
         }

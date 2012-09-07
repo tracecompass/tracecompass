@@ -160,6 +160,7 @@ public class TraceControlPropertiesTest extends TestCase {
         assertEquals("myNode", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_NAME_PROPERTY_ID));
         assertEquals("LOCALHOST",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
         assertEquals(TargetNodeState.CONNECTED.name(), source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_STATE_PROPERTY_ID));
+        assertEquals("2.0.0", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_VERSION_PROPERTY_ID));
         assertNull(source.getPropertyValue("test"));
 
         adapter = node.getAdapter(IChannelInfo.class);
