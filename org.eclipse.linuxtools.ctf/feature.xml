@@ -24,8 +24,13 @@
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.antlr.runtime" version="3.2.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.ctf.parser" version="1.0.0" match="greaterOrEqual"/>
    </requires>
+
+   <plugin
+         id="org.eclipse.linuxtools.ctf.parser"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.linuxtools.ctf.core"
@@ -33,11 +38,5 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
-   <plugin
-         id="org.eclipse.linuxtools.ctf.parser"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
 
 </feature>
