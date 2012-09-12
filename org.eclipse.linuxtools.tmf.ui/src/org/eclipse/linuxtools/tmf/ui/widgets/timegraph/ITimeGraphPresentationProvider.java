@@ -138,4 +138,16 @@ public interface ITimeGraphPresentationProvider {
      */
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event);
 
+    /**
+     * Returns a map of name and value providing additional information
+     * to display in the tool tip for this event.
+     *
+     * @param event the time event
+     * @param hoverTime the time corresponding to the mouse hover position
+     * @return a map of tool tip information
+     *
+     * @since 2.0
+     */
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime);
+
 }

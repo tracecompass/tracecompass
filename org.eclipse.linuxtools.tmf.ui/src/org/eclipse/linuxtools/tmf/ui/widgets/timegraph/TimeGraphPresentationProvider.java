@@ -138,4 +138,15 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventHoverToolTipInfo(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent, long)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
+        return getEventHoverToolTipInfo(event);
+    }
+
 }
