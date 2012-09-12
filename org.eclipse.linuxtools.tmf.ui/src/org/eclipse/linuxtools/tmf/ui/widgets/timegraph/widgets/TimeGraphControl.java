@@ -38,6 +38,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -48,6 +50,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
@@ -67,7 +70,7 @@ import org.eclipse.swt.widgets.ScrollBar;
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  */
-public class TimeGraphControl extends TimeGraphBaseControl implements FocusListener, KeyListener, MouseMoveListener, MouseListener, MouseWheelListener, ControlListener, SelectionListener, MouseTrackListener, TraverseListener, ISelectionProvider {
+public class TimeGraphControl extends TimeGraphBaseControl implements FocusListener, KeyListener, MouseMoveListener, MouseListener, MouseWheelListener, ControlListener, SelectionListener, MouseTrackListener, TraverseListener, ISelectionProvider, MenuDetectListener {
 
     private static final int DRAG_NONE = 0;
     private static final int DRAG_TRACE_ITEM = 1;
@@ -100,6 +103,8 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     private List<SelectionListener> _selectionListeners;
     private final List<ISelectionChangedListener> _selectionChangedListeners = new ArrayList<ISelectionChangedListener>();
     private final List<ITimeGraphTreeListener> _treeListeners = new ArrayList<ITimeGraphTreeListener>();
+    private final List<MenuDetectListener> _timeGraphEntryMenuListeners = new ArrayList<MenuDetectListener>();
+    private final List<MenuDetectListener> _timeEventMenuListeners = new ArrayList<MenuDetectListener>();
     private final Cursor _dragCursor3;
     private final Cursor _WaitCursor;
 
@@ -172,6 +177,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         addTraverseListener(this);
         addKeyListener(this);
         addControlListener(this);
+        addMenuDetectListener(this);
         ScrollBar scrollHor = getHorizontalBar();
 
         if (scrollHor != null) {
@@ -457,6 +463,78 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             } else {
                 listener.treeCollapsed(event);
             }
+        }
+    }
+    
+    /**
+     * Add a menu listener on {@link ITimeGraphEntry}s
+     *
+     * @param listener
+     *            The listener to add
+     */
+    public void addTimeGraphEntryMenuListener(MenuDetectListener listener) {
+        if (!_timeGraphEntryMenuListeners.contains(listener)) {
+        	_timeGraphEntryMenuListeners.add(listener);
+        }
+    }
+
+    /**
+     * Remove a menu listener on {@link ITimeGraphEntry}s
+     *
+     * @param listener
+     *            The listener to remove
+     */
+    public void removeTimeGraphEntryMenuListener(MenuDetectListener listener) {
+        if (_timeGraphEntryMenuListeners.contains(listener)) {
+        	_timeGraphEntryMenuListeners.remove(listener);
+        }
+    }
+
+    /**
+     * Menu event callback on {@link ITimeGraphEntry}s
+     *
+     * @param event
+     *            The MenuDetectEvent, with field {@link TypedEvent#data} set to the selected {@link ITimeGraphEntry}
+     */
+    private void fireMenuEventOnTimeGraphEntry(MenuDetectEvent event) {
+        for (MenuDetectListener listener : _timeGraphEntryMenuListeners) {
+        	listener.menuDetected(event);
+        }
+    }
+    
+    /**
+     * Add a menu listener on {@link ITimeEvent}s
+     *
+     * @param listener
+     *            The listener to add
+     */
+    public void addTimeEventMenuListener(MenuDetectListener listener) {
+        if (!_timeEventMenuListeners.contains(listener)) {
+        	_timeEventMenuListeners.add(listener);
+        }
+    }
+
+    /**
+     * Remove a menu listener on {@link ITimeEvent}s
+     *
+     * @param listener
+     *            The listener to remove
+     */
+    public void removeTimeEventMenuListener(MenuDetectListener listener) {
+        if (_timeEventMenuListeners.contains(listener)) {
+        	_timeEventMenuListeners.remove(listener);
+        }
+    }
+
+    /**
+     * Menu event callback on {@link ITimeEvent}s
+     *
+     * @param event
+     *            The MenuDetectEvent, with field {@link TypedEvent#data} set to the selected {@link ITimeEvent}
+     */
+    private void fireMenuEventOnTimeEvent(MenuDetectEvent event) {
+        for (MenuDetectListener listener : _timeEventMenuListeners) {
+        	listener.menuDetected(event);
         }
     }
 
@@ -1886,6 +1964,29 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             return _name;
         }
     }
+
+	@Override
+	public void menuDetected(MenuDetectEvent e) {
+		if (null == _timeProvider) {
+            return;
+        }
+		Point p = toControl(e.x, e.y);
+		int idx = getItemIndexAtY(p.y);
+		if (idx >= 0 && idx < _data._expandedItems.length) {
+			Item item = _data._expandedItems[idx];
+			ITimeGraphEntry entry = item._trace;
+			if (entry.hasTimeEvents()) {
+				ITimeEvent event = Utils.findEvent(entry, getTimeAtX(p.x), 2);
+                if (event != null) {
+                	e.data = event;
+                	fireMenuEventOnTimeEvent(e);
+                	return;
+                }
+			}
+			e.data = entry;
+			fireMenuEventOnTimeGraphEntry(e);
+		}
+	}
 
 }
 

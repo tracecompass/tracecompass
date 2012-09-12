@@ -37,6 +37,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -1335,6 +1337,38 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _verticalScrollBar.setValues(selection, min, max, thumb, increment, pageIncrement);
     }
 
+	/**
+	 * @param listener
+	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#addTimeGraphEntryMenuListener(org.eclipse.swt.events.MenuDetectListener)
+	 */
+	public void addTimeGraphEntryMenuListener(MenuDetectListener listener) {
+		_stateCtrl.addTimeGraphEntryMenuListener(listener);
+	}
 
+	/**
+	 * @param listener
+	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#removeTimeGraphEntryMenuListener(org.eclipse.swt.events.MenuDetectListener)
+	 */
+	public void removeTimeGraphEntryMenuListener(MenuDetectListener listener) {
+		_stateCtrl.removeTimeGraphEntryMenuListener(listener);
+	}
+
+	/**
+	 * @param listener
+	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#addTimeEventMenuListener(org.eclipse.swt.events.MenuDetectListener)
+	 */
+	public void addTimeEventMenuListener(MenuDetectListener listener) {
+		_stateCtrl.addTimeEventMenuListener(listener);
+	}
+
+	/**
+	 * @param listener
+	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#removeTimeEventMenuListener(org.eclipse.swt.events.MenuDetectListener)
+	 */
+	public void removeTimeEventMenuListener(MenuDetectListener listener) {
+		_stateCtrl.removeTimeEventMenuListener(listener);
+	}
+
+    
 
 }
