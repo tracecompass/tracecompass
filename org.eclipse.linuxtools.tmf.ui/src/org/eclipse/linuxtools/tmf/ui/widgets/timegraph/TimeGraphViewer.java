@@ -37,6 +37,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -1333,6 +1334,42 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         int increment = 1;
         int pageIncrement = Math.max(1, countPerPage);
         _verticalScrollBar.setValues(selection, min, max, thumb, increment, pageIncrement);
+    }
+
+    /**
+     * @param listener a {@link MenuDetectListener}
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#addTimeGraphEntryMenuListener(org.eclipse.swt.events.MenuDetectListener)
+     * @since 1.2
+     */
+    public void addTimeGraphEntryMenuListener(MenuDetectListener listener) {
+        _stateCtrl.addTimeGraphEntryMenuListener(listener);
+    }
+
+    /**
+     * @param listener a {@link MenuDetectListener}
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#removeTimeGraphEntryMenuListener(org.eclipse.swt.events.MenuDetectListener)
+     * @since 1.2
+     */
+    public void removeTimeGraphEntryMenuListener(MenuDetectListener listener) {
+        _stateCtrl.removeTimeGraphEntryMenuListener(listener);
+    }
+
+    /**
+     * @param listener a {@link MenuDetectListener}
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#addTimeEventMenuListener(org.eclipse.swt.events.MenuDetectListener)
+     * @since 1.2
+     */
+    public void addTimeEventMenuListener(MenuDetectListener listener) {
+        _stateCtrl.addTimeEventMenuListener(listener);
+    }
+
+    /**
+     * @param listener a {@link MenuDetectListener}
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#removeTimeEventMenuListener(org.eclipse.swt.events.MenuDetectListener)
+     * @since 1.2
+     */
+    public void removeTimeEventMenuListener(MenuDetectListener listener) {
+        _stateCtrl.removeTimeEventMenuListener(listener);
     }
 
 
