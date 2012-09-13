@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import java.nio.ByteOrder;
+
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
@@ -116,8 +118,11 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
             low = low & 0x00000000FFFFFFFFL;
             long high = input.getInt(32, false);
             high = high & 0x00000000FFFFFFFFL;
-
-            bits = (high << 32) | low;
+            if (this.declaration.getByteOrder() != ByteOrder.BIG_ENDIAN) {
+                bits = (high << 32) | low;
+            } else {
+                bits = (low << 32) | high;
+            }
         } else {
             bits = input.getInt(length, signed);
             bits = bits & 0x00000000FFFFFFFFL;

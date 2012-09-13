@@ -727,7 +727,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
             content[i] = fields[i].getValue() != null ? fields[i].getValue().toString() : ""; //$NON-NLS-1$
         }
         item.setText(content);
-        item.setData(event);
         item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
         item.setData(Key.RANK, rank);
 
@@ -820,7 +819,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
                 item.setText(i, ""); //$NON-NLS-1$
             }
         }
-        item.setData(null);
         item.setData(Key.TIMESTAMP, null);
         item.setData(Key.RANK, null);
         item.setForeground(null);
@@ -1284,6 +1282,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
         protected long rank;
         protected long foundRank = -1;
         protected TmfDataRequest request;
+        private ITmfTimestamp foundTimestamp = null;
 
         public SearchThread(final ITmfFilterTreeNode searchFilter, final ITmfFilterTreeNode eventFilter, final int startIndex,
                 final long currentRank, final int direction) {
@@ -1315,6 +1314,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
                     rank = event.rank;
                     if (searchFilter.matches(event.event) && ((eventFilter == null) || eventFilter.matches(event.event))) {
                         foundRank = event.rank;
+                        foundTimestamp = event.event.getTimestamp();
                         break;
                     }
                     if (direction == Direction.FORWARD) {
@@ -1352,6 +1352,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
                         super.handleData(event);
                         if (searchFilter.matches(event) && ((eventFilter == null) || eventFilter.matches(event))) {
                             foundRank = currentRank;
+                            foundTimestamp = event.getTimestamp();
                             if (direction == Direction.FORWARD) {
                                 done();
                                 return;
@@ -1415,6 +1416,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
                     }
                     fTable.setSelection(selection);
                     fSelectedRank = foundRank;
+                    fRawViewer.selectAndReveal(fSelectedRank);
+                    if (foundTimestamp != null) {
+                        broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, foundTimestamp));
+                    }
                     synchronized (fSearchSyncObj) {
                         fSearchThread = null;
                     }
