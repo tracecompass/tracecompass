@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.core.request;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
@@ -220,7 +220,7 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
         fRequestFailed = false;
         fRequestCanceled = false;
 
-        if (!(this instanceof ITmfEventRequest) && Tracer.isRequestTraced()) {
+        if (!(this instanceof ITmfEventRequest) && TmfCoreTracer.isRequestTraced()) {
             String type = getClass().getName();
             type = type.substring(type.lastIndexOf('.') + 1);
             @SuppressWarnings("nls")
@@ -228,7 +228,7 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
                     + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)")
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " DataType=" + getDataType().getSimpleName();
-            Tracer.traceRequest(this, message);
+            TmfCoreTracer.traceRequest(this, message);
         }
     }
 
@@ -374,8 +374,8 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
 
     @Override
     public void handleStarted() {
-        if (Tracer.isRequestTraced()) {
-            Tracer.traceRequest(this, "STARTED"); //$NON-NLS-1$
+        if (TmfCoreTracer.isRequestTraced()) {
+            TmfCoreTracer.traceRequest(this, "STARTED"); //$NON-NLS-1$
         }
     }
 
@@ -405,29 +405,29 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
         } else {
             handleSuccess();
         }
-        if (Tracer.isRequestTraced()) {
-            Tracer.traceRequest(this, "COMPLETED (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (TmfCoreTracer.isRequestTraced()) {
+            TmfCoreTracer.traceRequest(this, "COMPLETED (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
     @Override
     public void handleSuccess() {
-        if (Tracer.isRequestTraced()) {
-            Tracer.traceRequest(this, "SUCCEEDED"); //$NON-NLS-1$
+        if (TmfCoreTracer.isRequestTraced()) {
+            TmfCoreTracer.traceRequest(this, "SUCCEEDED"); //$NON-NLS-1$
         }
     }
 
     @Override
     public void handleFailure() {
-        if (Tracer.isRequestTraced()) {
-            Tracer.traceRequest(this, "FAILED"); //$NON-NLS-1$
+        if (TmfCoreTracer.isRequestTraced()) {
+            TmfCoreTracer.traceRequest(this, "FAILED"); //$NON-NLS-1$
         }
     }
 
     @Override
     public void handleCancel() {
-        if (Tracer.isRequestTraced()) {
-            Tracer.traceRequest(this, "CANCELLED"); //$NON-NLS-1$
+        if (TmfCoreTracer.isRequestTraced()) {
+            TmfCoreTracer.traceRequest(this, "CANCELLED"); //$NON-NLS-1$
         }
     }
 

@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.internal.tmf.core.request;
 
-import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -149,7 +149,7 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
         super(ITmfEvent.class, index, nbRequested, blockSize, priority);
         fRange = range;
 
-        if (Tracer.isRequestTraced()) {
+        if (TmfCoreTracer.isRequestTraced()) {
             String type = getClass().getName();
             type = type.substring(type.lastIndexOf('.') + 1);
             @SuppressWarnings("nls")
@@ -158,7 +158,7 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
-            Tracer.traceRequest(this, message);
+            TmfCoreTracer.traceRequest(this, message);
         }
     }
 

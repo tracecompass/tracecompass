@@ -1,17 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.component;
 
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 
@@ -30,7 +31,7 @@ public abstract class TmfComponent implements ITmfComponent {
     // ------------------------------------------------------------------------
 
 	private String fName;
-	
+
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
@@ -45,32 +46,33 @@ public abstract class TmfComponent implements ITmfComponent {
     /**
      * Perform component initialization and register it as a signal listener.
      * Need to be called when the default constructor was used.
-     * 
+     *
      * @param name the component name
      */
     public void init(String name) {
+        TmfCoreTracer.traceComponent(this, "created"); //$NON-NLS-1$
         fName = name;
         TmfSignalManager.register(this);
     }
 
 	/**
 	 * The standard constructor
-	 * 
+	 *
 	 * @param name the component name
 	 */
 	public TmfComponent(String name) {
 		init(name);
 	}
-	
+
 	/**
 	 * The copy constructor
-	 * 
+	 *
 	 * @param other the other component
 	 */
 	public TmfComponent(TmfComponent other) {
         init(other.fName);
 	}
-	
+
     // ------------------------------------------------------------------------
     // Getters/setters
     // ------------------------------------------------------------------------
@@ -100,7 +102,7 @@ public abstract class TmfComponent implements ITmfComponent {
 	@Override
 	public void dispose() {
 		TmfSignalManager.deregister(this);
-//		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "terminated");
+		TmfCoreTracer.traceComponent(this, "disposed"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfThread;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 
@@ -67,9 +67,9 @@ public class TmfRequestExecutor implements Executor {
         fExecutor = executor;
         String canonicalName = fExecutor.getClass().getCanonicalName();
         fExecutorName = canonicalName.substring(canonicalName.lastIndexOf('.') + 1);
-        if (Tracer.isComponentTraced())
+        if (TmfCoreTracer.isComponentTraced())
         {
-            Tracer.trace(fExecutor + " created"); //$NON-NLS-1$
+            TmfCoreTracer.trace(fExecutor + " created"); //$NON-NLS-1$
         }
     }
 
@@ -107,9 +107,9 @@ public class TmfRequestExecutor implements Executor {
 	    }
 
 		fExecutor.shutdown();
-		if (Tracer.isComponentTraced())
+		if (TmfCoreTracer.isComponentTraced())
          {
-            Tracer.trace(fExecutor + " terminated"); //$NON-NLS-1$
+            TmfCoreTracer.trace(fExecutor + " terminated"); //$NON-NLS-1$
         }
 	}
 

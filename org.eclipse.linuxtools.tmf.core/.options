@@ -1,7 +1,3 @@
-org.eclipse.linuxtools.tmf.core/error=false
-org.eclipse.linuxtools.tmf.core/warning=false
-org.eclipse.linuxtools.tmf.core/info=false
-
 org.eclipse.linuxtools.tmf.core/component=false
 org.eclipse.linuxtools.tmf.core/request=false
 org.eclipse.linuxtools.tmf.core/signal=false

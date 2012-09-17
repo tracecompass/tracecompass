@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
-import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
@@ -159,7 +159,7 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
     	super(dataType, index, nbRequested, blockSize, priority);
     	fRange = range;
 
-        if (Tracer.isRequestTraced()) {
+        if (TmfCoreTracer.isRequestTraced()) {
             String type = getClass().getName();
             type = type.substring(type.lastIndexOf('.') + 1);
             @SuppressWarnings("nls")
@@ -168,7 +168,7 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
-            Tracer.traceRequest(this, message);
+            TmfCoreTracer.traceRequest(this, message);
         }
     }
 
