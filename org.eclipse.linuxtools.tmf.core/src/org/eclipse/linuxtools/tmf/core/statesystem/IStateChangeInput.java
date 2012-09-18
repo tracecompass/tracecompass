@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * Usually a state change input, also called "state provider" is the piece of
  * the pipeline which converts trace events to state changes.
  *
- * @version 1.0
+ * @version 2.0
  * @author Alexandre Montplaisir
  */
 public interface IStateChangeInput {
@@ -48,11 +48,11 @@ public interface IStateChangeInput {
      * This will guarantee that all events it receives via processEvent() are
      * indeed of the given type, so it should be safe to cast to that type.
      *
-     * @return An example event of the expected class, which implements
-     *         ITmfEvent. The contents of that event doesn't matter, only the
-     *         class will be checked.
+     * @return The expected Class of the event. Only events of this class (and
+     *         valid subclasses) will be handled.
+     * @since 2.0
      */
-    public ITmfEvent getExpectedEventType();
+    public Class<? extends ITmfEvent> getExpectedEventType();
 
     /**
      * Assign the target state system where this SCI will insert its state
