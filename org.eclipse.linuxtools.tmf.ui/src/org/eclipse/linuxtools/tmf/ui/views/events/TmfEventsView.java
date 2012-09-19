@@ -204,7 +204,6 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
      */
-    @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class adapter) {
         if (IGotoMarker.class.equals(adapter)) {

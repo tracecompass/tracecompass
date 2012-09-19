@@ -44,7 +44,7 @@ public class TmfEditorInput implements IEditorInput {
     }
 
     @Override
-	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+	public Object getAdapter(Class adapter) {
         return null;
     }
 

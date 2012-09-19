@@ -83,7 +83,6 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         fSelection = null;
         if (selection instanceof TreeSelection) {
             fSelection = (TreeSelection) selection;
-            @SuppressWarnings("unchecked")
             Iterator<Object> iterator = fSelection.iterator();
             while (iterator.hasNext()) {
                 Object element = iterator.next();

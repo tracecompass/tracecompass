@@ -176,7 +176,7 @@ public class HistogramZoom implements MouseWheelListener {
         long requestedRange = (nbClicks > 0) ? Math.round(ZOOM_FACTOR * fRangeDuration) : (long) Math.ceil(fRangeDuration * (1.0 / ZOOM_FACTOR));
 
         // Distribute delta and adjust for boundaries
-        long requestedStart = validateStart(fRangeStartTime + (long) ((fRangeDuration - requestedRange) / 2));
+        long requestedStart = validateStart(fRangeStartTime + (fRangeDuration - requestedRange) / 2);
         long requestedEnd = validateEnd(requestedStart, requestedStart + requestedRange);
         requestedStart = validateStart(requestedEnd - requestedRange);
 

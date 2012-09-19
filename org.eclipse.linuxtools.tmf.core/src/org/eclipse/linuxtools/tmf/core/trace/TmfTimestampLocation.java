@@ -1,4 +1,5 @@
 /*******************************************************************************
+
  * Copyright (c) 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
@@ -15,30 +16,37 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * <b><u>TmfTimestampLocation</u></b>
- * <p>
- * Implement me. Please.
- * <p>
+ * A concrete implementation of TmfLocation based on ITmfTimestamp:s
+ *
+ * @author Francois Chouinard
  * @since 2.0
  */
 public class TmfTimestampLocation extends TmfLocation {
 
     /**
-     * @param location the location
+     * The normal constructor
+     *
+     * @param locationInfo the concrete location
      */
-    public TmfTimestampLocation(ITmfTimestamp location) {
-        super(location);
+    public TmfTimestampLocation(final ITmfTimestamp locationInfo) {
+        super(locationInfo);
     }
 
     /**
+     * The copy constructor
+     *
      * @param other the other location
      */
-    public TmfTimestampLocation(TmfTimestampLocation other) {
+    public TmfTimestampLocation(final TmfTimestampLocation other) {
         super(other.getLocationInfo());
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#clone()
+     */
     @Override
     public TmfTimestampLocation clone() {
         return new TmfTimestampLocation((ITmfTimestamp) getLocationInfo());
     }
+
 }

@@ -12,32 +12,38 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-
 /**
- * <b><u>TmfLongLocation</u></b>
- * <p>
- * Implement me. Please.
- * <p>
+ * A concrete implementation of TmfLocation based on Long:s
+ *
+ * @author Francois Chouinard
  * @since 2.0
  */
 public class TmfLongLocation extends TmfLocation {
 
     /**
-     * @param location the location
+     * The normal constructor
+     *
+     * @param locationInfo the concrete location
      */
-    public TmfLongLocation(Long location) {
-        super(location);
+    public TmfLongLocation(final Long locationInfo) {
+        super(locationInfo);
     }
 
     /**
+     * The copy constructor
+     *
      * @param other the other location
      */
-    public TmfLongLocation(TmfLongLocation other) {
+    public TmfLongLocation(final TmfLongLocation other) {
         super(other.getLocationInfo());
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#clone()
+     */
     @Override
     public TmfLongLocation clone() {
         return new TmfLongLocation((Long) getLocationInfo());
     }
+
 }
