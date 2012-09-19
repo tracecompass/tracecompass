@@ -72,6 +72,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     private static final int DRAG_NONE = 0;
     private static final int DRAG_TRACE_ITEM = 1;
     private static final int DRAG_SPLIT_LINE = 2;
+    private static final int DRAG_ZOOM = 3;
     public static final boolean DEFAULT_DRAW_THREAD_JOIN = true;
     public static final boolean DEFAULT_DRAW_THREAD_WAIT = true;
     public static final boolean DEFAULT_DRAW_THREAD_RELEASE = true;
@@ -974,6 +975,16 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         gc.setBackground(_colors.getBkColor(false, false, true));
         drawBackground(gc, bounds.x, bounds.y, nameSpace, bounds.height);
 
+        if (_dragState == DRAG_ZOOM) {
+            // draw selected zoom region background
+            gc.setBackground(_colors.getBkColor(false, false, true));
+            if (_dragX0 < _dragX) {
+                gc.fillRectangle(new Rectangle(_dragX0, bounds.y, _dragX - _dragX0, bounds.height));
+            } else if (_dragX0 > _dragX) {
+                gc.fillRectangle(new Rectangle(_dragX, bounds.y, _dragX0 - _dragX, bounds.height));
+            }
+        }
+
         drawItems(bounds, _timeProvider, _data._expandedItems, _topIndex, nameSpace, gc);
 
         // draw selected time
@@ -991,6 +1002,10 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         if (DRAG_SPLIT_LINE == _dragState) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.BLACK));
             gc.drawLine(bounds.x + nameSpace, bounds.y, bounds.x + nameSpace, bounds.y + bounds.height - 1);
+        } else if (DRAG_ZOOM == _dragState && Math.max(_dragX, _dragX0) > nameSpace) {
+            gc.setForeground(_colors.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
+            gc.drawLine(_dragX0, bounds.y, _dragX0, bounds.y + bounds.height - 1);
+            gc.drawLine(_dragX, bounds.y, _dragX, bounds.y + bounds.height - 1);
         } else if (DRAG_NONE == _dragState && _mouseOverSplitLine && _timeProvider.getNameSpace() > 0) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.RED));
             gc.drawLine(bounds.x + nameSpace, bounds.y, bounds.x + nameSpace, bounds.y + bounds.height - 1);
@@ -1262,6 +1277,14 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     protected void fillSpace(Rectangle rect, GC gc, boolean selected) {
         gc.setBackground(_colors.getBkColor(selected, _isInFocus, false));
         gc.fillRectangle(rect);
+        if (_dragState == DRAG_ZOOM) {
+            gc.setBackground(_colors.getBkColor(selected, _isInFocus, true));
+            if (_dragX0 < _dragX) {
+                gc.fillRectangle(new Rectangle(_dragX0, rect.y, _dragX - _dragX0, rect.height));
+            } else if (_dragX0 > _dragX) {
+                gc.fillRectangle(new Rectangle(_dragX, rect.y, _dragX0 - _dragX, rect.height));
+            }
+        }
         // draw middle line
         gc.setForeground(_colors.getColor(TimeGraphColorScheme.MID_LINE));
         int midy = rect.y + rect.height / 2;
@@ -1456,6 +1479,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         } else if (DRAG_SPLIT_LINE == _dragState) {
             _dragX = e.x;
             _timeProvider.setNameSpace(e.x);
+        } else if (DRAG_ZOOM == _dragState) {
+            _dragX = Math.min(Math.max(e.x, _timeProvider.getNameSpace()), size.x - RIGHT_MARGIN);
+            redraw();
         } else if (DRAG_NONE == _dragState) {
             boolean mouseOverSplitLine = isOverSplitLine(e.x);
             if (_mouseOverSplitLine != mouseOverSplitLine) {
@@ -1471,7 +1497,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         if (null == _timeProvider) {
             return;
         }
-        if (1 == e.button) {
+        if (1 == e.button && (e.stateMask & SWT.BUTTON_MASK) == 0) {
             if (isOverSplitLine(e.x) && _timeProvider.getNameSpace() != 0) {
                 _timeProvider.setNameSpace(_idealNameSpace);
                 boolean mouseOverSplitLine = isOverSplitLine(e.x);
@@ -1491,7 +1517,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     @Override
     public void mouseDown(MouseEvent e) {
-        if (null == _timeProvider) {
+        if (_dragState != DRAG_NONE || null == _timeProvider) {
             return;
         }
         int idx;
@@ -1531,6 +1557,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 redraw();
                 fireSelectionChanged();
             }
+        } else if (3 == e.button) {
+            if (_timeProvider.getTime0() == _timeProvider.getTime1() || getCtrlSize().x - _timeProvider.getNameSpace() <= 0) {
+                return;
+            }
+            setCapture(true);
+            _dragX = _dragX0 = Math.min(Math.max(e.x, _timeProvider.getNameSpace()), getCtrlSize().x - RIGHT_MARGIN);
+            _dragState = DRAG_ZOOM;
         }
     }
 
@@ -1538,7 +1571,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     public void mouseUp(MouseEvent e) {
         if (DRAG_NONE != _dragState) {
             setCapture(false);
-            if (DRAG_TRACE_ITEM == _dragState) {
+            if (e.button == 1 && DRAG_TRACE_ITEM == _dragState) {
                 // Notify time provider to check the need for listener
                 // notification
                 _timeProvider.notifyStartFinishTime();
@@ -1546,10 +1579,27 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                     long time = getTimeAtX(e.x);
                     _timeProvider.setSelectedTimeNotify(time, false);
                 }
-            } else if (DRAG_SPLIT_LINE == _dragState) {
+                _dragState = DRAG_NONE;
+            } else if (e.button == 1 && DRAG_SPLIT_LINE == _dragState) {
                 redraw();
+                _dragState = DRAG_NONE;
+            } else if (e.button == 3 && DRAG_ZOOM == _dragState) {
+                Point size = getCtrlSize();
+                int nameWidth = _timeProvider.getNameSpace();
+                int x = e.x - nameWidth;
+                if (Math.max(_dragX, _dragX0) > nameWidth && _dragX != _dragX0) {
+                    long time0 = getTimeAtX(_dragX0);
+                    long time1 = getTimeAtX(_dragX);
+                    if (time0 < time1) {
+                        _timeProvider.setStartFinishTimeNotify(time0, time1);
+                    } else {
+                        _timeProvider.setStartFinishTimeNotify(time1, time0);
+                    }
+                } else {
+                    redraw();
+                }
+                _dragState = DRAG_NONE;
             }
-            _dragState = DRAG_NONE;
         }
     }
 
