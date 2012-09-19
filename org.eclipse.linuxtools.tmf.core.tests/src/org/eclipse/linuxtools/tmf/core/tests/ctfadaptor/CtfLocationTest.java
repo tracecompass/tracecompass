@@ -72,7 +72,7 @@ public class CtfLocationTest {
         CtfLocation result = new CtfLocation(location);
 
         assertNotNull(result);
-        assertEquals(Long.valueOf(1), (Long)result.getLocationData().getTimestamp());
+        assertEquals(Long.valueOf(1), (Long)result.getLocationInfo().getTimestamp());
     }
 
     /**
@@ -84,7 +84,7 @@ public class CtfLocationTest {
         CtfLocation result = new CtfLocation(timestamp);
 
         assertNotNull(result);
-        assertEquals(new Long(0L), (Long)result.getLocationData().getTimestamp());
+        assertEquals(new Long(0L), (Long)result.getLocationInfo().getTimestamp());
     }
 
     /**
@@ -95,7 +95,7 @@ public class CtfLocationTest {
         CtfLocation result = fixture.clone();
 
         assertNotNull(result);
-        assertEquals(Long.valueOf(1), (Long)result.getLocationData().getTimestamp());
+        assertEquals(Long.valueOf(1), (Long)result.getLocationInfo().getTimestamp());
     }
 
     /**
@@ -103,7 +103,7 @@ public class CtfLocationTest {
      */
     @Test
     public void testGetLocation() {
-        CtfLocationData location = fixture.getLocationData();
+        CtfLocationData location = fixture.getLocationInfo();
         Long result = location.getTimestamp();
         assertNotNull(result);
         assertEquals("1", result.toString()); //$NON-NLS-1$

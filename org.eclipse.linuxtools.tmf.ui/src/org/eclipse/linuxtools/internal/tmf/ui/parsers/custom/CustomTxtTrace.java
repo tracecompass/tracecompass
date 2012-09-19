@@ -89,8 +89,8 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
         try {
             if (location == null) {
                 fFile.seek(0);
-            } else if (location.getLocationData() instanceof Long) {
-                fFile.seek((Long) location.getLocationData());
+            } else if (location.getLocationInfo() instanceof Long) {
+                fFile.seek((Long) location.getLocationInfo());
             }
             String line;
             long rawPos = fFile.getFilePointer();
@@ -149,8 +149,8 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
             return 0;
         }
         try {
-            if (location.getLocationData() instanceof Long) {
-                return (double) ((Long) location.getLocationData()) / fFile.length();
+            if (location.getLocationInfo() instanceof Long) {
+                return (double) ((Long) location.getLocationInfo()) / fFile.length();
             }
         } catch (final IOException e) {
             Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
@@ -190,7 +190,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
         }
 
         final CustomTxtTraceContext context = (CustomTxtTraceContext) tmfContext;
-        if (!(context.getLocation().getLocationData() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
+        if (!(context.getLocation().getLocationInfo() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
             return null;
         }
 

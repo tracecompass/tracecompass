@@ -131,7 +131,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
         for (int i = 0; i < checkpoints.size(); i++) {
             ITmfCheckpoint checkpoint = checkpoints.get(i);
             TmfExperimentLocation expLocation = (TmfExperimentLocation) checkpoint.getLocation();
-            TmfLocationArray locations = expLocation.getLocationData();
+            TmfLocationArray locations = expLocation.getLocationInfo();
             ITmfContext[] trcContexts = new ITmfContext[2];
             trcContexts[0] = new TmfContext(locations.getLocations()[0], (i * pageSize) / 2);
             trcContexts[1] = new TmfContext(locations.getLocations()[1], (i * pageSize) / 2);
@@ -189,7 +189,7 @@ public class TmfExperimentCheckpointIndexTest extends TestCase {
         for (int i = 0; i < checkpoints.size(); i++) {
             ITmfCheckpoint checkpoint = checkpoints.get(i);
             TmfExperimentLocation expLocation = (TmfExperimentLocation) checkpoint.getLocation();
-            TmfLocationArray locations = expLocation.getLocationData();
+            TmfLocationArray locations = expLocation.getLocationInfo();
             ITmfContext[] trcContexts = new ITmfContext[2];
             trcContexts[0] = new TmfContext(locations.getLocations()[0], (i * pageSize) / 2);
             trcContexts[1] = new TmfContext(locations.getLocations()[1], (i * pageSize) / 2);

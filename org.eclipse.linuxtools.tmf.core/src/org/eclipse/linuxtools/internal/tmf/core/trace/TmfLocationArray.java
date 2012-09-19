@@ -83,8 +83,8 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(TmfLocationArray o) {
         for (int i = 0; i < fLocations.length; i++) {
-            Comparable l1 = fLocations[i].getLocationData();
-            Comparable l2 = o.fLocations[i].getLocationData();
+            Comparable l1 = fLocations[i].getLocationInfo();
+            Comparable l2 = o.fLocations[i].getLocationInfo();
             int result = l1.compareTo(l2);
             if (result != 0) {
                 return result;

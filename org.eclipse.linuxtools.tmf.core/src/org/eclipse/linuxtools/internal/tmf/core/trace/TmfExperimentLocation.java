@@ -53,7 +53,7 @@ public class TmfExperimentLocation implements ITmfLocation {
      * @param location the other experiment location
      */
     public TmfExperimentLocation(TmfExperimentLocation location) {
-        this(location.getLocationData());
+        this(location.getLocationInfo());
     }
 
     // ------------------------------------------------------------------------
@@ -66,7 +66,7 @@ public class TmfExperimentLocation implements ITmfLocation {
     @Override
     public TmfExperimentLocation clone() {
 //        super.clone(); // To keep FindBugs happy
-        TmfLocationArray array = getLocationData();
+        TmfLocationArray array = getLocationInfo();
         TmfLocationArray clones = array.clone();
         return new TmfExperimentLocation(clones);
     }
@@ -82,7 +82,7 @@ public class TmfExperimentLocation implements ITmfLocation {
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        ITmfLocation[] locations = getLocationData().getLocations();
+        ITmfLocation[] locations = getLocationInfo().getLocations();
         for (ITmfLocation location : locations) {
             result.append("[" + location + "]");
         }
@@ -119,7 +119,7 @@ public class TmfExperimentLocation implements ITmfLocation {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationData()
      */
     @Override
-    public TmfLocationArray getLocationData() {
+    public TmfLocationArray getLocationInfo() {
         return fLocation;
     }
 

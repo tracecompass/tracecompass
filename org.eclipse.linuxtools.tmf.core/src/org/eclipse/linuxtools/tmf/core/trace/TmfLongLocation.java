@@ -33,11 +33,11 @@ public class TmfLongLocation extends TmfLocation {
      * @param other the other location
      */
     public TmfLongLocation(TmfLongLocation other) {
-        super(other.getLocationData());
+        super(other.getLocationInfo());
     }
 
     @Override
     public TmfLongLocation clone() {
-        return new TmfLongLocation((Long) getLocationData());
+        return new TmfLongLocation((Long) getLocationInfo());
     }
 }

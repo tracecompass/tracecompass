@@ -34,11 +34,11 @@ public class TmfTimestampLocation extends TmfLocation {
      * @param other the other location
      */
     public TmfTimestampLocation(TmfTimestampLocation other) {
-        super(other.getLocationData());
+        super(other.getLocationInfo());
     }
 
     @Override
     public TmfTimestampLocation clone() {
-        return new TmfTimestampLocation((ITmfTimestamp) getLocationData());
+        return new TmfTimestampLocation((ITmfTimestamp) getLocationInfo());
     }
 }

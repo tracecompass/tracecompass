@@ -288,9 +288,9 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
 
         for (int i = 0; i < fTraces.length; i++) {
             // Get the relevant trace attributes
-            final ITmfLocation trcLocation = expLocation.getLocationData().getLocations()[i];
+            final ITmfLocation trcLocation = expLocation.getLocationInfo().getLocations()[i];
             context.getContexts()[i] = fTraces[i].seekEvent(trcLocation);
-            expLocation.getLocationData().getLocations()[i] = context.getContexts()[i].getLocation().clone();
+            expLocation.getLocationInfo().getLocations()[i] = context.getContexts()[i].getLocation().clone();
             context.getEvents()[i] = fTraces[i].getNext(context.getContexts()[i]);
         }
 
@@ -404,7 +404,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
 
                 TmfExperimentLocation location = (TmfExperimentLocation) expContext.getLocation();
                 if (location != null) {
-                    location.getLocationData().getLocations()[trace] = traceContext.getLocation().clone();
+                    location.getLocationInfo().getLocations()[trace] = traceContext.getLocation().clone();
                 }
 
                 fExperimentContext = expContext.clone();

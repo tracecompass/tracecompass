@@ -28,12 +28,12 @@ public class TmfStringLocation extends TmfLocation {
     }
 
     public TmfStringLocation(TmfStringLocation other) {
-        super(other.getLocationData());
+        super(other.getLocationInfo());
     }
 
     @Override
     public TmfStringLocation clone() {
-        return new TmfStringLocation((String) getLocationData());
+        return new TmfStringLocation((String) getLocationInfo());
     }
 
 }

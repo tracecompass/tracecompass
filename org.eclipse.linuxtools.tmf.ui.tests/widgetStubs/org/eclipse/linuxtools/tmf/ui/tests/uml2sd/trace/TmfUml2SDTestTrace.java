@@ -69,7 +69,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
 
         long location = 0;
         if (context != null) {
-            location = (Long) context.getLocation().getLocationData();
+            location = (Long) context.getLocation().getLocationInfo();
         }
 
         try {
