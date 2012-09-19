@@ -30,7 +30,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 /**
@@ -223,7 +223,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
                     long loc  = 0;
                     long rank = 0;
                     if (location != null) {
-                        loc = ((TmfLocation<Long>) location).getLocationData();
+                        loc = ((ITmfLocation<Long>) location).getLocationData();
                         rank = ITmfContext.UNKNOWN_RANK;
                     }
                     if (loc != fTrace.getFilePointer()) {
@@ -252,7 +252,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
         fLock.lock();
         try {
             if (fTrace != null) {
-                final ITmfLocation<?> location = new TmfLocation<Long>(Long.valueOf((long) (ratio * fTrace.length())));
+                final ITmfLocation<?> location = new TmfLongLocation(Long.valueOf((long) (ratio * fTrace.length())));
                 final TmfContext context = seekEvent(location);
                 context.setRank(ITmfContext.UNKNOWN_RANK);
                 return context;
@@ -284,11 +284,11 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
     }
 
     @Override
-    public TmfLocation<Long> getCurrentLocation() {
+    public ITmfLocation<Long> getCurrentLocation() {
         fLock.lock();
         try {
             if (fTrace != null) {
-                return new TmfLocation<Long>(fTrace.getFilePointer());
+                return new TmfLongLocation(fTrace.getFilePointer());
             }
         } catch (final IOException e) {
             e.printStackTrace();

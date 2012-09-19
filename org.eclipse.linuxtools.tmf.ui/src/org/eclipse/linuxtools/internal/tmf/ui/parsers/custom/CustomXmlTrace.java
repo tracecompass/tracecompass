@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,7 +47,7 @@ import org.xml.sax.SAXParseException;
 
 public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
 
-    private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
+    private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
 
     private final CustomXmlTraceDefinition fDefinition;
@@ -111,7 +111,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
             while ((line = fFile.getNextLine()) != null) {
                 final int idx = line.indexOf(recordElementStart);
                 if (idx != -1) {
-                    context.setLocation(new TmfLocation<Long>(rawPos + idx));
+                    context.setLocation(new TmfLongLocation(rawPos + idx));
                     return context;
                 }
                 rawPos = fFile.getFilePointer();
@@ -138,7 +138,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
                 }
                 pos--;
             }
-            final ITmfLocation<?> location = new TmfLocation<Long>(pos);
+            final ITmfLocation<Long> location = new TmfLongLocation(pos);
             final TmfContext context = seekEvent(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
@@ -219,7 +219,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
             while ((line = fFile.getNextLine()) != null) {
                 final int idx = line.indexOf(recordElementStart);
                 if (idx != -1) {
-                    context.setLocation(new TmfLocation<Long>(rawPos + idx));
+                    context.setLocation(new TmfLongLocation(rawPos + idx));
                     return event;
                 }
                 rawPos = fFile.getFilePointer();

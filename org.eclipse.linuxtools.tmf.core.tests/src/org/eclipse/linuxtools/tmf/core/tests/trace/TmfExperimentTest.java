@@ -38,7 +38,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
@@ -190,7 +190,7 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testSeekBadLocation() {
-        ITmfContext context = fExperiment.seekEvent(new TmfLocation<Long>(0L));
+        ITmfContext context = fExperiment.seekEvent(new TmfLongLocation(0L));
         assertNull("seekEvent", context);
     }
 

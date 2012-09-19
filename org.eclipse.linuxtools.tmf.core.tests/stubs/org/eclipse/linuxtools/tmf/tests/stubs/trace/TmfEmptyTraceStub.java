@@ -16,7 +16,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
  * <b><u>TmfEmptyTraceStub</u></b>
@@ -60,7 +59,7 @@ public class TmfEmptyTraceStub extends TmfTraceStub {
     }
 
     @Override
-    public TmfLocation<Long> getCurrentLocation() {
+    public ITmfLocation<Long> getCurrentLocation() {
         return null;
     }
 

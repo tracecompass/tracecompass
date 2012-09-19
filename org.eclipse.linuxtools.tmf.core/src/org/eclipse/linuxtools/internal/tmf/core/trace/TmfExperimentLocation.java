@@ -14,7 +14,6 @@
 package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
  * The experiment location in TMF.
@@ -31,7 +30,9 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  *
  * @see TmfLocationArray
  */
-public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
+public class TmfExperimentLocation implements ITmfLocation<TmfLocationArray> {
+
+    TmfLocationArray fLocation;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -43,7 +44,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
      * @param locations the set of trace locations
      */
     public TmfExperimentLocation(TmfLocationArray locations) {
-        super(locations);
+        fLocation = locations;
     }
 
     /**
@@ -112,6 +113,14 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
             return false;
         }
         return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationData()
+     */
+    @Override
+    public TmfLocationArray getLocationData() {
+        return fLocation;
     }
 
 }

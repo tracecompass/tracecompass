@@ -13,18 +13,16 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-import java.lang.reflect.Method;
-
 /**
  * A convenience implementation on of ITmfLocation. The generic class (L) must
  * be comparable.
  *
- * @param <L> The trace lcoation type
+ * @param <L> The trace location type
  *
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cloneable {
+public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -77,30 +75,33 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cl
     // Cloneable
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
     @Override
-    @SuppressWarnings("unchecked")
-    public TmfLocation<L> clone() {
-        TmfLocation<L> clone = null;
-        try {
-            clone = (TmfLocation<L>) super.clone();
-            if (fLocationData != null) {
-                final Class<?> clazz = fLocationData.getClass();
-                final Method method = clazz.getMethod("clone", new Class[0]); //$NON-NLS-1$
-                final Object copy = method.invoke(this.fLocationData, new Object[0]);
-                clone.fLocationData = (L) copy;
-            } else {
-                clone.fLocationData = null;
-            }
-        } catch (final CloneNotSupportedException e) {
-        } catch (final NoSuchMethodException e) {
-        } catch (final Exception e) {
-            throw new InternalError(e.toString());
-        }
-        return clone;
-    }
+    public abstract TmfLocation<L> clone();
+
+//    /* (non-Javadoc)
+//     * @see java.lang.Object#clone()
+//     */
+//    @Override
+//    @SuppressWarnings("unchecked")
+//    public TmfLocation<L> clone() {
+//        TmfLocation<L> clone = null;
+//        try {
+//            clone = (TmfLocation<L>) super.clone();
+//            if (fLocationData != null) {
+//                final Class<?> clazz = fLocationData.getClass();
+//                final Method method = clazz.getMethod("clone", new Class[0]); //$NON-NLS-1$
+//                final Object copy = method.invoke(this.fLocationData, new Object[0]);
+//                clone.fLocationData = (L) copy;
+//            } else {
+//                clone.fLocationData = null;
+//            }
+//        } catch (final CloneNotSupportedException e) {
+//        } catch (final NoSuchMethodException e) {
+//        } catch (final Exception e) {
+//            throw new InternalError(e.toString());
+//        }
+//        return clone;
+//    }
 
     // ------------------------------------------------------------------------
     // Object
