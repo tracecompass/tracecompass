@@ -238,6 +238,16 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         _rect0.height--;
         gc.fillRectangle(_rect0);
 
+        if (3 == _dragState && null != _timeProvider) {
+            // draw selected zoom region background
+            gc.setBackground(_colors.getBkColor(true, false, true));
+            if (_dragX0 < _dragX) {
+                gc.fillRectangle(new Rectangle(leftSpace + _dragX0, _rect0.y, _dragX - _dragX0, _rect0.height));
+            } else if (_dragX0 > _dragX) {
+                gc.fillRectangle(new Rectangle(leftSpace + _dragX, _rect0.y, _dragX0 - _dragX, _rect0.height));
+            }
+        }
+
         if (time1 <= time0 || timeSpace < 2) {
             return;
         }
@@ -251,13 +261,10 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         TimeDraw timeDraw = getTimeDraw(_timeDelta);
 
-        // draw zoom rectangle
+        // draw selected zoom region lines
         if (3 == _dragState && null != _timeProvider) {
-            if (_dragX0 < _dragX) {
-                gc.drawRectangle(leftSpace + _dragX0, rect.y, _dragX - _dragX0 - 1, rect.height - 8);
-            } else if (_dragX0 > _dragX) {
-                gc.drawRectangle(leftSpace + _dragX, rect.y, _dragX0 - _dragX - 1, rect.height - 8);
-            }
+            gc.drawLine(leftSpace + _dragX0, rect.y, leftSpace + _dragX0, rect.y + rect.height);
+            gc.drawLine(leftSpace + _dragX, rect.y, leftSpace + _dragX, rect.y + rect.height);
         }
 
         if (_rect0.isEmpty()) {
@@ -434,6 +441,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         } else if (e.button == 3 && _dragState == 3 && null != _timeProvider) {
             _dragState = 0;
             if (_dragX0 == _dragX || _timeProvider.getTime0() == _timeProvider.getTime1()) {
+                redraw();
                 return;
             }
             int timeSpace = _timeProvider.getTimeSpace();
@@ -492,7 +500,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
     @Override
     public void mouseDoubleClick(MouseEvent e) {
-        if (null != _timeProvider && _timeProvider.getTime0() != _timeProvider.getTime1()) {
+        if (e.button == 1 && null != _timeProvider && _timeProvider.getTime0() != _timeProvider.getTime1() && (e.stateMask & SWT.BUTTON_MASK) == 0) {
             _timeProvider.resetStartFinishTime();
             _time0bak = _timeProvider.getTime0();
             _time1bak = _timeProvider.getTime1();

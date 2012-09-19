@@ -250,6 +250,9 @@ public class TimeGraphTooltipHandler {
 
             @Override
             public void mouseHover(MouseEvent event) {
+                if ((event.stateMask & SWT.BUTTON_MASK) != 0) {
+                    return;
+                }
                 Point pt = new Point(event.x, event.y);
                 TimeGraphControl timeGraphControl = (TimeGraphControl) event.widget;
                 createTooltipShell(timeGraphControl.getShell());
