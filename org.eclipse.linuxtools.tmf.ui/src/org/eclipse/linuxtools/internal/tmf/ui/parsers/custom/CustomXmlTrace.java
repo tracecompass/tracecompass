@@ -93,7 +93,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
     }
 
     @Override
-    public synchronized TmfContext seekEvent(final ITmfLocation<?> location) {
+    public synchronized TmfContext seekEvent(final ITmfLocation location) {
         final CustomXmlTraceContext context = new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         if (NULL_LOCATION.equals(location) || fFile == null) {
             return context;
@@ -138,7 +138,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
                 }
                 pos--;
             }
-            final ITmfLocation<Long> location = new TmfLongLocation(pos);
+            final ITmfLocation location = new TmfLongLocation(pos);
             final TmfContext context = seekEvent(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
@@ -149,7 +149,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
     }
 
     @Override
-    public synchronized double getLocationRatio(final ITmfLocation<?> location) {
+    public synchronized double getLocationRatio(final ITmfLocation location) {
         if (fFile == null) {
             return 0;
         }
@@ -164,7 +164,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
     }
 
     @Override
-    public ITmfLocation<?> getCurrentLocation() {
+    public ITmfLocation getCurrentLocation() {
         // TODO Auto-generated method stub
         return null;
     }

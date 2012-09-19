@@ -87,16 +87,16 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	private final CaretPosition[] fStoredCaretPosition = new CaretPosition[]
 	            { new CaretPosition(0, 0), new CaretPosition(0,0)};
 	private int fNumVisibleLines;
-    private ITmfLocation<?> fSelectedLocation = null;
+    private ITmfLocation fSelectedLocation = null;
     private long fHighlightedRank = Long.MIN_VALUE;
     private int fCursorYCoordinate = -1;
     private int fHoldSelection = 0;
 
 	private static class LineData {
 	    long rank;
-	    ITmfLocation<?> location;
+	    ITmfLocation location;
 	    String string;
-	    public LineData(long rank, ITmfLocation<?> location, String string) {
+	    public LineData(long rank, ITmfLocation location, String string) {
 	        this.rank = rank;
 	        this.location = location;
             if (string.length() == 0) {
@@ -408,10 +408,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                     singleEvent = true;
                 }
                 while (fTopLineIndex < 0) {
-                    ITmfLocation<?> endLocation = fLines.get(0).location;
+                    ITmfLocation endLocation = fLines.get(0).location;
                     firstRatio = Math.max(0, firstRatio - delta);
                     ITmfContext context = fTrace.seekEvent(firstRatio);
-                    ITmfLocation<?> location;
+                    ITmfLocation location;
                     int index = 0;
                     long rank = 0;
                     while (!context.getLocation().equals(endLocation)) {
@@ -468,7 +468,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	            }
 	        }
             long rank = fBottomContext.getRank();
-            ITmfLocation<?> location = fBottomContext.getLocation() != null ? fBottomContext.getLocation().clone() : null;
+            ITmfLocation location = fBottomContext.getLocation() != null ? fBottomContext.getLocation().clone() : null;
             ITmfEvent event = fTrace.getNext(fBottomContext);
             if (event == null) {
                 break;

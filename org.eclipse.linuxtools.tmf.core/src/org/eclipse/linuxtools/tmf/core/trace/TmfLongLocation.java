@@ -20,18 +20,24 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * <p>
  * @since 2.0
  */
-public class TmfLongLocation extends TmfLocation<Long> {
+public class TmfLongLocation extends TmfLocation {
 
+    /**
+     * @param location the location
+     */
     public TmfLongLocation(Long location) {
         super(location);
     }
 
-    public TmfLongLocation(TmfLongLocation location) {
-        super(location.getLocationData());
+    /**
+     * @param other the other location
+     */
+    public TmfLongLocation(TmfLongLocation other) {
+        super(other.getLocationData());
     }
 
     @Override
     public TmfLongLocation clone() {
-        return new TmfLongLocation(getLocationData());
+        return new TmfLongLocation((Long) getLocationData());
     }
 }

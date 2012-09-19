@@ -483,7 +483,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
                     }
                     fTable.setSelection(index + 1); // +1 for header row
                     fSelectedRank = rank;
-                } else if (e.data instanceof ITmfLocation<?>) {
+                } else if (e.data instanceof ITmfLocation) {
                     // DOES NOT WORK: rank undefined in context from seekLocation()
                     // ITmfLocation<?> location = (ITmfLocation<?>) e.data;
                     // TmfContext context = fTrace.seekLocation(location);

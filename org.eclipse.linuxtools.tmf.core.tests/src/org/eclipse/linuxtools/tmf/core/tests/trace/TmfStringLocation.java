@@ -20,19 +20,20 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  * Implement me. Please.
  * <p>
  */
-public class TmfStringLocation extends TmfLocation<String> {
+@SuppressWarnings("javadoc")
+public class TmfStringLocation extends TmfLocation {
 
     public TmfStringLocation(String location) {
         super(location);
     }
 
-    public TmfStringLocation(TmfStringLocation location) {
-        super(location.getLocationData());
+    public TmfStringLocation(TmfStringLocation other) {
+        super(other.getLocationData());
     }
 
     @Override
     public TmfStringLocation clone() {
-        return new TmfStringLocation(getLocationData());
+        return new TmfStringLocation((String) getLocationData());
     }
 
 }

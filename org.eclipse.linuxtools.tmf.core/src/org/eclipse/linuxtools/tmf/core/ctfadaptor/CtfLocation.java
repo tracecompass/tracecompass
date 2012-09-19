@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  * @version 1.0
  * @author Matthew Khouzam
  */
-public class CtfLocation implements ITmfLocation<CtfLocationData>, Cloneable {
+public class CtfLocation implements ITmfLocation, Cloneable {
 
     private CtfLocationData fLocation;
 

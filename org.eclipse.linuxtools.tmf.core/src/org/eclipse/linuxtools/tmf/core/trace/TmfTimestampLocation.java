@@ -21,18 +21,24 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
  * <p>
  * @since 2.0
  */
-public class TmfTimestampLocation extends TmfLocation<ITmfTimestamp> {
+public class TmfTimestampLocation extends TmfLocation {
 
+    /**
+     * @param location the location
+     */
     public TmfTimestampLocation(ITmfTimestamp location) {
         super(location);
     }
 
-    public TmfTimestampLocation(TmfTimestampLocation location) {
-        super( location.getLocationData());
+    /**
+     * @param other the other location
+     */
+    public TmfTimestampLocation(TmfTimestampLocation other) {
+        super(other.getLocationData());
     }
 
     @Override
     public TmfTimestampLocation clone() {
-        return new TmfTimestampLocation(getLocationData());
+        return new TmfTimestampLocation((ITmfTimestamp) getLocationData());
     }
 }

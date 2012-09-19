@@ -281,7 +281,7 @@ public class TmfLocationTest extends TestCase {
     }
 
     public void testEqualsWrongTypes() {
-        ITmfLocation<String> location1 = new TmfStringLocation(aString);
+        ITmfLocation location1 = new TmfStringLocation(aString);
         TmfLocation2 location2 = new TmfLocation2(aString);
 
         assertFalse("equals", location1.equals(location2));

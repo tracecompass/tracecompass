@@ -204,7 +204,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      * @param location ITmfLocation<?>
      */
     @Override
-    public void setLocation(final ITmfLocation<?> location) {
+    public void setLocation(final ITmfLocation location) {
         // FIXME alex: isn't there a cleaner way than a cast here?
         this.curLocation = (CtfLocation) location;
         seek(((CtfLocation) location).getLocationData());

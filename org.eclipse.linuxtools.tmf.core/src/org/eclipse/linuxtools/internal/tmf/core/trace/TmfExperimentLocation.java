@@ -30,7 +30,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  *
  * @see TmfLocationArray
  */
-public class TmfExperimentLocation implements ITmfLocation<TmfLocationArray> {
+public class TmfExperimentLocation implements ITmfLocation {
 
     TmfLocationArray fLocation;
 
@@ -82,8 +82,8 @@ public class TmfExperimentLocation implements ITmfLocation<TmfLocationArray> {
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        ITmfLocation<? extends Comparable<?>>[] locations = getLocationData().getLocations();
-        for (ITmfLocation<?> location : locations) {
+        ITmfLocation[] locations = getLocationData().getLocations();
+        for (ITmfLocation location : locations) {
             result.append("[" + location + "]");
         }
         result.append("]");

@@ -17,18 +17,16 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * A convenience implementation on of ITmfLocation. The generic class (L) must
  * be comparable.
  *
- * @param <L> The trace location type
- *
  * @version 1.0
  * @author Francois Chouinard
  */
-public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L>, Cloneable {
+public abstract class TmfLocation implements ITmfLocation, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private L fLocationData;
+    private Comparable<?> fLocationData;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -46,7 +44,7 @@ public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocati
      *
      * @param locationData the trace location
      */
-    public TmfLocation(final L locationData) {
+    public TmfLocation(final Comparable<?> locationData) {
         fLocationData = locationData;
     }
 
@@ -55,7 +53,7 @@ public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocati
      *
      * @param location the original location
      */
-    public TmfLocation(final TmfLocation<L> location) {
+    public TmfLocation(final TmfLocation location) {
         fLocationData = location.fLocationData;
     }
 
@@ -67,7 +65,7 @@ public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocati
      * @since 2.0
      */
     @Override
-    public L getLocationData() {
+    public Comparable<?> getLocationData() {
         return fLocationData;
     }
 
@@ -76,7 +74,7 @@ public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocati
     // ------------------------------------------------------------------------
 
     @Override
-    public abstract TmfLocation<L> clone();
+    public abstract TmfLocation clone();
 
 //    /* (non-Javadoc)
 //     * @see java.lang.Object#clone()
@@ -122,7 +120,6 @@ public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocati
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    @SuppressWarnings("unchecked")
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -133,7 +130,7 @@ public abstract class TmfLocation<L extends Comparable<L>> implements ITmfLocati
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final TmfLocation<L> other = (TmfLocation<L>) obj;
+        final TmfLocation other = (TmfLocation) obj;
         if (fLocationData == null) {
             if (other.fLocationData != null) {
                 return false;

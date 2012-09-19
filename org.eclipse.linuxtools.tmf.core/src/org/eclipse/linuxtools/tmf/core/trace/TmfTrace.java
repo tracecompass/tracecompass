@@ -439,7 +439,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
         // A rank <= 0 indicates to seek the first event
         if (rank <= 0) {
-            ITmfContext context = seekEvent((ITmfLocation<?>) null);
+            ITmfContext context = seekEvent((ITmfLocation) null);
             context.setRank(0);
             return context;
         }
@@ -466,7 +466,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
         // A null timestamp indicates to seek the first event
         if (timestamp == null) {
-            ITmfContext context = seekEvent((ITmfLocation<?>) null);
+            ITmfContext context = seekEvent((ITmfLocation) null);
             context.setRank(0);
             return context;
         }

@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
  * @version 1.0
  * @author Matthew khouzam
  */
-public class CtfTmfTrace extends TmfTrace implements ITmfEventParser{
+public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
 
 
     //-------------------------------------------
@@ -155,14 +155,14 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser{
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getCurrentLocation()
      */
     @Override
-    public ITmfLocation<?> getCurrentLocation() {
+    public ITmfLocation getCurrentLocation() {
         return null;
     }
 
 
 
     @Override
-    public double getLocationRatio(ITmfLocation<?> location) {
+    public double getLocationRatio(ITmfLocation location) {
         final CtfLocation curLocation = (CtfLocation) location;
         final CtfTmfLightweightContext context = new CtfTmfLightweightContext(this);
         context.setLocation(curLocation);
@@ -197,7 +197,7 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser{
      * @return ITmfContext
      */
     @Override
-    public ITmfContext seekEvent(final ITmfLocation<?> location) {
+    public ITmfContext seekEvent(final ITmfLocation location) {
         CtfLocation currentLocation = (CtfLocation) location;
         CtfTmfLightweightContext context = new CtfTmfLightweightContext(this);
         /*

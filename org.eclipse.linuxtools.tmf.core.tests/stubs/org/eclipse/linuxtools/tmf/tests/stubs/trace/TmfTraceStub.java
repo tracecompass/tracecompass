@@ -212,8 +212,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
     // ------------------------------------------------------------------------
 
     @Override
-    @SuppressWarnings("unchecked")
-    public TmfContext seekEvent(final ITmfLocation<?> location) {
+    public TmfContext seekEvent(final ITmfLocation location) {
         try {
             fLock.lock();
             try {
@@ -223,7 +222,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
                     long loc  = 0;
                     long rank = 0;
                     if (location != null) {
-                        loc = ((ITmfLocation<Long>) location).getLocationData();
+                        loc = (Long) location.getLocationData();
                         rank = ITmfContext.UNKNOWN_RANK;
                     }
                     if (loc != fTrace.getFilePointer()) {
@@ -252,7 +251,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
         fLock.lock();
         try {
             if (fTrace != null) {
-                final ITmfLocation<?> location = new TmfLongLocation(Long.valueOf((long) (ratio * fTrace.length())));
+                final ITmfLocation location = new TmfLongLocation(Long.valueOf((long) (ratio * fTrace.length())));
                 final TmfContext context = seekEvent(location);
                 context.setRank(ITmfContext.UNKNOWN_RANK);
                 return context;
@@ -267,7 +266,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
     }
 
     @Override
-    public double getLocationRatio(ITmfLocation<?> location) {
+    public double getLocationRatio(ITmfLocation location) {
         fLock.lock();
         try {
             if (fTrace != null) {
@@ -284,7 +283,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
     }
 
     @Override
-    public ITmfLocation<Long> getCurrentLocation() {
+    public ITmfLocation getCurrentLocation() {
         fLock.lock();
         try {
             if (fTrace != null) {

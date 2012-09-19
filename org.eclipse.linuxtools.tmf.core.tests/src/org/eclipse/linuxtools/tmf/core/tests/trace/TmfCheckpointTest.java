@@ -39,9 +39,9 @@ public class TmfCheckpointTest extends TestCase {
     Long aLong1 = 12345L;
     Long aLong2 = 23456L;
     Long aLong3 = 34567L;
-    ITmfLocation<Long> fLocation1 = new TmfLongLocation(aLong1);
-    ITmfLocation<Long> fLocation2 = new TmfLongLocation(aLong2);
-    ITmfLocation<Long> fLocation3 = new TmfLongLocation(aLong3);
+    ITmfLocation fLocation1 = new TmfLongLocation(aLong1);
+    ITmfLocation fLocation2 = new TmfLongLocation(aLong2);
+    ITmfLocation fLocation3 = new TmfLongLocation(aLong3);
 
     TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation1));
     TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, new TmfContext(fLocation2));

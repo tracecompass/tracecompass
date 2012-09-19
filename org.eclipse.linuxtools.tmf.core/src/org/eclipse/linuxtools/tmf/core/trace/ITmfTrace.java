@@ -207,7 +207,7 @@ public interface ITmfTrace extends ITmfDataProvider {
     /**
      * @return the current trace location
      */
-    public ITmfLocation<?> getCurrentLocation();
+    public ITmfLocation getCurrentLocation();
 
     /**
      * Returns the ratio (proportion) corresponding to the specified location.
@@ -215,7 +215,7 @@ public interface ITmfTrace extends ITmfDataProvider {
      * @param location a trace specific location
      * @return a floating-point number between 0.0 (beginning) and 1.0 (end)
      */
-    public double getLocationRatio(ITmfLocation<?> location);
+    public double getLocationRatio(ITmfLocation location);
 
     // ------------------------------------------------------------------------
     // SeekEvent operations (returning a trace context)
@@ -233,7 +233,7 @@ public interface ITmfTrace extends ITmfDataProvider {
      * @param location the trace specific location
      * @return a context which can later be used to read the corresponding event
      */
-    public ITmfContext seekEvent(ITmfLocation<?> location);
+    public ITmfContext seekEvent(ITmfLocation location);
 
     /**
      * Position the trace at the 'rank'th event in the trace.

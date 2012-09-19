@@ -296,7 +296,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      * @return the corresponding context
      */
     private ITmfContext restoreCheckpoint(final int checkpoint) {
-        ITmfLocation<?> location = null;
+        ITmfLocation location = null;
         int index = 0;
         synchronized (fTraceIndex) {
             if (!fTraceIndex.isEmpty()) {

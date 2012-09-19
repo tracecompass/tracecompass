@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 public class CustomXmlTraceContext extends TmfContext {
 
-    public CustomXmlTraceContext(ITmfLocation<?> location, long rank) {
+    public CustomXmlTraceContext(ITmfLocation location, long rank) {
         super(location, rank);
     }
 
