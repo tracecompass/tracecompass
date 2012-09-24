@@ -794,7 +794,8 @@ public class IOStructGen {
             long logLevel = parseUnaryInteger((CommonTree) rightNode.getChild(0));
             event.setLogLevel(logLevel);
         } else {
-            throw new ParseException("Unknown event attribute : " + left); //$NON-NLS-1$
+            /* Unknown event attribute, we'll simply ignore it */
+            // FIXME log this?
         }
     }
 
