@@ -51,9 +51,7 @@ public class TmfLongLocation extends TmfLocation {
      */
     @Override
     public TmfLongLocation clone() {
-        TmfLongLocation clone = null;
-        clone = (TmfLongLocation) super.clone();
-        return clone;
+        return (TmfLongLocation) super.clone();
     }
 
     /* (non-Javadoc)

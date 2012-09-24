@@ -54,9 +54,7 @@ public class TmfTimestampLocation extends TmfLocation {
      */
     @Override
     public TmfTimestampLocation clone() {
-        TmfTimestampLocation clone = null;
-        clone = (TmfTimestampLocation) super.clone();
-        return clone;
+        return (TmfTimestampLocation) super.clone();
     }
 
     /* (non-Javadoc)

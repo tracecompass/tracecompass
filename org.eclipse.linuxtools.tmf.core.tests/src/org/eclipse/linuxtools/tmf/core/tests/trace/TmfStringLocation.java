@@ -49,9 +49,7 @@ public class TmfStringLocation extends TmfLocation {
      */
     @Override
     public TmfStringLocation clone() {
-        TmfStringLocation clone = null;
-        clone = (TmfStringLocation) super.clone();
-        return clone;
+        return (TmfStringLocation) super.clone();
     }
 
     /* (non-Javadoc)
