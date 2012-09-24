@@ -39,11 +39,30 @@ public class TmfLongLocation extends TmfLocation {
     }
 
     /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationInfo()
+     */
+    @Override
+    public Long getLocationInfo() {
+        return (Long) super.getLocationInfo();
+    }
+
+    /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#clone()
      */
     @Override
     public TmfLongLocation clone() {
-        return new TmfLongLocation((Long) getLocationInfo());
+        TmfLongLocation clone = null;
+        clone = (TmfLongLocation) super.clone();
+        return clone;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#cloneValue()
+     */
+    @Override
+    protected Long cloneLocationInfo() {
+        // No need to clone a Long
+        return getLocationInfo();
     }
 
 }

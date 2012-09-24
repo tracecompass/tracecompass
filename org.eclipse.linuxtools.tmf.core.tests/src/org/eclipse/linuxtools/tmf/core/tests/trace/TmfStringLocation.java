@@ -20,20 +20,47 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  * Implement me. Please.
  * <p>
  */
-@SuppressWarnings("javadoc")
 public class TmfStringLocation extends TmfLocation {
 
+    /**
+     * @param location the concrete trace location
+     */
     public TmfStringLocation(String location) {
         super(location);
     }
 
+    /**
+     * @param other the other location
+     */
     public TmfStringLocation(TmfStringLocation other) {
         super(other.getLocationInfo());
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationInfo()
+     */
+    @Override
+    public String getLocationInfo() {
+        return (String) super.getLocationInfo();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
     @Override
     public TmfStringLocation clone() {
-        return new TmfStringLocation((String) getLocationInfo());
+        TmfStringLocation clone = null;
+        clone = (TmfStringLocation) super.clone();
+        return clone;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#cloneValue()
+     */
+    @Override
+    protected String cloneLocationInfo() {
+        // No need to clone a String
+        return getLocationInfo();
     }
 
 }

@@ -42,11 +42,29 @@ public class TmfTimestampLocation extends TmfLocation {
     }
 
     /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationInfo()
+     */
+    @Override
+    public ITmfTimestamp getLocationInfo() {
+        return (ITmfTimestamp) super.getLocationInfo();
+    }
+
+    /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#clone()
      */
     @Override
     public TmfTimestampLocation clone() {
-        return new TmfTimestampLocation((ITmfTimestamp) getLocationInfo());
+        TmfTimestampLocation clone = null;
+        clone = (TmfTimestampLocation) super.clone();
+        return clone;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#cloneValue()
+     */
+    @Override
+    protected ITmfTimestamp cloneLocationInfo() {
+        return getLocationInfo().clone();
     }
 
 }
