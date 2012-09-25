@@ -4,7 +4,7 @@
    <description url="http://download.eclipse.org/linuxtools/updates-nightly-juno">
       Nightly builds of Linux Tools project.
    </description>
-   <feature url="features/org.eclipse.linuxtools.lttng2.kernel_1.1.0.qualifier.jar" id="org.eclipse.linuxtools.lttng2.kernel" version="1.1.0.qualifier">
+   <feature url="features/org.eclipse.linuxtools.lttng2.kernel_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng2.kernel" version="0.0.0">
       <category name="LTTng"/>
    </feature>
    <category-def name="LTTng" label="Linux Tracing Toolkit"/>
