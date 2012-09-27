@@ -79,7 +79,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
          * because the super needs to know the cache size.
          */
         setCacheSize();
-        super.initTrace(resource, path, eventType);
 
         @SuppressWarnings("unused")
         CtfTmfEventType type;
@@ -108,6 +107,8 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
              */
             throw new TmfTraceException(e.getMessage(), e);
         }
+
+        super.initTrace(resource, path, eventType);
 
         //FIXME This should be called via the ExperimentUpdated signal
         buildStateSystem();
