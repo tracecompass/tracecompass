@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
@@ -373,6 +374,37 @@ public class HistogramView extends TmfView {
     }
 
     /**
+     * @param signal the incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void experimentDisposed(TmfExperimentDisposedSignal signal) {
+
+        // Kill any running request
+        if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
+            fTimeRangeRequest.cancel();
+        }
+        if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
+            fFullTraceRequest.cancel();
+        }
+
+        // Initialize the internal data
+        fCurrentExperiment = null;
+        fExperimentStartTime = 0;
+        fExperimentEndTime = 0;
+        fWindowStartTime = 0;
+        fWindowEndTime = 0;
+        fWindowSpan = INITIAL_WINDOW_SPAN;
+        fCurrentTimestamp = 0;
+
+        // Clear the UI widgets
+        fFullTraceHistogram.clear();
+        fTimeRangeHistogram.clear();
+        fCurrentEventTimeControl.setValue(0);
+        fTimeSpanControl.setValue(0);
+    }
+
+    /**
      * Handles experiment range updated signal. Extends histogram according to the new time range. If a
      * HistogramRequest is already ongoing, it will be cancelled and a new request with the new range
      * will be issued.
@@ -471,7 +503,7 @@ public class HistogramView extends TmfView {
     // ------------------------------------------------------------------------
 
     private void initializeHistograms() {
-        TmfTimeRange fullRange = updateExperimentTimeRange(fCurrentExperiment);
+        TmfTimeRange fullRange = updateExperimentTimeRange();
 
         fTimeRangeHistogram.clear();
         fTimeRangeHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
@@ -496,7 +528,7 @@ public class HistogramView extends TmfView {
         }
     }
 
-    private TmfTimeRange updateExperimentTimeRange(TmfExperiment experiment) {
+    private TmfTimeRange updateExperimentTimeRange() {
         fExperimentStartTime = 0;
         fExperimentEndTime = 0;
         fCurrentTimestamp = 0;

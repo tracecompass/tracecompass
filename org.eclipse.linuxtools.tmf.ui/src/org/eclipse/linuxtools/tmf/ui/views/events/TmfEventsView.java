@@ -274,7 +274,7 @@ public class TmfEventsView extends TmfView implements IResourceChangeListener {
             if ((fExperiment != null) && (fExperiment.getBookmarksFile() != null)) {
                 ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
             }
-
+            fExperiment = null;
         }
     }
 

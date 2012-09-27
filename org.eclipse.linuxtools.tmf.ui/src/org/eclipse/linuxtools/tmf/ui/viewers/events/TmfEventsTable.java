@@ -1527,8 +1527,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
                             startFilterThread();
                         }
                     }
-                    fRawViewer.setTrace(fTrace);
                 }
+                fRawViewer.setTrace(fTrace);
             }
         });
     }

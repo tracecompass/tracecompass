@@ -19,6 +19,7 @@ package org.eclipse.linuxtools.tmf.ui.views.statistics;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -192,6 +193,23 @@ public class TmfStatisticsView extends TmfView {
     public void dispose() {
         super.dispose();
         fStatsViewers.dispose();
+    }
+
+    /**
+     * @param signal the incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void experimentDisposed(TmfExperimentDisposedSignal signal) {
+
+        // Clear the internal data
+        fExperiment = null;
+        fRequestData = false;
+
+        // Clear the UI widgets
+        fStatsViewers.clear();  // Also cancels ongoing requests
+        createStatisticsViewers();
+        fStatsViewers.layout();
     }
 
     /*
