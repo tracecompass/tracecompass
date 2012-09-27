@@ -26,8 +26,8 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
@@ -99,7 +99,7 @@ public class HistoryBuilder extends TmfComponent {
      * @throws IOException
      *             If there was something wrong.
      */
-    public static IStateSystemBuilder openExistingHistory(
+    public static ITmfStateSystemBuilder openExistingHistory(
             IStateHistoryBackend hb) throws IOException {
         return new StateSystem(hb, false);
     }
@@ -110,7 +110,7 @@ public class HistoryBuilder extends TmfComponent {
      *
      * @return Reference to the state system, with access to everything.
      */
-    public IStateSystemBuilder getStateSystemBuilder() {
+    public ITmfStateSystemBuilder getStateSystemBuilder() {
         return ss;
     }
 
@@ -120,7 +120,7 @@ public class HistoryBuilder extends TmfComponent {
      * @return Reference to the state system, but only with the query methods
      *         available.
      */
-    public IStateSystemQuerier getStateSystemQuerier() {
+    public ITmfStateSystem getStateSystemQuerier() {
         return ss;
     }
 

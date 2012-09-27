@@ -43,7 +43,7 @@ public abstract class AbstractStateChangeInput implements IStateChangeInput {
     private final Thread eventHandlerThread;
 
     private boolean ssAssigned;
-    protected IStateSystemBuilder ss;
+    protected ITmfStateSystemBuilder ss;
     private ITmfEvent currentEvent;
 
     /**
@@ -74,7 +74,7 @@ public abstract class AbstractStateChangeInput implements IStateChangeInput {
     }
 
     @Override
-    public void assignTargetStateSystem(IStateSystemBuilder ssb) {
+    public void assignTargetStateSystem(ITmfStateSystemBuilder ssb) {
         ss = ssb;
         ssAssigned = true;
         eventHandlerThread.start();

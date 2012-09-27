@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,7 +47,7 @@ public class StateSystemFullHistoryTest {
     static File stateFileBenchmark;
 
     static IStateChangeInput input;
-    static IStateSystemQuerier ssq;
+    static ITmfStateSystem ssq;
 
     /* Offset in the trace + start time of the trace */
     private final static long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
@@ -89,7 +89,7 @@ public class StateSystemFullHistoryTest {
     @Test
     public void testBuild() throws TmfTraceException {
         IStateChangeInput input2;
-        IStateSystemQuerier ssb2;
+        ITmfStateSystem ssb2;
 
         input2 = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
         ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2, true);
@@ -100,7 +100,7 @@ public class StateSystemFullHistoryTest {
 
     @Test
     public void testOpenExistingStateFile() throws TmfTraceException {
-        IStateSystemQuerier ssb2;
+        ITmfStateSystem ssb2;
 
         /* 'newStateFile' should have already been created */
         ssb2 = StateSystemManager.loadStateHistory(stateFile, null, true);

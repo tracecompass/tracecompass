@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
@@ -37,7 +37,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  */
 public class StateSystemPushPopTest extends TestCase{
 
-    private IStateSystemBuilder ss;
+    private ITmfStateSystemBuilder ss;
 
     private ITmfStateInterval interval;
     private int attribute;

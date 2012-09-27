@@ -20,14 +20,19 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 /**
  * This is the external interface to build or modify an existing state history.
  *
- * It extends IStateSystemEnquirer, so you can still use it for reading the
- * history, but it also provides write-access to it with the quark-creating and
+ * It extends ITmfStateSystem, so you can still use it for reading the history,
+ * but it also provides write-access to it with the quark-creating and
  * state-change insertion methods.
  *
- * @version 1.0
+ * This should only be used by classes that need to build or modify the state
+ * history. Views, etc. (who will only be reading from it) should use the
+ * ITmfStateSystem interface instead.
+ *
  * @author Alexandre Montplaisir
+ * @version 2.0
+ * @since 2.0
  */
-public interface IStateSystemBuilder extends IStateSystemQuerier {
+public interface ITmfStateSystemBuilder extends ITmfStateSystem {
 
     /**
      * @name Read/write quark-getting methods
