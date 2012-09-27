@@ -1,11 +1,11 @@
 /*******************************************************************************
 * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -28,11 +28,15 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 
+/**
+ * <b><u>RefreshAction</u></b>
+ * <p>
+ * Implement me. Please.
+ * <p>
+ */
 public class RefreshAction extends Action {
 
-    private static final String REFRESH_TRACE_FOLDER_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.trace.refresh"; //$NON-NLS-1$
-    private static final String REFRESH_EXPERIMENT_FOLDER_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.refresh"; //$NON-NLS-1$
-    private static final String REFRESH_EXPERIMENT_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.experiment.refresh"; //$NON-NLS-1$
+    private static final String REFRESH_COMMAND_ID = "org.eclipse.ui.file.refresh"; //$NON-NLS-1$
 
     private IWorkbenchPage page;
     private ISelectionProvider selectionProvider;
@@ -77,12 +81,8 @@ public class RefreshAction extends Action {
     public void run() {
         try {
             IHandlerService handlerService = (IHandlerService) page.getActivePart().getSite().getService(IHandlerService.class);
-            if (element instanceof TmfTraceFolder) {
-                handlerService.executeCommand(REFRESH_TRACE_FOLDER_COMMAND_ID, null);
-            } else if (element instanceof TmfExperimentFolder) {
-                handlerService.executeCommand(REFRESH_EXPERIMENT_FOLDER_COMMAND_ID, null);
-            } else if (element instanceof TmfExperimentElement) {
-                handlerService.executeCommand(REFRESH_EXPERIMENT_COMMAND_ID, null);
+            if (element instanceof TmfTraceFolder || element instanceof TmfExperimentFolder || element instanceof TmfExperimentElement) {
+                handlerService.executeCommand(REFRESH_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {
             Activator.getDefault().logError("Error refreshing resource " + element.getName(), e); //$NON-NLS-1$

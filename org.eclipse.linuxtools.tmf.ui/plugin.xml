@@ -328,6 +328,44 @@
          </command>
       </menuContribution>
       <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.navigator.ProjectExplorer">
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.clear_views"
+               icon="icons/etool16/clear.gif"
+               label="%command.clear_views"
+               mnemonic="%command.clear_views.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.core.resources.IProject">
+                           </instanceof>
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.linuxtools.tmf.project.nature">
+                           </test>
+                        </and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <command
                commandId="org.eclipse.ui.file.import"
@@ -649,6 +687,35 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.clear_views"
+               icon="icons/etool16/clear.gif"
+               label="%command.clear_views"
+               mnemonic="%command.clear_views.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.core.resources.IProject">
+                        </instanceof>
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.eclipse.linuxtools.tmf.project.nature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -695,6 +762,12 @@
             description="%command.select_traces.description"
             id="org.eclipse.linuxtools.tmf.ui.command.select_traces"
             name="%command.select_traces">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.clear_views.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.clear_views"
+            name="%command.clear_views">
       </command>
       <category
             description="%commands.parser.category.description"
@@ -898,9 +971,6 @@
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <and>
-               <count
-                     value="1">
-               </count>
                <iterate>
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
@@ -914,9 +984,6 @@
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <and>
-               <count
-                     value="1">
-               </count>
                <iterate>
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
@@ -1001,6 +1068,10 @@
                </iterate>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.ClearViewsHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.clear_views">
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.commands.ManageCustomParsersCommandHandler"

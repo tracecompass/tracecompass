@@ -26,10 +26,15 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 
+/**
+ * <b><u>DeleteAction</u></b>
+ * <p>
+ * Implement me. Please.
+ * <p>
+ */
 public class DeleteAction extends Action {
 
-    private static final String DELETE_TRACE_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"; //$NON-NLS-1$
-    private static final String DELETE_EXPERIMENT_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"; //$NON-NLS-1$
+    private static final String DELETE_COMMAND_ID = "org.eclipse.ui.edit.delete"; //$NON-NLS-1$
 
     private final IWorkbenchPage page;
     private final ISelectionProvider selectionProvider;
@@ -81,10 +86,8 @@ public class DeleteAction extends Action {
     public void run() {
         try {
             IHandlerService handlerService = (IHandlerService) page.getActivePart().getSite().getService(IHandlerService.class);
-            if (tracesSelected) {
-                handlerService.executeCommand(DELETE_TRACE_COMMAND_ID, null);
-            } else if (experimentsSelected) {
-                handlerService.executeCommand(DELETE_EXPERIMENT_COMMAND_ID, null);
+            if (tracesSelected || experimentsSelected) {
+                handlerService.executeCommand(DELETE_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {
             Activator.getDefault().logError("Error deleting resources", e); //$NON-NLS-1$
