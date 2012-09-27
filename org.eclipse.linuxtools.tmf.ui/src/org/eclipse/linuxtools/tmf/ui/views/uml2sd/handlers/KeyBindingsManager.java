@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
@@ -21,64 +21,65 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * <p>
- * Singleton class that manages key-bindings for certain commands across multiple sequence 
+ * Singleton class that manages key-bindings for certain commands across multiple sequence
  * diagram view instances.
  * </p>
- * 
+ *
  * @version 1.0
  * @author Bernd Hufmann
- * 
+ *
  */
 public class KeyBindingsManager {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     /**
-     * The singleton instance. 
+     * The singleton instance.
      */
     private static KeyBindingsManager fInstance = null;
     /**
-     * The list of view names. 
+     * The list of view names.
      */
-    private Set<String> fViews = new HashSet<String>(); 
+    private Set<String> fViews = new HashSet<String>();
     /**
      * The list of activations Activations to store
      */
     private List<IHandlerActivation> fHandlerActivations = new ArrayList<IHandlerActivation>();
     /**
-     * The action reference for moving to a message in view. 
+     * The action reference for moving to a message in view.
      */
     private MoveToMessage fGoToMessageForKeyBinding;
     /**
-     * The action reference for opening the find dialog. 
+     * The action reference for opening the find dialog.
      */
     private OpenSDFindDialog fFindForKeyBinding;
     /**
-     * The action reference for moving up in view. 
+     * The action reference for moving up in view.
      */
     private MoveSDUp fMoveUpForKeyBinding;
     /**
-     * The action reference for moving down in view. 
+     * The action reference for moving down in view.
      */
     private MoveSDDown fMoveDownForKeyBinding;
     /**
-     * The action reference for moving left in view. 
+     * The action reference for moving left in view.
      */
     private MoveSDLeft fMoveLeftForKeyBinding;
     /**
-     * The action reference for moving right in view. 
+     * The action reference for moving right in view.
      */
     private MoveSDRight fMoveRightForKeyBinding;
     /**
-     * The action reference for showing node start. 
+     * The action reference for showing node start.
      */
     private ShowNodeStart fShowNodeStartForKeyBinding;
     /**
@@ -89,9 +90,9 @@ public class KeyBindingsManager {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    
+
     /**
-     * Constructor 
+     * Constructor
      */
     protected KeyBindingsManager() {
     }
@@ -101,7 +102,7 @@ public class KeyBindingsManager {
     // ------------------------------------------------------------------------
     /**
      * Returns the KeyBindingsManager singleton instance.
-     * 
+     *
      * @return the KeyBindingsManager singleton instance
      */
     public synchronized static KeyBindingsManager getInstance() {
@@ -110,26 +111,26 @@ public class KeyBindingsManager {
         }
         return fInstance;
     }
-    
+
     /**
-     * Adds a view list of managed view list. 
-     * 
+     * Adds a view list of managed view list.
+     *
      * @param viewId Id of SD view to add and to manage
      */
     public void add(String viewId) {
-        
+
         if (fViews.isEmpty()) {
             initialize();
         }
-        
+
         if(!fViews.contains(viewId)) {
             fViews.add(viewId);
         }
     }
-    
+
     /**
      * Removes a view from managed view list
-     * 
+     *
      * @param viewId Id of SD view to remove
      */
     public void remove(String viewId) {
@@ -140,7 +141,7 @@ public class KeyBindingsManager {
             dispose();
         }
     }
-    
+
     /*
      * Initialized the KeyBindingsManager.
      */
@@ -245,16 +246,21 @@ public class KeyBindingsManager {
         fHandlerActivations.add(activation);
 
     }
-    
+
     /*
      * Disposes the KeyBindingsManager
      */
     private void dispose() {
-        IHandlerService service = (IHandlerService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IHandlerService.class);
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (window == null) {
+            //During Eclipse shutdown the active workbench window is null
+            return;
+        }
+        IHandlerService service = (IHandlerService) window.getService(IHandlerService.class);
         for(IHandlerActivation activation : fHandlerActivations) {
             service.deactivateHandler(activation);
         }
-        
+
         fGoToMessageForKeyBinding = null;
         fFindForKeyBinding = null;
         fMoveUpForKeyBinding = null;
@@ -266,8 +272,8 @@ public class KeyBindingsManager {
     }
 
     /**
-     * Set the view in all supported actions 
-     * 
+     * Set the view in all supported actions
+     *
      * @param view to set in global actions
      */
     public void setSdView(SDView view) {
@@ -285,8 +291,8 @@ public class KeyBindingsManager {
 
     /**
      * Enable / disable find action
-     * 
-     * @param enabled <code>true</code> for enabling else <code>false</code>  
+     *
+     * @param enabled <code>true</code> for enabling else <code>false</code>
      */
     public void setFindEnabled(boolean enabled) {
         if (fFindForKeyBinding != null) {
