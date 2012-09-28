@@ -57,7 +57,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
      *            The LTTng 2.0 kernel trace directory
      */
     public CtfKernelStateInput(CtfTmfTrace trace) {
-        super(trace, CtfTmfEvent.class);
+        super(trace, CtfTmfEvent.class, "LTTng Kernel"); //$NON-NLS-1$
         knownEventNames = fillEventNames();
     }
 
