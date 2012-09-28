@@ -43,7 +43,8 @@ public class BasicStateSystemExample {
         try {
             File newStateFile = new File("/tmp/helloworldctf.ht"); //$NON-NLS-1$
             IStateChangeInput input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-            ITmfStateSystem ss = StateSystemManager.loadStateHistory(newStateFile, input, true);
+            String name = "test-ss"; //$NON-NLS-1$
+            ITmfStateSystem ss = StateSystemManager.loadStateHistory(newStateFile, input, name, true);
 
             requestExample(ss);
         } catch (TmfTraceException e) {

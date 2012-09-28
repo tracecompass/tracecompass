@@ -47,6 +47,7 @@ public class HistoryBuilder extends TmfComponent {
     private final IStateChangeInput sci;
     private final StateSystem ss;
     private final IStateHistoryBackend hb;
+    private final String id;
     private boolean started = true; /* Don't handle signals until we're ready */
 
     /**
@@ -56,24 +57,29 @@ public class HistoryBuilder extends TmfComponent {
      *            The input plugin to use. This is required.
      * @param backend
      *            The backend storage to use.
+     * @param id
+     *            The ID (or name) of the state system that will be built. This
+     *            can be useful in cases where there are more than 1 state
+     *            system per trace/experiment.
      * @param buildManually
      *            Should we build this history in-band or not. True means we
      *            will start the building ourselves and block the caller until
-     *            construction is done. False (out-of-band) means we will
-     *            start listening for the signal and return immediately. Another
+     *            construction is done. False (out-of-band) means we will start
+     *            listening for the signal and return immediately. Another
      *            signal will be sent when finished.
      * @throws IOException
      *             Is thrown if anything went wrong (usually with the storage
      *             backend)
      */
     public HistoryBuilder(IStateChangeInput stateChangeInput,
-            IStateHistoryBackend backend, boolean buildManually)
+            IStateHistoryBackend backend, String id, boolean buildManually)
             throws IOException {
         if (stateChangeInput == null || backend == null) {
             throw new IllegalArgumentException();
         }
         sci = stateChangeInput;
         hb = backend;
+        this.id = id;
         ss = new StateSystem(hb, true);
 
         sci.assignTargetStateSystem(ss);
@@ -189,7 +195,7 @@ public class HistoryBuilder extends TmfComponent {
             /* We won't broadcast the signal if the request was cancelled */
         } else {
             /* Broadcast the signal saying the history is done building */
-            doneSig = new TmfStateSystemBuildCompleted(this, sci.getTrace());
+            doneSig = new TmfStateSystemBuildCompleted(this, sci.getTrace(), id);
             TmfSignalManager.dispatchSignal(doneSig);
         }
 
