@@ -214,7 +214,6 @@ public class CtfTmfTraceTest {
     public void testGetLocationRatio() {
         final CtfLocationData location2 = new CtfLocationData(1, 0);
         CtfLocation location = new CtfLocation(location2);
-        location.setLocation(location2);
         double result = fixture.getLocationRatio(location);
 
         assertEquals(Double.NEGATIVE_INFINITY, result, 0.1);

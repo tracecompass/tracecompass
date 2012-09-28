@@ -51,7 +51,6 @@ public class CtfLocationTest {
     @Before
     public void setUp() {
         fixture = new CtfLocation(new CtfLocationData(1, 0));
-        fixture.setLocation(new CtfLocationData(1, 0));
     }
 
     /**
@@ -121,7 +120,7 @@ public class CtfLocationTest {
     @Test
     public void testSetLocation() {
         CtfLocationData location = new CtfLocationData(1337, 7331);
-        fixture.setLocation(location);
+        fixture = new CtfLocation(location);
     }
 
     /**

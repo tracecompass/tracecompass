@@ -331,7 +331,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         if (context instanceof TmfExperimentContext) {
             return saveExpContext(context);
         }
-        TmfContext ctx = new TmfContext(context.getLocation().clone(), context.getRank());
+        TmfContext ctx = new TmfContext(context.getLocation(), context.getRank());
         return ctx;
     }
 
@@ -341,10 +341,10 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         ITmfContext[] trcCtxts = new TmfContext[size];
         for (int i = 0; i < size; i++) {
             ITmfContext ctx = expContext.getContexts()[i];
-            trcCtxts[i] = (ctx != null) ? new TmfContext(ctx.getLocation().clone(), ctx.getRank()) : null;
+            trcCtxts[i] = (ctx != null) ? new TmfContext(ctx.getLocation(), ctx.getRank()) : null;
         }
         TmfExperimentContext expCtx = new TmfExperimentContext(trcCtxts);
-        expCtx.setLocation(context.getLocation().clone());
+        expCtx.setLocation(context.getLocation());
         expCtx.setRank(context.getRank());
         ITmfEvent[] trcEvts = expCtx.getEvents();
         for (int i = 0; i < size; i++) {
@@ -370,11 +370,11 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         for (int i = 0; i < size; i++) {
             ITmfTrace trace = ((TmfExperiment) fTrace).getTraces()[i];
             ITmfContext ctx = expContext.getContexts()[i];
-            trcCtxts[i] = trace.seekEvent(ctx.getLocation().clone());
+            trcCtxts[i] = trace.seekEvent(ctx.getLocation());
             trcCtxts[i].setRank(ctx.getRank());
         }
         TmfExperimentContext ctx = new TmfExperimentContext(trcCtxts);
-        ctx.setLocation(context.getLocation().clone());
+        ctx.setLocation(context.getLocation());
         ctx.setRank(context.getRank());
         ITmfEvent[] trcEvts = expContext.getEvents();
         for (int i = 0; i < size; i++) {

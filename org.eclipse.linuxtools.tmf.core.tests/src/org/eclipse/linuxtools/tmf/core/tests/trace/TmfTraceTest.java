@@ -1175,7 +1175,7 @@ public class TmfTraceTest extends TestCase {
     public void testGetNextLocation() {
         ITmfContext context1 = fTrace.seekEvent(0);
         fTrace.getNext(context1);
-        ITmfLocation location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation();
         ITmfEvent event1 = fTrace.getNext(context1);
         ITmfContext context2 = fTrace.seekEvent(location);
         ITmfEvent event2 = fTrace.getNext(context2);
@@ -1185,7 +1185,7 @@ public class TmfTraceTest extends TestCase {
     public void testGetNextEndLocation() {
         ITmfContext context1 = fTrace.seekEvent(fTrace.getNbEvents() - 1);
         fTrace.getNext(context1);
-        ITmfLocation location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation();
         ITmfContext context2 = fTrace.seekEvent(location);
         ITmfEvent event = fTrace.getNext(context2);
         assertNull("Event", event);

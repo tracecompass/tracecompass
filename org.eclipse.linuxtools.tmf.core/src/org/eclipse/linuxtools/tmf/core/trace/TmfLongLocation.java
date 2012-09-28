@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * @author Francois Chouinard
  * @since 2.0
  */
-public class TmfLongLocation extends TmfLocation {
+public final class TmfLongLocation extends TmfLocation {
 
     /**
      * The normal constructor
@@ -44,23 +44,6 @@ public class TmfLongLocation extends TmfLocation {
     @Override
     public Long getLocationInfo() {
         return (Long) super.getLocationInfo();
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#clone()
-     */
-    @Override
-    public TmfLongLocation clone() {
-        return (TmfLongLocation) super.clone();
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#cloneValue()
-     */
-    @Override
-    protected Long cloneLocationInfo() {
-        // No need to clone a Long
-        return getLocationInfo();
     }
 
 }

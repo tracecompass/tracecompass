@@ -44,21 +44,4 @@ public class TmfStringLocation extends TmfLocation {
         return (String) super.getLocationInfo();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    public TmfStringLocation clone() {
-        return (TmfStringLocation) super.clone();
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#cloneValue()
-     */
-    @Override
-    protected String cloneLocationInfo() {
-        // No need to clone a String
-        return getLocationInfo();
-    }
-
 }

@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
+
 /**
  * The experiment location in TMF.
  * <p>
@@ -30,9 +31,9 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  *
  * @see TmfLocationArray
  */
-public class TmfExperimentLocation implements ITmfLocation {
+public final class TmfExperimentLocation implements ITmfLocation {
 
-    TmfLocationArray fLocation;
+    private final TmfLocationArray fLocation;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -56,19 +57,16 @@ public class TmfExperimentLocation implements ITmfLocation {
         this(location.getLocationInfo());
     }
 
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#clone()
+    /**
+     * The "update" constructor. Copies the array of locations and updates
+     * a single entry.
+     *
+     * @param exp_location the experiment location
+     * @param index the entry to modify
+     * @param location the new entry
      */
-    @Override
-    public TmfExperimentLocation clone() {
-//        super.clone(); // To keep FindBugs happy
-        TmfLocationArray array = getLocationInfo();
-        TmfLocationArray clones = array.clone();
-        return new TmfExperimentLocation(clones);
+    public TmfExperimentLocation(TmfExperimentLocation exp_location, int index, ITmfLocation location) {
+        fLocation = new TmfLocationArray(exp_location.fLocation, index, location);
     }
 
     // ------------------------------------------------------------------------
@@ -82,9 +80,11 @@ public class TmfExperimentLocation implements ITmfLocation {
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        ITmfLocation[] locations = getLocationInfo().getLocations();
-        for (ITmfLocation location : locations) {
+        int index = 0;
+        ITmfLocation location = getLocationInfo().getLocation(index);
+        while (location != null) {
             result.append("[" + location + "]");
+            location = getLocationInfo().getLocation(++index);
         }
         result.append("]");
         return result.toString();

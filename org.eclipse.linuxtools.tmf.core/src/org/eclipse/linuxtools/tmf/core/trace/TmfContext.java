@@ -92,7 +92,7 @@ public class TmfContext implements ITmfContext, Cloneable {
         TmfContext clone = null;
         try {
             clone = (TmfContext) super.clone();
-            clone.fLocation = (fLocation != null) ? fLocation.clone() : null;
+            clone.fLocation = (fLocation != null) ? fLocation : null;
             clone.fRank = fRank;
         } catch (final CloneNotSupportedException e) {
         }

@@ -800,7 +800,7 @@ public class TmfExperimentTest extends TestCase {
     public void testGetNextLocation() {
         ITmfContext context1 = fExperiment.seekEvent(0);
         fExperiment.getNext(context1);
-        ITmfLocation location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation();
         ITmfEvent event1 = fExperiment.getNext(context1);
         ITmfContext context2 = fExperiment.seekEvent(location);
         ITmfEvent event2 = fExperiment.getNext(context2);
@@ -810,7 +810,7 @@ public class TmfExperimentTest extends TestCase {
     public void testGetNextEndLocation() {
         ITmfContext context1 = fExperiment.seekEvent(fExperiment.getNbEvents() - 1);
         fExperiment.getNext(context1);
-        ITmfLocation location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation();
         ITmfContext context2 = fExperiment.seekEvent(location);
         ITmfEvent event = fExperiment.getNext(context2);
         assertNull("Event", event);

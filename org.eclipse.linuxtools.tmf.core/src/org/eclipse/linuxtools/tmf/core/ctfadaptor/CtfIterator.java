@@ -150,7 +150,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         }
         /* Seek the current location accordingly */
         if (ret) {
-            curLocation.setLocation(new CtfLocationData(getCurrentEvent().getTimestamp().getValue(), index));
+            curLocation = new CtfLocation(new CtfLocationData(getCurrentEvent().getTimestamp().getValue(), index));
         } else {
             curLocation = NULL_LOCATION;
         }
@@ -255,9 +255,9 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         if (ret) {
             final long timestampValue = getCurrentEvent().getTimestamp().getValue();
             if (timestamp == timestampValue) {
-                curLocation.setLocation(timestampValue, index + 1);
+                curLocation = new CtfLocation(timestampValue, index + 1);
             } else {
-                curLocation.setLocation(timestampValue, 0L);
+                curLocation = new CtfLocation(timestampValue, 0L);
             }
         } else {
             curLocation = NULL_LOCATION;

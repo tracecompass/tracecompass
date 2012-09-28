@@ -94,7 +94,7 @@ public class TmfExperimentContext extends TmfContext {
         this(other.cloneContexts());
         fEvents = other.fEvents;
         if (other.getLocation() != null) {
-            setLocation(other.getLocation().clone());
+            setLocation(other.getLocation());
         }
         setRank(other.getRank());
         setLastTrace(other.fLastTraceRead);

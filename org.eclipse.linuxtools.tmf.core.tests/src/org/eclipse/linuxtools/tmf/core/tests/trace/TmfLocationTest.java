@@ -88,36 +88,6 @@ public class TmfLocationTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // clone
-    // ------------------------------------------------------------------------
-
-    public void testClone() {
-        try {
-            TmfStringLocation location1 = fLocation1.clone();
-            TmfStringLocation location2 = fLocation2.clone();
-            TmfLongLocation location3 = fLocation3.clone();
-            TmfTimestampLocation location4 = fLocation4.clone();
-
-            assertEquals("clone", fLocation1, location1);
-            assertEquals("clone", fLocation2, location2);
-            assertEquals("clone", fLocation3, location3);
-            assertEquals("clone", fLocation4, location4);
-
-            assertEquals("clone", fLocation1.getLocationInfo(), location1.getLocationInfo());
-            assertEquals("clone", fLocation2.getLocationInfo(), location2.getLocationInfo());
-            assertEquals("clone", fLocation3.getLocationInfo(), location3.getLocationInfo());
-            assertEquals("clone", fLocation4.getLocationInfo(), location4.getLocationInfo());
-
-            assertNull("clone", location1.getLocationInfo());
-            assertEquals("clone", aString, location2.getLocationInfo());
-            assertEquals("clone", aLong, location3.getLocationInfo());
-            assertEquals("clone", aTimestamp, location4.getLocationInfo());
-        } catch (InternalError e) {
-            fail("clone()");
-        }
-    }
-
-    // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------
 
