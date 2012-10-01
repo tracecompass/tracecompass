@@ -447,7 +447,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
             if (event == null) {
                 return;
             }
-            final TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp().clone(), TmfTimestamp.BIG_CRUNCH);
+            final TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp(), TmfTimestamp.BIG_CRUNCH);
             final TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(this, this, timeRange);
 
             // Broadcast in separate thread to prevent deadlock

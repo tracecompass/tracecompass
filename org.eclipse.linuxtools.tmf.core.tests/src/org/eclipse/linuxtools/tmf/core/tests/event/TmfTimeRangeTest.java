@@ -145,28 +145,6 @@ public class TmfTimeRangeTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // clone
-    // ------------------------------------------------------------------------
-
-    /**
-     * @throws CloneNotSupportedException cloning problem
-     */
-    public void testClone() throws CloneNotSupportedException {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
-
-        final TmfTimeRange range = new TmfTimeRange(ts1, ts2);
-        final TmfTimeRange clone = range.clone();
-
-        assertTrue("clone", range.clone().equals(range));
-        assertTrue("clone", clone.clone().equals(clone));
-
-        assertEquals("clone", range, clone);
-        assertEquals("clone", ts1, clone.getStartTime());
-        assertEquals("clone", ts2, clone.getEndTime());
-    }
-
-    // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------
 

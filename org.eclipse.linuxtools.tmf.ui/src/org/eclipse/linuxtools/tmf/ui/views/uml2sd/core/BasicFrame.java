@@ -525,20 +525,20 @@ public class BasicFrame extends GraphNode {
     protected void updateMinMax(SDTimeEvent m1, SDTimeEvent m2) {
         ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
         if (fComputeMinMax) {
-            fMinTime = delta.clone();
+            fMinTime = delta;
             if (fMinTime.compareTo(TmfTimestamp.ZERO, false) < 0) {
                 fMinTime = new TmfTimestamp(0, m1.getTime().getScale(), m1.getTime().getPrecision());
             }
-            fMaxTime = fMinTime.clone();
+            fMaxTime = fMinTime;
             fComputeMinMax = false;
         }
 
         if ((delta.compareTo(fMinTime, true) < 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
-            fMinTime = delta.clone();
+            fMinTime = delta;
         }
 
         if ((delta.compareTo(fMaxTime, true) > 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
-            fMaxTime = delta.clone();
+            fMaxTime = delta;
         }
     }
 

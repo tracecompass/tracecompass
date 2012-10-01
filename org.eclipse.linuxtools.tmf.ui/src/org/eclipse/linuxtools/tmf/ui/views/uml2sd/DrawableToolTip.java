@@ -215,8 +215,8 @@ public class DrawableToolTip implements PaintListener {
      * @param max the scale max
      */
     public void showToolTip(ITmfTimestamp value, ITmfTimestamp min, ITmfTimestamp max) {
-        fMinMaxRange = new TmfTimeRange(min.clone(), max.clone());
-        fCurrentValue = value.clone();
+        fMinMaxRange = new TmfTimeRange(min, max);
+        fCurrentValue = value;
 
         int w = fToolTipShell.getBounds().width;
         int h = fToolTipShell.getBounds().height;

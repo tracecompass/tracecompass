@@ -85,7 +85,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
         try {
             clone = (TmfCheckpoint) super.clone();
             clone.fContext = (fContext != null) ? fContext.clone() : null;
-            clone.fTimestamp = (fTimestamp != null) ? fTimestamp.clone() : null;
+            clone.fTimestamp = fTimestamp;
         } catch (final CloneNotSupportedException e) {
         }
         return clone;

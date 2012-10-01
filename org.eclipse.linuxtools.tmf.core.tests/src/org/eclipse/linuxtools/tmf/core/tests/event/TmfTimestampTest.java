@@ -153,50 +153,6 @@ public class TmfTimestampTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // clone
-    // ------------------------------------------------------------------------
-
-    private static class MyTimestamp extends TmfTimestamp {
-
-        @Override
-        public boolean equals(final Object other) {
-            return super.equals(other);
-        }
-
-        @Override
-        public MyTimestamp clone() {
-            return (MyTimestamp) super.clone();
-        }
-    }
-
-    /**
-     *
-     */
-    public void testClone() {
-        final ITmfTimestamp clone = ts0.clone();
-
-        assertTrue("clone", ts0.clone().equals(ts0));
-        assertTrue("clone", clone.clone().equals(clone));
-
-        assertEquals("clone", clone, ts0);
-        assertEquals("clone", ts0, clone);
-    }
-
-    /**
-     *
-     */
-    public void testClone2() {
-        final MyTimestamp timestamp = new MyTimestamp();
-        final MyTimestamp clone = timestamp.clone();
-
-        assertTrue("clone", timestamp.clone().equals(timestamp));
-        assertTrue("clone", clone.clone().equals(clone));
-
-        assertEquals("clone", clone, timestamp);
-        assertEquals("clone", timestamp, clone);
-    }
-
-    // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------
 

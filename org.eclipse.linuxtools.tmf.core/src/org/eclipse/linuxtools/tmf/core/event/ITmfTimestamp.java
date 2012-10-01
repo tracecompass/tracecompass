@@ -113,11 +113,6 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      */
     public ITmfTimestamp getDelta(ITmfTimestamp ts);
 
-    /**
-     * @return a clone of the timestamp
-     */
-    public ITmfTimestamp clone();
-
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------

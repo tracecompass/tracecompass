@@ -50,7 +50,7 @@ public class TmfAsyncSequenceDiagramEvent extends TmfSyncSequenceDiagramEvent im
         if (endEvent == null) {
             throw new IllegalArgumentException("TmfAsyncSequenceDiagramEvent constructor: endEvent=null"); //$NON-NLS-1$
         }
-        fEndTime = endEvent.getTimestamp().clone();
+        fEndTime = endEvent.getTimestamp();
     }
 
     // ------------------------------------------------------------------------
