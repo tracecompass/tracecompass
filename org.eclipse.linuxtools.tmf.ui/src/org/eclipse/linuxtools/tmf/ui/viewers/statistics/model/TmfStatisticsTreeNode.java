@@ -34,7 +34,7 @@ public class TmfStatisticsTreeNode {
     /**
      * Value of the node.
      */
-    protected TmfStatistics fValue;
+    protected TmfStatisticsValues fValue;
 
     /**
      * Path of the node.
@@ -58,7 +58,7 @@ public class TmfStatisticsTreeNode {
             AbsTmfStatisticsTree nodes) {
         fPath = path;
         fNodes = nodes;
-        fValue = new TmfStatistics();
+        fValue = new TmfStatisticsValues();
     }
 
     /**
@@ -135,7 +135,7 @@ public class TmfStatisticsTreeNode {
      *
      * @return Value associated with this node.
      */
-    public TmfStatistics getValue() {
+    public TmfStatisticsValues getValue() {
         return fValue;
     }
 
@@ -153,7 +153,7 @@ public class TmfStatisticsTreeNode {
      * no children.
      */
     public void reset() {
-        fValue = new TmfStatistics();
+        fValue = new TmfStatisticsValues();
         fNodes.reset(fPath);
     }
 
