@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.ui.viewers.events.ITmfEventsFilterProvider;
  */
 public class TmfTraceOpenedSignal extends TmfSignal {
 
-    private final ITmfTrace<?> fTrace;
+    private final ITmfTrace fTrace;
     private final IFile fBookmarksFile;
     private final ITmfEventsFilterProvider fEventsFilterProvider;
 
@@ -41,7 +41,7 @@ public class TmfTraceOpenedSignal extends TmfSignal {
      * @param eventsFilterProvider
      *            Provider for the event filter in use
      */
-    public TmfTraceOpenedSignal(Object source, ITmfTrace<?> trace,
+    public TmfTraceOpenedSignal(Object source, ITmfTrace trace,
             IFile bookmarksFile, ITmfEventsFilterProvider eventsFilterProvider) {
         super(source);
         fTrace = trace;
@@ -54,7 +54,7 @@ public class TmfTraceOpenedSignal extends TmfSignal {
      *
      * @return The trace
      */
-    public ITmfTrace<?> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

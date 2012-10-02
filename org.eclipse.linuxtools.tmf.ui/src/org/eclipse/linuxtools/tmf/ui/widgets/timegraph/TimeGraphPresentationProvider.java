@@ -49,6 +49,14 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         return Messages.TmfTimeLegend_TRACE_STATES;
     }
 
+    /**
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTypeName(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry)
+     * @since 2.0
+     */
+    @Override
+    public String getStateTypeName(ITimeGraphEntry entry) {
+        return null;
+    }
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTable()
@@ -128,6 +136,17 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
         return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventHoverToolTipInfo(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent, long)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
+        return getEventHoverToolTipInfo(event);
     }
 
 }

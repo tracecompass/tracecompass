@@ -14,7 +14,9 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
@@ -23,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
  * This is the read-only interface to the generic state system. It contains all
  * the read-only quark-getting methods, as well as the history-querying ones.
  *
- * @version 1.0
+ * @version 2.0
  * @author Alexandre Montplaisir
  */
 public interface IStateSystemQuerier {
@@ -44,11 +46,28 @@ public interface IStateSystemQuerier {
     public long getCurrentEndTime();
 
     /**
-     * Return the current total amount of attributes in the system.
+     * Return the current total amount of attributes in the system. This is also
+     * equal to the quark that will be assigned to the next attribute that's
+     * created.
      *
      * @return The current number of attributes in the system
      */
     public int getNbAttributes();
+
+    /**
+     * Check if a given quark is the last attribute that was added to the
+     * system.
+     *
+     * This is a common case, and it's a bit clearer than
+     * " x == getNbAttributes - 1"
+     *
+     * @param quark
+     *            The quark to check for
+     * @return True if this is the last quark that was added to the system,
+     *         false if not
+     * @since 2.0
+     */
+    public boolean isLastAttribute(int quark);
 
     /**
      * @name Read-only quark-getting methods
@@ -222,6 +241,35 @@ public interface IStateSystemQuerier {
             throws AttributeNotFoundException, TimeRangeException;
 
     /**
+     * Convenience method to query attribute stacks (created with
+     * pushAttribute()/popAttribute()). This will return the interval that is
+     * currently at the top of the stack, or 'null' if that stack is currently
+     * empty. It works similarly to querySingleState().
+     *
+     * To retrieve the other values in a stack, you can query the sub-attributes
+     * manually.
+     *
+     * @param t
+     *            The timestamp of the query
+     * @param stackAttributeQuark
+     *            The top-level stack-attribute (that was the target of
+     *            pushAttribute() at creation time)
+     * @return The interval that was at the top of the stack, or 'null' if the
+     *         stack was empty.
+     * @throws StateValueTypeException
+     *             If the target attribute is not a valid stack attribute (if it
+     *             has a string value for example)
+     * @throws AttributeNotFoundException
+     *             If the attribute was simply not found
+     * @throws TimeRangeException
+     *             If the given timestamp is invalid
+     * @since 2.0
+     */
+    public ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
+            throws StateValueTypeException, AttributeNotFoundException,
+            TimeRangeException;
+
+    /**
      * Return a list of state intervals, containing the "history" of a given
      * attribute between timestamps t1 and t2. The list will be ordered by
      * ascending time.
@@ -251,7 +299,8 @@ public interface IStateSystemQuerier {
     /**
      * Return the state history of a given attribute, but with at most one
      * update per "resolution". This can be useful for populating views (where
-     * it's useless to have more than one query per pixel, for example).
+     * it's useless to have more than one query per pixel, for example). A
+     * progress monitor can be used to cancel the query before completion.
      *
      * @param attributeQuark
      *            Which attribute this query is interested in
@@ -263,14 +312,19 @@ public interface IStateSystemQuerier {
      *            history.
      * @param resolution
      *            The "step" of this query
+     * @param monitor
+     *            A progress monitor. If the monitor is canceled during a query,
+     *            we will return what has been found up to that point. You can
+     *            use "null" if you do not want to use one.
      * @return The List of states that happened between t1 and t2
      * @throws TimeRangeException
      *             If t1 is invalid, if t2 <= t1, or if the resolution isn't
      *             greater than zero.
      * @throws AttributeNotFoundException
      *             If the attribute doesn't exist
+     * @since 2.0
      */
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
-            long t1, long t2, long resolution) throws TimeRangeException,
-            AttributeNotFoundException;
+            long t1, long t2, long resolution, IProgressMonitor monitor)
+            throws TimeRangeException, AttributeNotFoundException;
 }

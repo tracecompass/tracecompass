@@ -254,7 +254,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes", "null" })
+    @SuppressWarnings("null")
     public void testCopyConstructor() throws TmfTraceException {
         TmfTraceStub original = null;
         TmfTraceStub trace = null;
@@ -1109,7 +1109,7 @@ public class TmfTraceTest extends TestCase {
 
     public void testGetNextAfterSeekingOnLocation_1() {
 
-        final ITmfLocation<?> INITIAL_LOC = null;
+        final ITmfLocation INITIAL_LOC = null;
         final long INITIAL_TS = 1;
         final int NB_READS = 20;
 
@@ -1132,7 +1132,7 @@ public class TmfTraceTest extends TestCase {
 
     public void testGetNextAfterSeekingOnLocation_2() {
 
-        final ITmfLocation<?> INITIAL_LOC = fTrace.seekEvent(1L).getLocation();
+        final ITmfLocation INITIAL_LOC = fTrace.seekEvent(1L).getLocation();
         final long INITIAL_TS = 2;
         final int NB_READS = 20;
 
@@ -1153,7 +1153,7 @@ public class TmfTraceTest extends TestCase {
 
     public void testGetNextAfterSeekingOnLocation_3() {
 
-        final ITmfLocation<?> INITIAL_LOC = fTrace.seekEvent(500L).getLocation();
+        final ITmfLocation INITIAL_LOC = fTrace.seekEvent(500L).getLocation();
         final long INITIAL_TS = 501;
         final int NB_READS = 20;
 
@@ -1175,7 +1175,7 @@ public class TmfTraceTest extends TestCase {
     public void testGetNextLocation() {
         ITmfContext context1 = fTrace.seekEvent(0);
         fTrace.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation().clone();
         ITmfEvent event1 = fTrace.getNext(context1);
         ITmfContext context2 = fTrace.seekEvent(location);
         ITmfEvent event2 = fTrace.getNext(context2);
@@ -1185,7 +1185,7 @@ public class TmfTraceTest extends TestCase {
     public void testGetNextEndLocation() {
         ITmfContext context1 = fTrace.seekEvent(fTrace.getNbEvents() - 1);
         fTrace.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation().clone();
         ITmfContext context2 = fTrace.seekEvent(location);
         ITmfEvent event = fTrace.getNext(context2);
         assertNull("Event", event);
@@ -1198,17 +1198,17 @@ public class TmfTraceTest extends TestCase {
     @SuppressWarnings("hiding")
     public void testProcessEventRequestForAllEvents() throws InterruptedException {
         final int BLOCK_SIZE =  1;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1227,17 +1227,17 @@ public class TmfTraceTest extends TestCase {
     public void testProcessEventRequestForNbEvents() throws InterruptedException {
         final int BLOCK_SIZE = 100;
         final int NB_EVENTS  = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1257,17 +1257,17 @@ public class TmfTraceTest extends TestCase {
         final int BLOCK_SIZE =  1;
         final long startTime = 100;
         final int NB_EVENTS  = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1288,17 +1288,17 @@ public class TmfTraceTest extends TestCase {
         final int startIndex = 99;
         final long startTime = 100;
         final int NB_EVENTS  = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, startIndex, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, startIndex, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1317,16 +1317,16 @@ public class TmfTraceTest extends TestCase {
     public void testProcessDataRequestForSomeEvents() throws InterruptedException {
         final int startIndex = 100;
         final int NB_EVENTS  = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, startIndex, NB_EVENTS) {
+        final TmfDataRequest request = new TmfDataRequest(TmfEvent.class, startIndex, NB_EVENTS) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1346,13 +1346,13 @@ public class TmfTraceTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testCancel() throws InterruptedException {
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             int nbRead = 0;
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
                 if (++nbRead == BLOCK_SIZE) {
@@ -1360,7 +1360,7 @@ public class TmfTraceTest extends TestCase {
                 }
             }
         };
-        final ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 

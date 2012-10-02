@@ -55,8 +55,8 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     private static int          NB_EVENTS    = 20000;
     private static int          BLOCK_SIZE   = 1000;
 
-    private static ITmfTrace<TmfEvent>[] fTraces;
-    private static TmfExperimentStub<TmfEvent> fExperiment;
+    private static ITmfTrace[] fTraces;
+    private static TmfExperimentStub fExperiment;
 
     private static byte SCALE = (byte) -3;
 
@@ -64,8 +64,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
-    private synchronized static ITmfTrace<?>[] setupTrace(final String path1, final String path2) {
+    private synchronized static ITmfTrace[] setupTrace(final String path1, final String path2) {
         if (fTraces == null) {
             fTraces = new ITmfTrace[2];
             try {
@@ -100,7 +99,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         super.setUp();
         setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
         if (fExperiment == null) {
-            fExperiment = new TmfExperimentStub<TmfEvent>(EXPERIMENT, fTraces, BLOCK_SIZE);
+            fExperiment = new TmfExperimentStub(EXPERIMENT, fTraces, BLOCK_SIZE);
             fExperiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
         }
     }
@@ -384,7 +383,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     public void testSeekLocationOutOfScope() {
 
         // Position trace at beginning
-        ITmfContext context = fExperiment.seekEvent((ITmfLocation<?>) null);
+        ITmfContext context = fExperiment.seekEvent((ITmfLocation) null);
 
         ITmfEvent event = fExperiment.getNext(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
@@ -571,7 +570,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
     public void testGetNextAfterSeekingOnLocation_1() {
 
-        final ITmfLocation<?> INITIAL_LOC = null;
+        final ITmfLocation INITIAL_LOC = null;
         final long INITIAL_TS = 1;
         final int NB_READS = 20;
 
@@ -598,7 +597,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
     public void testGetNextAfterSeekingOnLocation_2() {
 
-        final ITmfLocation<?> INITIAL_LOC = fExperiment.seekEvent(1L).getLocation();
+        final ITmfLocation INITIAL_LOC = fExperiment.seekEvent(1L).getLocation();
         final long INITIAL_TS = 2;
         final int NB_READS = 20;
 
@@ -623,7 +622,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
     public void testGetNextAfterSeekingOnLocation_3() {
 
-        final ITmfLocation<?> INITIAL_LOC = fExperiment.seekEvent(500L).getLocation();
+        final ITmfLocation INITIAL_LOC = fExperiment.seekEvent(500L).getLocation();
         final long INITIAL_TS = 501;
         final int NB_READS = 20;
 
@@ -649,7 +648,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     public void testGetNextLocation() {
         ITmfContext context1 = fExperiment.seekEvent(0);
         fExperiment.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation().clone();
         ITmfEvent event1 = fExperiment.getNext(context1);
         ITmfContext context2 = fExperiment.seekEvent(location);
         ITmfEvent event2 = fExperiment.getNext(context2);
@@ -659,7 +658,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     public void testGetNextEndLocation() {
         ITmfContext context1 = fExperiment.seekEvent(fExperiment.getNbEvents() - 1);
         fExperiment.getNext(context1);
-        ITmfLocation<?> location = context1.getLocation().clone();
+        ITmfLocation location = context1.getLocation().clone();
         ITmfContext context2 = fExperiment.seekEvent(location);
         ITmfEvent event = fExperiment.getNext(context2);
         assertNull("Event", event);
@@ -673,12 +672,12 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int blockSize = 100;
         final int nbEvents  = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
@@ -701,12 +700,12 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int blockSize = 2 * NB_EVENTS;
         final int nbEvents = 1000;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
@@ -729,13 +728,13 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int nbEvents  = TmfDataRequest.ALL_DATA;
         final int blockSize =  1;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
         final long nbExpectedEvents = NB_EVENTS;
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
@@ -762,13 +761,13 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         final int nbEvents  = NB_EVENTS;
         final int blockSize = BLOCK_SIZE;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
             int nbRead = 0;
             @Override
-            public void handleData(final TmfEvent event) {
+            public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
                 if (++nbRead == blockSize) {

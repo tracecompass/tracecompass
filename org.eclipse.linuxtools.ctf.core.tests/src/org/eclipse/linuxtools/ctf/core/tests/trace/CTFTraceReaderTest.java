@@ -297,7 +297,7 @@ public class CTFTraceReaderTest {
      */
     private long getTimestamp() {
         if (fixture.getCurrentEventDef() != null) {
-            return fixture.getCurrentEventDef().getTimestamp()+ this.fixture.getTrace().getOffset();
+            return fixture.getTrace().timestampCyclesToNanos(fixture.getCurrentEventDef().getTimestamp());
         }
         return -1;
     }

@@ -72,6 +72,7 @@
          <sequence>
             <element ref="defaultEditor" minOccurs="0" maxOccurs="1"/>
             <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
+            <element ref="statisticsViewerType" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -165,6 +166,28 @@ If empty, the default events table will be used.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="statisticsViewerType">
+      <annotation>
+         <documentation>
+            The statistics viewer to use for this trace type.
+If omitted, the default statistics viewer will be used.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="default" value="org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer">
+            <annotation>
+               <documentation>
+                  The fully qualified name of a class that extends &lt;samp&gt;TmfStatisticsViewer&lt;/samp&gt; .
+If empty, the default statistics viewer will be used.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer:"/>
                </appinfo>
             </annotation>
          </attribute>

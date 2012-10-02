@@ -14,7 +14,6 @@
 package org.eclipse.linuxtools.internal.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
  * The experiment location in TMF.
@@ -31,7 +30,9 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  *
  * @see TmfLocationArray
  */
-public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
+public class TmfExperimentLocation implements ITmfLocation {
+
+    TmfLocationArray fLocation;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -43,7 +44,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
      * @param locations the set of trace locations
      */
     public TmfExperimentLocation(TmfLocationArray locations) {
-        super(locations);
+        fLocation = locations;
     }
 
     /**
@@ -52,7 +53,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
      * @param location the other experiment location
      */
     public TmfExperimentLocation(TmfExperimentLocation location) {
-        this(location.getLocation());
+        this(location.getLocationInfo());
     }
 
     // ------------------------------------------------------------------------
@@ -65,7 +66,7 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
     @Override
     public TmfExperimentLocation clone() {
 //        super.clone(); // To keep FindBugs happy
-        TmfLocationArray array = getLocation();
+        TmfLocationArray array = getLocationInfo();
         TmfLocationArray clones = array.clone();
         return new TmfExperimentLocation(clones);
     }
@@ -81,8 +82,8 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        ITmfLocation<? extends Comparable<?>>[] locations = getLocation().getLocations();
-        for (ITmfLocation<?> location : locations) {
+        ITmfLocation[] locations = getLocationInfo().getLocations();
+        for (ITmfLocation location : locations) {
             result.append("[" + location + "]");
         }
         result.append("]");
@@ -112,6 +113,14 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
             return false;
         }
         return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationData()
+     */
+    @Override
+    public TmfLocationArray getLocationInfo() {
+        return fLocation;
     }
 
 }

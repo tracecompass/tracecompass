@@ -1,3 +1,0 @@
-instructions.configure=\
-org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/linuxtools/updates-nightly,type:0,name:Linux Tools,enabled:false); \
-org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/linuxtools/updates-nightly,type:1,name:Linux Tools,enabled:false); 

@@ -74,6 +74,11 @@ public class StreamInput implements IDefinitionScope {
      */
     StructDefinition streamPacketContextDef = null;
 
+    /*
+     * Total number of lost events in this stream
+     */
+    long lostSoFar = 0;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -92,7 +97,7 @@ public class StreamInput implements IDefinitionScope {
         this.stream = stream;
         this.fileChannel = fileChannel;
         this.file = file;
-        index = stream.getTrace().getIndex(this);
+        this.index = stream.getTrace().getIndex(this);
     }
 
     // ------------------------------------------------------------------------
@@ -184,7 +189,7 @@ public class StreamInput implements IDefinitionScope {
          * The BitBuffer to extract data from the StreamInput
          */
         BitBuffer bitBuffer = new BitBuffer();
-        bitBuffer.order(this.getStream().getTrace().getByteOrder());
+        bitBuffer.setByteOrder(this.getStream().getTrace().getByteOrder());
 
         /*
          * Create the definitions we need to read the packet headers + contexts
@@ -218,7 +223,7 @@ public class StreamInput implements IDefinitionScope {
         long fileSize = getStreamSize();
         if (currentPos < fileSize) {
             BitBuffer bitBuffer = new BitBuffer();
-            bitBuffer.order(this.getStream().getTrace().getByteOrder());
+            bitBuffer.setByteOrder(this.getStream().getTrace().getByteOrder());
             StreamInputPacketIndexEntry packetIndex = new StreamInputPacketIndexEntry(
                     currentPos);
             createPacketIndexEntry(fileSize, currentPos, packetIndex,
@@ -416,30 +421,25 @@ public class StreamInput implements IDefinitionScope {
                 packetIndex.addAttribute(field,
                         ((StringDefinition) id).getValue());
             }
-
         }
 
         Long contentSize = (Long) packetIndex.lookupAttribute("content_size"); //$NON-NLS-1$
         Long packetSize = (Long) packetIndex.lookupAttribute("packet_size"); //$NON-NLS-1$
-        Long timestampBegin = (Long) packetIndex
-                .lookupAttribute("timestamp_begin"); //$NON-NLS-1$
+        Long timestampBegin = (Long) packetIndex.lookupAttribute("timestamp_begin"); //$NON-NLS-1$
         Long timestampEnd = (Long) packetIndex.lookupAttribute("timestamp_end"); //$NON-NLS-1$
         String device = (String) packetIndex.lookupAttribute("device"); //$NON-NLS-1$
         // LTTng Specific
         Long CPU_ID = (Long) packetIndex.lookupAttribute("cpu_id"); //$NON-NLS-1$
-        /*
-         * Read the content size in bits
-         */
+        Long lostEvents = (Long) packetIndex.lookupAttribute("events_discarded");  //$NON-NLS-1$
+
+        /* Read the content size in bits */
         if (contentSize != null) {
             packetIndex.setContentSizeBits(contentSize.intValue());
         } else {
             packetIndex.setContentSizeBits((int) (fileSizeBytes * 8));
         }
 
-        /*
-         * Read the packet size in bits
-         */
-
+        /* Read the packet size in bits */
         if (packetSize != null) {
             packetIndex.setPacketSizeBits(packetSize.intValue());
         } else {
@@ -450,17 +450,12 @@ public class StreamInput implements IDefinitionScope {
             }
         }
 
-        /*
-         * Read the begin timestamp
-         */
-
+        /* Read the begin timestamp */
         if (timestampBegin != null) {
             packetIndex.setTimestampBegin(timestampBegin.longValue());
         }
 
-        /*
-         * Read the end timestamp
-         */
+        /* Read the end timestamp */
         if (timestampEnd != null) {
             if( timestampEnd == -1 ) {
                 timestampEnd = Long.MAX_VALUE;
@@ -475,6 +470,11 @@ public class StreamInput implements IDefinitionScope {
 
         if (CPU_ID != null) {
             packetIndex.setTarget("CPU" + CPU_ID.toString()); //$NON-NLS-1$
+        }
+
+        if (lostEvents != null) {
+            packetIndex.setLostEvents(lostEvents - lostSoFar);
+            this.lostSoFar = lostEvents;
         }
     }
 

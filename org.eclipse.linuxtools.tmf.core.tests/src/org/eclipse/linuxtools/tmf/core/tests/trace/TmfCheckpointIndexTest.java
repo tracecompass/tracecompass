@@ -81,14 +81,14 @@ public class TmfCheckpointIndexTest extends TestCase {
     // Helper classes
     // ------------------------------------------------------------------------
 
-    private static class TestIndexer extends TmfCheckpointIndexer<ITmfTrace<ITmfEvent>> {
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static class TestIndexer extends TmfCheckpointIndexer {
+        @SuppressWarnings({ })
         public TestIndexer(TestTrace testTrace) {
-            super((ITmfTrace) testTrace, BLOCK_SIZE);
+            super(testTrace, BLOCK_SIZE);
         }
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings({ })
         public TestIndexer(EmptyTestTrace testTrace) {
-            super((ITmfTrace) testTrace, BLOCK_SIZE);
+            super(testTrace, BLOCK_SIZE);
         }
         public List<ITmfCheckpoint> getCheckpoints() {
             return getTraceIndex();

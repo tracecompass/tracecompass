@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-
 /**
  * The generic trace location in TMF.
  * <p>
@@ -23,21 +22,22 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * <p>
  * This location is trace-specific and must be comparable.
  *
- * @param <L> The trace location type
- *
- * @version 1.0
+ * @version 2.0
  * @author Francois Chouinard
  */
-public interface ITmfLocation<L extends Comparable<?>> {
+public interface ITmfLocation {
 
     // ------------------------------------------------------------------------
     // Getters
     // ------------------------------------------------------------------------
 
     /**
-     * @return the location
+     * Returns the concrete trace location information
+     *
+     * @return the location information
+     * @since 2.0
      */
-    public L getLocation();
+    public Comparable<?> getLocationInfo();
 
     // ------------------------------------------------------------------------
     // Operations
@@ -46,6 +46,6 @@ public interface ITmfLocation<L extends Comparable<?>> {
     /**
      * @return a clone of the location
      */
-    public ITmfLocation<L> clone();
+    public ITmfLocation clone();
 
 }

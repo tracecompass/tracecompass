@@ -81,7 +81,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     private TmfEventsTable fEventsTable;
     private IFile fFile;
-    @SuppressWarnings("rawtypes")
     private ITmfTrace fTrace;
     private Composite fParent;
 
@@ -127,7 +126,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             final List<TmfTraceElement> traceEntries = experimentElement.getTraces();
                             final int nbTraces = traceEntries.size();
                             int cacheSize = Integer.MAX_VALUE;
-                            final ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
+                            final ITmfTrace[] traces = new ITmfTrace[nbTraces];
                             for (int i = 0; i < nbTraces; i++) {
                                 final TmfTraceElement traceElement = traceEntries.get(i);
                                 final ITmfTrace trace = traceElement.instantiateTrace();
@@ -296,7 +295,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     private TmfEventsTable getEventsTable(final Composite parent, final int cacheSize) {
         if (fTrace instanceof TmfExperiment) {
-            return getExperimentEventsTable((TmfExperiment<?>) fTrace, parent, cacheSize);
+            return getExperimentEventsTable((TmfExperiment) fTrace, parent, cacheSize);
         }
         TmfEventsTable eventsTable = null;
         try {
@@ -367,12 +366,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      * @return an events table of the appropriate type
      */
     private static TmfEventsTable getExperimentEventsTable(
-            final TmfExperiment<?> experiment, final Composite parent,
+            final TmfExperiment experiment, final Composite parent,
             final int cacheSize) {
         TmfEventsTable eventsTable = null;
         String commonTraceType = null;
         try {
-            for (final ITmfTrace<?> trace : experiment.getTraces()) {
+            for (final ITmfTrace trace : experiment.getTraces()) {
                 final IResource resource = trace.getResource();
                 if (resource == null) {
                     return null;
@@ -434,7 +433,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     @Override
-    public ITmfTrace<?> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 
@@ -452,7 +451,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public Object getAdapter(final Class adapter) {
         if (IGotoMarker.class.equals(adapter)) {
             return fEventsTable;
@@ -505,7 +503,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      *
      * @param signal The incoming signal
      */
-    @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void traceParserUpdated(final TmfTraceParserUpdatedSignal signal) {
         if (signal.getTraceResource().equals(fFile)) {
@@ -517,7 +514,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 if (traceTypeId != null) {
                     for (final IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                         if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
-                            fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
+                            fTrace = (ITmfTrace) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                             final ITmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                             final String path = fFile.getLocationURI().getPath();
                             fTrace.initTrace(null, path, event.getClass());

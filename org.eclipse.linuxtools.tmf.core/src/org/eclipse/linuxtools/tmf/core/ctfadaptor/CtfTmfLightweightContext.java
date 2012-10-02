@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  * Lightweight Context for CtfTmf traces. Should only use 3 references, 1 ref to
  * a boxed Long, a long and an int.
  *
- * @versionj 1.0
+ * @version 1.0
  * @author Matthew Khouzam
  */
 public class CtfTmfLightweightContext implements ITmfContext {
@@ -49,7 +49,7 @@ public class CtfTmfLightweightContext implements ITmfContext {
     public CtfTmfLightweightContext(ArrayList<CtfIterator> iters,
             ListIterator<CtfIterator> pos) {
         fTrace = iters.get(0).getCtfTmfTrace();
-        curLocation = new CtfLocation((Long) null);
+        curLocation = new CtfLocation(new CtfLocationData(0, 0));
     }
 
     /**
@@ -60,7 +60,7 @@ public class CtfTmfLightweightContext implements ITmfContext {
      */
     public CtfTmfLightweightContext(CtfTmfTrace ctfTmfTrace) {
         fTrace = ctfTmfTrace;
-        curLocation = new CtfLocation((Long) null);
+        curLocation = new CtfLocation(new CtfLocationData(0, 0));
     }
 
     // -------------------------------------------
@@ -73,19 +73,19 @@ public class CtfTmfLightweightContext implements ITmfContext {
     }
 
     @Override
-    public ITmfLocation<? extends Comparable<?>> getLocation() {
+    public ITmfLocation getLocation() {
         return curLocation;
     }
 
     @Override
     public boolean hasValidRank() {
-        return curRank != CtfLocation.INVALID_LOCATION;
+        return curRank != CtfLocation.INVALID_LOCATION.getTimestamp();
     }
 
     @Override
-    public void setLocation(ITmfLocation<? extends Comparable<?>> location) {
+    public void setLocation(ITmfLocation location) {
         curLocation = (CtfLocation) location;
-        getIterator().seek(curLocation.getLocation());
+        getIterator().seek(curLocation.getLocationInfo());
     }
 
     @Override
@@ -120,10 +120,17 @@ public class CtfTmfLightweightContext implements ITmfContext {
      * @return success or not
      */
     public synchronized boolean advance() {
+        final CtfLocationData curLocationData = this.curLocation.getLocationInfo();
         boolean retVal = getIterator().advance();
         CtfTmfEvent currentEvent = getIterator().getCurrentEvent();
+
         if (currentEvent != null) {
-            curLocation.setLocation(currentEvent.getTimestampValue());
+            final long timestampValue = currentEvent.getTimestamp().getValue();
+            if (curLocationData.getTimestamp() == timestampValue) {
+                curLocation.setLocation(timestampValue, curLocationData.getIndex() + 1);
+            } else {
+                curLocation.setLocation(timestampValue, 0L);
+            }
         } else {
             curLocation.setLocation(CtfLocation.INVALID_LOCATION);
         }
@@ -144,8 +151,21 @@ public class CtfTmfLightweightContext implements ITmfContext {
      * @return success or not
      */
     public synchronized boolean seek(final long timestamp) {
-        curLocation.setLocation(timestamp);
+        curLocation.setLocation(timestamp, 0);
         return getIterator().seek(timestamp);
+    }
+
+    /**
+     * Seeks to a given location. Wrapper to help CtfTmfTrace
+     * @param location
+     *              unique location to find the event.
+     *
+     * @return success or not
+     * @since 2.0
+     */
+    public synchronized boolean seek(final CtfLocationData location) {
+        curLocation.setLocation(location);
+        return getIterator().seek(location);
     }
 
     /*

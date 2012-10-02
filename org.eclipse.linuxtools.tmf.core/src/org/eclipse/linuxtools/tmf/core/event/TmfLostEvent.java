@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  *
  * @author Francois Chouinard
  * @version 1.0
- * @since 1.2
+ * @since 2.0
 */
 public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
 
@@ -55,7 +55,7 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
      * @param timeRange the 'problematic' time range
      * @param nbLostEvents the number of lost events in the time range
      */
-    public TmfLostEvent(final ITmfTrace<? extends ITmfEvent> trace, final long rank, final ITmfTimestamp timestamp,
+    public TmfLostEvent(final ITmfTrace trace, final long rank, final ITmfTimestamp timestamp,
             final String source, final ITmfEventType type, final String reference, final TmfTimeRange timeRange, final long nbLostEvents)
     {
         super(trace, rank, timestamp, source, type, null, reference);

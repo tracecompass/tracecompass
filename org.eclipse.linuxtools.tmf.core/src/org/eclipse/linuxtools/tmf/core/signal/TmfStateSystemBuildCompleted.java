@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -16,14 +16,14 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * Signal sent when the state system has completed its build.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
 public class TmfStateSystemBuildCompleted extends TmfSignal {
 
-    private ITmfTrace<?> fTrace;
-    
+    private final ITmfTrace fTrace;
+
     /**
      * Constructor
      *
@@ -32,7 +32,7 @@ public class TmfStateSystemBuildCompleted extends TmfSignal {
      * @param trace
      *            The state system of which trace just finished building
      */
-    public TmfStateSystemBuildCompleted(Object source, ITmfTrace<?> trace) {
+    public TmfStateSystemBuildCompleted(Object source, ITmfTrace trace) {
         super(source);
         fTrace = trace;
     }
@@ -40,7 +40,7 @@ public class TmfStateSystemBuildCompleted extends TmfSignal {
     /**
      * @return The trace referred to by this signal
      */
-    public ITmfTrace<?> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

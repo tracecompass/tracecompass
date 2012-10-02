@@ -30,7 +30,7 @@ import org.eclipse.ui.ide.IDE;
 public class TmfEditorInput implements IEditorInput {
 
     private final IFile fFile;
-    private final ITmfTrace<?> fTrace;
+    private final ITmfTrace fTrace;
 
     /**
      * Standard constructor
@@ -38,13 +38,13 @@ public class TmfEditorInput implements IEditorInput {
      * @param file The IFile pointer
      * @param trace Reference to the trace
      */
-    public TmfEditorInput(IFile file, ITmfTrace<?> trace) {
+    public TmfEditorInput(IFile file, ITmfTrace trace) {
         fFile = file;
         fTrace = trace;
     }
 
     @Override
-	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+	public Object getAdapter(Class adapter) {
         return null;
     }
 
@@ -89,7 +89,7 @@ public class TmfEditorInput implements IEditorInput {
      *
      * @return The trace
      */
-    public ITmfTrace<?> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

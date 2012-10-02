@@ -28,8 +28,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     CtfIteratorTest.class,
+    CtfLocationDataTest.class,
     CtfLocationTest.class,
-    CtfTmfContentTest.class,
     CtfTmfEventFieldTest.class,
     CtfTmfEventTest.class,
     CtfTmfEventTypeTest.class,

@@ -292,11 +292,29 @@ public class TimeGraphCombo extends Composite {
             @Override
             public void treeCollapsed(TreeExpansionEvent event) {
                 fTimeGraphViewer.setExpandedState((ITimeGraphEntry) event.getElement(), false);
+                ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
+                if (treeItems.size() == 0) {
+                    return;
+                }
+                TreeItem treeItem = treeItems.get(fTimeGraphViewer.getTopIndex());
+                tree.setTopItem(treeItem);
             }
 
             @Override
             public void treeExpanded(TreeExpansionEvent event) {
                 fTimeGraphViewer.setExpandedState((ITimeGraphEntry) event.getElement(), true);
+                ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
+                if (treeItems.size() == 0) {
+                    return;
+                }
+                final TreeItem treeItem = treeItems.get(fTimeGraphViewer.getTopIndex());
+                // queue the top item update because the tree can change its top item
+                // autonomously immediately after the listeners have been notified
+                getDisplay().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        tree.setTopItem(treeItem);
+                    }});
             }
         });
 
@@ -575,7 +593,6 @@ public class TimeGraphCombo extends Composite {
         }
     }
 
-
     /**
      * Sets the time graph provider used by this time graph combo.
      *
@@ -609,8 +626,10 @@ public class TimeGraphCombo extends Composite {
      * Refreshes this time graph completely with information freshly obtained from its model.
      */
     public void refresh() {
+        fInhibitTreeSelection = true;
         fTreeViewer.refresh();
         fTimeGraphViewer.refresh();
+        fInhibitTreeSelection = false;
     }
 
     /**
@@ -657,6 +676,41 @@ public class TimeGraphCombo extends Composite {
         }
         TreeItem treeItem = treeItems.get(fTimeGraphViewer.getTopIndex());
         fTreeViewer.getTree().setTopItem(treeItem);
+    }
+
+    /**
+     * Set the expanded state of an entry
+     *
+     * @param entry
+     *            The entry to expand/collapse
+     * @param expanded
+     *            True for expanded, false for collapsed
+     *
+     * @since 2.0
+     */
+    public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
+        fTimeGraphViewer.setExpandedState(entry, expanded);
+        fTreeViewer.setExpandedState(entry, expanded);
+    }
+
+    /**
+     * Collapses all nodes of the viewer's tree, starting with the root.
+     *
+     * @since 2.0
+     */
+    public void collapseAll() {
+        fTimeGraphViewer.collapseAll();
+        fTreeViewer.collapseAll();
+    }
+
+    /**
+     * Expands all nodes of the viewer's tree, starting with the root.
+     *
+     * @since 2.0
+     */
+    public void expandAll() {
+        fTimeGraphViewer.expandAll();
+        fTreeViewer.expandAll();
     }
 
     // ------------------------------------------------------------------------

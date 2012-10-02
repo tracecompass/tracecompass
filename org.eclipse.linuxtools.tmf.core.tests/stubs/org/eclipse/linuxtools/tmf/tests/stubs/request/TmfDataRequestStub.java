@@ -12,20 +12,20 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.request;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 
 /**
- * @param <T> The event type
+ *
  */
-public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
+public class TmfDataRequestStub extends TmfDataRequest {
 
     /**
      * Default constructor
      *
      * @param dataType the request data type
      */
-    public TmfDataRequestStub(final Class<T> dataType) {
+    public TmfDataRequestStub(final Class<? extends ITmfEvent> dataType) {
         super(dataType);
     }
 
@@ -33,7 +33,7 @@ public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
      * @param dataType the request data type
      * @param index the initial event index
      */
-    public TmfDataRequestStub(final Class<T> dataType, final int index) {
+    public TmfDataRequestStub(final Class<? extends ITmfEvent> dataType, final int index) {
         super(dataType, index);
     }
 
@@ -42,7 +42,7 @@ public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
      * @param index the initial event index
      * @param nbRequested the number of events requested
      */
-    public TmfDataRequestStub(final Class<T> dataType, final int index, final int nbRequested) {
+    public TmfDataRequestStub(final Class<? extends ITmfEvent> dataType, final int index, final int nbRequested) {
         super(dataType, index, nbRequested);
     }
 
@@ -52,7 +52,7 @@ public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
      * @param nbRequested the number of events requested
      * @param blockSize the event block size
      */
-    public TmfDataRequestStub(final Class<T> dataType, final int index, final int nbRequested, final int blockSize) {
+    public TmfDataRequestStub(final Class<? extends ITmfEvent> dataType, final int index, final int nbRequested, final int blockSize) {
         super(dataType, index, nbRequested, blockSize);
     }
 
@@ -60,7 +60,7 @@ public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
      * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
      */
     @Override
-    public void handleData(final T data) {
+    public void handleData(final ITmfEvent data) {
         super.handleData(data);
     }
 

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 /**
  * The basic trace checkpoint structure in TMF. The purpose of the checkpoint is
  * to associate a trace location to an event timestamp.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -43,7 +43,7 @@ public interface ITmfCheckpoint extends Comparable<ITmfCheckpoint> {
     /**
      * @return the location of the event referred to by the context
      */
-    public ITmfLocation<? extends Comparable<?>> getLocation();
+    public ITmfLocation getLocation();
 
     /**
      * @return a clone of the checkpoint

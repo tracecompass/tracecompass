@@ -30,7 +30,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final ITmfLocation<? extends Comparable<?>>[] fLocations;
+    private final ITmfLocation[] fLocations;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -41,7 +41,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      *
      * @param locations the locations
      */
-    public TmfLocationArray(ITmfLocation<? extends Comparable<?>>[] locations) {
+    public TmfLocationArray(ITmfLocation[] locations) {
         fLocations = locations;
     }
 
@@ -54,7 +54,7 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      *
      * @return the locations
      */
-    public ITmfLocation<? extends Comparable<?>>[] getLocations() {
+    public ITmfLocation[] getLocations() {
         return fLocations;
     }
 
@@ -67,9 +67,9 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      */
     @Override
     public TmfLocationArray clone() {
-        ITmfLocation<? extends Comparable<?>>[] clones = new ITmfLocation<?>[fLocations.length];
+        ITmfLocation[] clones = new ITmfLocation[fLocations.length];
         for (int i = 0; i < fLocations.length; i++) {
-            ITmfLocation<?> location = fLocations[i];
+            ITmfLocation location = fLocations[i];
             clones[i] = (location != null) ? location.clone() : null;
         }
         return new TmfLocationArray(clones);
@@ -80,12 +80,12 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // ------------------------------------------------------------------------
 
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(TmfLocationArray o) {
         for (int i = 0; i < fLocations.length; i++) {
-            ITmfLocation<? extends Comparable> l1 = (ITmfLocation<? extends Comparable>) fLocations[i].getLocation();
-            ITmfLocation<? extends Comparable> l2 = (ITmfLocation<? extends Comparable>) o.fLocations[i].getLocation();
-            int result = l1.getLocation().compareTo(l2.getLocation());
+            Comparable l1 = fLocations[i].getLocationInfo();
+            Comparable l2 = o.fLocations[i].getLocationInfo();
+            int result = l1.compareTo(l2);
             if (result != 0) {
                 return result;
             }

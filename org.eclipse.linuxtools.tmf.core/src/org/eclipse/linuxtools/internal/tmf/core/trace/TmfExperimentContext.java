@@ -65,7 +65,7 @@ public class TmfExperimentContext extends TmfContext {
         super();
         fContexts = contexts;
         fEvents = new ITmfEvent[fContexts.length];
-        final ITmfLocation<?>[] locations = new ITmfLocation[fContexts.length];
+        final ITmfLocation[] locations = new ITmfLocation[fContexts.length];
 
         setLocation(new TmfExperimentLocation(new TmfLocationArray(locations.clone())));
 

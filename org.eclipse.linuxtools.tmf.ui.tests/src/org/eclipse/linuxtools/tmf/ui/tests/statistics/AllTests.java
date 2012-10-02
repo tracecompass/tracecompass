@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis (mathieu.denis@polymtl.ca) - Initial API and Implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *   Bernd Hufmann - Fixed suite name
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.tests.statistics;
@@ -24,16 +24,17 @@ public class AllTests {
     /**
      * @return the test suite
      */
-	public static Test suite() {
-		TestSuite suite = new TestSuite(AllTests.class.getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(TmfBaseColumnDataProviderTest.class);
-		suite.addTestSuite(TmfBaseColumnDataTest.class);
-		suite.addTestSuite(TmfBaseStatisticsDataTest.class);
-		suite.addTestSuite(TmfStatisticsTreeNodeTest.class);
-		suite.addTestSuite(TmfStatisticsTreeRootFactoryTest.class);
-		suite.addTestSuite(TmfTreeContentProviderTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+    public static Test suite() {
+        TestSuite suite = new TestSuite(AllTests.class.getName());
+        // $JUnit-BEGIN$
+        suite.addTestSuite(TmfBaseColumnDataProviderTest.class);
+        suite.addTestSuite(TmfBaseColumnDataTest.class);
+        suite.addTestSuite(TmfBaseStatisticsDataTest.class);
+        suite.addTestSuite(TmfStatisticsTreeNodeTest.class);
+        suite.addTestSuite(TmfStatisticsTreeRootFactoryTest.class);
+        suite.addTestSuite(TmfTreeContentProviderTest.class);
+        suite.addTestSuite(TmfStatisticsTest.class);
+        // $JUnit-END$
+        return suite;
+    }
 }

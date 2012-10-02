@@ -12,18 +12,15 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
  * The TMF event request
  *
- * @param <T> The request event type
- *
  * @version 1.0
  * @author Francois Chouinard
  */
-public interface ITmfEventRequest<T extends ITmfEvent> extends ITmfDataRequest<T> {
+public interface ITmfEventRequest extends ITmfDataRequest {
 
     /**
      * @return the requested time range

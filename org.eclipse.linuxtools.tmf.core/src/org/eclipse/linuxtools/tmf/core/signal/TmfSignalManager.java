@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
-import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 
 /**
  * This class manages the set of signal listeners and the signals they are
  * interested in. When a signal is broadcasted, the appropriate listeners
  * signal handlers are invoked.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -40,7 +40,7 @@ public class TmfSignalManager {
     static private Map<Object, Method[]> fVIPListeners = new HashMap<Object, Method[]>();
 
 	// If requested, add universal signal tracer
-	// TODO: Temporary solution: should be enabled/disabled dynamically 
+	// TODO: Temporary solution: should be enabled/disabled dynamically
 	private static boolean fTraceIsActive = false;
 	private static TmfSignalTracer fSignalTracer;
 	static {
@@ -75,8 +75,9 @@ public class TmfSignalManager {
      */
     public static synchronized void registerVIP(Object listener) {
         Method[] methods = getSignalHandlerMethods(listener);
-        if (methods.length > 0)
+        if (methods.length > 0) {
             fVIPListeners.put(listener, methods);
+        }
     }
 
     /**
@@ -94,7 +95,7 @@ public class TmfSignalManager {
 	/**
 	 * Returns the list of signal handlers in the listener. Signal handler name
 	 * is irrelevant; only the annotation (@TmfSignalHandler) is important.
-	 * 
+	 *
 	 * @param listener
 	 * @return
 	 */
@@ -113,14 +114,14 @@ public class TmfSignalManager {
 
 	/**
 	 * Invokes the handling methods that listens to signals of a given type.
-	 * 
+	 *
 	 * The list of handlers is built on-the-fly to allow for the dynamic
 	 * creation/deletion of signal handlers. Since the number of signal
 	 * handlers shouldn't be too high, this is not a big performance issue
 	 * to pay for the flexibility.
-	 * 
+	 *
 	 * For synchronization purposes, the signal is bracketed by two synch signals.
-	 * 
+	 *
 	 * @param signal the signal to dispatch
 	 */
 	static public synchronized void dispatchSignal(TmfSignal signal) {
@@ -138,7 +139,9 @@ public class TmfSignalManager {
 
     static private void sendSignal(Map<Object, Method[]> listeners, TmfSignal signal) {
 
-        if (Tracer.isSignalTraced()) Tracer.traceSignal(signal, "(start)"); //$NON-NLS-1$
+        if (TmfCoreTracer.isSignalTraced()) {
+            TmfCoreTracer.traceSignal(signal, "(start)"); //$NON-NLS-1$
+        }
 
         // Build the list of listener methods that are registered for this signal
         Class<?> signalClass = signal.getClass();
@@ -156,28 +159,30 @@ public class TmfSignalManager {
             }
         }
 
-        // Call the signal handlers 
+        // Call the signal handlers
         for (Map.Entry<Object, List<Method>> entry : targets.entrySet()) {
             for (Method method : entry.getValue()) {
                 try {
                     method.invoke(entry.getKey(), new Object[] { signal });
-                    if (Tracer.isSignalTraced()) {
+                    if (TmfCoreTracer.isSignalTraced()) {
                         Object key = entry.getKey();
                         String hash = String.format("%1$08X", entry.getKey().hashCode()); //$NON-NLS-1$
                         String target = "[" + hash + "] " + key.getClass().getSimpleName() + ":" + method.getName();   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-                        Tracer.traceSignal(signal, target);                     
+                        TmfCoreTracer.traceSignal(signal, target);
                     }
                 } catch (IllegalArgumentException e) {
-                    Activator.getDefault().logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
+                    Activator.logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (IllegalAccessException e) {
-                    Activator.getDefault().logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
+                    Activator.logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (InvocationTargetException e) {
-                    Activator.getDefault().logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
+                    Activator.logError("Exception handling signal " + signal + " in method " + method, e); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
         }
 
-        if (Tracer.isSignalTraced()) Tracer.traceSignal(signal, "(end)"); //$NON-NLS-1$
+        if (TmfCoreTracer.isSignalTraced()) {
+            TmfCoreTracer.traceSignal(signal, "(end)"); //$NON-NLS-1$
+        }
     }
 
 }

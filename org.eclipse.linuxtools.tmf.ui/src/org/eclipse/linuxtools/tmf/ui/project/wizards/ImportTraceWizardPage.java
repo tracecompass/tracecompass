@@ -740,10 +740,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
             List<File> traces = isolateTraces();
             for (File trace : traces) {
-                ITmfTrace<?> tmfTrace = null;
+                ITmfTrace tmfTrace = null;
                 try {
                     IConfigurationElement ce = fTraceAttributes.get(traceTypeName);
-                    tmfTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
+                    tmfTrace = (ITmfTrace) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                     if (tmfTrace != null && !tmfTrace.validate(fProject, trace.getAbsolutePath())) {
                         setMessage(null);
                         setErrorMessage(Messages.ImportTraceWizard_TraceValidationFailed);

@@ -17,9 +17,10 @@ import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 
 /**
  * Test suite for the TmfCheckpoint class.
@@ -38,9 +39,9 @@ public class TmfCheckpointTest extends TestCase {
     Long aLong1 = 12345L;
     Long aLong2 = 23456L;
     Long aLong3 = 34567L;
-    TmfLocation<Long> fLocation1 = new TmfLocation<Long>(aLong1);
-    TmfLocation<Long> fLocation2 = new TmfLocation<Long>(aLong2);
-    TmfLocation<Long> fLocation3 = new TmfLocation<Long>(aLong3);
+    ITmfLocation fLocation1 = new TmfLongLocation(aLong1);
+    ITmfLocation fLocation2 = new TmfLongLocation(aLong2);
+    ITmfLocation fLocation3 = new TmfLongLocation(aLong3);
 
     TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation1));
     TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, new TmfContext(fLocation2));

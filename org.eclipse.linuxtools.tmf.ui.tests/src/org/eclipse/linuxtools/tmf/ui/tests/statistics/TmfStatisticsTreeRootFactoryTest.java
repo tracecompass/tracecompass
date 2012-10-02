@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis (mathieu.denis@polymtl.ca)  - Initial design and implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial design and implementation
  *   Bernd Hufmann - Fixed warnings
  *******************************************************************************/
 
@@ -15,10 +15,10 @@ package org.eclipse.linuxtools.tmf.ui.tests.statistics;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseStatisticsTree;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.AbsTmfStatisticsTree;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsTreeNode;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsTreeRootFactory;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeRootFactory;
 
 /**
  * TmfStatisticsTreeRootFactory Test Case.
@@ -53,7 +53,7 @@ public class TmfStatisticsTreeRootFactoryTest extends TestCase {
     }
 
     /**
-     * Test adding of statistics tree root.
+     * Adding of statistics tree root.
      */
     public void addStatsTreeRoot() {
         fStatisticsData1 = new TmfBaseStatisticsTree();
@@ -62,6 +62,40 @@ public class TmfStatisticsTreeRootFactoryTest extends TestCase {
         TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData1);
         TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey2, fStatisticsData2);
         TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey2, fStatisticsData3);
+    }
+
+    /**
+     * Clean the statistics tree
+     */
+    public void removeStatsTreeRoot() {
+        TmfStatisticsTreeRootFactory.removeAll();
+    }
+
+    /**
+     * Test adding of statistics tree root. It should not throw exceptions
+     */
+    public void testaddStatsTreeRoot() {
+        removeStatsTreeRoot();
+
+        try {
+            assertNull(TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, null));
+            assertNull(TmfStatisticsTreeRootFactory.addStatsTreeRoot(null, fStatisticsData1));
+            assertNull(TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, null));
+            assertNull(TmfStatisticsTreeRootFactory.getStatTreeRoot(fDataKey1));
+
+            TmfStatisticsTreeNode returnRootNode = TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData1);
+            assertSame(fStatisticsData1, TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
+            assertSame(fStatisticsData1.get(AbsTmfStatisticsTree.ROOT), returnRootNode);
+
+            // Overwriting the value
+            returnRootNode = TmfStatisticsTreeRootFactory.addStatsTreeRoot(fDataKey1, fStatisticsData2);
+            assertSame(fStatisticsData2, TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
+            assertSame(fStatisticsData2.get(AbsTmfStatisticsTree.ROOT), returnRootNode);
+
+            // Success
+        } catch(Exception e) {
+            fail("AddStatsTreeRoot");
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -119,6 +153,9 @@ public class TmfStatisticsTreeRootFactoryTest extends TestCase {
         assertNull("removeStatTreeRoot", TmfStatisticsTreeRootFactory.getStatTree(fDataKey1));
 
         try {
+            // Trying to remove the same branch from the tree.
+            TmfStatisticsTreeRootFactory.removeStatTreeRoot(fDataKey1);
+
             TmfStatisticsTreeRootFactory.removeStatTreeRoot(null);
             // Success
         } catch (Exception e) {
