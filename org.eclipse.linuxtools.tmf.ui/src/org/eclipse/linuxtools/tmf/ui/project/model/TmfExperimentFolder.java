@@ -102,33 +102,73 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     }
 
     // ------------------------------------------------------------------------
-    // IPropertySource2    // ------------------------------------------------------------------------
+    // IPropertySource2
+    // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
-     */    @Override    public Object getEditableValue() {        return null;    }
+     */
+    @Override
+    public Object getEditableValue() {
+        return null;
+    }
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
-     */    @Override    public IPropertyDescriptor[] getPropertyDescriptors() {        return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;    }    
+     */
+    @Override
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
+    }
+    
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
-     */    @Override    public Object getPropertyValue(Object id) {        if (sfName.equals(id))            return getName();        if (sfPath.equals(id))            return getPath().toString();        if (sfLocation.equals(id))            return getLocation().toString();        return null;    }    /*
+     */
+    @Override
+    public Object getPropertyValue(Object id) {
+
+        if (sfName.equals(id))
+            return getName();
+
+        if (sfPath.equals(id))
+            return getPath().toString();
+
+        if (sfLocation.equals(id))
+            return getLocation().toString();
+
+        return null;
+    }
+    /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.lang.Object)
-     */    @Override    public void resetPropertyValue(Object id) {    }
+     */
+    @Override
+    public void resetPropertyValue(Object id) {
+    }
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object, java.lang.Object)
-     */    @Override    public void setPropertyValue(Object id, Object value) {    }
+     */
+    @Override
+    public void setPropertyValue(Object id, Object value) {
+    }
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertyResettable(java.lang.Object)
-     */    @Override    public boolean isPropertyResettable(Object id) {        return false;    }
+     */
+    @Override
+    public boolean isPropertyResettable(Object id) {
+        return false;
+    }
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertySet(java.lang.Object)
-     */    @Override    public boolean isPropertySet(Object id) {        return false;    }
+     */
+    @Override
+    public boolean isPropertySet(Object id) {
+        return false;
+    }
 
-}
+}
+
