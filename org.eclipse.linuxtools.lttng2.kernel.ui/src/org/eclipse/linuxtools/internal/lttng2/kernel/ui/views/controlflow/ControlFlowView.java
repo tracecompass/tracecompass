@@ -171,7 +171,8 @@ public class ControlFlowView extends TmfView {
         @Override
         public Object[] getChildren(Object parentElement) {
             ITimeGraphEntry entry = (ITimeGraphEntry) parentElement;
-            return entry.getChildren();
+            List<? extends ITimeGraphEntry> children = entry.getChildren();
+            return children.toArray(new ITimeGraphEntry[children.size()]);
         }
 
         @Override

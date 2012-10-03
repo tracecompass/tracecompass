@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.views.timechart;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -41,8 +42,11 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
         fTraceEvents = new Vector<TimeChartEvent>(modelSize);
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public ITimeGraphEntry[] getChildren() {
+    public List<ITimeGraphEntry> getChildren() {
         return null;
     }
 

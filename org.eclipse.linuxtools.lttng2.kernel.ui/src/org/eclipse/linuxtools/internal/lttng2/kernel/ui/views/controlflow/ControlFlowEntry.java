@@ -81,8 +81,8 @@ public class ControlFlowEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public ControlFlowEntry[] getChildren() {
-        return fChildren.toArray(new ControlFlowEntry[0]);
+    public List<ControlFlowEntry> getChildren() {
+        return fChildren;
     }
 
     @Override
