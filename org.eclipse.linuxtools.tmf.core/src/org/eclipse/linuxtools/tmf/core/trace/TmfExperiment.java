@@ -78,10 +78,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     private IFile fBookmarksFile;
 
-
-    // Saved experiment context (optimization)
-    private TmfExperimentContext fExperimentContext;
-
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
@@ -206,6 +202,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
     public ITmfTimestamp getTimestamp(final int index) {
         final ITmfContext context = seekEvent(index);
         final ITmfEvent event = getNext(context);
+        context.dispose();
         return (event != null) ? event.getTimestamp() : null;
     }
 
@@ -250,11 +247,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
             ((ITmfEventRequest<T>) request).setStartIndex((int) context.getRank());
             return context;
 
-        }
-
-        // Check if we are already at the right index
-        if ((fExperimentContext != null) && fExperimentContext.getRank() == request.getIndex()) {
-            return fExperimentContext;
         }
 
         return seekEvent(request.getIndex());
@@ -303,7 +295,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         context.setLastTrace(TmfExperimentContext.NO_TRACE);
         context.setRank((location == null) ? 0 : ITmfContext.UNKNOWN_RANK);
 
-        fExperimentContext = context;
         return context;
     }
 
@@ -412,7 +403,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
                     location.getLocation().getLocations()[trace] = traceContext.getLocation().clone();
                 }
 
-                fExperimentContext = expContext.clone();
                 processEvent(event);
             }
         }
@@ -443,6 +433,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
         if (getStreamingInterval() == 0) {
             final ITmfContext context = seekEvent(0);
             final ITmfEvent event = getNext(context);
+            context.dispose();
             if (event == null) {
                 return;
             }

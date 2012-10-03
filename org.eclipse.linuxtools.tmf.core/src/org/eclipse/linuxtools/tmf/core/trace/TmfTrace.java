@@ -484,9 +484,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
         ITmfEvent event = getNext(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
+            context.dispose();
             context = nextEventContext.clone();
             event = getNext(nextEventContext);
         }
+        nextEventContext.dispose();
         if (event == null) {
             context.setLocation(null);
             context.setRank(ITmfContext.UNKNOWN_RANK);
