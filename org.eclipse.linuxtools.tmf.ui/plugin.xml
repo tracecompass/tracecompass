@@ -838,7 +838,9 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
                   </instanceof>
@@ -854,7 +856,9 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
                   <or>
                      <instanceof
                            value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
@@ -878,7 +882,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
@@ -894,7 +899,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
@@ -910,7 +916,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
@@ -926,7 +933,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
@@ -942,7 +950,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
@@ -958,7 +967,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
@@ -970,26 +980,26 @@
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
-            <and>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                  </instanceof>
-               </iterate>
-            </and>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+               </instanceof>
+            </iterate>
          </activeWhen>
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteExperimentHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
-            <and>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                  </instanceof>
-               </iterate>
-            </and>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+               </instanceof>
+            </iterate>
          </activeWhen>
       </handler>
       <handler
@@ -1000,7 +1010,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
@@ -1016,7 +1027,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
@@ -1032,7 +1044,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
                   </instanceof>
@@ -1044,13 +1057,13 @@
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTraceTypeHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.select_trace_type">
          <activeWhen>
-            <and>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                  </instanceof>
-               </iterate>
-            </and>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+               </instanceof>
+            </iterate>
          </activeWhen>
       </handler>
       <handler
@@ -1061,7 +1074,8 @@
                <count
                      value="1">
                </count>
-               <iterate>
+               <iterate
+                     operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
