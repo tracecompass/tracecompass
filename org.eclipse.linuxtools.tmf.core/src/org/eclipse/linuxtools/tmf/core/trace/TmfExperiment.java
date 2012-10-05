@@ -307,7 +307,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfTrace<T> implements I
      */
     @Override
     public ITmfContext seekEvent(final double ratio) {
-        final ITmfContext context = seekEvent((long) (ratio * getNbEvents()));
+        final ITmfContext context = seekEvent(Math.round(ratio * getNbEvents()));
         return context;
     }
 

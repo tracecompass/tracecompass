@@ -124,7 +124,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         }
         try {
-            long pos = (long) (ratio * fFile.length());
+            long pos = Math.round(ratio * fFile.length());
             while (pos > 0) {
                 fFile.seek(pos - 1);
                 if (fFile.read() == '\n') {
