@@ -54,6 +54,10 @@ public class TmfStatistics  implements ITmfStatistics {
      */
     private final ITmfStateSystem stats;
 
+    public TmfStatistics() {
+        stats = null;
+    }
+
     /**
      * Constructor
      *
@@ -220,14 +224,14 @@ public class TmfStatistics  implements ITmfStatistics {
         return map;
     }
 
-    private long checkStartTime(long start) {
+    protected long checkStartTime(long start) {
         if (start < stats.getStartTime()) {
             return stats.getStartTime();
         }
         return start;
     }
 
-    private long checkEndTime(long end) {
+    protected long checkEndTime(long end) {
         if (end > stats.getCurrentEndTime()) {
             return stats.getCurrentEndTime();
         }
