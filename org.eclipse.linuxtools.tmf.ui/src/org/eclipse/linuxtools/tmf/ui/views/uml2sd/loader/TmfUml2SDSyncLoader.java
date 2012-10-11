@@ -654,8 +654,12 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         try {
             cancelOngoingRequests();
 
-            List<FilterCriteria> list = (List<FilterCriteria>)filters;
-            fFilterCriteria =  new ArrayList<FilterCriteria>(list);
+            if (filters == null) {
+                fFilterCriteria =  new ArrayList<FilterCriteria>();
+            } else {
+                List<FilterCriteria> list = (List<FilterCriteria>)filters;
+                fFilterCriteria =  new ArrayList<FilterCriteria>(list);
+            }
 
             fillCurrentPage(fEvents);
 
