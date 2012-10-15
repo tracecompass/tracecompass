@@ -20,7 +20,6 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test suite for " + Activator.PLUGIN_ID + ".util"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
 		suite.addTestSuite(PairTest.class);
-		suite.addTestSuite(TmfFixedArrayTest.class);
 		//$JUnit-END$
 		return suite;
 	}

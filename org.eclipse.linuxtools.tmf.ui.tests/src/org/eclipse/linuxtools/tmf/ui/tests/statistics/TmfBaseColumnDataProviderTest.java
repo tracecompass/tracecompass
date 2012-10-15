@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
@@ -103,7 +102,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
 
         fStatsData = new TmfBaseStatisticsTree();
 
-        fStatsData.getOrCreate(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes));
+        fStatsData.getOrCreate(fTestName, Messages.TmfStatisticsData_EventTypes);
 
         fStatsData.setTotal(fTestName, true, 3);
         fStatsData.setTypeCount(fTestName, fEvent1.getType().getName(), true, 1);
@@ -124,9 +123,9 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
         assertNotNull("getColumnData", columnsData);
         assertEquals("getColumnData", 3, columnsData.size());
 
-        TmfStatisticsTreeNode parentNode = fStatsData.get(new TmfFixedArray<String>(fTestName));
-        TmfStatisticsTreeNode treeNode1  = fStatsData.get(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getType().getName()));
-        TmfStatisticsTreeNode treeNode2  = fStatsData.get(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent3.getType().getName()));
+        TmfStatisticsTreeNode parentNode = fStatsData.get(fTestName);
+        TmfStatisticsTreeNode treeNode1  = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getType().getName());
+        TmfStatisticsTreeNode treeNode2  = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent3.getType().getName());
         ViewerComparator vComp = null;
         for (TmfBaseColumnData columnData : columnsData) {
             assertNotNull("getColumnData", columnData);

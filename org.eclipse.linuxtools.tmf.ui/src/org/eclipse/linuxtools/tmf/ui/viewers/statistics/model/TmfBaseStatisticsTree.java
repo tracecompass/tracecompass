@@ -15,10 +15,9 @@ package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 
 /**
  * Store information about base statistics data.
@@ -49,7 +48,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     /**
      * Root node key.
      */
-    protected static final String ROOT_NODE_KEY = mergeString(ROOT.get(0), NODE);
+    protected static final String ROOT_NODE_KEY = mergeString(ROOT[0], NODE);
 
     /**
      * Default constructor. Creates base statistics tree for counting total
@@ -73,7 +72,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         keys.put(mergeString(HEADER_EVENT_TYPES, NODE), temp);
 
         // //////////// CREATE root
-        keys.put(ROOT.get(0), new HashSet<String>(2)); // 1 trace at the time
+        keys.put(ROOT[0], new HashSet<String>(2)); // 1 trace at the time
         getOrCreate(ROOT);
     }
 
@@ -84,32 +83,34 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * (org.eclipse.linuxtools.tmf.core.util.TmfFixedArray)
      */
     @Override
-    public Collection<TmfStatisticsTreeNode> getChildren(TmfFixedArray<String> path) {
-        LinkedList<TmfStatisticsTreeNode> result = new LinkedList<TmfStatisticsTreeNode>();
+    public List<TmfStatisticsTreeNode> getChildren(String... path) {
+        List<TmfStatisticsTreeNode> result = new LinkedList<TmfStatisticsTreeNode>();
 
-        if (path.size() % 2 == 0) { // if we are at a Category
+        if (path.length % 2 == 0) { // if we are at a Category
             TmfStatisticsTreeNode current = null;
-            for (String value : getKeys().get(path.get(path.size() - 1))) {
-                current = get(path.append(value));
-                if (current != null && current.getValues().getTotal() != 0) {
-                    result.add(current);
+            for (String value : getKeys().get(path[path.length - 1])) {
+                current = get(addToArray(path, value));
+                if (current != null) {
+                    if (current.getValues().getTotal() > 0 || current.getValues().getPartial() > 0) {
+                        result.add(current);
+                    }
                 }
             }
-        } else if (path.size() == 1) { // Special case.
+        } else if (path.length == 1) { // Special case.
             if (path.equals(ROOT)) {
-                for (String value : getKeys().get(ROOT.get(0))) {
-                    result.add(getOrCreate(new TmfFixedArray<String>(value)));
+                for (String value : getKeys().get(ROOT[0])) {
+                    result.add(getOrCreate(value));
                 }
             } else {
                 // Get value under the root
                 for (String value : getKeys().get(ROOT_NODE_KEY)) {
-                    result.add(getOrCreate(path.append(value)));
+                    result.add(getOrCreate(addToArray(path, value)));
                 }
             }
         } else {// If we are at a value
-            for (String value : getKeys().get(mergeString(path.get(path.size() - 2), NODE))) {
+            for (String value : getKeys().get(mergeString(path[path.length - 2], NODE))) {
                 // Search the parent name + NODE
-                result.add(getOrCreate(path.append(value)));
+                result.add(getOrCreate(addToArray(path, value)));
             }
         }
 
@@ -123,32 +124,32 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * (org.eclipse.linuxtools.tmf.core.util.TmfFixedArray)
      */
     @Override
-    public Collection<TmfStatisticsTreeNode> getAllChildren(TmfFixedArray<String> path) {
+    public Collection<TmfStatisticsTreeNode> getAllChildren(String... path) {
         LinkedList<TmfStatisticsTreeNode> result = new LinkedList<TmfStatisticsTreeNode>();
 
-        if (path.size() % 2 == 0) { // if we are at a Category
+        if (path.length % 2 == 0) { // if we are at a Category
             TmfStatisticsTreeNode current = null;
-            for (String value : getKeys().get(path.get(path.size() - 1))) {
-                current = get(path.append(value));
+            for (String value : getKeys().get(path[path.length - 1])) {
+                current = get(addToArray(path, value));
                 if (current != null) {
                     result.add(current);
                 }
             }
-        } else if (path.size() == 1) { // Special case.
+        } else if (path.length == 1) { // Special case.
             if (path.equals(ROOT)) {
-                for (String value : getKeys().get(ROOT.get(0))) {
-                    result.add(getOrCreate(new TmfFixedArray<String>(value)));
+                for (String value : getKeys().get(ROOT[0])) {
+                    result.add(getOrCreate(value));
                 }
             } else {
                 // Get value under the root
                 for (String value : getKeys().get(ROOT_NODE_KEY)) {
-                    result.add(getOrCreate(path.append(value)));
+                    result.add(getOrCreate(addToArray(path, value)));
                 }
             }
         } else {// If we are at a value
-            for (String value : getKeys().get(mergeString(path.get(path.size() - 2), NODE))) {
+            for (String value : getKeys().get(mergeString(path[path.length - 2], NODE))) {
                 // Search the parent name + NODE
-                result.add(getOrCreate(path.append(value)));
+                result.add(getOrCreate(addToArray(path, value)));
             }
         }
         return result;
@@ -156,16 +157,16 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
 
     @Override
     public void setTotal(String traceName, boolean isGlobal, long qty) {
-        TmfFixedArray<String>[] paths = getNormalPaths(traceName);
-        for (TmfFixedArray<String> path : paths) {
+        String[][] paths = getNormalPaths(traceName);
+        for (String path[] : paths) {
             getOrCreate(path).getValues().setValue(isGlobal, qty);
         }
     }
 
     @Override
     public void setTypeCount(String traceName, String type, boolean isGlobal,  long qty) {
-        TmfFixedArray<String>[] paths = getTypePaths(traceName, type);
-        for (TmfFixedArray<String> path : paths) {
+        String[][] paths = getTypePaths(traceName, type);
+        for (String[] path : paths) {
             getOrCreate(path).getValues().setValue(isGlobal, qty);
         }
     }
@@ -179,9 +180,8 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      *            Extra information to pass along with the event
      * @return Array of FixedArray representing the paths.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected TmfFixedArray<String>[] getTypePaths(String traceName, String type) {
-        TmfFixedArray[] paths = { new TmfFixedArray<String>(traceName, HEADER_EVENT_TYPES, type) };
+    protected String[][] getTypePaths(String traceName, String type) {
+        String[][] paths = { new String[] {traceName, HEADER_EVENT_TYPES, type } };
         return paths;
     }
 
@@ -194,9 +194,8 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      *            Extra information to pass along with the event
      * @return Array of FixedArray representing the paths.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected TmfFixedArray<String>[] getNormalPaths(String traceName) {
-        TmfFixedArray[] paths = { new TmfFixedArray<String>(traceName) };
+    protected String[][] getNormalPaths(String traceName) {
+        String[][] paths = { new String[] { traceName } };
         return paths;
     }
 
@@ -207,13 +206,24 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * (org.eclipse.linuxtools.tmf.core.util.TmfFixedArray)
      */
     @Override
-    protected void registerName(TmfFixedArray<String> path) {
-        if (path.size() == 1) {
+    protected void registerName(String... path) {
+        if (path.length == 1) {
             if (!path.equals(ROOT)) {
-                getKeys().get(ROOT.get(0)).add(path.get(0));
+                getKeys().get(ROOT[0]).add(path[0]);
             }
-        } else if (path.size() % 2 != 0) {
-            getKeys().get(path.get(path.size() - 2)).add(path.get(path.size() - 1));
+        } else if (path.length % 2 != 0) {
+            getKeys().get(path[path.length - 2]).add(path[path.length - 1]);
         }
+    }
+
+    /**
+     * Return a new array that's a copy of the old one, plus 'newElem' added at
+     * the end.
+     */
+    private static String[] addToArray(String[] array, String newElem) {
+        String[] newArray = new String[array.length + 1];
+        System.arraycopy(array, 0, newArray, 0, array.length);
+        newArray[array.length] = newElem;
+        return newArray;
     }
 }
