@@ -31,7 +31,7 @@ public class AllTests {
         suite.addTestSuite(TmfBaseColumnDataTest.class);
         suite.addTestSuite(TmfBaseStatisticsDataTest.class);
         suite.addTestSuite(TmfStatisticsTreeNodeTest.class);
-        suite.addTestSuite(TmfStatisticsTreeRootFactoryTest.class);
+        suite.addTestSuite(TmfStatisticsTreeManagerTest.class);
         suite.addTestSuite(TmfTreeContentProviderTest.class);
         suite.addTestSuite(TmfStatisticsTest.class);
         // $JUnit-END$

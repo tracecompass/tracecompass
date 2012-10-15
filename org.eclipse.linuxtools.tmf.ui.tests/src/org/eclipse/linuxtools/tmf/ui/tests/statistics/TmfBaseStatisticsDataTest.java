@@ -24,9 +24,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.Messages;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
 
 /**
@@ -69,7 +68,7 @@ public class TmfBaseStatisticsDataTest extends TestCase {
     private final TmfEventField fContent2;
     private final TmfEventField fContent3;
 
-    private final TmfBaseStatisticsTree fStatsData;
+    private final TmfStatisticsTree fStatsData;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -93,7 +92,7 @@ public class TmfBaseStatisticsDataTest extends TestCase {
         fContent3 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some other different content");
         fEvent3 = new TmfEvent(null, fTimestamp3, fSource, fType3, fContent3, fReference);
 
-        fStatsData = new TmfBaseStatisticsTree();
+        fStatsData = new TmfStatisticsTree();
 
         fStatsData.setTotal(fTestName, true, 3);
         fStatsData.setTypeCount(fTestName, fEvent1.getType().getName(), true, 1);
@@ -110,7 +109,7 @@ public class TmfBaseStatisticsDataTest extends TestCase {
      */
     public void testGetChildren() {
         // Getting children of the ROOT
-        Collection<TmfStatisticsTreeNode> childrenTreeNode = fStatsData.getChildren(AbsTmfStatisticsTree.ROOT);
+        Collection<TmfStatisticsTreeNode> childrenTreeNode = fStatsData.getChildren(TmfStatisticsTree.ROOT);
         assertEquals("getChildren", 1, childrenTreeNode.size());
         TmfStatisticsTreeNode treeNode = childrenTreeNode.iterator().next();
         assertEquals("getChildren", fTestName, treeNode.getKey());
@@ -154,7 +153,7 @@ public class TmfBaseStatisticsDataTest extends TestCase {
      */
     public void testGetAllChildren() {
         // Getting children of the ROOT
-        Collection<TmfStatisticsTreeNode> childrenTreeNode = fStatsData.getAllChildren(AbsTmfStatisticsTree.ROOT);
+        Collection<TmfStatisticsTreeNode> childrenTreeNode = fStatsData.getAllChildren(TmfStatisticsTree.ROOT);
         assertEquals("getChildren", 1, childrenTreeNode.size());
         TmfStatisticsTreeNode treeNode = childrenTreeNode.iterator().next();
         assertEquals("getChildren", fTestName, treeNode.getKey());
@@ -267,12 +266,12 @@ public class TmfBaseStatisticsDataTest extends TestCase {
      * Test getting of parent node.
      */
     public void testGetParent() {
-        TmfStatisticsTreeNode parentNode = fStatsData.getParent(AbsTmfStatisticsTree.ROOT);
+        TmfStatisticsTreeNode parentNode = fStatsData.getParent(TmfStatisticsTree.ROOT);
         assertNull("getParent", parentNode);
 
         parentNode = fStatsData.getParent("TreeRootNode that should not exist");
         assertNotNull("getParent", parentNode);
-        assertEquals("getParent", 0, parentNode.getKey().compareTo(fStatsData.get(AbsTmfStatisticsTree.ROOT).getKey().toString()));
+        assertEquals("getParent", 0, parentNode.getKey().compareTo(fStatsData.get(TmfStatisticsTree.ROOT).getKey().toString()));
 
         parentNode = fStatsData.getParent("TreeNode", Messages.TmfStatisticsData_EventTypes, "TreeNode that should not exist");
         assertNull("getParent", parentNode);
@@ -281,7 +280,7 @@ public class TmfBaseStatisticsDataTest extends TestCase {
 
         parentNode = fStatsData.getParent(fTestName);
         assertNotNull("getParent", parentNode);
-        assertEquals("getParent", 0, parentNode.getPath().toString().compareTo(AbsTmfStatisticsTree.ROOT.toString()));
+        assertEquals("getParent", 0, parentNode.getPath().toString().compareTo(TmfStatisticsTree.ROOT.toString()));
 
         parentNode = fStatsData.getParent(fTestName, Messages.TmfStatisticsData_EventTypes);
         assertNotNull("getParent", parentNode);

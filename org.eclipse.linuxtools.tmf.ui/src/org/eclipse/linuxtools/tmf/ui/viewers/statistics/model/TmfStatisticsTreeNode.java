@@ -42,7 +42,7 @@ public class TmfStatisticsTreeNode {
     /**
      * Corresponding StatisticsData.
      */
-    protected AbsTmfStatisticsTree fNodes;
+    protected TmfStatisticsTree fNodes;
 
     /**
      * Constructor.
@@ -52,7 +52,7 @@ public class TmfStatisticsTreeNode {
      * @param nodes
      *            Corresponding StatisticsData.
      */
-    public TmfStatisticsTreeNode(AbsTmfStatisticsTree nodes, final String... path) {
+    public TmfStatisticsTreeNode(TmfStatisticsTree nodes, final String... path) {
         fPath = path;
         fNodes = nodes;
         fValues = new TmfStatisticsValues();
@@ -67,7 +67,7 @@ public class TmfStatisticsTreeNode {
      *         exists with given key name
      */
     public boolean containsChild(String key) {
-        if (AbsTmfStatisticsTree.ROOT.equals(fPath)) {
+        if (TmfStatisticsTree.ROOT.equals(fPath)) {
             return fNodes.get(key) != null;
         }
 

@@ -34,13 +34,12 @@ import org.eclipse.linuxtools.tmf.core.statistics.TmfStatistics;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewer;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.ITmfColumnDataProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeRootFactory;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfTreeContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -92,7 +91,7 @@ public class TmfStatisticsViewer extends TmfViewer {
     /**
      * The statistics tree linked to this viewer
      */
-    protected AbsTmfStatisticsTree fStatisticsData;
+    protected TmfStatisticsTree fStatisticsData;
 
     /**
      * Update synchronization parameter (used for streaming): Update busy
@@ -225,7 +224,7 @@ public class TmfStatisticsViewer extends TmfViewer {
         }
 
         // Clean the model for this viewer
-        TmfStatisticsTreeRootFactory.removeStatTreeRoot(getTreeID());
+        TmfStatisticsTreeManager.removeStatTreeRoot(getTreeID());
     }
 
     /**
@@ -329,9 +328,9 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @return a TmfStatisticsData object.
      */
-    public AbsTmfStatisticsTree getStatisticData() {
+    public TmfStatisticsTree getStatisticData() {
         if (fStatisticsData == null) {
-            fStatisticsData = new TmfBaseStatisticsTree();
+            fStatisticsData = new TmfStatisticsTree();
         }
         return fStatisticsData;
     }
@@ -519,9 +518,9 @@ public class TmfStatisticsViewer extends TmfViewer {
     protected void initInput() {
         String treeID = getTreeID();
         TmfStatisticsTreeNode experimentTreeNode;
-        if (TmfStatisticsTreeRootFactory.containsTreeRoot(treeID)) {
+        if (TmfStatisticsTreeManager.containsTreeRoot(treeID)) {
             // The experiment root is already present
-            experimentTreeNode = TmfStatisticsTreeRootFactory.getStatTreeRoot(treeID);
+            experimentTreeNode = TmfStatisticsTreeManager.getStatTreeRoot(treeID);
 
             // Checks if the trace is already in the statistics tree.
             int numNodeTraces = experimentTreeNode.getNbChildren();
@@ -559,7 +558,7 @@ public class TmfStatisticsViewer extends TmfViewer {
             }
         } else {
             // Creates a new tree
-            experimentTreeNode = TmfStatisticsTreeRootFactory.addStatsTreeRoot(treeID, getStatisticData());
+            experimentTreeNode = TmfStatisticsTreeManager.addStatsTreeRoot(treeID, getStatisticData());
         }
 
         // Sets the input to a clean data model
@@ -673,8 +672,8 @@ public class TmfStatisticsViewer extends TmfViewer {
      *            partial one.
      */
     private void buildStatisticsTree(final TmfExperiment experiment, TmfTimeRange timeRange, boolean isGlobal) {
-        final TmfStatisticsTreeNode statTree = TmfStatisticsTreeRootFactory.getStatTreeRoot(getTreeID());
-        final AbsTmfStatisticsTree statsData = TmfStatisticsTreeRootFactory.getStatTree(getTreeID());
+        final TmfStatisticsTreeNode statTree = TmfStatisticsTreeManager.getStatTreeRoot(getTreeID());
+        final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
         if (statsData == null) {
             return;
         }
@@ -730,7 +729,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      *            Are we updating the Global data (for the complete time range
      *            of the trace), or the selected time range data?
      */
-    protected void updateValues(AbsTmfStatisticsTree statsData, ITmfTrace trace,
+    protected void updateValues(TmfStatisticsTree statsData, ITmfTrace trace,
             TmfTimeRange timeRange, boolean isGlobal) {
         ITmfStatistics stats = trace.getStatistics();
 
@@ -779,7 +778,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      * Resets the number of events within the time range
      */
     protected void resetTimeRangeValue() {
-        TmfStatisticsTreeNode treeModelRoot = TmfStatisticsTreeRootFactory.getStatTreeRoot(getTreeID());
+        TmfStatisticsTreeNode treeModelRoot = TmfStatisticsTreeManager.getStatTreeRoot(getTreeID());
         if (treeModelRoot != null && treeModelRoot.hasChildren()) {
             treeModelRoot.resetTimeRangeValue();
         }

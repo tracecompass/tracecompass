@@ -7,12 +7,14 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
+ *   Mathieu Denis <mathieu.denis@polymtl.ca> - Implementation and Initial API
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,16 +22,20 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Store information about base statistics data.
+ * Base class for the statistics storage. It allow to implement a tree structure
+ * while avoiding the need to run through the tree each time you need to add a
+ * node at a given place.
  *
- * This class provides a way to represent statistics data that is compatible
- * with every type of trace.
- *
- * @version 2.0
  * @author Mathieu Denis
+ * @version 2.0
  * @since 2.0
  */
-public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
+public class TmfStatisticsTree {
+
+    /**
+     * Identification of the root.
+     */
+    public static final String[] ROOT = new String[] { "root" }; //$NON-NLS-1$
 
     /**
      * Header for the event type categories.
@@ -51,11 +57,24 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     protected static final String ROOT_NODE_KEY = mergeString(ROOT[0], NODE);
 
     /**
+     * Define what children a node can have. The management and usage of this map
+     * is done by subclasses. HashSet are always faster than TreeSet for String keys.
+     */
+    protected Map<String, Set<String>> fKeys;
+
+    /**
+     * The nodes in the tree.
+     */
+    protected Map<List<String>, TmfStatisticsTreeNode> fNodes;
+
+    /**
      * Default constructor. Creates base statistics tree for counting total
      * number of events and number of events per event type.
      */
-    public TmfBaseStatisticsTree() {
-        super();
+    public TmfStatisticsTree() {
+        fNodes = new HashMap<List<String>, TmfStatisticsTreeNode>();
+        fKeys = new HashMap<String, Set<String>>();
+
         Map<String, Set<String>> keys = getKeys();
 
         // //////////// Adding category sets
@@ -76,13 +95,25 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         getOrCreate(ROOT);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Get a node.
      *
-     * @see org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree#getChildren
-     * (org.eclipse.linuxtools.tmf.core.util.TmfFixedArray)
+     * @param path
+     *            Path to the node.
+     * @return The node or null.
      */
-    @Override
+    public TmfStatisticsTreeNode get(String... path) {
+        List<String> pathAsList = Arrays.asList(path);
+        return fNodes.get(pathAsList);
+    }
+
+    /**
+     * Get the children of a node.
+     *
+     * @param path
+     *            Path to the node.
+     * @return Collection containing the children.
+     */
     public List<TmfStatisticsTreeNode> getChildren(String... path) {
         List<TmfStatisticsTreeNode> result = new LinkedList<TmfStatisticsTreeNode>();
 
@@ -117,14 +148,15 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Get every children of a node, even if it doesn't have any registered
+     * events, as opposed to getChildren
      *
-     * @see org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree#getAllChildren
-     * (org.eclipse.linuxtools.tmf.core.util.TmfFixedArray)
+     * @param path
+     *            Path to the node.
+     * @return Collection containing all the children.
      */
-    @Override
-    public Collection<TmfStatisticsTreeNode> getAllChildren(String... path) {
+    public List<TmfStatisticsTreeNode> getAllChildren(String... path) {
         LinkedList<TmfStatisticsTreeNode> result = new LinkedList<TmfStatisticsTreeNode>();
 
         if (path.length % 2 == 0) { // if we are at a Category
@@ -155,7 +187,66 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         return result;
     }
 
-    @Override
+    /**
+     * Get the map of existing elements of path classified by parent.
+     *
+     * @return The map.
+     */
+    public Map<String, Set<String>> getKeys() {
+        return fKeys;
+    }
+
+    /**
+     * Get or create a node.
+     *
+     * @param path
+     *            Path to the node.
+     * @return The node.
+     */
+    public TmfStatisticsTreeNode getOrCreate(String... path) {
+        List<String> pathAsList = Arrays.asList(path);
+        TmfStatisticsTreeNode current = fNodes.get(pathAsList);
+
+        if (current == null) {
+            registerName(path);
+            current = new TmfStatisticsTreeNode(this, path);
+            fNodes.put(pathAsList, current);
+        }
+        return current;
+    }
+
+    /**
+     * Get the parent of a node.
+     *
+     * @param path
+     *            Path to the node.
+     * @return Parent node or null.
+     */
+    public TmfStatisticsTreeNode getParent(final String... path) {
+        if (path.length == 1) {
+            if (path.equals(ROOT)) {
+                return null;
+            }
+            return get(ROOT);
+        }
+
+        String[] parentPath = new String[path.length - 1];
+        System.arraycopy(path, 0, parentPath, 0, parentPath.length);
+        return get(parentPath);
+    }
+
+    /**
+     * Set the value to display in the "total" cells. This means the row
+     * indicating the total count of events for a trace.
+     *
+     * @param traceName
+     *            The name of the trace (will be used as a sub-tree in the view)
+     * @param isGlobal
+     *            Is this a for a global or a time range request? Determines if
+     *            this goes in the Global column or the Selected Time Range one.
+     * @param qty
+     *            The value to display
+     */
     public void setTotal(String traceName, boolean isGlobal, long qty) {
         String[][] paths = getNormalPaths(traceName);
         for (String path[] : paths) {
@@ -163,7 +254,20 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         }
     }
 
-    @Override
+    /**
+     * Set the value to display in the "Type count" cells. These are the counts
+     * for each event types.
+     *
+     * @param traceName
+     *            The name of the trace (will be used as a sub-tree in the view)
+     * @param type
+     *            The event type
+     * @param isGlobal
+     *            Is this a for a global or a time range request? Determines if
+     *            this goes in the Global column or the Selected Time Range one.
+     * @param qty
+     *            The value to display
+     */
     public void setTypeCount(String traceName, String type, boolean isGlobal,  long qty) {
         String[][] paths = getTypePaths(traceName, type);
         for (String[] path : paths) {
@@ -199,13 +303,15 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         return paths;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Register that a new node was created.
      *
-     * @see org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree#registerName
-     * (org.eclipse.linuxtools.tmf.core.util.TmfFixedArray)
+     * Must make sure the {@link #getChildren(TmfFixedArray)} on the parent node
+     * will return the newly created node.
+     *
+     * @param path
+     *            Path of the new node.
      */
-    @Override
     protected void registerName(String... path) {
         if (path.length == 1) {
             if (!path.equals(ROOT)) {
@@ -214,6 +320,67 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
         } else if (path.length % 2 != 0) {
             getKeys().get(path[path.length - 2]).add(path[path.length - 1]);
         }
+    }
+
+    /**
+     * Resets a node.
+     *
+     * Works recursively.
+     *
+     * @param path
+     *            Path to the node.
+     */
+    public void reset(final String... path) {
+        for (TmfStatisticsTreeNode node : getAllChildren(path)) {
+            reset(node.getPath());
+            List<String> nodePathList = Arrays.asList(node.getPath());
+            fNodes.remove(nodePathList);
+        }
+    }
+
+    /**
+     * Reset the global value of a node.
+     *
+     * Works recursively.
+     *
+     * @param path
+     *            Path to the node.
+     * @since 2.0
+     */
+    public void resetGlobalValue(final String... path) {
+        for (TmfStatisticsTreeNode node : getChildren(path)) {
+            node.resetGlobalValue();
+        }
+    }
+
+    /**
+     * Reset the time range value of a node.
+     *
+     * Works recursively.
+     *
+     * @param path
+     *            Path to the node.
+     * @since 2.0
+     */
+    public void resetTimeRangeValue(final String... path) {
+        for (TmfStatisticsTreeNode node : getChildren(path)) {
+            node.resetTimeRangeValue();
+        }
+    }
+
+    /**
+     * Function to merge many string more efficiently.
+     *
+     * @param strings
+     *            Strings to merge.
+     * @return A new string containing all the strings.
+     */
+    protected static String mergeString(String... strings) {
+        StringBuilder builder = new StringBuilder();
+        for (String s : strings) {
+            builder.append(s);
+        }
+        return builder.toString();
     }
 
     /**

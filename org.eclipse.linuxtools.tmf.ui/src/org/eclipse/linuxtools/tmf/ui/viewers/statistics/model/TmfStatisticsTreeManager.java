@@ -26,12 +26,12 @@ import java.util.Map;
  * @since 2.0
  * @author Mathieu Denis
  */
-public class TmfStatisticsTreeRootFactory {
+public class TmfStatisticsTreeManager {
 
     /**
      * Contains the experiment name as the key and the traces data
      */
-    private static final Map<String, AbsTmfStatisticsTree> fTreeInstances = new HashMap<String, AbsTmfStatisticsTree>();
+    private static final Map<String, TmfStatisticsTree> fTreeInstances = new HashMap<String, TmfStatisticsTree>();
 
     /**
      * Provide a statisticsTree instance per trace
@@ -42,11 +42,11 @@ public class TmfStatisticsTreeRootFactory {
      */
     public static TmfStatisticsTreeNode getStatTreeRoot(String traceUniqueId) {
 
-        AbsTmfStatisticsTree tree = getStatTree(traceUniqueId);
+        TmfStatisticsTree tree = getStatTree(traceUniqueId);
         if (tree == null) {
             return null;
         }
-        return tree.getOrCreate(AbsTmfStatisticsTree.ROOT);
+        return tree.getOrCreate(TmfStatisticsTree.ROOT);
     }
 
     /**
@@ -56,12 +56,12 @@ public class TmfStatisticsTreeRootFactory {
      *            Unique ID for the trace
      * @return the corresponding trace statistics tree
      */
-    public static AbsTmfStatisticsTree getStatTree(String traceUniqueId) {
+    public static TmfStatisticsTree getStatTree(String traceUniqueId) {
         if (traceUniqueId == null) {
             return null;
         }
 
-        AbsTmfStatisticsTree tree = fTreeInstances.get(traceUniqueId);
+        TmfStatisticsTree tree = fTreeInstances.get(traceUniqueId);
         return tree;
     }
 
@@ -78,13 +78,13 @@ public class TmfStatisticsTreeRootFactory {
      *            The information about the trace
      * @return The newly created root node of the trace statistics tree, or null if something went wrong
      */
-    public static TmfStatisticsTreeNode addStatsTreeRoot(String traceUniqueId, AbsTmfStatisticsTree statsData) {
+    public static TmfStatisticsTreeNode addStatsTreeRoot(String traceUniqueId, TmfStatisticsTree statsData) {
         if (traceUniqueId == null || statsData == null) {
             return null;
         }
         fTreeInstances.put(traceUniqueId, statsData);
         // if called for the first time, create the root node
-        return statsData.getOrCreate(AbsTmfStatisticsTree.ROOT);
+        return statsData.getOrCreate(TmfStatisticsTree.ROOT);
     }
 
     /**

@@ -22,9 +22,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.Messages;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseStatisticsTree;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfTreeContentProvider;
 
@@ -64,7 +63,7 @@ public class TmfTreeContentProviderTest extends TestCase {
     private final TmfEventField fContent1;
     private final TmfEventField fContent2;
 
-    private final TmfBaseStatisticsTree fStatsData;
+    private final TmfStatisticsTree fStatsData;
 
     private final TmfTreeContentProvider treeProvider;
 
@@ -87,7 +86,7 @@ public class TmfTreeContentProviderTest extends TestCase {
         fContent2 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some other content");
         fEvent2 = new TmfEvent(null, fTimestamp2, fSource, fType2, fContent2, fReference);
 
-        fStatsData = new TmfBaseStatisticsTree();
+        fStatsData = new TmfStatisticsTree();
 
         fStatsData.setTotal(fTestName, true, 2);
         fStatsData.setTypeCount(fTestName, fEvent1.getType().getName(), true, 1);
@@ -155,7 +154,7 @@ public class TmfTreeContentProviderTest extends TestCase {
         TmfStatisticsTreeNode parent = (TmfStatisticsTreeNode) treeProvider.getParent(fStatsData.get(fTestName));
 
         assertNotNull("getParent", parent);
-        assertTrue("getParent", parent.getPath().equals(AbsTmfStatisticsTree.ROOT));
+        assertTrue("getParent", parent.getPath().equals(TmfStatisticsTree.ROOT));
     }
 
     // ------------------------------------------------------------------------
@@ -165,7 +164,7 @@ public class TmfTreeContentProviderTest extends TestCase {
      * Test checking for children.
      */
     public void testHasChildren() {
-        Boolean hasChildren = treeProvider.hasChildren(fStatsData.getOrCreate(AbsTmfStatisticsTree.ROOT));
+        Boolean hasChildren = treeProvider.hasChildren(fStatsData.getOrCreate(TmfStatisticsTree.ROOT));
         assertTrue("hasChildren", hasChildren);
 
         hasChildren = treeProvider.hasChildren(fStatsData.getOrCreate(fTestName));
@@ -186,7 +185,7 @@ public class TmfTreeContentProviderTest extends TestCase {
      * Test getting of elements.
      */
     public void testGetElements() {
-        Object[] objectElements = treeProvider.getElements(fStatsData.get(AbsTmfStatisticsTree.ROOT));
+        Object[] objectElements = treeProvider.getElements(fStatsData.get(TmfStatisticsTree.ROOT));
         TmfStatisticsTreeNode[] nodeElements = Arrays.asList(objectElements).toArray(new TmfStatisticsTreeNode[0]);
         assertEquals("getElements", 1, nodeElements.length);
         assertTrue("getElements", nodeElements[0].getPath()[0].equals(fTestName));
