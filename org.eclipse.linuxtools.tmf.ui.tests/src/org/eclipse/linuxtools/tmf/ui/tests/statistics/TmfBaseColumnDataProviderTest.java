@@ -102,7 +102,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
 
         fStatsData = new TmfStatisticsTree();
 
-        fStatsData.getOrCreate(fTestName, Messages.TmfStatisticsData_EventTypes);
+        fStatsData.getOrCreateNode(fTestName, Messages.TmfStatisticsData_EventTypes);
 
         fStatsData.setTotal(fTestName, true, 3);
         fStatsData.setTypeCount(fTestName, fEvent1.getType().getName(), true, 1);
@@ -123,9 +123,9 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
         assertNotNull("getColumnData", columnsData);
         assertEquals("getColumnData", 3, columnsData.size());
 
-        TmfStatisticsTreeNode parentNode = fStatsData.get(fTestName);
-        TmfStatisticsTreeNode treeNode1  = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getType().getName());
-        TmfStatisticsTreeNode treeNode2  = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent3.getType().getName());
+        TmfStatisticsTreeNode parentNode = fStatsData.getNode(fTestName);
+        TmfStatisticsTreeNode treeNode1  = fStatsData.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getType().getName());
+        TmfStatisticsTreeNode treeNode2  = fStatsData.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent3.getType().getName());
         ViewerComparator vComp = null;
         for (TmfBaseColumnData columnData : columnsData) {
             assertNotNull("getColumnData", columnData);
@@ -135,7 +135,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
             // Testing labelProvider
             ColumnLabelProvider labelProvider = columnData.getLabelProvider();
             if (columnData.getHeader().compareTo(LEVEL_COLUMN) == 0) {
-                assertEquals("getColumnData", 0, labelProvider.getText(treeNode1).compareTo(treeNode1.getKey()));
+                assertEquals("getColumnData", 0, labelProvider.getText(treeNode1).compareTo(treeNode1.getName()));
             } else if (columnData.getHeader().compareTo(EVENTS_COUNT_COLUMN) == 0) {
                 assertEquals("getColumnData", 0, labelProvider.getText(treeNode1).compareTo(Long.toString(1)));
             }

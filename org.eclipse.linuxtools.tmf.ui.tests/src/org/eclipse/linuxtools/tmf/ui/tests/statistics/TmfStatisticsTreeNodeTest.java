@@ -19,11 +19,6 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
@@ -31,44 +26,19 @@ import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeN
 /**
  * TmfStatisticsTreeNode Test Cases.
  */
-@SuppressWarnings("nls")
 public class TmfStatisticsTreeNodeTest extends TestCase {
 
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
-    private       String   fTestName = null;
 
+    private final String fTypeId1 = "Some type1"; //$NON-NLS-1$
+    private final String fTypeId2 = "Some type2"; //$NON-NLS-1$
+    private final String fTypeId3 = "Some type3"; //$NON-NLS-1$
 
-    private final String fContext = "UnitTest";
-    private final String fTypeId1 = "Some type1";
-    private final String fTypeId2 = "Some type2";
+    private final TmfStatisticsTree fStatsTree;
 
-    private final String   fLabel0 = "label1";
-    private final String   fLabel1 = "label2";
-    private final String   fLabel2 = "label3";
-    private final String[] fLabels = new String[] { fLabel0, fLabel1, fLabel2 };
-
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
-    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
-    private final TmfTimestamp fTimestamp3 = new TmfTimestamp(12355, (byte) 2, 5);
-
-    private final String fSource = "Source";
-
-    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, TmfEventField.makeRoot(fLabels));
-    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId2, TmfEventField.makeRoot(fLabels));
-
-    private final String fReference = "Some reference";
-
-    private final TmfEvent fEvent1;
-    private final TmfEvent fEvent2;
-    private final TmfEvent fEvent3;
-
-    private final TmfEventField fContent1;
-    private final TmfEventField fContent2;
-    private final TmfEventField fContent3;
-
-    private final TmfStatisticsTree fStatsData;
+    private String fTestName = null;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -82,28 +52,19 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
         super(name);
 
         fTestName = name;
+        fStatsTree = new TmfStatisticsTree();
 
-        fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some content");
-        fEvent1 = new TmfEvent(null, fTimestamp1, fSource, fType1, fContent1, fReference);
+        /* Enter some global values */
+        fStatsTree.setTotal(fTestName, true, 18);
+        fStatsTree.setTypeCount(fTestName, fTypeId1, true, 5);
+        fStatsTree.setTypeCount(fTestName, fTypeId2, true, 6);
+        fStatsTree.setTypeCount(fTestName, fTypeId3, true, 7);
 
-        fContent2 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some other content");
-        fEvent2 = new TmfEvent(null, fTimestamp2, fSource, fType1, fContent2, fReference);
-
-        fContent3 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some other different content");
-        fEvent3 = new TmfEvent(null, fTimestamp3, fSource, fType2, fContent3, fReference);
-
-        fStatsData = new TmfStatisticsTree();
-
-        fStatsData.setTotal(fTestName, true, 9);
-        fStatsData.setTypeCount(fTestName, fEvent1.getType().getName(), true, 2);
-        fStatsData.setTypeCount(fTestName, fEvent2.getType().getName(), true, 3);
-        fStatsData.setTypeCount(fTestName, fEvent3.getType().getName(), true, 4);
-
-        // Registers some events in time range
-        fStatsData.setTotal(fTestName, false, 9);
-        fStatsData.setTypeCount(fTestName, fEvent1.getType().getName(), false, 2);
-        fStatsData.setTypeCount(fTestName, fEvent2.getType().getName(), false, 3);
-        fStatsData.setTypeCount(fTestName, fEvent3.getType().getName(), false, 4);
+        /* Enter some time range values */
+        fStatsTree.setTotal(fTestName, false, 9);
+        fStatsTree.setTypeCount(fTestName, fTypeId1, false, 2);
+        fStatsTree.setTypeCount(fTestName, fTypeId2, false, 3);
+        fStatsTree.setTypeCount(fTestName, fTypeId3, false, 4);
     }
 
     // ------------------------------------------------------------------------
@@ -114,22 +75,22 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * Test checking for child.
      */
     public void testContainsChild() {
-        TmfStatisticsTreeNode rootNode  = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode = fStatsData.get(fTestName);
+        TmfStatisticsTreeNode rootNode  = fStatsTree.getRootNode();
+        TmfStatisticsTreeNode traceNode = fStatsTree.getNode(fTestName);
         // Creates a category from the key already created
         TmfStatisticsTreeNode catNode = traceNode.getChildren().iterator().next();
 
-        assertTrue("containsChild", rootNode.containsChild(fTestName));
-        assertFalse("containsChild", rootNode.containsChild(catNode.getKey()));
-        assertFalse("containsChild", rootNode.containsChild(null));
+        assertTrue(rootNode.containsChild(fTestName));
+        assertFalse(rootNode.containsChild(catNode.getName()));
+        assertFalse(rootNode.containsChild(null));
 
-        assertTrue("containsChild", traceNode.containsChild(catNode.getKey()));
-        assertFalse("containsChild", traceNode.containsChild(fType1.getName()));
-        assertFalse("containsChild", traceNode.containsChild(null));
+        assertTrue(traceNode.containsChild(catNode.getName()));
+        assertFalse(traceNode.containsChild(fTypeId1));
+        assertFalse(traceNode.containsChild(null));
 
-        assertTrue("containsChild", catNode.containsChild(fType1.getName()));
-        assertTrue("containsChild", catNode.containsChild(fType2.getName()));
-        assertFalse("containsChild", catNode.containsChild(null));
+        assertTrue(catNode.containsChild(fTypeId1));
+        assertTrue(catNode.containsChild(fTypeId2));
+        assertFalse(catNode.containsChild(null));
     }
 
     // ------------------------------------------------------------------------
@@ -141,86 +102,39 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      */
     public void testGetChildren() {
         // Getting children of the ROOT
-        Collection<TmfStatisticsTreeNode> childrenTreeNode = fStatsData.get(TmfStatisticsTree.ROOT[0]).getChildren();
-        assertEquals("getChildren", 1, childrenTreeNode.size());
+        Collection<TmfStatisticsTreeNode> childrenTreeNode = fStatsTree.getRootNode().getChildren();
+        assertEquals(1, childrenTreeNode.size());
         TmfStatisticsTreeNode treeNode = childrenTreeNode.iterator().next();
-        assertEquals("getChildren", fTestName, treeNode.getKey());
+        assertEquals(fTestName, treeNode.getName());
 
         // Getting children of the trace
-        childrenTreeNode = fStatsData.get(fTestName).getChildren();
-        assertEquals("getChildren", 1, childrenTreeNode.size());
+        childrenTreeNode = fStatsTree.getNode(fTestName).getChildren();
+        assertEquals(1, childrenTreeNode.size());
         treeNode = childrenTreeNode.iterator().next();
-        assertEquals("getChildren", Messages.TmfStatisticsData_EventTypes, treeNode.getKey());
+        assertEquals(Messages.TmfStatisticsData_EventTypes, treeNode.getName());
 
         Vector<String> keyExpected = new Vector<String>();
-        keyExpected.add(fType1.getName());
-        keyExpected.add(fType2.getName());
+        keyExpected.add(fTypeId1);
+        keyExpected.add(fTypeId2);
+        keyExpected.add(fTypeId3);
         // Getting children of a category
         childrenTreeNode = treeNode.getChildren();
-        assertEquals("getChildren", 2, childrenTreeNode.size());
+        assertEquals(3, childrenTreeNode.size());
 
         Iterator<TmfStatisticsTreeNode> iterChild = childrenTreeNode.iterator();
         TmfStatisticsTreeNode temp;
         while (iterChild.hasNext()) {
             temp = iterChild.next();
-            if (keyExpected.contains(temp.getKey())) {
-                keyExpected.removeElement(temp.getKey());
+            if (keyExpected.contains(temp.getName())) {
+                keyExpected.removeElement(temp.getName());
             } else {
                 fail();
             }
         }
 
         // Get children of a specific event type
-        childrenTreeNode = fStatsData.get(childrenTreeNode.iterator().next().getPath()).getChildren();
-        assertEquals("getChildren", 0, childrenTreeNode.size());
-    }
-
-    // ------------------------------------------------------------------------
-    // GetAllChildren
-    // ------------------------------------------------------------------------
-
-    /**
-     * Test getting of all children.
-     */
-    public void testGetAllChildren() {
-        // Getting children of the ROOT
-        Collection<TmfStatisticsTreeNode> childrenTreeNode = fStatsData.get(TmfStatisticsTree.ROOT).getAllChildren();
-        assertEquals("getChildren", 1, childrenTreeNode.size());
-        TmfStatisticsTreeNode treeNode = childrenTreeNode.iterator().next();
-        assertEquals("getChildren", fTestName, treeNode.getKey());
-
-        // Getting children of the trace
-        childrenTreeNode = fStatsData.get(fTestName).getAllChildren();
-        assertEquals("getChildren", 1, childrenTreeNode.size());
-        treeNode = childrenTreeNode.iterator().next();
-        assertEquals("getChildren", Messages.TmfStatisticsData_EventTypes, treeNode.getKey());
-
-        Vector<String> keyExpected = new Vector<String>();
-        keyExpected.add(fType1.getName());
-        keyExpected.add(fType2.getName());
-        /*
-         * It should return the eventType even though the number of events
-         * equals 0
-         */
-        fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName()).reset();
-        // Getting children of a category
-        childrenTreeNode = treeNode.getAllChildren();
-        assertEquals("getChildren", 2, childrenTreeNode.size());
-
-        Iterator<TmfStatisticsTreeNode> iterChild = childrenTreeNode.iterator();
-        TmfStatisticsTreeNode temp;
-        while (iterChild.hasNext()) {
-            temp = iterChild.next();
-            if (keyExpected.contains(temp.getKey())) {
-                keyExpected.removeElement(temp.getKey());
-            } else {
-                fail();
-            }
-        }
-
-        // Get children of a specific event type
-        childrenTreeNode = fStatsData.get(childrenTreeNode.iterator().next().getPath()).getAllChildren();
-        assertEquals("getChildren", 0, childrenTreeNode.size());
+        childrenTreeNode = fStatsTree.getNode(childrenTreeNode.iterator().next().getPath()).getChildren();
+        assertEquals(0, childrenTreeNode.size());
     }
 
     // ------------------------------------------------------------------------
@@ -231,15 +145,15 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * Test getting of number of children.
      */
     public void testGetNbChildren() {
-        TmfStatisticsTreeNode rootNode    = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode   = fStatsData.get(fTestName);
+        TmfStatisticsTreeNode rootNode    = fStatsTree.getRootNode();
+        TmfStatisticsTreeNode traceNode   = fStatsTree.getNode(fTestName);
         TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode elementNode = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
+        TmfStatisticsTreeNode elementNode = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
 
-        assertEquals("getNbChildren", 1, rootNode.getNbChildren());
-        assertEquals("getNbChildren", 1, traceNode.getNbChildren());
-        assertEquals("getNbChildren", 2, catNode.getNbChildren());
-        assertEquals("getNbChildren", 0, elementNode.getNbChildren());
+        assertEquals(1, rootNode.getNbChildren());
+        assertEquals(1, traceNode.getNbChildren());
+        assertEquals(3, catNode.getNbChildren());
+        assertEquals(0, elementNode.getNbChildren());
     }
 
     // ------------------------------------------------------------------------
@@ -250,15 +164,15 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * Test checking for children.
      */
     public void testHasChildren() {
-        TmfStatisticsTreeNode rootNode    = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode   = fStatsData.get(fTestName);
+        TmfStatisticsTreeNode rootNode    = fStatsTree.getRootNode();
+        TmfStatisticsTreeNode traceNode   = fStatsTree.getNode(fTestName);
         TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode elementNode = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
+        TmfStatisticsTreeNode elementNode = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
 
-        assertTrue("hasChildren", rootNode.hasChildren());
-        assertTrue("hasChildren", traceNode.hasChildren());
-        assertTrue("hasChildren", catNode.hasChildren());
-        assertFalse("hasChildren", elementNode.hasChildren());
+        assertTrue(rootNode.hasChildren());
+        assertTrue(traceNode.hasChildren());
+        assertTrue(catNode.hasChildren());
+        assertFalse(elementNode.hasChildren());
     }
 
     // ------------------------------------------------------------------------
@@ -269,35 +183,31 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * Test getting of parent.
      */
     public void testGetParent() {
-        TmfStatisticsTreeNode rootNode = fStatsData.get(TmfStatisticsTree.ROOT);
+        final TmfStatisticsTreeNode rootNode = fStatsTree.getRootNode();
         TmfStatisticsTreeNode parentNode = rootNode.getParent();
-        assertNull("getParent", parentNode);
+        assertNull(parentNode);
 
-        TmfStatisticsTreeNode newTraceNode = new TmfStatisticsTreeNode(fStatsData, "newly created trace node");
+        TmfStatisticsTreeNode newTraceNode = new TmfStatisticsTreeNode(fStatsTree, rootNode, "newly created trace node"); //$NON-NLS-1$
         parentNode = newTraceNode.getParent();
-        assertNotNull("getParent", parentNode);
-        assertEquals("getParent", 0, parentNode.getKey().compareTo(fStatsData.get(TmfStatisticsTree.ROOT).getKey().toString()));
+        assertNotNull(parentNode);
+        assertTrue(fStatsTree.getRootNode() == parentNode);
 
-        TmfStatisticsTreeNode traceNode = fStatsData.get(fTestName);
+        TmfStatisticsTreeNode traceNode = fStatsTree.getNode(fTestName);
         parentNode = traceNode.getParent();
-        assertNotNull("getParent", parentNode);
-        assertEquals("getParent", 0, parentNode.getPath().toString().compareTo(TmfStatisticsTree.ROOT.toString()));
+        assertNotNull(parentNode);
+        assertTrue(rootNode == parentNode);
 
-        TmfStatisticsTreeNode newNode = new TmfStatisticsTreeNode(fStatsData, "TreeNode", Messages.TmfStatisticsData_EventTypes, "TreeNode that should not exist");
-        parentNode = newNode.getParent();
-        assertNull("getParent", parentNode);
-
-        TmfStatisticsTreeNode elementNode = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
+        TmfStatisticsTreeNode elementNode = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
         parentNode = elementNode.getParent();
-        assertNull("getParent", parentNode);
+        assertTrue(parentNode == fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes));
 
         TmfStatisticsTreeNode catNode = traceNode.getChildren().iterator().next();
         parentNode = catNode.getParent();
-        assertNotNull("getParent", parentNode);
-        assertEquals("getParent", 0, parentNode.getPath().toString().compareTo(fStatsData.get(fTestName).getPath().toString()));
+        assertNotNull(parentNode);
+        assertTrue(parentNode == fStatsTree.getNode(fTestName));
 
         parentNode = elementNode.getParent();
-        assertNotNull("getParent", parentNode);
+        assertNotNull(parentNode);
         assertTrue(arraysEqual(parentNode.getPath(), fTestName, Messages.TmfStatisticsData_EventTypes));
     }
 
@@ -308,16 +218,16 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
     /**
      * Test getting of key.
      */
-    public void testGetKey() {
-        TmfStatisticsTreeNode rootNode    = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode   = fStatsData.get(fTestName);
+    public void testgetName() {
+        TmfStatisticsTreeNode rootNode    = fStatsTree.getRootNode();
+        TmfStatisticsTreeNode traceNode   = fStatsTree.getNode(fTestName);
         TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode elementNode = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
+        TmfStatisticsTreeNode elementNode = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
 
-        assertEquals("getKey", 0, rootNode.getKey().compareTo(TmfStatisticsTree.ROOT[0]));
-        assertEquals("getKey", 0, traceNode.getKey().compareTo(fTestName));
-        assertEquals("getKey", 0, catNode.getKey().compareTo(Messages.TmfStatisticsData_EventTypes));
-        assertEquals("getKey", 0, elementNode.getKey().compareTo(fType1.getName()));
+        assertEquals(0, rootNode.getName().compareTo("root")); //$NON-NLS-1$
+        assertEquals(0, traceNode.getName().compareTo(fTestName));
+        assertEquals(0, catNode.getName().compareTo(Messages.TmfStatisticsData_EventTypes));
+        assertEquals(0, elementNode.getName().compareTo(fTypeId1));
     }
 
     // ------------------------------------------------------------------------
@@ -328,17 +238,17 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * Test getting of path to node.
      */
     public void testGetPath() {
-        TmfStatisticsTreeNode rootNode    = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode   = fStatsData.get(fTestName);
+        TmfStatisticsTreeNode rootNode    = fStatsTree.getRootNode();
+        TmfStatisticsTreeNode traceNode   = fStatsTree.getNode(fTestName);
         TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode elementNode = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
+        TmfStatisticsTreeNode elementNode = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
 
-        assertTrue("getPath", arraysEqual(rootNode.getPath(), TmfStatisticsTree.ROOT));
-        assertTrue("getPath", arraysEqual(traceNode.getPath(), fTestName));
-        assertTrue("getPath", arraysEqual(catNode.getPath(),
+        assertEquals(0, rootNode.getPath().length); /* Root node has an empty path */
+        assertTrue(arraysEqual(traceNode.getPath(), fTestName));
+        assertTrue(arraysEqual(catNode.getPath(),
                 fTestName, Messages.TmfStatisticsData_EventTypes));
-        assertTrue("getPath", arraysEqual(elementNode.getPath(),
-                fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName()));
+        assertTrue(arraysEqual(elementNode.getPath(),
+                fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1));
     }
 
     // ------------------------------------------------------------------------
@@ -349,23 +259,27 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * Test getting statistic value.
      */
     public void testGetValue() {
-        TmfStatisticsTreeNode rootNode     = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode    = fStatsData.get(fTestName);
-        TmfStatisticsTreeNode catNode      = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode elementNode1 = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
-        TmfStatisticsTreeNode elementNode3 = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType2.getName());
+        TmfStatisticsTreeNode rootNode, traceNode, catNode, elementNode1, elementNode2, elementNode3;
+        rootNode     = fStatsTree.getRootNode();
+        traceNode    = fStatsTree.getNode(fTestName);
+        catNode      = traceNode.getChildren().iterator().next();
+        elementNode1 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
+        elementNode2 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId2);
+        elementNode3 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId3);
 
-        assertEquals("getValue", 0, rootNode.getValues().getTotal());
-        assertEquals("getValue", 9, traceNode.getValues().getTotal());
-        assertEquals("getValue", 0, catNode.getValues().getTotal());
-        assertEquals("getValue", 3, elementNode1.getValues().getTotal());
-        assertEquals("getValue", 4, elementNode3.getValues().getTotal());
+        assertEquals(0, rootNode.getValues().getTotal());
+        assertEquals(18, traceNode.getValues().getTotal());
+        assertEquals(0, catNode.getValues().getTotal());
+        assertEquals(5, elementNode1.getValues().getTotal());
+        assertEquals(6, elementNode2.getValues().getTotal());
+        assertEquals(7, elementNode3.getValues().getTotal());
 
-        assertEquals("getValue", 0, rootNode.getValues().getPartial());
-        assertEquals("getValue", 9, traceNode.getValues().getPartial());
-        assertEquals("getValue", 0, catNode.getValues().getPartial());
-        assertEquals("getValue", 3, elementNode1.getValues().getPartial());
-        assertEquals("getValue", 4, elementNode3.getValues().getPartial());
+        assertEquals(0, rootNode.getValues().getPartial());
+        assertEquals(9, traceNode.getValues().getPartial());
+        assertEquals(0, catNode.getValues().getPartial());
+        assertEquals(2, elementNode1.getValues().getPartial());
+        assertEquals(3, elementNode2.getValues().getPartial());
+        assertEquals(4, elementNode3.getValues().getPartial());
     }
 
     // ------------------------------------------------------------------------
@@ -376,31 +290,31 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * Test reset of tree.
      */
     public void testReset() {
-        TmfStatisticsTreeNode rootNode    = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode   = fStatsData.get(fTestName);
-        TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode elementNode = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
+        TmfStatisticsTreeNode rootNode, traceNode, catNode, elementNode;
+        rootNode    = fStatsTree.getRootNode();
+        traceNode   = fStatsTree.getNode(fTestName);
+        catNode     = traceNode.getChildren().iterator().next();
+        elementNode = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
 
         elementNode.reset();
-        assertEquals("reset", 0, elementNode.getValues().getTotal());
-        assertEquals("reset", 0, elementNode.getValues().getPartial());
+        assertEquals(0, elementNode.getValues().getTotal());
+        assertEquals(0, elementNode.getValues().getPartial());
 
         catNode.reset();
-        assertEquals("reset", 0, catNode.getValues().getTotal());
-        assertEquals("reset", 0, catNode.getValues().getPartial());
-        assertEquals("reset", 0, catNode.getNbChildren());
-        assertNull("reset", fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName()));
+        assertEquals(0, catNode.getValues().getTotal());
+        assertEquals(0, catNode.getValues().getPartial());
+        assertEquals(0, catNode.getNbChildren());
+        assertNull(fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1));
 
         traceNode.reset();
-        assertEquals("reset", 0, traceNode.getValues().getTotal());
-        assertEquals("reset", 0, traceNode.getValues().getPartial());
-        // A trace always have at least one child that is eventType
-        assertEquals("reset", 1, traceNode.getNbChildren());
+        assertEquals(0, traceNode.getValues().getTotal());
+        assertEquals(0, traceNode.getValues().getPartial());
+        assertEquals(0, traceNode.getNbChildren());
 
         rootNode.reset();
-        assertEquals("reset", 0, rootNode.getValues().getTotal());
-        assertEquals("reset", 0, rootNode.getValues().getPartial());
-        assertEquals("reset", 1, rootNode.getNbChildren());
+        assertEquals(0, rootNode.getValues().getTotal());
+        assertEquals(0, rootNode.getValues().getPartial());
+        assertEquals(0, rootNode.getNbChildren());
     }
 
     /**
@@ -408,11 +322,13 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * the global value without removing any node from the tree.
      */
     public void testResetGlobalValue() {
-        TmfStatisticsTreeNode rootNode    = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode   = fStatsData.get(fTestName);
-        TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode eventTypeNode1 = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
-        TmfStatisticsTreeNode eventTypeNode2 = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType2.getName());
+        TmfStatisticsTreeNode rootNode, traceNode, catNode, eventTypeNode1, eventTypeNode2, eventTypeNode3;
+        rootNode       = fStatsTree.getRootNode();
+        traceNode      = fStatsTree.getNode(fTestName);
+        catNode        = traceNode.getChildren().iterator().next();
+        eventTypeNode1 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
+        eventTypeNode2 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId2);
+        eventTypeNode3 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId3);
 
         rootNode.resetGlobalValue();
 
@@ -421,20 +337,22 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
         assertEquals(0, catNode.getValues().getTotal());
         assertEquals(0, eventTypeNode1.getValues().getTotal());
         assertEquals(0, eventTypeNode2.getValues().getTotal());
+        assertEquals(0, eventTypeNode3.getValues().getTotal());
 
         // Checks the state of the statistics tree
-        Collection<TmfStatisticsTreeNode> rootChildren =  rootNode.getAllChildren();
+        Collection<TmfStatisticsTreeNode> rootChildren =  rootNode.getChildren();
         assertEquals(1, rootChildren.size());
         assertTrue(rootChildren.contains(traceNode));
 
-        Collection<TmfStatisticsTreeNode> traceChildren =  traceNode.getAllChildren();
+        Collection<TmfStatisticsTreeNode> traceChildren =  traceNode.getChildren();
         assertEquals(1, traceChildren.size());
         assertTrue(traceChildren.contains(catNode));
 
-        Collection<TmfStatisticsTreeNode> catChildren =  catNode.getAllChildren();
-        assertEquals(2, catChildren.size());
+        Collection<TmfStatisticsTreeNode> catChildren =  catNode.getChildren();
+        assertEquals(3, catChildren.size());
         assertTrue(catChildren.contains(eventTypeNode1));
         assertTrue(catChildren.contains(eventTypeNode2));
+        assertTrue(catChildren.contains(eventTypeNode3));
     }
 
     /**
@@ -442,11 +360,13 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
      * the time range value without removing any node from the tree.
      */
     public void testResetTimeRangeValue() {
-        TmfStatisticsTreeNode rootNode    = fStatsData.get(TmfStatisticsTree.ROOT);
-        TmfStatisticsTreeNode traceNode   = fStatsData.get(fTestName);
-        TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
-        TmfStatisticsTreeNode eventTypeNode1 = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getName());
-        TmfStatisticsTreeNode eventTypeNode2 = fStatsData.get(fTestName, Messages.TmfStatisticsData_EventTypes, fType2.getName());
+        TmfStatisticsTreeNode rootNode, traceNode, catNode, eventTypeNode1, eventTypeNode2, eventTypeNode3;
+        rootNode       = fStatsTree.getRootNode();
+        traceNode      = fStatsTree.getNode(fTestName);
+        catNode        = traceNode.getChildren().iterator().next();
+        eventTypeNode1 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
+        eventTypeNode2 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId2);
+        eventTypeNode3 = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId3);
 
         rootNode.resetTimeRangeValue();
 
@@ -457,22 +377,24 @@ public class TmfStatisticsTreeNodeTest extends TestCase {
         assertEquals(0, eventTypeNode2.getValues().getPartial());
 
         // Checks the state of the statistics tree
-        Collection<TmfStatisticsTreeNode> rootChildren =  rootNode.getAllChildren();
+        Collection<TmfStatisticsTreeNode> rootChildren =  rootNode.getChildren();
         assertEquals(1, rootChildren.size());
         assertTrue(rootChildren.contains(traceNode));
 
-        Collection<TmfStatisticsTreeNode> traceChildren =  traceNode.getAllChildren();
+        Collection<TmfStatisticsTreeNode> traceChildren =  traceNode.getChildren();
         assertEquals(1, traceChildren.size());
         assertTrue(traceChildren.contains(catNode));
 
-        Collection<TmfStatisticsTreeNode> catChildren =  catNode.getAllChildren();
-        assertEquals(2, catChildren.size());
+        Collection<TmfStatisticsTreeNode> catChildren =  catNode.getChildren();
+        assertEquals(3, catChildren.size());
         assertTrue(catChildren.contains(eventTypeNode1));
         assertTrue(catChildren.contains(eventTypeNode2));
+        assertTrue(catChildren.contains(eventTypeNode3));
     }
 
     /**
      * Check if two String arrays are equals, by comparing their contents.
+     * Unlike Arrays.equals(), we can use varargs for the second argument.
      */
     private static boolean arraysEqual(String[] array1, String... array2) {
         if (array1.length != array2.length) {

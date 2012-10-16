@@ -59,7 +59,7 @@ public class TmfBaseColumnDataTest extends TestCase {
         fLabelProvider = new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((TmfStatisticsTreeNode) element).getKey();
+                return ((TmfStatisticsTreeNode) element).getName();
             }
 
             @Override
@@ -73,7 +73,7 @@ public class TmfBaseColumnDataTest extends TestCase {
                 TmfStatisticsTreeNode n1 = (TmfStatisticsTreeNode) e1;
                 TmfStatisticsTreeNode n2 = (TmfStatisticsTreeNode) e2;
 
-                return n1.getKey().compareTo(n2.getKey());
+                return n1.getName().compareTo(n2.getName());
             }
         };
         fPercentageProvider = new ITmfColumnPercentageProvider() {
@@ -93,7 +93,7 @@ public class TmfBaseColumnDataTest extends TestCase {
 
         TmfStatisticsTree baseData = new TmfStatisticsTree();
         fTraceName = "trace1";
-        fTreeNode = new TmfStatisticsTreeNode(baseData, fTraceName);
+        fTreeNode = new TmfStatisticsTreeNode(baseData, baseData.getRootNode(), fTraceName);
 
         fBaseColumnData = new TmfBaseColumnData(fHeader, fWidth, fAlignment, fToolTip, fLabelProvider, fComparator, fPercentageProvider);
     }

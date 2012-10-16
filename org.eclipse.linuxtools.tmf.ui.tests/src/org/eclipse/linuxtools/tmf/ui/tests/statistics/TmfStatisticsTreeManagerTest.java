@@ -84,12 +84,12 @@ public class TmfStatisticsTreeManagerTest extends TestCase {
 
             TmfStatisticsTreeNode returnRootNode = TmfStatisticsTreeManager.addStatsTreeRoot(fDataKey1, fStatisticsData1);
             assertSame(fStatisticsData1, TmfStatisticsTreeManager.getStatTree(fDataKey1));
-            assertSame(fStatisticsData1.get(TmfStatisticsTree.ROOT), returnRootNode);
+            assertSame(fStatisticsData1.getRootNode(), returnRootNode);
 
             // Overwriting the value
             returnRootNode = TmfStatisticsTreeManager.addStatsTreeRoot(fDataKey1, fStatisticsData2);
             assertSame(fStatisticsData2, TmfStatisticsTreeManager.getStatTree(fDataKey1));
-            assertSame(fStatisticsData2.get(TmfStatisticsTree.ROOT), returnRootNode);
+            assertSame(fStatisticsData2.getRootNode(), returnRootNode);
 
             // Success
         } catch(Exception e) {

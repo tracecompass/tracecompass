@@ -10,11 +10,15 @@
  *   Yann N. Dauphin <dhaemon@gmail.com> - Implementation for stats
  *   Francois Godin <copelnug@gmail.com> - Re-design for new stats structure
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Re-design for new stats structure (2)
+ *   Alexandre Montplaisir - Move the tree structure logic into the nodes
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A tree where nodes can be accessed efficiently using paths.
@@ -23,58 +27,88 @@ import java.util.Collection;
  * array of String. The elements of the array represent the path from the root
  * to this node.
  *
+ * @author Mathieu Denis
  * @version 2.0
  * @since 2.0
- * @author Mathieu Denis
  */
 public class TmfStatisticsTreeNode {
 
-    /**
-     * Value of the node.
-     */
-    protected TmfStatisticsValues fValues;
+    /** Tree to which this node belongs */
+    private final TmfStatisticsTree fTree;
 
-    /**
-     * Path of the node.
-     */
-    protected String[] fPath;
+    /** Path of this node. The last element represents its basename. */
+    private final String[] fPath;
 
-    /**
-     * Corresponding StatisticsData.
-     */
-    protected TmfStatisticsTree fNodes;
+    /** Parent node */
+    private final TmfStatisticsTreeNode fParent;
+
+    /** Children of this node, indexed by their basename. */
+    private final Map<String, TmfStatisticsTreeNode> fChildren;
+
+    /** Statistics values associated to this node. */
+    private final TmfStatisticsValues fValues;
 
     /**
      * Constructor.
      *
+     * @param tree
+     *            Owner tree of this node
+     * @param parent
+     *            Parent node of this one
      * @param path
      *            Path to the node.
-     * @param nodes
-     *            Corresponding StatisticsData.
      */
-    public TmfStatisticsTreeNode(TmfStatisticsTree nodes, final String... path) {
+    public TmfStatisticsTreeNode(TmfStatisticsTree tree,
+            TmfStatisticsTreeNode parent, final String... path) {
+        /* The path must not contain any null element, or else we won't be
+         * able to walk the tree. */
+        for (String elem : path) {
+            if (elem == null) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        fTree = tree;
         fPath = path;
-        fNodes = nodes;
+        fParent = parent;
+        fChildren = new HashMap<String, TmfStatisticsTreeNode>();
         fValues = new TmfStatisticsValues();
+    }
+
+    /**
+     * Get the name for this node. It's used as the key in the parent's node.
+     *
+     * @return Name of this node.
+     */
+    public String getName() {
+        if (fPath.length == 0) {
+            /* This means we are the root node, which has no path itself */
+            return "root"; //$NON-NLS-1$
+        }
+        return fPath[fPath.length - 1];
     }
 
     /**
      * Test if a node contain the specified child.
      *
-     * @param key
+     * @param childName
      *            Name of the child.
      * @return true: if child with given key is present, false: if no child
      *         exists with given key name
      */
-    public boolean containsChild(String key) {
-        if (TmfStatisticsTree.ROOT.equals(fPath)) {
-            return fNodes.get(key) != null;
-        }
+    public boolean containsChild(String childName) {
+        return fChildren.containsKey(childName);
+    }
 
-        String[] childPath = new String[fPath.length + 1];
-        System.arraycopy(fPath, 0, childPath, 0, fPath.length);
-        childPath[fPath.length] = key;
-        return (fNodes.get(childPath) != null);
+    /**
+     * Retrieve the given child from this node.
+     *
+     * @param childName
+     *            The (base)name of the child you want
+     * @return The child object, or null if it doesn't exist
+     */
+    public TmfStatisticsTreeNode getChild(String childName) {
+        return fChildren.get(childName);
     }
 
     /**
@@ -83,25 +117,25 @@ public class TmfStatisticsTreeNode {
      * @return Direct children of this node.
      */
     public Collection<TmfStatisticsTreeNode> getChildren() {
-        return fNodes.getChildren(fPath);
+        return fChildren.values();
     }
 
     /**
-     * Gets every children of this node even if no event has been registered for a node.
+     * Add a child to this node.
      *
-     * @return Direct children of this node.
+     * @param childName
+     *            Name of the child to add
+     * @return The newly-created child
      */
-    public Collection<TmfStatisticsTreeNode> getAllChildren() {
-        return fNodes.getAllChildren(fPath);
-    }
+    public TmfStatisticsTreeNode addChild(String childName) {
+        TmfStatisticsTreeNode child;
+        String[] childPath = new String[fPath.length + 1];
+        System.arraycopy(fPath, 0, childPath, 0, fPath.length);
+        childPath[fPath.length] = childName;
 
-    /**
-     * Get the key for this node.
-     *
-     * @return Key associated with this node.
-     */
-    public String getKey() {
-        return fPath[fPath.length - 1];
+        child = new TmfStatisticsTreeNode(this.fTree, this, childPath);
+        fChildren.put(childName, child);
+        return child;
     }
 
     /**
@@ -110,7 +144,7 @@ public class TmfStatisticsTreeNode {
      * @return Number of direct children of this node.
      */
     public int getNbChildren() {
-        return fNodes.getChildren(fPath).size();
+        return fChildren.size();
     }
 
     /**
@@ -119,7 +153,7 @@ public class TmfStatisticsTreeNode {
      * @return Parent node.
      */
     public TmfStatisticsTreeNode getParent() {
-        return fNodes.getParent(fPath);
+        return fParent;
     }
 
     /**
@@ -146,7 +180,7 @@ public class TmfStatisticsTreeNode {
      * @return True if the node has children.
      */
     public boolean hasChildren() {
-        return !fNodes.getChildren(fPath).isEmpty();
+        return (fChildren.size() > 0);
     }
 
     /**
@@ -154,33 +188,41 @@ public class TmfStatisticsTreeNode {
      * no children.
      */
     public void reset() {
-        fValues = new TmfStatisticsValues();
-        fNodes.reset(fPath);
+        fValues.resetTotalCount();
+        fValues.resetPartialCount();
+        fChildren.clear();
     }
 
     /**
      * Resets the global number of events. It doesn't remove any node
-     * and doesn't modify the partial event count.
-     *
-     * Works recursively.
+     * and doesn't modify the partial event count. Works recursively.
      *
      * @since 2.0
      */
     public void resetGlobalValue() {
-        getValues().resetTotalCount();
-        fNodes.resetGlobalValue(fPath);
+        for (TmfStatisticsTreeNode child : fChildren.values()) {
+            child.resetGlobalValue();
+        }
+        fValues.resetTotalCount();
     }
 
     /**
      * Resets the number of events in the time range. It doesn't remove any node
-     * and doesn't modify the global event count.
-     *
-     * Works recursively.
+     * and doesn't modify the global event count. Works recursively.
      *
      * @since 2.0
      */
     public void resetTimeRangeValue() {
-        getValues().resetPartialCount();
-        fNodes.resetTimeRangeValue(fPath);
+        for (TmfStatisticsTreeNode child : fChildren.values()) {
+            child.resetTimeRangeValue();
+        }
+        fValues.resetPartialCount();
+    }
+
+    @Override
+    public String toString() {
+        /* Used for debugging only */
+        return "Stats node, path = " + Arrays.toString(fPath) + //$NON-NLS-1$
+                ", values = " + fValues.toString(); //$NON-NLS-1$
     }
 }

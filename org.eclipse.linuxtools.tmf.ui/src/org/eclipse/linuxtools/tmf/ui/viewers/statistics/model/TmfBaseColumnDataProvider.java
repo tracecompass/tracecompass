@@ -86,13 +86,13 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
         fColumnData.add(new TmfBaseColumnData(LEVEL_COLUMN, 200, SWT.LEFT, LEVEL_COLUMN_TIP, new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((TmfStatisticsTreeNode) element).getKey();
+                return ((TmfStatisticsTreeNode) element).getName();
             }
 
             @Override
             public Image getImage(Object element) {
                 TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) element;
-                if (fFolderLevels.contains(node.getKey())) {
+                if (fFolderLevels.contains(node.getName())) {
                     return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
                 }
                 return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
@@ -103,7 +103,7 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
                 TmfStatisticsTreeNode n1 = (TmfStatisticsTreeNode) e1;
                 TmfStatisticsTreeNode n2 = (TmfStatisticsTreeNode) e2;
 
-                return n1.getKey().compareTo(n2.getKey());
+                return n1.getName().compareTo(n2.getName());
             }
         }, null));
 
@@ -112,7 +112,7 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
             @Override
             public String getText(Object element) {
                 TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) element;
-                if (!fFolderLevels.contains(node.getKey())) {
+                if (!fFolderLevels.contains(node.getName())) {
                     return Long.toString(node.getValues().getTotal());
                 }
                 return ""; //$NON-NLS-1$
@@ -147,7 +147,7 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
             @Override
             public String getText(Object element) {
                 TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) element;
-                if (!fFolderLevels.contains(node.getKey())) {
+                if (!fFolderLevels.contains(node.getName())) {
                     return Long.toString(node.getValues().getPartial());
                 }
                 return ""; //$NON-NLS-1$

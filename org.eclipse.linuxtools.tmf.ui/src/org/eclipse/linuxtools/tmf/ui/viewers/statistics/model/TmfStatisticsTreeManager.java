@@ -22,9 +22,9 @@ import java.util.Map;
  * root node is created for each tree. Using the tree node ID the statistics
  * tree can be retrieved.
  *
+ * @author Mathieu Denis
  * @version 2.0
  * @since 2.0
- * @author Mathieu Denis
  */
 public class TmfStatisticsTreeManager {
 
@@ -46,7 +46,7 @@ public class TmfStatisticsTreeManager {
         if (tree == null) {
             return null;
         }
-        return tree.getOrCreate(TmfStatisticsTree.ROOT);
+        return tree.getRootNode();
     }
 
     /**
@@ -83,8 +83,7 @@ public class TmfStatisticsTreeManager {
             return null;
         }
         fTreeInstances.put(traceUniqueId, statsData);
-        // if called for the first time, create the root node
-        return statsData.getOrCreate(TmfStatisticsTree.ROOT);
+        return statsData.getRootNode();
     }
 
     /**

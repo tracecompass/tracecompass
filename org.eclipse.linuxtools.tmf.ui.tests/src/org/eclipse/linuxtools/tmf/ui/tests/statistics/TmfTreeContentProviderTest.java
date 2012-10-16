@@ -105,7 +105,7 @@ public class TmfTreeContentProviderTest extends TestCase {
      * but it could be rewritten to be much more simple...
      */
     public void testGetChildren() {
-        Object[] objectArray = treeProvider.getChildren(fStatsData.getOrCreate(fTestName, Messages.TmfStatisticsData_EventTypes));
+        Object[] objectArray = treeProvider.getChildren(fStatsData.getOrCreateNode(fTestName, Messages.TmfStatisticsData_EventTypes));
         TmfStatisticsTreeNode[] childrenNode = Arrays.asList(objectArray).toArray(new TmfStatisticsTreeNode[0]);
 
         String[][] childrenExpected = new String[][] {
@@ -151,10 +151,10 @@ public class TmfTreeContentProviderTest extends TestCase {
      * Test getting of parent.
      */
     public void testGetParent() {
-        TmfStatisticsTreeNode parent = (TmfStatisticsTreeNode) treeProvider.getParent(fStatsData.get(fTestName));
+        TmfStatisticsTreeNode parent = (TmfStatisticsTreeNode) treeProvider.getParent(fStatsData.getNode(fTestName));
 
         assertNotNull("getParent", parent);
-        assertTrue("getParent", parent.getPath().equals(TmfStatisticsTree.ROOT));
+        assertTrue("getParent", parent.getPath().equals(fStatsData.getRootNode().getPath()));
     }
 
     // ------------------------------------------------------------------------
@@ -164,16 +164,16 @@ public class TmfTreeContentProviderTest extends TestCase {
      * Test checking for children.
      */
     public void testHasChildren() {
-        Boolean hasChildren = treeProvider.hasChildren(fStatsData.getOrCreate(TmfStatisticsTree.ROOT));
+        Boolean hasChildren = treeProvider.hasChildren(fStatsData.getRootNode());
         assertTrue("hasChildren", hasChildren);
 
-        hasChildren = treeProvider.hasChildren(fStatsData.getOrCreate(fTestName));
+        hasChildren = treeProvider.hasChildren(fStatsData.getOrCreateNode(fTestName));
         assertTrue("hasChildren", hasChildren);
 
-        hasChildren = treeProvider.hasChildren(fStatsData.getOrCreate(fTestName, Messages.TmfStatisticsData_EventTypes));
+        hasChildren = treeProvider.hasChildren(fStatsData.getOrCreateNode(fTestName, Messages.TmfStatisticsData_EventTypes));
         assertTrue("hasChildren", hasChildren);
 
-        hasChildren = treeProvider.hasChildren(fStatsData.getOrCreate(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getType().getName()));
+        hasChildren = treeProvider.hasChildren(fStatsData.getOrCreateNode(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getType().getName()));
         assertFalse("hasChildren", hasChildren);
     }
 
@@ -185,7 +185,7 @@ public class TmfTreeContentProviderTest extends TestCase {
      * Test getting of elements.
      */
     public void testGetElements() {
-        Object[] objectElements = treeProvider.getElements(fStatsData.get(TmfStatisticsTree.ROOT));
+        Object[] objectElements = treeProvider.getElements(fStatsData.getRootNode());
         TmfStatisticsTreeNode[] nodeElements = Arrays.asList(objectElements).toArray(new TmfStatisticsTreeNode[0]);
         assertEquals("getElements", 1, nodeElements.length);
         assertTrue("getElements", nodeElements[0].getPath()[0].equals(fTestName));

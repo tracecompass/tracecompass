@@ -82,4 +82,9 @@ public class TmfStatisticsValues {
     public void resetPartialCount() {
         fNbEventsInTimeRange = 0;
     }
+
+    @Override
+    public String toString() {
+        return fNbEvents + ", " + fNbEventsInTimeRange; //$NON-NLS-1$
+    }
 }
