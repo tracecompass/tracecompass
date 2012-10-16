@@ -754,8 +754,10 @@ public class TmfStatisticsViewer extends TmfViewer {
          *  D : TimeRangeTypeCount(s)
          */
 
-        ITmfTimestamp start = timeRange.getStartTime();
-        ITmfTimestamp end = timeRange.getEndTime();
+        /* The generic statistics are stored in nanoseconds, so we must make
+         * sure the time range is scaled correctly. */
+        ITmfTimestamp start = timeRange.getStartTime().normalize(0, TIME_SCALE);
+        ITmfTimestamp end = timeRange.getEndTime().normalize(0, TIME_SCALE);
         String name = trace.getName();
 
         /*
