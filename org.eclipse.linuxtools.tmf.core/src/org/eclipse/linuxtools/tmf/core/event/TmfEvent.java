@@ -13,8 +13,10 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * A basic implementation of ITmfEvent.
@@ -31,7 +33,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @see ITmfEventField
  * @see ITmfTrace
 */
-public class TmfEvent implements ITmfEvent, Cloneable {
+public class TmfEvent implements ITmfEvent, IAdaptable, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -347,4 +349,17 @@ public class TmfEvent implements ITmfEvent, Cloneable {
                 + ", fReference=" + fReference + "]";
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new TmfEventPropertySource(this);
+        }
+        return null;
+    }
 }

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
@@ -26,6 +27,8 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventPropertySource;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * A wrapper class around CTF's Event Definition/Declaration that maps all
@@ -33,8 +36,9 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
  *
  * @version 1.0
  * @author Alexandre Montplaisir
+ * @since 2.0
  */
-public final class CtfTmfEvent implements ITmfEvent, Cloneable {
+public final class CtfTmfEvent implements ITmfEvent, IAdaptable, Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -287,5 +291,16 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
     @Override
     public CtfTmfEvent clone() {
         return new CtfTmfEvent(this);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new TmfEventPropertySource(this);
+        }
+        return null;
     }
 }
