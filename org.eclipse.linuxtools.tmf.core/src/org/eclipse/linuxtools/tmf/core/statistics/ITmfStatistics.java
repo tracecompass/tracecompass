@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.core.statistics;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.signal.TmfStatsUpdatedSignal;
 
 /**
  * Provider for statistics, which is assigned to a trace. This can be used to
@@ -24,6 +25,29 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
  * @since 2.0
  */
 public interface ITmfStatistics {
+
+    /**
+     * This method provides a centralized and asynchronous way of querying
+     * statistics information. It is an alternative to the other get* methods,
+     * and should not block the caller for too long.
+     *
+     * Implementors can usually call their own getEventTotal(),
+     * getEventsInRange(), etc. but should do so in a separate thread, and
+     * should send a {@link TmfStatsUpdatedSignal} whenever they are done (that
+     * signal will carry the results).
+     *
+     * @param isGlobal
+     *            Is this for a global query (whole time range of a trace), or
+     *            just for a specific time range.
+     * @param start
+     *            The start time of the query range. Has no effect if isGlobal
+     *            is true.
+     * @param end
+     *            The end time of the query range. Has no effect if isGlobal is
+     *            true.
+     */
+    public void updateStats(final boolean isGlobal, ITmfTimestamp start,
+            ITmfTimestamp end);
 
     /**
      * Return the total number of events in the trace.

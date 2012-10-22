@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
-import org.eclipse.linuxtools.tmf.core.statistics.TmfStatistics;
+import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
 
 /**
  * Abstract implementation of ITmfTrace.
@@ -262,7 +262,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
          * Initialize the statistics provider, but only if a Resource has been
          * set (so we don't build it for experiments, for unit tests, etc.)
          */
-        fStatistics = (fResource == null ? null : new TmfStatistics(this) );
+        fStatistics = (fResource == null ? null : new TmfStateStatistics(this) );
     }
 
     /**

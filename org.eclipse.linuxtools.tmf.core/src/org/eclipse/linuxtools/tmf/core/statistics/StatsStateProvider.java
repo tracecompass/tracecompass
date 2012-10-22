@@ -18,12 +18,12 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statesystem.AbstractStateChangeInput;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
-import org.eclipse.linuxtools.tmf.core.statistics.TmfStatistics.Attributes;
+import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics.Attributes;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * The state provider for traces statistics. It should work with any type of
- * trace TMF can handle.
+ * The state provider for traces statistics that use TmfStateStatistics. It
+ * should work with any trace type for which we can use the state system.
  *
  * The resulting attribute tree will look like this:
  *
