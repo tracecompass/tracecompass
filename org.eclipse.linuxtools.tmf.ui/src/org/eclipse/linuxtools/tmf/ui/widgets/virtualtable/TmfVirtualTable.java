@@ -429,8 +429,11 @@ public class TmfVirtualTable extends Composite {
             if (fSelectedEventRank < lastEventRank) {
                 fSelectedEventRank++;
                 selectedRow = fSelectedEventRank - fTableTopEventRank;
-                if (selectedRow >= fFullyVisibleRows) {
+                if (selectedRow == fFullyVisibleRows) {
                     fTableTopEventRank++;
+                    needsRefresh = true;
+                } else if (selectedRow < fFrozenRowCount || selectedRow > fFullyVisibleRows) {
+                    fTableTopEventRank = Math.max(0, Math.min(fSelectedEventRank - fFrozenRowCount, lastPageTopEntryRank));
                     needsRefresh = true;
                 }
             }
@@ -442,8 +445,11 @@ public class TmfVirtualTable extends Composite {
             if (fSelectedEventRank > 0) {
                 fSelectedEventRank--;
                 selectedRow = fSelectedEventRank - fTableTopEventRank;
-                if (selectedRow < fFrozenRowCount && fTableTopEventRank > 0) {
+                if (selectedRow == fFrozenRowCount - 1 && fTableTopEventRank > 0) {
                     fTableTopEventRank--;
+                    needsRefresh = true;
+                } else if (selectedRow < fFrozenRowCount || selectedRow > fFullyVisibleRows) {
+                    fTableTopEventRank = Math.max(0, Math.min(fSelectedEventRank - fFrozenRowCount, lastPageTopEntryRank));
                     needsRefresh = true;
                 }
             }
@@ -474,11 +480,14 @@ public class TmfVirtualTable extends Composite {
                     fSelectedEventRank = lastEventRank;
                 }
                 selectedRow = fSelectedEventRank - fTableTopEventRank;
-                if (selectedRow > fFullyVisibleRows - 1) {
+                if (selectedRow > fFullyVisibleRows + fFrozenRowCount - 1 && selectedRow < 2 * fFullyVisibleRows) {
                     fTableTopEventRank += fFullyVisibleRows;
                     if (fTableTopEventRank > lastPageTopEntryRank) {
                         fTableTopEventRank = lastPageTopEntryRank;
                     }
+                    needsRefresh = true;
+                } else if (selectedRow < fFrozenRowCount || selectedRow >= 2 * fFullyVisibleRows) {
+                    fTableTopEventRank = Math.max(0, Math.min(fSelectedEventRank - fFrozenRowCount, lastPageTopEntryRank));
                     needsRefresh = true;
                 }
             }
@@ -493,11 +502,14 @@ public class TmfVirtualTable extends Composite {
                     fSelectedEventRank = fFrozenRowCount;
                 }
                 selectedRow = fSelectedEventRank - fTableTopEventRank;
-                if (selectedRow < 0) {
+                if (selectedRow < fFrozenRowCount && selectedRow > -fFullyVisibleRows) {
                     fTableTopEventRank -= fFullyVisibleRows;
                     if (fTableTopEventRank < 0) {
                         fTableTopEventRank = 0;
                     }
+                    needsRefresh = true;
+                } else if (selectedRow <= -fFullyVisibleRows || selectedRow >= fFullyVisibleRows) {
+                    fTableTopEventRank = Math.max(0, Math.min(fSelectedEventRank - fFrozenRowCount, lastPageTopEntryRank));
                     needsRefresh = true;
                 }
             }
