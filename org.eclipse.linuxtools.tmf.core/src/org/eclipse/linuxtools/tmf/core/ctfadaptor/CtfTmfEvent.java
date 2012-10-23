@@ -296,6 +296,9 @@ public final class CtfTmfEvent implements ITmfEvent, IAdaptable, Cloneable {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
      */
+    /**
+     * @since 2.0
+     */
     @Override
     public Object getAdapter(Class adapter) {
         if (adapter == IPropertySource.class) {
