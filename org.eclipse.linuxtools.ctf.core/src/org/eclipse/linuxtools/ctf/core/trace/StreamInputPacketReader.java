@@ -411,6 +411,11 @@ public class StreamInputPacketReader implements IDefinitionScope {
             timestamp = calculateTimestamp(timestampDef);
         }
 
+        EventDefinition eventDef = events.get(eventID);
+        if (eventDef == null) {
+            throw new CTFReaderException("Incorrect event id : " + eventID); //$NON-NLS-1$
+        }
+
         /*
          * Read the stream event context.
          */
@@ -421,16 +426,13 @@ public class StreamInputPacketReader implements IDefinitionScope {
         /*
          * Get the right event definition using the event id.
          */
-        EventDefinition eventDef = events.get(eventID);
-        if (eventDef == null) {
-            throw new CTFReaderException("Incorrect event id : " + eventID); //$NON-NLS-1$
-        }
+
 
         /*
          * Read the event context.
          */
-        if (eventDef.getContext() != null) {
-            eventDef.getContext().read(currentBitBuffer);
+        if (eventDef.getEventContext() != null) {
+            eventDef.getEventContext().read(currentBitBuffer);
         }
 
         /*
