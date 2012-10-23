@@ -105,7 +105,7 @@ public class CTFTraceTest {
     @Test
     public void testAddStream() throws ParseException, CTFReaderException {
         Stream stream = new Stream(TestParams.createTrace());
-        stream.setId(1L);
+        stream.setId(1234);
         fixture.addStream(stream);
     }
 
@@ -332,7 +332,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testGetClock_3() {
-        String name = ""; //$NON-NLS-1$
+        String name = "invisibleClock"; //$NON-NLS-1$
         CTFClock result = fixture.getClock(name);
         assertNull(result);
     }
@@ -343,7 +343,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testSetClock_1() {
-        String name = ""; //$NON-NLS-1$
+        String name = "clockyClock"; //$NON-NLS-1$
         fixture.addClock(name, new CTFClock());
         CTFClock result = fixture.getClock(name);
 
@@ -382,7 +382,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testLookupEnvironment_2() {
-        String key = "test"; //$NON-NLS-1$
+        String key = "otherTest"; //$NON-NLS-1$
         String result = fixture.lookupEnvironment(key);
         assertNull(result);
     }
