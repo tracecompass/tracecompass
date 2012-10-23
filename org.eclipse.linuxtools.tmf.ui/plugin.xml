@@ -409,8 +409,8 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.copy"
-               disabledIcon="IMG_TOOL_COPY_DISABLED"
-               icon="IMG_TOOL_COPY"
+               disabledIcon="icons/dtool16/copy_edit.gif"
+               icon="icons/etool16/copy_edit.gif"
                label="%commands.trace.copy"
                mnemonic="%commands.trace.copy.mnemonic"
                style="push"
@@ -459,8 +459,8 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"
-               disabledIcon="IMG_ETOOL_DELETE_DISABLED"
-               icon="IMG_ETOOL_DELETE"
+               disabledIcon="icons/dtool16/delete.gif"
+               icon="icons/etool16/delete.gif"
                label="%commands.trace.delete"
                mnemonic="%commands.trace.delete.mnemonic"
                style="push"
@@ -489,8 +489,8 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"
-               disabledIcon="IMG_ETOOL_DELETE_DISABLED"
-               icon="IMG_ETOOL_DELETE"
+               disabledIcon="icons/dtool16/delete.gif"
+               icon="icons/etool16/delete.gif"
                label="%commands.trace.remove"
                mnemonic="%commands.trace.remove.mnemonic"
                style="push"
@@ -627,7 +627,7 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
-               icon="IMG_OBJ_ADD"
+               icon="icons/obj16/add_obj.gif"
                label="%commands.experiment.selecttraces"
                mnemonic="%commands.experiment.selecttraces.mnemonic"
                style="push"
@@ -679,8 +679,8 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.copy"
-               disabledIcon="IMG_TOOL_COPY_DISABLED"
-               icon="IMG_TOOL_COPY"
+               disabledIcon="icons/dtool16/copy_edit.gif"
+               icon="icons/etool16/copy_edit.gif"
                label="%commands.experiment.copy"
                mnemonic="%commands.experiment.copy.mnemonic"
                style="push"
@@ -728,8 +728,8 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"
-               disabledIcon="IMG_ETOOL_DELETE_DISABLED"
-               icon="IMG_ETOOL_DELETE"
+               disabledIcon="icons/dtool16/delete.gif"
+               icon="icons/etool16/delete.gif"
                label="%commands.experiment.delete"
                mnemonic="%commands.experiment.delete.mnemonic"
                style="push"
