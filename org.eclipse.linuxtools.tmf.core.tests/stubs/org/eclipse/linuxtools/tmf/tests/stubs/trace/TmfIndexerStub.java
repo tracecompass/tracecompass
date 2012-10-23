@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.tmf.tests.stubs.trace;
 
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
@@ -26,9 +25,8 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpointIndexer;
  * <p>
  */
 @SuppressWarnings("javadoc")
-public class TmfIndexerStub extends TmfCheckpointIndexer<ITmfTrace<ITmfEvent>> {
+public class TmfIndexerStub extends TmfCheckpointIndexer {
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public TmfIndexerStub(ITmfTrace trace, int blockSize) {
         super(trace, blockSize);
     }

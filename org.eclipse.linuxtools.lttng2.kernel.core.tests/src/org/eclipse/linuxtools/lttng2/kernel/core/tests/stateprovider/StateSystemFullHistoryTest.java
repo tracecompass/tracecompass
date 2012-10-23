@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,10 +47,13 @@ public class StateSystemFullHistoryTest {
     static File stateFileBenchmark;
 
     static IStateChangeInput input;
-    static IStateSystemQuerier ssq;
+    static ITmfStateSystem ssq;
 
     /* Offset in the trace + start time of the trace */
     private final static long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
+
+    /* ID we give to the state system we build */
+    private static final String STATE_ID = "test-ss";
 
     protected static String getTestFileName() {
         return "/tmp/statefile.ht"; //$NON-NLS-1$
@@ -62,7 +65,7 @@ public class StateSystemFullHistoryTest {
         stateFileBenchmark = new File(getTestFileName() + ".benchmark"); //$NON-NLS-1$
         try {
             input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-            ssq = StateSystemManager.loadStateHistory(stateFile, input, true);
+            ssq = StateSystemManager.loadStateHistory(stateFile, input, STATE_ID, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,10 +92,10 @@ public class StateSystemFullHistoryTest {
     @Test
     public void testBuild() throws TmfTraceException {
         IStateChangeInput input2;
-        IStateSystemQuerier ssb2;
+        ITmfStateSystem ssb2;
 
         input2 = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-        ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2, true);
+        ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2, STATE_ID, true);
 
         assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());
         assertEquals(CtfTestFiles.endTime, ssb2.getCurrentEndTime());
@@ -100,10 +103,10 @@ public class StateSystemFullHistoryTest {
 
     @Test
     public void testOpenExistingStateFile() throws TmfTraceException {
-        IStateSystemQuerier ssb2;
+        ITmfStateSystem ssb2;
 
         /* 'newStateFile' should have already been created */
-        ssb2 = StateSystemManager.loadStateHistory(stateFile, null, true);
+        ssb2 = StateSystemManager.loadStateHistory(stateFile, null, STATE_ID, true);
 
         assertNotNull(ssb2);
         assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());
@@ -225,7 +228,7 @@ public class StateSystemFullHistoryTest {
         List<ITmfStateInterval> intervals;
 
         quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        intervals = ssq.queryHistoryRange(quark, time1, time2, resolution);
+        intervals = ssq.queryHistoryRange(quark, time1, time2, resolution, null);
         assertEquals(126, intervals.size()); /* Number of context switches! */
         assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
         assertEquals(1331668248815698779L, intervals.get(100).getEndTime());

@@ -25,7 +25,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
  * <b><u>TmfEventParserStub</u></b>
@@ -33,7 +32,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  * TODO: Implement me. Please.
  */
 @SuppressWarnings({"nls","javadoc"})
-public class TmfEventParserStub implements ITmfEventParser<TmfEvent> {
+public class TmfEventParserStub implements ITmfEventParser {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -41,13 +40,13 @@ public class TmfEventParserStub implements ITmfEventParser<TmfEvent> {
 
     private static final int NB_TYPES = 10;
     private final TmfEventType[] fTypes;
-    private ITmfTrace<TmfEvent> fEventStream;
+    private final ITmfTrace fEventStream;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-    public TmfEventParserStub(final ITmfTrace<TmfEvent> eventStream) {
+    public TmfEventParserStub(final ITmfTrace eventStream) {
         fEventStream = eventStream;
         fTypes = new TmfEventType[NB_TYPES];
         for (int i = 0; i < NB_TYPES; i++) {
@@ -83,7 +82,7 @@ public class TmfEventParserStub implements ITmfEventParser<TmfEvent> {
 
         long location = 0;
         if (context != null && context.getLocation() != null) {
-            location = ((TmfLocation<Long>) (context.getLocation())).getLocation();
+            location = (Long) context.getLocation().getLocationInfo();
             try {
                 stream.seek(location);
 

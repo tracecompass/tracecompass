@@ -15,64 +15,85 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 /**
  * The nugget of information that is unique to a location in a CTF trace.
- * 
+ *
  * It can be copied and used to restore a position in a given trace.
- * 
+ *
  * @version 1.0
  * @author Matthew Khouzam
  */
-public class CtfLocation implements ITmfLocation<Long>, Cloneable {
+public final class CtfLocation implements ITmfLocation {
+
+    private final CtfLocationData fLocation;
 
     /**
      * An invalid location
      */
-    public static final Long INVALID_LOCATION = -1L;
+    public static final CtfLocationData INVALID_LOCATION = new CtfLocationData(-1, -1);
 
     /**
-     * Constructor for CtfLocation.
-     * @param location Long
+     * Constructor for CtfLocation. Uses a default index of 0.
+     *
+     * @param timestamp
+     *            The timestamp of this location
      */
-    public CtfLocation(Long location) {
-        setLocation(location);
+    public CtfLocation(final ITmfTimestamp timestamp) {
+        this(timestamp.getValue(), 0);
     }
 
     /**
-     * Constructor for CtfLocation.
-     * @param timestamp ITmfTimestamp
+     * Standard constructor
+     *
+     * @param timestamp
+     *            The timestamp of this location
+     * @param index
+     *            The index of this location for this timestamp
+     * @since 2.0
      */
-    public CtfLocation(ITmfTimestamp timestamp) {
-        setLocation(timestamp.getValue());
-    }
-
-    private Long fTimestamp;
-
-    /**
-     * Method setLocation.
-     * @param location Long
-     */
-    public void setLocation(Long location) {
-        this.fTimestamp = location;
+    public CtfLocation(final ITmfTimestamp timestamp, long index) {
+        this(timestamp.getValue(), index);
     }
 
     /**
-     * Method getLocation.
-     * @return Long
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocation()
+     * Change this location's timestamp and index values.
+     *
+     * @param timestampValue
+     *            The new timestamp
+     * @param index
+     *            The new index
+     * @since 2.0
+     */
+    public CtfLocation(final long timestampValue, final long index) {
+       this(new CtfLocationData(timestampValue, index));
+    }
+
+    /**
+     * Copy constructor
+     *
+     * @param location
+     *            Other location to copy
+     * @since 2.0
+     */
+    public CtfLocation(final CtfLocationData location) {
+        fLocation = location;
+    }
+
+    /**
+     * Get the Location Data of this location
+     *
+     * @return The CtfLocationData
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationInfo()
+     * @since 2.0
      */
     @Override
-    public Long getLocation() {
-        return this.fTimestamp;
+    public CtfLocationData getLocationInfo() {
+        return fLocation;
     }
 
-    /**
-     * Method clone.
-     * @return CtfLocation
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#clone()
-     */
     @Override
     public CtfLocation clone() {
-        return new CtfLocation(getLocation().longValue());
+        return new CtfLocation(new CtfLocationData(fLocation.getTimestamp(), fLocation.getIndex()));
     }
+
 
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
@@ -82,7 +103,7 @@ public class CtfLocation implements ITmfLocation<Long>, Cloneable {
         final int prime = 31;
         int result = 1;
         result = (prime * result)
-                + ((fTimestamp == null) ? 0 : fTimestamp.hashCode());
+                + ((fLocation == null) ? 0 : fLocation.hashCode());
         return result;
     }
 
@@ -101,11 +122,11 @@ public class CtfLocation implements ITmfLocation<Long>, Cloneable {
             return false;
         }
         CtfLocation other = (CtfLocation) obj;
-        if (fTimestamp == null) {
-            if (other.fTimestamp != null) {
+        if (fLocation == null) {
+            if (other.fLocation != null) {
                 return false;
             }
-        } else if (!fTimestamp.equals(other.fTimestamp)) {
+        } else if (!fLocation.equals(other.fLocation)) {
             return false;
         }
         return true;
@@ -116,10 +137,10 @@ public class CtfLocation implements ITmfLocation<Long>, Cloneable {
      */
     @Override
     public String toString() {
-        if( this.getLocation().equals(CtfLocation.INVALID_LOCATION )) {
+        if( this.getLocationInfo().equals(CtfLocation.INVALID_LOCATION )) {
             return "CtfLocation: INVALID"; //$NON-NLS-1$
         }
-        return "CtfLocation: " + getLocation().toString(); //$NON-NLS-1$
+        return "CtfLocation: " + getLocationInfo().toString(); //$NON-NLS-1$
     }
 
 }

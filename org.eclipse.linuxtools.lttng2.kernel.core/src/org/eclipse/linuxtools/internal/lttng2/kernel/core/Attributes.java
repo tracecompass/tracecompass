@@ -46,13 +46,6 @@ public abstract class Attributes {
     public static final String IRQS = "IRQs";
     public static final String SOFT_IRQS = "Soft_IRQs";
 
-    /*
-     * Statistics sub-nodes
-     * (Written all out, because "Stats" is easy to confuse with "Status")
-     */
-    public static final String STATISTICS = "Stats";
-    public static final String EVENT_TYPES = "Event_types";
-
     /* Misc stuff */
     public static final String UNKNOWN = "Unknown";
 }

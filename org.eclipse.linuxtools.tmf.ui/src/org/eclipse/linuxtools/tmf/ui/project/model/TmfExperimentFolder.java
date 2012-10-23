@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -24,7 +24,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * <p>
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  */
 public class TmfExperimentFolder extends TmfProjectModelElement implements IPropertySource2 {
 
@@ -59,7 +59,7 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     // ------------------------------------------------------------------------
 
     /**
-     * Constructor. 
+     * Constructor.
      * Creates a TmfExperimentFolder model element.
      * @param name The name of the folder
      * @param folder The folder reference
@@ -81,7 +81,7 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     public IFolder getResource() {
         return (IFolder) fResource;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getProject()
@@ -90,7 +90,7 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     public TmfProjectElement getProject() {
         return (TmfProjectElement) getParent();
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement#refresh()
@@ -120,7 +120,7 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
@@ -128,14 +128,17 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     @Override
     public Object getPropertyValue(Object id) {
 
-        if (sfName.equals(id))
+        if (sfName.equals(id)) {
             return getName();
+        }
 
-        if (sfPath.equals(id))
+        if (sfPath.equals(id)) {
             return getPath().toString();
+        }
 
-        if (sfLocation.equals(id))
+        if (sfLocation.equals(id)) {
             return getLocation().toString();
+        }
 
         return null;
     }

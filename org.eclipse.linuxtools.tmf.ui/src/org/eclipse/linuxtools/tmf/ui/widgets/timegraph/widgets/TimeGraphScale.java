@@ -564,7 +564,7 @@ class TimeDrawSec extends TimeDraw {
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
         time /= 1000000000;
-        Utils.drawText(gc, sep(time), rect, true); //$NON-NLS-1$
+        Utils.drawText(gc, sep(time), rect, true);
     }
 
     @Override

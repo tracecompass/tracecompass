@@ -21,16 +21,18 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationData;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.junit.After;
 import org.junit.Before;
@@ -201,7 +203,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetEventType() {
-        Class<CtfTmfEvent> result = fixture.getEventType();
+        Class<ITmfEvent> result = fixture.getEventType();
         assertNotNull(result);
     }
 
@@ -210,8 +212,8 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetLocationRatio() {
-        CtfLocation location = new CtfLocation(Long.valueOf(1));
-        location.setLocation(Long.valueOf(1));
+        final CtfLocationData location2 = new CtfLocationData(1, 0);
+        CtfLocation location = new CtfLocation(location2);
         double result = fixture.getLocationRatio(location);
 
         assertEquals(Double.NEGATIVE_INFINITY, result, 0.1);
@@ -241,7 +243,7 @@ public class CtfTmfTraceTest {
     @Test
     public void testGetNbEvents() {
         long result = fixture.getNbEvents();
-        assertEquals(0L, result);
+        assertEquals(1L, result);
     }
 
     /**
@@ -286,7 +288,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetStateSystem() {
-        IStateSystemQuerier result = fixture.getStateSystem();
+        ITmfStateSystem result = fixture.getStateSystem();
         assertNull(result);
     }
 
@@ -353,7 +355,8 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testSeekEvent_location() {
-        CtfLocation ctfLocation = new CtfLocation(new Long(1L));
+        final CtfLocationData location2 = new CtfLocationData(1L, 0L);
+        CtfLocation ctfLocation = new CtfLocation(location2);
         ITmfContext result = fixture.seekEvent(ctfLocation);
         assertNotNull(result);
     }

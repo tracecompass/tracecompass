@@ -69,15 +69,17 @@ public class OpenExperimentHandler extends AbstractHandler {
 
         // Check if we are closing down
         final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         final IWorkbenchPart part = page.getActivePart();
         final ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (selectionProvider == null) {
             return false;
+        }
         final ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only one selection and that it is an experiment
@@ -86,8 +88,9 @@ public class OpenExperimentHandler extends AbstractHandler {
             final TreeSelection sel = (TreeSelection) selection;
             // There should be only one item selected as per the plugin.xml
             final Object element = sel.getFirstElement();
-            if (element instanceof TmfExperimentElement)
+            if (element instanceof TmfExperimentElement) {
                 fExperiment = (TmfExperimentElement) element;
+            }
         }
 
         // We only enable opening from the Traces folder for now
@@ -104,8 +107,9 @@ public class OpenExperimentHandler extends AbstractHandler {
 
         // Check if we are closing down
         final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         try {
             final IFile bookmarksFile = fExperiment.getProject().getExperimentsFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
@@ -128,7 +132,7 @@ public class OpenExperimentHandler extends AbstractHandler {
             int cacheSize = Integer.MAX_VALUE;
             boolean useEditor = true;
             String experimentEditorId = null;
-            final ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
+            final ITmfTrace[] traces = new ITmfTrace[nbTraces];
             for (int i = 0; i < nbTraces; i++) {
                 TmfTraceElement element = traceEntries.get(i);
 

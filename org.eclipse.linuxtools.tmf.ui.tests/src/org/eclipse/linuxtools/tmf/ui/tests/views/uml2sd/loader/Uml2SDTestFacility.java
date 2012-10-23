@@ -58,7 +58,7 @@ public class Uml2SDTestFacility {
     private SDView fSdView;
     private TmfTraceStub fTrace = null;
     private TmfUml2SDTestTrace    fParser = null;
-    private TmfExperiment<TmfEvent> fExperiment = null;
+    private TmfExperiment fExperiment = null;
 
     private boolean fIsInitialized = false;
 
@@ -126,7 +126,7 @@ public class Uml2SDTestFacility {
     }
 
 
-    private TmfTraceStub setupTrace(final ITmfEventParser<TmfEvent> parser) {
+    private TmfTraceStub setupTrace(final ITmfEventParser parser) {
 
         try {
             // Create test trace object
@@ -223,7 +223,7 @@ public class Uml2SDTestFacility {
     /**
      * @return current experiment.
      */
-    public TmfExperiment<TmfEvent> getExperiment() {
+    public TmfExperiment getExperiment() {
         return fExperiment;
     }
 
@@ -283,7 +283,6 @@ public class Uml2SDTestFacility {
      * Selects the experiment.
      * @param wait true to wait for indexing to finish else false
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void selectExperiment(final boolean wait) {
         fParser = new TmfUml2SDTestTrace();
         fTrace = setupTrace(fParser);
@@ -293,8 +292,8 @@ public class Uml2SDTestFacility {
 
         final ITmfTrace traces[] = new ITmfTrace[1];
         traces[0] = fTrace;
-        fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, "TestExperiment", traces); //$NON-NLS-1$
-        fTrace.broadcast(new TmfExperimentSelectedSignal<TmfEvent>(this, fExperiment));
+        fExperiment = new TmfExperiment(TmfEvent.class, "TestExperiment", traces); //$NON-NLS-1$
+        fTrace.broadcast(new TmfExperimentSelectedSignal(this, fExperiment));
         if (wait) {
             while (fExperiment.getNbEvents() == 0) {
                 delay(IUml2SDTestConstants.GUI_REFESH_DELAY);

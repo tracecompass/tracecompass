@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestamp
 
 /**
  * A CTF trace reader. Reads the events of a trace.
- * 
+ *
  * @version 1.0
  * @author Matthew Khouzam
  * @author Alexandre Montplaisir
@@ -244,8 +244,7 @@ public class CTFTraceReader {
              * Add it back in the queue.
              */
             this.prio.add(top);
-            final long topEnd = top.getCurrentEvent().getTimestamp()
-                    + this.getTrace().getOffset();
+            final long topEnd = this.trace.timestampCyclesToNanos(top.getCurrentEvent().getTimestamp());
             this.setEndTime(Math.max(topEnd, this.getEndTime()));
             this.eventCountPerTraceFile[top.getName()]++;
 

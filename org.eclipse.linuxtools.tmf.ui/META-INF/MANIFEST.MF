@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.tmf.ui;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.tmf.ui.Activator
@@ -24,12 +24,14 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.ui.preferences;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.ui.project.handlers;x-internal:=true,
- org.eclipse.linuxtools.internal.tmf.ui.signal;x-internal:=true,
  org.eclipse.linuxtools.tmf.ui.editors,
  org.eclipse.linuxtools.tmf.ui.project.model,
  org.eclipse.linuxtools.tmf.ui.project.wizards,
  org.eclipse.linuxtools.tmf.ui.signal,
+ org.eclipse.linuxtools.tmf.ui.viewers,
  org.eclipse.linuxtools.tmf.ui.viewers.events,
+ org.eclipse.linuxtools.tmf.ui.viewers.statistics,
+ org.eclipse.linuxtools.tmf.ui.viewers.statistics.model,
  org.eclipse.linuxtools.tmf.ui.views,
  org.eclipse.linuxtools.tmf.ui.views.colors,
  org.eclipse.linuxtools.tmf.ui.views.distribution.model,
@@ -38,7 +40,6 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.views.filter,
  org.eclipse.linuxtools.tmf.ui.views.histogram,
  org.eclipse.linuxtools.tmf.ui.views.statistics,
- org.eclipse.linuxtools.tmf.ui.views.statistics.model,
  org.eclipse.linuxtools.tmf.ui.views.timechart,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.core,
@@ -52,6 +53,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.util,
  org.eclipse.linuxtools.tmf.ui.widgets.rawviewer,
+ org.eclipse.linuxtools.tmf.ui.widgets.tabsview,
  org.eclipse.linuxtools.tmf.ui.widgets.timegraph,
  org.eclipse.linuxtools.tmf.ui.widgets.timegraph.dialogs,
  org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model,

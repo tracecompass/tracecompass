@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.views.timechart;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -28,7 +29,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  */
 public class TimeChartAnalysisEntry implements ITimeGraphEntry {
 
-    private final ITmfTrace<?> fTrace;
+    private final ITmfTrace fTrace;
     private final Vector<TimeChartEvent> fTraceEvents;
     private int fPower = 0; // 2^fPower nanoseconds per vector position
     private long fReferenceTime = -1; // time corresponding to beginning of index 0
@@ -36,13 +37,16 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
     private long fStopTime = -1; // time of last event
     private long fLastRank = -1; // rank of last processed trace event
 
-    TimeChartAnalysisEntry(ITmfTrace<?> trace, int modelSize) {
+    TimeChartAnalysisEntry(ITmfTrace trace, int modelSize) {
         fTrace = trace;
         fTraceEvents = new Vector<TimeChartEvent>(modelSize);
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public ITimeGraphEntry[] getChildren() {
+    public List<ITimeGraphEntry> getChildren() {
         return null;
     }
 
@@ -248,7 +252,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
      *
      * @return The trace object
      */
-    public ITmfTrace<?> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

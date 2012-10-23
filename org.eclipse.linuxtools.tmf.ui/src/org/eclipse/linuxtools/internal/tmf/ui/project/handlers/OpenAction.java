@@ -1,11 +1,11 @@
 /*******************************************************************************
 * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -27,13 +27,18 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 
+/**
+ * <b><u>OpenAction</u></b>
+ * <p>
+ * Implement me. Please.
+ * <p>
+ */
 public class OpenAction extends Action {
 
-    private static final String OPEN_TRACE_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.trace.open"; //$NON-NLS-1$
-    private static final String OPEN_EXPERIMENT_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.experiment.open"; //$NON-NLS-1$
+    private static final String OPEN_COMMAND_ID = "org.eclipse.ui.navigate.openResource"; //$NON-NLS-1$
 
-    private IWorkbenchPage page;
-    private ISelectionProvider selectionProvider;
+    private final IWorkbenchPage page;
+    private final ISelectionProvider selectionProvider;
     private TmfProjectModelElement element;
 
     /**
@@ -74,10 +79,8 @@ public class OpenAction extends Action {
     public void run() {
         try {
             IHandlerService handlerService = (IHandlerService) page.getActivePart().getSite().getService(IHandlerService.class);
-            if (element instanceof TmfTraceElement) {
-                handlerService.executeCommand(OPEN_TRACE_COMMAND_ID, null);
-            } else if (element instanceof TmfExperimentElement) {
-                handlerService.executeCommand(OPEN_EXPERIMENT_COMMAND_ID, null);
+            if (element instanceof TmfTraceElement || element instanceof TmfExperimentElement) {
+                handlerService.executeCommand(OPEN_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {
             Activator.getDefault().logError("Error opening resource " + element.getName(), e); //$NON-NLS-1$

@@ -14,8 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.environment;
 import java.util.ArrayList;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -38,7 +37,7 @@ public class TmfEnvironmentView extends TmfView {
     /** The Environment View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.environment"; //$NON-NLS-1$
 
-    private TmfExperiment<?> fExperiment;
+    private TmfExperiment fExperiment;
     private Table fTable;
 //    final private String fTitlePrefix;
     private Composite fParent;
@@ -64,31 +63,32 @@ public class TmfEnvironmentView extends TmfView {
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void createPartControl(Composite parent) {
         fParent = parent;
         TableItem ti[];
-        // If an experiment is already selected, update the table
-        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) TmfExperiment
-                .getCurrentExperiment();
-        if (experiment == null) {
-            return;
-        }
+
+        // Always create the table anyway otherwise we have an NPE when
+        // setFocus() is called by platform. Besides it's nice to have
+        // at least the column headers.
         fTable = new Table(parent, SWT.BORDER|SWT.FILL);
-
-
         ArrayList<Pair> tableData = new ArrayList<Pair>();
-        for (ITmfTrace trace : experiment.getTraces()) {
-            Pair traceEntry = new Pair(trace.getName());
-            tableData.add(traceEntry);
-            if (trace instanceof CtfTmfTrace) {
-                CtfTmfTrace ctfTrace = (CtfTmfTrace) trace;
-                for (String varName : ctfTrace
-                        .getEnvNames()) {
-                    tableData.add(new Pair( varName, ctfTrace.getEnvValue(varName)));
+
+        // If an experiment is already selected, update the table
+        TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
+        if (experiment != null) {
+            for (ITmfTrace trace : experiment.getTraces()) {
+                Pair traceEntry = new Pair(trace.getName());
+                tableData.add(traceEntry);
+                if (trace instanceof CtfTmfTrace) {
+                    CtfTmfTrace ctfTrace = (CtfTmfTrace) trace;
+                    for (String varName : ctfTrace
+                            .getEnvNames()) {
+                        tableData.add(new Pair( varName, ctfTrace.getEnvValue(varName)));
+                    }
                 }
             }
         }
+
         TableColumn nameCol = new TableColumn(fTable, SWT.NONE, 0);
         TableColumn valueCol = new TableColumn(fTable, SWT.NONE, 1);
         nameCol.setText("Environment Variable"); //$NON-NLS-1$
@@ -110,7 +110,6 @@ public class TmfEnvironmentView extends TmfView {
         fTable.pack();
 
         parent.layout();
-
     }
 
     /* (non-Javadoc)
@@ -135,11 +134,10 @@ public class TmfEnvironmentView extends TmfView {
      * @param signal
      *            The incoming signal
      */
-    @SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal signal) {
         // Update the trace reference
-        TmfExperiment<TmfEvent> exp = (TmfExperiment<TmfEvent>) signal.getExperiment();
+        TmfExperiment exp = signal.getExperiment();
         if (!exp.equals(fExperiment)) {
             fExperiment = exp;
             if (fTable != null) {
@@ -150,5 +148,14 @@ public class TmfEnvironmentView extends TmfView {
         }
     }
 
+    /**
+     * @param signal the incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void experimentDisposed(TmfExperimentDisposedSignal signal) {
+        fExperiment = null;
+        fTable.clearAll();
+    }
 
 }

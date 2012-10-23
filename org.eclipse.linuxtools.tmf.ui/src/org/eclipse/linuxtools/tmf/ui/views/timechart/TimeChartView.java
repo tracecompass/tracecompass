@@ -78,7 +78,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
     private final int fDisplayWidth;
     private TimeGraphViewer fViewer;
     private final ArrayList<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<TimeChartAnalysisEntry>();
-    private final Map<ITmfTrace<?>, TimeChartDecorationProvider> fDecorationProviders = new HashMap<ITmfTrace<?>, TimeChartDecorationProvider>();
+    private final Map<ITmfTrace, TimeChartDecorationProvider> fDecorationProviders = new HashMap<ITmfTrace, TimeChartDecorationProvider>();
     private ArrayList<DecorateThread> fDecorateThreads;
     private long fStartTime = 0;
     private long fStopTime = Long.MAX_VALUE;
@@ -112,7 +112,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
         for (IEditorReference editorReference : editorReferences) {
             IEditorPart editor = editorReference.getEditor(false);
             if (editor instanceof ITmfTraceEditor) {
-                ITmfTrace<?> trace = ((ITmfTraceEditor) editor).getTrace();
+                ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
                 if (trace != null) {
                     IFile bookmarksFile = ((ITmfTraceEditor) editor).getBookmarksFile();
                     TimeChartAnalysisEntry timeAnalysisEntry = new TimeChartAnalysisEntry(trace, fDisplayWidth * 2);
@@ -161,7 +161,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
     }
 
     private void updateTraceEntry(TimeChartAnalysisEntry timeAnalysisEntry, long stopRank, long startTime, long stopTime) {
-        ITmfTrace<?> trace = timeAnalysisEntry.getTrace();
+        ITmfTrace trace = timeAnalysisEntry.getTrace();
         TimeChartDecorationProvider decorationProvider = fDecorationProviders.get(trace);
         if (decorationProvider == null) {
             return; // the trace has been closed
@@ -463,7 +463,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
         public void decorateEvent(TimeChartEvent timeChartEvent) {
             // TODO possible concurrency problem here with ItemizeJob
             TimeChartAnalysisEntry timeAnalysisEntry = (TimeChartAnalysisEntry) timeChartEvent.getEntry();
-            ITmfTrace<?> trace = timeAnalysisEntry.getTrace();
+            ITmfTrace trace = timeAnalysisEntry.getTrace();
             int priority = ColorSettingsManager.PRIORITY_NONE;
             boolean isBookmarked = false;
             boolean isVisible = false;
@@ -567,14 +567,14 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
     }
 
     @Override
-    public void filterApplied(ITmfFilter filter, ITmfTrace<?> trace) {
+    public void filterApplied(ITmfFilter filter, ITmfTrace trace) {
         TimeChartDecorationProvider decorationProvider = fDecorationProviders.get(trace);
         decorationProvider.filterApplied(filter);
         redecorate();
     }
 
     @Override
-    public void searchApplied(ITmfFilter filter, ITmfTrace<?> trace) {
+    public void searchApplied(ITmfFilter filter, ITmfTrace trace) {
         TimeChartDecorationProvider decorationProvider = fDecorationProviders.get(trace);
         decorationProvider.searchApplied(filter);
         redecorate();
@@ -595,7 +595,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
         if (fTimeAnalysisEntries == null) {
             return;
         }
-        final ITmfTrace<?> trace = signal.getTrace();
+        final ITmfTrace trace = signal.getTrace();
         final IFile bookmarksFile = signal.getBookmarksFile();
         final ITmfEventsFilterProvider eventsFilterProvider = signal.getEventsFilterProvider();
         TimeChartAnalysisEntry timeAnalysisEntry = null;
@@ -629,7 +629,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
         if (fTimeAnalysisEntries == null) {
             return;
         }
-        final ITmfTrace<?> trace = signal.getTrace();
+        final ITmfTrace trace = signal.getTrace();
         for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
             if (fTimeAnalysisEntries.get(i).getTrace().equals(trace)) {
                 fTimeAnalysisEntries.remove(i);
@@ -649,7 +649,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
         if (signal.getSource() != this && fTimeAnalysisEntries != null) {
-            ITmfTrace<?> trace = signal.getTrace();
+            ITmfTrace trace = signal.getTrace();
             for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
                 if (fTimeAnalysisEntries.get(i).getTrace().equals(trace)) {
                     fViewer.setSelection(fTimeAnalysisEntries.get(i));
@@ -670,7 +670,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener,
         if (fTimeAnalysisEntries == null) {
             return;
         }
-        final ITmfTrace<?> trace = signal.getTrace();
+        final ITmfTrace trace = signal.getTrace();
         for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
             TimeChartAnalysisEntry timeAnalysisEntry = fTimeAnalysisEntries.get(i);
             if (timeAnalysisEntry.getTrace().equals(trace)) {

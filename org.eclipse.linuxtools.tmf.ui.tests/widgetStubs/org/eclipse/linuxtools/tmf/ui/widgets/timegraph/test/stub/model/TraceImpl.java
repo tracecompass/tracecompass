@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -98,7 +99,7 @@ public class TraceImpl implements ITimeGraphEntry {
     }
 
     @Override
-    public ITimeGraphEntry[] getChildren() {
+    public List<ITimeGraphEntry> getChildren() {
         return null;
     }
 

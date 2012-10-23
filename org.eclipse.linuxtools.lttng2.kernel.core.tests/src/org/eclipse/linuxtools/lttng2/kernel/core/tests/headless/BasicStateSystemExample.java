@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
 
 /**
@@ -43,7 +43,8 @@ public class BasicStateSystemExample {
         try {
             File newStateFile = new File("/tmp/helloworldctf.ht"); //$NON-NLS-1$
             IStateChangeInput input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-            IStateSystemQuerier ss = StateSystemManager.loadStateHistory(newStateFile, input, true);
+            String name = "test-ss"; //$NON-NLS-1$
+            ITmfStateSystem ss = StateSystemManager.loadStateHistory(newStateFile, input, name, true);
 
             requestExample(ss);
         } catch (TmfTraceException e) {
@@ -59,7 +60,7 @@ public class BasicStateSystemExample {
      * @param ssb
      *            the State System Builder through which make request
      */
-    private static void requestExample(final IStateSystemQuerier ssb) {
+    private static void requestExample(final ITmfStateSystem ssb) {
         try {
             /* Request the current thread executing on each CPU */
             List<Integer> currentThreadByCPUS;

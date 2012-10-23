@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
+
 /**
  * A convenience class to store trace location arrays. The main purpose is to
  * provide a Comparable implementation for TmfExperimentLocation.
@@ -24,13 +25,13 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable {
+public final class TmfLocationArray implements Comparable<TmfLocationArray> {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final ITmfLocation<? extends Comparable<?>>[] fLocations;
+    private final ITmfLocation[] fLocations;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -41,8 +42,22 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
      *
      * @param locations the locations
      */
-    public TmfLocationArray(ITmfLocation<? extends Comparable<?>>[] locations) {
+    public TmfLocationArray(ITmfLocation[] locations) {
         fLocations = locations;
+    }
+
+    /**
+     * The "update" constructor. Copies the array of locations and updates
+     * a single entry.
+     *
+     * @param locations the locations
+     * @param index the entry to modify
+     * @param location the new entry
+     */
+    public TmfLocationArray(TmfLocationArray locations, int index, ITmfLocation location) {
+        assert(locations != null && index >= 0 && index < locations.fLocations.length);
+        fLocations = Arrays.copyOf(locations.fLocations, locations.fLocations.length);
+        fLocations[index] = location;
     }
 
     // ------------------------------------------------------------------------
@@ -50,29 +65,17 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // ------------------------------------------------------------------------
 
     /**
-     * Get the locations inside this array
+     * Get a specific location
      *
-     * @return the locations
+     * @param index the location element
+     *
+     * @return the specific location (possibly null)
      */
-    public ITmfLocation<? extends Comparable<?>>[] getLocations() {
-        return fLocations;
-    }
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    public TmfLocationArray clone() {
-        ITmfLocation<? extends Comparable<?>>[] clones = new ITmfLocation<?>[fLocations.length];
-        for (int i = 0; i < fLocations.length; i++) {
-            ITmfLocation<?> location = fLocations[i];
-            clones[i] = (location != null) ? location.clone() : null;
+    public ITmfLocation getLocation(int index) {
+        if (fLocations != null && index >= 0 && index < fLocations.length) {
+            return fLocations[index];
         }
-        return new TmfLocationArray(clones);
+        return null;
     }
 
     // ------------------------------------------------------------------------
@@ -80,12 +83,12 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
     // ------------------------------------------------------------------------
 
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(TmfLocationArray o) {
         for (int i = 0; i < fLocations.length; i++) {
-            ITmfLocation<? extends Comparable> l1 = (ITmfLocation<? extends Comparable>) fLocations[i].getLocation();
-            ITmfLocation<? extends Comparable> l2 = (ITmfLocation<? extends Comparable>) o.fLocations[i].getLocation();
-            int result = l1.getLocation().compareTo(l2.getLocation());
+            Comparable l1 = fLocations[i].getLocationInfo();
+            Comparable l2 = o.fLocations[i].getLocationInfo();
+            int result = l1.compareTo(l2);
             if (result != 0) {
                 return result;
             }

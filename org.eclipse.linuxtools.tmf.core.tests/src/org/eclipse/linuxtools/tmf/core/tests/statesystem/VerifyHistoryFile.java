@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryT
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 
 /**
  * Small program to ensure a history file does not contain any "holes".
@@ -40,7 +40,7 @@ public class VerifyHistoryFile {
 
     private static File htFile;
     private static IStateHistoryBackend htBackend;
-    private static IStateSystemQuerier ss;
+    private static ITmfStateSystem ss;
 
     private static long startTime;
     private static long endTime;

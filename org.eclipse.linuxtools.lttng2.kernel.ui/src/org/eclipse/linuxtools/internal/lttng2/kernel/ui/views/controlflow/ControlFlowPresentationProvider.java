@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -103,7 +103,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         Map<String, String> retMap = new LinkedHashMap<String, String>();
         if (event instanceof ControlFlowEvent) {
             ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-            IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+            ITmfStateSystem ssq = entry.getTrace().getStateSystem();
             int tid = entry.getThreadId();
 
             try {

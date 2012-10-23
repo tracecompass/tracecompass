@@ -35,6 +35,17 @@ public interface ITimeGraphPresentationProvider {
      */
     public String getStateTypeName();
 
+   /**
+    * Returns the name of state type depending on the given entry.
+    * Note that this overwrites the name which is return by getStateTypeName().
+    *
+    * @param entry
+    *           the entry
+    * @return the name of state type depending on the given entry or null.
+    * @since 2.0
+    */
+   public String getStateTypeName(ITimeGraphEntry entry);
+
     /**
      * Returns table of states with state name to state color relationship.
      *
@@ -126,5 +137,17 @@ public interface ITimeGraphPresentationProvider {
      * @return a map of tool tip information
      */
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event);
+
+    /**
+     * Returns a map of name and value providing additional information
+     * to display in the tool tip for this event.
+     *
+     * @param event the time event
+     * @param hoverTime the time corresponding to the mouse hover position
+     * @return a map of tool tip information
+     *
+     * @since 2.0
+     */
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime);
 
 }

@@ -19,15 +19,13 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 /**
  * The generic trace indexer in TMF with support for incremental indexing.
  *
- * @param <T> The trace event type
- *
  * @version 1.0
  * @author Francois Chouinard
  *
  * @see ITmfTrace
  * @see ITmfEvent
  */
-public interface ITmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> {
+public interface ITmfTraceIndexer {
 
     /**
      * Start an asynchronous index building job and waits for the job completion

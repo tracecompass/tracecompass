@@ -1112,6 +1112,26 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
+     * Collapses all nodes of the viewer's tree, starting with the root.
+     *
+     * @since 2.0
+     */
+    public void collapseAll() {
+        _stateCtrl.collapseAll();
+        adjustVerticalScrollBar();
+    }
+
+    /**
+     * Expands all nodes of the viewer's tree, starting with the root.
+     *
+     * @since 2.0
+     */
+    public void expandAll() {
+        _stateCtrl.expandAll();
+        adjustVerticalScrollBar();
+    }
+
+    /**
      * Get the number of sub-elements when expanded
      *
      * @return The element count

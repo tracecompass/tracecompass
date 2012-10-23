@@ -12,19 +12,17 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
-import org.eclipse.linuxtools.internal.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
  * An extension of TmfDataRequest for timestamped events.
  *
- * @param <T> The request event type
- *
  * @version 1.0
  * @author Francois Chouinard
  */
-public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataRequest<T> implements ITmfEventRequest<T> {
+public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEventRequest {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -42,7 +40,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      *
      * @param dataType the requested data type
      */
-    public TmfEventRequest(Class<T> dataType) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType) {
         this(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
@@ -53,7 +51,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param dataType the requested data type
      * @param priority the requested execution priority
      */
-    public TmfEventRequest(Class<T> dataType, ExecutionType priority) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, ExecutionType priority) {
         this(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
@@ -64,7 +62,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param dataType the requested data type
      * @param range the time range of the requested events
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range) {
         this(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
@@ -76,7 +74,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param range the time range of the requested events
      * @param priority the requested execution priority
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType priority) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, ExecutionType priority) {
         this(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
@@ -88,7 +86,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param range the time range of the requested events
      * @param nbRequested the number of events requested
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested) {
         this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
@@ -101,7 +99,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param nbRequested the number of events requested
      * @param priority the requested execution priority
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType priority) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested, ExecutionType priority) {
         this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, priority);
     }
 
@@ -114,7 +112,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param nbRequested the number of events requested
      * @param blockSize the number of events per block
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
     	this(dataType, range, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
@@ -128,7 +126,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param nbRequested the number of events requested
      * @param blockSize the number of events per block
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize) {
         this(dataType, range, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
@@ -142,7 +140,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType priority) {
     	this(dataType, range, 0, nbRequested, blockSize, priority);
     }
 
@@ -157,11 +155,11 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param blockSize the number of events per block
      * @param priority the requested execution priority
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
     	super(dataType, index, nbRequested, blockSize, priority);
     	fRange = range;
 
-        if (Tracer.isRequestTraced()) {
+        if (TmfCoreTracer.isRequestTraced()) {
             String type = getClass().getName();
             type = type.substring(type.lastIndexOf('.') + 1);
             @SuppressWarnings("nls")
@@ -170,7 +168,7 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
-            Tracer.traceRequest(this, message);
+            TmfCoreTracer.traceRequest(this, message);
         }
     }
 
@@ -213,8 +211,8 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
 
     @Override
     public boolean equals(Object other) {
-    	if (other instanceof TmfEventRequest<?>) {
-    		TmfEventRequest<?> request = (TmfEventRequest<?>) other;
+    	if (other instanceof TmfEventRequest) {
+    		TmfEventRequest request = (TmfEventRequest) other;
     		return super.equals(other) && request.fRange.equals(fRange);
     	}
     	return false;

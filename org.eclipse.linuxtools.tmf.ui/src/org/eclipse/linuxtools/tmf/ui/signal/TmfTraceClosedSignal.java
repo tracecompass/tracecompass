@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  */
 public class TmfTraceClosedSignal extends TmfSignal {
 
-    private final ITmfTrace<?> fTrace;
+    private final ITmfTrace fTrace;
 
     /**
      * Constructor for a new signal
@@ -33,7 +33,7 @@ public class TmfTraceClosedSignal extends TmfSignal {
      * @param trace
      *            The trace being closed
      */
-    public TmfTraceClosedSignal(Object source, ITmfTrace<?> trace) {
+    public TmfTraceClosedSignal(Object source, ITmfTrace trace) {
         super(source);
         fTrace = trace;
     }
@@ -43,7 +43,7 @@ public class TmfTraceClosedSignal extends TmfSignal {
      *
      * @return The trace object
      */
-    public ITmfTrace<?> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

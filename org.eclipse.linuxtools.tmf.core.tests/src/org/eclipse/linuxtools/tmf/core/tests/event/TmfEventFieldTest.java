@@ -415,11 +415,11 @@ public class TmfEventFieldTest extends TestCase {
      *
      */
     public void testToString() {
-        final String expected1 = "TmfEventField [fFieldId=" + fFieldName1 + ", fValue=" + fValue1.toString() + "]";
+        final String expected1 = fFieldName1 + "=" + fValue1.toString();
         TmfEventField field = new TmfEventField(fFieldName1, fValue1, null);
         assertEquals("toString", expected1, field.toString());
 
-        final String expected2 = "TmfEventField [fFieldId=" + fFieldName1 + ", fValue=" + fValue2.toString() + "]";
+        final String expected2 = fFieldName1 + "=" + fValue2.toString();
         field = new TmfEventField(fFieldName1, fValue2, null);
         assertEquals("toString", expected2, field.toString());
     }

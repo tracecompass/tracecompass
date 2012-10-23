@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +24,14 @@ import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
+import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -136,9 +140,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     }
 
     @Override
-    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
 
-        Map<String, String> retMap = new HashMap<String, String>();
+        Map<String, String> retMap = new LinkedHashMap<String, String>();
         if (event instanceof ResourcesEvent) {
 
             ResourcesEvent resourcesEvent = (ResourcesEvent) event;
@@ -160,10 +164,10 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 if (status == StateValues.CPU_STATUS_IRQ) {
                     // In IRQ state get the IRQ that caused the interruption
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
-                    IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+                    ITmfStateSystem ssq = entry.getTrace().getStateSystem();
                     int cpu = entry.getId();
 
-                    IStateSystemQuerier ss = entry.getTrace().getStateSystem();
+                    ITmfStateSystem ss = entry.getTrace().getStateSystem();
                     try {
                         List<ITmfStateInterval> fullState = ss.queryFullState(event.getTime());
                         List<Integer> irqQuarks = ss.getQuarks(Attributes.RESOURCES, Attributes.IRQS, "*"); //$NON-NLS-1$
@@ -188,10 +192,10 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
                     // In SOFT_IRQ state get the SOFT_IRQ that caused the interruption
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
-                    IStateSystemQuerier ssq = entry.getTrace().getStateSystem();
+                    ITmfStateSystem ssq = entry.getTrace().getStateSystem();
                     int cpu = entry.getId();
 
-                    IStateSystemQuerier ss = entry.getTrace().getStateSystem();
+                    ITmfStateSystem ss = entry.getTrace().getStateSystem();
                     try {
                         List<ITmfStateInterval> fullState = ss.queryFullState(event.getTime());
                         List<Integer> softIrqQuarks = ss.getQuarks(Attributes.RESOURCES, Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
@@ -213,7 +217,43 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                     } catch (StateValueTypeException e) {
                         e.printStackTrace();
                     }
-                }
+                } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL){
+                    // In running state get the current tid
+                    ResourcesEntry entry = (ResourcesEntry) event.getEntry();
+                    ITmfStateSystem ssq = entry.getTrace().getStateSystem();
+
+                    try {
+                        retMap.put(Messages.ResourcesView_attributeHoverTime, Utils.formatTime(hoverTime, TimeFormat.ABSOLUTE, Resolution.NANOSEC));
+                        int cpuQuark = entry.getQuark();
+                        int currentThreadQuark = ssq.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
+                        ITmfStateInterval interval = ssq.querySingleState(hoverTime, currentThreadQuark);
+                        if (!interval.getStateValue().isNull()) {
+                            ITmfStateValue value = interval.getStateValue();
+                            int currentThreadId = value.unboxInt();
+                            retMap.put(Messages.ResourcesView_attributeTidName, Integer.toString(currentThreadId));
+                            int execNameQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.EXEC_NAME);
+                            interval = ssq.querySingleState(hoverTime, execNameQuark);
+                            if (!interval.getStateValue().isNull()) {
+                                value = interval.getStateValue();
+                                retMap.put(Messages.ResourcesView_attributeProcessName, value.unboxStr());
+                            }
+                            if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
+                                int syscallQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
+                                interval = ssq.querySingleState(hoverTime, syscallQuark);
+                                if (!interval.getStateValue().isNull()) {
+                                    value = interval.getStateValue();
+                                    retMap.put(Messages.ResourcesView_attributeSyscallName, value.unboxStr());
+                                }
+                            }
+                        }
+                    } catch (AttributeNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (TimeRangeException e) {
+                        e.printStackTrace();
+                    } catch (StateValueTypeException e) {
+                        e.printStackTrace();
+                    }
+                    }
             }
         }
 

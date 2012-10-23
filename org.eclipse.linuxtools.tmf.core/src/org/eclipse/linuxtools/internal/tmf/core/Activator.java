@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -18,10 +18,11 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
- * <b><u>TmfCorePlugin</u></b>
- * <p>
  * The activator class controls the plug-in life cycle. No more than one such
  * plug-in can exist at any time.
+ * <p>
+ * It also provides the plug-in's general logging facility and manages the
+ * internal tracer.
  */
 public class Activator extends Plugin {
 
@@ -30,7 +31,7 @@ public class Activator extends Plugin {
 	// ------------------------------------------------------------------------
 
     /**
-     * The plug-in ID 
+     * The plug-in ID
      */
 	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.core"; //$NON-NLS-1$
 
@@ -38,7 +39,7 @@ public class Activator extends Plugin {
      * The shared instance
      */
 	private static Activator fPlugin;
-	
+
 	// ------------------------------------------------------------------------
     // Constructors
 	// ------------------------------------------------------------------------
@@ -55,9 +56,9 @@ public class Activator extends Plugin {
 	// ------------------------------------------------------------------------
 
 	/**
-     * Returns the TMF UI plug-in instance.
+     * Returns the TMF Core plug-in instance.
      *
-     * @return the TMF UI plug-in instance.
+     * @return the TMF Core plug-in instance.
      */
     public static Activator getDefault() {
         return fPlugin;
@@ -80,7 +81,7 @@ public class Activator extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		setDefault(this);
-		Tracer.init();
+		TmfCoreTracer.init();
 	}
 
 	/*
@@ -89,66 +90,78 @@ public class Activator extends Plugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		Tracer.stop();
+		TmfCoreTracer.stop();
 		setDefault(null);
 		super.stop(context);
 	}
 
+	// ------------------------------------------------------------------------
+	// Log INFO
+    // ------------------------------------------------------------------------
+
     /**
      * Logs a message with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
-    public void logInfo(String message) {
-        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+    public static void logInfo(String message) {
+        fPlugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
-     * @param exception A exception to log
+     * @param exception The corresponding exception
      */
-    public void logInfo(String message, Throwable exception) {
-        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, exception));
+    public static void logInfo(String message, Throwable exception) {
+        fPlugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, exception));
+    }
+
+    // ------------------------------------------------------------------------
+    // Log WARNING
+    // ------------------------------------------------------------------------
+
+    /**
+     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
+     *
+     * @param message A message to log
+     */
+    public static void logWarning(String message) {
+        fPlugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
     }
 
     /**
      * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
+     * @param exception The corresponding exception
      */
-    public void logWarning(String message) {
-        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+    public static void logWarning(String message, Throwable exception) {
+        fPlugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, exception));
     }
-    
+
+    // ------------------------------------------------------------------------
+    // Log ERROR
+    // ------------------------------------------------------------------------
+
     /**
-     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
+     *
      * @param message A message to log
-     * @param exception A exception to log
      */
-    public void logWarning(String message, Throwable exception) {
-        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, exception));
+    public static void logError(String message) {
+        fPlugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
     }
 
     /**
      * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
+     * @param exception The corresponding exception
      */
-    public void logError(String message) {
-        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
-    }
-    
-    /**
-     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
-     * @param message A message to log
-     * @param exception A exception to log
-     */
-    public void logError(String message, Throwable exception) {
-        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
+    public static void logError(String message, Throwable exception) {
+        fPlugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
     }
 
 }
