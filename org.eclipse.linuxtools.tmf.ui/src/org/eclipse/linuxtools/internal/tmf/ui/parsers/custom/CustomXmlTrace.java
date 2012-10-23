@@ -130,7 +130,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         }
         try {
-            long pos = (long) (ratio * fFile.length());
+            long pos = Math.round(ratio * fFile.length());
             while (pos > 0) {
                 fFile.seek(pos - 1);
                 if (fFile.read() == '\n') {
@@ -177,7 +177,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
 
     @Override
     public synchronized CustomXmlEvent getNext(final ITmfContext context) {
-        final ITmfContext savedContext = context.clone();
+        final ITmfContext savedContext = new TmfContext(context.getLocation(), context.getRank());
         final CustomXmlEvent event = parse(context);
         if (event != null) {
             updateAttributes(savedContext, event.getTimestamp());

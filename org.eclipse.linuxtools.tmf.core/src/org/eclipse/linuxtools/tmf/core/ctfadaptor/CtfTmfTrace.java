@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
@@ -234,7 +234,7 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
         final long end = this.getEndTime().getValue();
         final long start = this.getStartTime().getValue();
         final long diff = end - start;
-        final long ratioTs = (long) (diff * ratio) + start;
+        final long ratioTs = Math.round(diff * ratio) + start;
         context.seek(ratioTs);
         context.setRank(ITmfContext.UNKNOWN_RANK);
         return context;

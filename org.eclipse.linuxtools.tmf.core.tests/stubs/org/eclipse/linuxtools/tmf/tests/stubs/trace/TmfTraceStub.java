@@ -251,7 +251,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
         fLock.lock();
         try {
             if (fTrace != null) {
-                final ITmfLocation location = new TmfLongLocation(Long.valueOf((long) (ratio * fTrace.length())));
+                final ITmfLocation location = new TmfLongLocation(Long.valueOf(Math.round(ratio * fTrace.length())));
                 final TmfContext context = seekEvent(location);
                 context.setRank(ITmfContext.UNKNOWN_RANK);
                 return context;

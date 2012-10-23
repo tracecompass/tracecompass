@@ -428,8 +428,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     public void synchToTime(TmfTimeSynchSignal signal) {
         fLock.lock();
         try {
-            if ((signal.getSource() != this) && (fFrame != null)) {
-
+            if ((signal.getSource() != this) && (fFrame != null) && (fCheckPoints.size() > 0)) {
                 fCurrentTime = signal.getCurrentTime();
                 fIsSelect = true;
                 moveToMessage();
@@ -450,7 +449,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     public void synchToTimeRange(TmfRangeSynchSignal signal) {
         fLock.lock();
         try {
-            if ((signal.getSource() != this) && (fFrame != null) && !fIsSignalSent) {
+            if ((signal.getSource() != this) && (fFrame != null) && !fIsSignalSent && (fCheckPoints.size() > 0)) {
                 TmfTimeRange newTimeRange = signal.getCurrentRange();
                 ITmfTimestamp delta = newTimeRange.getEndTime().getDelta(newTimeRange.getStartTime());
                 fInitialWindow = delta.getValue();
@@ -655,8 +654,12 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         try {
             cancelOngoingRequests();
 
-            List<FilterCriteria> list = (List<FilterCriteria>)filters;
-            fFilterCriteria =  new ArrayList<FilterCriteria>(list);
+            if (filters == null) {
+                fFilterCriteria =  new ArrayList<FilterCriteria>();
+            } else {
+                List<FilterCriteria> list = (List<FilterCriteria>)filters;
+                fFilterCriteria =  new ArrayList<FilterCriteria>(list);
+            }
 
             fillCurrentPage(fEvents);
 

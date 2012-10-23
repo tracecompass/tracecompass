@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Shell;
  * <p>
  * Dialog box for collecting information about the events to enable.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
@@ -48,7 +48,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     /**
      * The icon file for this dialog box.
      */
-    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/enable_event.gif"; //$NON-NLS-1$ 
+    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/enable_event.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -86,7 +86,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
      */
     private int fSessionIndex = 0;
     /**
-     * The Channel where the events should be enabled. 
+     * The Channel where the events should be enabled.
      */
     private TraceChannelComponent fChannel;
     /**
@@ -135,7 +135,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     public void setIsKernel(boolean isKernel) {
         fIsKernel = isKernel;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IGetEventInfoDialog#setSessions(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent[])
@@ -165,24 +165,24 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
      */
     @Override
     protected Control createDialogArea(Composite parent) {
-        
+
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
         fDialogComposite.setLayout(layout);
         fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        
+
         fSessionsGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fSessionsGroup.setText(Messages.TraceControl_EnableEventsSessionGroupName);
         layout = new GridLayout(1, true);
-        fSessionsGroup.setLayout(layout); 
+        fSessionsGroup.setLayout(layout);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         fSessionsGroup.setLayoutData(data);
 
         fSessionsCombo = new CCombo(fSessionsGroup, SWT.READ_ONLY);
         fSessionsCombo.setToolTipText(Messages.TraceControl_EnableEventsSessionsTooltip);
         fSessionsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        
+
         String items[] = new String[fSessions.length];
         for (int i = 0; i < items.length; i++) {
             items[i] = String.valueOf(fSessions[i].getName());
@@ -190,14 +190,14 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
 
         fSessionsCombo.setItems(items);
         fSessionsCombo.setEnabled(fSessions.length > 0);
-        
+
         fChannelsGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fChannelsGroup.setText(Messages.TraceControl_EnableEventsChannelGroupName);
         layout = new GridLayout(1, true);
         fChannelsGroup.setLayout(layout);
         data = new GridData(GridData.FILL_HORIZONTAL);
         fChannelsGroup.setLayoutData(data);
-        
+
         fChannelsCombo = new CCombo(fChannelsGroup, SWT.READ_ONLY);
         fChannelsCombo.setToolTipText(Messages.TraceControl_EnableEventsChannelsTooltip);
         fChannelsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -207,7 +207,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 fSessionIndex = fSessionsCombo.getSelectionIndex();
-                
+
                 if (fSessionIndex >= 0) {
                     TraceDomainComponent domain = null;
                     TraceDomainComponent[] domains = fSessions[fSessionIndex].getDomains();
@@ -227,7 +227,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
                         }
                         fChannelsCombo.setItems(selectionItems);
                         fChannelsCombo.setEnabled(fChannels.length > 0);
-                    } else { 
+                    } else {
                         fChannelsCombo.setItems(new String[0]);
                         fChannelsCombo.setEnabled(false);
                         fChannels = null;
@@ -240,9 +240,9 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        
+
         getShell().setMinimumSize(new Point(300, 200));
-        
+
         return fDialogComposite;
     }
 
@@ -262,11 +262,11 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
      */
     @Override
     protected void okPressed() {
-        
+
         if (fSessionsCombo.getSelectionIndex() < 0) {
             MessageDialog.openError(getShell(),
                   Messages.TraceControl_EnableEventsDialogTitle,
-                  Messages.TraceControl_EnableEventsNoSessionError);  
+                  Messages.TraceControl_EnableEventsNoSessionError);
             return;
         }
 
@@ -275,10 +275,11 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         if ((fChannels != null) && (fChannels.length > 0) && (fChannelsCombo.getSelectionIndex() < 0)) {
             MessageDialog.openError(getShell(),
                     Messages.TraceControl_EnableEventsDialogTitle,
-                    Messages.TraceControl_EnableEventsNoChannelError);  
+                    Messages.TraceControl_EnableEventsNoChannelError);
               return;
         }
-        
+        // Initialize fChannel to null
+        fChannel = null;
         if ((fChannels != null) && (fChannels.length > 0)) {
             fChannel = fChannels[fChannelsCombo.getSelectionIndex()];
         }

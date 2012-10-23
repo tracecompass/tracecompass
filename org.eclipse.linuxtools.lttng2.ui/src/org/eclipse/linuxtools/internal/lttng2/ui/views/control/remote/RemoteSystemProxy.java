@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.IRSECallback;
@@ -150,7 +151,10 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
             if (!shellSubSystem.isConnected()) {
                 try {
                     shellSubSystem.connect(false, callback);
-                } catch (Exception e) {
+                } catch (OperationCanceledException e) {
+                    callback.done(Status.CANCEL_STATUS, null);
+                }
+                catch (Exception e) {
                     throw new ExecutionException(e.toString(), e);
                 }
             } else {
