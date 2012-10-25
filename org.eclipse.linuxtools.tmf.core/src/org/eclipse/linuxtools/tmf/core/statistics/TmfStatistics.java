@@ -94,15 +94,24 @@ public class TmfStatistics  implements ITmfStatistics {
 
     @Override
     public long getEventsTotal() {
-        /*
-         * The total itself is not stored in the state, so we will do a
-         * "event types" query then add the contents manually.
-         */
-        Map<String, Long> map = getEventTypesTotal();
-        long total = 0;
-        for (long count : map.values()) {
-            total += count;
+        long start = stats.getStartTime();
+        long end = stats.getCurrentEndTime();
+        int countAtStart = 0, countAtEnd = 0;
+
+        try {
+            final int quark = stats.getQuarkAbsolute(Attributes.TOTAL);
+            countAtStart = stats.querySingleState(start, quark).getStateValue().unboxInt();
+            countAtEnd = stats.querySingleState(end, quark).getStateValue().unboxInt();
+        } catch (AttributeNotFoundException e) {
+            e.printStackTrace();
+        } catch (StateValueTypeException e) {
+            e.printStackTrace();
+        } catch (TimeRangeException e) {
+            /* Should not happen, we're clamped to the start and end times */
+            e.printStackTrace();
         }
+
+        long total = countAtEnd - countAtStart;
         return total;
     }
 
@@ -139,15 +148,24 @@ public class TmfStatistics  implements ITmfStatistics {
 
     @Override
     public long getEventsInRange(ITmfTimestamp start, ITmfTimestamp end) {
-        /*
-         * The total itself is not stored in the state, so we will do a
-         * "event types" query then add the contents manually.
-         */
-        Map<String, Long> map = getEventTypesInRange(start, end);
-        long total = 0;
-        for (long count : map.values()) {
-            total += count;
+        int countAtStart = 0, countAtEnd = 0;
+        long startTimestamp = checkStartTime(start.getValue());
+        long endTimestamp = checkEndTime(end.getValue());
+
+        try {
+            final int quark = stats.getQuarkAbsolute(Attributes.TOTAL);
+            countAtStart = stats.querySingleState(startTimestamp, quark).getStateValue().unboxInt();
+            countAtEnd = stats.querySingleState(endTimestamp, quark).getStateValue().unboxInt();
+        } catch (AttributeNotFoundException e) {
+            e.printStackTrace();
+        } catch (StateValueTypeException e) {
+            e.printStackTrace();
+        } catch (TimeRangeException e) {
+            /* Should not happen, we're clamped to the start and end times */
+            e.printStackTrace();
         }
+
+        long total = countAtEnd - countAtStart;
         return total;
     }
 
@@ -247,6 +265,9 @@ public class TmfStatistics  implements ITmfStatistics {
      * The attribute names that are used in the state provider
      */
     public static class Attributes {
+
+        /** Total nb of events */
+        public static final String TOTAL = "total"; //$NON-NLS-1$
 
         /** event_types */
         public static final String EVENT_TYPES = "event_types"; //$NON-NLS-1$<
