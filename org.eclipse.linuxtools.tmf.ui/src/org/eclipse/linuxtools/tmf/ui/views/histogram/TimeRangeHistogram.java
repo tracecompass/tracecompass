@@ -17,7 +17,6 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <p>
  * A basic histogram widget that displays the event distribution of a specific time range of a trace.
  * It has the following additional features:
  * <ul>
@@ -81,6 +80,7 @@ public class TimeRangeHistogram extends Histogram {
      */
     public synchronized void setTimeRange(long startTime, long duration) {
         fZoom.setNewRange(startTime, duration);
+        getDataModel().setTimeRange(startTime, startTime + duration);
     }
 
     /**

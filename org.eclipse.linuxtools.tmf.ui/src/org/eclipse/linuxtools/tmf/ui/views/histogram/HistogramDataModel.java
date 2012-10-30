@@ -11,6 +11,7 @@
  *   Bernd Hufmann - Implementation of new interfaces/listeners and support for
  *                   time stamp in any order
  *   Francois Chouinard - Moved from LTTng to TMF
+ *   Francois Chouinard - Added support for empty initial buckets
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -58,7 +59,7 @@ import org.eclipse.core.runtime.ListenerList;
  * a nice result when visualizing the histogram.
  * <p>
  *
- * @version 1.0
+ * @version 2.0
  * @author Francois Chouinard
  */
 public class HistogramDataModel implements IHistogramDataModel {
@@ -106,7 +107,16 @@ public class HistogramDataModel implements IHistogramDataModel {
      * Default constructor with default number of buckets.
      */
     public HistogramDataModel() {
-        this(DEFAULT_NUMBER_OF_BUCKETS);
+        this(0, DEFAULT_NUMBER_OF_BUCKETS);
+    }
+
+    /**
+     * Default constructor with default number of buckets.
+     * @param startTime The histogram start time
+     * @since 2.0
+     */
+    public HistogramDataModel(long startTime) {
+        this(startTime, DEFAULT_NUMBER_OF_BUCKETS);
     }
 
     /**
@@ -114,6 +124,17 @@ public class HistogramDataModel implements IHistogramDataModel {
      * @param nbBuckets A number of buckets.
      */
     public HistogramDataModel(int nbBuckets) {
+        this(0, nbBuckets);
+    }
+
+    /**
+     * Constructor with non-default number of buckets.
+     * @param startTime the histogram start time
+     * @param nbBuckets A number of buckets.
+     * @since 2.0
+     */
+    public HistogramDataModel(long startTime, int nbBuckets) {
+        fFirstBucketTime = fFirstEventTime = fLastEventTime = startTime;
         fNbBuckets = nbBuckets;
         fBuckets = new long[nbBuckets];
         fModelListeners = new ListenerList();
@@ -127,7 +148,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     public HistogramDataModel(HistogramDataModel other) {
         fNbBuckets = other.fNbBuckets;
         fBuckets = Arrays.copyOf(other.fBuckets, fNbBuckets);
-        fBucketDuration = Math.max(other.fBucketDuration,1);
+        fBucketDuration = Math.max(other.fBucketDuration, 1);
         fNbEvents = other.fNbEvents;
         fLastBucket = other.fLastBucket;
         fFirstBucketTime = other.fFirstBucketTime;
@@ -184,6 +205,21 @@ public class HistogramDataModel implements IHistogramDataModel {
      */
     public long getStartTime() {
         return fFirstEventTime;
+    }
+
+    /**
+     * Sets the model start time
+     * @param startTime the histogram range start time
+     * @param endTime the histogram range end time
+     * @since 2.0
+     */
+    public void setTimeRange(long startTime, long endTime) {
+        fFirstBucketTime = fFirstEventTime = fLastEventTime = startTime;
+        fBucketDuration = 1;
+        updateEndTime();
+        while (endTime >= fTimeLimit) {
+            mergeBuckets();
+        }
     }
 
     /**
@@ -311,7 +347,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         }
 
         // Set the start/end time if not already done
-        if ((fLastBucket == 0) && (fBuckets[0] == 0) && (timestamp > 0)) {
+        if ((fFirstBucketTime == 0) && (fLastBucket == 0) && (fBuckets[0] == 0) && (timestamp > 0)) {
             fFirstBucketTime = timestamp;
             fFirstEventTime = timestamp;
             updateEndTime();
