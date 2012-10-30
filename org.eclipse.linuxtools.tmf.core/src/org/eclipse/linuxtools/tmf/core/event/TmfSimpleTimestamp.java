@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Standardize on the default toString()
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.event;
@@ -15,7 +16,7 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * A simplified timestamp where scale and precision are set to 0.
  *
- * @version 1.0
+ * @version 1.1
  * @author Francois Chouinard
  */
 public class TmfSimpleTimestamp extends TmfTimestamp {
@@ -43,13 +44,15 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     /**
      * Copy constructor
      *
-     * @param timestamp the timestamp to copy
+     * @param timestamp the timestamp to copy or scale to 0
+     * @throws IllegalArgumentException if timestamp is null
+     * @throws ArithmeticException if timestamp can't be scaled to 0
      */
     public TmfSimpleTimestamp(final ITmfTimestamp timestamp) {
-        if (timestamp == null || timestamp.getScale() != 0 || timestamp.getPrecision() != 0) {
+        if (timestamp == null) {
             throw new IllegalArgumentException();
         }
-        setValue(timestamp.getValue(), 0, 0);
+        setValue(timestamp.normalize(0, 0).getValue(), 0, 0);
     }
 
     // ------------------------------------------------------------------------
@@ -131,15 +134,6 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
         final TmfSimpleTimestamp ts = (TmfSimpleTimestamp) other;
 
         return compareTo(ts, false) == 0;
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#toString()
-     */
-    @Override
-    @SuppressWarnings("nls")
-    public String toString() {
-        return "TmfSimpleTimestamp [fValue=" + getValue() + "]";
     }
 
 }

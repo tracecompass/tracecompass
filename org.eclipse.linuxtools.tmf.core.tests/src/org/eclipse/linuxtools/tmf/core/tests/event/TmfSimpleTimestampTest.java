@@ -94,8 +94,7 @@ public class TmfSimpleTimestampTest extends TestCase {
      *
      */
     public void testCopyBadTimestamp() {
-        final ITmfTimestamp ts0a = new TmfTimestamp(0, 1, 0);
-        final ITmfTimestamp ts0b = new TmfTimestamp(0, 0, 1);
+        final ITmfTimestamp ts0a = new TmfTimestamp(0, 100, 0);
 
         try {
             new TmfSimpleTimestamp(null);
@@ -106,13 +105,7 @@ public class TmfSimpleTimestampTest extends TestCase {
         try {
             new TmfSimpleTimestamp(ts0a);
             fail("TmfSimpleTimestamp: bad scale");
-        } catch (final IllegalArgumentException e) {
-        }
-
-        try {
-            new TmfSimpleTimestamp(ts0b);
-            fail("TmfSimpleTimestamp: bad precision");
-        } catch (final IllegalArgumentException e) {
+        } catch (final ArithmeticException e) {
         }
     }
 
@@ -236,9 +229,9 @@ public class TmfSimpleTimestampTest extends TestCase {
      *
      */
     public void testToString() {
-        assertEquals("toString", "TmfSimpleTimestamp [fValue=0]", ts0.toString());
-        assertEquals("toString", "TmfSimpleTimestamp [fValue=12345]", ts1.toString());
-        assertEquals("toString", "TmfSimpleTimestamp [fValue=-1234]", ts2.toString());
+        assertEquals("toString", "00:00:00.000_000_000", ts0.toString());
+        assertEquals("toString", "03:25:45.000_000_000", ts1.toString());
+        assertEquals("toString", "23:39:26.000_000_000", ts2.toString());
     }
 
     // ------------------------------------------------------------------------

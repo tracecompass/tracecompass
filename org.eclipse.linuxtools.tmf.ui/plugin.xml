@@ -1182,6 +1182,12 @@
             id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewerPage"
             name="%preference.page.uml2sd.name">
       </page>
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.linuxtools.tmf.ui.properties.TmfTimestampFormatPage"
+            id="org.eclipse.linuxtools.tmf.ui.preferences.timestamp.format"
+            name="%preferences.page.timestamp.format">
+      </page>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">

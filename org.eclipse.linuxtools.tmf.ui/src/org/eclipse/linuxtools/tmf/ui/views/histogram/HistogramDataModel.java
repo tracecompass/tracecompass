@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.ListenerList;
 
 /**
  * Histogram-independent data model.
- * 
+ *
  * It has the following characteristics:
  * <ul>
  * <li>The <i>basetime</i> is the timestamp of the first event
@@ -57,7 +57,7 @@ import org.eclipse.core.runtime.ListenerList;
  * respect to to the number of pixels in the actual histogram, we should achieve
  * a nice result when visualizing the histogram.
  * <p>
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -73,7 +73,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     public static final int DEFAULT_NUMBER_OF_BUCKETS = 16 * 1000;
 
     /**
-     * Number of events after which listeners will be notified.  
+     * Number of events after which listeners will be notified.
      */
     public static final int REFRESH_FREQUENCY = DEFAULT_NUMBER_OF_BUCKETS;
 
@@ -195,7 +195,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     }
 
     /**
-     * Returns the time of the current event in the model. 
+     * Returns the time of the current event in the model.
      * @return the time of the current event.
      */
     public long getCurrentEventTime() {
@@ -230,7 +230,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         fModelListeners.remove(listener);
     }
 
-    // Notify listeners (always) 
+    // Notify listeners (always)
     private void fireModelUpdateNotification() {
         fireModelUpdateNotification(0);
     }
@@ -271,13 +271,13 @@ public class HistogramDataModel implements IHistogramDataModel {
         fLastEventTime = 0;
         fCurrentEventTime = 0;
         fLastBucket = 0;
-        fBucketDuration = 1; // 1ns
+        fBucketDuration = 1;
         updateEndTime();
         fireModelUpdateNotification();
     }
 
     /**
-     * Sets the current event time (no notification of listeners) 
+     * Sets the current event time (no notification of listeners)
      *
      * @param timestamp A time stamp to set.
      */
@@ -286,7 +286,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     }
 
     /**
-     * Sets the current event time with notification of listeners 
+     * Sets the current event time with notification of listeners
      *
      * @param timestamp A time stamp to set.
      */
@@ -300,7 +300,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      *
      * @param eventCount The current event Count (for notification purposes)
      * @param timestamp The timestamp of the event to count
-     *  
+     *
      */
     @Override
     public void countEvent(long eventCount, long timestamp) {
@@ -369,7 +369,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      * @param height A height of the histogram canvas
      * @param barWidth A width (in pixel) of a histogram bar
      * @return the result array of size [width] and where the highest value doesn't exceed [height]
-     *         
+     *
      * @see org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramDataModel#scaleTo(int, int, int)
      */
     @Override
