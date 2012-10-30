@@ -47,6 +47,19 @@ public interface ITmfStateSystem {
     public long getCurrentEndTime();
 
     /**
+     * While it's possible to query a state history that is being built,
+     * sometimes we might want to wait until the construction is finished before
+     * we start doing queries.
+     *
+     * This method blocks the calling thread until the history back-end is done
+     * building. If it's already built (ie, opening a pre-existing file) this
+     * should return immediately. It's an alternative to listening to the
+     * {@link org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted}
+     * signal.
+     */
+    public void waitUntilBuilt();
+
+    /**
      * Return the current total amount of attributes in the system. This is also
      * equal to the quark that will be assigned to the next attribute that's
      * created.
