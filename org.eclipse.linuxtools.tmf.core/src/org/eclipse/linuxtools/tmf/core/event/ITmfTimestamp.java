@@ -44,25 +44,25 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      * The millisecond scale factor (10e0)
      * @since 2.0
      */
-    public int SECOND_SCALE = 0;
+    public static final int SECOND_SCALE = 0;
 
     /**
      * The millisecond scale factor (10e-3)
      * @since 2.0
      */
-    public int MILLISECOND_SCALE = -3;
+    public static final int MILLISECOND_SCALE = -3;
 
     /**
      * The microsecond scale factor (10e-6)
      * @since 2.0
      */
-    public int MICROSECOND_SCALE = -6;
+    public static final int MICROSECOND_SCALE = -6;
 
     /**
      * The nanosecond scale factor (10e-9)
      * @since 2.0
      */
-    public int NANOSECOND_SCALE = -9;
+    public static final int NANOSECOND_SCALE = -9;
 
     // ------------------------------------------------------------------------
     // Getters

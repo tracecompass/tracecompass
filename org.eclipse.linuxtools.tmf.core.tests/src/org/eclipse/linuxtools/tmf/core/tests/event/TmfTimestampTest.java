@@ -293,20 +293,20 @@ public class TmfTimestampTest extends TestCase {
      *
      */
     public void testToStringDefault() {
-        assertEquals("toString", "00:00:00.000_000_000", ts0.toString());
-        assertEquals("toString", "03:25:45.000_000_000", ts1.toString());
-        assertEquals("toString", "00:20:34.500_000_000", ts2.toString());
-        assertEquals("toString", "06:55:00.000_000_000", ts3.toString());
+        assertEquals("toString", "00:00:00.000 000 000", ts0.toString());
+        assertEquals("toString", "03:25:45.000 000 000", ts1.toString());
+        assertEquals("toString", "00:20:34.500 000 000", ts2.toString());
+        assertEquals("toString", "06:55:00.000 000 000", ts3.toString());
     }
 
     /**
     *
     */
    public void testToStringInterval() {
-       assertEquals("toString", "000.000_000_000", ts0.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
-       assertEquals("toString", "12345.000_000_000", ts1.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
-       assertEquals("toString", "1234.500_000_000", ts2.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
-       assertEquals("toString", "1234500.000_000_000", ts3.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+       assertEquals("toString", "000.000 000 000", ts0.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+       assertEquals("toString", "12345.000 000 000", ts1.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+       assertEquals("toString", "1234.500 000 000", ts2.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+       assertEquals("toString", "1234500.000 000 000", ts3.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
    }
 
     // ------------------------------------------------------------------------

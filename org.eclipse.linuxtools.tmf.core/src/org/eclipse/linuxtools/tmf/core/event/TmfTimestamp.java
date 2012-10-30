@@ -17,8 +17,8 @@ package org.eclipse.linuxtools.tmf.core.event;
 
 /**
  * A generic timestamp implementation. The timestamp is represented by the
- * tuple { value, scale, precision }. By default, timestamps are in the
- * nanosecond scale.
+ * tuple { value, scale, precision }. By default, timestamps are scaled in
+ * seconds.
  *
  * @version 1.1
  * @author Francois Chouinard
@@ -51,7 +51,7 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable {
      * A more practical definition of "end of time"
      * @since 2.0
      */
-    public static final ITmfTimestamp PROJECT_IS_CANCELLED = BIG_CRUNCH;
+    public static final ITmfTimestamp PROJECT_IS_CANNED = BIG_CRUNCH;
 
     /**
      * Zero
@@ -64,7 +64,7 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * The timestamp raw value (mantissa) in nanoseconds
+     * The timestamp raw value (mantissa)
      */
     private long fValue;
 

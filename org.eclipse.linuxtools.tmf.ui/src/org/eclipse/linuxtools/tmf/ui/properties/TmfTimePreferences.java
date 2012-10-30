@@ -53,8 +53,8 @@ public class TmfTimePreferences {
     static final String TIME_NO_FMT      = "";                   //$NON-NLS-1$
 
     static final String SUBSEC_MILLI_FMT = "SSS";                //$NON-NLS-1$
-    static final String SUBSEC_MICRO_FMT = "SSS_CCC";            //$NON-NLS-1$
-    static final String SUBSEC_NANO_FMT  = "SSS_CCC_NNN";        //$NON-NLS-1$
+    static final String SUBSEC_MICRO_FMT = "SSS CCC";            //$NON-NLS-1$
+    static final String SUBSEC_NANO_FMT  = "SSS CCC NNN";        //$NON-NLS-1$
     static final String SUBSEC_NO_FMT    = "";                   //$NON-NLS-1$
 
     static final String DELIMITER_NONE      = "";    //$NON-NLS-1$
@@ -97,7 +97,7 @@ public class TmfTimePreferences {
         fPreferenceStore.setDefault(TmfTimePreferences.SUBSEC, SUBSEC_NANO_FMT);
         fPreferenceStore.setDefault(TmfTimePreferences.DATE_DELIMITER, DELIMITER_DASH);
         fPreferenceStore.setDefault(TmfTimePreferences.TIME_DELIMITER, DELIMITER_COLON);
-        fPreferenceStore.setDefault(TmfTimePreferences.SSEC_DELIMITER, DELIMITER_UNDERLINE);
+        fPreferenceStore.setDefault(TmfTimePreferences.SSEC_DELIMITER, DELIMITER_SPACE);
 
         // Create the singleton and initialize format preferences
         getInstance();
@@ -214,7 +214,7 @@ public class TmfTimePreferences {
     void updatePatterns() {
         String dateFmt = fDateFormat.replaceAll("-", fDateFieldSep); //$NON-NLS-1$
         String timeFmt = fTimeFormat.replaceAll(":", fTimeFieldSep); //$NON-NLS-1$
-        String ssecFmt = fSSecFormat.replaceAll("_", fSSecFieldSep); //$NON-NLS-1$
+        String ssecFmt = fSSecFormat.replaceAll(" ", fSSecFieldSep); //$NON-NLS-1$
 
         fTimestampPattern = dateFmt + timeFmt + "." + ssecFmt; //$NON-NLS-1$
         fIntervalPattern = "TTT." + ssecFmt; //$NON-NLS-1$
@@ -225,7 +225,7 @@ public class TmfTimePreferences {
         setSSecFormat(TmfTimePreferences.SUBSEC_NANO_FMT);
         setDateFieldSep(TmfTimePreferences.DELIMITER_DASH);
         setTimeFieldSep(TmfTimePreferences.DELIMITER_COLON);
-        setSSecFieldSep(TmfTimePreferences.DELIMITER_UNDERLINE);
+        setSSecFieldSep(TmfTimePreferences.DELIMITER_SPACE);
         updatePatterns();
     }
 

@@ -250,6 +250,15 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
         displayExample();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.PreferencePage#performOk()
+     */
+    @Override
+    public boolean performOk() {
+        performApply();
+        return super.performOk();
+    }
+
     // ------------------------------------------------------------------------
     // SelectionListener
     // ------------------------------------------------------------------------
