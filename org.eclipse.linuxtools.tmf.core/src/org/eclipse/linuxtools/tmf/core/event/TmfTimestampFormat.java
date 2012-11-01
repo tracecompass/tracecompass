@@ -235,12 +235,15 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      */
     protected String fSupplPatternLetters = "TSCN"; //$NON-NLS-1$
 
-    /**
+    /*
      * The bracketing symbols used to mitigate the risk of a format string
      * that contains escaped sequences that would conflict with our format
      * extension.
      */
+    /** The open bracket symbol */
     protected String fOpenBracket   = "[&"; //$NON-NLS-1$
+
+    /** The closing bracket symbol */
     protected String fCloseBracket  = "&]"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------

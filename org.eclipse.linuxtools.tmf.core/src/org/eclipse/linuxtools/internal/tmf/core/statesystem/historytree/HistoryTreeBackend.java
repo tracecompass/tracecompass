@@ -35,7 +35,10 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  */
 public class HistoryTreeBackend implements IStateHistoryBackend {
 
+    /** The history tree that sits underneath */
     protected final HistoryTree sht;
+
+    /** Direct reference to the tree's IO object */
     private final HT_IO treeIO;
 
     /** Indicates if the history tree construction is done */

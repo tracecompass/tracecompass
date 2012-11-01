@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
@@ -27,9 +27,9 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**
  * The base class for all the types of nodes that go in the History Tree.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 abstract class HTNode {
 
@@ -67,7 +67,7 @@ abstract class HTNode {
     /**
      * Reader factory constructor. Build a Node object (of the right type) by
      * reading a block in the file.
-     * 
+     *
      * @param tree
      *            Reference to the HT which will own this node
      * @param fc
@@ -232,7 +232,7 @@ abstract class HTNode {
 
     /**
      * Add an interval to this node
-     * 
+     *
      * @param newInterval
      */
     void addInterval(HTInterval newInterval) {
@@ -248,7 +248,7 @@ abstract class HTNode {
     /**
      * We've received word from the containerTree that newest nodes now exist to
      * our right. (Puts isDone = true and sets the endtime)
-     * 
+     *
      * @param endtime
      *            The nodeEnd time that the node will have
      * @throws TimeRangeException
@@ -286,7 +286,7 @@ abstract class HTNode {
      * The method to fill up the stateInfo (passed on from the Current State
      * Tree when it does a query on the SHT). We'll replace the data in that
      * vector with whatever relevant we can find from this node
-     * 
+     *
      * @param stateInfo
      *            The same stateInfo that comes from SHT's doQuery()
      * @param t
@@ -319,7 +319,7 @@ abstract class HTNode {
     /**
      * Get a single Interval from the information in this node If the
      * key/timestamp pair cannot be found, we return null.
-     * 
+     *
      * @param key
      * @param t
      * @return The Interval containing the information we want, or null if it
@@ -471,7 +471,7 @@ abstract class HTNode {
 
     /**
      * Debugging function that prints out the contents of this node
-     * 
+     *
      * @param writer
      *            PrintWriter in which we will print the debug output
      */
@@ -505,20 +505,20 @@ abstract class HTNode {
     final static int getCommonHeaderSize() {
         /*
          * 1 - byte (type)
-         * 
+         *
          * 16 - 2x long (start time, end time)
-         * 
+         *
          * 16 - 4x int (seq number, parent seq number, intervalcount, strings
          * section pos.)
-         * 
+         *
          * 1 - byte (done or not)
          */
         return 34;
     }
 
-    /**
-     * @name Abstract methods
-     */
+    // ------------------------------------------------------------------------
+    // Abstract methods
+    // ------------------------------------------------------------------------
 
     protected abstract byte getNodeType();
 

@@ -56,13 +56,13 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     // Attributes
     // ------------------------------------------------------------------------
 
-    // The event trace to index
+    /** The event trace to index */
     protected final ITmfTrace fTrace;
 
-    // The interval between checkpoints
+    /** The interval between checkpoints */
     private final int fCheckpointInterval;
 
-    // The event trace to index
+    /** The event trace to index */
     private boolean fIsIndexing;
 
     /**

@@ -330,7 +330,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         return map;
     }
 
-    protected long checkStartTime(ITmfTimestamp startTs) {
+    private long checkStartTime(ITmfTimestamp startTs) {
         long start = startTs.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         if (start < stats.getStartTime()) {
             return stats.getStartTime();
@@ -338,7 +338,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         return start;
     }
 
-    protected long checkEndTime(ITmfTimestamp endTs) {
+    private long checkEndTime(ITmfTimestamp endTs) {
         long end = endTs.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         if (end > stats.getCurrentEndTime()) {
             return stats.getCurrentEndTime();

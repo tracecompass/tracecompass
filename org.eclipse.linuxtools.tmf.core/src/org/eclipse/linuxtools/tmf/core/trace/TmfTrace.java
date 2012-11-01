@@ -109,7 +109,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @param type the trace event type
      * @param path the trace path
      * @param cacheSize the trace cache size
-     * @throws TmfTraceException
+     * @throws TmfTraceException If something failed during the opening
      */
     protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize) throws TmfTraceException {
         this(resource, type, path, cacheSize, 0);
@@ -124,7 +124,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @param path the trace path
      * @param cacheSize the trace cache size
      * @param interval the trace streaming interval
-     * @throws TmfTraceException
+     * @throws TmfTraceException If something failed during the opening
      */
     protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize, final long interval) throws TmfTraceException {
         this(resource, type, path, cacheSize, interval, null);
@@ -138,8 +138,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @param type the trace event type
      * @param path the trace path
      * @param cacheSize the trace cache size
+     * @param interval the trace streaming interval
      * @param indexer the trace indexer
-     * @throws TmfTraceException
+     * @throws TmfTraceException If something failed during the opening
      */
     protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize,
             final long interval, final ITmfTraceIndexer indexer) throws TmfTraceException {
@@ -153,9 +154,10 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @param type the trace event type
      * @param path the trace path
      * @param cacheSize the trace cache size
+     * @param interval the trace streaming interval
      * @param indexer the trace indexer
      * @param parser the trace event parser
-     * @throws TmfTraceException
+     * @throws TmfTraceException If something failed during the opening
      */
     protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize,
             final long interval, final ITmfTraceIndexer indexer, final ITmfEventParser parser) throws TmfTraceException {
@@ -205,7 +207,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @param path the trace path
      * @param type the trace event type
      *
-     * @throws TmfTraceException
+     * @throws TmfTraceException If something failed during the initialization
      */
     protected void initialize(final IResource resource, final String path, final Class<? extends ITmfEvent> type) throws TmfTraceException {
         if (path == null) {
@@ -252,9 +254,11 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     }
 
     /**
-     * The default implementation of TmfTrace uses a TmfStatistics backend.
+     * The default implementation of TmfTrace uses a TmfStatistics back-end.
      * Override this if you want to specify another type (or none at all).
      *
+     * @throws TmfTraceException
+     *             If there was a problem setting up the statistics
      * @since 2.0
      */
     protected void buildStatistics() throws TmfTraceException {

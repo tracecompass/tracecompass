@@ -265,10 +265,13 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
     }
 
     /**
+     * Build the state system(s) associated with this trace type.
+     *
      * Suppressing the warning, because the 'throws' will usually happen in
      * sub-classes.
      *
      * @throws TmfTraceException
+     *             If there is a problem during the build
      */
     @SuppressWarnings("unused")
     protected void buildStateSystem() throws TmfTraceException {

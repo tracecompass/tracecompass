@@ -66,10 +66,6 @@ public class CTFTraceReader {
      */
     private long endTime;
 
-    protected void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -131,6 +127,17 @@ public class CTFTraceReader {
     public long getStartTime() {
         return this.startTime;
     }
+
+    /**
+     * Set the trace's end time
+     *
+     * @param endTime
+     *            The end time to use
+     */
+    protected void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
 
     // ------------------------------------------------------------------------
     // Operations

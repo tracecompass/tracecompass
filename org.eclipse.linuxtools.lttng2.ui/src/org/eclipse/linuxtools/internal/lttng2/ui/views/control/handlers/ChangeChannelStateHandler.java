@@ -67,7 +67,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
      * @param domain - the domain of the channels.
      * @param channelNames - a list of channel names
      * @param monitor - a progress monitor
-     * @throws ExecutionException
+     * @throws ExecutionException If the command fails
      */
     abstract protected void changeState(TraceDomainComponent domain, List<String> channelNames, IProgressMonitor monitor) throws ExecutionException;
 
