@@ -56,8 +56,19 @@ public interface ITmfStateSystem {
      * should return immediately. It's an alternative to listening to the
      * {@link org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted}
      * signal.
+     *
+     * @return If the build was successful. If false is returned, this either
+     *         means there was a problem during the build, or it got cancelled
+     *         before it could finished. In that case, no queries should be run
+     *         afterwards.
      */
-    public void waitUntilBuilt();
+    public boolean waitUntilBuilt();
+
+    /**
+     * Notify the state system that the trace is being closed, so it should
+     * clean up, close its files, etc.
+     */
+    public void dispose();
 
     /**
      * Return the current total amount of attributes in the system. This is also

@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
@@ -24,16 +25,16 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 /**
  * Variant of the HistoryTreeBackend which runs all the interval-insertion logic
  * in a separate thread.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         implements Runnable {
 
     /*
      * From superclass:
-     * 
+     *
      * protected final StateHistoryTree sht;
      */
 
@@ -42,10 +43,10 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
 
     /**
      * New state history constructor
-     * 
+     *
      * Note that it usually doesn't make sense to use a Threaded HT if you're
      * opening an existing state-file, but you know what you're doing...
-     * 
+     *
      * @param newStateFile
      *            The name of the history file that will be created. Should end
      *            in ".ht"
@@ -73,7 +74,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
     /**
      * New State History constructor. This version provides default values for
      * blockSize and maxChildren.
-     * 
+     *
      * @param newStateFile
      *            The name of the history file that will be created. Should end
      *            in ".ht"
@@ -98,7 +99,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      * The Threaded version does not specify an "existing file" constructor,
      * since the history is already built (and we only use the other thread
      * during building). Just use a plain HistoryTreeProvider in this case.
-     * 
+     *
      * TODO but what about streaming??
      */
 
@@ -123,7 +124,6 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
 
     @Override
     public void finishedBuilding(long endTime) {
-        HTInterval pill;
         /*
          * We need to commit everything in the History Tree and stop the
          * standalone thread before returning to the StateHistorySystem. (SHS
@@ -131,13 +131,34 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          * at the same time we are writing the last nodes!)
          */
 
+        stopRunningThread(endTime);
+        isFinishedBuilding = true;
+        return;
+    }
+
+    @Override
+    public void dispose() {
+        if (!isFinishedBuilding) {
+            stopRunningThread(TmfTimestamp.PROJECT_IS_CANNED.getValue());
+        }
         /*
-         * Send the "poison pill" in the queue, then wait for the HT to finish
+         * isFinishedBuilding remains false, so the superclass will ask the
+         * back-end to delete the file.
+         */
+        super.dispose();
+    }
+
+    private void stopRunningThread(long endTime) {
+        if (!shtThread.isAlive()) {
+            return;
+        }
+
+        /*
+         * Send a "poison pill" in the queue, then wait for the HT to finish
          * its closeTree()
          */
-        
         try {
-            pill = new HTInterval(-1, endTime, -1, TmfStateValue.nullValue());
+            HTInterval pill = new HTInterval(-1, endTime, -1, TmfStateValue.nullValue());
             intervalQueue.put(pill);
             shtThread.join();
         } catch (TimeRangeException e) {
@@ -145,7 +166,6 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return;
     }
 
     @Override

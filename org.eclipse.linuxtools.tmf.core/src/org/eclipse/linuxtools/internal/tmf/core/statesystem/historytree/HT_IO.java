@@ -156,13 +156,17 @@ class HT_IO {
                 + ((long) tree.getNodeCount() * tree.config.blockSize);
     }
 
-    synchronized void deleteFile() {
+    synchronized void closeFile() {
         try {
             fis.close();
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    synchronized void deleteFile() {
+        closeFile();
 
         if(!historyTreeFile.delete()) {
             /* We didn't succeed in deleting the file */

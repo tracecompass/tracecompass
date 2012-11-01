@@ -122,6 +122,11 @@ public class TmfStateStatistics implements ITmfStatistics {
     // ------------------------------------------------------------------------
 
     @Override
+    public void dispose() {
+        stats.dispose();
+    }
+
+    @Override
     public void updateStats(final boolean isGlobal, final ITmfTimestamp start,
             final ITmfTimestamp end) {
         /*
@@ -137,7 +142,9 @@ public class TmfStateStatistics implements ITmfStatistics {
                 Map<String, Long> map;
 
                 /* Wait until the history building completed */
-                stats.waitUntilBuilt();
+                if (!stats.waitUntilBuilt()) {
+                    return;
+                }
 
                 /* Range should be valid for both global and time range queries */
                 total = getEventsInRange(start, end);

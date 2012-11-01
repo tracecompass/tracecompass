@@ -87,4 +87,10 @@ public interface ITmfStatistics {
      */
     public Map<String, Long> getEventTypesInRange(ITmfTimestamp start,
             ITmfTimestamp end);
+
+    /**
+     * Notify the statistics back-end that the trace is being closed, so it
+     * should dispose itself as appropriate (release file descriptors, etc.)
+     */
+    public void dispose();
 }

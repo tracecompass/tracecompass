@@ -36,6 +36,9 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     protected final HistoryTree sht;
     private final HT_IO treeIO;
 
+    /** Indicates if the history tree construction is done */
+    protected boolean isFinishedBuilding = false;
+
     /**
      * Construtor for new history files. Use this when creating a new history
      * from scratch.
@@ -89,6 +92,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     public HistoryTreeBackend(File existingStateFile) throws IOException {
         sht = new HistoryTree(existingStateFile);
         treeIO = sht.getTreeIO();
+        isFinishedBuilding = true;
     }
 
     @Override
@@ -114,6 +118,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void finishedBuilding(long endTime) {
         sht.closeTree(endTime);
+        isFinishedBuilding = true;
     }
 
     @Override
@@ -134,6 +139,20 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void removeFiles() {
         treeIO.deleteFile();
+    }
+
+    @Override
+    public void dispose() {
+        if (isFinishedBuilding) {
+            treeIO.closeFile();
+        } else {
+            /*
+             * The build is being interrupted, delete the file we partially
+             * built since it won't be complete, so shouldn't be re-used in the
+             * future (.deleteFile() will close the file first)
+             */
+            treeIO.deleteFile();
+        }
     }
 
     @Override

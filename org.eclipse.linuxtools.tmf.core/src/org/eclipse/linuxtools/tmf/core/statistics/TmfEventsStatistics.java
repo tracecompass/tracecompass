@@ -56,6 +56,11 @@ public class TmfEventsStatistics implements ITmfStatistics {
     }
 
     @Override
+    public void dispose() {
+        cancelOngoingRequests();
+    }
+
+    @Override
     public void updateStats(final boolean isGlobal, ITmfTimestamp start,
             ITmfTimestamp end) {
         cancelOngoingRequests();

@@ -55,6 +55,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
     /* Latch tracking if the state history is done building or not */
     private final CountDownLatch finishedLatch = new CountDownLatch(1);
 
+    private boolean buildCancelled = false;
+
     /**
      * General constructor
      *
@@ -82,12 +84,22 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
-    public void waitUntilBuilt() {
+    public boolean waitUntilBuilt() {
         try {
             finishedLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return !buildCancelled;
+    }
+
+    @Override
+    public synchronized void dispose() {
+        if (transState.isActive()) {
+            transState.setInactive();
+            buildCancelled = true;
+        }
+        backend.dispose();
     }
 
     //--------------------------------------------------------------------------

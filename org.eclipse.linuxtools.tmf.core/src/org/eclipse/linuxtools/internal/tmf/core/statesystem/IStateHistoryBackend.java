@@ -126,6 +126,12 @@ public interface IStateHistoryBackend {
     public void removeFiles();
 
     /**
+     * Notify the state history back-end that the trace is being closed, so it
+     * should release its file descriptors, close its connections, etc.
+     */
+    public void dispose();
+
+    /**
      * @name Query methods
      */
 
