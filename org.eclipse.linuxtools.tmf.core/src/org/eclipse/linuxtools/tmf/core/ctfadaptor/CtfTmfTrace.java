@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp.TimestampType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -211,7 +210,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
             context.setRank(0);
         }
         if (currentLocation.getLocationInfo() == CtfLocation.INVALID_LOCATION) {
-            ((CtfTmfTimestamp) getEndTime()).setType(TimestampType.NANOS);
             currentLocation = new CtfLocation(getEndTime().getValue() + 1, 0L);
         }
         context.setLocation(currentLocation);
