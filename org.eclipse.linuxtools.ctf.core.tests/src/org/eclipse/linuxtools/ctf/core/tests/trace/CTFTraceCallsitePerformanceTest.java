@@ -186,5 +186,5 @@ public class CTFTraceCallsitePerformanceTest {
     public void test2MCallsites() {
         test(2000000);
     }
-
 }
+
