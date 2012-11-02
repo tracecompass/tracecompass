@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider.CtfTestFiles;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -96,6 +97,8 @@ public class BasicStateSystemExample {
         } catch (AttributeNotFoundException e) {
             e.printStackTrace();
         } catch (StateValueTypeException e) {
+            e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
             e.printStackTrace();
         }
     }

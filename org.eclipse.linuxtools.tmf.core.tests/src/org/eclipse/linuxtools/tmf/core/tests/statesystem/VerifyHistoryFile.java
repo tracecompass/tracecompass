@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.internal.tmf.core.statesystem.HistoryBuilder;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
@@ -47,7 +48,8 @@ public class VerifyHistoryFile {
     private static int nbErrors;
 
     public static void main(String[] args) throws IOException,
-            TimeRangeException, AttributeNotFoundException {
+            TimeRangeException, AttributeNotFoundException,
+            StateSystemDisposedException {
         htFile = new File(pathToHistoryFile);
         htBackend = new HistoryTreeBackend(htFile);
         ss = HistoryBuilder.openExistingHistory(htBackend);
@@ -65,7 +67,8 @@ public class VerifyHistoryFile {
     }
 
     private static void verifyAttribute(int attribute)
-            throws TimeRangeException, AttributeNotFoundException {
+            throws TimeRangeException, AttributeNotFoundException,
+            StateSystemDisposedException {
         List<ITmfStateInterval> intervals;
 
         System.out.print("Checking attribute " + attribute);

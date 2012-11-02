@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
@@ -129,6 +130,8 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
                 e.printStackTrace();
             } catch (StateValueTypeException e) {
                 e.printStackTrace();
+            } catch (StateSystemDisposedException e) {
+                /* Ignored */
             }
             int status = ((ControlFlowEvent) event).getStatus();
             if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
@@ -144,6 +147,8 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
                     e.printStackTrace();
                 } catch (TimeRangeException e) {
                     e.printStackTrace();
+                } catch (StateSystemDisposedException e) {
+                    /* Ignored */
                 }
             }
         }

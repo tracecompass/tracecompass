@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
@@ -618,6 +619,8 @@ public class ResourcesView extends TmfView {
             e.printStackTrace();
         } catch (StateValueTypeException e) {
             e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
+            /* Ignored */
         }
         return eventList;
     }

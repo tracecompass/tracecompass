@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
@@ -35,7 +36,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  *
  * @author Alexandre Montplaisir
  */
-public class StateSystemPushPopTest extends TestCase{
+public class StateSystemPushPopTest extends TestCase {
 
     private ITmfStateSystemBuilder ss;
 
@@ -158,6 +159,8 @@ public class StateSystemPushPopTest extends TestCase{
             fail(errMsg + e.toString());
         } catch (TimeRangeException e) {
             fail(errMsg + e.toString());
+        } catch (StateSystemDisposedException e) {
+            fail(errMsg + e.toString());
         }
     }
 
@@ -192,6 +195,8 @@ public class StateSystemPushPopTest extends TestCase{
             fail(errMsg + e.toString());
         } catch (TimeRangeException e) {
             fail(errMsg + e.toString());
+        } catch (StateSystemDisposedException e) {
+            fail(errMsg + e.toString());
         }
     }
 
@@ -217,6 +222,8 @@ public class StateSystemPushPopTest extends TestCase{
         } catch (StateValueTypeException e) {
             fail(errMsg + e.toString());
         } catch (TimeRangeException e) {
+            fail(errMsg + e.toString());
+        } catch (StateSystemDisposedException e) {
             fail(errMsg + e.toString());
         }
     }
@@ -249,6 +256,8 @@ public class StateSystemPushPopTest extends TestCase{
         } catch (StateValueTypeException e) {
             fail(errMsg + e.toString());
         } catch (TimeRangeException e) {
+            fail(errMsg + e.toString());
+        } catch (StateSystemDisposedException e) {
             fail(errMsg + e.toString());
         }
     }
@@ -293,6 +302,8 @@ public class StateSystemPushPopTest extends TestCase{
         } catch (StateValueTypeException e) {
             fail(errMsg + e.toString());
         } catch (TimeRangeException e) {
+            fail(errMsg + e.toString());
+        } catch (StateSystemDisposedException e) {
             fail(errMsg + e.toString());
         }
     }

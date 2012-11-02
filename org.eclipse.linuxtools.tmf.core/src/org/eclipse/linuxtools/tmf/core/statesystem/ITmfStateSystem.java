@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
@@ -238,9 +239,11 @@ public interface ITmfStateSystem {
      * @throws TimeRangeException
      *             If the 't' parameter is outside of the range of the state
      *             history.
+     * @throws StateSystemDisposedException
+     *             If the query is sent after the state system has been disposed
      */
     public List<ITmfStateInterval> queryFullState(long t)
-            throws TimeRangeException;
+            throws TimeRangeException, StateSystemDisposedException;
 
     /**
      * Singular query method. This one does not update the whole stateInfo
@@ -261,9 +264,12 @@ public interface ITmfStateSystem {
      *             If 't' is invalid
      * @throws AttributeNotFoundException
      *             If the requested quark does not exist in the model
+     * @throws StateSystemDisposedException
+     *             If the query is sent after the state system has been disposed
      */
     public ITmfStateInterval querySingleState(long t, int attributeQuark)
-            throws AttributeNotFoundException, TimeRangeException;
+            throws AttributeNotFoundException, TimeRangeException,
+            StateSystemDisposedException;
 
     /**
      * Convenience method to query attribute stacks (created with
@@ -288,11 +294,13 @@ public interface ITmfStateSystem {
      *             If the attribute was simply not found
      * @throws TimeRangeException
      *             If the given timestamp is invalid
+     * @throws StateSystemDisposedException
+     *             If the query is sent after the state system has been disposed
      * @since 2.0
      */
     public ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
             throws StateValueTypeException, AttributeNotFoundException,
-            TimeRangeException;
+            TimeRangeException, StateSystemDisposedException;
 
     /**
      * Return a list of state intervals, containing the "history" of a given
@@ -316,10 +324,12 @@ public interface ITmfStateSystem {
      *             If t1 is invalid, or if t2 <= t1
      * @throws AttributeNotFoundException
      *             If the requested quark does not exist in the model.
+     * @throws StateSystemDisposedException
+     *             If the query is sent after the state system has been disposed
      */
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2) throws TimeRangeException,
-            AttributeNotFoundException;
+            AttributeNotFoundException, StateSystemDisposedException;
 
     /**
      * Return the state history of a given attribute, but with at most one
@@ -347,9 +357,12 @@ public interface ITmfStateSystem {
      *             greater than zero.
      * @throws AttributeNotFoundException
      *             If the attribute doesn't exist
+     * @throws StateSystemDisposedException
+     *             If the query is sent after the state system has been disposed
      * @since 2.0
      */
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2, long resolution, IProgressMonitor monitor)
-            throws TimeRangeException, AttributeNotFoundException;
+            throws TimeRangeException, AttributeNotFoundException,
+            StateSystemDisposedException;
 }

@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
@@ -188,6 +189,8 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                         e.printStackTrace();
                     } catch (StateValueTypeException e) {
                         e.printStackTrace();
+                    } catch (StateSystemDisposedException e) {
+                        /* Ignored */
                     }
                 } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
                     // In SOFT_IRQ state get the SOFT_IRQ that caused the interruption
@@ -216,6 +219,8 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                         e.printStackTrace();
                     } catch (StateValueTypeException e) {
                         e.printStackTrace();
+                    } catch (StateSystemDisposedException e) {
+                        /* Ignored */
                     }
                 } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL){
                     // In running state get the current tid
@@ -252,8 +257,10 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                         e.printStackTrace();
                     } catch (StateValueTypeException e) {
                         e.printStackTrace();
+                    } catch (StateSystemDisposedException e) {
+                        /* Ignored */
                     }
-                    }
+                }
             }
         }
 

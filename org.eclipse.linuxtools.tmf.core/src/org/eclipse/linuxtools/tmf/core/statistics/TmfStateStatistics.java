@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -179,6 +180,8 @@ public class TmfStateStatistics implements ITmfStatistics {
             e.printStackTrace();
         } catch (StateValueTypeException e) {
             e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
+            e.printStackTrace();
         }
 
         return count;
@@ -214,6 +217,8 @@ public class TmfStateStatistics implements ITmfStatistics {
             e.printStackTrace();
         } catch (StateValueTypeException e) {
             e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
+            e.printStackTrace();
         }
         return map;
     }
@@ -244,6 +249,8 @@ public class TmfStateStatistics implements ITmfStatistics {
         } catch (AttributeNotFoundException e) {
             e.printStackTrace();
         } catch (StateValueTypeException e) {
+            e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
             e.printStackTrace();
         }
 
@@ -316,6 +323,8 @@ public class TmfStateStatistics implements ITmfStatistics {
              */
             e.printStackTrace();
         } catch (StateValueTypeException e) {
+            e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
             e.printStackTrace();
         }
         return map;
