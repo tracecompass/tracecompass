@@ -16,9 +16,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
@@ -157,7 +159,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     @Override
     public void doQuery(List<ITmfStateInterval> stateInfo, long t)
-            throws TimeRangeException {
+            throws TimeRangeException, StateSystemDisposedException {
         if (!checkValidTime(t)) {
             /* We can't possibly have information about this query */
             throw new TimeRangeException();
@@ -170,9 +172,13 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         currentNode.writeInfoFromNode(stateInfo, t);
 
         /* Then we follow the branch down in the relevant children */
-        while (currentNode.getNbChildren() > 0) {
-            currentNode = (CoreNode) sht.selectNextChild(currentNode, t);
-            currentNode.writeInfoFromNode(stateInfo, t);
+        try {
+            while (currentNode.getNbChildren() > 0) {
+                currentNode = (CoreNode) sht.selectNextChild(currentNode, t);
+                currentNode.writeInfoFromNode(stateInfo, t);
+            }
+        } catch (ClosedChannelException e) {
+            throw new StateSystemDisposedException();
         }
 
         /*
@@ -184,7 +190,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     @Override
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark)
-            throws TimeRangeException {
+            throws TimeRangeException, StateSystemDisposedException {
         return getRelevantInterval(t, attributeQuark);
     }
 
@@ -202,7 +208,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @return The node containing the information we want
      */
     private HTInterval getRelevantInterval(long t, int key)
-            throws TimeRangeException {
+            throws TimeRangeException, StateSystemDisposedException {
         if (!checkValidTime(t)) {
             throw new TimeRangeException();
         }
@@ -212,9 +218,13 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         CoreNode currentNode = sht.latestBranch.firstElement();
         HTInterval interval = currentNode.getRelevantInterval(key, t);
 
-        while (interval == null && currentNode.getNbChildren() > 0) {
-            currentNode = (CoreNode) sht.selectNextChild(currentNode, t);
-            interval = currentNode.getRelevantInterval(key, t);
+        try {
+            while (interval == null && currentNode.getNbChildren() > 0) {
+                currentNode = (CoreNode) sht.selectNextChild(currentNode, t);
+                interval = currentNode.getRelevantInterval(key, t);
+            }
+        } catch (ClosedChannelException e) {
+            throw new StateSystemDisposedException();
         }
         /*
          * Since we should now have intervals at every attribute/timestamp
@@ -252,9 +262,13 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         long total = 0;
         long ret;
 
-        for (int seq = 0; seq < sht.getNodeCount(); seq++) {
-            node = treeIO.readNode(seq);
-            total += node.getNodeUsagePRC();
+        try {
+            for (int seq = 0; seq < sht.getNodeCount(); seq++) {
+                node = treeIO.readNode(seq);
+                total += node.getNodeUsagePRC();
+            }
+        } catch (ClosedChannelException e) {
+            e.printStackTrace();
         }
 
         ret = total / sht.getNodeCount();
