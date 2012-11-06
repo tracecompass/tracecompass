@@ -159,8 +159,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
         return null;
     }
 
-
-
     @Override
     public double getLocationRatio(ITmfLocation location) {
         final CtfLocation curLocation = (CtfLocation) location;
@@ -174,21 +172,15 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
                 / (endTime - startTime);
     }
 
-
-
-
-
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#seekEvent(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
      */
     @Override
     public synchronized ITmfContext seekEvent(ITmfTimestamp timestamp) {
-        if( timestamp instanceof CtfTmfTimestamp){
-            CtfTmfLightweightContext iter = new CtfTmfLightweightContext(this);
-            iter.seek(timestamp.getValue());
-            return iter;
-        }
-        return super.seekEvent(timestamp);
+        CtfTmfLightweightContext iter = new CtfTmfLightweightContext(this);
+        /* seek the context to the timestamp value in nanoseconds */
+        iter.seek(timestamp.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+        return iter;
     }
 
     /**

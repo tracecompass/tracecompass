@@ -109,6 +109,14 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader#seek(long)
+     */
+    @Override
+    public boolean seek(long timestamp) {
+        return seek(new CtfLocationData(timestamp, 0));
+    }
+
     /**
      * Seek this iterator to a given location.
      *
