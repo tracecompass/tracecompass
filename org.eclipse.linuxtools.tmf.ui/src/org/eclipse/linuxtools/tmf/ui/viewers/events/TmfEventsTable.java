@@ -1493,14 +1493,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker,
             final String source = event.getSource();
             final String type = event.getType().getName();
             final String reference = event.getReference();
-            final ITmfEventField content = event.getContent();
-            final String value = (content.getValue() != null) ? content.getValue().toString() : content.toString();
+            final String content = event.getContent().toString();
             fields = new TmfEventField[] {
                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, timestamp),
                     new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, source),
                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, type),
                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, reference),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, value)
+                    new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, content)
             };
         }
         return fields;
