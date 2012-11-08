@@ -336,9 +336,9 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getName", path, trace.getName());
 
         assertEquals("getNbEvents",    0, trace.getNbEvents());
-        assertEquals("getRange-start", Long.MAX_VALUE, trace.getTimeRange().getStartTime().getValue());
+        assertEquals("getRange-start", Long.MIN_VALUE, trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   Long.MIN_VALUE, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   Long.MAX_VALUE, trace.getStartTime().getValue());
+        assertEquals("getStartTime",   Long.MIN_VALUE, trace.getStartTime().getValue());
         assertEquals("getEndTime",     Long.MIN_VALUE, trace.getEndTime().getValue());
     }
 
@@ -364,9 +364,9 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getName", name, trace.getName());
 
         assertEquals("getNbEvents",    0, trace.getNbEvents());
-        assertEquals("getRange-start", Long.MAX_VALUE, trace.getTimeRange().getStartTime().getValue());
+        assertEquals("getRange-start", Long.MIN_VALUE, trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   Long.MIN_VALUE, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   Long.MAX_VALUE, trace.getStartTime().getValue());
+        assertEquals("getStartTime",   Long.MIN_VALUE, trace.getStartTime().getValue());
         assertEquals("getEndTime",     Long.MIN_VALUE, trace.getEndTime().getValue());
     }
 
@@ -382,9 +382,9 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getName", "", trace.getName());
 
         assertEquals("getNbEvents",    0, trace.getNbEvents());
-        assertEquals("getRange-start", Long.MAX_VALUE, trace.getTimeRange().getStartTime().getValue());
+        assertEquals("getRange-start", Long.MIN_VALUE, trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   Long.MIN_VALUE, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   Long.MAX_VALUE, trace.getStartTime().getValue());
+        assertEquals("getStartTime",   Long.MIN_VALUE, trace.getStartTime().getValue());
         assertEquals("getEndTime",     Long.MIN_VALUE, trace.getEndTime().getValue());
 
         // Validate

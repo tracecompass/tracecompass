@@ -108,7 +108,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
         }
 
         fTraces = traces;
-        setTimeRange(TmfTimeRange.NULL_RANGE);
     }
 
     /**

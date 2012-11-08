@@ -75,7 +75,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     private long fNbEvents = 0;
 
     // The time span of the event stream
-    private ITmfTimestamp fStartTime = TmfTimestamp.BIG_CRUNCH;
+    private ITmfTimestamp fStartTime = TmfTimestamp.BIG_BANG;
     private ITmfTimestamp fEndTime = TmfTimestamp.BIG_BANG;
 
     // The trace streaming interval (0 = no streaming)
