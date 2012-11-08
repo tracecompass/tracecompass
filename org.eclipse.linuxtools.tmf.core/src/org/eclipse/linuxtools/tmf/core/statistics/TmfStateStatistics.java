@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.statistics;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,6 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-
 public class TmfStateStatistics implements ITmfStatistics {
 
     /** ID for the statistics state system */
@@ -157,7 +157,44 @@ public class TmfStateStatistics implements ITmfStatistics {
         };
         statsThread.start();
         return;
+    }
 
+    @Override
+    public List<Long> histogramQuery(final long start, final long end, final int nb) {
+        final List<Long> list = new LinkedList<Long>();
+        final long increment = (end - start) / nb;
+
+        /* Wait until the history building completed */
+        if (!stats.waitUntilBuilt()) {
+            return null;
+        }
+
+        /*
+         * We will do one state system query per "border", and save the
+         * differences between each border.
+         */
+        long prevTotal = (start == stats.getStartTime()) ? 0 : getEventCountAt(start);
+        long curTime = start + increment;
+
+        long curTotal, count;
+        for (int i = 0; i < nb - 1; i++) {
+            curTotal = getEventCountAt(curTime);
+            count = curTotal - prevTotal;
+            list.add(count);
+
+            curTime += increment;
+            prevTotal = curTotal;
+        }
+
+        /*
+         * For the last bucket, we'll stretch its end time to the end time of
+         * the requested range, in case it got truncated down.
+         */
+        curTotal = getEventCountAt(end);
+        count = curTotal - prevTotal;
+        list.add(count);
+
+        return list;
     }
 
     @Override
@@ -228,33 +265,19 @@ public class TmfStateStatistics implements ITmfStatistics {
         // end time, and answer as soon as possible...
         stats.waitUntilBuilt();
 
-        int countAtStart = 0, countAtEnd = 0;
-        long startTime = checkStartTime(start);
-        long endTime = checkEndTime(end);
-
-        try {
-            final int quark = stats.getQuarkAbsolute(Attributes.TOTAL);
-            if (startTime == stats.getStartTime()) {
-                countAtStart = 0;
-            } else {
-                /* State system works that way... */
-                countAtStart = stats.querySingleState(startTime - 1, quark).getStateValue().unboxInt();
-            }
-            countAtEnd = stats.querySingleState(endTime, quark).getStateValue().unboxInt();
-
-        } catch (TimeRangeException e) {
-            /* Assume there is no events for that range */
-            return 0;
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
-        } catch (StateSystemDisposedException e) {
-            e.printStackTrace();
+        long startCount;
+        if (start == stats.getStartTime()) {
+            startCount = 0;
+        } else {
+            /*
+             * We want the events happening at "start" to be included, so we'll
+             * need to query one unit before that point.
+             */
+            startCount = getEventCountAt(start - 1);
         }
+        long endCount = getEventCountAt(end);
 
-        long total = countAtEnd - countAtStart;
-        return total;
+        return endCount - startCount;
     }
 
     @Override
@@ -327,6 +350,29 @@ public class TmfStateStatistics implements ITmfStatistics {
             e.printStackTrace();
         }
         return map;
+    }
+
+    private long getEventCountAt(long timestamp) {
+        /* Make sure the target time is within the range of the history */
+        long ts = checkStartTime(timestamp);
+        ts = checkEndTime(ts);
+
+        try {
+            final int quark = stats.getQuarkAbsolute(Attributes.TOTAL);
+            long count = stats.querySingleState(ts, quark).getStateValue().unboxInt();
+            return count;
+
+        } catch (TimeRangeException e) {
+            /* Assume there is no events for that range */
+        } catch (AttributeNotFoundException e) {
+            e.printStackTrace();
+        } catch (StateValueTypeException e) {
+            e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
     private long checkStartTime(long initialStart) {

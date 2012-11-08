@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.statistics;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
@@ -51,6 +52,29 @@ public interface ITmfStatistics {
      *            true.
      */
     public void updateStats(boolean isGlobal, long start, long end);
+
+    /**
+     * Run a histogram query on the statistics back-end. This means, return the
+     * total number of events in a series of 'nb' equal-sized ranges between
+     * 'start' and 'end'. As its name implies, this is typically used to fill
+     * the histogram data (where each range represents one pixel on the
+     * histogram).
+     *
+     * Unlike {@link #updateStats}, this method will block the caller until the
+     * results are returned, so it should not be called from a signal handler or
+     * from the UI thread.
+     *
+     * @param start
+     *            Start time of the query
+     * @param end
+     *            End time of the query
+     * @param nb
+     *            The number of ranges to separate the complete time range into.
+     *            It will be the size() of the returned array.
+     * @return The array representing the number of events found in each
+     *         sub-range.
+     */
+    public List<Long> histogramQuery(long start, long end, int nb);
 
     /**
      * Return the total number of events in the trace.
