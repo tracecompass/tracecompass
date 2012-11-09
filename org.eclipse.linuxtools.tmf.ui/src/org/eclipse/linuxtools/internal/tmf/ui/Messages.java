@@ -50,7 +50,7 @@ public class Messages extends NLS {
     public static String CustomXmlTraceDefinition_timestampOutputFormat;
 
     public static String TmfEventsTable_AddBookmarkActionText;
-    public static String TmfEventsTable_AddBookmarkDialogText;
+    public static String TmfEventsTable_AddBookmarkDialogMessage;
     public static String TmfEventsTable_AddBookmarkDialogTitle;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
     public static String TmfEventsTable_ClearFiltersActionText;
