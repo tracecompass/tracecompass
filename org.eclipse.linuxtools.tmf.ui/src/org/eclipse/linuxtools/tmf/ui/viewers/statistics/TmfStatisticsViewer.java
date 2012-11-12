@@ -21,17 +21,14 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStatsUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
-import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewer;
@@ -564,9 +561,6 @@ public class TmfStatisticsViewer extends TmfViewer {
 
     /**
      * Initializes the input for the tree viewer.
-     *
-     * @param input
-     *            The input of this viewer, or <code>null</code> if none
      */
     protected void initInput() {
         String treeID = getTreeID();
@@ -675,7 +669,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @param experiment
      *            The experiment used to send the request
-     * @param range
+     * @param timeRange
      *            The range to request to the experiment
      */
     protected void requestData(final TmfExperiment experiment, final TmfTimeRange timeRange) {
@@ -687,7 +681,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @param experiment
      *            The experiment used to send the request
-     * @param range
+     * @param timeRange
      *            The range to request to the experiment
      */
     protected void requestTimeRangeData(final TmfExperiment experiment, final TmfTimeRange timeRange) {
@@ -746,8 +740,8 @@ public class TmfStatisticsViewer extends TmfViewer {
 
                 /* The generic statistics are stored in nanoseconds, so we must make
                  * sure the time range is scaled correctly. */
-                ITmfTimestamp start = timeRange.getStartTime().normalize(0, TIME_SCALE);
-                ITmfTimestamp end = timeRange.getEndTime().normalize(0, TIME_SCALE);
+                long start = timeRange.getStartTime().normalize(0, TIME_SCALE).getValue();
+                long end = timeRange.getEndTime().normalize(0, TIME_SCALE).getValue();
 
                 /*
                  * Send a request to update the statistics view. The result will

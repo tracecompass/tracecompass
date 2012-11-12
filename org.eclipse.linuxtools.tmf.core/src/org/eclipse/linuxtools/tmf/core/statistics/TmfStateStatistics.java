@@ -20,7 +20,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -128,8 +127,8 @@ public class TmfStateStatistics implements ITmfStatistics {
     }
 
     @Override
-    public void updateStats(final boolean isGlobal, final ITmfTimestamp start,
-            final ITmfTimestamp end) {
+    public void updateStats(final boolean isGlobal, final long start,
+            final long end) {
         /*
          * Since we are currently in a signal handler (ie, in the UI thread),
          * and since state system queries can be arbitrarily long (O(log n) wrt
@@ -224,7 +223,7 @@ public class TmfStateStatistics implements ITmfStatistics {
     }
 
     @Override
-    public long getEventsInRange(ITmfTimestamp start, ITmfTimestamp end) {
+    public long getEventsInRange(long start, long end) {
         // FIXME Instead of waiting until the end, we could check the current
         // end time, and answer as soon as possible...
         stats.waitUntilBuilt();
@@ -259,7 +258,7 @@ public class TmfStateStatistics implements ITmfStatistics {
     }
 
     @Override
-    public Map<String, Long> getEventTypesInRange(ITmfTimestamp start, ITmfTimestamp end) {
+    public Map<String, Long> getEventTypesInRange(long start, long end) {
         // FIXME Instead of waiting until the end, we could check the current
         // end time, and answer as soon as possible...
         stats.waitUntilBuilt();
@@ -330,16 +329,16 @@ public class TmfStateStatistics implements ITmfStatistics {
         return map;
     }
 
-    private long checkStartTime(ITmfTimestamp startTs) {
-        long start = startTs.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+    private long checkStartTime(long initialStart) {
+        long start = initialStart;
         if (start < stats.getStartTime()) {
             return stats.getStartTime();
         }
         return start;
     }
 
-    private long checkEndTime(ITmfTimestamp endTs) {
-        long end = endTs.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+    private long checkEndTime(long initialEnd) {
+        long end = initialEnd;
         if (end > stats.getCurrentEndTime()) {
             return stats.getCurrentEndTime();
         }

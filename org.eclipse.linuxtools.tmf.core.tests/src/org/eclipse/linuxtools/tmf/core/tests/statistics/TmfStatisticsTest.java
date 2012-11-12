@@ -16,8 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.junit.Test;
 
@@ -29,21 +27,21 @@ import org.junit.Test;
  */
 public abstract class TmfStatisticsTest {
 
+    /** The statistics back-end object */
     protected static ITmfStatistics backend;
 
     /* Known values about the trace */
-    private static final int SCALE = ITmfTimestamp.NANOSECOND_SCALE;
     private static final int totalNbEvents = 695319;
-    private static final ITmfTimestamp tStart = new TmfTimestamp(1332170682440133097L, SCALE); /* Timestamp of first event */
-    private static final ITmfTimestamp tEnd   = new TmfTimestamp(1332170692664579801L, SCALE); /* Timestamp of last event */
+    private static final long tStart = 1332170682440133097L; /* Timestamp of first event */
+    private static final long tEnd   = 1332170692664579801L; /* Timestamp of last event */
 
     /* Timestamps of interest */
-    private static final ITmfTimestamp t1 = new TmfTimestamp(1332170682490946000L, SCALE);
-    private static final ITmfTimestamp t2 = new TmfTimestamp(1332170682490947524L, SCALE); /* event exactly here */
-    private static final ITmfTimestamp t3 = new TmfTimestamp(1332170682490948000L, SCALE);
-    private static final ITmfTimestamp t4 = new TmfTimestamp(1332170682490949000L, SCALE);
-    private static final ITmfTimestamp t5 = new TmfTimestamp(1332170682490949270L, SCALE); /* following event here */
-    private static final ITmfTimestamp t6 = new TmfTimestamp(1332170682490949300L, SCALE);
+    private static final long t1 = 1332170682490946000L;
+    private static final long t2 = 1332170682490947524L; /* event exactly here */
+    private static final long t3 = 1332170682490948000L;
+    private static final long t4 = 1332170682490949000L;
+    private static final long t5 = 1332170682490949270L; /* following event here */
+    private static final long t6 = 1332170682490949300L;
 
     private static final String eventType = "lttng_statedump_process_state"; //$NON-NLS-1$
 
@@ -96,7 +94,7 @@ public abstract class TmfStatisticsTest {
      */
     @Test
     public void testGetEventsInRangeMinusStart() {
-        long count = backend.getEventsInRange(new TmfTimestamp(tStart.getValue() + 1, SCALE), tEnd);
+        long count = backend.getEventsInRange(tStart + 1, tEnd);
         assertEquals(totalNbEvents - 1, count);
     }
 
@@ -106,7 +104,7 @@ public abstract class TmfStatisticsTest {
      */
     @Test
     public void testGetEventsInRangeMinusEnd() {
-        long count = backend.getEventsInRange(tStart, new TmfTimestamp(tEnd.getValue() - 1, SCALE));
+        long count = backend.getEventsInRange(tStart, tEnd - 1);
         assertEquals(totalNbEvents - 1, count);
     }
 
@@ -190,8 +188,7 @@ public abstract class TmfStatisticsTest {
      */
     @Test
     public void testGetEventTypesInRangeMinusStart() {
-        ITmfTimestamp newStart = new TmfTimestamp(tStart.getValue() + 1, SCALE);
-        Map<String, Long> result = backend.getEventTypesInRange(newStart, tEnd);
+        Map<String, Long> result = backend.getEventTypesInRange(tStart + 1, tEnd);
 
         long count = sumOfEvents(result);
         assertEquals(totalNbEvents - 1, count);
@@ -203,8 +200,7 @@ public abstract class TmfStatisticsTest {
      */
     @Test
     public void testGetEventTypesInRangeMinusEnd() {
-        ITmfTimestamp newEnd = new TmfTimestamp(tEnd.getValue() - 1, SCALE);
-        Map<String, Long> result = backend.getEventTypesInRange(tStart, newEnd);
+        Map<String, Long> result = backend.getEventTypesInRange(tStart, tEnd - 1);
 
         long count = sumOfEvents(result);
         assertEquals(totalNbEvents - 1, count);
