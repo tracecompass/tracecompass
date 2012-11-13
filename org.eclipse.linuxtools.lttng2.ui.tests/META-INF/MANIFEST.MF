@@ -8,4 +8,4 @@ Bundle-SymbolicName: org.eclipse.linuxtools.lttng2.ui.tests
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.eclipse.linuxtools.lttng2.ui
-Require-Bundle: org.junit;bundle-version="4.8.0"
+Require-Bundle: org.junit
