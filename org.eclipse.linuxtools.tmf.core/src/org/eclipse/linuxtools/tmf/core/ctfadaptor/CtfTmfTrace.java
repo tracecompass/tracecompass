@@ -172,17 +172,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
                 / (endTime - startTime);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#seekEvent(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
-     */
-    @Override
-    public synchronized ITmfContext seekEvent(ITmfTimestamp timestamp) {
-        CtfTmfLightweightContext iter = new CtfTmfLightweightContext(this);
-        /* seek the context to the timestamp value in nanoseconds */
-        iter.seek(timestamp.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
-        return iter;
-    }
-
     /**
      * Method seekEvent.
      * @param location ITmfLocation<?>
