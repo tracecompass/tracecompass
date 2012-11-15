@@ -272,7 +272,7 @@ class TransientState {
         for (int i = 0; i < ongoingStateInfo.size(); i++) {
             if (ongoingStateStartTimes.get(i) > endTime) {
                 /*
-                 * Handle the cases where trace end >= timetamp of last state
+                 * Handle the cases where trace end > timestamp of last state
                  * change. This can happen when inserting "future" changes.
                  */
                 continue;

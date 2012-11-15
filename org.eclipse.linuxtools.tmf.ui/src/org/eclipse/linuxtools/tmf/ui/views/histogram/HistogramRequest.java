@@ -16,6 +16,7 @@
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -83,7 +84,7 @@ public class HistogramRequest extends TmfEventRequest {
     public void handleData(ITmfEvent event) {
         super.handleData(event);
         if (event != null) {
-            long timestamp = event.getTimestamp().normalize(0, -9).getValue();
+            long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
             fHistogram.countEvent(getNbRead(), timestamp);
         }
     }

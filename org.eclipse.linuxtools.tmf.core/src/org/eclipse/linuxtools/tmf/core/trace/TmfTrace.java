@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import java.io.File;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -25,6 +26,9 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
@@ -229,8 +233,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             }
         }
         super.init(traceName, type);
-
-        buildStatistics();
     }
 
     /**
@@ -267,6 +269,25 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
          * set (so we don't build it for experiments, for unit tests, etc.)
          */
         fStatistics = (fResource == null ? null : new TmfStateStatistics(this) );
+    }
+
+    /**
+     * Build the state system(s) associated with this trace type.
+     *
+     * Suppressing the warning, because the 'throws' will usually happen in
+     * sub-classes.
+     *
+     * @throws TmfTraceException
+     *             If there is a problem during the build
+     * @since 2.0
+     */
+    @SuppressWarnings("unused")
+    protected void buildStateSystem() throws TmfTraceException {
+        /*
+         * Nothing is done in the base implementation, please specify
+         * how/if to build a state system in derived classes.
+         */
+        return;
     }
 
     /**
@@ -603,7 +624,10 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#armRequest(org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest)
      */
     @Override
-    protected ITmfContext armRequest(final ITmfDataRequest request) {
+    protected synchronized ITmfContext armRequest(final ITmfDataRequest request) {
+        if (executorIsShutdown()) {
+            return null;
+        }
         if ((request instanceof ITmfEventRequest)
             && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest) request).getRange().getStartTime())
             && (request.getIndex() == 0))
@@ -614,6 +638,92 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
         }
         return seekEvent(request.getIndex());
+    }
+
+    // ------------------------------------------------------------------------
+    // Signal handlers
+    // ------------------------------------------------------------------------
+
+    /**
+     * Handler for the Trace Opened signal
+     *
+     * @param signal
+     *            The incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        ITmfTrace trace = signal.getTrace();
+        if (signal.getTrace() instanceof TmfExperiment) {
+            TmfExperiment experiment = (TmfExperiment) signal.getTrace();
+            for (ITmfTrace expTrace : experiment.getTraces()) {
+                if (expTrace == this) {
+                    trace = expTrace;
+                    break;
+                }
+            }
+        }
+        if (signal.getTrace() == this || trace == this) {
+            /* the signal is for this trace or experiment or for an experiment containing this trace */
+
+            /* ensure start time is set */
+            final ITmfContext context = seekEvent(0);
+            getNext(context);
+            context.dispose();
+        }
+        if (trace == this) {
+            /* the signal is for this trace or for an experiment containing this trace */
+            try {
+                buildStatistics();
+            } catch (TmfTraceException e) {
+                e.printStackTrace();
+            }
+            try {
+                buildStateSystem();
+            } catch (TmfTraceException e) {
+                e.printStackTrace();
+            }
+
+            /* Refresh the project, so it can pick up new files that got created. */
+            try {
+                if (fResource != null) {
+                    fResource.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+                }
+            } catch (CoreException e) {
+                e.printStackTrace();
+            }
+        }
+        if (signal.getTrace() == this) {
+            /* the signal is for this trace or experiment */
+            if (getNbEvents() == 0) {
+                return;
+            }
+
+            final TmfTimeRange timeRange = new TmfTimeRange(getStartTime(), TmfTimestamp.BIG_CRUNCH);
+            final TmfTraceRangeUpdatedSignal rangeUpdatedsignal = new TmfTraceRangeUpdatedSignal(this, this, timeRange);
+
+            // Broadcast in separate thread to prevent deadlock
+            new Thread() {
+                @Override
+                public void run() {
+                    broadcast(rangeUpdatedsignal);
+                }
+            }.start();
+            return;
+        }
+    }
+
+    /**
+     * Signal handler for the TmfTraceRangeUpdatedSignal signal
+     *
+     * @param signal The incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void traceRangeUpdated(final TmfTraceRangeUpdatedSignal signal) {
+        if (signal.getTrace() == this) {
+            getIndexer().buildIndex(getNbEvents(), signal.getRange(), false);
+        }
     }
 
     // ------------------------------------------------------------------------

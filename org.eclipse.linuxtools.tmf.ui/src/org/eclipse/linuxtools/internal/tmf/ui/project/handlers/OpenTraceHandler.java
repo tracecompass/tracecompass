@@ -29,13 +29,10 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.ui.editors.EventsViewEditor;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
+import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorInput;
@@ -131,8 +128,8 @@ public class OpenTraceHandler extends AbstractHandler {
         }
 
         // Get the editor_id from the extension point
-        final String editorId = fTrace.getEditorId();
-        final boolean usesEditor = (editorId != null) && (editorId.length() > 0);
+        String traceEditorId = fTrace.getEditorId();
+        final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
 
         try {
             trace.initTrace(fTrace.getResource(), fTrace.getLocation().getPath(), traceEvent.getClass());
@@ -160,44 +157,30 @@ public class OpenTraceHandler extends AbstractHandler {
                     file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
                 }
                 file.setHidden(true);
-                if (usesEditor) {
-                    file.setPersistentProperty(TmfCommonConstants.TRACETYPE, fTrace.getTraceType());
-                } else {
-                    file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfTrace.class.getCanonicalName());
-                }
+                file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfTrace.class.getCanonicalName());
+                IDE.setDefaultEditor(file, editorId);
             } catch (final CoreException e) {
                 Activator.getDefault().logError("Error opening trace " + fTrace.getName(), e); //$NON-NLS-1$
             }
         }
 
-        if (usesEditor) {
-            try {
-                final IEditorInput editorInput = new TmfEditorInput(file, trace);
-                final IWorkbench wb = PlatformUI.getWorkbench();
-                final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        try {
+            final IEditorInput editorInput = new TmfEditorInput(file, trace);
+            final IWorkbench wb = PlatformUI.getWorkbench();
+            final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
 
-                final IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
-                if ((editor != null) && (editor instanceof IReusableEditor)) {
-                    activePage.reuseEditor((IReusableEditor) editor, editorInput);
-                    activePage.activate(editor);
-                } else {
-                    activePage.openEditor(editorInput, editorId);
-                    if (resource instanceof IFile) {
-                        IDE.setDefaultEditor((IFile) resource, editorId);
-                    }
+            final IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
+            if ((editor != null) && (editor instanceof IReusableEditor)) {
+                activePage.reuseEditor((IReusableEditor) editor, editorInput);
+                activePage.activate(editor);
+            } else {
+                activePage.openEditor(editorInput, editorId);
+                if (resource instanceof IFile) {
+                    IDE.setDefaultEditor((IFile) resource, editorId);
                 }
-            } catch (final PartInitException e) {
-                Activator.getDefault().logError("Error opening trace " + fTrace.getName(), e); //$NON-NLS-1$
             }
-        } else {
-            // Create the experiment
-            final ITmfTrace[] traces = new ITmfTrace[] { trace };
-            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
-            experiment.setBookmarksFile(file);
-
-            TmfExperiment.setCurrentExperiment(experiment);
-            TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
-            IDE.setDefaultEditor(file, EventsViewEditor.ID);
+        } catch (final PartInitException e) {
+            Activator.getDefault().logError("Error opening trace " + fTrace.getName(), e); //$NON-NLS-1$
         }
         return null;
     }

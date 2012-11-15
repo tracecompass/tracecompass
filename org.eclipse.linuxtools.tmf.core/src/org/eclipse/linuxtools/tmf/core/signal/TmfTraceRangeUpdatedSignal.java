@@ -12,20 +12,23 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * Signal indicating a trace has been selected.
+ * Signal indicating a trace range has been updated.
  *
- * The specified trace is the active trace and has been brought to top
- * or the signal is used as a trigger to bring it to top.
+ * Receivers can safely perform event requests for the specified time range.
+ * The signal acts as a trigger for coalescing such requests.
  *
  * @version 1.0
  * @author Patrick Tasse
+ * @since 2.0
  */
-public class TmfTraceSelectedSignal extends TmfSignal {
+public class TmfTraceRangeUpdatedSignal extends TmfSignal {
 
     private final ITmfTrace fTrace;
+    private final TmfTimeRange fTimeRange;
 
     /**
      * Constructor
@@ -33,22 +36,37 @@ public class TmfTraceSelectedSignal extends TmfSignal {
      * @param source
      *            Object sending this signal
      * @param trace
-     *            The trace that was selected
+     *            Trace whose range was updated
+     * @param range
+     *            The new time range of the trace
      */
-    public TmfTraceSelectedSignal(Object source, ITmfTrace trace) {
+    public TmfTraceRangeUpdatedSignal(Object source, ITmfTrace trace, TmfTimeRange range) {
         super(source);
         fTrace = trace;
+        fTimeRange = range;
     }
 
     /**
-     * @return The trace referred to by this signal
+     * @return The trace
      */
     public ITmfTrace getTrace() {
         return fTrace;
     }
 
-    @Override
-    public String toString() {
-        return "[TmfTraceSelectedSignal (" + fTrace.getName() + ")]"; //$NON-NLS-1$ //$NON-NLS-2$
+    /**
+     * @return The time range
+     */
+    public TmfTimeRange getRange() {
+        return fTimeRange;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    @SuppressWarnings("nls")
+    public String toString() {
+        return "[TmfTraceRangeUpdatedSignal (" + fTrace.getName() + ", " + fTimeRange.toString() + ")]";
+    }
+
 }

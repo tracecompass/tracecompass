@@ -27,13 +27,9 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfClearExperimentSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 
 /**
  * TmfExperiment presents a time-ordered, unified view of a set of ITmfTrace:s
@@ -56,11 +52,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
-    /**
-     * The currently selected experiment (null if none)
-     */
-    protected static TmfExperiment fCurrentExperiment = null;
 
     /**
      * The set of traces that constitute the experiment
@@ -116,13 +107,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
     @Override
     public synchronized void dispose() {
 
-        final TmfExperimentDisposedSignal signal = new TmfExperimentDisposedSignal(this, this);
-        broadcast(signal);
-
-        if (fCurrentExperiment == this) {
-            fCurrentExperiment = null;
-        }
-
         // Clean up the index if applicable
         if (getIndexer() != null) {
             getIndexer().dispose();
@@ -168,25 +152,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-
-    /**
-     * Selects the current, framework-wide, experiment
-     *
-     * @param experiment das experiment
-     */
-    public static void setCurrentExperiment(final TmfExperiment experiment) {
-        if (fCurrentExperiment != null && fCurrentExperiment != experiment) {
-            fCurrentExperiment.dispose();
-        }
-        fCurrentExperiment = experiment;
-    }
-
-    /**
-     * @return das experiment
-     */
-    public static TmfExperiment getCurrentExperiment() {
-        return fCurrentExperiment;
-    }
 
     /**
      * Get the list of traces. Handle with care...
@@ -447,7 +412,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
                 return;
             }
             final TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp(), TmfTimestamp.BIG_CRUNCH);
-            final TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(this, this, timeRange);
+            final TmfTraceRangeUpdatedSignal signal = new TmfTraceRangeUpdatedSignal(this, this, timeRange);
 
             // Broadcast in separate thread to prevent deadlock
             new Thread() {
@@ -486,8 +451,8 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
                         }
                         safeTimestamp = endTimestamp;
                         if (timeRange != null) {
-                            final TmfExperimentRangeUpdatedSignal signal =
-                                    new TmfExperimentRangeUpdatedSignal(TmfExperiment.this, TmfExperiment.this, timeRange);
+                            final TmfTraceRangeUpdatedSignal signal =
+                                    new TmfTraceRangeUpdatedSignal(TmfExperiment.this, TmfExperiment.this, timeRange);
                             broadcast(signal);
                         }
                     }
@@ -518,56 +483,14 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
     // Signal handlers
     // ------------------------------------------------------------------------
 
-    private Integer fEndSynchReference;
-
-    /**
-     * Signal handler for the TmfExperimentSelectedSignal signal
-     *
-     * @param signal The incoming signal
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#traceOpened(org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal)
      */
+    @Override
     @TmfSignalHandler
-    public void experimentSelected(final TmfExperimentSelectedSignal signal) {
-        final TmfExperiment experiment = signal.getExperiment();
-        if (experiment == this) {
-            setCurrentExperiment(experiment);
-            fEndSynchReference = Integer.valueOf(signal.getReference());
-        }
-    }
-
-    /**
-     * Signal handler for the TmfEndSynchSignal signal
-     *
-     * @param signal The incoming signal
-     */
-    @TmfSignalHandler
-    public void endSync(final TmfEndSynchSignal signal) {
-        if (fEndSynchReference != null && fEndSynchReference.intValue() == signal.getReference()) {
-            fEndSynchReference = null;
-            initializeStreamingMonitor();
-        }
-    }
-
-    /**
-     * Signal handler for the TmfTraceUpdatedSignal signal
-     *
-     * @param signal The incoming signal
-     */
-    @TmfSignalHandler
-    public void traceUpdated(final TmfTraceUpdatedSignal signal) {
+    public void traceOpened(TmfTraceOpenedSignal signal) {
         if (signal.getTrace() == this) {
-            broadcast(new TmfExperimentUpdatedSignal(this, this));
-        }
-    }
-
-    /**
-     * Signal handler for the TmfExperimentRangeUpdatedSignal signal
-     *
-     * @param signal The incoming signal
-     */
-    @TmfSignalHandler
-    public void experimentRangeUpdated(final TmfExperimentRangeUpdatedSignal signal) {
-        if (signal.getExperiment() == this) {
-            getIndexer().buildIndex(getNbEvents(), signal.getRange(), false);
+            initializeStreamingMonitor();
         }
     }
 

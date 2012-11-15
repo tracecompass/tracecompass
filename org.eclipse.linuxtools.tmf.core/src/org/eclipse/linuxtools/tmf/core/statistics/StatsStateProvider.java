@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.statistics;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
@@ -70,7 +71,7 @@ class StatsStateProvider extends AbstractStateChangeInput {
 
         /* Since this can be used for any trace types, normalize all the
          * timestamp values to nanoseconds. */
-        final long ts = event.getTimestamp().normalize(0, -9).getValue();
+        final long ts = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
 
         final String eventName = event.getType().getName();
 

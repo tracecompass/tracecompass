@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Ericsson
+ * Copyright (c) 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,24 +10,25 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.signal;
+package org.eclipse.linuxtools.tmf.core.signal;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.viewers.events.ITmfEventsFilterProvider;
 
 /**
  * Signal indicating a trace has been opened.
  *
+ * Receivers can get ready to receive TmfTraceRangeUpdatedSignal for coalescing
+ * and can expect TmfTraceSelectedSignal to follow.
+ *
  * @version 1.0
  * @author Patrick Tasse
+ * @since 2.0
  */
 public class TmfTraceOpenedSignal extends TmfSignal {
 
     private final ITmfTrace fTrace;
     private final IFile fBookmarksFile;
-    private final ITmfEventsFilterProvider fEventsFilterProvider;
 
     /**
      * Constructor for a new signal.
@@ -38,15 +39,11 @@ public class TmfTraceOpenedSignal extends TmfSignal {
      *            The trace that has been opened
      * @param bookmarksFile
      *            Pointer to the bookmark file
-     * @param eventsFilterProvider
-     *            Provider for the event filter in use
      */
-    public TmfTraceOpenedSignal(Object source, ITmfTrace trace,
-            IFile bookmarksFile, ITmfEventsFilterProvider eventsFilterProvider) {
+    public TmfTraceOpenedSignal(Object source, ITmfTrace trace, IFile bookmarksFile) {
         super(source);
         fTrace = trace;
         fBookmarksFile = bookmarksFile;
-        fEventsFilterProvider = eventsFilterProvider;
     }
 
     /**
@@ -65,15 +62,6 @@ public class TmfTraceOpenedSignal extends TmfSignal {
      */
     public IFile getBookmarksFile() {
         return fBookmarksFile;
-    }
-
-    /**
-     * Get the events filter provider of this trace
-     *
-     * @return The EventsFilterProvider
-     */
-    public ITmfEventsFilterProvider getEventsFilterProvider() {
-        return fEventsFilterProvider;
     }
 
     @Override

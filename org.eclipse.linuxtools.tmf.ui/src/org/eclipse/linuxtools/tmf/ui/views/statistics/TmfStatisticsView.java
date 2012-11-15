@@ -17,15 +17,17 @@
 package org.eclipse.linuxtools.tmf.ui.views.statistics;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.viewers.ITmfViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer;
@@ -34,6 +36,8 @@ import org.eclipse.linuxtools.tmf.ui.widgets.tabsview.TmfViewerFolder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * The generic Statistics View displays statistics for any kind of traces.
@@ -66,14 +70,9 @@ public class TmfStatisticsView extends TmfView {
     protected final TmfViewerFolder fStatsViewers;
 
     /**
-     * Flag to force request the data from trace.
+     * Stores a reference to the selected trace.
      */
-    protected boolean fRequestData = false;
-
-    /**
-     * Stores a reference to the selected experiment.
-     */
-    private TmfExperiment fExperiment;
+    private ITmfTrace fTrace;
 
     /**
      * Constructor of a statistics view.
@@ -106,80 +105,13 @@ public class TmfStatisticsView extends TmfView {
     @Override
     public void createPartControl(Composite parent) {
         fStatsViewers.setParent(parent);
-        TmfExperiment currentExperiment = TmfExperiment.getCurrentExperiment();
-        // Read current data if any available
-        if (currentExperiment != null) {
-            fRequestData = true;
-            // Insert the statistics data into the tree
-            TmfExperimentSelectedSignal signal = new TmfExperimentSelectedSignal(this, currentExperiment);
-            experimentSelected(signal);
-            return;
-        }
         createStatisticsViewers();
-        /*
-         * Updates the experiment field only at the end because
-         * experimentSelected signal verifies the old selected experiment to
-         * avoid reloading the same trace.
-         */
-        fExperiment = currentExperiment;
-    }
 
-    /**
-     * Handler called when an experiment is selected. Checks if the experiment
-     * has changed and requests the selected experiment if it has not yet been
-     * cached.
-     *
-     * @param signal
-     *            Contains the information about the selection.
-     */
-    @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal signal) {
-        if (signal != null) {
-            // Does not reload the same trace if already opened
-            if (fExperiment == null
-                    || signal.getExperiment().toString().compareTo(fExperiment.toString()) != 0) {
-                /*
-                 * Dispose the current viewer and adapt the new one to the trace
-                 * type of the experiment selected
-                 */
-                fStatsViewers.clear();
-                // Update the current experiment
-                fExperiment = signal.getExperiment();
-                createStatisticsViewers();
-                fStatsViewers.layout();
-
-                if (fRequestData) {
-                    TmfExperimentRangeUpdatedSignal updateSignal = new TmfExperimentRangeUpdatedSignal(this, fExperiment, fExperiment.getTimeRange());
-                    TmfStatisticsViewer statsViewer;
-                    // Synchronizes the request to make them coalesced
-                    fExperiment.startSynch(new TmfStartSynchSignal(0));
-                    for (ITmfViewer viewer : fStatsViewers.getViewers()) {
-                        if (!(viewer instanceof TmfStatisticsViewer)) {
-                            Activator.getDefault().logError("Error - cannot cast viewer to a statistics viewer"); //$NON-NLS-1$
-                            continue;
-                        }
-                        statsViewer = (TmfStatisticsViewer) viewer;
-                        statsViewer.experimentRangeUpdated(updateSignal);
-                    }
-                    fExperiment.endSynch(new TmfEndSynchSignal(0));
-                    fRequestData = false;
-                }
-            } else {
-                /*
-                 * If the same experiment is reselected, sends a notification to
-                 * the viewers to make sure they reload correctly their partial
-                 * event count.
-                 */
-                TmfStatisticsViewer statsViewer;
-                for (ITmfViewer viewer : fStatsViewers.getViewers()) {
-                    if (!(viewer instanceof TmfStatisticsViewer)) {
-                        Activator.getDefault().logError("Error - cannot cast viewer to a statistics viewer"); //$NON-NLS-1$
-                        continue;
-                    }
-                    statsViewer = (TmfStatisticsViewer) viewer;
-                    // Will update the partial event count if needed.
-                    statsViewer.sendPartialRequestOnNextUpdate();
-                }
+        IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        if (editor instanceof ITmfTraceEditor) {
+            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
+            if (trace != null) {
+                traceSelected(new TmfTraceSelectedSignal(this, trace));
             }
         }
     }
@@ -196,15 +128,88 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
+     * Handler called when an trace is opened.
+     *
+     * @param signal
+     *            Contains the information about the selection.
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        /*
+         * Dispose the current viewer and adapt the new one to the trace
+         * type of the trace opened
+         */
+        fStatsViewers.clear();
+        // Update the current trace
+        fTrace = signal.getTrace();
+        createStatisticsViewers();
+        fStatsViewers.layout();
+    }
+
+    /**
+     * Handler called when an trace is selected. Checks if the trace
+     * has changed and requests the selected trace if it has not yet been
+     * cached.
+     *
+     * @param signal
+     *            Contains the information about the selection.
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        // Does not reload the same trace if already opened
+        if (signal.getTrace() != fTrace) {
+            /*
+             * Dispose the current viewer and adapt the new one to the trace
+             * type of the trace selected
+             */
+            fStatsViewers.clear();
+            // Update the current trace
+            fTrace = signal.getTrace();
+            createStatisticsViewers();
+            fStatsViewers.layout();
+
+            TmfTraceRangeUpdatedSignal updateSignal = new TmfTraceRangeUpdatedSignal(this, fTrace, fTrace.getTimeRange());
+
+            // Synchronizes the requests to make them coalesced
+            if (fTrace instanceof TmfDataProvider) {
+                ((TmfDataProvider) fTrace).startSynch(new TmfStartSynchSignal(0));
+            }
+            for (ITmfViewer viewer : fStatsViewers.getViewers()) {
+                TmfStatisticsViewer statsViewer = (TmfStatisticsViewer) viewer;
+                statsViewer.sendPartialRequestOnNextUpdate();
+                statsViewer.traceRangeUpdated(updateSignal);
+            }
+            if (fTrace instanceof TmfDataProvider) {
+                ((TmfDataProvider) fTrace).endSynch(new TmfEndSynchSignal(0));
+            }
+        } else {
+            /*
+             * If the same trace is reselected, sends a notification to
+             * the viewers to make sure they reload correctly their partial
+             * event count.
+             */
+            for (ITmfViewer viewer : fStatsViewers.getViewers()) {
+                TmfStatisticsViewer statsViewer = (TmfStatisticsViewer) viewer;
+                // Will update the partial event count if needed.
+                statsViewer.sendPartialRequestOnNextUpdate();
+            }
+        }
+    }
+
+    /**
      * @param signal the incoming signal
      * @since 2.0
      */
     @TmfSignalHandler
-    public void experimentDisposed(TmfExperimentDisposedSignal signal) {
+    public void traceClosed(TmfTraceClosedSignal signal) {
+        if (signal.getTrace() != fTrace) {
+            return;
+        }
 
         // Clear the internal data
-        fExperiment = null;
-        fRequestData = false;
+        fTrace = null;
 
         // Clear the UI widgets
         fStatsViewers.clear();  // Also cancels ongoing requests
@@ -223,14 +228,14 @@ public class TmfStatisticsView extends TmfView {
     }
 
     /**
-     * Creates the statistics viewers for all traces in the experiment and
+     * Creates the statistics viewers for all traces in an experiment and
      * populates a viewer folder. Each viewer is placed in a different tab and
      * the first one is selected automatically.
      *
      * It uses the extension point that defines the statistics viewer to build
      * from the trace type. If no viewer is defined, another tab won't be
      * created, since the global viewer already contains all the basic
-     * statistics. If the experiment is empty, a global statistics viewer will
+     * statistics. If there is no trace selected, a global statistics viewer will
      * still be created.
      *
      * @since 2.0
@@ -244,17 +249,24 @@ public class TmfStatisticsView extends TmfView {
 
         // Instantiation of the global viewer
         TmfStatisticsViewer globalViewer = getGlobalViewer();
-        if (fExperiment != null) {
+        if (fTrace != null) {
             if (globalViewer != null) {
-                // Shows the name of the experiment in the global tab
-                globalViewer.init(folder, Messages.TmfStatisticsView_GlobalTabName + " - " + fExperiment.getName(), fExperiment); //$NON-NLS-1$
+                // Shows the name of the trace in the global tab
+                globalViewer.init(folder, Messages.TmfStatisticsView_GlobalTabName + " - " + fTrace.getName(), fTrace); //$NON-NLS-1$
             }
             fStatsViewers.addTab(globalViewer, Messages.TmfStatisticsView_GlobalTabName, defaultStyle);
 
             String traceName;
             IResource traceResource;
-            // Creates a statistics viewer for each traces.
-            for (ITmfTrace trace : fExperiment.getTraces()) {
+            ITmfTrace[] traces;
+            if (fTrace instanceof TmfExperiment) {
+                TmfExperiment experiment = (TmfExperiment) fTrace;
+                traces = experiment.getTraces();
+            } else {
+                traces = new ITmfTrace[] { fTrace };
+            }
+            // Creates a statistics viewer for each trace.
+            for (ITmfTrace trace : traces) {
                 traceName = trace.getName();
                 traceResource = trace.getResource();
                 TmfStatisticsViewer viewer = getStatisticsViewer(traceResource);
@@ -270,8 +282,8 @@ public class TmfStatisticsView extends TmfView {
             }
         } else {
             if (globalViewer != null) {
-                // There is no experiment selected. Shows an empty global tab
-                globalViewer.init(folder, Messages.TmfStatisticsView_GlobalTabName, fExperiment);
+                // There is no trace selected. Shows an empty global tab
+                globalViewer.init(folder, Messages.TmfStatisticsView_GlobalTabName, fTrace);
             }
             fStatsViewers.addTab(globalViewer, Messages.TmfStatisticsView_GlobalTabName, defaultStyle);
         }

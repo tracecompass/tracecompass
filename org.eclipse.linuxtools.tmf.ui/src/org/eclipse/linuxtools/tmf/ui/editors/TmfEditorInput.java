@@ -44,34 +44,36 @@ public class TmfEditorInput implements IEditorInput {
     }
 
     @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         return null;
     }
 
     @Override
-	public boolean exists() {
-        return fFile.exists();
+    public boolean exists() {
+        /* prevent this input from appearing in "Files Most Recently Used" list,
+         * as this causes lingering reference to ITmfTrace in the platform */
+        return false;
     }
 
     @Override
-	public ImageDescriptor getImageDescriptor() {
+    public ImageDescriptor getImageDescriptor() {
         IContentType contentType = IDE.getContentType(fFile);
         return PlatformUI.getWorkbench().getEditorRegistry()
                 .getImageDescriptor(fFile.getName(), contentType);
     }
 
     @Override
-	public String getName() {
+    public String getName() {
         return fTrace.getName();
     }
 
     @Override
-	public IPersistableElement getPersistable() {
+    public IPersistableElement getPersistable() {
         return null;
     }
 
     @Override
-	public String getToolTipText() {
+    public String getToolTipText() {
         return fFile.getFullPath().makeRelative().toString();
     }
 

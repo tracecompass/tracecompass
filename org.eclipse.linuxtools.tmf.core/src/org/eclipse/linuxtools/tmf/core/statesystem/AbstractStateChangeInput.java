@@ -16,6 +16,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
@@ -78,7 +79,7 @@ public abstract class AbstractStateChangeInput implements IStateChangeInput {
 
     @Override
     public long getStartTime() {
-        return trace.getStartTime().getValue();
+        return trace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
     }
 
     @Override
@@ -164,7 +165,7 @@ public abstract class AbstractStateChangeInput implements IStateChangeInput {
                 return;
             }
             try {
-                ss.closeHistory(currentEvent.getTimestamp().getValue());
+                ss.closeHistory(currentEvent.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
             } catch (TimeRangeException e) {
                 /*
                  * Since we're using currentEvent.getTimestamp, this shouldn't

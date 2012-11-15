@@ -143,21 +143,6 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("getEndTime", NB_EVENTS, timeRange.getEndTime().getValue());
     }
 
-    @SuppressWarnings("static-access")
-    public void testSetCurrentExperiment() {
-
-        TmfExperiment experiment = new TmfExperiment(TmfEvent.class, EXPERIMENT, fTestTraces);
-        experiment.setCurrentExperiment(experiment);
-        assertEquals("getCurrentExperiment", experiment, experiment.getCurrentExperiment());
-
-        TmfExperiment experiment2 = new TmfExperiment(TmfEvent.class, EXPERIMENT, null);
-        experiment.setCurrentExperiment(experiment2);
-        assertEquals("getCurrentExperiment", experiment2, experiment.getCurrentExperiment());
-
-        experiment.dispose();
-        experiment2.dispose();
-    }
-
     // ------------------------------------------------------------------------
     // getTimestamp
     // ------------------------------------------------------------------------

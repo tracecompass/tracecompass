@@ -23,7 +23,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
@@ -150,6 +151,7 @@ public class Uml2SDTestFacility {
      */
     public void dispose() {
         if (fIsInitialized) {
+            fTrace.broadcast(new TmfTraceClosedSignal(this, fExperiment));
             fExperiment.dispose();
 
             // Wait for all Eclipse jobs to finish
@@ -293,7 +295,7 @@ public class Uml2SDTestFacility {
         final ITmfTrace traces[] = new ITmfTrace[1];
         traces[0] = fTrace;
         fExperiment = new TmfExperiment(TmfEvent.class, "TestExperiment", traces); //$NON-NLS-1$
-        fTrace.broadcast(new TmfExperimentSelectedSignal(this, fExperiment));
+        fTrace.broadcast(new TmfTraceSelectedSignal(this, fExperiment));
         if (wait) {
             while (fExperiment.getNbEvents() == 0) {
                 delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
@@ -307,6 +309,7 @@ public class Uml2SDTestFacility {
      * Disposes the experiment.
      */
     public void disposeExperiment() {
+        fTrace.broadcast(new TmfTraceClosedSignal(this, fExperiment));
         fExperiment.dispose();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }

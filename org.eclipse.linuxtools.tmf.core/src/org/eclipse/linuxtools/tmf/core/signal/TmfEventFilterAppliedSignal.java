@@ -12,43 +12,57 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
+import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * Signal indicating a trace has been selected.
- *
- * The specified trace is the active trace and has been brought to top
- * or the signal is used as a trigger to bring it to top.
+ * Signal indicating an event filter has been applied.
  *
  * @version 1.0
  * @author Patrick Tasse
+ * @since 2.0
  */
-public class TmfTraceSelectedSignal extends TmfSignal {
+public class TmfEventFilterAppliedSignal extends TmfSignal {
 
     private final ITmfTrace fTrace;
+    private final ITmfFilter fEventFilter;
 
     /**
-     * Constructor
+     * Constructor for a new signal.
      *
      * @param source
-     *            Object sending this signal
+     *            The object sending this signal
      * @param trace
-     *            The trace that was selected
+     *            The trace to which filter is applied
+     * @param filter
+     *            The applied event filter or null
      */
-    public TmfTraceSelectedSignal(Object source, ITmfTrace trace) {
+    public TmfEventFilterAppliedSignal(Object source, ITmfTrace trace, ITmfFilter filter) {
         super(source);
         fTrace = trace;
+        fEventFilter = filter;
     }
 
     /**
-     * @return The trace referred to by this signal
+     * Get the trace object concerning this signal
+     *
+     * @return The trace
      */
     public ITmfTrace getTrace() {
         return fTrace;
     }
 
+    /**
+     * Get the event filter being applied
+     *
+     * @return The filter
+     */
+    public ITmfFilter getEventFilter() {
+        return fEventFilter;
+    }
+
     @Override
     public String toString() {
-        return "[TmfTraceSelectedSignal (" + fTrace.getName() + ")]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return "[TmfEventFilterAppliedSignal (" + fTrace.getName() + " : " + fEventFilter + ")]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }

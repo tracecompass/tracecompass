@@ -20,15 +20,6 @@
             name="%views.category.name">
       </category>
       <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView"
-            icon="icons/eview16/events_view.gif"
-            id="org.eclipse.linuxtools.tmf.ui.views.events"
-            name="%events.view.name"
-            restorable="true">
-      </view>
-      <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.linuxtools.tmf.ui.views.timechart.TimeChartView"
             icon="icons/eview16/timechart_view.gif"
@@ -98,16 +89,6 @@
             icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.editors.events"
             name="%events.editor.name">
-         <contentTypeBinding
-               contentTypeId="org.eclipse.linuxtools.tmf.ui.content-type.trace">
-         </contentTypeBinding>
-      </editor>
-      <editor
-            class="org.eclipse.linuxtools.tmf.ui.editors.EventsViewEditor"
-            default="false"
-            icon="icons/eview16/events_view.gif"
-            id="org.eclipse.linuxtools.tmf.ui.editors.eventsView"
-            name="%eventsview.editor.name">
          <contentTypeBinding
                contentTypeId="org.eclipse.linuxtools.tmf.ui.content-type.trace">
          </contentTypeBinding>
@@ -325,44 +306,6 @@
                commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers"
                id="org.eclipse.linuxtools.tmf.ui.menu.managecustomparsers"
                style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="toolbar:org.eclipse.ui.navigator.ProjectExplorer">
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.clear_views"
-               icon="icons/etool16/clear.gif"
-               label="%command.clear_views"
-               mnemonic="%command.clear_views.mnemonic"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <or>
-                        <and>
-                           <instanceof
-                                 value="org.eclipse.core.resources.IProject">
-                           </instanceof>
-                           <test
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.eclipse.linuxtools.tmf.project.nature">
-                           </test>
-                        </and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
-                        </instanceof>
-                     </or>
-                  </iterate>
-               </with>
-            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
@@ -693,35 +636,6 @@
                </with>
             </visibleWhen>
          </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.clear_views"
-               icon="icons/etool16/clear.gif"
-               label="%command.clear_views"
-               mnemonic="%command.clear_views.mnemonic"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.core.resources.IProject">
-                        </instanceof>
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.linuxtools.tmf.project.nature">
-                        </test>
-                     </and>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
       </menuContribution>
    </extension>
    <extension
@@ -768,12 +682,6 @@
             description="%command.select_traces.description"
             id="org.eclipse.linuxtools.tmf.ui.command.select_traces"
             name="%command.select_traces">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
-            description="%command.clear_views.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.clear_views"
-            name="%command.clear_views">
       </command>
       <category
             description="%commands.parser.category.description"
@@ -1088,10 +996,6 @@
                </iterate>
             </and>
          </activeWhen>
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.ClearViewsHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.clear_views">
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.commands.ManageCustomParsersCommandHandler"

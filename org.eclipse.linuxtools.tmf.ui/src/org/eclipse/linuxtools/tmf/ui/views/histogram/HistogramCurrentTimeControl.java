@@ -20,11 +20,11 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestampFormat;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
-import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -39,7 +39,7 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private long fExperimentStartTime;
+    private long fTraceStartTime;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -78,15 +78,15 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
         String string = fTextValue.getText();
         long value = 0;
         try {
-            value = TmfTimestampFormat.getDefaulTimeFormat().parseValue(string, fExperimentStartTime);
+            value = TmfTimestampFormat.getDefaulTimeFormat().parseValue(string, fTraceStartTime);
         } catch (ParseException e) {
         }
 
         if (getValue() != value) {
             // Make sure that the new time is within range
-            TmfExperiment exp = TmfExperiment.getCurrentExperiment();
-            if (exp != null) {
-                TmfTimeRange range = exp.getTimeRange();
+            ITmfTrace trace = fParentView.getTrace();
+            if (trace != null) {
+                TmfTimeRange range = trace.getTimeRange();
                 long startTime = range.getStartTime().getValue();
                 long endTime = range.getEndTime().getValue();
                 if (value < startTime) {
@@ -118,8 +118,8 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
      * @since 2.0
      */
     @TmfSignalHandler
-    public void experimentRangeUpdated(final TmfExperimentUpdatedSignal signal) {
-        fExperimentStartTime = signal.getExperiment().getTimeRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+    public void traceUpdated(final TmfTraceUpdatedSignal signal) {
+        fTraceStartTime = signal.getTrace().getTimeRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
     }
 
     // ------------------------------------------------------------------------

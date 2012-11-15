@@ -135,7 +135,7 @@
       <annotation>
          <documentation>
             The default editor to use for this trace type.
-If omitted, the trace will open in the Events view.
+If omitted, the default events editor will be used.
          </documentation>
       </annotation>
       <complexType>

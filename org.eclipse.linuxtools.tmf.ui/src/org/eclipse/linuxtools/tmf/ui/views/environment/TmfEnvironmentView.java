@@ -14,17 +14,20 @@ package org.eclipse.linuxtools.tmf.ui.views.environment;
 import java.util.ArrayList;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Displays the CTF trace properties.
@@ -37,10 +40,8 @@ public class TmfEnvironmentView extends TmfView {
     /** The Environment View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.environment"; //$NON-NLS-1$
 
-    private TmfExperiment fExperiment;
+    private ITmfTrace fTrace;
     private Table fTable;
-//    final private String fTitlePrefix;
-    private Composite fParent;
 
     /**
      * Default constructor
@@ -64,52 +65,60 @@ public class TmfEnvironmentView extends TmfView {
 
     @Override
     public void createPartControl(Composite parent) {
-        fParent = parent;
-        TableItem ti[];
-
-        // Always create the table anyway otherwise we have an NPE when
-        // setFocus() is called by platform. Besides it's nice to have
-        // at least the column headers.
-        fTable = new Table(parent, SWT.BORDER|SWT.FILL);
-        ArrayList<Pair> tableData = new ArrayList<Pair>();
-
-        // If an experiment is already selected, update the table
-        TmfExperiment experiment = TmfExperiment.getCurrentExperiment();
-        if (experiment != null) {
-            for (ITmfTrace trace : experiment.getTraces()) {
-                Pair traceEntry = new Pair(trace.getName());
-                tableData.add(traceEntry);
-                if (trace instanceof CtfTmfTrace) {
-                    CtfTmfTrace ctfTrace = (CtfTmfTrace) trace;
-                    for (String varName : ctfTrace
-                            .getEnvNames()) {
-                        tableData.add(new Pair( varName, ctfTrace.getEnvValue(varName)));
-                    }
-                }
-            }
-        }
-
+        fTable = new Table(parent, SWT.NONE);
         TableColumn nameCol = new TableColumn(fTable, SWT.NONE, 0);
         TableColumn valueCol = new TableColumn(fTable, SWT.NONE, 1);
         nameCol.setText("Environment Variable"); //$NON-NLS-1$
         valueCol.setText("Value"); //$NON-NLS-1$
 
-        final int tableSize = tableData.size();
-
-        fTable.setItemCount(tableSize);
-        ti = fTable.getItems();
-        for(int i = 0; i < tableSize; i++){
-            final Pair currentPair = tableData.get(i);
-            ti[i].setText(0, currentPair.getKey());
-            ti[i].setText(1, currentPair.getValue());
-        }
+        fTable.setItemCount(0);
 
         fTable.setHeaderVisible(true);
         nameCol.pack();
         valueCol.pack();
-        fTable.pack();
 
-        parent.layout();
+        IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        if (editor instanceof ITmfTraceEditor) {
+            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
+            if (trace != null) {
+                traceSelected(new TmfTraceSelectedSignal(this, trace));
+            }
+        }
+    }
+
+    private void updateTable() {
+        fTable.setItemCount(0);
+        if (fTrace == null) {
+            return;
+        }
+        ITmfTrace[] traces;
+        if (fTrace instanceof TmfExperiment) {
+            TmfExperiment experiment = (TmfExperiment) fTrace;
+            traces = experiment.getTraces();
+        } else {
+            traces = new ITmfTrace[] { fTrace };
+        }
+        ArrayList<Pair> tableData = new ArrayList<Pair>();
+        for (ITmfTrace trace : traces) {
+            Pair traceEntry = new Pair(trace.getName());
+            tableData.add(traceEntry);
+            if (trace instanceof CtfTmfTrace) {
+                CtfTmfTrace ctfTrace = (CtfTmfTrace) trace;
+                for (String varName : ctfTrace.getEnvNames()) {
+                    tableData.add(new Pair(varName, ctfTrace.getEnvValue(varName)));
+                }
+            }
+        }
+
+        for (Pair pair : tableData) {
+            TableItem item = new TableItem(fTable, SWT.NONE);
+            item.setText(0, pair.getKey());
+            item.setText(1, pair.getValue());
+        }
+
+        for (TableColumn column : fTable.getColumns()) {
+            column.pack();
+        }
     }
 
     /* (non-Javadoc)
@@ -120,42 +129,35 @@ public class TmfEnvironmentView extends TmfView {
         fTable.setFocus();
     }
 
-    @Override
-    public void dispose() {
-        if (fTable != null) {
-            fTable.dispose();
-        }
-        super.dispose();
-    }
-
     /**
-     * Handler for the experiment updated signal.
+     * Handler for the trace selected signal.
      *
      * @param signal
      *            The incoming signal
+     * @since 2.0
      */
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal signal) {
+    public void traceSelected(TmfTraceSelectedSignal signal) {
         // Update the trace reference
-        TmfExperiment exp = signal.getExperiment();
-        if (!exp.equals(fExperiment)) {
-            fExperiment = exp;
-            if (fTable != null) {
-                fTable.dispose();
-            }
-            createPartControl( fParent );
-            fParent.layout();
+        ITmfTrace trace = signal.getTrace();
+        if (!trace.equals(fTrace)) {
+            fTrace = trace;
+            updateTable();
         }
     }
 
     /**
+     * Handler for the trace closed signal.
+     *
      * @param signal the incoming signal
      * @since 2.0
      */
     @TmfSignalHandler
-    public void experimentDisposed(TmfExperimentDisposedSignal signal) {
-        fExperiment = null;
-        fTable.clearAll();
+    public void traceClosed(TmfTraceClosedSignal signal) {
+        if (signal.getTrace() == fTrace) {
+            fTrace = null;
+            fTable.setItemCount(0);
+        }
     }
 
 }

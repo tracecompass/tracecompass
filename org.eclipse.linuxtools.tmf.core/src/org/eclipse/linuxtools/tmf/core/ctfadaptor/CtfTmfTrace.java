@@ -13,7 +13,6 @@ package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -108,18 +107,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
         }
 
         super.initTrace(resource, path, eventType);
-
-        //FIXME This should be called via the ExperimentUpdated signal
-        buildStateSystem();
-
-        /* Refresh the project, so it can pick up new files that got created. */
-        if ( resource != null) {
-            try {
-                resource.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                throw new TmfTraceException(e.getMessage(), e);
-            }
-        }
     }
 
     /* (non-Javadoc)
@@ -128,6 +115,7 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
     @Override
     public synchronized void dispose() {
         CtfIteratorManager.removeTrace(this);
+        fTrace = null;
         super.dispose();
     }
 
@@ -227,6 +215,9 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
      */
     @Override
     public synchronized CtfTmfEvent getNext(final ITmfContext context) {
+        if (fTrace == null) {
+            return null;
+        }
         CtfTmfEvent event = null;
         if (context instanceof CtfTmfLightweightContext) {
             if (CtfLocation.INVALID_LOCATION.equals(context.getLocation().getLocationInfo())) {
@@ -243,24 +234,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
         }
 
         return event;
-    }
-
-    /**
-     * Build the state system(s) associated with this trace type.
-     *
-     * Suppressing the warning, because the 'throws' will usually happen in
-     * sub-classes.
-     *
-     * @throws TmfTraceException
-     *             If there is a problem during the build
-     */
-    @SuppressWarnings("unused")
-    protected void buildStateSystem() throws TmfTraceException {
-        /*
-         * Nothing is done in the basic implementation, please specify
-         * how/if to build a state system in derived classes.
-         */
-        return;
     }
 
     /**

@@ -118,7 +118,7 @@ public class TmfUml2SDSyncLoaderExpTest extends TestCase {
             fFacility.delay(IUml2SDTestConstants.INITIAL_INDEX_DELAY);
 
             try {
-                fFacility.getExperiment().dispose();
+                fFacility.disposeExperiment();
                 fFacility.getLoader().nextPage(); // to test out of bounce
                 // Note: To actually create an out of bound exception remove
                 // safety-checks in nextPage/moveToPage of loader class
