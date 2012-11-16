@@ -152,7 +152,7 @@ public final class CtfTmfEvent implements ITmfEvent, Cloneable {
         /* Add callsite */
         final String name = eventDef.getDeclaration().getName();
         List<CTFCallsite> eventList = fTrace.getCTFTrace().getCallsiteCandidates(name);
-        if (eventList != null) {
+        if (!eventList.isEmpty()) {
             final String callsite = "callsite"; //$NON-NLS-1$
             if (eventList.size() == 1 || ip == -1) {
                 CTFCallsite cs = eventList.get(0);
