@@ -363,7 +363,6 @@ public class ResourcesView extends TmfView {
      */
     @Override
     public void setFocus() {
-        refresh(INITIAL_WINDOW_OFFSET);
         fTimeGraphViewer.setFocus();
     }
 

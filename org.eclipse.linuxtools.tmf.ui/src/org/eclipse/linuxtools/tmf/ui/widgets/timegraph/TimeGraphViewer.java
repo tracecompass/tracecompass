@@ -586,7 +586,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     @Override
     public void resetStartFinishTime() {
-        setStartFinishTimeNotify(_time0_, _time1_);
+        setStartFinishTime(_time0_, _time1_);
         _timeRangeFixed = false;
     }
 

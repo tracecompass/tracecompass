@@ -489,6 +489,8 @@ public class HistogramView extends TmfView {
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
 
+        fFullTraceHistogram.setTimeRange(fTimeRangeHistogram.getStartTime(), fWindowSpan);
+
         if ((fFullTraceRequest != null) && fFullTraceRequest.getRange().getEndTime().compareTo(signal.getRange().getEndTime()) < 0) {
             sendFullRangeRequest(fullRange);
         }

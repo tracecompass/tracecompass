@@ -129,7 +129,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
                 return;
             }
 
-            ((HistogramView) fParentView).updateTimeRange(fRangeStartTime, fRangeStartTime + fZoom.getDuration());
+            ((HistogramView) fParentView).updateTimeRange(fRangeStartTime, fRangeStartTime + fRangeDuration);
 
         }
     }
