@@ -677,6 +677,15 @@ public class TmfVirtualTable extends Composite {
     }
 
     /**
+     * Gets the menu of this table
+     * @return a Menu
+     */
+    @Override
+    public Menu getMenu() {
+        return fTable.getMenu();
+    }
+
+    /**
      * Method clearAll empties a table.
      */
     public void clearAll() {
