@@ -508,7 +508,7 @@ public class ControlFlowView extends TmfView {
             }
             if (trace instanceof CtfKernelTrace) {
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) trace;
-                ITmfStateSystem ssq = ctfKernelTrace.getStateSystem();
+                ITmfStateSystem ssq = ctfKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID);
                 if (time >= ssq.getStartTime() && time <= ssq.getCurrentEndTime()) {
                     List<Integer> currentThreadQuarks = ssq.getQuarks(Attributes.CPUS, "*", Attributes.CURRENT_THREAD);  //$NON-NLS-1$
                     for (int currentThreadQuark : currentThreadQuarks) {
@@ -614,7 +614,7 @@ public class ControlFlowView extends TmfView {
             if (aTrace instanceof CtfKernelTrace) {
                 ArrayList<ControlFlowEntry> entryList = new ArrayList<ControlFlowEntry>();
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) aTrace;
-                ITmfStateSystem ssq = ctfKernelTrace.getStateSystem();
+                ITmfStateSystem ssq = ctfKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID);
                 if (!ssq.waitUntilBuilt()) {
                     return;
                 }
@@ -723,7 +723,7 @@ public class ControlFlowView extends TmfView {
     }
 
     private void buildStatusEvents(ITmfTrace trace, ControlFlowEntry entry, IProgressMonitor monitor) {
-        ITmfStateSystem ssq = entry.getTrace().getStateSystem();
+        ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
         long start = ssq.getStartTime();
         long end = ssq.getCurrentEndTime() + 1;
         long resolution = Math.max(1, (end - start) / fDisplayWidth);
@@ -751,7 +751,7 @@ public class ControlFlowView extends TmfView {
         if (endTime <= startTime) {
             return null;
         }
-        ITmfStateSystem ssq = entry.getTrace().getStateSystem();
+        ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
         List<ITimeEvent> eventList = null;
         try {
             int statusQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.STATUS);

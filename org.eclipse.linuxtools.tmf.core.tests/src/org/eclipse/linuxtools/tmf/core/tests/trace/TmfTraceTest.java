@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Vector;
 
 import junit.framework.TestCase;
@@ -33,6 +34,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
+import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -519,6 +522,28 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
 
         trace.dispose();
+    }
+
+    // ------------------------------------------------------------------------
+    // State system and statistics methods
+    // ------------------------------------------------------------------------
+
+    public void testGetStatistics() {
+        /* Should be null in unit tests */
+        ITmfStatistics stats = fTrace.getStatistics();
+        assertNull(stats);
+    }
+
+    public void testGetStateSystem() {
+        /* There should be no state system registered so far */
+        ITmfStateSystem ss = fTrace.getStateSystem("something");
+        assertNull(ss);
+    }
+
+    public void testListStateSystem() {
+        Collection<String> sss = fTrace.listStateSystems();
+        assertNotNull(sss);
+        assertEquals(0, sss.size());
     }
 
     // ------------------------------------------------------------------------

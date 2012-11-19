@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Vector;
 
 import junit.framework.TestCase;
@@ -33,6 +34,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
+import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -168,6 +171,28 @@ public class TmfExperimentTest extends TestCase {
         IFile bookmarks = (IFile) fTestTraces[0].getResource();
         fExperiment.setBookmarksFile(bookmarks);
         assertEquals("GetBookmarksFile", bookmarks, fExperiment.getBookmarksFile());
+    }
+
+    // ------------------------------------------------------------------------
+    // State system and statistics methods
+    // ------------------------------------------------------------------------
+
+    public void testGetStatistics() {
+        /* There should not be any experiment-specific statistics */
+        ITmfStatistics stats = fExperiment.getStatistics();
+        assertNull(stats);
+    }
+
+    public void testGetStateSystem() {
+        /* There should not be any experiment-specific state system */
+        ITmfStateSystem ss = fExperiment.getStateSystem("something");
+        assertNull(ss);
+    }
+
+    public void testListStateSystem() {
+        Collection<String> sss = fExperiment.listStateSystems();
+        assertNotNull(sss);
+        assertEquals(0, sss.size());
     }
 
     // ------------------------------------------------------------------------

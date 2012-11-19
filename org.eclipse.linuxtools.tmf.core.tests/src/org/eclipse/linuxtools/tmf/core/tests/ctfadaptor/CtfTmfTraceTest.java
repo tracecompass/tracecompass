@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.junit.After;
 import org.junit.Before;
@@ -93,7 +92,6 @@ public class CtfTmfTraceTest {
         assertEquals(1000, result.getCacheSize());
         assertEquals(0L, result.getNbEvents());
         assertEquals(0L, result.getStreamingInterval());
-        assertNull(result.getStateSystem());
         assertNull(result.getResource());
         assertEquals(1000, result.getQueueSize());
         assertNull(result.getType());
@@ -281,15 +279,6 @@ public class CtfTmfTraceTest {
     public void testGetStartTime() {
         ITmfTimestamp result = fixture.getStartTime();
         assertNotNull(result);
-    }
-
-    /**
-     * Run the IStateSystemQuerier getStateSystem() method test.
-     */
-    @Test
-    public void testGetStateSystem() {
-        ITmfStateSystem result = fixture.getStateSystem();
-        assertNull(result);
     }
 
     /**

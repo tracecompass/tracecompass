@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
 
 /**
@@ -76,6 +77,8 @@ public class CtfKernelTrace extends CtfTmfTrace {
 
     @Override
     protected void buildStateSystem() throws TmfTraceException {
+        super.buildStateSystem();
+
         /* Set up the path to the history tree file we'll use */
         IResource resource = this.getResource();
         String supplDirectory = null;
@@ -90,17 +93,8 @@ public class CtfKernelTrace extends CtfTmfTrace {
         final File htFile = new File(supplDirectory + File.separator + HISTORY_TREE_FILE_NAME);
         final IStateChangeInput htInput = new CtfKernelStateInput(this);
 
-        this.ss = StateSystemManager.loadStateHistory(htFile, htInput, STATE_ID, false);
+        ITmfStateSystem ss = StateSystemManager.loadStateHistory(htFile, htInput, STATE_ID, false);
+        fStateSystems.put(STATE_ID, ss);
     }
-
-    @Override
-    public synchronized void dispose() {
-        /* Clean up the state system */
-        if (ss != null) {
-            ss.dispose();
-        }
-        super.dispose();
-    }
-
 
 }

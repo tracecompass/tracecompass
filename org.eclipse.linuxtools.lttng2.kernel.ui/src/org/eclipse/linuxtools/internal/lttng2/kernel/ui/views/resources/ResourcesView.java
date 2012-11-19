@@ -268,7 +268,7 @@ public class ResourcesView extends TmfView {
             }
             long resolution = Math.max(1, (fZoomEndTime - fZoomStartTime) / fDisplayWidth);
             for (TraceEntry traceEntry : fZoomEntryList) {
-                if (!traceEntry.fKernelTrace.getStateSystem().waitUntilBuilt()) {
+                if (!traceEntry.fKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID).waitUntilBuilt()) {
                     return;
                 }
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
@@ -497,7 +497,7 @@ public class ResourcesView extends TmfView {
             }
             if (aTrace instanceof CtfKernelTrace) {
                 CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) aTrace;
-                ITmfStateSystem ssq = ctfKernelTrace.getStateSystem();
+                ITmfStateSystem ssq = ctfKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID);
                 if (!ssq.waitUntilBuilt()) {
                     return;
                 }
@@ -547,7 +547,7 @@ public class ResourcesView extends TmfView {
                 return;
             }
             CtfKernelTrace ctfKernelTrace = traceEntry.getTrace();
-            ITmfStateSystem ssq = ctfKernelTrace.getStateSystem();
+            ITmfStateSystem ssq = ctfKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID);
             long startTime = ssq.getStartTime();
             long endTime = ssq.getCurrentEndTime() + 1;
             long resolution = (endTime - startTime) / fDisplayWidth;
@@ -562,7 +562,7 @@ public class ResourcesView extends TmfView {
     private static List<ITimeEvent> getEventList(ResourcesEntry entry,
             long startTime, long endTime, long resolution, boolean includeNull,
             IProgressMonitor monitor) {
-        ITmfStateSystem ssq = entry.getTrace().getStateSystem();
+        ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
         startTime = Math.max(startTime, ssq.getStartTime());
         endTime = Math.min(endTime, ssq.getCurrentEndTime() + 1);
         if (endTime <= startTime) {

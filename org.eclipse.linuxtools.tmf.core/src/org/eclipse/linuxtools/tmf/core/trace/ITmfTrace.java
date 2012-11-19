@@ -13,6 +13,8 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
+import java.util.Collection;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
@@ -180,10 +182,24 @@ public interface ITmfTrace extends ITmfDataProvider {
     public ITmfStatistics getStatistics();
 
     /**
-     * @return The state system that is associated with this trace
+     * Retrieve a state system that belongs to this trace
+     *
+     * @param id
+     *            The ID of the state system to retrieve.
+     * @return The state system that is associated with this trace and ID, or
+     *         'null' if such a match doesn't exist.
      * @since 2.0
      */
-    public ITmfStateSystem getStateSystem();
+    public ITmfStateSystem getStateSystem(String id);
+
+    /**
+     * Return the list of existing state systems registered with this trace.
+     *
+     * @return A Collection view of the available state systems. The collection
+     *         could be empty, but should not be null.
+     * @since 2.0
+     */
+    public Collection<String> listStateSystems();
 
     // ------------------------------------------------------------------------
     // Trace characteristics getters
