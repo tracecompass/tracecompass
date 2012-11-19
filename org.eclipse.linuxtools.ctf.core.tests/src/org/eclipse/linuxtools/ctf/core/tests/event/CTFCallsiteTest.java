@@ -1,0 +1,96 @@
+package org.eclipse.linuxtools.ctf.core.tests.event;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Arrays;
+
+import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * The class <code>CTFCallsiteTest</code> contains tests for the class
+ * <code>{@link CTFCallsite}</code>.
+ *
+ * @author Matthew Khouzam
+ * @version $Revision: 1.0 $
+ */
+
+public class CTFCallsiteTest {
+    /**
+     * Perform pre-test initialization.
+     */
+    @Before
+    public void setUp() {
+        // add additional set up code here
+    }
+
+    /**
+     * Perform post-test clean-up.
+     */
+    @After
+    public void tearDown() {
+        // Add additional tear down code here
+    }
+
+    @SuppressWarnings("nls")
+    private static CTFCallsite GenerateCS(long ip){
+        return new CTFCallsite("event name", "func name", ip, "file.java", 1);
+    }
+
+    /**
+     * Test the constructor
+     */
+    @Test
+    public void constructorTest(){
+        CTFCallsite cs = GenerateCS(0x01);
+        assertNotNull(cs);
+    }
+
+    /**
+     * Test the comparator (it should sort using the IP)
+     */
+    @Test
+    public void comparatorTest(){
+        CTFCallsite cs[] = new CTFCallsite[5];
+        long vals[] = {1L, 0L, -2L, 2L, -1L};
+        for(int i = 0 ; i < 5 ; i++ ){
+            cs[i] = GenerateCS(vals[i]);
+        }
+
+        assertEquals(1, cs[0].compareTo(cs[1]));
+        assertEquals(-1, cs[1].compareTo(cs[0]));
+        assertEquals(0, cs[0].compareTo(cs[0]));
+        assertEquals(-1, cs[0].compareTo(cs[2]));
+        assertEquals(1, cs[2].compareTo(cs[0]));
+
+        Arrays.sort(cs);
+
+        assertEquals( 0L, cs[0].getIp());
+        assertEquals( 1L, cs[1].getIp());
+        assertEquals( 2L, cs[2].getIp());
+        assertEquals( -2L , cs[3].getIp());
+        assertEquals( -1L, cs[4].getIp());
+    }
+
+    /**
+     * Tests the output of a callsite toString function
+     */
+    @Test
+    public void toStringTest(){
+        CTFCallsite cs = GenerateCS(0x01);
+        assertEquals("file.java/func name:1", cs.toString()); //$NON-NLS-1$
+    }
+
+    /**
+     * Launch the test.
+     *
+     * @param args
+     *            the command line arguments
+     */
+    public static void main(String[] args) {
+        new org.junit.runner.JUnitCore().run(CTFCallsiteTest.class);
+    }
+}

@@ -19,8 +19,10 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
@@ -108,12 +110,12 @@ public final class CtfTmfEvent implements ITmfEvent, IAdaptable, Cloneable {
      * Extract the field information from the structDefinition haze-inducing
      * mess, and put them into something ITmfEventField can cope with.
      */
-    private static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
+    private CtfTmfEventField[] parseFields(EventDefinition eventDef) {
         List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
 
         StructDefinition structFields = eventDef.getFields();
         HashMap<String, Definition> definitions = structFields.getDefinitions();
-        String curFieldName;
+        String curFieldName = null;
         Definition curFieldDef;
         CtfTmfEventField curField;
         Iterator<Entry<String, Definition>> it = definitions.entrySet().iterator();
@@ -126,6 +128,7 @@ public final class CtfTmfEvent implements ITmfEvent, IAdaptable, Cloneable {
         }
 
         /* Add context information as CtfTmfEventField */
+        long ip = -1;
         StructDefinition structContext = eventDef.getContext();
         if (structContext != null) {
             definitions = structContext.getDefinitions();
@@ -135,11 +138,30 @@ public final class CtfTmfEvent implements ITmfEvent, IAdaptable, Cloneable {
             it = definitions.entrySet().iterator();
             while(it.hasNext()) {
                 Entry<String, Definition> entry = it.next();
+                /* This is to get the instruction pointer if available */
+                if (entry.getKey().equals("_ip") && //$NON-NLS-1$
+                        (entry.getValue() instanceof IntegerDefinition)) {
+                    ip = ((IntegerDefinition) entry.getValue()).getValue();
+                }
                 /* Prefix field name to */
                 curContextName = CONTEXT_FIELD_PREFIX + entry.getKey();
                 curContextDef = entry.getValue();
                 curContext = CtfTmfEventField.parseField(curContextDef, curContextName);
                 fields.add(curContext);
+            }
+        }
+        /* Add callsite */
+        final String name = eventDef.getDeclaration().getName();
+        List<CTFCallsite> eventList = fTrace.getCTFTrace().getCallsiteCandidates(name);
+        if (!eventList.isEmpty()) {
+            final String callsite = "callsite"; //$NON-NLS-1$
+            if (eventList.size() == 1 || ip == -1) {
+                CTFCallsite cs = eventList.get(0);
+                fields.add(new CTFStringField(cs.toString(), callsite));
+            } else {
+                fields.add(new CTFStringField(
+                        fTrace.getCTFTrace().getCallsite(name, ip).toString(),
+                        callsite));
             }
         }
 

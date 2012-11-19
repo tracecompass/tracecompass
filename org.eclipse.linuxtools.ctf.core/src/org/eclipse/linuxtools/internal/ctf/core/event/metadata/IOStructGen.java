@@ -40,14 +40,6 @@ import org.eclipse.linuxtools.ctf.parser.CTFParser;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
-/*
- * Asserts throughout this class denote the assumptions we can make because of
- * the way the grammar generates the AST.
- *
- * There is also an assert at the beginning of each function that receives a
- * tree node to make sure that the node is indeed of the type the function is
- * expecting.
- */
 /**
  * IOStructGen
  */
@@ -109,10 +101,8 @@ public class IOStructGen {
      * @throws ParseException
      */
     private void parseRoot(CommonTree root) throws ParseException {
-        assert (root.getType() == CTFParser.ROOT);
 
         List<CommonTree> children = root.getChildren();
-        assert (children != null);
         java.io.FileOutputStream fos = null;
         java.io.OutputStreamWriter out = null;
         if (DEBUG_) {
@@ -134,16 +124,18 @@ public class IOStructGen {
         List<CommonTree> declarations = new ArrayList<CommonTree>();
         List<CommonTree> environments = new ArrayList<CommonTree>();
         List<CommonTree> clocks = new ArrayList<CommonTree>();
+        List<CommonTree> callsites = new ArrayList<CommonTree>();
         /* Create a new declaration scope with no parent. */
         pushScope();
 
         try {
             for (CommonTree child : children) {
+                final int type = child.getType();
                 if (DEBUG_) {
                     out.write(child.toString()
-                            + " -> " + child.getType() + '\n'); //$NON-NLS-1$
+                            + " -> " + type + '\n'); //$NON-NLS-1$
                 }
-                switch (child.getType()) {
+                switch (type) {
                 case CTFParser.DECLARATION:
                     declarations.add(child);
                     break;
@@ -165,6 +157,9 @@ public class IOStructGen {
                     break;
                 case CTFParser.ENV:
                     environments.add(child);
+                    break;
+                case CTFParser.CALLSITE:
+                    callsites.add(child);
                     break;
                 default:
                     childTypeError(child);
@@ -196,6 +191,12 @@ public class IOStructGen {
             }
             for (CommonTree clock : clocks) {
                 parseClock(clock);
+            }
+            if (DEBUG_) {
+                out.write("Callsites\n"); //$NON-NLS-1$
+            }
+            for (CommonTree callsite : callsites) {
+                parseCallsite(callsite);
             }
 
             if (DEBUG_) {
@@ -237,6 +238,37 @@ public class IOStructGen {
             e.printStackTrace();
         }
         popScope();
+    }
+
+    private void parseCallsite(CommonTree callsite) {
+
+        List<CommonTree> children = callsite.getChildren();
+        String name = null;
+        String func_name = null;
+        long line_number = -1;
+        long ip = -1;
+        String file_name = null;
+
+        for (CommonTree child : children) {
+            String left;
+            /* this is a regex to find the leading and trailing quotes*/
+            final String regex = "^\"|\"$"; //$NON-NLS-1$
+            /* this is to replace the previous quotes with nothing... effectively deleting them */
+            final String nullString = ""; //$NON-NLS-1$
+            left = child.getChild(0).getChild(0).getChild(0).getText();
+            if (left.equals("name")) { //$NON-NLS-1$
+                name = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
+            } else if (left.equals("func")) { //$NON-NLS-1$
+                func_name = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
+            } else if (left.equals("ip")) { //$NON-NLS-1$
+                ip = Long.parseLong(child.getChild(1).getChild(0).getChild(0).getText().substring(2),16); // trim the 0x
+            } else if (left.equals("file")) { //$NON-NLS-1$
+                file_name = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
+            } else if (left.equals("line")) { //$NON-NLS-1$
+                line_number = Long.parseLong(child.getChild(1).getChild(0).getChild(0).getText());
+            }
+        }
+        trace.addCallsite(name, func_name, ip,file_name, line_number);
     }
 
     private void parseEnvironment(CommonTree environment) {
@@ -288,7 +320,6 @@ public class IOStructGen {
     }
 
     private void parseTrace(CommonTree traceNode) throws ParseException {
-        assert (traceNode.getType() == CTFParser.TRACE);
 
         List<CommonTree> children = traceNode.getChildren();
         if (children == null) {
@@ -328,19 +359,13 @@ public class IOStructGen {
 
     private void parseTraceDeclaration(CommonTree traceDecl)
             throws ParseException {
-        assert ((traceDecl.getType() == CTFParser.CTF_EXPRESSION_TYPE) ||
-                (traceDecl.getType() == CTFParser.CTF_EXPRESSION_VAL));
 
         /* There should be a left and right */
-        assert (traceDecl.getChildCount() == 2);
 
         CommonTree leftNode = (CommonTree) traceDecl.getChild(0);
-        assert (leftNode.getType() == CTFParser.CTF_LEFT);
         CommonTree rightNode = (CommonTree) traceDecl.getChild(1);
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
 
         List<CommonTree> leftStrings = leftNode.getChildren();
-        assert (leftStrings != null);
 
         if (!isUnaryString(leftStrings.get(0))) {
             throw new ParseException(
@@ -491,7 +516,6 @@ public class IOStructGen {
     }
 
     private void parseStream(CommonTree streamNode) throws ParseException {
-        assert (streamNode.getType() == CTFParser.STREAM);
 
         Stream stream = new Stream(trace);
 
@@ -535,18 +559,13 @@ public class IOStructGen {
 
     private void parseStreamDeclaration(CommonTree streamDecl, Stream stream)
             throws ParseException {
-        assert ((streamDecl.getType() == CTFParser.CTF_EXPRESSION_TYPE) || (streamDecl.getType() == CTFParser.CTF_EXPRESSION_VAL));
 
         /* There should be a left and right */
-        assert (streamDecl.getChildCount() == 2);
 
         CommonTree leftNode = (CommonTree) streamDecl.getChild(0);
-        assert (leftNode.getType() == CTFParser.CTF_LEFT);
         CommonTree rightNode = (CommonTree) streamDecl.getChild(1);
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
 
         List<CommonTree> leftStrings = leftNode.getChildren();
-        assert (leftStrings != null);
 
         if (!isUnaryString(leftStrings.get(0))) {
             throw new ParseException(
@@ -629,7 +648,6 @@ public class IOStructGen {
     }
 
     private void parseEvent(CommonTree eventNode) throws ParseException {
-        assert (eventNode.getType() == CTFParser.EVENT);
 
         List<CommonTree> children = eventNode.getChildren();
         if (children == null) {
@@ -698,18 +716,13 @@ public class IOStructGen {
 
     private void parseEventDeclaration(CommonTree eventDecl,
             EventDeclaration event) throws ParseException {
-        assert ((eventDecl.getType() == CTFParser.CTF_EXPRESSION_TYPE) || (eventDecl.getType() == CTFParser.CTF_EXPRESSION_VAL));
 
         /* There should be a left and right */
-        assert (eventDecl.getChildCount() == 2);
 
         CommonTree leftNode = (CommonTree) eventDecl.getChild(0);
-        assert (leftNode.getType() == CTFParser.CTF_LEFT);
         CommonTree rightNode = (CommonTree) eventDecl.getChild(1);
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
 
         List<CommonTree> leftStrings = leftNode.getChildren();
-        assert (leftStrings != null);
 
         if (!isUnaryString(leftStrings.get(0))) {
             throw new ParseException(
@@ -808,10 +821,8 @@ public class IOStructGen {
      */
     private void parseRootDeclaration(CommonTree declaration)
             throws ParseException {
-        assert (declaration.getType() == CTFParser.DECLARATION);
 
         List<CommonTree> children = declaration.getChildren();
-        assert (children != null);
 
         for (CommonTree child : children) {
             switch (child.getType()) {
@@ -839,10 +850,8 @@ public class IOStructGen {
      * @throws ParseException
      */
     private void parseTypealias(CommonTree typealias) throws ParseException {
-        assert (typealias.getType() == CTFParser.TYPEALIAS);
 
         List<CommonTree> children = typealias.getChildren();
-        assert (children != null);
 
         CommonTree target = null;
         CommonTree alias = null;
@@ -850,11 +859,9 @@ public class IOStructGen {
         for (CommonTree child : children) {
             switch (child.getType()) {
             case CTFParser.TYPEALIAS_TARGET:
-                assert (target == null);
                 target = child;
                 break;
             case CTFParser.TYPEALIAS_ALIAS:
-                assert (alias == null);
                 alias = child;
                 break;
             default:
@@ -863,8 +870,6 @@ public class IOStructGen {
             }
         }
 
-        assert (target != null);
-        assert (alias != null);
 
         IDeclaration targetDeclaration = parseTypealiasTarget(target);
 
@@ -891,10 +896,8 @@ public class IOStructGen {
      */
     private IDeclaration parseTypealiasTarget(CommonTree target)
             throws ParseException {
-        assert (target.getType() == CTFParser.TYPEALIAS_TARGET);
 
         List<CommonTree> children = target.getChildren();
-        assert (children != null);
 
         CommonTree typeSpecifierList = null;
         CommonTree typeDeclaratorList = null;
@@ -904,11 +907,9 @@ public class IOStructGen {
         for (CommonTree child : children) {
             switch (child.getType()) {
             case CTFParser.TYPE_SPECIFIER_LIST:
-                assert (typeSpecifierList == null);
                 typeSpecifierList = child;
                 break;
             case CTFParser.TYPE_DECLARATOR_LIST:
-                assert (typeDeclaratorList == null);
                 typeDeclaratorList = child;
                 break;
             default:
@@ -917,7 +918,6 @@ public class IOStructGen {
             }
         }
 
-        assert (typeSpecifierList != null);
 
         if (typeDeclaratorList != null) {
             /*
@@ -965,10 +965,8 @@ public class IOStructGen {
      */
     private static String parseTypealiasAlias(CommonTree alias)
             throws ParseException {
-        assert (alias.getType() == CTFParser.TYPEALIAS_ALIAS);
 
         List<CommonTree> children = alias.getChildren();
-        assert (children != null);
 
         CommonTree typeSpecifierList = null;
         CommonTree typeDeclaratorList = null;
@@ -978,11 +976,9 @@ public class IOStructGen {
         for (CommonTree child : children) {
             switch (child.getType()) {
             case CTFParser.TYPE_SPECIFIER_LIST:
-                assert (typeSpecifierList == null);
                 typeSpecifierList = child;
                 break;
             case CTFParser.TYPE_DECLARATOR_LIST:
-                assert (typeDeclaratorList == null);
                 typeDeclaratorList = child;
                 break;
             default:
@@ -1006,7 +1002,6 @@ public class IOStructGen {
             typeDeclarator = (CommonTree) typeDeclaratorList.getChild(0);
 
             List<CommonTree> typeDeclaratorChildren = typeDeclarator.getChildren();
-            assert (typeDeclaratorChildren != null);
 
             for (CommonTree child : typeDeclaratorChildren) {
                 switch (child.getType()) {
@@ -1037,16 +1032,12 @@ public class IOStructGen {
      *             If there is an error creating the declaration.
      */
     private void parseTypedef(CommonTree typedef) throws ParseException {
-        assert (typedef.getType() == CTFParser.TYPEDEF);
 
         CommonTree typeDeclaratorListNode = (CommonTree) typedef.getFirstChildWithType(CTFParser.TYPE_DECLARATOR_LIST);
-        assert (typeDeclaratorListNode != null);
 
         CommonTree typeSpecifierListNode = (CommonTree) typedef.getFirstChildWithType(CTFParser.TYPE_SPECIFIER_LIST);
-        assert (typeSpecifierListNode != null);
 
         List<CommonTree> typeDeclaratorList = typeDeclaratorListNode.getChildren();
-        assert (typeDeclaratorList != null);
 
         for (CommonTree typeDeclaratorNode : typeDeclaratorList) {
             StringBuilder identifierSB = new StringBuilder();
@@ -1085,10 +1076,6 @@ public class IOStructGen {
     private IDeclaration parseTypeDeclarator(CommonTree typeDeclarator,
             CommonTree typeSpecifierList, StringBuilder identifierSB)
             throws ParseException {
-        if (typeDeclarator != null) {
-            assert (typeDeclarator.getType() == CTFParser.TYPE_DECLARATOR);
-        }
-        assert (typeSpecifierList.getType() == CTFParser.TYPE_SPECIFIER_LIST);
 
         IDeclaration declaration = null;
         List<CommonTree> children = null;
@@ -1099,7 +1086,6 @@ public class IOStructGen {
         /* Separate the tokens by type */
         if (typeDeclarator != null) {
             children = typeDeclarator.getChildren();
-            assert (children != null);
             for (CommonTree child : children) {
 
                 switch (child.getType()) {
@@ -1107,7 +1093,6 @@ public class IOStructGen {
                     pointers.add(child);
                     break;
                 case CTFParser.IDENTIFIER:
-                    assert (identifier == null);
                     identifier = child;
                     break;
                 case CTFParser.LENGTH:
@@ -1142,7 +1127,6 @@ public class IOStructGen {
                  * it is an array or a sequence.
                  */
                 List<CommonTree> lengthChildren = length.getChildren();
-                assert (lengthChildren != null);
 
                 CommonTree first = lengthChildren.get(0);
                 if (isUnaryInteger(first)) {
@@ -1189,7 +1173,6 @@ public class IOStructGen {
      */
     private IDeclaration parseTypeSpecifierList(CommonTree typeSpecifierList,
             List<CommonTree> pointerList) throws ParseException {
-        assert (typeSpecifierList.getType() == CTFParser.TYPE_SPECIFIER_LIST);
         IDeclaration declaration = null;
 
         /*
@@ -1197,7 +1180,6 @@ public class IOStructGen {
          * determine which type it belongs to.
          */
         CommonTree firstChild = (CommonTree) typeSpecifierList.getChild(0);
-        assert (firstChild != null); /* grammar */
 
         switch (firstChild.getType()) {
         case CTFParser.FLOATING_POINT:
@@ -1312,7 +1294,6 @@ public class IOStructGen {
 
         floatDeclaration = new FloatDeclaration(exponent, mantissa, byteOrder, alignment);
 
-        assert (floatDeclaration != null);
         return floatDeclaration;
 
     }
@@ -1357,7 +1338,6 @@ public class IOStructGen {
      */
     private IntegerDeclaration parseInteger(CommonTree integer)
             throws ParseException {
-        assert (integer.getType() == CTFParser.INTEGER);
 
         List<CommonTree> children = integer.getChildren();
 
@@ -1387,15 +1367,11 @@ public class IOStructGen {
                 /*
                  * An assignment expression must have 2 children, left and right
                  */
-                assert (child.getChildCount() == 2);
 
                 CommonTree leftNode = (CommonTree) child.getChild(0);
-                assert (leftNode.getType() == CTFParser.CTF_LEFT);
                 CommonTree rightNode = (CommonTree) child.getChild(1);
-                assert (rightNode.getType() == CTFParser.CTF_RIGHT);
 
                 List<CommonTree> leftStrings = leftNode.getChildren();
-                assert (leftStrings != null);
 
                 if (!isUnaryString(leftStrings.get(0))) {
                     throw new ParseException(
@@ -1444,7 +1420,6 @@ public class IOStructGen {
         integerDeclaration = new IntegerDeclaration((int) size, signed, base,
                 byteOrder, encoding, clock, alignment);
 
-        assert (integerDeclaration != null);
         return integerDeclaration;
     }
 
@@ -1454,7 +1429,6 @@ public class IOStructGen {
 
     private static StringDeclaration parseString(CommonTree string)
             throws ParseException {
-        assert (string.getType() == CTFParser.STRING);
 
         List<CommonTree> children = string.getChildren();
         StringDeclaration stringDeclaration = null;
@@ -1470,15 +1444,11 @@ public class IOStructGen {
                      * An assignment expression must have 2 children, left and
                      * right
                      */
-                    assert (child.getChildCount() == 2);
 
                     CommonTree leftNode = (CommonTree) child.getChild(0);
-                    assert (leftNode.getType() == CTFParser.CTF_LEFT);
                     CommonTree rightNode = (CommonTree) child.getChild(1);
-                    assert (rightNode.getType() == CTFParser.CTF_RIGHT);
 
                     List<CommonTree> leftStrings = leftNode.getChildren();
-                    assert (leftStrings != null);
 
                     if (!isUnaryString(leftStrings.get(0))) {
                         throw new ParseException(
@@ -1516,10 +1486,8 @@ public class IOStructGen {
      */
     private StructDeclaration parseStruct(CommonTree struct)
             throws ParseException {
-        assert (struct.getType() == CTFParser.STRUCT);
 
         List<CommonTree> children = struct.getChildren();
-        assert (children != null);
 
         /* The return value */
         StructDeclaration structDeclaration = null;
@@ -1541,10 +1509,8 @@ public class IOStructGen {
             case CTFParser.STRUCT_NAME: {
                 hasName = true;
 
-                assert (child.getChildCount() == 1);
                 CommonTree structNameIdentifier = (CommonTree) child.getChild(0);
 
-                assert (structNameIdentifier.getType() == CTFParser.IDENTIFIER);
                 structName = structNameIdentifier.getText();
 
                 break;
@@ -1557,7 +1523,6 @@ public class IOStructGen {
                 break;
             }
             case CTFParser.ALIGN: {
-                assert (child.getChildCount() == 1);
                 CommonTree structAlignExpression = (CommonTree) child.getChild(0);
 
                 structAlign = getAlignment(structAlignExpression);
@@ -1631,7 +1596,6 @@ public class IOStructGen {
             }
         }
 
-        assert (structDeclaration != null);
         return structDeclaration;
     }
 
@@ -1647,7 +1611,6 @@ public class IOStructGen {
      */
     private void parseStructBody(CommonTree structBody,
             StructDeclaration structDeclaration) throws ParseException {
-        assert (structBody.getType() == CTFParser.STRUCT_BODY);
 
         List<CommonTree> structDeclarations = structBody.getChildren();
 
@@ -1689,29 +1652,22 @@ public class IOStructGen {
      */
     private void parseStructDeclaration(CommonTree declaration,
             StructDeclaration struct) throws ParseException {
-        assert (declaration.getType() == CTFParser.SV_DECLARATION);
 
-        List<CommonTree> children = declaration.getChildren();
-        assert (children != null);
 
         /* Get the type specifier list node */
         CommonTree typeSpecifierListNode = (CommonTree) declaration.getFirstChildWithType(CTFParser.TYPE_SPECIFIER_LIST);
-        assert (typeSpecifierListNode != null);
 
         /* Get the type declarator list node */
         CommonTree typeDeclaratorListNode = (CommonTree) declaration.getFirstChildWithType(CTFParser.TYPE_DECLARATOR_LIST);
-        assert (typeDeclaratorListNode != null);
 
         /* Get the type declarator list */
         List<CommonTree> typeDeclaratorList = typeDeclaratorListNode.getChildren();
-        assert (typeDeclaratorList != null);
 
         /*
          * For each type declarator, parse the declaration and add a field to
          * the struct
          */
         for (CommonTree typeDeclaratorNode : typeDeclaratorList) {
-            assert (typeDeclaratorNode.getType() == CTFParser.TYPE_DECLARATOR);
 
             StringBuilder identifierSB = new StringBuilder();
 
@@ -1738,10 +1694,8 @@ public class IOStructGen {
      * @throws ParseException
      */
     private EnumDeclaration parseEnum(CommonTree _enum) throws ParseException {
-        assert (_enum.getType() == CTFParser.ENUM);
 
         List<CommonTree> children = _enum.getChildren();
-        assert (children != null);
 
         /* The return value */
         EnumDeclaration enumDeclaration = null;
@@ -1759,25 +1713,19 @@ public class IOStructGen {
         for (CommonTree child : children) {
             switch (child.getType()) {
             case CTFParser.ENUM_NAME: {
-                assert (enumName == null);
-
-                assert (child.getChildCount() == 1);
                 CommonTree enumNameIdentifier = (CommonTree) child.getChild(0);
 
-                assert (enumNameIdentifier.getType() == CTFParser.IDENTIFIER);
                 enumName = enumNameIdentifier.getText();
 
                 break;
             }
             case CTFParser.ENUM_BODY: {
-                assert (enumBody == null);
 
                 enumBody = child;
 
                 break;
             }
             case CTFParser.ENUM_CONTAINER_TYPE: {
-                assert (containerTypeDeclaration == null);
 
                 containerTypeDeclaration = parseEnumContainerType(child);
 
@@ -1880,11 +1828,9 @@ public class IOStructGen {
      */
     private void parseEnumBody(CommonTree enumBody,
             EnumDeclaration enumDeclaration) throws ParseException {
-        assert (enumBody.getType() == CTFParser.ENUM_BODY);
 
         List<CommonTree> enumerators = enumBody.getChildren();
         /* enum body can't be empty (unlike struct). */
-        assert (enumerators != null);
 
         pushScope();
 
@@ -1923,10 +1869,8 @@ public class IOStructGen {
     private static long parseEnumEnumerator(CommonTree enumerator,
             EnumDeclaration enumDeclaration, long lastHigh)
             throws ParseException {
-        assert (enumerator.getType() == CTFParser.ENUM_ENUMERATOR);
 
         List<CommonTree> children = enumerator.getChildren();
-        assert (children != null);
 
         long low = 0, high = 0;
         boolean valueSpecified = false;
@@ -1936,17 +1880,12 @@ public class IOStructGen {
             if (isUnaryString(child)) {
                 label = parseUnaryString(child);
             } else if (child.getType() == CTFParser.ENUM_VALUE) {
-                assert (child.getChildCount() == 1);
-                assert (isUnaryInteger((CommonTree) child.getChild(0)));
 
                 valueSpecified = true;
 
                 low = parseUnaryInteger((CommonTree) child.getChild(0));
                 high = low;
             } else if (child.getType() == CTFParser.ENUM_VALUE_RANGE) {
-                assert (child.getChildCount() == 2);
-                assert (isUnaryInteger((CommonTree) child.getChild(0)));
-                assert (isUnaryInteger((CommonTree) child.getChild(1)));
 
                 valueSpecified = true;
 
@@ -1956,8 +1895,6 @@ public class IOStructGen {
                 childTypeError(child);
             }
         }
-
-        assert (label != null);
 
         if (!valueSpecified) {
             low = lastHigh + 1;
@@ -1988,10 +1925,8 @@ public class IOStructGen {
      */
     private IntegerDeclaration parseEnumContainerType(
             CommonTree enumContainerType) throws ParseException {
-        assert (enumContainerType.getType() == CTFParser.ENUM_CONTAINER_TYPE);
 
         /* Get the child, which should be a type specifier list */
-        assert (enumContainerType.getChildCount() == 1);
         CommonTree typeSpecifierList = (CommonTree) enumContainerType.getChild(0);
 
         /* Parse it and get the corresponding declaration */
@@ -2006,7 +1941,6 @@ public class IOStructGen {
 
     private VariantDeclaration parseVariant(CommonTree variant)
             throws ParseException {
-        assert (variant.getType() == CTFParser.VARIANT);
 
         List<CommonTree> children = variant.getChildren();
         VariantDeclaration variantDeclaration = null;
@@ -2023,31 +1957,24 @@ public class IOStructGen {
         for (CommonTree child : children) {
             switch (child.getType()) {
             case CTFParser.VARIANT_NAME:
-                assert (variantName == null);
 
                 hasName = true;
 
-                assert (child.getChildCount() == 1);
                 CommonTree variantNameIdentifier = (CommonTree) child.getChild(0);
 
-                assert (variantNameIdentifier.getType() == CTFParser.IDENTIFIER);
                 variantName = variantNameIdentifier.getText();
 
                 break;
             case CTFParser.VARIANT_TAG:
-                assert (variantTag == null);
 
                 hasTag = true;
 
-                assert (child.getChildCount() == 1);
                 CommonTree variantTagIdentifier = (CommonTree) child.getChild(0);
 
-                assert (variantTagIdentifier.getType() == CTFParser.IDENTIFIER);
                 variantTag = variantTagIdentifier.getText();
 
                 break;
             case CTFParser.VARIANT_BODY:
-                assert (variantBody == null);
 
                 hasBody = true;
 
@@ -2110,16 +2037,13 @@ public class IOStructGen {
             variantDeclaration.setTag(variantTag);
         }
 
-        assert (variantDeclaration != null);
         return variantDeclaration;
     }
 
     private void parseVariantBody(CommonTree variantBody,
             VariantDeclaration variantDeclaration) throws ParseException {
-        assert (variantBody.getType() == CTFParser.VARIANT_BODY);
 
         List<CommonTree> variantDeclarations = variantBody.getChildren();
-        assert (variantDeclarations != null);
 
         pushScope();
 
@@ -2145,29 +2069,22 @@ public class IOStructGen {
 
     private void parseVariantDeclaration(CommonTree declaration,
             VariantDeclaration variant) throws ParseException {
-        assert (declaration.getType() == CTFParser.SV_DECLARATION);
 
-        List<CommonTree> children = declaration.getChildren();
-        assert (children != null);
 
         /* Get the type specifier list node */
         CommonTree typeSpecifierListNode = (CommonTree) declaration.getFirstChildWithType(CTFParser.TYPE_SPECIFIER_LIST);
-        assert (typeSpecifierListNode != null);
 
         /* Get the type declarator list node */
         CommonTree typeDeclaratorListNode = (CommonTree) declaration.getFirstChildWithType(CTFParser.TYPE_DECLARATOR_LIST);
-        assert (typeDeclaratorListNode != null);
 
         /* Get the type declarator list */
         List<CommonTree> typeDeclaratorList = typeDeclaratorListNode.getChildren();
-        assert (typeDeclaratorList != null);
 
         /*
          * For each type declarator, parse the declaration and add a field to
          * the variant
          */
         for (CommonTree typeDeclaratorNode : typeDeclaratorList) {
-            assert (typeDeclaratorNode.getType() == CTFParser.TYPE_DECLARATOR);
 
             StringBuilder identifierSB = new StringBuilder();
 
@@ -2217,10 +2134,8 @@ public class IOStructGen {
     private static void createTypeSpecifierListString(
             CommonTree typeSpecifierList, StringBuilder sb)
             throws ParseException {
-        assert (typeSpecifierList.getType() == CTFParser.TYPE_SPECIFIER_LIST);
 
         List<CommonTree> children = typeSpecifierList.getChildren();
-        assert (children != null);
 
         boolean firstItem = true;
 
@@ -2271,10 +2186,8 @@ public class IOStructGen {
                 throw new ParseException(
                         "nameless struct found in createTypeSpecifierString"); //$NON-NLS-1$
             }
-            assert (structName.getChildCount() == 1);
 
             CommonTree structNameIdentifier = (CommonTree) structName.getChild(0);
-            assert (structNameIdentifier.getType() == CTFParser.IDENTIFIER);
 
             sb.append(structNameIdentifier.getText());
             break;
@@ -2285,10 +2198,8 @@ public class IOStructGen {
                 throw new ParseException(
                         "nameless variant found in createTypeSpecifierString"); //$NON-NLS-1$
             }
-            assert (variantName.getChildCount() == 1);
 
             CommonTree variantNameIdentifier = (CommonTree) variantName.getChild(0);
-            assert (variantNameIdentifier.getType() == CTFParser.IDENTIFIER);
 
             sb.append(variantNameIdentifier.getText());
             break;
@@ -2299,10 +2210,8 @@ public class IOStructGen {
                 throw new ParseException(
                         "nameless enum found in createTypeSpecifierString"); //$NON-NLS-1$
             }
-            assert (enumName.getChildCount() == 1);
 
             CommonTree enumNameIdentifier = (CommonTree) enumName.getChild(0);
-            assert (enumNameIdentifier.getType() == CTFParser.IDENTIFIER);
 
             sb.append(enumNameIdentifier.getText());
             break;
@@ -2335,26 +2244,13 @@ public class IOStructGen {
         }
 
         for (CommonTree pointer : pointerList) {
-            assert (pointer.getType() == CTFParser.POINTER);
 
             sb.append(" *"); //$NON-NLS-1$
             if (pointer.getChildCount() > 0) {
-                assert (pointer.getChildCount() == 1);
-                CommonTree constQualifier = (CommonTree) pointer.getChild(0);
-                assert (constQualifier.getType() == CTFParser.CONSTTOK);
 
                 sb.append(" const"); //$NON-NLS-1$
             }
         }
-    }
-
-    /**
-     * @param node
-     *            The node to check.
-     * @return True if the given node is an unary string or unary integer.
-     */
-    private static boolean isUnaryExpression(CommonTree node) {
-        return isUnaryInteger(node) || isUnaryString(node);
     }
 
     /**
@@ -2391,11 +2287,8 @@ public class IOStructGen {
      * parser.
      */
     private static String parseUnaryString(CommonTree unaryString) {
-        assert (isUnaryString(unaryString));
 
-        assert (unaryString.getChildCount() == 1);
         CommonTree value = (CommonTree) unaryString.getChild(0);
-        assert (value != null);
         String strval = value.getText();
 
         /* Remove quotes */
@@ -2414,9 +2307,6 @@ public class IOStructGen {
      * @return The integer value.
      */
     private static long parseUnaryInteger(CommonTree unaryInteger) {
-        assert (isUnaryInteger(unaryInteger));
-
-        assert (unaryInteger.getChildCount() >= 1);
 
         List<CommonTree> children = unaryInteger.getChildren();
         CommonTree value = children.get(0);
@@ -2441,8 +2331,6 @@ public class IOStructGen {
 
     private static long getMajorOrMinor(CommonTree rightNode)
             throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2463,8 +2351,6 @@ public class IOStructGen {
     }
 
     private static UUID getUUID(CommonTree rightNode) throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2495,8 +2381,6 @@ public class IOStructGen {
      */
     private static boolean getSigned(CommonTree rightNode)
             throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         boolean ret = false;
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
@@ -2546,8 +2430,6 @@ public class IOStructGen {
      * @throws ParseException
      */
     private ByteOrder getByteOrder(CommonTree rightNode) throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2588,8 +2470,6 @@ public class IOStructGen {
      * @throws ParseException
      */
     private static long getSize(CommonTree rightNode) throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2618,7 +2498,6 @@ public class IOStructGen {
      * @throws ParseException
      */
     private static long getAlignment(CommonTree node) throws ParseException {
-        assert (isUnaryExpression(node) || (node.getType() == CTFParser.CTF_RIGHT));
 
         /*
          * If a CTF_RIGHT node was passed, call getAlignment with the first
@@ -2652,8 +2531,6 @@ public class IOStructGen {
      * @throws ParseException
      */
     private static int getBase(CommonTree rightNode) throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2708,7 +2585,6 @@ public class IOStructGen {
      */
     private static Encoding getEncoding(CommonTree rightNode)
             throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2729,8 +2605,6 @@ public class IOStructGen {
     }
 
     private static long getStreamID(CommonTree rightNode) throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2748,8 +2622,6 @@ public class IOStructGen {
 
     private static String getEventName(CommonTree rightNode)
             throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2762,8 +2634,6 @@ public class IOStructGen {
     }
 
     private static long getEventID(CommonTree rightNode) throws ParseException {
-        assert (rightNode.getType() == CTFParser.CTF_RIGHT);
-        assert (rightNode.getChildCount() > 0);
 
         CommonTree firstChild = (CommonTree) rightNode.getChild(0);
 
@@ -2788,7 +2658,6 @@ public class IOStructGen {
      * @return The string representation of the unary string chain.
      */
     private static String concatenateUnaryStrings(List<CommonTree> strings) {
-        assert ((strings != null) && (strings.size() > 0));
 
         StringBuilder sb = new StringBuilder();
 
@@ -2803,8 +2672,6 @@ public class IOStructGen {
                 continue;
             }
 
-            assert ((ref.getType() == CTFParser.ARROW) || (ref.getType() == CTFParser.DOT));
-            assert (ref.getChildCount() == 1);
 
             CommonTree id = (CommonTree) ref.getChild(0);
 
@@ -2853,7 +2720,6 @@ public class IOStructGen {
      * Removes the top declaration scope from the scope stack.
      */
     private void popScope() {
-        assert (scope != null);
         scope = scope.getParentScope();
     }
 
@@ -2863,7 +2729,6 @@ public class IOStructGen {
      * @return The current declaration scope.
      */
     private DeclarationScope getCurrentScope() {
-        assert (scope != null);
         return scope;
     }
 

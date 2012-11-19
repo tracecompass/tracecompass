@@ -96,9 +96,9 @@ public class CTFEventFieldTest {
      * @throws CTFReaderException
      */
     @Test
-    public void testParseField_simple() throws CTFReaderException {
-        Definition fieldDef = new SequenceDefinition(new SequenceDeclaration(
-                "", new StringDeclaration()), null, fieldName); //$NON-NLS-1$
+    public void testParseField_simple() {
+        final StringDeclaration elemType = new StringDeclaration();
+        Definition fieldDef = elemType.createDefinition(null, fieldName);
 
         assertNotNull(fieldDef);
     }
@@ -125,7 +125,7 @@ public class CTFEventFieldTest {
                 new StringDeclaration(), null, fieldName);
         fieldDef.setString(new StringBuilder("Hello World")); //$NON-NLS-1$
 
-        String other = fieldName + "=Hello World"; //$NON-NLS-1$
+        String other = "\"Hello World\""; //$NON-NLS-1$
         assertNotNull(fieldDef);
         assertEquals(fieldDef.toString(), other);
     }
@@ -176,8 +176,7 @@ public class CTFEventFieldTest {
         ((IntegerDefinition) ((ArrayDefinition) fieldDef).getDefinitions()[11]).setValue(0);
 
         assertNotNull(fieldDef);
-        String other = fieldName
-                + "={ 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 0}"; //$NON-NLS-1$
+        String other = "[ 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 0 ]"; //$NON-NLS-1$
         assertEquals(other, fieldDef.toString());
     }
 }

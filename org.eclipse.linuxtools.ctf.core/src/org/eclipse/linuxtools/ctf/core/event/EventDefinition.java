@@ -14,9 +14,11 @@ package org.eclipse.linuxtools.ctf.core.event;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 
@@ -100,12 +102,64 @@ public class EventDefinition implements IDefinitionScope {
     }
 
     /**
-     * Gets the context of this event
+     * Gets the context of this event without the context of the stream
+     *
+     * @return the context in struct form
+     * @since 1.2
+     */
+    public StructDefinition getEventContext() {
+        return context;
+    }
+
+    /**
+     * Gets the context of this event within a stream
      *
      * @return the context in struct form
      */
     public StructDefinition getContext() {
-        return context;
+        final StructDefinition streamContext =
+                streamInputReader.getPacketReader().getStreamEventContextDef();
+
+        /* Most common case so far */
+        if (streamContext == null) {
+            return context;
+        }
+
+        /* streamContext is not null, but the context of the event is null */
+        if (context == null) {
+            return streamContext;
+        }
+
+        /* The stream context and event context are assigned. */
+        StructDeclaration mergedDeclaration = new StructDeclaration(1);
+
+        /* Add fields from the stream */
+        HashMap<String, Definition> defs = streamContext.getDefinitions();
+        for (Entry<String, Definition> entry : defs.entrySet()) {
+            mergedDeclaration.addField(entry.getKey(), entry.getValue().getDeclaration());
+        }
+
+        /* Add fields from the event context, overwrite the stream ones if needed. */
+        for (Entry<String, Definition> entry : context.getDefinitions().entrySet()) {
+            mergedDeclaration.addField(entry.getKey(), entry.getValue().getDeclaration());
+        }
+
+        StructDefinition mergedContext = mergedDeclaration.createDefinition(null, "context"); //$NON-NLS-1$
+        for (String key : mergedContext.getDefinitions().keySet()) {
+            final Definition lookupDefinition = context.lookupDefinition(key);
+            /*
+             * If the key is in the event context, add it from there, if it is
+             * not, then it's in the stream. There is a priority with scoping so
+             * if there is a field like "context" in both stream and context,
+             * you display the context.
+             */
+            if (lookupDefinition != null) {
+                mergedContext.getDefinitions().put(key, lookupDefinition);
+            } else {
+                mergedContext.getDefinitions().put(key, streamContext.lookupDefinition(key));
+            }
+        }
+        return mergedContext;
     }
 
     /**

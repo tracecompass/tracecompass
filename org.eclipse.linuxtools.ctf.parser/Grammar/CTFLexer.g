@@ -42,6 +42,11 @@ COMPLEXTOK       : '_Complex' ;
 IMAGINARYTOK     : '_Imaginary' ;
 ENVTOK           : 'env' ;
 CLOCKTOK         : 'clock' ;
+/*
+ * Callsite tokens (v1.9)
+ */
+CALLSITETOK      : 'callsite' ;
+
 
 /*
  * Spec still to come.
