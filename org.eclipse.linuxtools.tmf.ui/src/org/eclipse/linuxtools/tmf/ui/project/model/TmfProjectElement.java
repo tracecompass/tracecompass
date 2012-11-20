@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -25,8 +25,8 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 
 /**
- * The implementation of TMF project model element. 
- * 
+ * The implementation of TMF project model element.
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -44,8 +44,8 @@ public class TmfProjectElement extends TmfProjectModelElement {
     // ------------------------------------------------------------------------
     /**
      * Constructor.
-     * 
-     * Creates the TMF project model element. 
+     *
+     * Creates the TMF project model element.
      * @param name The name of the project.
      * @param project The project reference.
      * @param parent The parent element
@@ -88,7 +88,7 @@ public class TmfProjectElement extends TmfProjectModelElement {
     // Accessors
     // ------------------------------------------------------------------------
     /**
-     * Returns the containing trace folder element. 
+     * Returns the containing trace folder element.
      * @return the TMF trace folder element.
      */
     public TmfTraceFolder getTracesFolder() {
@@ -122,6 +122,10 @@ public class TmfProjectElement extends TmfProjectModelElement {
                     return;
                 }
                 IWorkbenchPage activePage = wbWindow.getActivePage();
+                if (activePage == null) {
+                    return;
+                }
+
                 for (IViewReference viewReference : activePage.getViewReferences()) {
                     IViewPart viewPart = viewReference.getView(false);
                     if (viewPart instanceof CommonNavigator) {

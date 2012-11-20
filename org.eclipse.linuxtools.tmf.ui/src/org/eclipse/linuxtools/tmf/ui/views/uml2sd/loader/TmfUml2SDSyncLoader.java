@@ -499,7 +499,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
             resetLoader();
 
-            IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+            IEditorPart editor = fView.getSite().getPage().getActiveEditor();
             if (editor instanceof ITmfTraceEditor) {
                 ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
                 if (trace != null) {
