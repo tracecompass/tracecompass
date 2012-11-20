@@ -764,8 +764,11 @@ public class SDView extends ViewPart {
         }
 
         IUml2SDLoader loader = LoadersManager.getInstance().getCurrentLoader(getViewSite().getId(), this);
+        if (loader == null) {
+            return;
+        }
 
-        if ((loader != null) && (loader.getTitleString() != null)) {
+        if (loader.getTitleString() != null) {
             setContentDescription(loader.getTitleString());
         }
 

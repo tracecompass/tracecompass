@@ -534,6 +534,15 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
            if (window != null) {
                window.getSelectionService().removePostSelectionListener(this);
            }
+
+           if (fIndexRequest != null) {
+               if (!fIndexRequest.isCompleted()) {
+                   fIndexRequest.cancel();
+               }
+               fIndexRequest = null;
+           }
+           cancelOngoingRequests();
+
            fView.setSDFindProvider(null);
            fView.setSDPagingProvider(null);
            fView.setSDFilterProvider(null);
@@ -1501,6 +1510,9 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      */
     protected static class IndexingJob extends Job {
 
+        /**
+         * @param name The job name
+         */
         public IndexingJob(String name) {
             super(name);
         }
