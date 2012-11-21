@@ -34,6 +34,7 @@ public class AllTests {
         suite.addTestSuite(TmfContextTest.class);
 		suite.addTestSuite(TmfCheckpointTest.class);
         suite.addTestSuite(TmfCheckpointIndexTest.class);
+        suite.addTestSuite(TmfCheckpointIndexTest2.class);
 		suite.addTestSuite(TmfTraceTest.class);
 
         suite.addTestSuite(TmfExperimentCheckpointIndexTest.class);

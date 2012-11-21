@@ -265,6 +265,10 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         int index = Collections.binarySearch(fTraceIndex, new TmfCheckpoint(timestamp, null));
         if (index < 0) {
             index = Math.max(0, -(index + 2));
+        } else {
+            // If timestamp was in the list, use previous index to be able to find the
+            // first event with the same timestamp before the checkpoint
+            index = Math.max(0, index - 1);
         }
 
         // Position the trace at the checkpoint
