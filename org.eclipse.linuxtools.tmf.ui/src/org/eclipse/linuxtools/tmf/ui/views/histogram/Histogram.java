@@ -539,7 +539,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             // Draw the histogram bars
             imageGC.setBackground(fHistoBarColor);
             final int limit = width < scaledData.fWidth ? width : scaledData.fWidth;
-            for (int i = 1; i < limit; i++) {
+            for (int i = 0; i < limit; i++) {
                 final int value = (int) Math.ceil(scaledData.fData[i] * scaledData.fScalingFactor);
                 imageGC.fillRectangle(i, height - value, 1, value);
             }
