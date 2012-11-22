@@ -26,7 +26,9 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
@@ -93,6 +95,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
     // The trace's statistics
     private ITmfStatistics fStatistics;
+
+    // The current selected time
+    private ITmfTimestamp fCurrentTime = TmfTimestamp.ZERO;
+
+    // The current selected range
+    private TmfTimeRange fCurrentRange = TmfTimeRange.NULL_RANGE;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -421,8 +429,41 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         return fEndTime;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getCurrentTime()
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public ITmfTimestamp getCurrentTime() {
+        return fCurrentTime;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getCurrentRange()
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfTimeRange getCurrentRange() {
+        return fCurrentRange;
+    }
+
+    /**
+     * Returns the initial range offset
+     *
+     * @return the initial range offset
+     * @since 2.0
+     */
+    protected TmfTimestamp getInitialRangeOffset() {
+        final long DEFAULT_INITIAL_OFFSET_VALUE = (1L * 100 * 1000 * 1000); // .1sec
+        return new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
+    }
+
     // ------------------------------------------------------------------------
-    // Convenience setters/getters
+    // Convenience setters
     // ------------------------------------------------------------------------
 
     /**
@@ -605,6 +646,13 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || (fEndTime.compareTo(timestamp, false) < 0)) {
             fEndTime = timestamp;
         }
+        if (fCurrentRange == TmfTimeRange.NULL_RANGE) {
+            fCurrentTime = timestamp;
+            ITmfTimestamp initialOffset = getInitialRangeOffset();
+            long endValue = timestamp.getValue() + initialOffset.normalize(0, timestamp.getScale()).getValue();
+            ITmfTimestamp endTimestamp = new TmfTimestamp(endValue, timestamp.getScale());
+            fCurrentRange = new TmfTimeRange(timestamp, endTimestamp);
+        }
         if (context.hasValidRank()) {
             long rank = context.getRank();
             if (fNbEvents <= rank) {
@@ -663,14 +711,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
                 }
             }
         }
-        if (signal.getTrace() == this || trace == this) {
-            /* the signal is for this trace or experiment or for an experiment containing this trace */
-
-            /* ensure start time is set */
-            final ITmfContext context = seekEvent(0);
-            getNext(context);
-            context.dispose();
-        }
         if (trace == this) {
             /* the signal is for this trace or for an experiment containing this trace */
             try {
@@ -723,6 +763,35 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     public void traceRangeUpdated(final TmfTraceRangeUpdatedSignal signal) {
         if (signal.getTrace() == this) {
             getIndexer().buildIndex(getNbEvents(), signal.getRange(), false);
+        }
+    }
+
+    /**
+     * Signal handler for the TmfTimeSynchSignal signal
+     *
+     * @param signal The incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void synchToTime(final TmfTimeSynchSignal signal) {
+        if (signal.getCurrentTime().compareTo(fStartTime) >= 0 && signal.getCurrentTime().compareTo(fEndTime) <= 0) {
+            fCurrentTime = signal.getCurrentTime();
+        }
+    }
+
+    /**
+     * Signal handler for the TmfRangeSynchSignal signal
+     *
+     * @param signal The incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void synchToRange(final TmfRangeSynchSignal signal) {
+        if (signal.getCurrentTime().compareTo(fStartTime) >= 0 && signal.getCurrentTime().compareTo(fEndTime) <= 0) {
+            fCurrentTime = signal.getCurrentTime();
+        }
+        if (signal.getCurrentRange().getIntersection(getTimeRange()) != null) {
+            fCurrentRange = signal.getCurrentRange().getIntersection(getTimeRange());
         }
     }
 

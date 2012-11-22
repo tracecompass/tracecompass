@@ -292,4 +292,19 @@ public interface ITmfTrace extends ITmfDataProvider {
      */
     public ITmfContext seekEvent(double ratio);
 
+    /**
+     * Return the current selected time.
+     *
+     * @return the current time stamp
+     * @since 2.0
+     */
+    public ITmfTimestamp getCurrentTime();
+
+    /**
+     * Return the current selected range.
+     *
+     * @return the current time range
+     * @since 2.0
+     */
+    public TmfTimeRange getCurrentRange();
 }

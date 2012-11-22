@@ -23,7 +23,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -61,11 +60,6 @@ import org.eclipse.swt.widgets.Listener;
  * @since 2.0
  */
 public class TmfStatisticsViewer extends TmfViewer {
-
-    /**
-     * The initial window span (in nanoseconds)
-     */
-    public static final long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
 
     /**
      * Timestamp scale (nanosecond)
@@ -248,13 +242,7 @@ public class TmfStatisticsViewer extends TmfViewer {
             // Sends the time range request only once from this method.
             if (fSendRangeRequest) {
                 fSendRangeRequest = false;
-                // Calculate the selected time range to request
-                long startTime = signal.getRange().getStartTime().normalize(0, TIME_SCALE).getValue();
-                TmfTimestamp startTS = new TmfTimestamp(startTime, TIME_SCALE);
-                TmfTimestamp endTS = new TmfTimestamp(startTime + INITIAL_WINDOW_SPAN, TIME_SCALE);
-                TmfTimeRange timeRange = new TmfTimeRange(startTS, endTS);
-
-                requestTimeRangeData(trace, timeRange);
+                requestTimeRangeData(trace, fTrace.getCurrentRange());
             }
         }
         requestData(trace, signal.getRange());

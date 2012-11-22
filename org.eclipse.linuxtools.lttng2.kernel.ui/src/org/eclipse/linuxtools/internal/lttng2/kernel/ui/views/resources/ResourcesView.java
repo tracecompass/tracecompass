@@ -75,9 +75,6 @@ public class ResourcesView extends TmfView {
     /** View ID. */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.views.resources"; //$NON-NLS-1$
 
-    /** Initial time range */
-    private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
-
     /**
      * Redraw state enum
      */
@@ -393,7 +390,7 @@ public class ResourcesView extends TmfView {
             } else {
                 fStartTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
                 fEndTime = fTrace.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                refresh(INITIAL_WINDOW_OFFSET);
+                refresh();
             }
         }
     }
@@ -421,7 +418,7 @@ public class ResourcesView extends TmfView {
             if (fZoomThread != null) {
                 fZoomThread.cancel();
             }
-            refresh(INITIAL_WINDOW_OFFSET);
+            refresh();
         }
     }
 
@@ -540,7 +537,7 @@ public class ResourcesView extends TmfView {
             fEntryListMap.put(trace, (ArrayList<TraceEntry>) entryList.clone());
         }
         if (trace == fTrace) {
-            refresh(INITIAL_WINDOW_OFFSET);
+            refresh();
         }
         for (TraceEntry traceEntry : entryList) {
             if (monitor.isCanceled()) {
@@ -659,7 +656,7 @@ public class ResourcesView extends TmfView {
         return eventList;
     }
 
-    private void refresh(final long windowRange) {
+    private void refresh() {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -679,14 +676,15 @@ public class ResourcesView extends TmfView {
                     fTimeGraphViewer.setInput(entries);
                     fTimeGraphViewer.setTimeBounds(fStartTime, fEndTime);
 
-                    long endTime = fStartTime + windowRange;
+                    long timestamp = fTrace == null ? 0 : fTrace.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    long startTime = fTrace == null ? 0 : fTrace.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    long endTime = fTrace == null ? 0 : fTrace.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    startTime = Math.max(startTime, fStartTime);
+                    endTime = Math.min(endTime, fEndTime);
+                    fTimeGraphViewer.setSelectedTime(timestamp, false);
+                    fTimeGraphViewer.setStartFinishTime(startTime, endTime);
 
-                    if (fEndTime < endTime) {
-                        endTime = fEndTime;
-                    }
-                    fTimeGraphViewer.setStartFinishTime(fStartTime, endTime);
-
-                    startZoomThread(fStartTime, endTime);
+                    startZoomThread(startTime, endTime);
                 }
             }
         });
