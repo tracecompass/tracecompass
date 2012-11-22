@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -77,6 +78,11 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
                 fFile = null;
             }
         }
+    }
+
+    @Override
+    public ITmfTraceIndexer getIndexer() {
+        return super.getIndexer();
     }
 
     @Override
