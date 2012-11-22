@@ -263,7 +263,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * @param pattern the format pattern
      */
     public TmfTimestampFormat(String pattern) {
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
         applyPattern(pattern);
     }
 
