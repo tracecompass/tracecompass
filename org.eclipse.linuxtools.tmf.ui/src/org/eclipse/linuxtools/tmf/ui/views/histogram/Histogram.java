@@ -622,6 +622,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         if (fDataModel.getNbEvents() > 0 && fScaledData != null && fScaledData.fLastBucket >= event.x) {
             final String tooltip = formatToolTipLabel(event.x);
             fCanvas.setToolTipText(tooltip);
+        } else {
+            fCanvas.setToolTipText(null);
         }
     }
 
