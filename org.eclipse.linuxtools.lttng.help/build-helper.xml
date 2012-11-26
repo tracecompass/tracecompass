@@ -18,11 +18,34 @@
             <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
         </fileset>
     </path>
-
+	
+	<!-- Uncomment and set proxy host and port if necessary -->
+	<!--
+	<setproxy proxyhost="host" proxyport="port"/>
+	-->
+	
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties" />
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
 
     <target name="all" description="Generate Eclipse help content for the Linux Tools LTTng User Guide">
+    	<sequential>
+    		
+          <wikitext-to-eclipse-help markupLanguage="MediaWiki"
+                validate="true"
+                failonvalidationerror="true"
+          	    overwrite="true"
+          	    multipleOutputFiles="true"
+                navigationimages="true"
+                title="${ug.title}"
+                formatoutput="true"
+          	    helpPrefix="doc">
+          	    <fileset dir="./doc">
+          	       <include name="User-Guide.mediawiki" />
+          	    </fileset>          	
+                <stylesheet url="book.css" />
+            </wikitext-to-eclipse-help>
+          <antcall target="test" />
+    		
         <mediawiki-to-eclipse-help wikiBaseUrl="${help.doc.url.base}" title="${ug.title}" formatoutput="true" dest="." templateExcludes="*eclipseproject*">
             <path name="${ug.path}" title="${ug.title}" generateToc="false" />
             <stylesheet url="book.css" />
@@ -33,7 +56,8 @@ This document is maintained in a collaborative wiki.  If you wish to update or m
 http://wiki.eclipse.org/Linux_Tools_Project/LTTng2/User_Guide.
                  </pageAppendum>
         </mediawiki-to-eclipse-help>
-        <antcall target="test" />
+
+        </sequential>
     </target>
 
     <target name="test" description="Verify that all of the HTML files are well-formed XML">
@@ -55,7 +79,7 @@ or inadvertently starting a line with a space character (in MediaWiki this start
         -->
         <echo file="${temp.dir}/__empty.dtd" message="" />
         <xmlvalidate lenient="true">
-            <fileset dir="Linux_Tools_Project">
+            <fileset dir="doc">
                 <include name="**/*.html" />
             </fileset>
             <dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location="${temp.dir}/__empty.dtd" />

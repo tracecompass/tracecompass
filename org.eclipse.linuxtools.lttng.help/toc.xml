@@ -82,8 +82,8 @@
 		<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html" label="LTTng Kernel Analysis">
 			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#LTTng_Kernel_Perspective" label="LTTng Kernel Perspective"></topic>
 			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Control_Flow_View" label="Control Flow View">
-				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Process_Tree_and_Information" label="Process Tree and Information"></topic>
-				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#States_Flow" label="States Flow">
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Process_tree_and_informations" label="Process tree and informations"></topic>
+				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#States_flow" label="States flow">
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Using_the_mouse" label="Using the mouse"></topic>
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Incomplete_regions" label="Incomplete regions"></topic>
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Zoom_region" label="Zoom region"></topic>
