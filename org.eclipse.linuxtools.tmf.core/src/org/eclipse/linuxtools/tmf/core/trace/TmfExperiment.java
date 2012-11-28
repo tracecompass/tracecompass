@@ -385,6 +385,28 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
     }
 
     /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#getInitialRangeOffset()
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public ITmfTimestamp getInitialRangeOffset() {
+        if ((fTraces == null) || (fTraces.length == 0)) {
+            return super.getInitialRangeOffset();
+        }
+
+        ITmfTimestamp initTs = TmfTimestamp.BIG_CRUNCH;
+        for (int i = 0; i < fTraces.length; i++) {
+            ITmfTimestamp ts = fTraces[i].getInitialRangeOffset();
+            if (ts.compareTo(initTs) < 0) {
+                initTs = ts;
+            }
+        }
+        return initTs;
+    }
+
+    /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     @Override

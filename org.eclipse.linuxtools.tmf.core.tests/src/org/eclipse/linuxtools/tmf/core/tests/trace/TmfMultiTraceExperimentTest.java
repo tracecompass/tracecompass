@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -47,7 +48,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
+    private static final long   DEFAULT_INITIAL_OFFSET_VALUE = (1L * 100 * 1000 * 1000); // .1sec
     private static final String DIRECTORY    = "testfiles";
     private static final String TEST_STREAM1 = "O-Test-10K";
     private static final String TEST_STREAM2 = "E-Test-10K";
@@ -71,10 +72,13 @@ public class TmfMultiTraceExperimentTest extends TestCase {
                 URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path1), null);
                 File test = new File(FileLocator.toFileURL(location).toURI());
                 final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true);
+                trace1.setInitialRangeOffset(new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE));
+
                 fTraces[0] = trace1;
                 location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path2), null);
                 test = new File(FileLocator.toFileURL(location).toURI());
                 final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true);
+                trace2.setInitialRangeOffset(new TmfTimestamp(2, ITmfTimestamp.MILLISECOND_SCALE));
                 fTraces[1] = trace2;
             } catch (final TmfTraceException e) {
                 e.printStackTrace();
@@ -121,6 +125,16 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         final TmfTimeRange timeRange = fExperiment.getTimeRange();
         assertEquals("getStartTime", 1, timeRange.getStartTime().getValue());
         assertEquals("getEndTime", NB_EVENTS, timeRange.getEndTime().getValue());
+
+        TmfTimestamp initRange = new TmfTimestamp(2, ITmfTimestamp.MILLISECOND_SCALE);
+        assertEquals("getInitialRangeOffset", initRange, fExperiment.getInitialRangeOffset());
+        assertEquals("getCurrentTime", fExperiment.getTimeRange().getStartTime(), fExperiment.getCurrentTime());
+
+        ITmfTimestamp startTimestamp = fExperiment.getTimeRange().getStartTime();
+        long endValue = startTimestamp.getValue() + initRange.normalize(0, startTimestamp.getScale()).getValue();
+        ITmfTimestamp endTimestamp = new TmfTimestamp(endValue, startTimestamp.getScale());
+        TmfTimeRange expectedRange = new TmfTimeRange(startTimestamp, endTimestamp);
+        assertEquals("getCurrentRange", expectedRange, fExperiment.getCurrentRange());
     }
 
     // ------------------------------------------------------------------------
@@ -806,4 +820,21 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         assertNull("getTimestamp", fExperiment.getTimestamp(20000));
     }
 
+    // ------------------------------------------------------------------------
+    // getInitialRangeOffset, getCurrentRange, getCurrentTime
+    // ------------------------------------------------------------------------
+    public void testDefaultCurrentTimeValues() {
+        // reset to default initial range offset
+        ((TmfTraceStub)fTraces[0]).setInitialRangeOffset(null);
+        ((TmfTraceStub)fTraces[1]).setInitialRangeOffset(null);
+
+        TmfExperimentStub exp = new TmfExperimentStub(EXPERIMENT, fTraces, BLOCK_SIZE);
+
+        // verify initial values
+        TmfTimestamp initRange = new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
+        assertEquals("getInitialRangeOffset", initRange, exp.getInitialRangeOffset());
+        assertEquals("getCurrentTime", TmfTimestamp.ZERO, exp.getCurrentTime());
+        assertEquals("getCurrentRange", TmfTimeRange.NULL_RANGE, exp.getCurrentRange());
+
+    }
 }

@@ -54,6 +54,8 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
     // The synchronization lock
     private final ReentrantLock fLock = new ReentrantLock();
 
+    private ITmfTimestamp fInitialRangeOffset = null;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -205,6 +207,18 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
 
     public RandomAccessFile getStream() {
         return fTrace;
+    }
+
+    public void setInitialRangeOffset(ITmfTimestamp initOffset) {
+        fInitialRangeOffset = initOffset;
+    }
+
+    @Override
+    public ITmfTimestamp getInitialRangeOffset() {
+        if (fInitialRangeOffset != null) {
+            return fInitialRangeOffset;
+        }
+        return super.getInitialRangeOffset();
     }
 
     // ------------------------------------------------------------------------

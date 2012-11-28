@@ -293,6 +293,14 @@ public interface ITmfTrace extends ITmfDataProvider {
     public ITmfContext seekEvent(double ratio);
 
     /**
+     * Returns the initial range offset
+     *
+     * @return the initial range offset
+     * @since 2.0
+     */
+    public ITmfTimestamp getInitialRangeOffset();
+
+    /**
      * Return the current selected time.
      *
      * @return the current time stamp
