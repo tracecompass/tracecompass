@@ -168,7 +168,7 @@ public class OpenTraceHandler extends AbstractHandler {
                         file.setHidden(true);
                         file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfTrace.class.getCanonicalName());
                         IDE.setDefaultEditor(file, editorId);
-                        // editor should dispose the experiment on close
+                        // editor should dispose the trace on close
                     } catch (final CoreException e) {
                         Activator.getDefault().logError("Error opening trace " + traceElement.getName(), e); //$NON-NLS-1$
                         displayErrorMsg(Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$
