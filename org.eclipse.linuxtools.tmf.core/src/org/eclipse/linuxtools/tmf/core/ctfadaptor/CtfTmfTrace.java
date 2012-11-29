@@ -166,9 +166,14 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
      * @return ITmfContext
      */
     @Override
-    public ITmfContext seekEvent(final ITmfLocation location) {
+    public synchronized ITmfContext seekEvent(final ITmfLocation location) {
         CtfLocation currentLocation = (CtfLocation) location;
         CtfTmfLightweightContext context = new CtfTmfLightweightContext(this);
+        if (fTrace == null) {
+            context.setLocation(null);
+            context.setRank(ITmfContext.UNKNOWN_RANK);
+            return context;
+        }
         /*
          * The rank is set to 0 if the iterator seeks the beginning. If not, it
          * will be set to UNKNOWN_RANK, since CTF traces don't support seeking
@@ -196,8 +201,13 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
 
 
     @Override
-    public ITmfContext seekEvent(double ratio) {
+    public synchronized ITmfContext seekEvent(double ratio) {
         CtfTmfLightweightContext context = new CtfTmfLightweightContext(this);
+        if (fTrace == null) {
+            context.setLocation(null);
+            context.setRank(ITmfContext.UNKNOWN_RANK);
+            return context;
+        }
         final long end = this.getEndTime().getValue();
         final long start = this.getStartTime().getValue();
         final long diff = end - start;
