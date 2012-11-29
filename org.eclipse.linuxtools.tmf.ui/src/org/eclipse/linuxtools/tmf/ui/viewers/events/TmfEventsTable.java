@@ -1093,8 +1093,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @since 1.1
      */
     protected void applyFilter(ITmfFilter filter) {
-    	stopFilterThread();
-    	stopSearchThread();
+        stopFilterThread();
+        stopSearchThread();
         fFilterMatchCount = 0;
         fFilterCheckCount = 0;
         fCache.applyFilter(filter);
@@ -1465,9 +1465,20 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (fPackDone) {
             return;
         }
-        for (final TableColumn column : fTable.getColumns()) {
+        boolean isLinux = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
+
+        TableColumn tableColumns[] = fTable.getColumns();
+        for (int i = 0; i < tableColumns.length; i++) {
+            final TableColumn column = tableColumns[i];
             final int headerWidth = column.getWidth();
             column.pack();
+            // Workaround for Linux which doesn't consider the image width of
+            // search/filter row in TableColumn.pack() after having executed
+            // TableItem.setImage((Image)null) for other rows than search/filter row.
+            if (isLinux && (i == 0)) {
+                column.setWidth(column.getWidth() + SEARCH_IMAGE.getBounds().width);
+            }
+
             if (column.getWidth() < headerWidth) {
                 column.setWidth(headerWidth);
             }
