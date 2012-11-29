@@ -335,7 +335,7 @@ public class HistogramView extends TmfView {
     public synchronized void updateTimeRange(long newDuration) {
         if (fTrace != null) {
             long delta = newDuration - fWindowSpan;
-            long newStartTime = fWindowStartTime + (delta / 2);
+            long newStartTime = fWindowStartTime - (delta / 2);
             setNewRange(newStartTime, newDuration);
         }
     }
@@ -348,7 +348,7 @@ public class HistogramView extends TmfView {
         long endTime = startTime + duration;
         if (endTime > fTraceEndTime) {
             endTime = fTraceEndTime;
-            if ((endTime - duration) > fTraceEndTime) {
+            if ((endTime - duration) > fTraceStartTime) {
                 startTime = endTime - duration;
             } else {
                 startTime = fTraceStartTime;
@@ -524,9 +524,15 @@ public class HistogramView extends TmfView {
         assert (signal != null);
 
         if (fTrace != null) {
+            // Validate the time range
+            TmfTimeRange range = signal.getCurrentRange().getIntersection(fTrace.getTimeRange());
+            if (range == null) {
+                return;
+            }
+
             // Update the time range
-            fWindowStartTime = signal.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-            fWindowEndTime = signal.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            fWindowStartTime = range.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            fWindowEndTime = range.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
             fWindowSpan = fWindowEndTime - fWindowStartTime;
 
             // Notify the relevant widgets

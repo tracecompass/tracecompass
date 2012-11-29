@@ -457,6 +457,9 @@ public class ResourcesView extends TmfView {
         if (signal.getSource() == this || fTrace == null) {
             return;
         }
+        if (signal.getCurrentRange().getIntersection(fTrace.getTimeRange()) == null) {
+            return;
+        }
         final long startTime = signal.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         final long endTime = signal.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         final long time = signal.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
