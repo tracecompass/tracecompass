@@ -148,6 +148,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         } else {
             _timeDelta = 10 * (long) Math.pow(10, pow10) * unit;
         }
+        if (_timeDelta<=0) {
+            _timeDelta=1;
+        }
     }
 
     private static TimeDraw TIMEDRAW_NANOSEC = new TimeDrawNanosec();
