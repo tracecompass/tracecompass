@@ -81,14 +81,13 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
             value = TmfTimestampFormat.getDefaulTimeFormat().parseValue(string, fTraceStartTime);
         } catch (ParseException e) {
         }
-
         if (getValue() != value) {
             // Make sure that the new time is within range
             ITmfTrace trace = fParentView.getTrace();
             if (trace != null) {
                 TmfTimeRange range = trace.getTimeRange();
-                long startTime = range.getStartTime().getValue();
-                long endTime = range.getEndTime().getValue();
+                long startTime = range.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long endTime = range.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
                 if (value < startTime) {
                     value = startTime;
                 } else if (value > endTime) {

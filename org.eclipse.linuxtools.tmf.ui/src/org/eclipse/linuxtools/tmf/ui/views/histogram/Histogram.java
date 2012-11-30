@@ -326,7 +326,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     public void clear() {
         fDataModel.clear();
-        fScaledData = null;
+        synchronized (fDataModel) {
+            fScaledData = null;
+        }
     }
 
     /**
@@ -459,7 +461,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         }
                         fDataModel.setCurrentEvent(fCurrentEventTime);
                         fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight, 1);
-                        synchronized(fScaledData) {
+                        synchronized(fDataModel) {
                             if (fScaledData != null) {
                                 fCanvas.redraw();
                                 // Display histogram and update X-,Y-axis labels
