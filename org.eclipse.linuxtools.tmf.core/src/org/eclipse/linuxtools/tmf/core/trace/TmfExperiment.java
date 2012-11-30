@@ -202,7 +202,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#armRequest(org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest)
      */
     @Override
-    protected synchronized ITmfContext armRequest(final ITmfDataRequest request) {
+    public synchronized ITmfContext armRequest(final ITmfDataRequest request) {
 
         // Make sure we have something to read from
         if (fTraces == null) {
