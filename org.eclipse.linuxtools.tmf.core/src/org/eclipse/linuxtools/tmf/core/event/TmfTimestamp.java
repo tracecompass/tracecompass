@@ -287,7 +287,7 @@ public class TmfTimestamp implements ITmfTimestamp {
     public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
         final ITmfTimestamp nts = ts.normalize(0, fScale);
         final long value = fValue - nts.getValue();
-        return new TmfTimestamp(value, fScale, fPrecision + nts.getPrecision());
+        return new TmfTimestampDelta(value, fScale, fPrecision + nts.getPrecision());
     }
 
     // ------------------------------------------------------------------------

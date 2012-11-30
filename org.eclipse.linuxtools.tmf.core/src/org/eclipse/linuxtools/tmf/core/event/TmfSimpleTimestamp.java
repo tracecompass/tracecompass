@@ -87,7 +87,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     @Override
     public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
         if (ts instanceof TmfSimpleTimestamp) {
-            return new TmfSimpleTimestamp(getValue() - ts.getValue());
+            return new TmfTimestampDelta(getValue() - ts.getValue());
         }
         return super.getDelta(ts);
     }
