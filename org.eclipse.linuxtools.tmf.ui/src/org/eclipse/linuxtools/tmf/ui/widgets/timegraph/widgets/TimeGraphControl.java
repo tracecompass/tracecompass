@@ -1679,12 +1679,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         if (DRAG_NONE != _dragState) {
             setCapture(false);
             if (e.button == 1 && DRAG_TRACE_ITEM == _dragState) {
-                // Notify time provider to check the need for listener
-                // notification
-                _timeProvider.notifyStartFinishTime();
                 if (_dragX == _dragX0) { // click without drag
                     long time = getTimeAtX(e.x);
                     _timeProvider.setSelectedTimeNotify(time, false);
+                } else {
+                    // Notify time provider to check the need for listener
+                    // notification
+                    _timeProvider.notifyStartFinishTime();
                 }
                 _dragState = DRAG_NONE;
             } else if (e.button == 1 && DRAG_SPLIT_LINE == _dragState) {
