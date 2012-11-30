@@ -28,7 +28,7 @@
 				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Opening_a_Trace_or_Experiment" label="Opening a Trace or Experiment"></topic>
 				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Drag_and_Drop" label="Drag and Drop"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Events_View" label="Events View">
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Events_Editor" label="Events Editor">
 				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Searching_and_Filtering" label="Searching and Filtering">
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Searching" label="Searching"></topic>
 					<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng.html#Filtering" label="Filtering"></topic>
@@ -96,7 +96,7 @@
 				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Incomplete_regions_2" label="Incomplete regions"></topic>
 				<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Toolbar_2" label="Toolbar"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Events_View_2" label="Events View"></topic>
+			<topic href="Linux_Tools_Project/LTTng2/User_Guide/LTTng-Kernel-Analysis.html#Events_Editor_2" label="Events Editor"></topic>
 		</topic>
 		<topic href="Linux_Tools_Project/LTTng2/User_Guide/Limitations.html" label="Limitations"></topic>
 		<topic href="Linux_Tools_Project/LTTng2/User_Guide/How-to-use-LTTng-to-diagnose-problems.html" label="How to use LTTng to diagnose problems">

@@ -76,8 +76,6 @@ For other distributions, older Ubuntu distributions, or the latest, bleeding edg
 
 The easiest way to install the LTTng plug-ins for Eclipse is through the Software Updates and Add-ons menu. For information on how to use this menu, refer to this [http://wiki.eclipse.org/Linux_Tools_Project/PluginInstallHelp#Installing_Updates_From_the_Linux_Tools_Update_Site link].
 
-The legacy (''Classic'' :-)) Eclipse LTTng (v0.x) is also available as an optional download. Refer to [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng/User_Guide here] for installation and verification instructions.
-
 The LTTng plug-ins are structured as a stack of features/plug-ins as following:
 
 * '''CTF''' - A CTF parser that can also be used as a standalone component
@@ -137,7 +135,7 @@ To download sample LTTng traces, go to [http://lttng.org/download]. At the botto
 The '''Tracing''' perspective is part of the '''Tracing and Monitoring Framework (TMF)''' and groups the following views: 
 
 * [[#Project_View | Project View]]
-* [[#Events_View | Events View]]
+* [[#Events_Editor | Events Editor]]
 * [[#Histogram_View | Histogram View]]
 * [[#Statistics_View   | Statistics View]]
 
@@ -251,7 +249,7 @@ After that the selected trace(s) are removed from the experiment. Note that the 
 
 === Renaming a Trace or Experiment ===
 
-Traces and Experiment can be renamed from the '''Project Explorer''' view. To rename a trace or experiment select the relevant trace and click the right mouse button. Then select '''Rename...''' from the context sensitive menu. 
+Traces and Experiment can be renamed from the '''Project Explorer''' view. To rename a trace or experiment select the relevant trace and click the right mouse button. Then select '''Rename...''' from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation. 
 
 [[Image:images/RenameTraceAction.png]]
   
@@ -283,7 +281,7 @@ Note that the directory for all supplementary files will be copied, too. (see al
 
 === Deleting a Trace or Experiment ===
 
-To delete a trace or experiment select the relevant trace or experiment in the '''Project Explorer''' view and click the right mouse button. Then select '''Delete...''' from the context sensitive menu.
+To delete a trace or experiment select the relevant trace or experiment in the '''Project Explorer''' view and click the right mouse button. Then select '''Delete...''' from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation. 
 
 [[Image:images/DeleteExperimentAction.png]]
   
@@ -297,11 +295,11 @@ Note that the directory for all supplementary files will be deleted, too. (see a
 
 === Deleting Supplementary Files ===
 
-Supplementary files are by definition trace specific files that accompany a trace. These file could be temporary files, persistent indexes or any other persistent data files created by the LTTng integration in Eclipse during parsing a trace. For the LTTng 2.0 trace viewer a persistent state history of the Linux Kernel is created and is stored under the name '''stateHistroy.ht'''.  
+Supplementary files are by definition trace specific files that accompany a trace. These file could be temporary files, persistent indexes or any other persistent data files created by the LTTng integration in Eclipse during parsing a trace. For the LTTng 2.0 trace viewer a persistent state history of the Linux Kernel is created and is stored under the name '''stateHistory.ht'''. The statistics for all traces are stored under '''statistics.ht'''. Other state systems may appear in the same folder as more custom views are added.
 
 All supplementary file are hidden from the user and are handled internally by the TMF. However, there is a possibility to delete the supplementary files so that there are recreated when opening a trace.
 
-To delete all supplementary files from a single trace, select the relevant trace in the '''Project Explorer''' view and click the right mouse button. Then select the '''Delete Supplementary Files...''' menu item from the context-sensitive menu.
+To delete all supplementary files from a single trace, first, make sure the trace is not opened, then select the relevant trace in the '''Project Explorer''' view and click the right mouse button. Then select the '''Delete Supplementary Files...''' menu item from the context-sensitive menu.
 
 [[Image:images/DeleteSupplementaryFilesAction.png]]
 
@@ -309,7 +307,7 @@ A new dialog box will open with a list of supplementary files. Select the file(s
 
 [[Image:images/DeleteSupplementaryFilesDialog.png]]
 
-To delete all supplementary files from all traces of a experiment, select the relevant experiment in the '''Project Explorer''' view and click the right mouse button. In the context-sensitive menu select '''Delete Supplementary Files...''' menu item. 
+To delete all supplementary files from all traces of a experiment, select the relevant experiment in the '''Project Explorer''' view and click the right mouse button. In the context-sensitive menu select '''Delete Supplementary Files...''' menu item. The experiment and included traces need to be closed in order to do this operation.
 
 A new dialog box will open with a list of supplementary files. Note that the supplementary files are prefixed with the trace name to indicate the trace they belong to. Select the file(s) to delete from the list and press '''OK'''. 
 
@@ -331,11 +329,11 @@ Any resource can be dragged and dropped from a non-tracing project, and any file
 
 It is also possible to drop a trace, resource, file or folder into an existing experiment. If the item does not already exist as a trace in the project's trace folder, it will first be copied or imported, then the trace will be added to the experiment.
 
-== Events View ==
+== Events Editor ==
 
-The Events view shows the basic trace data in chronological order in a tabular format.
+The Events editor shows the basic trace data elements (events) in a tabular format. The editors can be dragged in the editor area so that several traces may be shown side by side. These traces are synchronized by timestamp.
 
-When opened, the Events view displays the events of the currently selected trace or experiment.
+[[Image:images/LTTng2EventsEditor.png]]
 
 The header displays the current trace (or experiment) name. 
 
@@ -349,9 +347,11 @@ Being part of the '''Tracing and Monitoring''' Framework, the default table disp
 
 The first row of the table is the header row a.k.a. the Search and Filter row.
 
-[[Image:images/DefaultEventsView.png]]
+The highlighted event is the ''current event'' and is synchronized with the other views. If you select another event, the other views will be updated accordingly. The properties view will display a more detailed view of the selected event.
 
-The highlighted event is the ''current event'' and is synchronized with the other views. If you select another event, the other views will be synchronized accordingly.
+[[Image:images/LTTng2EventProperties.png]]
+
+The Events editor can be closed, disposing a trace. When this is done, all the views displaying the information will be updated with the trace data of the next event editor tab. If all the editor tabs are closed, then the views will display their empty states.
 
 === Searching and Filtering ===
 
@@ -442,9 +442,11 @@ In each histogram, the following keys are handled:
 
 == Statistics View ==
 
-The Statistics View displays the various event counters that are collected when analyzing a trace. The data is organized per trace. To open the Statistics View, select Windows -> Show View -> Other... -> Tracing -> Statistics. A new view will open with the name Statistics. This view shows 2 columns: ''Level'' and ''Number of Events''. After parsing a trace the view will display the number of events per event type. The cells where the number of events are printed also contain a colored bar that indicates the percentage of the event count in relation to the total number of events. The statistics is collected for the whole trace. This view is part of the '''Tracing and Monitoring Framework (TMF)''' and is generic. It will work for any trace type extensions. For the LTTng 2.0 integration the Statistics view will display statistics as shown below.:
+The Statistics View displays the various event counters that are collected when analyzing a trace. The data is organized per trace. To open the Statistics View, select Windows -> Show View -> Other... -> Tracing -> Statistics. A new view will open with the name Statistics. This view shows 3 columns: ''Level'' ''Events total'' and ''Events in selected time range''. After parsing a trace the view will display the number of events per event type in the second column and in the third, the currently selected time range's event type distribution is shown. The cells where the number of events are printed also contain a colored bar that indicates the percentage of the event count in relation to the total number of events. The statistics is collected for the whole trace. This view is part of the '''Tracing and Monitoring Framework (TMF)''' and is generic. It will work for any trace type extensions. For the LTTng 2.0 integration the Statistics view will display statistics as shown below.:
 
 [[Image:images/LTTng2StatisticsView.png]]
+
+By default, the statistics use a state system, therefore will load very quickly once the state system is written to the disk as a supplementary file.
 
 == Colors View ==
 
@@ -506,7 +508,7 @@ The Time Chart only supports traces that are opened in an editor. The use of an 
 
 == Environment Variables View ==
 A new feature of CTF traces is their ability to store user defined data that is not to be placed in an event. It is generally data that is per-trace specific, such as the tracer version and the trace domain. It will be populated when a trace is loaded if the trace has environment variables. <br>
-[[Image:images/environment_variables.png]]<br>
+[[Image:images/LTTng2EnvironmentsView.png]]<br>
 The above picture shows a trace loaded that was collevcted with the '''lttng-modules''' version '''2'''.'''0'''.'''0''' tracer. It is a '''kernel''' trace of the '''3.2.0-18-generic''' '''linux''' kernel.
 
 == Custom Parser ==
@@ -765,7 +767,7 @@ To connect to a remote host, select the host in the Control View and press the '
 
 ==== Deleting to a Remote Host Connection ====
 
-To delete a remote host connection, select the host in the Control View and press the '''Delete''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Delete''' button. For that command to be active the connection state has to be '''DISCONNECTED'''. 
+To delete a remote host connection, select the host in the Control View and press the '''Delete''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Delete''' button. For that command to be active the connection state has to be '''DISCONNECTED''' and the trace has to be closed.
 
 [[Image:images/LTTng2ControlViewDelete.png]]
 
@@ -1191,7 +1193,7 @@ The states flow is usable with the mouse. The following actions are set:
 * '''drag the time ruler horizontally with the right button''': [[#Zoom region|zoom region]]
 * '''double-click the time ruler''': reset zoom
 
-When the current time indicator is changed (when clicking in the states flow), all the other views are '''synchronized'''. For example, the [[#Events_View_2|Events View]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
+When the current time indicator is changed (when clicking in the states flow), all the other views are '''synchronized'''. For example, the [[#LTTng_Kernel_Events_Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
 
 ==== Incomplete regions ====
 
@@ -1259,7 +1261,7 @@ Then, by selecting '''Next Event''', it will show the next state transition and 
 
 [[Image:images/RV_infobox2.png|Shows the next state of the IRQ]]
 
-This view is also synchronized with the others : [[#Histogram_View | histogram]], [[#Events_View_2 | events view]], [[#Control_Flow_View | control flow view]], etc.
+This view is also synchronized with the others : [[#Histogram_View | histogram]], [[#LTTng_Kernel_Events_Editor | Events editor]], [[#Control_Flow_View | control flow view]], etc.
 
 === Navigation ===
 
@@ -1273,9 +1275,9 @@ See Control Flow View's '''[[#Incomplete_regions|Incomplete regions]]'''.
 
 See Control Flow View's '''[[#Toolbar|Toolbar]]'''.
 
-== Events View ==
+== LTTng Kernel Events Editor ==
 
-The LTTng Kernel Events View '''is''' the plain TMF [[#Events_View | Events Views]] except that it provide its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
+The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
 
 * '''Timestamp''': the event timestamp
 * '''Channel''': the event channel (data collector)
@@ -1283,11 +1285,31 @@ The LTTng Kernel Events View '''is''' the plain TMF [[#Events_View | Events View
 * '''Content''': the raw event content 
 
 
-[[Image:images/LTTngKernelEventsViewer.png]]
+[[Image:images/LTTng2EventsEditor.png]]
+
+= Timestamp formatting =
+
+Most views that show timestamps are displayed in the same time format. The unified timestamp format can be changed in the Preferences page. To get to that page, click on '''Window''' -> '''Preferences''' -> '''Tracing''' -> '''Time Format'''. Then a window will show the time format preferences. 
+
+[[Image:images/TmfTimestampFormatPage.png]]
+
+The preference page has several subsections:
+
+* '''Current Format''' a format string generated by the page
+* '''Sample Display''' an example of a timestamp formatted with the '''Current Format''' string.
+* '''Data and Time format''' how to format the date (days/months/years) and the time (hours/minutes/seconds)
+* '''Sub-second format''' how much precision is shown for the sub-second units
+* '''Date delimiter''' the character used to delimit the date units such as months and years
+* '''Time delimiter''' the character to separate super-second time units such as seconds and minutes
+* '''Sub-Second Delimiter''' the character to separate the sub-second groups such as milliseconds and nanoseconds
+* '''Restore Defaults''' restores the system settings
+* '''Apply''' apply changes
+
+This will update all the displayed timestamps.
 
 = Limitations =
 
-TBD
+* When parsing text traces, the timestamps are assumed to be in the local time zone. This means that when combining it to CTF binary traces, there could be offsets by a few hours depending on where the traces were taken and where they were read.
 
 = How to use LTTng to diagnose problems = 
 

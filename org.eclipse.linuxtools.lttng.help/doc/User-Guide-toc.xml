@@ -27,7 +27,7 @@
 			<topic href="doc/LTTng.html#Opening_a_Trace_or_Experiment" label="Opening a Trace or Experiment"></topic>
 			<topic href="doc/LTTng.html#Drag_and_Drop" label="Drag and Drop"></topic>
 		</topic>
-		<topic href="doc/LTTng.html#Events_View" label="Events View">
+		<topic href="doc/LTTng.html#Events_Editor" label="Events Editor">
 			<topic href="doc/LTTng.html#Searching_and_Filtering" label="Searching and Filtering">
 				<topic href="doc/LTTng.html#Searching" label="Searching"></topic>
 				<topic href="doc/LTTng.html#Filtering" label="Filtering"></topic>
@@ -95,8 +95,9 @@
 			<topic href="doc/LTTng-Kernel-Analysis.html#Incomplete_regions_2" label="Incomplete regions"></topic>
 			<topic href="doc/LTTng-Kernel-Analysis.html#Toolbar_2" label="Toolbar"></topic>
 		</topic>
-		<topic href="doc/LTTng-Kernel-Analysis.html#Events_View_2" label="Events View"></topic>
+		<topic href="doc/LTTng-Kernel-Analysis.html#LTTng_Kernel_Events_Editor" label="LTTng Kernel Events Editor"></topic>
 	</topic>
+	<topic href="doc/Timestamp-formatting.html" label="Timestamp formatting"></topic>
 	<topic href="doc/Limitations.html" label="Limitations"></topic>
 	<topic href="doc/How-to-use-LTTng-to-diagnose-problems.html" label="How to use LTTng to diagnose problems">
 		<topic href="doc/How-to-use-LTTng-to-diagnose-problems.html#Random_stutters" label="Random stutters"></topic>
