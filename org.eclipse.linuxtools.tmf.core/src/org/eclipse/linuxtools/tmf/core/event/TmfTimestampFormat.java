@@ -345,7 +345,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * @param value the timestamp value to format (in ns)
      * @return the formatted timestamp
      */
-    public String format(long value) {
+    public synchronized String format(long value) {
 
         // Split the timestamp value into its sub-components
         long sec = value / 1000000000;            // seconds
@@ -414,7 +414,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * @return the parsed value
      * @throws ParseException if the string has an invalid format
      */
-    public long parseValue(final String string, final long ref) throws ParseException {
+    public synchronized long parseValue(final String string, final long ref) throws ParseException {
 
         // Trivial case
         if (string == null || string.length() == 0) {
