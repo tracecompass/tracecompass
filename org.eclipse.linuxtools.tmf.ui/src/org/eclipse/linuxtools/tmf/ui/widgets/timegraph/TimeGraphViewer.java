@@ -259,7 +259,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         });
         _verticalScrollBar.setEnabled(false);
 
-        _stateCtrl = createTimeGraphControl();
+        _stateCtrl = createTimeGraphControl(_dataViewer, _colors);
 
         _stateCtrl.setTimeProvider(this);
         _stateCtrl.addSelectionListener(this);
@@ -305,8 +305,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _colors.dispose();
     }
 
-    protected TimeGraphControl createTimeGraphControl() {
-        return new TimeGraphControl(_dataViewer, _colors);
+    /**
+     * @since 2.0
+     */
+    protected TimeGraphControl createTimeGraphControl(Composite parent, TimeGraphColorScheme colors) {
+        return new TimeGraphControl(parent, colors);
     }
 
     /**

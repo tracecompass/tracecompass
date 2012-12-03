@@ -55,7 +55,11 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
@@ -89,6 +93,30 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     private ITimeGraphPresentationProvider fPresentationProvider;
 
     /**
+     * TimeChartViewer extends TimeGraphViewer to use a TimeGraphControl that overrides drawState
+     * to inhibit drawing of filtered-out events.
+     */
+    private class TimeChartViewer extends TimeGraphViewer {
+
+        public TimeChartViewer(Composite parent, int style) {
+            super(parent, style);
+        }
+
+        @Override
+        protected TimeGraphControl createTimeGraphControl(Composite parent, TimeGraphColorScheme colorScheme) {
+            return new TimeGraphControl(parent, colorScheme) {
+                @Override
+                protected void drawState(TimeGraphColorScheme colors, ITimeEvent event, Rectangle rect, GC gc, boolean selected, boolean timeSelected) {
+                    if (! ((TimeChartEvent) event).isVisible()) {
+                        return;
+                    }
+                    super.drawState(colors, event, rect, gc, selected, timeSelected);
+                }
+            };
+        }
+    }
+
+    /**
      * Default constructor
      */
     public TimeChartView() {
@@ -98,7 +126,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     @Override
     public void createPartControl(Composite parent) {
-        fViewer = new TimeGraphViewer(parent, SWT.NONE);
+        fViewer = new TimeChartViewer(parent, SWT.NONE);
         fPresentationProvider = new TimeChartAnalysisProvider();
         fViewer.setTimeGraphProvider(fPresentationProvider);
         fViewer.setTimeCalendarFormat(true);
