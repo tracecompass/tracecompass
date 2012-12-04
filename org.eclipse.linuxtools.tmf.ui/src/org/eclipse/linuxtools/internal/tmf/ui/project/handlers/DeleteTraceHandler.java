@@ -133,13 +133,13 @@ public class DeleteTraceHandler extends AbstractHandler {
                                 child.getResource().delete(true, null);
                             }
                         }
+
+                        // Delete supplementary files
+                        trace.deleteSupplementaryFolder();
                     }
 
                     // Finally, delete the trace
                     resource.delete(true, new NullProgressMonitor());
-
-                    // Delete supplementary files
-                    trace.deleteSupplementaryFolder();
 
                     // Refresh the project
                     trace.getProject().refresh();
