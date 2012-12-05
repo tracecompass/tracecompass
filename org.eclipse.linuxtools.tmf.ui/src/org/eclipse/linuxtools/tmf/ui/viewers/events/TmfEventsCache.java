@@ -100,6 +100,9 @@ public class TmfEventsCache {
      * Clear the current contents of this cache.
      */
     public synchronized void clear() {
+        if (job != null && job.getState() != Job.NONE) {
+            job.cancel();
+        }
         Arrays.fill(fCache, null);
         fCacheStartIndex = 0;
         fCacheEndIndex = 0;
