@@ -78,7 +78,7 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
         String string = fTextValue.getText();
         long value = 0;
         try {
-            value = TmfTimestampFormat.getDefaulTimeFormat().parseValue(string, fTraceStartTime);
+            value = TmfTimestampFormat.getDefaulTimeFormat().parseValue(string, getValue());
         } catch (ParseException e) {
         }
         if (getValue() != value) {
