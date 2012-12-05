@@ -1184,6 +1184,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                 @Override
                 public void run() {
                     resetStartFinishTime();
+                    notifyStartFinishTime();
                 }
             };
             resetScale.setText(Messages.TmfTimeGraphViewer_ResetScaleActionNameText);
