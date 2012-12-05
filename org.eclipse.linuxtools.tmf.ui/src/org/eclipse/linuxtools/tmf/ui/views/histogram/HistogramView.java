@@ -446,7 +446,6 @@ public class HistogramView extends TmfView {
             return;
         }
 
-        boolean drawTimeRangeHistogram = fTraceStartTime == 0;
         TmfTimeRange fullRange = signal.getRange();
 
         fTraceStartTime = fullRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
@@ -454,17 +453,6 @@ public class HistogramView extends TmfView {
 
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
-
-        if (drawTimeRangeHistogram) {
-            long startTime = fTrace.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-            long duration = fTrace.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue() - startTime;
-            fCurrentTimestamp = fTrace.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-            fCurrentEventTimeControl.setValue(fCurrentTimestamp);
-            fTimeSpanControl.setValue(duration);
-            fFullTraceHistogram.setTimeRange(startTime, duration);
-            fTimeRangeHistogram.setTimeRange(startTime, duration);
-            sendTimeRangeRequest(startTime, startTime + duration);
-        }
 
         sendFullRangeRequest(fullRange);
     }
@@ -487,6 +475,7 @@ public class HistogramView extends TmfView {
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
 
         fFullTraceHistogram.setTimeRange(fTimeRangeHistogram.getStartTime(), fWindowSpan);
+        fTimeRangeHistogram.setTimeRange(fTimeRangeHistogram.getStartTime(), fWindowSpan);
 
         if ((fFullTraceRequest != null) && fFullTraceRequest.getRange().getEndTime().compareTo(signal.getRange().getEndTime()) < 0) {
             sendFullRangeRequest(fullRange);
@@ -605,6 +594,7 @@ public class HistogramView extends TmfView {
         TmfTimeRange timeRange = new TmfTimeRange(startTS, endTS);
 
         fTimeRangeHistogram.clear();
+        fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setTimeRange(startTime, endTime - startTime);
 
         int cacheSize = fTrace.getCacheSize();

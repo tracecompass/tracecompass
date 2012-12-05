@@ -82,7 +82,9 @@ public class TimeRangeHistogram extends Histogram {
      */
     public synchronized void setTimeRange(long startTime, long duration) {
         fZoom.setNewRange(startTime, duration);
-        getDataModel().setTimeRange(startTime, startTime + duration);
+        if (getDataModel().getNbEvents() == 0) {
+            getDataModel().setTimeRange(startTime, startTime + duration);
+        }
     }
 
     /**
