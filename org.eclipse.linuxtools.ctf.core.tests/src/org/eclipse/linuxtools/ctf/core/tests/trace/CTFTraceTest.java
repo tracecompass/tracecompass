@@ -104,9 +104,16 @@ public class CTFTraceTest {
      */
     @Test
     public void testAddStream() throws ParseException, CTFReaderException {
+        // test number of streams
+        int nbStreams = fixture.nbStreams();
+        assertEquals(1, nbStreams);
+        // Add a stream
         Stream stream = new Stream(TestParams.createTrace());
         stream.setId(1234);
         fixture.addStream(stream);
+        // test number of streams
+        nbStreams = fixture.nbStreams();
+        assertEquals(2, nbStreams);
     }
 
     /**
@@ -226,15 +233,6 @@ public class CTFTraceTest {
     public void testMinorIsSet() {
         boolean result = fixture.minorIsSet();
         assertTrue(result);
-    }
-
-    /**
-     * Run the int nbStreams() method test.
-     */
-    @Test
-    public void testNbStreams() {
-        int result = fixture.nbStreams();
-        assertEquals(2, result);
     }
 
     /**
