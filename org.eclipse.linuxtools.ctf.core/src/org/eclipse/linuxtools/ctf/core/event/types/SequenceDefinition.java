@@ -12,12 +12,12 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
  * A CTF sequence definition (a fixed-size array).
- * 
+ *
  * An array where the size is fixed but declared in the trace, unlike array
  * where it is declared with a literal
  *

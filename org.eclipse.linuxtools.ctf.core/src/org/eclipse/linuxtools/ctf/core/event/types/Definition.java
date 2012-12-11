@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
  * A CTF definiton
@@ -98,6 +98,7 @@ public abstract class Definition {
      *
      * @param input
      *            the bitbuffer containing the data to read.
+     * @since 2.0
      */
     public abstract void read(BitBuffer input);
 

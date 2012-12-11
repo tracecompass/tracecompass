@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteOrder;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

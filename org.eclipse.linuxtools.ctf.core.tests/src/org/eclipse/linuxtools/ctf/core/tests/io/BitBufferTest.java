@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

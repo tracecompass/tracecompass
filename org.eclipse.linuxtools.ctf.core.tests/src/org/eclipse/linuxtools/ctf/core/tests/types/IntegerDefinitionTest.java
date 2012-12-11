@@ -5,11 +5,11 @@ import static org.junit.Assert.assertNotNull;
 
 import java.nio.ByteOrder;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -19,6 +19,7 @@ import java.util.HashMap;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
@@ -26,8 +27,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.SimpleDatatypeDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
@@ -156,7 +155,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
      *
      * @return the current packet
      */
-    public StreamInputPacketIndexEntry getCurrentPacket() {
+    StreamInputPacketIndexEntry getCurrentPacket() {
         return this.currentPacket;
     }
 
@@ -202,7 +201,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
      * @param currentPacket
      *            The index entry of the packet to switch to.
      */
-    public void setCurrentPacket(StreamInputPacketIndexEntry currentPacket) {
+    void setCurrentPacket(StreamInputPacketIndexEntry currentPacket) {
         this.currentPacket = currentPacket;
 
         if (this.currentPacket != null) {

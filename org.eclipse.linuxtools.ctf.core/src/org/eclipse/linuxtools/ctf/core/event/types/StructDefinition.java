@@ -16,11 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
  * A CTF structure definition (similar to a C structure).
- * 
+ *
  * A structure is similar to a C structure, it is a compound data type that
  * contains other datatypes in fields. they are stored in an hashmap and indexed
  * by names which are strings.

@@ -12,11 +12,11 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
  * A CTF string definition (similar to a C null-terminated byte array).
- * 
+ *
  * Strings are an array of bytes of variable size and are terminated by a '\0'
  * "NULL" character. Their encoding is described in the TSDL meta-data. In
  * absence of encoding attribute information, the default encoding is UTF-8.

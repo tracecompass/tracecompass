@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.nio.ByteOrder;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
@@ -28,7 +29,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventField;
 import org.junit.After;
 import org.junit.Before;

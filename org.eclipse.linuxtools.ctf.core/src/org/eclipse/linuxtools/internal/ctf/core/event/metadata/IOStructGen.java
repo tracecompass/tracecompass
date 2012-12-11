@@ -36,9 +36,9 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
+import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
-import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
 /**
  * IOStructGen

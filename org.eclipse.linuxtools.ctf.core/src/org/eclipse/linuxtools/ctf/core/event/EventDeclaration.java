@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.ctf.core.event;
 
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
+import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
-import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
 /**
  * Representation of one type of event. A bit like "int" or "long" but for trace
@@ -172,6 +172,7 @@ public class EventDeclaration {
     /**
      * Sets the stream of am event declaration
      * @param stream the stream
+     * @since 2.0
      */
     public void setStream(Stream stream) {
         this.stream = stream;
@@ -180,6 +181,7 @@ public class EventDeclaration {
     /**
      * Gets the stream of am event declaration
      * @return stream the stream
+     * @since 2.0
      */
     public Stream getStream() {
         return stream;

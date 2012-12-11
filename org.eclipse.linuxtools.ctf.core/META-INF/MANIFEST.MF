@@ -11,10 +11,10 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.linuxtools.ctf.parser;bundle-version="1.0.0"
 Export-Package: org.eclipse.linuxtools.ctf.core.event,
+ org.eclipse.linuxtools.ctf.core.event.io,
  org.eclipse.linuxtools.ctf.core.event.types,
  org.eclipse.linuxtools.ctf.core.trace,
  org.eclipse.linuxtools.internal.ctf.core;x-internal:=true,
- org.eclipse.linuxtools.internal.ctf.core.event.io;x-internal:=true,
  org.eclipse.linuxtools.internal.ctf.core.event.metadata;x-internal:=true,
  org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions;x-internal:=true,
  org.eclipse.linuxtools.internal.ctf.core.trace;x-internal:=true

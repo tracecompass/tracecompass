@@ -10,7 +10,7 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.ctf.core.trace;
+package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.UUID;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
@@ -27,14 +28,14 @@ import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.Utils;
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndex;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
  * <b><u>StreamInput</u></b>
  * <p>
  * Represents a trace file that belongs to a certain stream.
+ * @since 2.0
  */
 public class StreamInput implements IDefinitionScope {
 
@@ -118,7 +119,7 @@ public class StreamInput implements IDefinitionScope {
      *
      * @return the stream input Index
      */
-    public StreamInputPacketIndex getIndex() {
+    StreamInputPacketIndex getIndex() {
         return index;
     }
 

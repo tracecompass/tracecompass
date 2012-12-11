@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 
 import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
  * A CTF integer definition.

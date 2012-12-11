@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
-import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.ctf.core.trace.Stream;
 
 @SuppressWarnings("javadoc")
 public class ReadTrace {

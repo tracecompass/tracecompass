@@ -10,7 +10,7 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.ctf.core.trace;
+package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,13 +18,13 @@ import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 
 /**
  * <b><u>Stream</u></b>
  * <p>
  * Represents a stream in a trace.
+ * @since 2.0
  */
 public class Stream {
 

@@ -15,11 +15,11 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
  * A CTF variant definition (similar to a C union).
- * 
+ *
  * A variant is similar to a C union, only taking the minimum size of the types,
  * it is a compound data type that contains other datatypes in fields. they are
  * stored in an hashmap and indexed by names which are strings.
