@@ -17,3 +17,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.linuxtools.lttng2.core;bundle-version="2.0.0",
  org.eclipse.linuxtools.lttng2.ui;bundle-version="2.0.0",
  org.eclipse.linuxtools.lttng2.kernel.core;bundle-version="2.0.0"
+Export-Package: org.eclipse.linuxtools.internal.lttng2.kernel.ui;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.kernel.ui.views;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.common;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;x-internal:=true
