@@ -68,10 +68,6 @@ public class LTTng2EventsTable extends TmfEventsTable {
         fTable.getColumns()[3].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_CONTENT);
     }
 
-    /**
-     * @param event
-     * @return
-     */
     @Override
     protected ITmfEventField[] extractItemFields(ITmfEvent event) {
         ITmfEventField[] fields = new TmfEventField[0];

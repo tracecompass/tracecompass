@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
-import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IFolderLayout;
@@ -31,7 +30,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     public static final String ID = "org.eclipse.linuxtools.lttng2.ui.perspective"; //$NON-NLS-1$
 
     // LTTng views
-    private static final String EVENTS_VIEW_ID = TmfEventsView.ID;
     private static final String HISTOGRAM_VIEW_ID = HistogramView.ID;
     private static final String CONTROL_VIEW_ID = ControlView.ID;
     private static final String CONTROLFLOW_VIEW_ID = ControlFlowView.ID;
@@ -51,7 +49,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     @Override
     public void createInitialLayout(IPageLayout layout) {
 
-        layout.setEditorAreaVisible(false);
+        layout.setEditorAreaVisible(true);
 
         addFastViews(layout);
         addViewShortcuts(layout);
@@ -74,14 +72,9 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         topRightFolder.addView(RESOURCES_VIEW_ID);
         topRightFolder.addView(STATISTICS_VIEW_ID);
 
-        // Create the middle right folder
-        IFolderLayout middleRightFolder = layout.createFolder(
-                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
-        middleRightFolder.addView(EVENTS_VIEW_ID);
-
         // Create the bottom right folder
         IFolderLayout bottomRightFolder = layout.createFolder(
-                "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+                "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
         bottomRightFolder.addView(PROPERTIES_VIEW_ID);
         bottomRightFolder.addView(BOOKMARKS_VIEW_ID);

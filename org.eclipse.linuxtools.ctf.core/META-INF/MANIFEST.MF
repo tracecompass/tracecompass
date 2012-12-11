@@ -8,7 +8,7 @@ Bundle-SymbolicName: org.eclipse.linuxtools.ctf.core;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.ctf.core.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.linuxtools.ctf.parser;bundle-version="1.0.0"
 Export-Package: org.eclipse.linuxtools.ctf.core.event,
  org.eclipse.linuxtools.ctf.core.event.types,

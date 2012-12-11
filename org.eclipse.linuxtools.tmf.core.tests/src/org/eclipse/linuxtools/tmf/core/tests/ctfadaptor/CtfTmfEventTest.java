@@ -176,7 +176,7 @@ public class CtfTmfEventTest {
         assertEquals("No stream", nullEvent.getChannelName()); //$NON-NLS-1$
         assertArrayEquals(new ITmfEventField[0], nullEvent.getContent().getFields());
         assertEquals(-1L, nullEvent.getID());
-        assertEquals(-1L, nullEvent.getTimestampValue());
+        assertEquals(-1L, nullEvent.getTimestamp().getValue());
     }
 
     /**
@@ -186,7 +186,7 @@ public class CtfTmfEventTest {
     @Test
     public void testGetTimestamp() {
         CtfTmfEvent nullEvent = CtfTmfEvent.getNullEvent();
-        long result = nullEvent.getTimestampValue();
+        long result = nullEvent.getTimestamp().getValue();
 
         assertEquals(-1L, result);
     }

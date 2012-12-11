@@ -81,14 +81,14 @@ public class TmfCheckpointIndexTest extends TestCase {
     // Helper classes
     // ------------------------------------------------------------------------
 
-    private static class TestIndexer extends TmfCheckpointIndexer<ITmfTrace<ITmfEvent>> {
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static class TestIndexer extends TmfCheckpointIndexer {
+        @SuppressWarnings({ })
         public TestIndexer(TestTrace testTrace) {
-            super((ITmfTrace) testTrace, BLOCK_SIZE);
+            super(testTrace, BLOCK_SIZE);
         }
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings({ })
         public TestIndexer(EmptyTestTrace testTrace) {
-            super((ITmfTrace) testTrace, BLOCK_SIZE);
+            super(testTrace, BLOCK_SIZE);
         }
         public List<ITmfCheckpoint> getCheckpoints() {
             return getTraceIndex();
@@ -175,9 +175,9 @@ public class TmfCheckpointIndexTest extends TestCase {
     public void testEmptyTmfTraceIndexing() {
         assertEquals("getCacheSize",   ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, fEmptyTrace.getCacheSize());
         assertEquals("getTraceSize",   0,  fEmptyTrace.getNbEvents());
-        assertEquals("getRange-start", TmfTimestamp.BIG_CRUNCH, fEmptyTrace.getTimeRange().getStartTime());
+        assertEquals("getRange-start", TmfTimestamp.BIG_BANG, fEmptyTrace.getTimeRange().getStartTime());
         assertEquals("getRange-end",   TmfTimestamp.BIG_BANG, fEmptyTrace.getTimeRange().getEndTime());
-        assertEquals("getStartTime",   TmfTimestamp.BIG_CRUNCH, fEmptyTrace.getStartTime());
+        assertEquals("getStartTime",   TmfTimestamp.BIG_BANG, fEmptyTrace.getStartTime());
         assertEquals("getEndTime",     TmfTimestamp.BIG_BANG, fEmptyTrace.getEndTime());
 
         List<ITmfCheckpoint> checkpoints = fEmptyTrace.getIndexer().getCheckpoints();

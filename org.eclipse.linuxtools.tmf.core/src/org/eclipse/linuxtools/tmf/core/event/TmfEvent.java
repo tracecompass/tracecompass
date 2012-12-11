@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Event Model 1.0
@@ -13,8 +13,10 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * A basic implementation of ITmfEvent.
@@ -22,22 +24,22 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * Note that for performance reasons TmfEvent is NOT immutable. If a shallow
  * copy of the event is needed, use the copy constructor. Otherwise (deep copy)
  * use clone().
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  * @see ITmfTimestamp
  * @see ITmfEventType
  * @see ITmfEventField
  * @see ITmfTrace
 */
-public class TmfEvent implements ITmfEvent, Cloneable {
+public class TmfEvent implements ITmfEvent, IAdaptable, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private ITmfTrace<? extends ITmfEvent> fTrace;
+    private ITmfTrace fTrace;
     private long fRank;
     private ITmfTimestamp fTimestamp;
     private String fSource;
@@ -68,7 +70,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
      * @param reference the event reference
 
      */
-    public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final ITmfTimestamp timestamp, final String source,
+    public TmfEvent(final ITmfTrace trace, final ITmfTimestamp timestamp, final String source,
             final ITmfEventType type, final ITmfEventField content, final String reference)
     {
         this(trace, ITmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
@@ -76,7 +78,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
 
     /**
      * Full constructor
-     * 
+     *
      * @param trace the parent trace
      * @param rank the event rank (in the trace)
      * @param timestamp the event timestamp
@@ -85,7 +87,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
      * @param content the event content (payload)
      * @param reference the event reference
      */
-    public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final long rank, final ITmfTimestamp timestamp, final String source,
+    public TmfEvent(final ITmfTrace trace, final long rank, final ITmfTimestamp timestamp, final String source,
             final ITmfEventType type, final ITmfEventField content, final String reference)
     {
         fTrace = trace;
@@ -99,7 +101,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param event the original event
      */
     public TmfEvent(final ITmfEvent event) {
@@ -123,7 +125,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getTrace()
      */
     @Override
-    public ITmfTrace<? extends ITmfEvent> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 
@@ -182,7 +184,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
     /**
      * @param trace the new event trace
      */
-    protected void setTrace(final ITmfTrace<? extends ITmfEvent> trace) {
+    protected void setTrace(final ITmfTrace trace) {
         fTrace = trace;
     }
 
@@ -242,7 +244,7 @@ public class TmfEvent implements ITmfEvent, Cloneable {
             clone = (TmfEvent) super.clone();
             clone.fTrace = fTrace;
             clone.fRank = fRank;
-            clone.fTimestamp = fTimestamp != null ? fTimestamp.clone() : null;
+            clone.fTimestamp = fTimestamp;
             clone.fSource = fSource;
             clone.fType = fType != null ? fType.clone() : null;
             clone.fContent = fContent != null ? fContent.clone() : null;
@@ -347,4 +349,17 @@ public class TmfEvent implements ITmfEvent, Cloneable {
                 + ", fReference=" + fReference + "]";
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new TmfEventPropertySource(this);
+        }
+        return null;
+    }
 }

@@ -1169,6 +1169,7 @@ public class LTTngControlService implements ILttngControlService {
      *            - a progress monitor
      * @return the command result
      * @throws ExecutionException
+     *             If the command fails
      */
     protected ICommandResult executeCommand(String command,
             IProgressMonitor monitor) throws ExecutionException {

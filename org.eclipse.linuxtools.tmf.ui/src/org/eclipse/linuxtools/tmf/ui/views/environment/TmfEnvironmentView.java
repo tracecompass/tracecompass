@@ -8,29 +8,29 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Bernd Hufmann - Updated to use Tree with columns to be able to group traces
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.environment;
 
-import java.util.ArrayList;
-
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorPart;
 
 /**
  * Displays the CTF trace properties.
  *
- * @version 1.0
+ * @version 1.1
  * @author Matthew Khouzam
  */
 public class TmfEnvironmentView extends TmfView {
@@ -38,10 +38,8 @@ public class TmfEnvironmentView extends TmfView {
     /** The Environment View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.environment"; //$NON-NLS-1$
 
-    private TmfExperiment<?> fExperiment;
-    private Table fTable;
-//    final private String fTitlePrefix;
-    private Composite fParent;
+    private ITmfTrace fTrace;
+    private Tree fTree;
 
     /**
      * Default constructor
@@ -54,63 +52,65 @@ public class TmfEnvironmentView extends TmfView {
     // ------------------------------------------------------------------------
     // ViewPart
     // ------------------------------------------------------------------------
-    final private class Pair{
-        final private String key;
-        final private String value;
-        public Pair(String k) { key = k ; value = "";} //$NON-NLS-1$
-        public Pair(String k, String v){ key = k; value = v; }
-        public String getKey() { return key; }
-        public String getValue() { return value; }
-    }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void createPartControl(Composite parent) {
-        fParent = parent;
-        TableItem ti[];
-        // If an experiment is already selected, update the table
-        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) TmfExperiment
-                .getCurrentExperiment();
-        if (experiment == null) {
-            return;
-        }
-        fTable = new Table(parent, SWT.BORDER|SWT.FILL);
-
-
-        ArrayList<Pair> tableData = new ArrayList<Pair>();
-        for (ITmfTrace trace : experiment.getTraces()) {
-            Pair traceEntry = new Pair(trace.getName());
-            tableData.add(traceEntry);
-            if (trace instanceof CtfTmfTrace) {
-                CtfTmfTrace ctfTrace = (CtfTmfTrace) trace;
-                for (String varName : ctfTrace
-                        .getEnvNames()) {
-                    tableData.add(new Pair( varName, ctfTrace.getEnvValue(varName)));
-                }
-            }
-        }
-        TableColumn nameCol = new TableColumn(fTable, SWT.NONE, 0);
-        TableColumn valueCol = new TableColumn(fTable, SWT.NONE, 1);
+        fTree = new Tree(parent, SWT.NONE);
+        TreeColumn nameCol = new TreeColumn(fTree, SWT.NONE, 0);
+        TreeColumn valueCol = new TreeColumn(fTree, SWT.NONE, 1);
         nameCol.setText("Environment Variable"); //$NON-NLS-1$
         valueCol.setText("Value"); //$NON-NLS-1$
 
-        final int tableSize = tableData.size();
+        fTree.setItemCount(0);
 
-        fTable.setItemCount(tableSize);
-        ti = fTable.getItems();
-        for(int i = 0; i < tableSize; i++){
-            final Pair currentPair = tableData.get(i);
-            ti[i].setText(0, currentPair.getKey());
-            ti[i].setText(1, currentPair.getValue());
-        }
-
-        fTable.setHeaderVisible(true);
+        fTree.setHeaderVisible(true);
         nameCol.pack();
         valueCol.pack();
-        fTable.pack();
 
-        parent.layout();
+        IEditorPart editor = getSite().getPage().getActiveEditor();
+        if (editor instanceof ITmfTraceEditor) {
+            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
+            if (trace != null) {
+                traceSelected(new TmfTraceSelectedSignal(this, trace));
+            }
+        }
+    }
 
+    private void updateTable() {
+        fTree.setItemCount(0);
+        if (fTrace == null) {
+            return;
+        }
+
+        ITmfTrace[] traces;
+        if (fTrace instanceof TmfExperiment) {
+            TmfExperiment experiment = (TmfExperiment) fTrace;
+            traces = experiment.getTraces();
+        } else {
+            traces = new ITmfTrace[] { fTrace };
+        }
+
+        for (ITmfTrace trace : traces) {
+            if (trace instanceof CtfTmfTrace) {
+                TreeItem item = new TreeItem(fTree, SWT.NONE);
+                item.setText(0, trace.getName());
+                CtfTmfTrace ctfTrace = (CtfTmfTrace) trace;
+                for (String varName : ctfTrace.getEnvNames()) {
+                    TreeItem subItem = new TreeItem(item, SWT.NONE);
+                    subItem.setText(0, varName);
+                    subItem.setText(1, ctfTrace.getEnvValue(varName));
+                }
+            }
+        }
+
+        // Expand the tree items
+        for (int i = 0; i < fTree.getItemCount(); i++) {
+            fTree.getItem(i).setExpanded(true);
+        }
+
+        for (TreeColumn column : fTree.getColumns()) {
+            column.pack();
+        }
     }
 
     /* (non-Javadoc)
@@ -118,37 +118,39 @@ public class TmfEnvironmentView extends TmfView {
      */
     @Override
     public void setFocus() {
-        fTable.setFocus();
-    }
-
-    @Override
-    public void dispose() {
-        if (fTable != null) {
-            fTable.dispose();
-        }
-        super.dispose();
+        fTree.setFocus();
     }
 
     /**
-     * Handler for the experiment updated signal.
+     * Handler for the trace selected signal.
      *
      * @param signal
      *            The incoming signal
+     * @since 2.0
      */
-    @SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
+    public void traceSelected(TmfTraceSelectedSignal signal) {
         // Update the trace reference
-        TmfExperiment<TmfEvent> exp = (TmfExperiment<TmfEvent>) signal.getExperiment();
-        if (!exp.equals(fExperiment)) {
-            fExperiment = exp;
-            if (fTable != null) {
-                fTable.dispose();
-            }
-            createPartControl( fParent );
-            fParent.layout();
+        ITmfTrace trace = signal.getTrace();
+        if (!trace.equals(fTrace)) {
+            fTrace = trace;
+            updateTable();
         }
     }
 
+    /**
+     * Handler for the trace closed signal.
+     *
+     * @param signal the incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void traceClosed(TmfTraceClosedSignal signal) {
+        if (signal.getTrace() == fTrace) {
+            fTrace = null;
+            fTree.setItemCount(0);
+        }
+    }
 
 }
+

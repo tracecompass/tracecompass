@@ -540,7 +540,6 @@ public class Utils {
      *            expects.
      * @return The mangled string of types
      */
-    @SuppressWarnings("nls")
     static public String getTypeSignature(String type) {
         int dim = 0;
         for (int j = 0; j < type.length(); j++) {

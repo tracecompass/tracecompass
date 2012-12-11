@@ -13,6 +13,8 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
+import java.util.Collection;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
@@ -20,6 +22,8 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
+import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 
 /**
  * The event stream structure in TMF. In its basic form, a trace has:
@@ -99,8 +103,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * }
  * </pre>
  *
- * @param <T> The trace event type
- *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -109,7 +111,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * @see ITmfTraceIndexer
  * @see ITmfEventParser
  */
-public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
+public interface ITmfTrace extends ITmfDataProvider {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -137,7 +139,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param type the trace event type
      * @throws TmfTraceException If we couldn't open the trace
      */
-    public void initTrace(IResource resource, String path, Class<T> type) throws TmfTraceException;
+    public void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type) throws TmfTraceException;
 
     /**
      * Validate that the trace is of the correct type.
@@ -156,7 +158,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     /**
      * @return the trace event type
      */
-    public Class<T> getEventType();
+    public Class<? extends ITmfEvent> getEventType();
 
     /**
      * @return the associated trace resource
@@ -172,6 +174,32 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @return the trace cache size
      */
     public int getCacheSize();
+
+    /**
+     * @return The statistics provider for this trace
+     * @since 2.0
+     */
+    public ITmfStatistics getStatistics();
+
+    /**
+     * Retrieve a state system that belongs to this trace
+     *
+     * @param id
+     *            The ID of the state system to retrieve.
+     * @return The state system that is associated with this trace and ID, or
+     *         'null' if such a match doesn't exist.
+     * @since 2.0
+     */
+    public ITmfStateSystem getStateSystem(String id);
+
+    /**
+     * Return the list of existing state systems registered with this trace.
+     *
+     * @return A Collection view of the available state systems. The collection
+     *         could be empty, but should not be null.
+     * @since 2.0
+     */
+    public Collection<String> listStateSystems();
 
     // ------------------------------------------------------------------------
     // Trace characteristics getters
@@ -209,7 +237,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     /**
      * @return the current trace location
      */
-    public ITmfLocation<?> getCurrentLocation();
+    public ITmfLocation getCurrentLocation();
 
     /**
      * Returns the ratio (proportion) corresponding to the specified location.
@@ -217,7 +245,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param location a trace specific location
      * @return a floating-point number between 0.0 (beginning) and 1.0 (end)
      */
-    public double getLocationRatio(ITmfLocation<?> location);
+    public double getLocationRatio(ITmfLocation location);
 
     // ------------------------------------------------------------------------
     // SeekEvent operations (returning a trace context)
@@ -235,7 +263,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param location the trace specific location
      * @return a context which can later be used to read the corresponding event
      */
-    public ITmfContext seekEvent(ITmfLocation<?> location);
+    public ITmfContext seekEvent(ITmfLocation location);
 
     /**
      * Position the trace at the 'rank'th event in the trace.
@@ -280,4 +308,27 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      */
     public ITmfContext seekEvent(double ratio);
 
+    /**
+     * Returns the initial range offset
+     *
+     * @return the initial range offset
+     * @since 2.0
+     */
+    public ITmfTimestamp getInitialRangeOffset();
+
+    /**
+     * Return the current selected time.
+     *
+     * @return the current time stamp
+     * @since 2.0
+     */
+    public ITmfTimestamp getCurrentTime();
+
+    /**
+     * Return the current selected range.
+     *
+     * @return the current time range
+     * @since 2.0
+     */
+    public TmfTimeRange getCurrentRange();
 }

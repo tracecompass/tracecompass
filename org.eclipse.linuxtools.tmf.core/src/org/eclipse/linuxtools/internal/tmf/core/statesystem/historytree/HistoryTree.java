@@ -2,12 +2,12 @@
  * Copyright (c) 2012 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.Vector;
 
@@ -26,9 +27,9 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 /**
  * Meta-container for the History Tree. This structure contains all the
  * high-level data relevant to the tree.
- * 
+ *
  * @author alexmont
- * 
+ *
  */
 class HistoryTree {
 
@@ -65,7 +66,7 @@ class HistoryTree {
     /**
      * Create a new State History from scratch, using a SHTConfig object for
      * configuration
-     * 
+     *
      * @param conf
      * @throws IOException
      */
@@ -103,7 +104,7 @@ class HistoryTree {
     /**
      * "Reader" constructor : instantiate a SHTree from an existing tree file on
      * disk
-     * 
+     *
      * @param existingFileName
      *            Path/filename of the history-file we are to open
      * @throws IOException
@@ -194,7 +195,7 @@ class HistoryTree {
      * commit all nodes to disk and then return the RandomAccessFile descriptor
      * so the Tree object can save its configuration into the header of the
      * file.
-     * 
+     *
      * @param requestedEndTime
      */
     void closeTree(long requestedEndTime) {
@@ -202,11 +203,11 @@ class HistoryTree {
         ByteBuffer buffer;
         int i, res;
 
-        /* 
+        /*
          * Work-around the "empty branches" that get created when the root node
          * becomes full. Overwrite the tree's end time with the original wanted
          * end-time, to ensure no queries are sent into those empty nodes.
-         * 
+         *
          * This won't be needed once extended nodes are implemented.
          */
         this.treeEnd = requestedEndTime;
@@ -287,12 +288,13 @@ class HistoryTree {
      * Rebuild the latestBranch "cache" object by reading the nodes from disk
      * (When we are opening an existing file on disk and want to append to it,
      * for example).
-     * 
+     *
      * @param rootNodeSeqNb
      *            The sequence number of the root node, so we know where to
      *            start
+     * @throws ClosedChannelException
      */
-    private void rebuildLatestBranch(int rootNodeSeqNb) {
+    private void rebuildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
         HTNode nextChildNode;
 
         this.latestBranch = new Vector<CoreNode>();
@@ -307,7 +309,7 @@ class HistoryTree {
 
     /**
      * Insert an interval in the tree
-     * 
+     *
      * @param interval
      */
     void insertInterval(HTInterval interval) throws TimeRangeException {
@@ -319,7 +321,7 @@ class HistoryTree {
 
     /**
      * Inner method to find in which node we should add the interval.
-     * 
+     *
      * @param interval
      *            The interval to add to the tree
      * @param indexOfNode
@@ -364,7 +366,7 @@ class HistoryTree {
     /**
      * Method to add a sibling to any node in the latest branch. This will add
      * children back down to the leaf level, if needed.
-     * 
+     *
      * @param indexOfNode
      *            The index in latestBranch where we start adding
      */
@@ -442,7 +444,7 @@ class HistoryTree {
 
     /**
      * Add a new empty node to the tree.
-     * 
+     *
      * @param parentSeqNumber
      *            Sequence number of this node's parent
      * @param startTime
@@ -465,12 +467,14 @@ class HistoryTree {
      * Inner method to select the next child of the current node intersecting
      * the given timestamp. Useful for moving down the tree following one
      * branch.
-     * 
+     *
      * @param currentNode
      * @param t
      * @return The child node intersecting t
+     * @throws ClosedChannelException
+     *             If the file channel was closed while we were reading the tree
      */
-    HTNode selectNextChild(CoreNode currentNode, long t) {
+    HTNode selectNextChild(CoreNode currentNode, long t) throws ClosedChannelException {
         assert (currentNode.getNbChildren() > 0);
         int potentialNextSeqNb = currentNode.getSequenceNumber();
 
@@ -511,9 +515,9 @@ class HistoryTree {
         return config.stateFile.length();
     }
 
-    /**
-     * @name Test/debugging functions
-     */
+    // ------------------------------------------------------------------------
+    // Test/debugging methods
+    // ------------------------------------------------------------------------
 
     /* Only used for debugging, shouldn't be externalized */
     @SuppressWarnings("nls")
@@ -531,45 +535,50 @@ class HistoryTree {
 
         node = (CoreNode) zenode;
 
-        /*
-         * Test that this node's start and end times match the start of the
-         * first child and the end of the last child, respectively
-         */
-        if (node.getNbChildren() > 0) {
-            otherNode = treeIO.readNode(node.getChild(0));
-            if (node.getNodeStart() != otherNode.getNodeStart()) {
-                buf.append("Start time of node (" + node.getNodeStart() + ") "
-                        + "does not match start time of first child " + "("
-                        + otherNode.getNodeStart() + "), " + "node #"
-                        + otherNode.getSequenceNumber() + ")\n");
-                ret = false;
-            }
-            if (node.isDone()) {
-                otherNode = treeIO.readNode(node.getLatestChild());
-                if (node.getNodeEnd() != otherNode.getNodeEnd()) {
-                    buf.append("End time of node (" + node.getNodeEnd()
-                            + ") does not match end time of last child ("
-                            + otherNode.getNodeEnd() + ", node #"
+        try {
+            /*
+             * Test that this node's start and end times match the start of the
+             * first child and the end of the last child, respectively
+             */
+            if (node.getNbChildren() > 0) {
+                otherNode = treeIO.readNode(node.getChild(0));
+                if (node.getNodeStart() != otherNode.getNodeStart()) {
+                    buf.append("Start time of node (" + node.getNodeStart() + ") "
+                            + "does not match start time of first child " + "("
+                            + otherNode.getNodeStart() + "), " + "node #"
                             + otherNode.getSequenceNumber() + ")\n");
                     ret = false;
                 }
+                if (node.isDone()) {
+                    otherNode = treeIO.readNode(node.getLatestChild());
+                    if (node.getNodeEnd() != otherNode.getNodeEnd()) {
+                        buf.append("End time of node (" + node.getNodeEnd()
+                                + ") does not match end time of last child ("
+                                + otherNode.getNodeEnd() + ", node #"
+                                + otherNode.getSequenceNumber() + ")\n");
+                        ret = false;
+                    }
+                }
             }
-        }
 
-        /*
-         * Test that the childStartTimes[] array matches the real nodes' start
-         * times
-         */
-        for (int i = 0; i < node.getNbChildren(); i++) {
-            otherNode = treeIO.readNode(node.getChild(i));
-            if (otherNode.getNodeStart() != node.getChildStart(i)) {
-                buf.append("  Expected start time of child node #"
-                        + node.getChild(i) + ": " + node.getChildStart(i)
-                        + "\n" + "  Actual start time of node #"
-                        + otherNode.getSequenceNumber() + ": "
-                        + otherNode.getNodeStart() + "\n");
-                ret = false;
+            /*
+             * Test that the childStartTimes[] array matches the real nodes' start
+             * times
+             */
+            for (int i = 0; i < node.getNbChildren(); i++) {
+                otherNode = treeIO.readNode(node.getChild(i));
+                if (otherNode.getNodeStart() != node.getChildStart(i)) {
+                    buf.append("  Expected start time of child node #"
+                            + node.getChild(i) + ": " + node.getChildStart(i)
+                            + "\n" + "  Actual start time of node #"
+                            + otherNode.getSequenceNumber() + ": "
+                            + otherNode.getNodeStart() + "\n");
+                    ret = false;
+                }
             }
+
+        } catch (ClosedChannelException e) {
+            e.printStackTrace();
         }
 
         if (!ret) {
@@ -582,8 +591,12 @@ class HistoryTree {
     }
 
     void checkIntegrity() {
-        for (int i = 0; i < nodeCount; i++) {
-            checkNodeIntegrity(treeIO.readNode(i));
+        try {
+            for (int i = 0; i < nodeCount; i++) {
+                checkNodeIntegrity(treeIO.readNode(i));
+            }
+        } catch (ClosedChannelException e) {
+            e.printStackTrace();
         }
     }
 
@@ -622,14 +635,18 @@ class HistoryTree {
         }
         curDepth++;
 
-        for (i = 0; i < currentNode.getNbChildren(); i++) {
-            nextNode = treeIO.readNode(currentNode.getChild(i));
-            assert (nextNode instanceof CoreNode); // TODO temporary
-            for (j = 0; j < curDepth - 1; j++) {
-                writer.print("  ");
+        try {
+            for (i = 0; i < currentNode.getNbChildren(); i++) {
+                nextNode = treeIO.readNode(currentNode.getChild(i));
+                assert (nextNode instanceof CoreNode); // TODO temporary
+                for (j = 0; j < curDepth - 1; j++) {
+                    writer.print("  ");
+                }
+                writer.print("+-");
+                preOrderPrint(writer, printIntervals, (CoreNode) nextNode);
             }
-            writer.print("+-");
-            preOrderPrint(writer, printIntervals, (CoreNode) nextNode);
+        } catch (ClosedChannelException e) {
+            e.printStackTrace();
         }
         curDepth--;
         return;
@@ -637,7 +654,7 @@ class HistoryTree {
 
     /**
      * Print out the full tree for debugging purposes
-     * 
+     *
      * @param writer
      *            PrintWriter in which to write the output
      * @param printIntervals

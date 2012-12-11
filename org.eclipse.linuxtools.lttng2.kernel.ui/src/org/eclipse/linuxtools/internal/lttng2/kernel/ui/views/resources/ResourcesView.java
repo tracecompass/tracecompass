@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,23 +29,23 @@ import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemQuerier2;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -58,6 +59,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
 
 /**
  * Main implementation for the LTTng 2.0 kernel Resource view
@@ -73,9 +75,6 @@ public class ResourcesView extends TmfView {
     /** View ID. */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.views.resources"; //$NON-NLS-1$
 
-    /** Initial time range */
-    private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
-
     /**
      * Redraw state enum
      */
@@ -88,14 +87,17 @@ public class ResourcesView extends TmfView {
     // The time graph viewer
     TimeGraphViewer fTimeGraphViewer;
 
-    // The selected experiment
-    private TmfExperiment<ITmfEvent> fSelectedExperiment;
+    // The selected trace
+    private ITmfTrace fTrace;
 
     // The time graph entry list
     private ArrayList<TraceEntry> fEntryList;
 
-    // The time graph entry list synchronization object
-    final private Object fEntryListSyncObj = new Object();
+    // The trace to entry list hash map
+    final private HashMap<ITmfTrace, ArrayList<TraceEntry>> fEntryListMap = new HashMap<ITmfTrace, ArrayList<TraceEntry>>();
+
+    // The trace to build thread hash map
+    final private HashMap<ITmfTrace, BuildThread> fBuildThreadMap = new HashMap<ITmfTrace, BuildThread>();
 
     // The start time
     private long fStartTime;
@@ -127,7 +129,7 @@ public class ResourcesView extends TmfView {
 
     private class TraceEntry implements ITimeGraphEntry {
         // The Trace
-        private final CtfKernelTrace fTrace;
+        private final CtfKernelTrace fKernelTrace;
         // The start time
         private final long fTraceStartTime;
         // The end time
@@ -138,7 +140,7 @@ public class ResourcesView extends TmfView {
         private final String fName;
 
         public TraceEntry(CtfKernelTrace trace, String name, long startTime, long endTime) {
-            fTrace = trace;
+            fKernelTrace = trace;
             fChildren = new ArrayList<ResourcesEntry>();
             fName = name;
             fTraceStartTime = startTime;
@@ -156,8 +158,8 @@ public class ResourcesView extends TmfView {
         }
 
         @Override
-        public ResourcesEntry[] getChildren() {
-            return fChildren.toArray(new ResourcesEntry[0]);
+        public List<ResourcesEntry> getChildren() {
+            return fChildren;
         }
 
         @Override
@@ -191,7 +193,7 @@ public class ResourcesView extends TmfView {
         }
 
         public CtfKernelTrace getTrace() {
-            return fTrace;
+            return fKernelTrace;
         }
 
         public void addChild(ResourcesEntry entry) {
@@ -222,13 +224,38 @@ public class ResourcesView extends TmfView {
         }
     }
 
+    private class BuildThread extends Thread {
+        private final ITmfTrace fBuildTrace;
+        private final IProgressMonitor fMonitor;
+
+        public BuildThread(ITmfTrace trace) {
+            super("ResourcesView build"); //$NON-NLS-1$
+            fBuildTrace = trace;
+            fMonitor = new NullProgressMonitor();
+        }
+
+        @Override
+        public void run() {
+            buildEventList(fBuildTrace, fMonitor);
+            synchronized (fBuildThreadMap) {
+                fBuildThreadMap.remove(this);
+            }
+        }
+
+        public void cancel() {
+            fMonitor.setCanceled(true);
+        }
+    }
+
     private class ZoomThread extends Thread {
+        private final ArrayList<TraceEntry> fZoomEntryList;
         private final long fZoomStartTime;
         private final long fZoomEndTime;
         private final IProgressMonitor fMonitor;
 
-        public ZoomThread(long startTime, long endTime) {
+        public ZoomThread(ArrayList<TraceEntry> entryList, long startTime, long endTime) {
             super("ResourcesView zoom"); //$NON-NLS-1$
+            fZoomEntryList = entryList;
             fZoomStartTime = startTime;
             fZoomEndTime = endTime;
             fMonitor = new NullProgressMonitor();
@@ -236,15 +263,14 @@ public class ResourcesView extends TmfView {
 
         @Override
         public void run() {
-            ArrayList<TraceEntry> entryList = null;
-            synchronized (fEntryListSyncObj) {
-                entryList = fEntryList;
-            }
-            if (entryList == null) {
+            if (fZoomEntryList == null) {
                 return;
             }
             long resolution = Math.max(1, (fZoomEndTime - fZoomStartTime) / fDisplayWidth);
-            for (TraceEntry traceEntry : entryList) {
+            for (TraceEntry traceEntry : fZoomEntryList) {
+                if (!traceEntry.fKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID).waitUntilBuilt()) {
+                    return;
+                }
                 for (ITimeGraphEntry child : traceEntry.getChildren()) {
                     if (fMonitor.isCanceled()) {
                         break;
@@ -315,19 +341,17 @@ public class ResourcesView extends TmfView {
             }
         });
 
-        final Thread thread = new Thread("ResourcesView build") { //$NON-NLS-1$
-            @Override
-            public void run() {
-                if (TmfExperiment.getCurrentExperiment() != null) {
-                    selectExperiment(TmfExperiment.getCurrentExperiment());
-                }
-            }
-        };
-        thread.start();
-
         // View Action Handling
         makeActions();
         contributeToActionBars();
+
+        IEditorPart editor = getSite().getPage().getActiveEditor();
+        if (editor instanceof ITmfTraceEditor) {
+            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
+            if (trace != null) {
+                traceSelected(new TmfTraceSelectedSignal(this, trace));
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -343,24 +367,59 @@ public class ResourcesView extends TmfView {
     // ------------------------------------------------------------------------
 
     /**
-     * Handler for the ExperimentSelected signal
+     * Handler for the trace selected signal
      *
      * @param signal
      *            The incoming signal
      */
     @TmfSignalHandler
-    public void experimentSelected(final TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
-        if (signal.getExperiment().equals(fSelectedExperiment)) {
+    public void traceSelected(final TmfTraceSelectedSignal signal) {
+        if (signal.getTrace() == fTrace) {
             return;
         }
+        fTrace = signal.getTrace();
 
-        final Thread thread = new Thread("ResourcesView build") { //$NON-NLS-1$
-            @Override
-            public void run() {
-                selectExperiment(signal.getExperiment());
+        synchronized (fEntryListMap) {
+            fEntryList = fEntryListMap.get(fTrace);
+            if (fEntryList == null) {
+                synchronized (fBuildThreadMap) {
+                    BuildThread buildThread = new BuildThread(fTrace);
+                    fBuildThreadMap.put(fTrace, buildThread);
+                    buildThread.start();
+                }
+            } else {
+                fStartTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                fEndTime = fTrace.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                refresh();
             }
-        };
-        thread.start();
+        }
+    }
+
+    /**
+     * Trace is disposed: clear the data structures and the view
+     *
+     * @param signal the signal received
+     */
+    @TmfSignalHandler
+    public void traceClosed(final TmfTraceClosedSignal signal) {
+        synchronized (fBuildThreadMap) {
+            BuildThread buildThread = fBuildThreadMap.remove(signal.getTrace());
+            if (buildThread != null) {
+                buildThread.cancel();
+            }
+        }
+        synchronized (fEntryListMap) {
+            fEntryListMap.remove(signal.getTrace());
+        }
+        if (signal.getTrace() == fTrace) {
+            fTrace = null;
+            fStartTime = 0;
+            fEndTime = 0;
+            if (fZoomThread != null) {
+                fZoomThread.cancel();
+            }
+            refresh();
+        }
     }
 
     /**
@@ -371,10 +430,10 @@ public class ResourcesView extends TmfView {
      */
     @TmfSignalHandler
     public void synchToTime(final TmfTimeSynchSignal signal) {
-        if (signal.getSource() == this || fSelectedExperiment == null) {
+        if (signal.getSource() == this || fTrace == null) {
             return;
         }
-        final long time = signal.getCurrentTime().normalize(0, -9).getValue();
+        final long time = signal.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -395,12 +454,15 @@ public class ResourcesView extends TmfView {
      */
     @TmfSignalHandler
     public void synchToRange(final TmfRangeSynchSignal signal) {
-        if (signal.getSource() == this || fSelectedExperiment == null) {
+        if (signal.getSource() == this || fTrace == null) {
             return;
         }
-        final long startTime = signal.getCurrentRange().getStartTime().normalize(0, -9).getValue();
-        final long endTime = signal.getCurrentRange().getEndTime().normalize(0, -9).getValue();
-        final long time = signal.getCurrentTime().normalize(0, -9).getValue();
+        if (signal.getCurrentRange().getIntersection(fTrace.getTimeRange()) == null) {
+            return;
+        }
+        final long startTime = signal.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        final long endTime = signal.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        final long time = signal.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -414,49 +476,34 @@ public class ResourcesView extends TmfView {
         });
     }
 
-    /**
-     * Handler for the StatesystemBuildCompleted signal
-     *
-     * @param signal
-     *            The incoming signal
-     */
-    @TmfSignalHandler
-    public void stateSystemBuildCompleted (final TmfStateSystemBuildCompleted signal) {
-        final TmfExperiment<?> selectedExperiment = fSelectedExperiment;
-        if (selectedExperiment == null || selectedExperiment.getTraces() == null) {
-            return;
-        }
-        for (ITmfTrace<?> trace : selectedExperiment.getTraces()) {
-            if (trace == signal.getTrace() && trace instanceof CtfKernelTrace) {
-                final Thread thread = new Thread("ResourcesView build") { //$NON-NLS-1$
-                    @Override
-                    public void run() {
-                        // rebuild the model
-                        selectExperiment(selectedExperiment);
-                    }
-                };
-                thread.start();
-            }
-        }
-    }
-
     // ------------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
-    private void selectExperiment(TmfExperiment<?> experiment) {
+    private void buildEventList(final ITmfTrace trace, IProgressMonitor monitor) {
         fStartTime = Long.MAX_VALUE;
         fEndTime = Long.MIN_VALUE;
-        fSelectedExperiment = (TmfExperiment<ITmfEvent>) experiment;
+        ITmfTrace[] traces;
+        if (trace instanceof TmfExperiment) {
+            TmfExperiment experiment = (TmfExperiment) trace;
+            traces = experiment.getTraces();
+        } else {
+            traces = new ITmfTrace[] { trace };
+        }
         ArrayList<TraceEntry> entryList = new ArrayList<TraceEntry>();
-        for (ITmfTrace<?> trace : experiment.getTraces()) {
-            if (trace instanceof CtfKernelTrace) {
-                CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) trace;
-                IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
+        for (ITmfTrace aTrace : traces) {
+            if (monitor.isCanceled()) {
+                return;
+            }
+            if (aTrace instanceof CtfKernelTrace) {
+                CtfKernelTrace ctfKernelTrace = (CtfKernelTrace) aTrace;
+                ITmfStateSystem ssq = ctfKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID);
+                if (!ssq.waitUntilBuilt()) {
+                    return;
+                }
                 long startTime = ssq.getStartTime();
                 long endTime = ssq.getCurrentEndTime() + 1;
-                TraceEntry groupEntry = new TraceEntry(ctfKernelTrace, trace.getName(), startTime, endTime);
+                TraceEntry groupEntry = new TraceEntry(ctfKernelTrace, aTrace.getName(), startTime, endTime);
                 entryList.add(groupEntry);
                 fStartTime = Math.min(fStartTime, startTime);
                 fEndTime = Math.max(fEndTime, endTime);
@@ -489,18 +536,23 @@ public class ResourcesView extends TmfView {
                 }
             }
         }
-        synchronized (fEntryListSyncObj) {
-            fEntryList = (ArrayList<TraceEntry>) entryList.clone();
+        synchronized (fEntryListMap) {
+            fEntryListMap.put(trace, (ArrayList<TraceEntry>) entryList.clone());
         }
-        refresh(INITIAL_WINDOW_OFFSET);
+        if (trace == fTrace) {
+            refresh();
+        }
         for (TraceEntry traceEntry : entryList) {
+            if (monitor.isCanceled()) {
+                return;
+            }
             CtfKernelTrace ctfKernelTrace = traceEntry.getTrace();
-            IStateSystemQuerier ssq = ctfKernelTrace.getStateSystem();
+            ITmfStateSystem ssq = ctfKernelTrace.getStateSystem(CtfKernelTrace.STATE_ID);
             long startTime = ssq.getStartTime();
             long endTime = ssq.getCurrentEndTime() + 1;
             long resolution = (endTime - startTime) / fDisplayWidth;
             for (ResourcesEntry entry : traceEntry.getChildren()) {
-                List<ITimeEvent> eventList = getEventList(entry, startTime, endTime, resolution, false, new NullProgressMonitor());
+                List<ITimeEvent> eventList = getEventList(entry, startTime, endTime, resolution, false, monitor);
                 entry.setEventList(eventList);
                 redraw();
             }
@@ -510,7 +562,7 @@ public class ResourcesView extends TmfView {
     private static List<ITimeEvent> getEventList(ResourcesEntry entry,
             long startTime, long endTime, long resolution, boolean includeNull,
             IProgressMonitor monitor) {
-        IStateSystemQuerier2 ssq = (IStateSystemQuerier2) entry.getTrace().getStateSystem();
+        ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
         startTime = Math.max(startTime, ssq.getStartTime());
         endTime = Math.min(endTime, ssq.getCurrentEndTime() + 1);
         if (endTime <= startTime) {
@@ -601,11 +653,13 @@ public class ResourcesView extends TmfView {
             e.printStackTrace();
         } catch (StateValueTypeException e) {
             e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
+            /* Ignored */
         }
         return eventList;
     }
 
-    private void refresh(final long windowRange) {
+    private void refresh() {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -613,25 +667,31 @@ public class ResourcesView extends TmfView {
                     return;
                 }
                 ITimeGraphEntry[] entries = null;
-                synchronized (fEntryListSyncObj) {
+                synchronized (fEntryListMap) {
+                    fEntryList = fEntryListMap.get(fTrace);
+                    if (fEntryList == null) {
+                        fEntryList = new ArrayList<TraceEntry>();
+                    }
                     entries = fEntryList.toArray(new ITimeGraphEntry[0]);
                 }
-                Arrays.sort(entries, new TraceEntryComparator());
-                fTimeGraphViewer.setInput(entries);
-                fTimeGraphViewer.setTimeBounds(fStartTime, fEndTime);
+                if (entries != null) {
+                    Arrays.sort(entries, new TraceEntryComparator());
+                    fTimeGraphViewer.setInput(entries);
+                    fTimeGraphViewer.setTimeBounds(fStartTime, fEndTime);
 
-                long endTime = fStartTime + windowRange;
+                    long timestamp = fTrace == null ? 0 : fTrace.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    long startTime = fTrace == null ? 0 : fTrace.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    long endTime = fTrace == null ? 0 : fTrace.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    startTime = Math.max(startTime, fStartTime);
+                    endTime = Math.min(endTime, fEndTime);
+                    fTimeGraphViewer.setSelectedTime(timestamp, false);
+                    fTimeGraphViewer.setStartFinishTime(startTime, endTime);
 
-                if (fEndTime < endTime) {
-                    endTime = fEndTime;
+                    startZoomThread(startTime, endTime);
                 }
-                fTimeGraphViewer.setStartFinishTime(fStartTime, endTime);
-
-                startZoomThread(fStartTime, endTime);
             }
         });
     }
-
 
     private void redraw() {
         synchronized (fSyncObj) {
@@ -666,7 +726,7 @@ public class ResourcesView extends TmfView {
         if (fZoomThread != null) {
             fZoomThread.cancel();
         }
-        fZoomThread = new ZoomThread(startTime, endTime);
+        fZoomThread = new ZoomThread(fEntryList, startTime, endTime);
         fZoomThread.start();
     }
 

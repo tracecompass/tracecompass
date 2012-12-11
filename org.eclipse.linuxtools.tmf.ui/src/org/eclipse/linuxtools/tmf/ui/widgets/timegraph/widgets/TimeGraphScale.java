@@ -505,6 +505,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     public void mouseDoubleClick(MouseEvent e) {
         if (e.button == 1 && null != _timeProvider && _timeProvider.getTime0() != _timeProvider.getTime1() && (e.stateMask & SWT.BUTTON_MASK) == 0) {
             _timeProvider.resetStartFinishTime();
+            _timeProvider.notifyStartFinishTime();
             _time0bak = _timeProvider.getTime0();
             _time1bak = _timeProvider.getTime1();
         }
@@ -567,7 +568,7 @@ class TimeDrawSec extends TimeDraw {
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
         time /= 1000000000;
-        Utils.drawText(gc, sep(time), rect, true); //$NON-NLS-1$
+        Utils.drawText(gc, sep(time), rect, true);
     }
 
     @Override

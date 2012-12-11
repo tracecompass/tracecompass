@@ -2,14 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.tmf.core;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.tmf.core.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
- org.eclipse.core.resources;bundle-version="3.7.100",
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui.views,
  org.eclipse.linuxtools.ctf.core;bundle-version="1.0.0"
 Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.component;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
@@ -31,6 +32,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse
  org.eclipse.linuxtools.tmf.core.signal,
  org.eclipse.linuxtools.tmf.core.statesystem,
  org.eclipse.linuxtools.tmf.core.statevalue,
+ org.eclipse.linuxtools.tmf.core.statistics,
  org.eclipse.linuxtools.tmf.core.trace,
  org.eclipse.linuxtools.tmf.core.uml2sd,
  org.eclipse.linuxtools.tmf.core.util

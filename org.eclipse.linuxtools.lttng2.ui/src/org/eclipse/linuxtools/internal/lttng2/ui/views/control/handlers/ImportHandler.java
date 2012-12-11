@@ -56,6 +56,10 @@ public class ImportHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
+    /**
+     * The command parameter
+     */
     protected CommandParameter fParam;
 
     // ------------------------------------------------------------------------

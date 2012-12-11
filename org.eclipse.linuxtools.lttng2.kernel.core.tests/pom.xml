@@ -14,11 +14,11 @@
   <parent>
     <artifactId>linuxtools-lttng-parent</artifactId>
     <groupId>org.eclipse.linuxtools.lttng</groupId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.linuxtools.lttng2.kernel.core.tests</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools LTTng Kernel Analysis Core Unit Test Suite</name>
@@ -58,8 +58,9 @@
             <artifactId>tycho-surefire-plugin</artifactId>
             <version>${tycho-version}</version>
             <configuration>
-                <testSuite>org.eclipse.linuxtools.lttng2.kernel.core.tests</testSuite>
-                <testClass>org.eclipse.linuxtools.lttng2.kernel.core.tests.AllTests</testClass>
+                <includes>
+                    <include>**/AllTests.*</include>
+                </includes>
                 <useUIHarness>false</useUIHarness>
                 <useUIThread>false</useUIThread>
                 <product>org.eclipse.sdk.ide</product>

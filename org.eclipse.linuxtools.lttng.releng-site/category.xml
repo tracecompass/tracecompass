@@ -3,9 +3,6 @@
    <description>
       Nightly builds of LTTng project.
    </description>
-   <feature url="features/org.eclipse.linuxtools.lttng_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng" version="0.0.0" os="linux" ws="*" arch="*">
-      <category name="LTTng"/>
-   </feature>
    <feature url="features/org.eclipse.linuxtools.lttng2.kernel_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng2.kernel" version="0.0.0">
       <category name="LTTng"/>
    </feature>

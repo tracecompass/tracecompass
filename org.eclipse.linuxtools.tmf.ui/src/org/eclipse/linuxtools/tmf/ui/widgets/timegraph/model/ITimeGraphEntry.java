@@ -14,6 +14,7 @@
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Interface for an entry (row) in the time graph view
@@ -43,8 +44,9 @@ public interface ITimeGraphEntry {
      * Returns the child elements of this entry.
      *
      * @return an array of child elements
+     * @since 2.0
      */
-    public ITimeGraphEntry[] getChildren();
+    public List<? extends ITimeGraphEntry> getChildren();
 
     /**
      * Returns the name of this entry.

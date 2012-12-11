@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
@@ -126,8 +127,14 @@ public interface IStateHistoryBackend {
     public void removeFiles();
 
     /**
-     * @name Query methods
+     * Notify the state history back-end that the trace is being closed, so it
+     * should release its file descriptors, close its connections, etc.
      */
+    public void dispose();
+
+    // ------------------------------------------------------------------------
+    // Query methods
+    // ------------------------------------------------------------------------
 
     /**
      * Complete "give me the state at a given time" method 'currentStateInfo' is
@@ -141,9 +148,11 @@ public interface IStateHistoryBackend {
      *            Target timestamp of the query
      * @throws TimeRangeException
      *             If the timestamp is outside of the history/trace
+     * @throws StateSystemDisposedException
+     *             If the state system is disposed while a request is ongoing.
      */
     public void doQuery(List<ITmfStateInterval> currentStateInfo, long t)
-            throws TimeRangeException;
+            throws TimeRangeException, StateSystemDisposedException;
 
     /**
      * Some providers might want to specify a different way to obtain just a
@@ -160,9 +169,12 @@ public interface IStateHistoryBackend {
      *             If the timestamp was invalid
      * @throws AttributeNotFoundException
      *             If the quark was invalid
+     * @throws StateSystemDisposedException
+     *             If the state system is disposed while a request is ongoing.
      */
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark)
-            throws TimeRangeException, AttributeNotFoundException;
+            throws TimeRangeException, AttributeNotFoundException,
+            StateSystemDisposedException;
 
     /**
      * Simple check to make sure the requested timestamps are within the borders

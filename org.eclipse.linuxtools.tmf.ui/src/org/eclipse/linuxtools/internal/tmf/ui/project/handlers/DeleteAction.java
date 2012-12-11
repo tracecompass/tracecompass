@@ -1,11 +1,11 @@
 /*******************************************************************************
 * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -26,13 +26,18 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 
+/**
+ * <b><u>DeleteAction</u></b>
+ * <p>
+ * Implement me. Please.
+ * <p>
+ */
 public class DeleteAction extends Action {
 
-    private static final String DELETE_TRACE_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"; //$NON-NLS-1$
-    private static final String DELETE_EXPERIMENT_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"; //$NON-NLS-1$
+    private static final String DELETE_COMMAND_ID = "org.eclipse.ui.edit.delete"; //$NON-NLS-1$
 
-    private IWorkbenchPage page;
-    private ISelectionProvider selectionProvider;
+    private final IWorkbenchPage page;
+    private final ISelectionProvider selectionProvider;
     private boolean tracesSelected;
     private boolean experimentsSelected;
 
@@ -68,7 +73,7 @@ public class DeleteAction extends Action {
             if (tracesSelected && experimentsSelected) {
                 return false;
             }
-            return (tracesSelected || experimentsSelected); 
+            return (tracesSelected || experimentsSelected);
         }
         return false;
     }
@@ -81,10 +86,8 @@ public class DeleteAction extends Action {
     public void run() {
         try {
             IHandlerService handlerService = (IHandlerService) page.getActivePart().getSite().getService(IHandlerService.class);
-            if (tracesSelected) {
-                handlerService.executeCommand(DELETE_TRACE_COMMAND_ID, null);
-            } else if (experimentsSelected) {
-                handlerService.executeCommand(DELETE_EXPERIMENT_COMMAND_ID, null);
+            if (tracesSelected || experimentsSelected) {
+                handlerService.executeCommand(DELETE_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {
             Activator.getDefault().logError("Error deleting resources", e); //$NON-NLS-1$

@@ -1,19 +1,21 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Wiliam Bourque - Adapted from SpinnerGroup (in TimeFrameView)
  *   Francois Chouinard - Cleanup and refactoring
  *   Francois Chouinard - Moved from LTTng to TMF
- *******************************************************************************/
+ *   Francois Chouinard - Better handling of control display, support for signals
+  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -30,8 +32,8 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * This control provides a group containing a text control.
- * 
- * @version 1.0
+ *
+ * @version 1.1
  * @author Francois Chouinard
  */
 public abstract class HistogramTextControl implements FocusListener, KeyListener {
@@ -44,45 +46,34 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
      * The parent histogram view.
      */
     protected final HistogramView fParentView;
-    private final Composite fParent;
 
-    // Controls
+    // Controls data
+    private final Composite fParent;
+    private Font fFont;
     private final Group fGroup;
+
     /**
      * The text value field.
      */
     protected final Text fTextValue;
+
     private long fValue;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-    /**
-     * Constructor default values
-     *
-     * @param parentView The parent histogram view.
-     * @param parent The parent composite
-     * @param textStyle The text style bits.
-     * @param groupStyle The group style bits.
-     * 
-     */
-    public HistogramTextControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle) {
-        this(parentView, parent, textStyle, groupStyle, "", HistogramUtils.nanosecondsToString(0L)); //$NON-NLS-1$
-    }
-
    /**
     * Constructor with given group and text values.
-    * 
+    *
     * @param parentView The parent histogram view.
     * @param parent The parent composite
-    * @param textStyle The text style bits.
-    * @param groupStyle The group style bits.
-    * @param groupValue A group value
-    * @param textValue A text value
+    * @param label The text label
+    * @param value The initial value
+    * @since 2.0
     */
-    public HistogramTextControl(HistogramView parentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue) {
-
+    public HistogramTextControl(HistogramView parentView, Composite parent, String label, long value)
+    {
         fParentView = parentView;
         fParent = parent;
 
@@ -93,15 +84,7 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
         final int fontSizeAdjustment = -1;
         final Font font = parent.getFont();
         final FontData fontData = font.getFontData()[0];
-        final Font adjustedFont = new Font(font.getDevice(), fontData.getName(), fontData.getHeight() + fontSizeAdjustment, fontData.getStyle());
-
-        // --------------------------------------------------------------------
-        // Pre-compute the size of the control
-        // --------------------------------------------------------------------
-
-        final String longestStringValue = "." + Long.MAX_VALUE; //$NON-NLS-1$
-        final int maxChars = longestStringValue.length();
-        final int textBoxSize = HistogramUtils.getTextSizeInControl(parent, longestStringValue);
+        fFont = new Font(font.getDevice(), fontData.getName(), fontData.getHeight() + fontSizeAdjustment, fontData.getStyle());
 
         // --------------------------------------------------------------------
         // Create the group
@@ -112,23 +95,20 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
         GridData gridData;
 
         // Group control
-        gridLayout = new GridLayout(1, false);
+        gridLayout = new GridLayout(1, true);
         gridLayout.horizontalSpacing = 0;
         gridLayout.verticalSpacing = 0;
-        fGroup = new Group(fParent, groupStyle);
-        fGroup.setText(groupValue);
-        fGroup.setFont(adjustedFont);
+        fGroup = new Group(fParent, SWT.SHADOW_NONE);
+        fGroup.setText(label);
+        fGroup.setFont(fFont);
         fGroup.setLayout(gridLayout);
 
         // Group control
         gridData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
         gridData.horizontalIndent = 0;
         gridData.verticalIndent = 0;
-        gridData.minimumWidth = textBoxSize;
-        fTextValue = new Text(fGroup, textStyle);
-        fTextValue.setTextLimit(maxChars);
-        fTextValue.setText(textValue);
-        fTextValue.setFont(adjustedFont);
+        fTextValue = new Text(fGroup, SWT.BORDER);
+        fTextValue.setFont(fFont);
         fTextValue.setLayoutData(gridData);
 
         // --------------------------------------------------------------------
@@ -137,6 +117,16 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
 
         fTextValue.addFocusListener(this);
         fTextValue.addKeyListener(this);
+
+        TmfSignalManager.register(this);
+    }
+
+    /**
+     * Dispose of the widget
+     * @since 2.0
+     */
+    public void dispose() {
+        TmfSignalManager.deregister(this);
     }
 
     // ------------------------------------------------------------------------
@@ -145,7 +135,7 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
 
     /**
      * Returns if widget isDisposed or not
-     * @return <code>true</code> if widget is disposed else <code>false</code>  
+     * @return <code>true</code> if widget is disposed else <code>false</code>
      */
     public boolean isDisposed() {
         return fGroup.isDisposed();
@@ -169,40 +159,40 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     }
 
     /**
-     * Sets the value converted to nano-seconds in the text field.
-     * @param timeString the time string (input)
-     */
-    public void setValue(String timeString) {
-        long timeValue = HistogramUtils.stringToNanoseconds(timeString);
-        setValue(timeValue);
-    }
-
-    /**
-     * The time value in nano-seconds to set in the text field. 
+     * The time value in to set in the text field.
+     *
      * @param time the time to set
+     * @param displayTime the display value
+     * @since 2.0
      */
-    public void setValue(final long time) {
+    protected void setValue(final long time, final String displayTime) {
         // If this is the UI thread, process now
         Display display = Display.getCurrent();
         if (display != null) {
             fValue = time;
-            fTextValue.setText(HistogramUtils.nanosecondsToString(time));
+            fTextValue.setText(displayTime);
+            fParent.getParent().layout();
             return;
         }
 
-        // Call "recursively" from the UI thread
+        // Call self from the UI thread
         if (!isDisposed()) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     if (!isDisposed()) {
-                        setValue(time);
+                        setValue(time, displayTime);
                     }
                 }
             });
         }
     }
-    
+
+    /**
+     * @param time the time value to display
+     */
+    public abstract void setValue(long time);
+
     /**
      * Returns the time value.
      * @return time value.

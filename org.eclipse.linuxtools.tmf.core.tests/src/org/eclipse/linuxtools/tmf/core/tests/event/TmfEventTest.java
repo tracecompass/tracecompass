@@ -181,7 +181,7 @@ public class TmfEventTest extends TestCase {
      *
      */
     public void testConstructorWithTrace() {
-        final ITmfTrace<TmfEvent> trace = openTrace();
+        final ITmfTrace trace = openTrace();
         final TmfEvent event = new TmfEvent(trace, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertNotNull("getTrace", event.getTrace());
         assertEquals("getRank", 0, event.getRank());
@@ -230,7 +230,7 @@ public class TmfEventTest extends TestCase {
         }
 
         @Override
-        public void setTrace(final ITmfTrace<? extends ITmfEvent> trace) {
+        public void setTrace(final ITmfTrace trace) {
             super.setTrace(trace);
         }
 
@@ -266,8 +266,8 @@ public class TmfEventTest extends TestCase {
 
     }
 
-    private ITmfTrace<TmfEvent> setupTrace() {
-        ITmfTrace<TmfEvent> trace = null;
+    private ITmfTrace setupTrace() {
+        ITmfTrace trace = null;
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fTracePath), null);
             final File test = new File(FileLocator.toFileURL(location).toURI());
@@ -286,7 +286,7 @@ public class TmfEventTest extends TestCase {
      *
      */
     public void testSetTrace() {
-        final ITmfTrace<TmfEvent> trace = setupTrace();
+        final ITmfTrace trace = setupTrace();
         assertNotNull(trace);
 
         final TestEvent event = new TestEvent(fEvent1);
@@ -464,7 +464,7 @@ public class TmfEventTest extends TestCase {
 
         assertTrue("hashCode", event1.hashCode() == event2.hashCode());
 
-        final ITmfTrace<TmfEvent> trace = openTrace();
+        final ITmfTrace trace = openTrace();
         event1 = new TmfEvent(trace, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         event2 = new TmfEvent(trace, 1, fTimestamp2, fSource, fType, fContent2, fReference2);
         final TmfEvent event1b = new TmfEvent(event1);
@@ -541,8 +541,8 @@ public class TmfEventTest extends TestCase {
      *
      */
     public void testNonEqualTraces() {
-        final ITmfTrace<TmfEvent> trace1 = openTrace();
-        final ITmfTrace<TmfEvent> trace2 = openTrace();
+        final ITmfTrace trace1 = openTrace();
+        final ITmfTrace trace2 = openTrace();
 
         final TmfEvent event1 = new TmfEvent(trace1, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
         TmfEvent event2 = new TmfEvent(trace1,  0, fTimestamp1, fSource, fType, fContent1, fReference1);

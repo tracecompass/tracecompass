@@ -12,6 +12,10 @@
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
@@ -94,70 +98,11 @@ public class TmfSimpleTimestampTest extends TestCase {
      *
      */
     public void testCopyBadTimestamp() {
-        final ITmfTimestamp ts0a = new TmfTimestamp(0, 1, 0);
-        final ITmfTimestamp ts0b = new TmfTimestamp(0, 0, 1);
-
         try {
             new TmfSimpleTimestamp(null);
             fail("TmfSimpleTimestamp: null argument");
-        } catch (final IllegalArgumentException e) {
+        } catch (final NullPointerException e) {
         }
-
-        try {
-            new TmfSimpleTimestamp(ts0a);
-            fail("TmfSimpleTimestamp: bad scale");
-        } catch (final IllegalArgumentException e) {
-        }
-
-        try {
-            new TmfSimpleTimestamp(ts0b);
-            fail("TmfSimpleTimestamp: bad precision");
-        } catch (final IllegalArgumentException e) {
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // clone
-    // ------------------------------------------------------------------------
-
-    private static class MyTimestamp extends TmfSimpleTimestamp {
-
-        @Override
-        public boolean equals(final Object other) {
-            return super.equals(other);
-        }
-
-        @Override
-        public MyTimestamp clone() {
-            return (MyTimestamp) super.clone();
-        }
-    }
-
-    /**
-     *
-     */
-    public void testClone() {
-        final ITmfTimestamp clone = ts0.clone();
-
-        assertTrue("clone", ts0.clone().equals(ts0));
-        assertTrue("clone", clone.clone().equals(clone));
-
-        assertEquals("clone", clone, ts0);
-        assertEquals("clone", ts0, clone);
-    }
-
-    /**
-     *
-     */
-    public void testClone2() {
-        final MyTimestamp timestamp = new MyTimestamp();
-        final MyTimestamp clone = timestamp.clone();
-
-        assertTrue("clone", timestamp.clone().equals(timestamp));
-        assertTrue("clone", clone.clone().equals(clone));
-
-        assertEquals("clone", clone, timestamp);
-        assertEquals("clone", timestamp, clone);
     }
 
     // ------------------------------------------------------------------------
@@ -236,9 +181,13 @@ public class TmfSimpleTimestampTest extends TestCase {
      *
      */
     public void testToString() {
-        assertEquals("toString", "TmfSimpleTimestamp [fValue=0]", ts0.toString());
-        assertEquals("toString", "TmfSimpleTimestamp [fValue=12345]", ts1.toString());
-        assertEquals("toString", "TmfSimpleTimestamp [fValue=-1234]", ts2.toString());
+        DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+        Date d0 = new Date(ts0.getValue()*1000);
+        Date d1 = new Date(ts1.getValue()*1000);
+        Date d2 = new Date(ts2.getValue()*1000);
+        assertEquals("toString", df.format(d0) + " 000 000", ts0.toString());
+        assertEquals("toString", df.format(d1) + " 000 000", ts1.toString());
+        assertEquals("toString", df.format(d2) + " 000 000", ts2.toString());
     }
 
     // ------------------------------------------------------------------------

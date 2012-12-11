@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BasicExecutionOccurrence;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Frame;
@@ -1193,7 +1192,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
      */
     protected String getPostfixForTooltip(boolean accessible) {
         StringBuffer postfix = new StringBuffer();
-//        String postfix = "";//$NON-NLS-1$
         // Determine if the tooltip must show the time difference between the current mouse position and
         // the last selected graphNode
         if ((fCurrentGraphNode != null) &&
@@ -1208,19 +1206,15 @@ public class SDWidget extends ScrollView implements SelectionListener,
             postfix.append(SDMessages._138);
             postfix.append(" "); //$NON-NLS-1$
 
-//            postfix = " -> " + fCurrentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
             //double delta = ((ITimeRange)toolTipNode).getLastTime()-((ITimeRange)currentGraphNode).getLastTime();
             ITmfTimestamp firstTime = ((ITimeRange) fCurrentGraphNode).getEndTime();
             ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();
-            TmfTimestamp delta = (TmfTimestamp) lastTime.getDelta(firstTime);
+            ITmfTimestamp delta =  lastTime.getDelta(firstTime);
             postfix.append(delta.toString());
 
-//            postfix += delta.toString();
         } else {
             if ((fToolTipNode instanceof ITimeRange) && ((ITimeRange) fToolTipNode).hasTimeInfo()) {
                 postfix.append("\n"); //$NON-NLS-1$
-//                postfix = "\n";//$NON-NLS-1$
                 ITmfTimestamp firstTime = ((ITimeRange) fToolTipNode).getStartTime();
                 ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();
 
@@ -1232,16 +1226,12 @@ public class SDWidget extends ScrollView implements SelectionListener,
                         postfix.append("end: "); //$NON-NLS-1$
                         postfix.append(lastTime.toString());
                         postfix.append("\n"); //$NON-NLS-1$
-//                            postfix += "start: " + firstTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
-//                            postfix += "end: " + lastTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
                         } else {
                             postfix.append(firstTime.toString());
-//                            postfix += firstTime.toString();
                         }
                     }
                 else if (lastTime != null) {
                     postfix.append(lastTime.toString());
-//                    postfix += lastTime.toString();
                 }
             }
         }

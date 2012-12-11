@@ -24,19 +24,21 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
-public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEventParser<CustomTxtEvent> {
+public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
 
-    private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
+    private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
 
     private final CustomTxtTraceDefinition fDefinition;
@@ -56,14 +58,13 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     }
 
     @Override
-    public void initTrace(final IResource resource, final String path, final Class<CustomTxtEvent> eventType) throws TmfTraceException {
+    public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
         try {
             fFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
         } catch (IOException e) {
             throw new TmfTraceException(e.getMessage(), e);
         }
-        indexTrace(false);
     }
 
     @Override
@@ -80,7 +81,12 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     }
 
     @Override
-    public synchronized TmfContext seekEvent(final ITmfLocation<?> location) {
+    public ITmfTraceIndexer getIndexer() {
+        return super.getIndexer();
+    }
+
+    @Override
+    public synchronized TmfContext seekEvent(final ITmfLocation location) {
         final CustomTxtTraceContext context = new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         if (NULL_LOCATION.equals(location) || fFile == null) {
             return context;
@@ -88,8 +94,8 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
         try {
             if (location == null) {
                 fFile.seek(0);
-            } else if (location.getLocation() instanceof Long) {
-                fFile.seek((Long) location.getLocation());
+            } else if (location.getLocationInfo() instanceof Long) {
+                fFile.seek((Long) location.getLocationInfo());
             }
             String line;
             long rawPos = fFile.getFilePointer();
@@ -97,7 +103,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
                 for (final InputLine input : getFirstLines()) {
                     final Matcher matcher = input.getPattern().matcher(line);
                     if (matcher.find()) {
-                        context.setLocation(new TmfLocation<Long>(rawPos));
+                        context.setLocation(new TmfLongLocation(rawPos));
                         context.firstLineMatcher = matcher;
                         context.firstLine = line;
                         context.nextLineLocation = fFile.getFilePointer();
@@ -132,7 +138,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
                 }
                 pos--;
             }
-            final ITmfLocation<?> location = new TmfLocation<Long>(pos);
+            final ITmfLocation location = new TmfLongLocation(pos);
             final TmfContext context = seekEvent(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
@@ -143,13 +149,13 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     }
 
     @Override
-    public synchronized double getLocationRatio(final ITmfLocation<?> location) {
+    public synchronized double getLocationRatio(final ITmfLocation location) {
         if (fFile == null) {
             return 0;
         }
         try {
-            if (location.getLocation() instanceof Long) {
-                return (double) ((Long) location.getLocation()) / fFile.length();
+            if (location.getLocationInfo() instanceof Long) {
+                return (double) ((Long) location.getLocationInfo()) / fFile.length();
             }
         } catch (final IOException e) {
             Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
@@ -158,7 +164,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     }
 
     @Override
-    public ITmfLocation<?> getCurrentLocation() {
+    public ITmfLocation getCurrentLocation() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -189,7 +195,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
         }
 
         final CustomTxtTraceContext context = (CustomTxtTraceContext) tmfContext;
-        if (!(context.getLocation().getLocation() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
+        if (context.getLocation() == null || !(context.getLocation().getLocationInfo() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
             return null;
         }
 
@@ -214,7 +220,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
                     for (final InputLine input : getFirstLines()) {
                         final Matcher matcher = input.getPattern().matcher(line);
                         if (matcher.find()) {
-                            context.setLocation(new TmfLocation<Long>(rawPos));
+                            context.setLocation(new TmfLongLocation(rawPos));
                             context.firstLineMatcher = matcher;
                             context.firstLine = line;
                             context.nextLineLocation = fFile.getFilePointer();
@@ -229,7 +235,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
                             for (final InputLine input : getFirstLines()) {
                                 final Matcher matcher = input.getPattern().matcher(line);
                                 if (matcher.find()) {
-                                    context.setLocation(new TmfLocation<Long>(rawPos));
+                                    context.setLocation(new TmfLongLocation(rawPos));
                                     context.firstLineMatcher = matcher;
                                     context.firstLine = line;
                                     context.nextLineLocation = fFile.getFilePointer();

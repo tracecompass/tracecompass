@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -32,7 +32,7 @@ public class CustomEvent extends TmfEvent {
     protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F"; //$NON-NLS-1$
     protected static final String NO_MESSAGE = ""; //$NON-NLS-1$
     public static final byte TIMESTAMP_SCALE = -3;
-    
+
     protected CustomTraceDefinition fDefinition;
     protected Map<String, String> fData;
     private TmfEventField[] fColumnData;
@@ -48,7 +48,7 @@ public class CustomEvent extends TmfEvent {
         fData = new HashMap<String, String>();
     }
 
-    public CustomEvent(CustomTraceDefinition definition, ITmfTrace<?> parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
+    public CustomEvent(CustomTraceDefinition definition, ITmfTrace parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
         super(parentTrace, timestamp, source, type, null, reference);
         fDefinition = definition;
         fData = new HashMap<String, String>();
@@ -56,12 +56,16 @@ public class CustomEvent extends TmfEvent {
 
     @Override
     public ITmfTimestamp getTimestamp() {
-        if (fData != null) processData();
+        if (fData != null) {
+            processData();
+        }
         return super.getTimestamp();
     }
 
     public TmfEventField[] extractItemFields() {
-        if (fData != null) processData();
+        if (fData != null) {
+            processData();
+        }
         return Arrays.copyOf(fColumnData, fColumnData.length);
     }
 
@@ -80,7 +84,7 @@ public class CustomEvent extends TmfEvent {
         } else {
             setTimestamp(TmfTimestamp.ZERO);
         }
-        
+
         int i = 0;
         fColumnData = new TmfEventField[fDefinition.outputs.size()];
         for (OutputColumn outputColumn : fDefinition.outputs) {

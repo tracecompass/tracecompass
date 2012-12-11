@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -56,22 +56,23 @@ public class DeleteTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
         ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (selectionProvider == null) {
             return false;
+        }
         ISelection selection = selectionProvider.getSelection();
 
         // Make sure selection contains only traces
         fSelection = null;
         if (selection instanceof TreeSelection) {
             fSelection = (TreeSelection) selection;
-            @SuppressWarnings("unchecked")
             Iterator<Object> iterator = fSelection.iterator();
             while (iterator.hasNext()) {
                 Object element = iterator.next();
@@ -94,18 +95,19 @@ public class DeleteTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return null;
+        }
 
         // Confirm the operation
         Shell shell = window.getShell();
         MessageBox confirmOperation = new MessageBox(shell, SWT.ICON_QUESTION | SWT.CANCEL | SWT.OK);
         confirmOperation.setText(Messages.DeleteDialog_Title);
         confirmOperation.setMessage(Messages.DeleteTraceHandler_Message);
-        if (confirmOperation.open() != SWT.OK)
+        if (confirmOperation.open() != SWT.OK) {
             return null;
+        }
 
-        @SuppressWarnings("unchecked")
         Iterator<Object> iterator = fSelection.iterator();
         while (iterator.hasNext()) {
             Object element = iterator.next();
@@ -131,13 +133,13 @@ public class DeleteTraceHandler extends AbstractHandler {
                                 child.getResource().delete(true, null);
                             }
                         }
+
+                        // Delete supplementary files
+                        trace.deleteSupplementaryFolder();
                     }
 
                     // Finally, delete the trace
                     resource.delete(true, new NullProgressMonitor());
-
-                    // Delete supplementary files
-                    trace.deleteSupplementaryFolder();
 
                     // Refresh the project
                     trace.getProject().refresh();

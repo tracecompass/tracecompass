@@ -16,7 +16,7 @@
   <parent>
     <artifactId>linuxtools-lttng-parent</artifactId>
     <groupId>org.eclipse.linuxtools.lttng</groupId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <name>Linux Tools LTTng CTF Core Unit Test Suite</name>
@@ -37,12 +37,49 @@
     </resources>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.2</version>
+          <executions>
+            <execution>
+              <id>prepare</id>
+              <phase>validate</phase>
+              <configuration>
+                <tasks>
+                  <echo message="prepare phase" />
+                  <!-- Download traces -->
+                  <get src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2" dest="traces/sample-ctf-trace-20120412.tar.bz2"/>
+                  <get src="http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2" dest="traces/trace2.tar.bz2"/>
+
+                  <!-- Unzip Traces -->
+                  <bunzip2 src="traces/sample-ctf-trace-20120412.tar.bz2" dest="traces/" />
+                  <bunzip2 src="traces/trace2.tar.bz2" dest="traces/" />
+
+                  <!-- Extract traces -->
+                  <untar src="traces/sample-ctf-trace-20120412.tar" dest="traces/" />
+                  <untar src="traces/trace2.tar" dest="traces/" />
+
+                  <!-- Delete unnecessary files -->
+                  <delete>
+                    <fileset dir="traces" includes="**/*.tar.bz2"/>
+                    <fileset dir="traces" includes="**/*.tar"/>
+                  </delete>
+                </tasks>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <version>${tycho-version}</version>
         <configuration>
-          <testSuite>org.eclipse.linuxtools.ctf.core.tests</testSuite>
-          <testClass>org.eclipse.linuxtools.ctf.core.tests.AllCtfCoreTests</testClass>
+          <includes>
+            <include>**/AllCtfCoreTests.*</include>
+          </includes>
           <useUIHarness>false</useUIHarness>
           <useUIThread>false</useUIThread>
           <product>org.eclipse.sdk.ide</product>

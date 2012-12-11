@@ -163,8 +163,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
     protected Object getFieldValue(ITmfEvent event, String field) {
         Object value = null;
         if (ITmfEvent.EVENT_FIELD_CONTENT.equals(field)) {
-            ITmfEventField content = event.getContent();
-            value = (content.getValue() != null) ? content.getValue().toString() : content.toString();
+            value = event.getContent().toString();
         }
         else if (ITmfEvent.EVENT_FIELD_TYPE.equals(field)) {
             value = event.getType().getName();

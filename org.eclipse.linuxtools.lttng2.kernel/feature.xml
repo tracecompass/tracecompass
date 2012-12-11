@@ -3,7 +3,7 @@
 <feature
       id="org.eclipse.linuxtools.lttng2.kernel"
       label="%featureName"
-      version="1.2.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="%featureProvider">
 
    <description>
@@ -38,17 +38,17 @@
          name="Common Trace Format (CTF)"/>
 
    <requires>
-      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.help" version="3.5.100" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.tmf.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.tmf.core" version="1.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.ide" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.tmf.ui" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.lttng2.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.lttng2.ui" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.lttng2.kernel.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.linuxtools.ctf.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.linuxtools.tmf.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.lttng2.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.lttng2.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.lttng2.kernel.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help"/>
    </requires>
 
    <plugin

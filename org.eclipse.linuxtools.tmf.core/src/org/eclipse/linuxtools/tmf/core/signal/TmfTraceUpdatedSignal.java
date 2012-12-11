@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -16,14 +16,16 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * A trace was updated (typically its time range)
- * 
+ * Signal indicating a trace has been updated.
+ *
+ * The trace has been indexed up to the specified range.
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
 public class TmfTraceUpdatedSignal extends TmfSignal {
 
-    private final ITmfTrace<?> fTrace;
+    private final ITmfTrace fTrace;
     private final TmfTimeRange fTimeRange;
 
     /**
@@ -36,7 +38,7 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
      * @param range
      *            The new time range of the trace
      */
-    public TmfTraceUpdatedSignal(Object source, ITmfTrace<?> trace, TmfTimeRange range) {
+    public TmfTraceUpdatedSignal(Object source, ITmfTrace trace, TmfTimeRange range) {
         super(source);
         fTrace = trace;
         fTimeRange = range;
@@ -45,7 +47,7 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
     /**
      * @return The trace referred to by this signal
      */
-    public ITmfTrace<?> getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

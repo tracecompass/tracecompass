@@ -80,7 +80,7 @@
 			<b><span style="color: #AD77D7;">toolbar</span></b>.
 		</p>
 		<p>The following sections provide detailed information for each part of the Control Flow View.</p>
-		<h3 id="Process_Tree_and_Information">Process Tree and Information</h3>
+		<h3 id="Process_tree_and_informations">Process tree and informations</h3>
 		<p>Processes are organized as a tree within this view. This way, child and parent processes are easy to identify.</p>
 		<p>
 			<img border="0" src="images/Cfv_process_tree.png"/>
@@ -88,17 +88,17 @@
 		<p>The layout is based on the states computed from the trace events.</p>
 		<p>A given process may be shown at different places within the tree since the nodes are 
 			<b>unique (TID, birth time) couples</b>. This means that if process B of parent A dies, you'll still see it in the tree. If process A forks process B again, it will be shown as a different node since it won't have the same birth time (and probably not the same TID). This has the advantage that the tree, once loaded, never changes: horizontal scrolling within the 
-			<a href="#anc-cfw-states-flow">states flow</a> remains possible.
+			<a href="LTTng-Kernel-Analysis.html#States_flow">states flow</a> remains possible.
 		</p>
 		<p>The TID column shows the process node's 
 			<b>thread ID</b> and the PTID column shows its 
 			<b>parent thread ID</b> (nothing is shown if the process has no parent).
 		</p>
-		<h3 id="States_Flow">States Flow</h3>
+		<h3 id="States_flow">States flow</h3>
 		<p>This part of the Control Flow View is probably the most interesting one. Using the mouse, you can navigate through the trace (go left, right) and zoom on a specific region to inspect its details.</p>
 		<p>The colored bars you see represent 
 			<b>states</b> for the associated process node. When a process state changes in time, so does the color. States colors legend is available through a 
-			<a href="#anc-cfw-toolbar">toolbar button</a>:
+			<a href="LTTng-Kernel-Analysis.html#Toolbar">toolbar button</a>:
 		</p>
 		<p>
 			<img border="0" src="images/Cfv_legend.png"/>
@@ -224,17 +224,25 @@
 			<a href="LTTng-Kernel-Analysis.html#Control_Flow_View">control flow view</a>, etc.
 		</p>
 		<h3 id="Navigation">Navigation</h3>
-		<p>See 
-			<a href="LTTng-Kernel-Analysis.html#Using_the_mouse">using the mouse </a> and 
-			<a href="LTTng-Kernel-Analysis.html#Zoom_region">zoom region </a>.
+		<p>See Control Flow View's 
+			<b>
+				<a href="LTTng-Kernel-Analysis.html#Using_the_mouse">Using the mouse</a>
+			</b> and 
+			<b>
+				<a href="LTTng-Kernel-Analysis.html#Zoom_region">Zoom region</a>
+			</b>.
 		</p>
 		<h3 id="Incomplete_regions_2">Incomplete regions</h3>
-		<p>See 
-			<a href="LTTng-Kernel-Analysis.html#Incomplete_regions">Incomplete regions</a>.
+		<p>See Control Flow View's 
+			<b>
+				<a href="LTTng-Kernel-Analysis.html#Incomplete_regions">Incomplete regions</a>
+			</b>.
 		</p>
 		<h3 id="Toolbar_2">Toolbar</h3>
-		<p>See 
-			<a href="LTTng-Kernel-Analysis.html#Toolbar">Toolbar</a>.
+		<p>See Control Flow View's 
+			<b>
+				<a href="LTTng-Kernel-Analysis.html#Toolbar">Toolbar</a>
+			</b>.
 		</p>
 		<h2 id="Events_View_2">Events View</h2>
 		<p>The LTTng Kernel Events View 

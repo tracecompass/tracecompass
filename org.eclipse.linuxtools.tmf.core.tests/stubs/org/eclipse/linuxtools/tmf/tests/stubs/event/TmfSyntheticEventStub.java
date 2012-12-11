@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.event;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 
 /**
@@ -23,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 public class TmfSyntheticEventStub extends TmfEvent {
 
 
-    public TmfSyntheticEventStub(final TmfEvent event) {
+    public TmfSyntheticEventStub(final ITmfEvent event) {
         super(event);
     }
     public TmfSyntheticEventStub(final TmfSyntheticEventStub other) {

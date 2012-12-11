@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Trace Model 1.0
@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 /**
  * A basic implementation of ITmfCheckpoint. It simply maps an event timestamp
  * to a generic location.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -50,7 +50,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
 
     /**
      * Full constructor
-     * 
+     *
      * @param timestamp the checkpoint timestamp
      * @param context the corresponding trace location
      */
@@ -61,7 +61,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param other the other checkpoint
      */
     public TmfCheckpoint(final TmfCheckpoint other) {
@@ -85,7 +85,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
         try {
             clone = (TmfCheckpoint) super.clone();
             clone.fContext = (fContext != null) ? fContext.clone() : null;
-            clone.fTimestamp = (fTimestamp != null) ? fTimestamp.clone() : null;
+            clone.fTimestamp = fTimestamp;
         } catch (final CloneNotSupportedException e) {
         }
         return clone;
@@ -115,7 +115,7 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint#getLocation()
      */
     @Override
-    public ITmfLocation<? extends Comparable<?>> getLocation() {
+    public ITmfLocation getLocation() {
         return fContext.getLocation();
     }
 
@@ -125,19 +125,40 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint#compareTo(org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint)
-     * 
+     *
      * Compares the checkpoints timestamp. If either is null, compares the
      * trace checkpoints locations.
      */
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(final ITmfCheckpoint other) {
-        if (fTimestamp == null || other.getTimestamp() == null) {
-            final Comparable location1 = getLocation().getLocation();
-            final Comparable location2 = other.getLocation().getLocation();
-            return location1.compareTo(location2);
+        int comp = 0;
+        if ((fTimestamp != null) && (other.getTimestamp() != null)) {
+            comp = fTimestamp.compareTo(other.getTimestamp(), false);
+            if (comp != 0) {
+                return comp;
+            }
+            // compare locations if timestamps are the same
         }
-        return fTimestamp.compareTo(other.getTimestamp(), false);
+
+        if ((getContext() == null) && (other.getContext() == null)) {
+            return 0;
+        }
+
+        // treat location of other as null location which is before any location
+        if ((getContext() != null) && (other.getContext() == null)) {
+            return 1;
+        }
+
+        // treat this as null location which is before any other locations
+        if ((getContext() == null) && (other.getContext() != null)) {
+            return -1;
+        }
+
+        // compare location
+        final Comparable location1 = getLocation().getLocationInfo();
+        final Comparable location2 = other.getLocation().getLocationInfo();
+        return location1.compareTo(location2);
     }
 
     // ------------------------------------------------------------------------

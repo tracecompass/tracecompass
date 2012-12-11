@@ -1,7 +1,0 @@
-2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
-
-    Suppress warning for non-externalized strings
-	   * stubs/org/eclipse/linuxtools/lttng/stubs/LTTngTimestampStub.java: 
-	   * stubs/org/eclipse/linuxtools/lttng/stubs/LTTngTraceStub.java: 
-
- 

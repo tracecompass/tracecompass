@@ -28,7 +28,7 @@ public interface ITmfTraceEditor {
      *
      * @return The trace
      */
-    public ITmfTrace<?> getTrace();
+    public ITmfTrace getTrace();
 
     /**
      * Get the bookmark file associated to this trace

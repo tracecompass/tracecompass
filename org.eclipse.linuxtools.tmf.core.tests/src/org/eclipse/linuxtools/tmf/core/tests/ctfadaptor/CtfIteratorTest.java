@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationData;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -57,8 +58,7 @@ public class CtfIteratorTest {
     @Before
     public void setUp() throws TmfTraceException {
         fixture = new CtfIterator(createTrace());
-        CtfLocation ctfLocation = new CtfLocation(Long.valueOf(1));
-        ctfLocation.setLocation(Long.valueOf(1));
+        CtfLocation ctfLocation = new CtfLocation(new CtfLocationData(1, 0));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
     }
@@ -116,7 +116,7 @@ public class CtfIteratorTest {
         CtfTmfTrace trace = createTrace();
         long timestampValue = 1L;
         long rank = 1L;
-        CtfIterator result = new CtfIterator(trace, timestampValue, rank);
+        CtfIterator result = new CtfIterator(trace, new CtfLocationData(timestampValue, 0), rank);
 
         assertNotNull(result);
     }
@@ -164,8 +164,7 @@ public class CtfIteratorTest {
     @Test
     public void testEquals_other() throws TmfTraceException {
         CtfIterator obj = new CtfIterator(createTrace());
-        CtfLocation ctfLocation1 = new CtfLocation(Long.valueOf(1));
-        ctfLocation1.setLocation(Long.valueOf(1));
+        CtfLocation ctfLocation1 = new CtfLocation(new CtfLocationData(1, 0));
         obj.setLocation(ctfLocation1);
         obj.increaseRank();
 
@@ -262,8 +261,7 @@ public class CtfIteratorTest {
      */
     @Test
     public void testSetLocation() {
-        CtfLocation location = new CtfLocation(Long.valueOf(1));
-        location.setLocation(Long.valueOf(1));
+        CtfLocation location = new CtfLocation(new CtfLocationData(1, 0));
         fixture.setLocation(location);
     }
 }

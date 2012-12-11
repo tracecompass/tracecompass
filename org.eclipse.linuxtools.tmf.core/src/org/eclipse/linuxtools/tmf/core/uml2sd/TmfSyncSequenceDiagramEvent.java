@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
  * <p>
  * A basic implementation of ITmfSyncSequenceDiagramEvent.
  * </p>
- * 
+ *
  * @version 1.0
  * @author Bernd Hufmann
  */
@@ -49,12 +49,12 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * 
+     *
      * @param startEvent The start event (on sender side).
      * @param sender The name of sender of signal.
      * @param receiver The Name of receiver of signal.
      * @param name - The signal name
-     */    
+     */
     public TmfSyncSequenceDiagramEvent(ITmfEvent startEvent, String sender, String receiver, String name) {
 
         if ((startEvent == null) || (sender == null) || (receiver == null) || (name == null)) {
@@ -65,7 +65,7 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
                     (name == null ? ", name=null" : "")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        fStartTime = startEvent.getTimestamp().clone();
+        fStartTime = startEvent.getTimestamp();
 
         fSender = sender;
         fReceiver = receiver;
