@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  *
  * @author Francois Chouinard
  * @version 1.0
- * @since 2.0
+ * @since 1.2
 */
 public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
 

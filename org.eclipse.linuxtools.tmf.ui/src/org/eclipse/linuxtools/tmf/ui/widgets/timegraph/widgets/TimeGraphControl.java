@@ -497,7 +497,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      * Add a menu listener on {@link ITimeGraphEntry}s
      * @param listener
      *            The listener to add
-     * @since 2.0
+     * @since 1.2
      */
     public void addTimeGraphEntryMenuListener(MenuDetectListener listener) {
         if (!_timeGraphEntryMenuListeners.contains(listener)) {
@@ -510,7 +510,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *
      * @param listener
      *            The listener to remove
-     * @since 2.0
+     * @since 1.2
      */
     public void removeTimeGraphEntryMenuListener(MenuDetectListener listener) {
         if (_timeGraphEntryMenuListeners.contains(listener)) {
@@ -535,7 +535,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *
      * @param listener
      *            The listener to add
-     * @since 2.0
+     * @since 1.2
      */
     public void addTimeEventMenuListener(MenuDetectListener listener) {
         if (!_timeEventMenuListeners.contains(listener)) {
@@ -548,7 +548,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *
      * @param listener
      *            The listener to remove
-     * @since 2.0
+     * @since 1.2
      */
     public void removeTimeEventMenuListener(MenuDetectListener listener) {
         if (_timeEventMenuListeners.contains(listener)) {
@@ -2046,7 +2046,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     public void menuDetected(MenuDetectEvent e) {
