@@ -40,7 +40,7 @@
 		<topic href="doc/LTTng.html#Filters_View" label="Filters View"></topic>
 		<topic href="doc/LTTng.html#Time_Chart_View" label="Time Chart View"></topic>
 		<topic href="doc/LTTng.html#Environment_Variables_View" label="Environment Variables View"></topic>
-		<topic href="doc/LTTng.html#Custom_Parser" label="Custom Parser">
+		<topic href="doc/LTTng.html#Custom_Parsers" label="Custom Parsers">
 			<topic href="doc/LTTng.html#Creating_a_custom_text_parser" label="Creating a custom text parser"></topic>
 			<topic href="doc/LTTng.html#Creating_a_custom_XML_parser" label="Creating a custom XML parser"></topic>
 			<topic href="doc/LTTng.html#Managing_custom_parsers" label="Managing custom parsers"></topic>

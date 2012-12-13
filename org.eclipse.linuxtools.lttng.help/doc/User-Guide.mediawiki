@@ -81,7 +81,7 @@ The LTTng plug-ins are structured as a stack of features/plug-ins as following:
 * '''CTF''' - A CTF parser that can also be used as a standalone component
 ** ''Feature'': org.eclipse.linuxtools.ctf
 ** ''Plug-ins'': org.eclipse.linuxtools.ctf.core, org.eclipse.linuxtools.ctf.parser
- 
+
 * '''TMF''' - ''Tracing and Monitoring Framework'' a framework for generic trace processing
 ** ''Feature'': org.eclipse.linuxtools.tmf
 ** ''Plug-ins'': org.eclipse.linuxtools.tmf.core, org.eclipse.linuxtools.tmf.ui
@@ -132,7 +132,7 @@ To download sample LTTng traces, go to [http://lttng.org/download]. At the botto
 
 == Tracing Perspective ==
 
-The '''Tracing''' perspective is part of the '''Tracing and Monitoring Framework (TMF)''' and groups the following views: 
+The '''Tracing''' perspective is part of the '''Tracing and Monitoring Framework (TMF)''' and groups the following views:
 
 * [[#Project_View | Project View]]
 * [[#Events_Editor | Events Editor]]
@@ -147,29 +147,32 @@ The perspective can be opened from the Eclipse Open Perspective dialog ('''Windo
 
 [[Image:images/ShowTracingPerspective.png]]
 
-On top to these views, the '''Tracing and Monitoring Framework (TMF)''' feature provides a set of generic tracing specific views, such as: 
+In addition to these views, the '''Tracing and Monitoring Framework (TMF)''' feature provides a set of generic tracing specific views, such as:
 
 * [[#Colors_View | Colors View]]
 * [[#Filters_View | Filters View]]
 * [[#Time_Chart_View  | Time Chart View]]
 * [[#Environment_Variables_View  | Environment Variables View]]
-* [[#Custom Parser  | Custom Parser]]
 
-To open one of the above '''Tracing''' view, use the Eclipse Show View dialog ('''Window > Show View > Other...'''. Then select the relevant view from the '''Tracing'''. 
+The framework also supports user creation of [[#Custom_Parsers  | Custom Parsers]].
+
+To open one of the above '''Tracing''' views, use the Eclipse Show View dialog ('''Window > Show View > Other...'''). Then select the relevant view from the '''Tracing''' category.
 
 [[Image:images/ShowTracingViews.png]]
 
-Additionally, the '''LTTng''' feature provides a '''LTTng Tracer Control'''. It comes with a  dedicated '''Control View'''.  
+Additionally, the '''LTTng''' feature provides an '''LTTng Tracer Control''' functionality. It comes with a dedicated '''Control View'''.
 
 * [[#LTTng_Tracer_Control | LTTng Tracer Control]]
 
 == Project View ==
-The project view is the standard Eclipse Project Explorer. '''Tracing''' projects are well integrated in the Eclipse's Common Navigator Framework. The Project Explorer shows '''Tracing''' project with a small "T" decorator in the upper right of the project folder icon. 
+
+The project view is the standard Eclipse Project Explorer. '''Tracing''' projects are well integrated in the Eclipse's Common Navigator Framework. The Project Explorer shows '''Tracing''' project with a small "T" decorator in the upper right of the project folder icon.
 
 === Creating a Tracing Project ===
+
 A new '''Tracing''' project can be created using the New Tracing Project wizard. To create a new '''Tracing'''  select '''File > New > Project...''' from the main menu bar or alternatively form the context-sensitive menu (click with right mouse button in the '''Project Explorer'''.
 
-The first page of project wizard will open. 
+The first page of project wizard will open.
 
 [[Image:images/NewTracingProjectPage1.png]]
 
@@ -177,15 +180,15 @@ In the list of project categories, expand category '''Tracing''' and select '''T
 
 [[Image:images/NewTracingProjectPage2.png]]
 
-A new project will appear in the '''Project Explorer''' view. 
+A new project will appear in the '''Project Explorer''' view.
 
 [[Image:images/NewProjectExplorer.png]]
 
-Tracing projects have two sub-folders: '''Traces''' which holds the individual traces, and '''Experiments''' which holds sets of traces that we want to correlate. 
+Tracing projects have two sub-folders: '''Traces''' which holds the individual traces, and '''Experiments''' which holds sets of traces that we want to correlate.
 
 === Importing Traces in a Project ===
 
-The '''Traces''' folder holds the set of traces available for experiments. To import a trace to the traces folder, select the Traces folder and click the right mouse button. Then select '''Import...''' menu item in the context-sensitive menu.   
+The '''Traces''' folder holds the set of traces available for experiments. To import a trace to the traces folder, select the Traces folder and click the right mouse button. Then select '''Import...''' menu item in the context-sensitive menu.
 
 [[Image:images/ProjectImportTraceAction.png]]
 
@@ -197,7 +200,7 @@ Note, that traces of certain types (e.g. LTTng Kernel) are actually a composite 
 
 Upon successful importing the traces will be stored in the '''Traces''' folder. If a trace type was selected in the import dialog, then the corresponding icon will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
 
-Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary. 
+Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
 
 === Selecting a Trace Type ===
 
@@ -213,23 +216,23 @@ After selecting the trace type, the trace icon will be updated with the correspo
 
 === Creating a Experiment ===
 
-An experiment consists in an arbitrary number of aggregated traces for purpose of correlation. In the degenerate case, an experiment can consist of a single trace. The experiment provides a unified, time-ordered stream of the individual trace events. 
+An experiment consists in an arbitrary number of aggregated traces for purpose of correlation. In the degenerate case, an experiment can consist of a single trace. The experiment provides a unified, time-ordered stream of the individual trace events.
 
-To create an experiment, select the folder '''Experiments''' and click the right mouse button. Then select '''New...'''. 
+To create an experiment, select the folder '''Experiments''' and click the right mouse button. Then select '''New...'''.
 
 [[Image:images/NewExperimentAction.png]]
 
-A new display will open for entering the experiment name. Type the name of the experiment in the text field '''Experiment Name''' and the click on '''OK'''. 
+A new display will open for entering the experiment name. Type the name of the experiment in the text field '''Experiment Name''' and the click on '''OK'''.
 
 [[Image:images/NewExperimentDialog.png]]
 
 === Selecting Traces for an Experiment ===
 
-After creating an experiment, traces need to be added to the experiment. To select traces for an experiment select the newly create experiment and click the right mouse button. Select '''Select Traces...''' from the context sensitive menu. 
+After creating an experiment, traces need to be added to the experiment. To select traces for an experiment select the newly create experiment and click the right mouse button. Select '''Select Traces...''' from the context sensitive menu.
 
 [[Image:images/SelectTracesAction.png]]
 
-A new dialog box will open with a list of available traces. Select the traces to add from the list and then click on '''Finish'''. 
+A new dialog box will open with a list of available traces. Select the traces to add from the list and then click on '''Finish'''.
 
 [[Image:images/SelectTracesDialog.png]]
 
@@ -241,7 +244,7 @@ Alternatively, traces can be added to an experiment using [[#Drag_and_Drop | Dra
 
 === Removing Traces from an Experiment ===
 
-To remove one or more traces for an experiment select the trace(s) to remove under the Experiment folder and click the right mouse button. Select '''Remove''' from the context sensitive menu. 
+To remove one or more traces for an experiment select the trace(s) to remove under the Experiment folder and click the right mouse button. Select '''Remove''' from the context sensitive menu.
 
 [[Image:images/RemoveTracesAction.png]]
 
@@ -249,47 +252,47 @@ After that the selected trace(s) are removed from the experiment. Note that the 
 
 === Renaming a Trace or Experiment ===
 
-Traces and Experiment can be renamed from the '''Project Explorer''' view. To rename a trace or experiment select the relevant trace and click the right mouse button. Then select '''Rename...''' from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation. 
+Traces and Experiment can be renamed from the '''Project Explorer''' view. To rename a trace or experiment select the relevant trace and click the right mouse button. Then select '''Rename...''' from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation.
 
 [[Image:images/RenameTraceAction.png]]
-  
-A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on '''OK'''. If the new name already exists the dialog box will show an error and a different name has to be entered.    
 
-[[Image:images/RenameTraceDialog.png]]  
+A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on '''OK'''. If the new name already exists the dialog box will show an error and a different name has to be entered.
 
-[[Image:images/RenameExperimentDialog.png]]  
+[[Image:images/RenameTraceDialog.png]]
 
-After successful renaming the new name will show in the '''Project Explorer'''. In case of a trace all reference links to that trace will be updated too. Note that linked traces only changes the display name, the underlying trace resource will stay the original name. 
+[[Image:images/RenameExperimentDialog.png]]
+
+After successful renaming the new name will show in the '''Project Explorer'''. In case of a trace all reference links to that trace will be updated too. Note that linked traces only changes the display name, the underlying trace resource will stay the original name.
 
 Note that all supplementary files will be also handled accordingly (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
 
 === Copying a Trace or Experiment ===
 
-To copy a trace or experiment select the relevant trace or experiment in the '''Project Explorer''' view and click the right mouse button. Then select '''Copy...''' from the context sensitive menu. 
+To copy a trace or experiment select the relevant trace or experiment in the '''Project Explorer''' view and click the right mouse button. Then select '''Copy...''' from the context sensitive menu.
 
 [[Image:images/CopyTraceAction.png]]
-  
-A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on '''OK'''. If the new name already exists the dialog box will show an error and a different name has to be entered.    
 
-[[Image:images/CopyTraceDialog.png]]  
+A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on '''OK'''. If the new name already exists the dialog box will show an error and a different name has to be entered.
 
-[[Image:images/CopyExperimentDialog.png]]  
+[[Image:images/CopyTraceDialog.png]]
 
-After successful copy operation the new trace or experiment respectively will show in the '''Project Explorer'''. In case of a linked trace, the copied trace will be a link to the original trace too. 
+[[Image:images/CopyExperimentDialog.png]]
+
+After successful copy operation the new trace or experiment respectively will show in the '''Project Explorer'''. In case of a linked trace, the copied trace will be a link to the original trace too.
 
 Note that the directory for all supplementary files will be copied, too. (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
 
 === Deleting a Trace or Experiment ===
 
-To delete a trace or experiment select the relevant trace or experiment in the '''Project Explorer''' view and click the right mouse button. Then select '''Delete...''' from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation. 
+To delete a trace or experiment select the relevant trace or experiment in the '''Project Explorer''' view and click the right mouse button. Then select '''Delete...''' from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation.
 
 [[Image:images/DeleteExperimentAction.png]]
-  
+
 A confirmation dialog box will open. To perform the deletion press '''OK''' otherwise select '''Cancel'''.
 
 [[Image:images/DeleteExperimentConfirmationDialog.png]]
 
-After successful operation the selected trace or experiment will be removed from the project. In case of a linked trace only the link will be removed. The actual trace resource remain on the disk. 
+After successful operation the selected trace or experiment will be removed from the project. In case of a linked trace only the link will be removed. The actual trace resource remain on the disk.
 
 Note that the directory for all supplementary files will be deleted, too. (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
 
@@ -303,13 +306,13 @@ To delete all supplementary files from a single trace, first, make sure the trac
 
 [[Image:images/DeleteSupplementaryFilesAction.png]]
 
-A new dialog box will open with a list of supplementary files. Select the file(s) to delete from the list and press '''OK'''. 
+A new dialog box will open with a list of supplementary files. Select the file(s) to delete from the list and press '''OK'''.
 
 [[Image:images/DeleteSupplementaryFilesDialog.png]]
 
 To delete all supplementary files from all traces of a experiment, select the relevant experiment in the '''Project Explorer''' view and click the right mouse button. In the context-sensitive menu select '''Delete Supplementary Files...''' menu item. The experiment and included traces need to be closed in order to do this operation.
 
-A new dialog box will open with a list of supplementary files. Note that the supplementary files are prefixed with the trace name to indicate the trace they belong to. Select the file(s) to delete from the list and press '''OK'''. 
+A new dialog box will open with a list of supplementary files. Note that the supplementary files are prefixed with the trace name to indicate the trace they belong to. Select the file(s) to delete from the list and press '''OK'''.
 
 [[Image:images/DeleteExpSupplementaryFilesDialog.png]]
 
@@ -335,15 +338,15 @@ The Events editor shows the basic trace data elements (events) in a tabular form
 
 [[Image:images/LTTng2EventsEditor.png]]
 
-The header displays the current trace (or experiment) name. 
+The header displays the current trace (or experiment) name.
 
-Being part of the '''Tracing and Monitoring''' Framework, the default table displays the following fields:  
+Being part of the '''Tracing and Monitoring''' Framework, the default table displays the following fields:
 
 * '''Timestamp''': the event timestamp
 * '''Source''': the source of the event
 * '''Type''': the event type and localization
 * '''Reference''' the event reference
-* '''Content''': the raw event content 
+* '''Content''': the raw event content
 
 The first row of the table is the header row a.k.a. the Search and Filter row.
 
@@ -511,16 +514,16 @@ A new feature of CTF traces is their ability to store user defined data that is 
 [[Image:images/LTTng2EnvironmentsView.png]]<br>
 The above picture shows a trace loaded that was collevcted with the '''lttng-modules''' version '''2'''.'''0'''.'''0''' tracer. It is a '''kernel''' trace of the '''3.2.0-18-generic''' '''linux''' kernel.
 
-== Custom Parser ==
+== Custom Parsers ==
 
 Custom parser wizards allow the user to define their own parsers for text or XML traces. The user defines how the input should be parsed into internal trace events and identifies the event fields that should be created and displayed. Traces created using a custom parser can be correlated with other built-in traces or traces added by plug-in extension.
 
 === Creating a custom text parser ===
- 
+
 The '''New Custom Text Parser''' wizard can be used to create a custom parser for text logs. It can be launched several ways:
- 
+
 * Select '''File''' &gt; '''New''' &gt; '''Other...''' &gt; '''Tracing''' &gt; '''Custom Text Parser'''
-* Open the '''Manage Custom Parsers''' dialog from the '''Project Explorer''' view menu, select the '''Text''' radio button and click the '''New...''' button
+* Open the '''[[#Managing_custom_parsers | Manage Custom Parsers]]''' dialog, select the '''Text''' radio button and click the '''New...''' button
 
 [[Image:images/CustomTextParserInput.png]]
 
@@ -529,7 +532,7 @@ Fill out the first wizard page with the following information:
 * '''Log type:''' Enter a name for the custom log entries, which is also the name of the custom parser.
 * '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
 Note: information about date and time patterns can be found here: [http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html]
-  
+
 Click the '''Add next line''', '''Add child line''' or '''Remove line''' buttons to create a new line of input or delete it. For each line of input, enter the following information:
 
 * '''Regular expression:''' Enter a regular expression that should match the input line in the log, using capturing groups to extract the data.<br>
@@ -538,23 +541,23 @@ Note: information about date and time patterns can be found here: [http://java.s
 * '''Cardinality:''' Enter the minimum and maximum number of lines matching this line's regular expression that must be found in the log. At least the minimum number of lines must be found before the parser will consider the next line. Child lines will always be considered first.
 
 <u>Important note:</u> The custom parsers identify a log entry when the first line's regular expression matches (Root Line n). Each subsequent text line in the log is attempted to be matched against the regular expression of the parser's input lines in the order that they are defined (Line n.*). Only the first matching input line will be used to process the captured data to be stored in the log entry. When a text line matches a Root Line's regular expression, a new log entry is started.
- 
+
 Click the '''Add group''' or '''Remove group''' buttons to define the data extracted from the capturing groups in the line's regular expression. For each group, enter the following information:
 
 * '''Name combo:''' Select a name for the extracted data:
-** '''Time Stamp''': Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box. 
+** '''Time Stamp''': Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
 ** '''Message''': Select this option to identify the main log entry's message. This is usually a group which could have text of greater length.
-** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. 
- 
+** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box.
+
 * '''Action combo:''' Select the action to be performed on the extracted data:
-** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this group. 
-** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this group. 
+** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this group.
+** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this group.
 ** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this group, using a | separator between matches.
-  
+
 The '''Preview input''' text box can be used to enter any log data that will be processed against the defined custom parser. When the wizard is invoked from a selected log file resource, this input will be automatically filled with the file contents.
- 
+
 The '''Preview:''' text field of each capturing group and of the Time Stamp will be filled from the parsed data of the first matching log entry.
- 
+
 In the '''Preview input''' text box, the matching entries are highlighted with different colors:
 
 * <code><span style="background:#FFFF00">&nbsp;Yellow&nbsp;</span></code> : indicates uncaptured text in a matching line.
@@ -563,11 +566,11 @@ In the '''Preview input''' text box, the matching entries are highlighted with d
 * <code>&nbsp;White&nbsp;&nbsp;</code> : indicates a non-matching line.
 
 The first line of a matching entry is highlighted with darker colors.
- 
+
 By default only the first matching entry will be highlighted. To highlight all matching entries in the preview input data, click the '''Highlight All''' button. This might take a few seconds to process, depending on the input size.
- 
+
 Click the '''Next''' button to go to the second page of the wizard.
- 
+
 [[Image:images/CustomTextParserOutput.png]]
 
 On this page, the list of default and custom data is shown, along with a preview of the custom parser log table output.
@@ -579,7 +582,7 @@ The custom data output can be modified by the following options:
 * '''Column order:''' Click '''Move before''' or '''Move after''' to change the display order of custom data.
 
 The table at the bottom of the page shows a preview of the custom parser log table output according to the selected options, using the matching entries of the previous page's '''Preview input''' log data.
- 
+
 Click the '''Finish''' button to close the wizard and save the custom parser.
 
 === Creating a custom XML parser ===
@@ -587,7 +590,7 @@ Click the '''Finish''' button to close the wizard and save the custom parser.
 The '''New Custom XML Parser''' wizard can be used to create a custom parser for XML logs. It can be launched several ways:
 
 * Select '''File''' &gt; '''New''' &gt; '''Other...''' &gt; '''Tracing''' &gt; '''Custom XML Parser'''
-* Open the '''Manage Custom Parsers''' dialog from the '''Project Explorer''' view menu, select the '''XML''' radio button and click the '''New...''' button
+* Open the '''[[#Managing_custom_parsers | Manage Custom Parsers]]''' dialog, select the '''XML''' radio button and click the '''New...''' button
 
 [[Image:images/CustomXMLParserInput.png]]
 
@@ -605,14 +608,14 @@ Click the '''Add child''' button to create a new element of input to the documen
 * '''Element name:''' Enter a name for the element that must match an element of the XML file.
 * '''Log entry:''' Select this checkbox to identify an element which represents a log entry. Each element with this name in the XML file will be parsed to a new log entry. At least one log entry element must be identified in the XML document. Log entry elements cannot be nested.
 * '''Name combo:''' Select a name for the extracted data:
-** '''Ignore''': Select this option to ignore the extracted element's data at this level. It is still possible to extract data from this element's child elements. 
+** '''Ignore''': Select this option to ignore the extracted element's data at this level. It is still possible to extract data from this element's child elements.
 ** '''Time Stamp''': Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
-** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length. 
-** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name. 
+** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
+** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
 * '''Action combo:''' Select the action to be performed on the extracted data:
-** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this element. 
-** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this element. 
-** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches. 
+** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this element.
+** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this element.
+** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches.
 
 Note: An element's extracted data 'value' is a parsed string representation of all its attributes, children elements and their own values. To extract more specific information from an element, ignore its data value and extract the data from one or many of its attributes and children elements.
 
@@ -621,12 +624,12 @@ Click the '''Add attribute''' button to create a new attribute input from the do
 * '''Attribute name:''' Enter a name for the attribute that must match an attribute of this element in the XML file.
 * '''Name combo:''' Select a name for the extracted data:
 ** '''Time Stamp''': Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
-** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length. 
-** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name. 
+** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
+** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
 * '''Action combo:''' Select the action to be performed on the extracted data:
-** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this element. 
-** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this element. 
-** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches. 
+** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this element.
+** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this element.
+** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches.
 
 Note: A log entry can inherited input data from its parent elements if the data is extracted at a higher level.
 
@@ -657,34 +660,35 @@ Click the '''Finish''' button to close the wizard and save the custom parser.
 
 The '''Manage Custom Parsers''' dialog is used to manage the list of custom parsers used by the tool. To open the dialog:
 
-* Select '''Manage Custom Parsers''' from the '''Project Explorer''' view menu.
+* Open the '''Project Explorer''' view.
+* Select '''Manage Custom Parsers...''' from the '''Traces''' folder context menu, or from a trace's '''Select Trace Type...''' context sub-menu.
 
 [[Image:images/ManageCustomParsers.png]]
- 
+
 The ordered list of currently defined custom parsers for the selected type is displayed on the left side of the dialog.
- 
+
 To change the type of custom parser to manage, select the '''Text''' or '''XML''' radio button.
- 
+
 The following actions can be performed from this dialog:
 
 * New...
- 
+
 Click the '''New...''' button to launch the '''New Custom Parser''' wizard.
- 
+
 * Edit...
- 
+
 Select a custom parser from the list and click the '''Edit...''' button to launch the '''Edit Custom Parser''' wizard.
- 
+
 * Delete
- 
+
 Select a custom parser from the list and click the '''Delete''' button to remove the custom parser.
 
 * Import...
- 
+
 Click the '''Import...''' button and select a file from the opened file dialog to import all its custom parsers.
- 
+
 * Export...
- 
+
 Select a custom parser from the list, click the '''Export...''' button and enter or select a file in the opened file dialog to export the custom parser. Note that if an existing file containing custom parsers is selected, the custom parser will be appended to the file.
 
 === Opening a trace using a custom parser ===
@@ -692,7 +696,7 @@ Select a custom parser from the list, click the '''Export...''' button and enter
 Once a custom parser has been created, any [[#Importing Traces in a Project|imported trace]] file can be opened and parsed using it.
 
 To do so:
- 
+
 * Select a trace in the '''Project Explorer''' view
 * Right-click the trace and select '''Select Trace Type...''' &gt; '''Custom Text''' or '''Custom XML''' &gt; ''parser name''
 * Double-click the trace or right-click it and select '''Open'''
@@ -701,12 +705,12 @@ The trace will be opened in an editor showing the events table, and an entry wil
 
 == LTTng Tracer Control ==
 
-The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corresponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View. 
+The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corresponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.
 
-In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters [[#References | References]]. 
+In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters [[#References | References]].
 
 === Control View ===
-To open the Control View, select '''Window->Show View->Other...->LTTng->Control View''. 
+To open the Control View, select '''Window->Show View->Other...->LTTng->Control View''.
 
 [[Image:images/LTTngControlView.png]]
 
@@ -716,7 +720,7 @@ To connect to a remote host, select the '''New Connection''' button in the Contr
 
 [[Image:images/LTTngControlViewConnect.png]]
 
-A new display will show for entering the remote host information. A drop down menu will filled with all existing host information which were used before. To enter the host information either select one of the hosts in the drop down menu or enter the host information manually. 
+A new display will show for entering the remote host information. A drop down menu will filled with all existing host information which were used before. To enter the host information either select one of the hosts in the drop down menu or enter the host information manually.
 
 [[Image:images/LTTng2NewConnection.png]]
 
@@ -725,13 +729,13 @@ To use an existing connection definition, select the relevant entry in the drop-
 [[Image:images/LTTng2SelectConnection.png]]
 
 To enter the host information manually select first the button '''Edit connection information'''. Then the text fields '''Connection Name''' and '''Host Name''' will enabled. Enter the relevant information and then select '''Ok'''.
-   
+
 [[Image:images/LTTng2EditConnection.png]]
 
 A new display will show for providing the user name and password. This display only opens if no password had been saved before. Enter user name and password in the '''Enter Password''' dialog box and select '''Ok'''.
 
-The '''Host Name''' holds the IP address or DNS name of the remote system. 
-The '''Connection Name''' is the alias name to be displayed in the Control View. 
+The '''Host Name''' holds the IP address or DNS name of the remote system.
+The '''Connection Name''' is the alias name to be displayed in the Control View.
 
 [[Image:images/LTTng2EnterPassword.png]]
 
@@ -741,11 +745,11 @@ After pressing '''Ok''' the SSH connection will be established and after success
 
 The top level tree node is the representation of the remote connection (host). The connection name of the connection will be displayed. Depending on the connection state different icons are displayed. If the node is '''CONNECTED''' the icon is shown [[Image:images/Target_connected.gif]], otherwise (states '''CONNECTING''', '''DISCONNNECTING''' or '''DISCONNECTED''' the icon is [[Image:images/Target_disconnected.gif]].
 
-Under the host level two folder groups are located. The first one is the '''Provider''' group. The second one is the '''Sessions''' group. 
+Under the host level two folder groups are located. The first one is the '''Provider''' group. The second one is the '''Sessions''' group.
 
-Under the '''Provider''' group all trace providers are displayed. Trace providers are '''Kernel''' and any user space application that supports UST tracing. Under each provider a corresponding list of events are displayed. 
+Under the '''Provider''' group all trace providers are displayed. Trace providers are '''Kernel''' and any user space application that supports UST tracing. Under each provider a corresponding list of events are displayed.
 
-Under the '''Sessions''' group all current sessions will be shown. The level under the sessions show the configured domains. Currently the LTTng 2.0 Tracer Toolchan supports domain '''Kernel''' and '''UST global'''. Under each domain the configured channels will be displayed. The last level is under the channels where the configured events are displayed. 
+Under the '''Sessions''' group all current sessions will be shown. The level under the sessions show the configured domains. Currently the LTTng 2.0 Tracer Toolchan supports domain '''Kernel''' and '''UST global'''. Under each domain the configured channels will be displayed. The last level is under the channels where the configured events are displayed.
 
 Each session can be '''ACTIVE''' or '''INACTIVE'''. Active means that tracing has been started, inactive means that the tracing has been stopped. Depending on the state of a session a different icon is displayed. The icon for an active session is [[Image:images/Session_active.gif]]. The icon for an inactive session is [[Image:images/Session_inactive.gif]].
 
@@ -755,8 +759,8 @@ Events within a channel can be in state '''ENABLED''' or '''DISABLED'''. Enabled
 
 ==== Disconnecting from a Remote Host ====
 
-To disconnect from a remote host, select the host in the Control View and press the '''Disconnect''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Disconnect''' button. 
- 
+To disconnect from a remote host, select the host in the Control View and press the '''Disconnect''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Disconnect''' button.
+
 [[Image:images/LTTng2ControlViewDisconnect.png]]
 
 ==== Connecting to a Remote Host ====
@@ -776,7 +780,7 @@ To create a tracing session, select the tree node '''Sessions''' and press the r
 
 [[Image:images/LTTng2CreateSessionAction.png]]
 
-A dialog box will open for entering information about the session to be created. 
+A dialog box will open for entering information about the session to be created.
 
 [[Image:images/LTTng2CreateSessionDialog.png]]
 
@@ -784,11 +788,11 @@ Fill in the '''Session Name''' and optionally the '''Session Path''' and press '
 
 ==== Enabling Channels - General ====
 
-Enabling channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.  
+Enabling channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.
 
 ==== Enabling Channels On Session Level ====
 
-To enable a channel, select the tree node of the relevant session and press the right mouse button. Then select the '''Enable Channel...''' button of the context-sensitive menu. 
+To enable a channel, select the tree node of the relevant session and press the right mouse button. Then select the '''Enable Channel...''' button of the context-sensitive menu.
 
 [[Image:images/LTTng2CreateChannelAction.png]]
 
@@ -796,11 +800,11 @@ A dialog box will open for entering information about the channel to be created.
 
 [[Image:images/LTTng2CreateChannelDialog.png]]
 
-By default the domain '''Kernel''' is selected and the corresponding default values are shown. To create a UST channel, select '''UST''' under the domain section. To get the default values of UST, then press button '''Default'''.  
-  
+By default the domain '''Kernel''' is selected and the corresponding default values are shown. To create a UST channel, select '''UST''' under the domain section. To get the default values of UST, then press button '''Default'''.
+
 If required update the following channel information and then press '''Ok'''.
 
-* '''Channel Name''': The name of the channel. 
+* '''Channel Name''': The name of the channel.
 * '''Number of Sub Buffers''': The number of sub-buffers of the channel.
 * '''Overwrite Mode''': The channel overwrite mode ('''true''' or '''false''')
 * '''Read Timer Interval''': The read timer interval.
@@ -823,7 +827,7 @@ Fill the relevant information and press '''Ok'''.
 
 ==== Enabling and Disabling Channels ====
 
-To disable one or more enabled channels, select the tree nodes of the relevant channels and press the right mouse button. Then select the '''Disable Channel''' menu item of the context-sensitive menu. 
+To disable one or more enabled channels, select the tree nodes of the relevant channels and press the right mouse button. Then select the '''Disable Channel''' menu item of the context-sensitive menu.
 
 [[Image:images/LTTng2DisableChannelAction.png]]
 
@@ -837,11 +841,11 @@ Upon successful operation, the selected channels will be '''ENABLED''' and the i
 
 ==== Enabling Events - General ====
 
-Enabling events can be done using different levels in the tree node. It can be done on the session, domain level and channel level. For the case of session or domain, i.e. when no specific channels is assigned then enabling of events is done on the default channel with the name '''channel0''' which created, if not already exists, by the LTTng tracer control on the server side.  
+Enabling events can be done using different levels in the tree node. It can be done on the session, domain level and channel level. For the case of session or domain, i.e. when no specific channels is assigned then enabling of events is done on the default channel with the name '''channel0''' which created, if not already exists, by the LTTng tracer control on the server side.
 
 ==== Enabling Kernel Events On Session Level ====
 
-To enable events, select the tree node of the relevant session and press the right mouse button. Then select the '''Enable Event (default channel)...''' button of the context-sensitive menu. 
+To enable events, select the tree node of the relevant session and press the right mouse button. Then select the '''Enable Event (default channel)...''' button of the context-sensitive menu.
 
 [[Image:images/LTTng2EventOnSessionAction.png]]
 
@@ -859,9 +863,9 @@ Upon successful operation, the domain '''Kernel''' will be created in the tree (
 
 [[Image:images/LTTng2EnabledKernelTracepoints.png]]
 
-To enable all '''Syscalls''', select the corresponding '''Select''' button and press '''Ok'''. 
+To enable all '''Syscalls''', select the corresponding '''Select''' button and press '''Ok'''.
 
-[[Image:images/LTTng2SyscallsDialog.png]] 
+[[Image:images/LTTng2SyscallsDialog.png]]
 
 Upon successful operation, the event with the name '''syscalls''' and event type '''SYSCALL''' will be added under the default channel (channel0). If necessary the domain '''Kernel''' and the channel '''channel0''' will be created.
 
@@ -890,14 +894,14 @@ For enabling UST events, first open the enable events dialog as described in sec
 To enable '''Tracepoint''' events, first select the corresponding '''Select''' button, then select either all tracepoins (select '''All''') or select selectively one or more tracepoints in the displayed tree of tracepoints and finally press '''Ok'''.
 
 [[Image:images/LTTng2UstTracepointEventsDialog.png]]
- 
-Upon successful operation, the domain '''UST global''' will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all requested events under the channel. The channel and events will be '''ENABLED'''. Note that for the case that '''All''' tracepoints were selected the wildcard '''*''' is used which will be shown in the Control View as below. 
+
+Upon successful operation, the domain '''UST global''' will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all requested events under the channel. The channel and events will be '''ENABLED'''. Note that for the case that '''All''' tracepoints were selected the wildcard '''*''' is used which will be shown in the Control View as below.
 
 [[Image:images/LTTng2EnabledAllUstTracepoints.png]]
 
 For UST it is possible to enable '''Tracepoint''' events using a wildcard. To enable '''Tracepoint''' events with a wildcard, select first the corresponding '''Select''' button, fill the '''Wildcard''' field and press '''Ok'''.
 
-[[Image:images/LTTng2UstWildcardEventsDialog.png]]  
+[[Image:images/LTTng2UstWildcardEventsDialog.png]]
 
 Upon successful operation, the event with the given wildcard and event type '''TRACEPOINT''' will be added under the default channel (channel0). If necessary the domain '''UST global''' and the channel '''channel0''' will be created.
 
@@ -905,9 +909,9 @@ Upon successful operation, the event with the given wildcard and event type '''T
 
 For UST it is possible to enable '''Tracepoint''' events using log levels. To enable '''Tracepoint''' events using log levels, select first the corresponding '''Select''' button, select a log level from the drop down menu, fill in the relevant information (see below) and press '''Ok'''.
 
-* '''Event Name''': Name to display 
+* '''Event Name''': Name to display
 * '''loglevel''': To specify if a range of log levels (0 to selected log level) shall be configured
-* '''loglevel-only''': To specify that only the specified log level shall be configured  
+* '''loglevel-only''': To specify that only the specified log level shall be configured
 
 [[Image:images/LTTng2UstLoglevelEventsDialog.png]]
 
@@ -917,7 +921,7 @@ Upon successful operation, the event with the given event name and event type ''
 
 ==== Enabling Events On Domain Level ====
 
-Kernel events can also be enabled on the domain level. For that select the relevant domain tree node, click the right mouse button and the select '''Enable Event (default channel)...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only.  
+Kernel events can also be enabled on the domain level. For that select the relevant domain tree node, click the right mouse button and the select '''Enable Event (default channel)...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only.
 
 [[Image:images/LTTng2EventOnDomainAction.png]]
 
@@ -927,9 +931,9 @@ When enabling events on the domain level, the events will be add to the default 
 
 ==== Enabling Events On Channel Level ====
 
-Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections [[#Enabling Channels On Session Level | Creating Channels On Session Level]] or [[#Enabling Channels On Domain Level | Creating Channels On Domain Level]].   
+Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections [[#Enabling Channels On Session Level | Creating Channels On Session Level]] or [[#Enabling Channels On Domain Level | Creating Channels On Domain Level]].
 
-Then select the relevant channel tree node, click the right mouse button and the select '''Enable Event...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only.  
+Then select the relevant channel tree node, click the right mouse button and the select '''Enable Event...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only.
 
 [[Image:images/LTTng2EventOnChannelAction.png]]
 
@@ -939,7 +943,7 @@ When enabling events on the channel level, the events will be add to the selecte
 
 ==== Enabling and Disabling Events ====
 
-To disable one or more enabled events, select the tree nodes of the relevant events and click the right mouse button. Then select '''Disable Event''' menu item in the context-sensitive menu. 
+To disable one or more enabled events, select the tree nodes of the relevant events and click the right mouse button. Then select '''Disable Event''' menu item in the context-sensitive menu.
 
 [[Image:images/LTTng2DisableEventAction.png]]
 
@@ -955,17 +959,17 @@ Upon successful operation, the selected events will be '''ENABLED''' and the ico
 
 ==== Enabling Tracepoint Events From Provider ====
 
-It is possible to enable events of type '''Tracepoint''' directly from the providers and assign the enabled event to a session and channel. Before doing that a session has to be created as described in section [[#Creating a Tracing Session | Creating a Tracing Session]]. Also, if other than default channel '''channel0''' is required, create a channel as described in sections [[#Enabling Channels On Session Level | Creating Channels On Session Level]] or [[#Enabling Channels On Domain Level | Creating Channels On Domain Level]]. 
+It is possible to enable events of type '''Tracepoint''' directly from the providers and assign the enabled event to a session and channel. Before doing that a session has to be created as described in section [[#Creating a Tracing Session | Creating a Tracing Session]]. Also, if other than default channel '''channel0''' is required, create a channel as described in sections [[#Enabling Channels On Session Level | Creating Channels On Session Level]] or [[#Enabling Channels On Domain Level | Creating Channels On Domain Level]].
 
-To assign tracepoint events to a session and channel, select the events to be enabled under the provider (e.g. provider '''Kernel'''), click right mouse button and then select '''Enable Event...''' menu item from the context sensitive menu. 
+To assign tracepoint events to a session and channel, select the events to be enabled under the provider (e.g. provider '''Kernel'''), click right mouse button and then select '''Enable Event...''' menu item from the context sensitive menu.
 
 [[Image:images/LTTng2AssignEventAction.png]]
 
-A new display will open for defining the session and channel.  
- 
+A new display will open for defining the session and channel.
+
 [[Image:images/LTTng2AssignEventDialog.png]]
 
-Select a session from the '''Session List''' drop-down menu, a channel from the '''Channel List''' drop-down menu and the press '''Ok'''. Upon successful operation, the selected events will be added to the selected session and channel of the domain that the selected provider belongs to. In case that there was no channel available, the domain and the default channel '''channel0''' will be created for corresponding session. The newly added events will be '''ENABLED'''.  
+Select a session from the '''Session List''' drop-down menu, a channel from the '''Channel List''' drop-down menu and the press '''Ok'''. Upon successful operation, the selected events will be added to the selected session and channel of the domain that the selected provider belongs to. In case that there was no channel available, the domain and the default channel '''channel0''' will be created for corresponding session. The newly added events will be '''ENABLED'''.
 
 [[Image:images/LTTng2AssignedEvents.png]]
 
@@ -979,13 +983,13 @@ A new display will open for selecting one or more contexts to add.
 
 [[Image:images/LTTng2AddContextDialog.png]]
 
-The tree shows all available context that can be added. Select one or more context and the press '''Ok'''. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. 
+The tree shows all available context that can be added. Select one or more context and the press '''Ok'''. Upon successful operation, the selected context will be added to all channels and their events of the selected domain.
 
 '''Note''': The LTTng UST tracer only supports  contexts '''procname''', '''pthread_id''', '''vpid''' '''vtid'''. Adding any other contexts in the UST domina will fail.
 
 ==== Adding Contexts to All Events of a Channel ====
 
-Adding contexts on channels and events from the channel level, will enable the specified contexts to all events of the selected channel. To add contexts on the channel level, select a channel, click right mouse button on a channel tree node and select the menu item '''Add Context...''' from the context-sensitive menu. 
+Adding contexts on channels and events from the channel level, will enable the specified contexts to all events of the selected channel. To add contexts on the channel level, select a channel, click right mouse button on a channel tree node and select the menu item '''Add Context...''' from the context-sensitive menu.
 
 [[Image:images/LTTng2AddContextOnChannelAction.png]]
 
@@ -997,7 +1001,7 @@ Adding contexts to a event of a channel, select an event of a channel, click rig
 
 [[Image:images/LTTng2AddContextToEventsAction.png]]
 
-A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to the selected event. 
+A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to the selected event.
 
 ==== Start Tracing ====
 
@@ -1005,7 +1009,7 @@ To start tracing, select one or more sessions to start in the Control View and p
 
 [[Image:images/LTTng2StartTracingAction.png]]
 
-Upon successful operation, the tracing session will be '''ACTIVE''' and the icon of the session will be updated.  
+Upon successful operation, the tracing session will be '''ACTIVE''' and the icon of the session will be updated.
 
 ==== Stop Tracing ====
 
@@ -1017,11 +1021,11 @@ Upon successful operation, the tracing session will be '''INACTIVE''' and the ic
 
 ==== Destroying a Tracing Session ====
 
-To destroy a tracing session, select one or more sessions to destroy in the Control View and press the '''Destroy''' button. Alternatively, click the right mouse button on the session tree node. A context-sensitive menu will show. Then select the '''Destroy...''' menu item. Note that the session has to be '''INACTIVE''' for this operation. 
+To destroy a tracing session, select one or more sessions to destroy in the Control View and press the '''Destroy''' button. Alternatively, click the right mouse button on the session tree node. A context-sensitive menu will show. Then select the '''Destroy...''' menu item. Note that the session has to be '''INACTIVE''' for this operation.
 
 [[Image:images/LTTng2DestroySessionAction.png]]
 
-A confirmation dialog box will open. Click on '''Ok''' to destroy the session otherwise click on '''Cancel'''.  
+A confirmation dialog box will open. Click on '''Ok''' to destroy the session otherwise click on '''Cancel'''.
 
 [[Image:images/LTTng2DestroyConfirmationDialog.png]]
 
@@ -1029,7 +1033,7 @@ Upon successful operation, the tracing session will be destroyed and removed fro
 
 ==== Refreshing the Node Information ====
 
-To refresh the remote host information, select any node in the tree of the Control View and press the '''Refresh''' button. Alternatively, click the right mouse button on any tree node. A context-sensitive menu will show. Then select the '''Refresh''' menu item. 
+To refresh the remote host information, select any node in the tree of the Control View and press the '''Refresh''' button. Alternatively, click the right mouse button on any tree node. A context-sensitive menu will show. Then select the '''Refresh''' menu item.
 
 [[Image:images/LTTng2RefreshAction.png]]
 
@@ -1046,7 +1050,7 @@ Upon successful operation, the calibrate command is executed and relevant inform
 
 ==== Importing Session Traces to a Tracing Project ====
 
-To import traces from a tracing session, select the relevant session and click on the '''Import''' Button. Alternatively, click the right mouse button on the session tree node and select the menu item '''Import...''' from the context-sensitive menu. 
+To import traces from a tracing session, select the relevant session and click on the '''Import''' Button. Alternatively, click the right mouse button on the session tree node and select the menu item '''Import...''' from the context-sensitive menu.
 
 [[Image:images/LTTng2ImportAction.png]]
 
@@ -1054,7 +1058,7 @@ A new display will open for selecting the traces to import.
 
 [[Image:images/LTTng2ImportDialog.png]]
 
-Select the trace to be imported by selecting the relevant traces in the tree viewer, select a tracing project from the '''Available Projects''' combo box and select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the the selected traces will be stored in the '''Traces''' directory of the specified tracing project. From the '''Project Explorer''' view, the trace can be analyzed further. 
+Select the trace to be imported by selecting the relevant traces in the tree viewer, select a tracing project from the '''Available Projects''' combo box and select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the the selected traces will be stored in the '''Traces''' directory of the specified tracing project. From the '''Project Explorer''' view, the trace can be analyzed further.
 
 '''Note''': If the overwrite button ('''Overwrite existing trace without warning''') was not selected and a trace with the same name of a trace to be imported already exists in the project, then a new confirmation dialog box will open.
 
@@ -1069,7 +1073,7 @@ If the existing trace should not be overwritten select, then select the '''Renam
 === Properties View ===
 
 The Control View provides property information of selected tree component. Depending on the selected tree component different properties are displayed in the property view. For example, when selecting the node level the property view will be filled as followed:
-   
+
 [[Image:images/LTTng2PropertyView.png]]
 
 '''List of properties''':
@@ -1086,7 +1090,7 @@ The Control View provides property information of selected tree component. Depen
 * '''Event''' Properties (Provider)
 ** '''Event Name''': The name of the event.
 ** '''Event Type''': The event type ('''TRACEPOINT''' only).
-** '''Log Level''': The log level of the event. 
+** '''Log Level''': The log level of the event.
 * '''Session''' Properties
 ** '''Session Name''': The name of the Session.
 ** '''Session Path''': The path on the remote host where the traces will be stored.
@@ -1094,7 +1098,7 @@ The Control View provides property information of selected tree component. Depen
 * '''Domain''' Properties
 ** '''Domain Name''': The name of the domain.
 * '''Channel''' Properties
-** '''Channel Name''': The name of the channel. 
+** '''Channel Name''': The name of the channel.
 ** '''Number of Sub Buffers''': The number of sub-buffers of the channel.
 ** '''Output type''': The output type for the trace (e.g. ''splice()'' or ''mmap()'')
 ** '''Overwrite Mode''': The channel overwrite mode ('''true''' for overwrite mode, '''false''' for discard)
@@ -1102,7 +1106,7 @@ The Control View provides property information of selected tree component. Depen
 ** '''State''': The channel state ('''ENABLED''' or '''DISABLED''')
 ** '''Sub Buffer size''': The size of the sub-buffers of the channel (in bytes).
 ** '''Switch Timer Interval''': The switch timer interval.
-* '''Event''' Properties (Channel) 
+* '''Event''' Properties (Channel)
 ** '''Event Name''': The name of the event.
 ** '''Event Type''': The event type ('''TRACEPOINT''', '''SYSCALL''' or '''PROBE''')..
 ** '''Log Level''': The log level of the event.
@@ -1114,7 +1118,7 @@ Serveral LTTng 2.0 tracer control preferences exists which can be configured. To
 
 [[Image:images/LTTng2Preferences.png]]
 
-To change the tracing group of the user which will be specified on each command line, enter the new group name in the '''Tracing Group''' text field and click ok. The default tracing group is '''tracing''' and can be restored by pressing the '''Restore Defaults''' button. 
+To change the tracing group of the user which will be specified on each command line, enter the new group name in the '''Tracing Group''' text field and click ok. The default tracing group is '''tracing''' and can be restored by pressing the '''Restore Defaults''' button.
 
 [[Image:images/LTTng2PreferencesGroup.png]]
 
@@ -1130,7 +1134,7 @@ This section presents a description of the LTTng Kernel Perspective.
 
 == LTTng Kernel Perspective ==
 
-The '''LTTng Kernel''' perspective is built upon the [[#Tracing_Perspective | Tracing Perspective]], re-organizes them slightly and adds the following views: 
+The '''LTTng Kernel''' perspective is built upon the [[#Tracing_Perspective | Tracing Perspective]], re-organizes them slightly and adds the following views:
 
 * [[#Control_Flow_View | Control Flow View]] - to visualize processes state transitions
 * [[#Resources_View | Resources View]] - to visualize system resources state transitions
@@ -1282,14 +1286,14 @@ The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events 
 * '''Timestamp''': the event timestamp
 * '''Channel''': the event channel (data collector)
 * '''Event Type''': the event type (or kernel marker)
-* '''Content''': the raw event content 
+* '''Content''': the raw event content
 
 
 [[Image:images/LTTng2EventsEditor.png]]
 
 = Timestamp formatting =
 
-Most views that show timestamps are displayed in the same time format. The unified timestamp format can be changed in the Preferences page. To get to that page, click on '''Window''' -> '''Preferences''' -> '''Tracing''' -> '''Time Format'''. Then a window will show the time format preferences. 
+Most views that show timestamps are displayed in the same time format. The unified timestamp format can be changed in the Preferences page. To get to that page, click on '''Window''' -> '''Preferences''' -> '''Tracing''' -> '''Time Format'''. Then a window will show the time format preferences.
 
 [[Image:images/TmfTimestampFormatPage.png]]
 
@@ -1311,13 +1315,13 @@ This will update all the displayed timestamps.
 
 * When parsing text traces, the timestamps are assumed to be in the local time zone. This means that when combining it to CTF binary traces, there could be offsets by a few hours depending on where the traces were taken and where they were read.
 
-= How to use LTTng to diagnose problems = 
+= How to use LTTng to diagnose problems =
 
 LTTng is a tracer, it will give an enormous amount of information about the system it is running on. This means it can solve many types of problems.
 
-The following are examples of problems that can be solved with a tracer. 
+The following are examples of problems that can be solved with a tracer.
 
-== Random stutters == 
+== Random stutters ==
 
 Bob is running a computer program and it stutters periodically every 2 minutes. The CPU load is relatively low and Bob isn't running low on RAM.
 
@@ -1339,7 +1343,7 @@ The FooMonitor team finds that they were calling a system bus call that would ha
 
 By using system wide kernel tracing, even without deep kernel knowledge Bob was able to isolate a bug in a rogue piece of software in his system.
 
-== Slow I/O == 
+== Slow I/O ==
 
 Alice is running her server. She noticed that one of her nodes was slowing down, and wasn't sure why, upon reading the trace she noticed that her time between a block request and complete was around 10ms.
 

@@ -33,7 +33,7 @@
 		<h2 id="Tracing_Perspective">Tracing Perspective</h2>
 		<p>The 
 			<b>Tracing</b> perspective is part of the 
-			<b>Tracing and Monitoring Framework (TMF)</b> and groups the following views: 
+			<b>Tracing and Monitoring Framework (TMF)</b> and groups the following views:
 		</p>
 		<ul>
 			<li>
@@ -59,8 +59,8 @@
 		<p>
 			<img border="0" src="images/ShowTracingPerspective.png"/>
 		</p>
-		<p>On top to these views, the 
-			<b>Tracing and Monitoring Framework (TMF)</b> feature provides a set of generic tracing specific views, such as: 
+		<p>In addition to these views, the 
+			<b>Tracing and Monitoring Framework (TMF)</b> feature provides a set of generic tracing specific views, such as:
 		</p>
 		<ul>
 			<li>
@@ -75,22 +75,22 @@
 			<li>
 				<a href="LTTng.html#Environment_Variables_View">Environment Variables View</a>
 			</li>
-			<li>
-				<a href="LTTng.html#Custom_Parser">Custom Parser</a>
-			</li>
 		</ul>
+		<p>The framework also supports user creation of 
+			<a href="LTTng.html#Custom_Parsers">Custom Parsers</a>.
+		</p>
 		<p>To open one of the above 
-			<b>Tracing</b> view, use the Eclipse Show View dialog (
-			<b>Window &gt; Show View &gt; Other...</b>. Then select the relevant view from the 
-			<b>Tracing</b>. 
+			<b>Tracing</b> views, use the Eclipse Show View dialog (
+			<b>Window &gt; Show View &gt; Other...</b>). Then select the relevant view from the 
+			<b>Tracing</b> category.
 		</p>
 		<p>
 			<img border="0" src="images/ShowTracingViews.png"/>
 		</p>
 		<p>Additionally, the 
-			<b>LTTng</b> feature provides a 
-			<b>LTTng Tracer Control</b>. It comes with a  dedicated 
-			<b>Control View</b>.  
+			<b>LTTng</b> feature provides an 
+			<b>LTTng Tracer Control</b> functionality. It comes with a dedicated 
+			<b>Control View</b>.
 		</p>
 		<ul>
 			<li>
@@ -100,7 +100,7 @@
 		<h2 id="Project_View">Project View</h2>
 		<p>The project view is the standard Eclipse Project Explorer. 
 			<b>Tracing</b> projects are well integrated in the Eclipse's Common Navigator Framework. The Project Explorer shows 
-			<b>Tracing</b> project with a small "T" decorator in the upper right of the project folder icon. 
+			<b>Tracing</b> project with a small "T" decorator in the upper right of the project folder icon.
 		</p>
 		<h3 id="Creating_a_Tracing_Project">Creating a Tracing Project</h3>
 		<p>A new 
@@ -109,7 +109,7 @@
 			<b>File &gt; New &gt; Project...</b> from the main menu bar or alternatively form the context-sensitive menu (click with right mouse button in the 
 			<b>Project Explorer</b>.
 		</p>
-		<p>The first page of project wizard will open. </p>
+		<p>The first page of project wizard will open.</p>
 		<p>
 			<img border="0" src="images/NewTracingProjectPage1.png"/>
 		</p>
@@ -124,19 +124,19 @@
 			<img border="0" src="images/NewTracingProjectPage2.png"/>
 		</p>
 		<p>A new project will appear in the 
-			<b>Project Explorer</b> view. 
+			<b>Project Explorer</b> view.
 		</p>
 		<p>
 			<img border="0" src="images/NewProjectExplorer.png"/>
 		</p>
 		<p>Tracing projects have two sub-folders: 
 			<b>Traces</b> which holds the individual traces, and 
-			<b>Experiments</b> which holds sets of traces that we want to correlate. 
+			<b>Experiments</b> which holds sets of traces that we want to correlate.
 		</p>
 		<h3 id="Importing_Traces_in_a_Project">Importing Traces in a Project</h3>
 		<p>The 
 			<b>Traces</b> folder holds the set of traces available for experiments. To import a trace to the traces folder, select the Traces folder and click the right mouse button. Then select 
-			<b>Import...</b> menu item in the context-sensitive menu.   
+			<b>Import...</b> menu item in the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/ProjectImportTraceAction.png"/>
@@ -156,7 +156,7 @@
 			<b>Traces</b> folder. If a trace type was selected in the import dialog, then the corresponding icon will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
 		</p>
 		<p>Note that trace type is an extension point of the 
-			<b>Tracing and Monitoring Framework (TMF)</b>. Depending on the which features are loaded, the list of trace types can vary. 
+			<b>Tracing and Monitoring Framework (TMF)</b>. Depending on the which features are loaded, the list of trace types can vary.
 		</p>
 		<h3 id="Selecting_a_Trace_Type">Selecting a Trace Type</h3>
 		<p>If no trace type was selected a trace type as to be associated to a trace before it can be opened. To select a trace type select the relevant trace and click the right mouse button. In the context-sensitive menu, select 
@@ -176,30 +176,30 @@
 			<img border="0" src="images/ExplorerWithAssociatedTraceType.png"/>
 		</p>
 		<h3 id="Creating_a_Experiment">Creating a Experiment</h3>
-		<p>An experiment consists in an arbitrary number of aggregated traces for purpose of correlation. In the degenerate case, an experiment can consist of a single trace. The experiment provides a unified, time-ordered stream of the individual trace events. </p>
+		<p>An experiment consists in an arbitrary number of aggregated traces for purpose of correlation. In the degenerate case, an experiment can consist of a single trace. The experiment provides a unified, time-ordered stream of the individual trace events.</p>
 		<p>To create an experiment, select the folder 
 			<b>Experiments</b> and click the right mouse button. Then select 
-			<b>New...</b>. 
+			<b>New...</b>.
 		</p>
 		<p>
 			<img border="0" src="images/NewExperimentAction.png"/>
 		</p>
 		<p>A new display will open for entering the experiment name. Type the name of the experiment in the text field 
 			<b>Experiment Name</b> and the click on 
-			<b>OK</b>. 
+			<b>OK</b>.
 		</p>
 		<p>
 			<img border="0" src="images/NewExperimentDialog.png"/>
 		</p>
 		<h3 id="Selecting_Traces_for_an_Experiment">Selecting Traces for an Experiment</h3>
 		<p>After creating an experiment, traces need to be added to the experiment. To select traces for an experiment select the newly create experiment and click the right mouse button. Select 
-			<b>Select Traces...</b> from the context sensitive menu. 
+			<b>Select Traces...</b> from the context sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/SelectTracesAction.png"/>
 		</p>
 		<p>A new dialog box will open with a list of available traces. Select the traces to add from the list and then click on 
-			<b>Finish</b>. 
+			<b>Finish</b>.
 		</p>
 		<p>
 			<img border="0" src="images/SelectTracesDialog.png"/>
@@ -215,7 +215,7 @@
 		</p>
 		<h3 id="Removing_Traces_from_an_Experiment">Removing Traces from an Experiment</h3>
 		<p>To remove one or more traces for an experiment select the trace(s) to remove under the Experiment folder and click the right mouse button. Select 
-			<b>Remove</b> from the context sensitive menu. 
+			<b>Remove</b> from the context sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/RemoveTracesAction.png"/>
@@ -226,22 +226,22 @@
 		<h3 id="Renaming_a_Trace_or_Experiment">Renaming a Trace or Experiment</h3>
 		<p>Traces and Experiment can be renamed from the 
 			<b>Project Explorer</b> view. To rename a trace or experiment select the relevant trace and click the right mouse button. Then select 
-			<b>Rename...</b> from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation. 
+			<b>Rename...</b> from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation.
 		</p>
 		<p>
 			<img border="0" src="images/RenameTraceAction.png"/>
 		</p>
 		<p>A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on 
-			<b>OK</b>. If the new name already exists the dialog box will show an error and a different name has to be entered.    
+			<b>OK</b>. If the new name already exists the dialog box will show an error and a different name has to be entered.
 		</p>
 		<p>
-			<img border="0" src="images/RenameTraceDialog.png"/>  
+			<img border="0" src="images/RenameTraceDialog.png"/>
 		</p>
 		<p>
-			<img border="0" src="images/RenameExperimentDialog.png"/>  
+			<img border="0" src="images/RenameExperimentDialog.png"/>
 		</p>
 		<p>After successful renaming the new name will show in the 
-			<b>Project Explorer</b>. In case of a trace all reference links to that trace will be updated too. Note that linked traces only changes the display name, the underlying trace resource will stay the original name. 
+			<b>Project Explorer</b>. In case of a trace all reference links to that trace will be updated too. Note that linked traces only changes the display name, the underlying trace resource will stay the original name.
 		</p>
 		<p>Note that all supplementary files will be also handled accordingly (see also 
 			<a href="LTTng.html#Deleting_Supplementary_Files">Deleting Supplementary Files</a>).
@@ -249,22 +249,22 @@
 		<h3 id="Copying_a_Trace_or_Experiment">Copying a Trace or Experiment</h3>
 		<p>To copy a trace or experiment select the relevant trace or experiment in the 
 			<b>Project Explorer</b> view and click the right mouse button. Then select 
-			<b>Copy...</b> from the context sensitive menu. 
+			<b>Copy...</b> from the context sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/CopyTraceAction.png"/>
 		</p>
 		<p>A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on 
-			<b>OK</b>. If the new name already exists the dialog box will show an error and a different name has to be entered.    
+			<b>OK</b>. If the new name already exists the dialog box will show an error and a different name has to be entered.
 		</p>
 		<p>
-			<img border="0" src="images/CopyTraceDialog.png"/>  
+			<img border="0" src="images/CopyTraceDialog.png"/>
 		</p>
 		<p>
-			<img border="0" src="images/CopyExperimentDialog.png"/>  
+			<img border="0" src="images/CopyExperimentDialog.png"/>
 		</p>
 		<p>After successful copy operation the new trace or experiment respectively will show in the 
-			<b>Project Explorer</b>. In case of a linked trace, the copied trace will be a link to the original trace too. 
+			<b>Project Explorer</b>. In case of a linked trace, the copied trace will be a link to the original trace too.
 		</p>
 		<p>Note that the directory for all supplementary files will be copied, too. (see also 
 			<a href="LTTng.html#Deleting_Supplementary_Files">Deleting Supplementary Files</a>).
@@ -272,7 +272,7 @@
 		<h3 id="Deleting_a_Trace_or_Experiment">Deleting a Trace or Experiment</h3>
 		<p>To delete a trace or experiment select the relevant trace or experiment in the 
 			<b>Project Explorer</b> view and click the right mouse button. Then select 
-			<b>Delete...</b> from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation. 
+			<b>Delete...</b> from the context sensitive menu. The trace or experiment needs to be closed in order to do this operation.
 		</p>
 		<p>
 			<img border="0" src="images/DeleteExperimentAction.png"/>
@@ -284,7 +284,7 @@
 		<p>
 			<img border="0" src="images/DeleteExperimentConfirmationDialog.png"/>
 		</p>
-		<p>After successful operation the selected trace or experiment will be removed from the project. In case of a linked trace only the link will be removed. The actual trace resource remain on the disk. </p>
+		<p>After successful operation the selected trace or experiment will be removed from the project. In case of a linked trace only the link will be removed. The actual trace resource remain on the disk.</p>
 		<p>Note that the directory for all supplementary files will be deleted, too. (see also 
 			<a href="LTTng.html#Deleting_Supplementary_Files">Deleting Supplementary Files</a>).
 		</p>
@@ -302,7 +302,7 @@
 			<img border="0" src="images/DeleteSupplementaryFilesAction.png"/>
 		</p>
 		<p>A new dialog box will open with a list of supplementary files. Select the file(s) to delete from the list and press 
-			<b>OK</b>. 
+			<b>OK</b>.
 		</p>
 		<p>
 			<img border="0" src="images/DeleteSupplementaryFilesDialog.png"/>
@@ -312,7 +312,7 @@
 			<b>Delete Supplementary Files...</b> menu item. The experiment and included traces need to be closed in order to do this operation.
 		</p>
 		<p>A new dialog box will open with a list of supplementary files. Note that the supplementary files are prefixed with the trace name to indicate the trace they belong to. Select the file(s) to delete from the list and press 
-			<b>OK</b>. 
+			<b>OK</b>.
 		</p>
 		<p>
 			<img border="0" src="images/DeleteExpSupplementaryFilesDialog.png"/>
@@ -336,9 +336,9 @@
 		<p>
 			<img border="0" src="images/LTTng2EventsEditor.png"/>
 		</p>
-		<p>The header displays the current trace (or experiment) name. </p>
+		<p>The header displays the current trace (or experiment) name.</p>
 		<p>Being part of the 
-			<b>Tracing and Monitoring</b> Framework, the default table displays the following fields:  
+			<b>Tracing and Monitoring</b> Framework, the default table displays the following fields:
 		</p>
 		<ul>
 			<li>
@@ -354,7 +354,7 @@
 				<b>Reference</b> the event reference
 			</li>
 			<li>
-				<b>Content</b>: the raw event content 
+				<b>Content</b>: the raw event content
 			</li>
 		</ul>
 		<p>The first row of the table is the header row a.k.a. the Search and Filter row.</p>
@@ -574,7 +574,7 @@
 			<b>3.2.0-18-generic</b> 
 			<b>linux</b> kernel.
 		</p>
-		<h2 id="Custom_Parser">Custom Parser</h2>
+		<h2 id="Custom_Parsers">Custom Parsers</h2>
 		<p>Custom parser wizards allow the user to define their own parsers for text or XML traces. The user defines how the input should be parsed into internal trace events and identifies the event fields that should be created and displayed. Traces created using a custom parser can be correlated with other built-in traces or traces added by plug-in extension.</p>
 		<h3 id="Creating_a_custom_text_parser">Creating a custom text parser</h3>
 		<p>The 
@@ -589,8 +589,9 @@
 				<b>Custom Text Parser</b>
 			</li>
 			<li>Open the 
-				<b>Manage Custom Parsers</b> dialog from the 
-				<b>Project Explorer</b> view menu, select the 
+				<b>
+					<a href="LTTng.html#Managing_custom_parsers">Manage Custom Parsers</a>
+				</b> dialog, select the 
 				<b>Text</b> radio button and click the 
 				<b>New...</b> button
 			</li>
@@ -640,13 +641,13 @@
 				<b>Name combo:</b> Select a name for the extracted data:
 				<ul>
 					<li>
-						<b>Time Stamp</b>: Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box. 
+						<b>Time Stamp</b>: Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
 					</li>
 					<li>
 						<b>Message</b>: Select this option to identify the main log entry's message. This is usually a group which could have text of greater length.
 					</li>
 					<li>
-						<b>Other</b>: Select this option to identify any non-standard data. The name must be entered in the name: text box. 
+						<b>Other</b>: Select this option to identify any non-standard data. The name must be entered in the name: text box.
 					</li>
 				</ul>
 			</li>
@@ -656,10 +657,10 @@
 				<b>Action combo:</b> Select the action to be performed on the extracted data:
 				<ul>
 					<li>
-						<b>Set</b>: Select this option to overwrite the data for the chosen name when there is a match for this group. 
+						<b>Set</b>: Select this option to overwrite the data for the chosen name when there is a match for this group.
 					</li>
 					<li>
-						<b>Append</b>: Select this option to append to the data with the chosen name, if any, when there is a match for this group. 
+						<b>Append</b>: Select this option to append to the data with the chosen name, if any, when there is a match for this group.
 					</li>
 					<li>
 						<b>Append with |</b> : Select this option to append to the data with the chosen name, if any, when there is a match for this group, using a | separator between matches.
@@ -725,8 +726,9 @@
 				<b>Custom XML Parser</b>
 			</li>
 			<li>Open the 
-				<b>Manage Custom Parsers</b> dialog from the 
-				<b>Project Explorer</b> view menu, select the 
+				<b>
+					<a href="LTTng.html#Managing_custom_parsers">Manage Custom Parsers</a>
+				</b> dialog, select the 
 				<b>XML</b> radio button and click the 
 				<b>New...</b> button
 			</li>
@@ -764,16 +766,16 @@
 				<b>Name combo:</b> Select a name for the extracted data:
 				<ul>
 					<li>
-						<b>Ignore</b>: Select this option to ignore the extracted element's data at this level. It is still possible to extract data from this element's child elements. 
+						<b>Ignore</b>: Select this option to ignore the extracted element's data at this level. It is still possible to extract data from this element's child elements.
 					</li>
 					<li>
 						<b>Time Stamp</b>: Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
 					</li>
 					<li>
-						<b>Message</b>: Select this option to identify the main log entry's message. This is usually an input which could have text of greater length. 
+						<b>Message</b>: Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
 					</li>
 					<li>
-						<b>Other</b>: Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name. 
+						<b>Other</b>: Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
 					</li>
 				</ul>
 			</li>
@@ -781,13 +783,13 @@
 				<b>Action combo:</b> Select the action to be performed on the extracted data:
 				<ul>
 					<li>
-						<b>Set</b>: Select this option to overwrite the data for the chosen name when there is a match for this element. 
+						<b>Set</b>: Select this option to overwrite the data for the chosen name when there is a match for this element.
 					</li>
 					<li>
-						<b>Append</b>: Select this option to append to the data with the chosen name, if any, when there is a match for this element. 
+						<b>Append</b>: Select this option to append to the data with the chosen name, if any, when there is a match for this element.
 					</li>
 					<li>
-						<b>Append with |</b> : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches. 
+						<b>Append with |</b> : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches.
 					</li>
 				</ul>
 			</li>
@@ -807,10 +809,10 @@
 						<b>Time Stamp</b>: Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
 					</li>
 					<li>
-						<b>Message</b>: Select this option to identify the main log entry's message. This is usually an input which could have text of greater length. 
+						<b>Message</b>: Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
 					</li>
 					<li>
-						<b>Other</b>: Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name. 
+						<b>Other</b>: Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
 					</li>
 				</ul>
 			</li>
@@ -818,13 +820,13 @@
 				<b>Action combo:</b> Select the action to be performed on the extracted data:
 				<ul>
 					<li>
-						<b>Set</b>: Select this option to overwrite the data for the chosen name when there is a match for this element. 
+						<b>Set</b>: Select this option to overwrite the data for the chosen name when there is a match for this element.
 					</li>
 					<li>
-						<b>Append</b>: Select this option to append to the data with the chosen name, if any, when there is a match for this element. 
+						<b>Append</b>: Select this option to append to the data with the chosen name, if any, when there is a match for this element.
 					</li>
 					<li>
-						<b>Append with |</b> : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches. 
+						<b>Append with |</b> : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches.
 					</li>
 				</ul>
 			</li>
@@ -873,9 +875,13 @@
 			<b>Manage Custom Parsers</b> dialog is used to manage the list of custom parsers used by the tool. To open the dialog:
 		</p>
 		<ul>
+			<li>Open the 
+				<b>Project Explorer</b> view.
+			</li>
 			<li>Select 
-				<b>Manage Custom Parsers</b> from the 
-				<b>Project Explorer</b> view menu.
+				<b>Manage Custom Parsers...</b> from the 
+				<b>Traces</b> folder context menu, or from a trace's 
+				<b>Select Trace Type...</b> context sub-menu.
 			</li>
 		</ul>
 		<p>
@@ -940,13 +946,13 @@
 		</ul>
 		<p>The trace will be opened in an editor showing the events table, and an entry will be added for it in the Time Chart view.</p>
 		<h2 id="LTTng_Tracer_Control">LTTng Tracer Control</h2>
-		<p>The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corresponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View. </p>
+		<p>The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corresponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.</p>
 		<p>In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters 
-			<a href="References.html#References">References</a>. 
+			<a href="References.html#References">References</a>.
 		</p>
 		<h3 id="Control_View">Control View</h3>
 		<p>To open the Control View, select '
-			<i>Window-&gt;Show View-&gt;Other...-&gt;LTTng-&gt;Control View</i>. 
+			<i>Window-&gt;Show View-&gt;Other...-&gt;LTTng-&gt;Control View</i>.
 		</p>
 		<p>
 			<img border="0" src="images/LTTngControlView.png"/>
@@ -958,7 +964,7 @@
 		<p>
 			<img border="0" src="images/LTTngControlViewConnect.png"/>
 		</p>
-		<p>A new display will show for entering the remote host information. A drop down menu will filled with all existing host information which were used before. To enter the host information either select one of the hosts in the drop down menu or enter the host information manually. </p>
+		<p>A new display will show for entering the remote host information. A drop down menu will filled with all existing host information which were used before. To enter the host information either select one of the hosts in the drop down menu or enter the host information manually.</p>
 		<p>
 			<img border="0" src="images/LTTng2NewConnection.png"/>
 		</p>
@@ -982,9 +988,9 @@
 			<b>Ok</b>.
 		</p>
 		<p>The 
-			<b>Host Name</b> holds the IP address or DNS name of the remote system. 
+			<b>Host Name</b> holds the IP address or DNS name of the remote system.
 			The 
-			<b>Connection Name</b> is the alias name to be displayed in the Control View. 
+			<b>Connection Name</b> is the alias name to be displayed in the Control View.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2EnterPassword.png"/>
@@ -1005,16 +1011,16 @@
 		</p>
 		<p>Under the host level two folder groups are located. The first one is the 
 			<b>Provider</b> group. The second one is the 
-			<b>Sessions</b> group. 
+			<b>Sessions</b> group.
 		</p>
 		<p>Under the 
 			<b>Provider</b> group all trace providers are displayed. Trace providers are 
-			<b>Kernel</b> and any user space application that supports UST tracing. Under each provider a corresponding list of events are displayed. 
+			<b>Kernel</b> and any user space application that supports UST tracing. Under each provider a corresponding list of events are displayed.
 		</p>
 		<p>Under the 
 			<b>Sessions</b> group all current sessions will be shown. The level under the sessions show the configured domains. Currently the LTTng 2.0 Tracer Toolchan supports domain 
 			<b>Kernel</b> and 
-			<b>UST global</b>. Under each domain the configured channels will be displayed. The last level is under the channels where the configured events are displayed. 
+			<b>UST global</b>. Under each domain the configured channels will be displayed. The last level is under the channels where the configured events are displayed.
 		</p>
 		<p>Each session can be 
 			<b>ACTIVE</b> or 
@@ -1037,7 +1043,7 @@
 		<h4 id="Disconnecting_from_a_Remote_Host">Disconnecting from a Remote Host</h4>
 		<p>To disconnect from a remote host, select the host in the Control View and press the 
 			<b>Disconnect</b> button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the 
-			<b>Disconnect</b> button. 
+			<b>Disconnect</b> button.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2ControlViewDisconnect.png"/>
@@ -1068,7 +1074,7 @@
 		<p>
 			<img border="0" src="images/LTTng2CreateSessionAction.png"/>
 		</p>
-		<p>A dialog box will open for entering information about the session to be created. </p>
+		<p>A dialog box will open for entering information about the session to be created.</p>
 		<p>
 			<img border="0" src="images/LTTng2CreateSessionDialog.png"/>
 		</p>
@@ -1079,10 +1085,10 @@
 			<b>Sessions</b>.
 		</p>
 		<h4 id="Enabling_Channels_-_General">Enabling Channels - General</h4>
-		<p>Enabling channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.  </p>
+		<p>Enabling channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.</p>
 		<h4 id="Enabling_Channels_On_Session_Level">Enabling Channels On Session Level</h4>
 		<p>To enable a channel, select the tree node of the relevant session and press the right mouse button. Then select the 
-			<b>Enable Channel...</b> button of the context-sensitive menu. 
+			<b>Enable Channel...</b> button of the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2CreateChannelAction.png"/>
@@ -1094,14 +1100,14 @@
 		<p>By default the domain 
 			<b>Kernel</b> is selected and the corresponding default values are shown. To create a UST channel, select 
 			<b>UST</b> under the domain section. To get the default values of UST, then press button 
-			<b>Default</b>.  
+			<b>Default</b>.
 		</p>
 		<p>If required update the following channel information and then press 
 			<b>Ok</b>.
 		</p>
 		<ul>
 			<li>
-				<b>Channel Name</b>: The name of the channel. 
+				<b>Channel Name</b>: The name of the channel.
 			</li>
 			<li>
 				<b>Number of Sub Buffers</b>: The number of sub-buffers of the channel.
@@ -1140,7 +1146,7 @@
 		</p>
 		<h4 id="Enabling_and_Disabling_Channels">Enabling and Disabling Channels</h4>
 		<p>To disable one or more enabled channels, select the tree nodes of the relevant channels and press the right mouse button. Then select the 
-			<b>Disable Channel</b> menu item of the context-sensitive menu. 
+			<b>Disable Channel</b> menu item of the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2DisableChannelAction.png"/>
@@ -1159,11 +1165,11 @@
 		</p>
 		<h4 id="Enabling_Events_-_General">Enabling Events - General</h4>
 		<p>Enabling events can be done using different levels in the tree node. It can be done on the session, domain level and channel level. For the case of session or domain, i.e. when no specific channels is assigned then enabling of events is done on the default channel with the name 
-			<b>channel0</b> which created, if not already exists, by the LTTng tracer control on the server side.  
+			<b>channel0</b> which created, if not already exists, by the LTTng tracer control on the server side.
 		</p>
 		<h4 id="Enabling_Kernel_Events_On_Session_Level">Enabling Kernel Events On Session Level</h4>
 		<p>To enable events, select the tree node of the relevant session and press the right mouse button. Then select the 
-			<b>Enable Event (default channel)...</b> button of the context-sensitive menu. 
+			<b>Enable Event (default channel)...</b> button of the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2EventOnSessionAction.png"/>
@@ -1199,10 +1205,10 @@
 		<p>To enable all 
 			<b>Syscalls</b>, select the corresponding 
 			<b>Select</b> button and press 
-			<b>Ok</b>. 
+			<b>Ok</b>.
 		</p>
 		<p>
-			<img border="0" src="images/LTTng2SyscallsDialog.png"/> 
+			<img border="0" src="images/LTTng2SyscallsDialog.png"/>
 		</p>
 		<p>Upon successful operation, the event with the name 
 			<b>syscalls</b> and event type 
@@ -1267,7 +1273,7 @@
 			<b>UST global</b> will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all requested events under the channel. The channel and events will be 
 			<b>ENABLED</b>. Note that for the case that 
 			<b>All</b> tracepoints were selected the wildcard 
-			<b>*</b> is used which will be shown in the Control View as below. 
+			<b>*</b> is used which will be shown in the Control View as below.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2EnabledAllUstTracepoints.png"/>
@@ -1280,7 +1286,7 @@
 			<b>Ok</b>.
 		</p>
 		<p>
-			<img border="0" src="images/LTTng2UstWildcardEventsDialog.png"/>  
+			<img border="0" src="images/LTTng2UstWildcardEventsDialog.png"/>
 		</p>
 		<p>Upon successful operation, the event with the given wildcard and event type 
 			<b>TRACEPOINT</b> will be added under the default channel (channel0). If necessary the domain 
@@ -1298,13 +1304,13 @@
 		</p>
 		<ul>
 			<li>
-				<b>Event Name</b>: Name to display 
+				<b>Event Name</b>: Name to display
 			</li>
 			<li>
 				<b>loglevel</b>: To specify if a range of log levels (0 to selected log level) shall be configured
 			</li>
 			<li>
-				<b>loglevel-only</b>: To specify that only the specified log level shall be configured  
+				<b>loglevel-only</b>: To specify that only the specified log level shall be configured
 			</li>
 		</ul>
 		<p>
@@ -1322,7 +1328,7 @@
 		<p>Kernel events can also be enabled on the domain level. For that select the relevant domain tree node, click the right mouse button and the select 
 			<b>Enable Event (default channel)...</b>. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, 
 			<b>Kernel</b> or 
-			<b>UST global</b>, the domain specifc fields are shown and the domain selector is preselected and read-only.  
+			<b>UST global</b>, the domain specifc fields are shown and the domain selector is preselected and read-only.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2EventOnDomainAction.png"/>
@@ -1339,12 +1345,12 @@
 		<h4 id="Enabling_Events_On_Channel_Level">Enabling Events On Channel Level</h4>
 		<p>Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections 
 			<a href="LTTng.html#Enabling_Channels_On_Session_Level">Creating Channels On Session Level</a> or 
-			<a href="LTTng.html#Enabling_Channels_On_Domain_Level">Creating Channels On Domain Level</a>.   
+			<a href="LTTng.html#Enabling_Channels_On_Domain_Level">Creating Channels On Domain Level</a>.
 		</p>
 		<p>Then select the relevant channel tree node, click the right mouse button and the select 
 			<b>Enable Event...</b>. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, 
 			<b>Kernel</b> or 
-			<b>UST global</b>, the domain specifc fields are shown and the domain selector is preselected and read-only.  
+			<b>UST global</b>, the domain specifc fields are shown and the domain selector is preselected and read-only.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2EventOnChannelAction.png"/>
@@ -1358,7 +1364,7 @@
 		<p>When enabling events on the channel level, the events will be add to the selected channel.</p>
 		<h4 id="Enabling_and_Disabling_Events">Enabling and Disabling Events</h4>
 		<p>To disable one or more enabled events, select the tree nodes of the relevant events and click the right mouse button. Then select 
-			<b>Disable Event</b> menu item in the context-sensitive menu. 
+			<b>Disable Event</b> menu item in the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2DisableEventAction.png"/>
@@ -1385,16 +1391,16 @@
 			<a href="LTTng.html#Creating_a_Tracing_Session">Creating a Tracing Session</a>. Also, if other than default channel 
 			<b>channel0</b> is required, create a channel as described in sections 
 			<a href="LTTng.html#Enabling_Channels_On_Session_Level">Creating Channels On Session Level</a> or 
-			<a href="LTTng.html#Enabling_Channels_On_Domain_Level">Creating Channels On Domain Level</a>. 
+			<a href="LTTng.html#Enabling_Channels_On_Domain_Level">Creating Channels On Domain Level</a>.
 		</p>
 		<p>To assign tracepoint events to a session and channel, select the events to be enabled under the provider (e.g. provider 
 			<b>Kernel</b>), click right mouse button and then select 
-			<b>Enable Event...</b> menu item from the context sensitive menu. 
+			<b>Enable Event...</b> menu item from the context sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2AssignEventAction.png"/>
 		</p>
-		<p>A new display will open for defining the session and channel.  </p>
+		<p>A new display will open for defining the session and channel.</p>
 		<p>
 			<img border="0" src="images/LTTng2AssignEventDialog.png"/>
 		</p>
@@ -1403,7 +1409,7 @@
 			<b>Channel List</b> drop-down menu and the press 
 			<b>Ok</b>. Upon successful operation, the selected events will be added to the selected session and channel of the domain that the selected provider belongs to. In case that there was no channel available, the domain and the default channel 
 			<b>channel0</b> will be created for corresponding session. The newly added events will be 
-			<b>ENABLED</b>.  
+			<b>ENABLED</b>.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2AssignedEvents.png"/>
@@ -1421,7 +1427,7 @@
 			<img border="0" src="images/LTTng2AddContextDialog.png"/>
 		</p>
 		<p>The tree shows all available context that can be added. Select one or more context and the press 
-			<b>Ok</b>. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. 
+			<b>Ok</b>. Upon successful operation, the selected context will be added to all channels and their events of the selected domain.
 		</p>
 		<p>
 			<b>Note</b>: The LTTng UST tracer only supports  contexts 
@@ -1432,7 +1438,7 @@
 		</p>
 		<h4 id="Adding_Contexts_to_All_Events_of_a_Channel">Adding Contexts to All Events of a Channel</h4>
 		<p>Adding contexts on channels and events from the channel level, will enable the specified contexts to all events of the selected channel. To add contexts on the channel level, select a channel, click right mouse button on a channel tree node and select the menu item 
-			<b>Add Context...</b> from the context-sensitive menu. 
+			<b>Add Context...</b> from the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2AddContextOnChannelAction.png"/>
@@ -1449,7 +1455,7 @@
 			<img border="0" src="images/LTTng2AddContextToEventsAction.png"/>
 		</p>
 		<p>A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter 
-			<a href="LTTng.html#Adding_Contexts_to_Channels_and_Events_of_a_Domain">Adding Contexts to Channels and Events of a Domain</a>. Upon successful operation, the selected context will be added to the selected event. 
+			<a href="LTTng.html#Adding_Contexts_to_Channels_and_Events_of_a_Domain">Adding Contexts to Channels and Events of a Domain</a>. Upon successful operation, the selected context will be added to the selected event.
 		</p>
 		<h4 id="Start_Tracing">Start Tracing</h4>
 		<p>To start tracing, select one or more sessions to start in the Control View and press the 
@@ -1460,7 +1466,7 @@
 			<img border="0" src="images/LTTng2StartTracingAction.png"/>
 		</p>
 		<p>Upon successful operation, the tracing session will be 
-			<b>ACTIVE</b> and the icon of the session will be updated.  
+			<b>ACTIVE</b> and the icon of the session will be updated.
 		</p>
 		<h4 id="Stop_Tracing">Stop Tracing</h4>
 		<p>To stop tracing, select one or more sessions to stop in the Control View and press the 
@@ -1477,14 +1483,14 @@
 		<p>To destroy a tracing session, select one or more sessions to destroy in the Control View and press the 
 			<b>Destroy</b> button. Alternatively, click the right mouse button on the session tree node. A context-sensitive menu will show. Then select the 
 			<b>Destroy...</b> menu item. Note that the session has to be 
-			<b>INACTIVE</b> for this operation. 
+			<b>INACTIVE</b> for this operation.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2DestroySessionAction.png"/>
 		</p>
 		<p>A confirmation dialog box will open. Click on 
 			<b>Ok</b> to destroy the session otherwise click on 
-			<b>Cancel</b>.  
+			<b>Cancel</b>.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2DestroyConfirmationDialog.png"/>
@@ -1493,7 +1499,7 @@
 		<h4 id="Refreshing_the_Node_Information">Refreshing the Node Information</h4>
 		<p>To refresh the remote host information, select any node in the tree of the Control View and press the 
 			<b>Refresh</b> button. Alternatively, click the right mouse button on any tree node. A context-sensitive menu will show. Then select the 
-			<b>Refresh</b> menu item. 
+			<b>Refresh</b> menu item.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2RefreshAction.png"/>
@@ -1512,7 +1518,7 @@
 		<h4 id="Importing_Session_Traces_to_a_Tracing_Project">Importing Session Traces to a Tracing Project</h4>
 		<p>To import traces from a tracing session, select the relevant session and click on the 
 			<b>Import</b> Button. Alternatively, click the right mouse button on the session tree node and select the menu item 
-			<b>Import...</b> from the context-sensitive menu. 
+			<b>Import...</b> from the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2ImportAction.png"/>
@@ -1526,7 +1532,7 @@
 			<b>Overwrite existing trace without warning</b>) if required. Then press button 
 			<b>Ok</b>. Upon successful import operation the the selected traces will be stored in the 
 			<b>Traces</b> directory of the specified tracing project. From the 
-			<b>Project Explorer</b> view, the trace can be analyzed further. 
+			<b>Project Explorer</b> view, the trace can be analyzed further.
 		</p>
 		<p>
 			<b>Note</b>: If the overwrite button (
@@ -1603,7 +1609,7 @@
 						<b>TRACEPOINT</b> only).
 					</li>
 					<li>
-						<b>Log Level</b>: The log level of the event. 
+						<b>Log Level</b>: The log level of the event.
 					</li>
 				</ul>
 			</li>
@@ -1635,7 +1641,7 @@
 				<b>Channel</b> Properties
 				<ul>
 					<li>
-						<b>Channel Name</b>: The name of the channel. 
+						<b>Channel Name</b>: The name of the channel.
 					</li>
 					<li>
 						<b>Number of Sub Buffers</b>: The number of sub-buffers of the channel.
@@ -1667,7 +1673,7 @@
 				</ul>
 			</li>
 			<li>
-				<b>Event</b> Properties (Channel) 
+				<b>Event</b> Properties (Channel)
 				<ul>
 					<li>
 						<b>Event Name</b>: The name of the event.
@@ -1700,7 +1706,7 @@
 		<p>To change the tracing group of the user which will be specified on each command line, enter the new group name in the 
 			<b>Tracing Group</b> text field and click ok. The default tracing group is 
 			<b>tracing</b> and can be restored by pressing the 
-			<b>Restore Defaults</b> button. 
+			<b>Restore Defaults</b> button.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2PreferencesGroup.png"/>
