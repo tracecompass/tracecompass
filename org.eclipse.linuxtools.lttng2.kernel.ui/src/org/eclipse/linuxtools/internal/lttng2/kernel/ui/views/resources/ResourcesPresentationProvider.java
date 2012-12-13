@@ -30,11 +30,16 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * Presentation provider for the Resource view, based on the generic TMF
@@ -43,6 +48,9 @@ import org.eclipse.swt.graphics.RGB;
  * @author Patrick Tasse
  */
 public class ResourcesPresentationProvider extends TimeGraphPresentationProvider {
+
+    private final TimeGraphViewer fTimeGraphViewer;
+    private long fLastThreadId = -1; // used to draw the process name label only once per thread id
 
     private enum State {
         UNKNOWN         (new RGB(100, 100, 100)),
@@ -60,6 +68,16 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         private State (RGB rgb) {
             this.rgb = rgb;
         }
+    }
+
+    /**
+     * Default constructor
+     *
+     * @param timeGraphViewer the time graph viewer
+     */
+    public ResourcesPresentationProvider(TimeGraphViewer timeGraphViewer) {
+        super();
+        this.fTimeGraphViewer = timeGraphViewer;
     }
 
     @Override
@@ -266,4 +284,88 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         return retMap;
     }
 
+    @Override
+    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
+        if (bounds.width <= gc.getFontMetrics().getAverageCharWidth()) {
+            return;
+        }
+        if (!(event instanceof ResourcesEvent)) {
+            return;
+        }
+        ResourcesEvent resourcesEvent = (ResourcesEvent) event;
+        if (!resourcesEvent.getType().equals(Type.CPU)) {
+            return;
+        }
+        int status = resourcesEvent.getValue();
+        if (status != StateValues.CPU_STATUS_RUN_USERMODE && status != StateValues.CPU_STATUS_RUN_SYSCALL) {
+            return;
+        }
+        ResourcesEntry entry = (ResourcesEntry) event.getEntry();
+        ITmfStateSystem ss = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+        long time = event.getTime();
+        while (time < event.getTime() + event.getDuration()) {
+            try {
+                int cpuQuark = entry.getQuark();
+                int currentThreadQuark = ss.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
+                ITmfStateInterval tidInterval = ss.querySingleState(time, currentThreadQuark);
+                if (!tidInterval.getStateValue().isNull()) {
+                    ITmfStateValue value = tidInterval.getStateValue();
+                    int currentThreadId = value.unboxInt();
+                    if (status == StateValues.CPU_STATUS_RUN_USERMODE && currentThreadId != fLastThreadId) {
+                        int execNameQuark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.EXEC_NAME);
+                        ITmfStateInterval interval = ss.querySingleState(time, execNameQuark);
+                        if (!interval.getStateValue().isNull()) {
+                            value = interval.getStateValue();
+                            gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+                            long startTime = Math.max(tidInterval.getStartTime(), event.getTime());
+                            long endTime = Math.min(tidInterval.getEndTime() + 1, event.getTime() + event.getDuration());
+                            if (fTimeGraphViewer.getXForTime(endTime) > bounds.x) {
+                                int x = Math.max(fTimeGraphViewer.getXForTime(startTime), bounds.x);
+                                int width = Math.min(fTimeGraphViewer.getXForTime(endTime), bounds.x + bounds.width) - x;
+                                int drawn = Utils.drawText(gc, value.unboxStr(), x + 1, bounds.y - 2, width - 1, true, true);
+                                if (drawn > 0) {
+                                    fLastThreadId = currentThreadId;
+                                }
+                            }
+                        }
+                    } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
+                        int syscallQuark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
+                        ITmfStateInterval interval = ss.querySingleState(time, syscallQuark);
+                        if (!interval.getStateValue().isNull()) {
+                            value = interval.getStateValue();
+                            gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+                            long startTime = Math.max(tidInterval.getStartTime(), event.getTime());
+                            long endTime = Math.min(tidInterval.getEndTime() + 1, event.getTime() + event.getDuration());
+                            if (fTimeGraphViewer.getXForTime(endTime) > bounds.x) {
+                                int x = Math.max(fTimeGraphViewer.getXForTime(startTime), bounds.x);
+                                int width = Math.min(fTimeGraphViewer.getXForTime(endTime), bounds.x + bounds.width) - x;
+                                Utils.drawText(gc, value.unboxStr().substring(4), x + 1, bounds.y - 2, width - 1, true, true);
+                            }
+                        }
+                    }
+                }
+                time = tidInterval.getEndTime() + 1;
+                if (time < event.getTime() + event.getDuration()) {
+                    int x = fTimeGraphViewer.getXForTime(time);
+                    if (x >= bounds.x) {
+                        gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GRAY));
+                        gc.drawLine(x, bounds.y + 1, x, bounds.y + bounds.height - 2);
+                    }
+                }
+            } catch (AttributeNotFoundException e) {
+                e.printStackTrace();
+            } catch (TimeRangeException e) {
+                e.printStackTrace();
+            } catch (StateValueTypeException e) {
+                e.printStackTrace();
+            } catch (StateSystemDisposedException e) {
+                /* Ignored */
+            }
+        }
+    }
+
+    @Override
+    public void postDrawEntry(ITimeGraphEntry entry, Rectangle bounds, GC gc) {
+        fLastThreadId = -1;
+    }
 }

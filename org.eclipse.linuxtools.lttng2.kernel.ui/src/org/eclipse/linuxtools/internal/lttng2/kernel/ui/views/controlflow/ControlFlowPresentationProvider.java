@@ -30,7 +30,11 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * Presentation provider for the control flow view
@@ -155,6 +159,37 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         }
 
         return retMap;
+    }
+
+    @Override
+    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
+        if (bounds.width <= gc.getFontMetrics().getAverageCharWidth()) {
+            return;
+        }
+        if (!(event instanceof ControlFlowEvent)) {
+            return;
+        }
+        ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
+        ITmfStateSystem ss = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+        int status = ((ControlFlowEvent) event).getStatus();
+        if (status != StateValues.PROCESS_STATUS_RUN_SYSCALL) {
+            return;
+        }
+        try {
+            int syscallQuark = ss.getQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
+            ITmfStateInterval value = ss.querySingleState(event.getTime(), syscallQuark);
+            if (!value.getStateValue().isNull()) {
+                ITmfStateValue state = value.getStateValue();
+                gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+                Utils.drawText(gc, state.toString().substring(4), bounds.x, bounds.y - 2, bounds.width, true, true);
+            }
+        } catch (AttributeNotFoundException e) {
+            e.printStackTrace();
+        } catch (TimeRangeException e) {
+            e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
+            /* Ignored */
+        }
     }
 
 }

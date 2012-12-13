@@ -1045,6 +1045,30 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
+     * Return the x coordinate corresponding to a time
+     *
+     * @param time the time
+     * @return the x coordinate corresponding to the time
+     *
+     * @since 2.0
+     */
+    public int getXForTime(long time) {
+        return _stateCtrl.getXForTime(time);
+    }
+
+    /**
+     * Return the time corresponding to an x coordinate
+     *
+     * @param x the x coordinate
+     * @return the time corresponding to the x coordinate
+     *
+     * @since 2.0
+     */
+    public long getTimeAtX(int x) {
+        return _stateCtrl.getTimeAtX(x);
+    }
+
+    /**
      * Get the selection provider
      *
      * @return the selection provider
