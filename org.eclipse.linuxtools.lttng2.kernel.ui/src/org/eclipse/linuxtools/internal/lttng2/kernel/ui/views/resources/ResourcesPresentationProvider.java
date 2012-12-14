@@ -245,7 +245,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                     ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
 
                     try {
-                        retMap.put(Messages.ResourcesView_attributeHoverTime, Utils.formatTime(hoverTime, TimeFormat.ABSOLUTE, Resolution.NANOSEC));
+                        retMap.put(Messages.ResourcesView_attributeHoverTime, Utils.formatTime(hoverTime, TimeFormat.CALENDAR, Resolution.NANOSEC));
                         int cpuQuark = entry.getQuark();
                         int currentThreadQuark = ssq.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
                         ITmfStateInterval interval = ssq.querySingleState(hoverTime, currentThreadQuark);

@@ -1,3 +1,4 @@
+
 /*****************************************************************************
  * Copyright (c) 2007 Intel Corporation, 2009, 2012 Ericsson.
  * All rights reserved. This program and the accompanying materials
@@ -14,6 +15,7 @@
  *****************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
 
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -206,43 +208,33 @@ public class TimeGraphTooltipHandler {
                     }
 
                     Resolution res = Resolution.NANOSEC;
-                    if (_timeDataProvider.isCalendarFormat()) {
+                    TimeFormat tf = _timeDataProvider.getTimeFormat();
+                    if (tf == TimeFormat.CALENDAR) {
                         addItem(Messages.TmfTimeTipHandler_TRACE_DATE, eventStartTime > -1 ?
                                 Utils.formatDate(eventStartTime)
                                 : "?"); //$NON-NLS-1$
-                        if (eventDuration > 0) {
-                            addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, eventStartTime > -1 ?
-                                    Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
-                                    : "?"); //$NON-NLS-1$
+                    }
+                    if (eventDuration > 0) {
+                        addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, eventStartTime > -1 ?
+                                Utils.formatTime(eventStartTime, tf, res)
+                                : "?"); //$NON-NLS-1$
 
-                            addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, eventEndTime > -1 ?
-                                    Utils.formatTime(eventEndTime, TimeFormat.ABSOLUTE, res)
-                                    : "?"); //$NON-NLS-1$
-                        } else {
-                            addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, eventStartTime > -1 ?
-                                    Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
-                                    : "?"); //$NON-NLS-1$
-                        }
+                        addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, eventEndTime > -1 ?
+                                Utils.formatTime(eventEndTime, tf, res)
+                                : "?"); //$NON-NLS-1$
                     } else {
-                        if (eventDuration > 0) {
-                            addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, eventStartTime > -1 ?
-                                    Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
-                                    : "?"); //$NON-NLS-1$
-
-                            addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, eventEndTime > -1 ?
-                                    Utils.formatTime(eventEndTime, TimeFormat.RELATIVE, res)
-                                    : "?"); //$NON-NLS-1$
-                        } else {
-                            addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, eventStartTime > -1 ?
-                                    Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
-                                    : "?"); //$NON-NLS-1$
-                        }
+                        addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, eventStartTime > -1 ?
+                                Utils.formatTime(eventStartTime, tf, res)
+                                : "?"); //$NON-NLS-1$
                     }
 
                     if (eventDuration > 0) {
                         // Duration in relative format in any case
+                        if (tf == TimeFormat.CALENDAR) {
+                            tf = TimeFormat.RELATIVE;
+                        }
                         addItem(Messages.TmfTimeTipHandler_DURATION, eventDuration > -1 ?
-                                Utils.formatTime(eventDuration, TimeFormat.RELATIVE, res)
+                                Utils.formatTime(eventDuration, tf, res)
                                 : "?"); //$NON-NLS-1$
                     }
                 }

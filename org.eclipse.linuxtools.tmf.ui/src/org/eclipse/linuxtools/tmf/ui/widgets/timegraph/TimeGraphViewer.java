@@ -1,3 +1,4 @@
+
 /*****************************************************************************
  * Copyright (c) 2007, 2008 Intel Corporation, 2009, 2010, 2011, 2012 Ericsson.
  * All rights reserved. This program and the accompanying materials
@@ -32,6 +33,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -89,9 +91,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     ArrayList<ITimeGraphTimeListener> fTimeListeners = new ArrayList<ITimeGraphTimeListener>();
     ArrayList<ITimeGraphRangeListener> fRangeListeners = new ArrayList<ITimeGraphRangeListener>();
 
-    // Calender Time format, using Epoch reference or Relative time
-    // format(default
-    private boolean calendarTimeFormat = false;
+    // Time format, using Epoch reference, Relative time format(default) or Number
+    private TimeFormat timeFormat = TimeFormat.RELATIVE;
     private int borderWidth = 0;
     private int timeScaleHeight = 22;
 
@@ -897,19 +898,26 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _time1_extSynch = _time1;
     }
 
-    /**
-     * Set the calendar format
-     *
-     * @param toAbsoluteCaltime
-     *            True for absolute time, false for relative
-     */
-    public void setTimeCalendarFormat(boolean toAbsoluteCaltime) {
-        calendarTimeFormat = toAbsoluteCaltime;
+    @Override
+    @Deprecated
+    public boolean isCalendarFormat() {
+        return timeFormat == TimeFormat.CALENDAR;
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public boolean isCalendarFormat() {
-        return calendarTimeFormat;
+    public TimeFormat getTimeFormat() {
+        return timeFormat;
+    }
+
+    /**
+     * @param tf the {@link TimeFormat} used to display timestamps
+     * @since 2.0
+     */
+    public void setTimeFormat(TimeFormat tf) {
+        this.timeFormat = tf;
     }
 
     /**

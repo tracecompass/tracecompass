@@ -55,6 +55,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -319,7 +320,7 @@ public class ResourcesView extends TmfView {
 
         fTimeGraphViewer.setTimeGraphProvider(new ResourcesPresentationProvider(fTimeGraphViewer));
 
-        fTimeGraphViewer.setTimeCalendarFormat(true);
+        fTimeGraphViewer.setTimeFormat(TimeFormat.CALENDAR);
 
         fTimeGraphViewer.addRangeListener(new ITimeGraphRangeListener() {
             @Override

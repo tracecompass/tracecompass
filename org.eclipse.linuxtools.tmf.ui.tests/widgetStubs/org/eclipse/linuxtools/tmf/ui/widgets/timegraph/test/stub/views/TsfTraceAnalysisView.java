@@ -44,6 +44,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.adaption.TsfImp
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model.EventImpl;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model.TraceImpl;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model.TraceModelImplFactory;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
@@ -281,7 +282,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		tsfviewer.setInput(traceArr);
 		tsfviewer.addSelectionListener(this);
 		tsfviewer.addRangeListener(this);
-		tsfviewer.setTimeCalendarFormat(true);
+		tsfviewer.setTimeFormat(TimeFormat.CALENDAR);
 
 		tsfviewer2.setInput(traceArr);
 		tsfviewer2.addSelectionListener(this);

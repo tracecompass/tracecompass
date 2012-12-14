@@ -57,6 +57,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
@@ -129,7 +130,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         fViewer = new TimeChartViewer(parent, SWT.NONE);
         fPresentationProvider = new TimeChartAnalysisProvider();
         fViewer.setTimeGraphProvider(fPresentationProvider);
-        fViewer.setTimeCalendarFormat(true);
+        fViewer.setTimeFormat(TimeFormat.CALENDAR);
         fViewer.addTimeListener(this);
         fViewer.addRangeListener(this);
         fViewer.addSelectionListener(this);
