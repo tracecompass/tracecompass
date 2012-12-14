@@ -257,6 +257,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 fEventsTable.addSelectionChangedListener(this);
                 fEventsTable.setTrace(fTrace, true);
                 fEventsTable.refreshBookmarks(fFile);
+
+                /* ensure start time is set */
+                final ITmfContext context = fTrace.seekEvent(0);
+                fTrace.getNext(context);
+                context.dispose();
+
                 broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile));
             } else {
                 fEventsTable = new TmfEventsTable(fParent, 0);
