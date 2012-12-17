@@ -70,6 +70,10 @@ public class HistogramTimeRangeControl extends HistogramTextControl {
      */
     @Override
     protected void updateValue() {
+        if (getValue() == Long.MIN_VALUE) {
+            fTextValue.setText(""); //$NON-NLS-1$
+            return;
+        }
         String string = fTextValue.getText();
         long value = getValue();
         try {
@@ -81,8 +85,12 @@ public class HistogramTimeRangeControl extends HistogramTextControl {
 
     @Override
     public void setValue(long time) {
-        ITmfTimestamp ts = new TmfTimestamp(time, ITmfTimestamp.NANOSECOND_SCALE);
-        super.setValue(time, ts.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        if (time != Long.MIN_VALUE) {
+            ITmfTimestamp ts = new TmfTimestamp(time, ITmfTimestamp.NANOSECOND_SCALE);
+            super.setValue(time, ts.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        } else {
+            super.setValue(time, ""); //$NON-NLS-1$
+        }
     }
 
     // ------------------------------------------------------------------------

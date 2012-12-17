@@ -36,8 +36,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -104,7 +102,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     protected TmfView fParentView;
 
-    private Composite fParent;
+    private Composite fComposite;
     private Font fFont;
 
     // Histogram text fields
@@ -145,9 +143,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     public Histogram(final TmfView view, final Composite parent) {
         fParentView = view;
-        fParent = parent;
 
-        createWidget(parent);
+        fComposite = createWidget(parent);
         fDataModel = new HistogramDataModel();
         fDataModel.addHistogramListener(this);
         clear();
@@ -171,7 +168,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fDataModel.removeHistogramListener(this);
     }
 
-    private void createWidget(final Composite parent) {
+    private Composite createWidget(final Composite parent) {
 
         final Color labelColor = parent.getBackground();
         fFont = adjustFont(parent);
@@ -253,7 +250,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeRangeStartText = new Text(composite, SWT.READ_ONLY);
         fTimeRangeStartText.setFont(fFont);
         fTimeRangeStartText.setBackground(labelColor);
-        fTimeRangeStartText.setText(TmfTimestamp.ZERO.toString());
         fTimeRangeStartText.setLayoutData(gridData);
 
         // Window range end time
@@ -263,8 +259,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeRangeEndText = new Text(composite, SWT.READ_ONLY);
         fTimeRangeEndText.setFont(fFont);
         fTimeRangeEndText.setBackground(labelColor);
-        fTimeRangeEndText.setText(TmfTimestamp.ZERO.toString());
         fTimeRangeEndText.setLayoutData(gridData);
+
+        return composite;
     }
 
     private static Font adjustFont(final Composite composite) {
@@ -464,9 +461,14 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         synchronized(fDataModel) {
                             if (fScaledData != null) {
                                 fCanvas.redraw();
-                                // Display histogram and update X-,Y-axis labels
-                                fTimeRangeStartText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getFirstBucketTime()));
-                                fTimeRangeEndText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
+                                if (fDataModel.getNbEvents() != 0) {
+                                    // Display histogram and update X-,Y-axis labels
+                                    fTimeRangeStartText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getFirstBucketTime()));
+                                    fTimeRangeEndText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
+                                } else {
+                                    fTimeRangeStartText.setText(""); //$NON-NLS-1$
+                                    fTimeRangeEndText.setText(""); //$NON-NLS-1$
+                                }
                                 fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
                                 // The Y-axis area might need to be re-sized
                                 fMaxNbEventsText.getParent().layout();
@@ -675,42 +677,17 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
-        Point size = fTimeRangeStartText.getSize();
+        if (fDataModel.getNbEvents() == 0) {
+            return;
+        }
+
         String newTS = TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getFirstBucketTime());
-        size.x = getTextSize(newTS);
-        fTimeRangeStartText.setSize(size);
         fTimeRangeStartText.setText(newTS);
 
         newTS = TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime());
-        Rectangle rect = fTimeRangeEndText.getBounds();
-        int newWidth = getTextSize(newTS);
-        rect.x += rect.width - newWidth;
-        rect.width = newWidth;
-        fTimeRangeEndText.setBounds(rect);
         fTimeRangeEndText.setText(newTS);
-    }
 
-    /**
-     * Compute the width of a String.
-     *
-     * @param text the Text to measure
-     * @return The result size
-     * @since 2.0
-     */
-    private int getTextSize(final String text) {
-        GC controlGC = new GC(fParent);
-        controlGC.setFont(fFont);
-
-        int textSize = 0;
-        for (int pos = 0; pos < text.length(); pos++) {
-            textSize += controlGC.getAdvanceWidth(text.charAt(pos));
-        }
-        // Add an extra space
-        textSize += controlGC.getAdvanceWidth(' ');
-
-        controlGC.dispose();
-
-        return textSize;
+        fComposite.layout();
     }
 
 }

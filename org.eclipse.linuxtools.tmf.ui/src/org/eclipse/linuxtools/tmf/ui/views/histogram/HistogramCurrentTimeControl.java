@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestampFormat;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.swt.widgets.Composite;
 
@@ -34,12 +33,6 @@ import org.eclipse.swt.widgets.Composite;
  * @author Francois Chouinard
  */
 public class HistogramCurrentTimeControl extends HistogramTextControl {
-
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    private long fTraceStartTime;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -75,6 +68,10 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
 
     @Override
     protected void updateValue() {
+        if (getValue() == Long.MIN_VALUE) {
+            fTextValue.setText(""); //$NON-NLS-1$
+            return;
+        }
         String string = fTextValue.getText();
         long value = 0;
         try {
@@ -103,22 +100,11 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
 
     @Override
     public void setValue(long time) {
-        super.setValue(time, new TmfTimestamp(time, ITmfTimestamp.NANOSECOND_SCALE).toString());
-    }
-
-    // ------------------------------------------------------------------------
-    // Signal Handlers
-    // ------------------------------------------------------------------------
-
-    /**
-     * Update the initial time value
-     *
-     * @param signal the time range signal
-     * @since 2.0
-     */
-    @TmfSignalHandler
-    public void traceUpdated(final TmfTraceUpdatedSignal signal) {
-        fTraceStartTime = signal.getTrace().getTimeRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        if (time != Long.MIN_VALUE) {
+            super.setValue(time, new TmfTimestamp(time, ITmfTimestamp.NANOSECOND_SCALE).toString());
+        } else {
+            super.setValue(time, ""); //$NON-NLS-1$
+        }
     }
 
     // ------------------------------------------------------------------------
