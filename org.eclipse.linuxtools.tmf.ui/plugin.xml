@@ -247,6 +247,9 @@
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
             </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfEditorLinkHelper">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
    </extension>
@@ -1159,6 +1162,26 @@
             name="%tracetype.type.ctf"
             trace_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace">
       </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.linkHelper">
+      <linkHelper
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfEditorLinkHelper"
+            id="org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfEditorLinkHelper">
+         <editorInputEnablement>
+             <instanceof value="org.eclipse.ui.IFileEditorInput"/>
+         </editorInputEnablement>
+         <selectionEnablement>
+             <or>
+                <instanceof
+                      value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                </instanceof>
+                <instanceof
+                      value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                </instanceof>
+             </or>
+         </selectionEnablement>
+      </linkHelper>
    </extension>
 
 </plugin>
