@@ -17,6 +17,7 @@ import java.util.Iterator;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
@@ -24,12 +25,16 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * <b><u>DeleteExperimentHandler</u></b>
@@ -70,12 +75,40 @@ public class DeleteExperimentHandler extends AbstractHandler {
             while (iterator.hasNext()) {
                 Object element = iterator.next();
                 if (element instanceof TmfExperimentElement) {
-                    TmfExperimentElement experiment = (TmfExperimentElement) element;
+                    final TmfExperimentElement experiment = (TmfExperimentElement) element;
                     IResource resource = experiment.getResource();
+
                     try {
+                        // Close the experiment if open
+                        IFile file = experiment.getBookmarksFile();
+                        FileEditorInput input = new FileEditorInput(file);
+                        IWorkbench wb = PlatformUI.getWorkbench();
+                        for (IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {
+                            for (IWorkbenchPage wbPage : wbWindow.getPages()) {
+                                for (IEditorReference editorReference : wbPage.getEditorReferences()) {
+                                    if (editorReference.getEditorInput().equals(input)) {
+                                        wbPage.closeEditor(editorReference.getEditor(false), false);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Finally, delete the experiment
                         resource.delete(true, null);
+
+                        // Refresh the project
                         experiment.getProject().refresh();
-                    } catch (CoreException e) {
+
+                    } catch (final CoreException e) {
+                        Display.getDefault().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+                                mb.setText(Messages.DeleteTraceHandler_Error + ' ' + experiment.getName());
+                                mb.setMessage(e.getMessage());
+                                mb.open();
+                            }
+                        });
                         Activator.getDefault().logError("Error deleting experiment: " + experiment.getName(), e); //$NON-NLS-1$
                     }
                 }

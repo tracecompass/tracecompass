@@ -82,6 +82,10 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
     }
 
+    private void dispose() {
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+    }
+
     // ------------------------------------------------------------------------
     // ITmfProjectModelElement
     // ------------------------------------------------------------------------
@@ -156,6 +160,9 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     @Override
     public void removeChild(ITmfProjectModelElement child) {
         fChildren.remove(child);
+        if (child instanceof TmfProjectModelElement) {
+            ((TmfProjectModelElement) child).dispose();
+        }
         refresh();
     }
     /*

@@ -13,10 +13,13 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -33,6 +36,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefin
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.ui.IActionFilter;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -87,6 +91,8 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         sfTypeDescriptor.setCategory(sfInfoCategory);
         sfIsLinkedDescriptor.setCategory(sfInfoCategory);
     }
+
+    private static final String BOOKMARKS_HIDDEN_FILE = ".bookmarks"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -260,6 +266,38 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the file resource used to store bookmarks.
+     * If the trace resource is a file, it is returned directly.
+     * If the trace resource is a folder, a linked file is returned.
+     * The linked file will be created if it doesn't exist.
+     * @return the bookmarks file
+     * @throws CoreException if the bookmarks file cannot be created
+     * @since 2.0
+     */
+    public IFile getBookmarksFile() throws CoreException {
+        IFile file = null;
+        if (fResource instanceof IFile) {
+            file = (IFile) fResource;
+        } else if (fResource instanceof IFolder) {
+            final IFile bookmarksFile = getProject().getTracesFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
+            if (!bookmarksFile.exists()) {
+                final InputStream source = new ByteArrayInputStream(new byte[0]);
+                bookmarksFile.create(source, true, null);
+            }
+            bookmarksFile.setHidden(true);
+
+            final IFolder folder = (IFolder) fResource;
+            file = folder.getFile(getName() + '_');
+            if (!file.exists()) {
+                file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
+            }
+            file.setHidden(true);
+            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfTrace.class.getCanonicalName());
+        }
+        return file;
     }
 
     /**
