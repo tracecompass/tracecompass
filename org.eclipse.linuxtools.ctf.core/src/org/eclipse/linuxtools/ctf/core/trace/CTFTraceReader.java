@@ -113,6 +113,19 @@ public class CTFTraceReader {
         return newReader;
     }
 
+    /**
+     * Dispose the CTFTraceReader
+     * @since 2.0
+     */
+    public void dispose() {
+        for (StreamInputReader reader : streamInputReaders) {
+            if (reader != null) {
+                reader.dispose();
+            }
+        }
+        streamInputReaders.clear();
+    }
+
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
