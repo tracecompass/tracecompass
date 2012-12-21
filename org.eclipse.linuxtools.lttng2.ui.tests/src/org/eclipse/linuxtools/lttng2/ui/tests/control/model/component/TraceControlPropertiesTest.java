@@ -160,7 +160,7 @@ public class TraceControlPropertiesTest extends TestCase {
         assertEquals("myNode", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_NAME_PROPERTY_ID));
         assertEquals("LOCALHOST",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
         assertEquals(TargetNodeState.CONNECTED.name(), source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_STATE_PROPERTY_ID));
-        assertEquals("2.0.0", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_VERSION_PROPERTY_ID));
+        assertEquals("2.1.0", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_VERSION_PROPERTY_ID));
         assertNull(source.getPropertyValue("test"));
 
         adapter = node.getAdapter(IChannelInfo.class);
@@ -224,6 +224,16 @@ public class TraceControlPropertiesTest extends TestCase {
         assertEquals("ust_tests_hello:tptest_sighandler", baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_NAME_PROPERTY_ID));
         assertEquals(TraceEventType.TRACEPOINT.name(), baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_TYPE_PROPERTY_ID));
         assertEquals(TraceLogLevel.TRACE_DEBUG_MODULE.name(), baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_LOGLEVEL_PROPERTY_ID));
+
+        baseEventInfo = (BaseEventComponent) events[1];
+        assertNotNull(baseEventInfo);
+
+        adapter = baseEventInfo.getAdapter(IPropertySource.class);
+        assertNotNull(adapter);
+        assertTrue(adapter instanceof BaseEventPropertySource);
+        baseSource = (BaseEventPropertySource)adapter;
+        assertNotNull(baseSource.getPropertyDescriptors());
+        assertEquals("doublefield=float;floatfield=float;stringfield=string", baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_FIELDS_PROPERTY_ID));
 
         // ------------------------------------------------------------------------
         // Verify Session Properties (adapter)
@@ -347,6 +357,13 @@ public class TraceControlPropertiesTest extends TestCase {
         assertEquals(TraceEnablement.ENABLED.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_STATE_PROPERTY_ID));
         assertEquals("0x0", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_OFFSET_PROPERTY_ID));
         assertEquals("init_post", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_SYMBOL_PROPERTY_ID));
+
+        //-------------------------------------------------------------------------
+        // Verify Filter of UST event
+        //-------------------------------------------------------------------------
+        event = (TraceEventComponent) domains[1].getChildren()[1].getChildren()[0];
+        adapter = event.getAdapter(IPropertySource.class);
+        assertEquals("with filter", event.getFilterExpression());
 
         //-------------------------------------------------------------------------
         // Delete node

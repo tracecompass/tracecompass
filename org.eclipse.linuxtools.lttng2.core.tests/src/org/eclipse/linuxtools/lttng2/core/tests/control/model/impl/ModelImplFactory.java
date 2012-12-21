@@ -15,6 +15,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IDomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IProbeEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IUstProviderInfo;
@@ -26,6 +27,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BaseEventI
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.DomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.EventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.FieldInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ProbeEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.SessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.UstProviderInfo;
@@ -45,6 +47,8 @@ public class ModelImplFactory {
     private IEventInfo fEventInfo1 = null;
     private IEventInfo fEventInfo2 = null;
     private IEventInfo fEventInfo3 = null;
+    private IFieldInfo fFieldInfo1 = null;
+    private IFieldInfo fFieldInfo2 = null;
     private IBaseEventInfo fBaseEventInfo1 = null;
     private IBaseEventInfo fBaseEventInfo2 = null;
     private IUstProviderInfo fUstProviderInfo1 = null;
@@ -53,9 +57,19 @@ public class ModelImplFactory {
     private IProbeEventInfo fProbeEventInfo2 = null;
 
     public ModelImplFactory() {
+
+        fFieldInfo1 = new FieldInfo("intfield");
+        fFieldInfo1.setFieldType("int");
+        fFieldInfo2 = new FieldInfo("stringfield");
+        fFieldInfo2.setFieldType("string");
+
         fBaseEventInfo1 = new BaseEventInfo("event1");
         fBaseEventInfo1.setEventType(TraceEventType.UNKNOWN);
         fBaseEventInfo1.setLogLevel(TraceLogLevel.TRACE_ERR);
+        fBaseEventInfo1.addField(fFieldInfo1);
+        fBaseEventInfo1.addField(fFieldInfo2);
+        fBaseEventInfo1.setFilterExpression("intField==10");
+
         fBaseEventInfo2 = new BaseEventInfo("event2");
         fBaseEventInfo2.setEventType(TraceEventType.TRACEPOINT);
         fBaseEventInfo1.setLogLevel(TraceLogLevel.TRACE_DEBUG);
@@ -192,4 +206,11 @@ public class ModelImplFactory {
         return fProbeEventInfo2;
     }
 
+    public IFieldInfo getFieldInfo1() {
+        return fFieldInfo1;
+    }
+
+    public IFieldInfo getFieldInfo2() {
+        return fFieldInfo2;
+    }
 }

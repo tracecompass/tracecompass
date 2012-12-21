@@ -63,12 +63,14 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
      *            - list of event names
      * @param isKernel
      *            - true if kernel domain else false
+     * @param filterExpression
+     *            - a filter expression
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails for some reason
      */
-    abstract public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+    abstract public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Enables all syscall events.
@@ -111,12 +113,14 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
      *            - a log level type
      * @param level
      *            - a log level
+     * @param filterExpression
+     *            - a filter expression
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails for some reason
      */
-    abstract public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException;
+    abstract public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExpression, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * @param param
@@ -159,14 +163,16 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
                     Exception error = null;
 
                     try {
+                        String filter = dialog.getFilterExpression();
+
                         // Enable tracepoint events
                         if (dialog.isTracepoints()) {
                             if (dialog.isAllTracePoints()) {
-                                enableEvents(param, null, dialog.isKernel(), monitor);
+                                enableEvents(param, null, dialog.isKernel(), filter, monitor);
                             } else {
                                 List<String> eventNames = dialog.getEventNames();
                                 if (!eventNames.isEmpty()) {
-                                    enableEvents(param, eventNames, dialog.isKernel(), monitor);
+                                    enableEvents(param, eventNames, dialog.isKernel(), filter, monitor);
                                 }
                             }
                         }
@@ -192,13 +198,13 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
                             eventNames.add(dialog.getWildcard());
 
                             if (!eventNames.isEmpty()) {
-                                enableEvents(param, eventNames, dialog.isKernel(), monitor);
+                                enableEvents(param, eventNames, dialog.isKernel(), filter, monitor);
                             }
                         }
 
                         // Enable events using log level
                         if (dialog.isLogLevel()) {
-                            enableLogLevel(param, dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), monitor);
+                            enableLogLevel(param, dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), filter, monitor);
                         }
 
                     } catch (ExecutionException e) {

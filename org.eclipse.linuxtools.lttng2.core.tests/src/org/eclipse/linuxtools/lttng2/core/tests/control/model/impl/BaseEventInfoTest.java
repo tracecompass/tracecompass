@@ -11,12 +11,17 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.FieldInfo;
 
 /**
  * The class <code>BaseEventInfoTest</code> contains test for the class <code>{@link BaseEventInfo}</code>.
@@ -93,6 +98,15 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals(fEventInfo1.getName(), info.getName());
         assertEquals(fEventInfo1.getEventType(), info.getEventType());
         assertEquals(fEventInfo1.getLogLevel(), info.getLogLevel());
+        assertEquals(fEventInfo1.getFilterExpression(), info.getFilterExpression());
+
+        IFieldInfo[] orignalFields = fEventInfo1.getFields();
+        IFieldInfo[] copiedFields = info.getFields();
+        assertEquals(orignalFields.length, copiedFields.length);
+
+        for (int i = 0; i < copiedFields.length; i++) {
+            assertEquals(orignalFields[i], copiedFields[i]);
+        }
     }
 
     /**
@@ -391,6 +405,64 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals(14, result.ordinal());
     }
 
+    /**
+     * test filter expression
+     */
+     public void testSetFields() {
+         BaseEventInfo info = new BaseEventInfo((BaseEventInfo)fEventInfo2);
+         info.setFilterExpression("stringfield==test");
+         assertEquals("stringfield==test", info.getFilterExpression());
+     }
+
+
+   /**
+    * test add field
+    */
+    public void testAddField() {
+        BaseEventInfo info = new BaseEventInfo((BaseEventInfo)fEventInfo2);
+
+        IFieldInfo field =  new FieldInfo("intfield");
+        field.setFieldType("int");
+
+        info.addField(field);
+
+        // Verify the stored events
+        IFieldInfo[] result = info.getFields();
+
+        assertNotNull(result);
+        assertEquals(1, result.length);
+        assertNotNull(result[0]);
+        assertTrue(field.equals(result[0]));
+    }
+
+    /**
+     * test set fields
+     */
+    public void testFields() {
+        BaseEventInfo info = new BaseEventInfo((BaseEventInfo)fEventInfo2);
+
+        IFieldInfo field1 =  new FieldInfo("intfield");
+        field1.setFieldType("int");
+
+        IFieldInfo field2 =  new FieldInfo("stringfield");
+        field2.setFieldType("string");
+
+        List<IFieldInfo> fields = new LinkedList<IFieldInfo>();
+        fields.add(field1);
+        fields.add(field2);
+        info.setFields(fields);
+
+        // Verify the stored events
+        IFieldInfo[] result = info.getFields();
+
+        assertNotNull(result);
+        assertEquals(2, result.length);
+
+        for (int i = 0; i < result.length; i++) {
+            assertNotNull(result[i]);
+            assertTrue(fields.get(i).equals(result[i]));
+        }
+    }
 
     /**
      * Run the String toString() method test.

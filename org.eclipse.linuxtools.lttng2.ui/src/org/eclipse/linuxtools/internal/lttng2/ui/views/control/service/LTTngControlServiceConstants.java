@@ -193,6 +193,15 @@ public class LTTngControlServiceConstants {
      * Command line option for printing the help of a specif command
      */
     public final static String OPTION_HELP = " -h ";  //$NON-NLS-1$
+    /**
+     * Command line option for listing the fields of UST tracepoints
+     */
+    public final static String OPTION_FIELDS = " -f "; //$NON-NLS-1$
+    /**
+     * Command line option for configuring event's filter
+     */
+    public final static String OPTION_FILTER = " --filter "; //$NON-NLS-1$
+
 
     // ------------------------------------------------------------------------
     // Parsing constants
@@ -244,11 +253,11 @@ public class LTTngControlServiceConstants {
     /**
      * Pattern to match for event information (lttng list <session>)
      */
-    public final static Pattern EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(loglevel:\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\].*"); //$NON-NLS-1$
+    public final static Pattern EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(loglevel:\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[.*\\]){0,1}.*"); //$NON-NLS-1$
     /**
      * Pattern to match a wildcarded event information (lttng list <session>)
      */
-    public final static Pattern WILDCARD_EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\].*"); //$NON-NLS-1$
+    public final static Pattern WILDCARD_EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[.*\\]){0,1}.*"); //$NON-NLS-1$
     /**
      * Pattern to match a probe address information (lttng list <session>)
      */
@@ -293,6 +302,11 @@ public class LTTngControlServiceConstants {
      * Pattern to match for provider information (lttng list -k/-u)
      */
     public final static Pattern PROVIDER_EVENT_PATTERN = Pattern.compile("\\s*(.*)\\s+\\(loglevel:\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)"); //$NON-NLS-1$
+    /**
+     * Pattern to match event fields
+     */
+    //                                                                 field: content (string)
+    public final static Pattern EVENT_FIELD_PATTERN = Pattern.compile("\\s*(field:)\\s+(.*)\\s+\\((.*)\\)"); //$NON-NLS-1$
     /**
      * Pattern to match for UST provider information (lttng list -u)
      */

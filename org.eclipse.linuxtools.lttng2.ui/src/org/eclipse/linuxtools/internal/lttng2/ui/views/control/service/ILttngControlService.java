@@ -38,6 +38,14 @@ public interface ILttngControlService {
     public String getVersion();
 
     /**
+     * Checks if given version is supported by this ILTTngControlService implementation.
+     *
+     * @param version The version to check
+     * @return <code>true</code> if version is supported else <code>false</code>
+     */
+    public boolean isVersionSupported(String version);
+
+    /**
      * Retrieves the existing sessions names from the node.
      *
      * @param monitor
@@ -206,14 +214,18 @@ public interface ILttngControlService {
      *            0)for all events .
      * @param isKernel
      *            - a flag for indicating kernel or UST.
+     * @param filterExpression
+     *            - a filter expression
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     public void enableEvents(String sessionName, String channelName,
-            List<String> eventNames, boolean isKernel, IProgressMonitor monitor)
+            List<String> eventNames, boolean isKernel, String filterExpression,
+            IProgressMonitor monitor)
             throws ExecutionException;
+
 
     /**
      * Enables all syscall events.
@@ -265,6 +277,8 @@ public interface ILttngControlService {
      *            - a log level type
      * @param level
      *            - a log level
+     * @param filterExpression
+     *            - a filter expression
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
@@ -272,6 +286,7 @@ public interface ILttngControlService {
      */
     public void enableLogLevel(String sessionName, String channelName,
             String eventName, LogLevelType logLevelType, TraceLogLevel level,
+            String filterExpression,
             IProgressMonitor monitor) throws ExecutionException;
 
     /**

@@ -154,6 +154,8 @@ final public class Messages extends NLS {
     public static String TraceControl_EnableEventsLogLevelOnlyTypeTooltip;
     public static String TraceControl_EnableEventsLogLevelTooltip;
     public static String TraceControl_EnableEventsLoglevelEventNameTooltip;
+    public static String TraceControl_EnableEventsFilterGroupName;
+    public static String TraceControl_EnableEventsFilterTooltip;
 
     public static String TraceControl_InvalidProbeNameError;
     public static String TraceControl_InvalidWildcardError;
@@ -200,6 +202,8 @@ final public class Messages extends NLS {
     public static String TraceControl_EventNamePropertyName;
     public static String TraceControl_EventTypePropertyName;
     public static String TraceControl_LogLevelPropertyName;
+    public static String TraceControl_FieldsPropertyName;
+    public static String TraceControl_FilterPropertyName;
     public static String TraceControl_StatePropertyName;
     public static String TraceControl_VersionPropertyName;
     public static String TraceControl_DomainNamePropertyName;

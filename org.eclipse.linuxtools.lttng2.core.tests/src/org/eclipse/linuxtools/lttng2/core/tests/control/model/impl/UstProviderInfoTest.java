@@ -171,7 +171,10 @@ public class UstProviderInfoTest extends TestCase {
      */
     public void testToString_2() {
         String result = fUstProviderInfo2.toString();
-        assertEquals("[EventInfo([TraceInfo(Name=myUST2)],PID=2345,Events=[BaseEventInfo([TraceInfo(Name=event1)],type=UNKNOWN,level=TRACE_DEBUG)][BaseEventInfo([TraceInfo(Name=event2)],type=TRACEPOINT,level=TRACE_DEBUG)])]", result);
+        assertEquals("[EventInfo([TraceInfo(Name=myUST2)],PID=2345,Events=[BaseEventInfo([TraceInfo(Name=event1)]," +
+        		"type=UNKNOWN,level=TRACE_DEBUG,Fields=[FieldInfo([TraceInfo(Name=intfield)],type=int[FieldInfo" +
+        		"([TraceInfo(Name=stringfield)],type=string,Filter=intField==10)][BaseEventInfo([TraceInfo(Name=event2)]," +
+        		"type=TRACEPOINT,level=TRACE_DEBUG)])]", result);
     }
 
     // ------------------------------------------------------------------------

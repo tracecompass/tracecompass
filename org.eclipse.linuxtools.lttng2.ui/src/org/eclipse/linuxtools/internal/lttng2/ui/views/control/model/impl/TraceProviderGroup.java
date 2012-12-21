@@ -104,5 +104,13 @@ public class TraceProviderGroup extends TraceControlComponent {
         List<ITraceControlComponent> kernelList = getChildren(KernelProviderComponent.class);
         return !kernelList.isEmpty();
     }
+
+    /**
+     * Returns if node supports filtering of events
+     * @return <code>true</code> if node supports filtering else <code>false</code>
+     */
+    public boolean isEventFilteringSupported() {
+        return ((TargetNodeComponent)getParent()).isEventFilteringSupported();
+    }
 }
 

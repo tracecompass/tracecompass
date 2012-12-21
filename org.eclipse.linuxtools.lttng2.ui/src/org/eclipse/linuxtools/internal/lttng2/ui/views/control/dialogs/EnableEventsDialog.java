@@ -338,6 +338,18 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getFilterExpression()
+     */
+    @Override
+    public String getFilterExpression() {
+        if (!fIsKernel) {
+            return fUstComposite.getFilterExpression();
+        }
+        return null;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

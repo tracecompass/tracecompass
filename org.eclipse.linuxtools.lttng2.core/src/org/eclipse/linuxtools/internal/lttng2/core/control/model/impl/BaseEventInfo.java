@@ -1,26 +1,31 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 
 /**
 * <p>
 * Implementation of the basic trace event interface (IEventInfo) to store event
-* related data. 
+* related data.
 * </p>
-* 
+*
 * @author Bernd Hufmann
 */
 public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
@@ -36,7 +41,15 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
      * The trace log level.
      */
     private TraceLogLevel fLogLevel = TraceLogLevel.TRACE_DEBUG;
-  
+    /**
+     * The Event fields
+     */
+    private final List<IFieldInfo> fFields = new ArrayList<IFieldInfo>();
+    /**
+     * The filter expression.
+     */
+    private String fFilterExpression;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -55,6 +68,17 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     public BaseEventInfo(BaseEventInfo other) {
         super(other);
         fEventType = other.fEventType;
+        if(other.fFields != null) {
+            for (Iterator<IFieldInfo> iterator = other.fFields.iterator(); iterator.hasNext();) {
+                IFieldInfo field = iterator.next();
+                if (field instanceof FieldInfo) {
+                    fFields.add(new FieldInfo((FieldInfo)field));
+                } else {
+                    fFields.add(field);
+                }
+            }
+        }
+        fFilterExpression = other.fFilterExpression;
     }
 
     // ------------------------------------------------------------------------
@@ -89,7 +113,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
         } else if(TraceEventType.SYSCALL.getInName().equals(typeName)) {
             fEventType = TraceEventType.SYSCALL;
         } else if (TraceEventType.PROBE.getInName().equals(typeName)) {
-            fEventType = TraceEventType.PROBE;  
+            fEventType = TraceEventType.PROBE;
         } else {
             fEventType = TraceEventType.UNKNOWN;
         }
@@ -155,23 +179,74 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             fLogLevel = TraceLogLevel.TRACE_DEBUG;
         }
     }
-    
+
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo#getFields()
+     */
+    @Override
+    public IFieldInfo[] getFields() {
+        return fFields.toArray(new IFieldInfo[fFields.size()]);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo#addField(org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo)
+     */
+    @Override
+    public void addField(IFieldInfo field) {
+        fFields.add(field);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo#setFields(java.util.List)
+     */
+    @Override
+    public void setFields(List<IFieldInfo> fields) {
+        for (Iterator<IFieldInfo> iterator = fields.iterator(); iterator.hasNext();) {
+            IFieldInfo fieldInfo = iterator.next();
+            fFields.add(fieldInfo);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo#getFilterExpression()
+     */
+    @Override
+    public String getFilterExpression() {
+        return fFilterExpression;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo#setFilterExpression(java.lang.String)
+     */
+    @Override
+    public void setFilterExpression(String filter) {
+        fFilterExpression = filter;
+    }
+
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#hashCode()
      */
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((fEventType == null) ? 0 : (fEventType.ordinal() + 1));
-        result = prime * result + ((fLogLevel == null) ? 0 : (fLogLevel.ordinal() + 1));
+        result = prime * result + ((fEventType == null) ? 0 : fEventType.hashCode());
+        result = prime * result + ((fFields == null) ? 0 : fFields.hashCode());
+        result = prime * result + ((fFilterExpression == null) ? 0 : fFilterExpression.hashCode());
+        result = prime * result + ((fLogLevel == null) ? 0 : fLogLevel.hashCode());
         return result;
-    }    
+    }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
@@ -188,11 +263,25 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
         if (fEventType != other.fEventType) {
             return false;
         }
+        if (fFields == null) {
+            if (other.fFields != null) {
+                return false;
+            }
+        } else if (!fFields.equals(other.fFields)) {
+            return false;
+        }
+        if (fFilterExpression == null) {
+            if (other.fFilterExpression != null) {
+                return false;
+            }
+        } else if (!fFilterExpression.equals(other.fFilterExpression)) {
+            return false;
+        }
         if (fLogLevel != other.fLogLevel) {
             return false;
         }
         return true;
-    }    
+    }
 
     /*
      * (non-Javadoc)
@@ -208,11 +297,18 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             output.append(fEventType);
             output.append(",level=");
             output.append(fLogLevel);
+            if ((fFields != null) && (!fFields.isEmpty())) {
+                output.append(",Fields=");
+                for (Iterator<IFieldInfo> iterator = fFields.iterator(); iterator.hasNext();) {
+                    IFieldInfo field = iterator.next();
+                    output.append(field.toString());
+                }
+            }
+            if (fFilterExpression != null) {
+                output.append(",Filter=");
+                output.append(fFilterExpression);
+            }
             output.append(")]");
             return output.toString();
     }
-
- 
-
-
 }

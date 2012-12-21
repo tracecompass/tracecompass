@@ -49,6 +49,11 @@ public class TraceEventPropertySource extends BasePropertySource {
      */
     public static final String TRACE_EVENT_STATE_PROPERTY_ID = "trace.event.state"; //$NON-NLS-1$
     /**
+     * The trace event 'filter' property ID.
+     */
+    public static final String TRACE_EVENT_FILTER_PROPERTY_ID = "trace.event.filter"; //$NON-NLS-1$
+
+    /**
      *  The trace event 'name' property name.
      */
     public static final String TRACE_EVENT_NAME_PROPERTY_NAME = Messages.TraceControl_EventNamePropertyName;
@@ -64,6 +69,10 @@ public class TraceEventPropertySource extends BasePropertySource {
      * The trace event 'state' property name.
      */
     public static final String TRACE_EVENT_STATE_PROPERTY_NAME = Messages.TraceControl_StatePropertyName;
+    /**
+     * The trace event 'filter' property name.
+     */
+    public static final String TRACE_EVENT_FILTER_PROPERTY_NAME = Messages.TraceControl_FilterPropertyName;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -100,6 +109,9 @@ public class TraceEventPropertySource extends BasePropertySource {
         if (fEvent.getLogLevel() != TraceLogLevel.LEVEL_UNKNOWN) {
             list.add(new TextPropertyDescriptor(TRACE_EVENT_LOGLEVEL_PROPERTY_ID, TRACE_EVENT_LOGLEVEL_PROPERTY_NAME));
         }
+        if (fEvent.getFilterExpression() != null) {
+            list.add(new TextPropertyDescriptor(TRACE_EVENT_FILTER_PROPERTY_ID, TRACE_EVENT_FILTER_PROPERTY_NAME));
+        }
         return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
@@ -121,6 +133,10 @@ public class TraceEventPropertySource extends BasePropertySource {
         if (TRACE_EVENT_STATE_PROPERTY_ID.equals(id)) {
             return fEvent.getState().name();
         }
+        if (TRACE_EVENT_FILTER_PROPERTY_ID.equals(id)) {
+            return fEvent.getFilterExpression();
+        }
+
         return null;
     }
 

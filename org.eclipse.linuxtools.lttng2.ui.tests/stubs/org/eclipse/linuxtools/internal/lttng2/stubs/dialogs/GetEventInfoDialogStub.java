@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;
@@ -18,12 +18,13 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceC
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 
 /**
- * Get event information dialog stub implementation. 
+ * Get event information dialog stub implementation.
  */
 public class GetEventInfoDialogStub implements IGetEventInfoDialog {
 
     private TraceSessionComponent[] fSessions;
-    
+    private String fFilterExpression;
+
     @Override
     public TraceSessionComponent getSession() {
         return fSessions[0];
@@ -48,8 +49,20 @@ public class GetEventInfoDialogStub implements IGetEventInfoDialog {
     }
 
     @Override
+    public String getFilterExpression() {
+        return fFilterExpression;
+    }
+
+    @Override
     public int open() {
         return 0;
+    }
+
+    /**
+     * @param filter the filter to set
+     */
+    public void setFilterExpression(String filter) {
+        fFilterExpression = filter;
     }
 }
 

@@ -169,6 +169,22 @@ public class TraceEventComponent extends TraceControlComponent {
         fEventInfo.setLogLevel(levelName);
     }
 
+    /**
+     * Returns filter expression.
+     * @return filter expression
+     */
+    public String getFilterExpression() {
+        return fEventInfo.getFilterExpression();
+    }
+
+    /**
+     * Sets the filter expression.
+     * @param filter The filter expression to set
+     */
+    public void setFilterExpression(String filter) {
+        fEventInfo.setFilterExpression(filter);
+    }
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
