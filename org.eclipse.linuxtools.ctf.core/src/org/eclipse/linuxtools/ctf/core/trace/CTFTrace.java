@@ -288,6 +288,7 @@ public class CTFTrace implements IDefinitionScope {
      * Gets an event Declaration hashmap for a given StreamInput
      * @param id the StreamInput
      * @return the hashmap with the event definitions
+     * @since 2.0
      */
     public HashMap<Long, EventDefinition> getEventDefs(StreamInput id) {
         if(! eventDefs.containsKey(id)){
@@ -315,6 +316,7 @@ public class CTFTrace implements IDefinitionScope {
      * @param id
      *            Long the id of the stream
      * @return Stream the stream that we need
+     * @since 2.0
      */
     public Stream getStream(Long id) {
         return streams.get(id);
@@ -617,6 +619,7 @@ public class CTFTrace implements IDefinitionScope {
      *            A stream object.
      * @throws ParseException
      *             If there was some problem reading the metadata
+     * @since 2.0
      */
     public void addStream(Stream stream) throws ParseException {
 

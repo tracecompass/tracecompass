@@ -37,6 +37,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  *
  * @version 1.0
  * @author Francois Chouinard
+ * @since 2.0
  */
 public class TmfTimestampFormatPage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener, IPropertyChangeListener {
 

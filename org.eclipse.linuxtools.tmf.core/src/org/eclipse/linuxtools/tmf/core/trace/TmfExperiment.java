@@ -198,8 +198,8 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
     // Request management
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#armRequest(org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest)
+    /**
+     * @since 2.0
      */
     @Override
     public synchronized ITmfContext armRequest(final ITmfDataRequest request) {
