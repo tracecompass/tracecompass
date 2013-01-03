@@ -140,7 +140,7 @@ public class OpenTraceHandler extends AbstractHandler {
 
                 final IFile file;
                 try {
-                    file = traceElement.getBookmarksFile();
+                    file = traceElement.createBookmarksFile();
                 } catch (final CoreException e) {
                     Activator.getDefault().logError("Error opening trace " + traceElement.getName(), e); //$NON-NLS-1$
                     displayErrorMsg(Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$

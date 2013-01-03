@@ -69,6 +69,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
 
         /* Make sure the domain is "kernel" in the trace's env vars */
         String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
+        temp.dispose();
         if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
             return true;
         }

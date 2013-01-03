@@ -134,7 +134,7 @@ public class RenameTraceHandler extends AbstractHandler {
         TmfExperimentFolder experimentFolder = newTrace.getProject().getExperimentsFolder();
         for (final ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
             for (final ITmfProjectModelElement trace : experiment.getChildren()) {
-                if (trace.equals(oldTrace)) {
+                if (trace.getName().equals(oldTrace.getName())) {
                     // Create a link to the renamed trace
                     createTraceLink(newTrace, experiment);
 

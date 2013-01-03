@@ -129,7 +129,9 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
     public boolean validate(final IProject project, final String path) {
         try {
             final CTFTrace temp = new CTFTrace(path);
-            return temp.majortIsSet(); // random test
+            boolean valid = temp.majortIsSet(); // random test
+            temp.dispose();
+            return valid;
         } catch (final CTFReaderException e) {
             /* Nope, not a CTF trace we can read */
             return false;

@@ -199,8 +199,6 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fLocation == null) ? 0 : fLocation.hashCode());
-        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
         result = prime * result + ((fPath == null) ? 0 : fPath.hashCode());
         return result;
     }
@@ -220,7 +218,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
             return false;
         }
         TmfProjectModelElement element = (TmfProjectModelElement) other;
-        return element.fName.equals(fName) && element.fLocation.equals(fLocation);
+        return element.fPath.equals(fPath);
     }
 
     /**

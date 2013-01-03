@@ -118,28 +118,37 @@ public class TmfExperimentElement extends TmfProjectModelElement implements IPro
     }
 
     /**
-     * Returns the file resource used to store bookmarks.
-     * The linked file will be created if it doesn't exist.
+     * Returns the file resource used to store bookmarks after creating it if necessary.
+     * The file will be created if it does not exist.
      * @return the bookmarks file
      * @throws CoreException if the bookmarks file cannot be created
      * @since 2.0
      */
-    public IFile getBookmarksFile() throws CoreException {
-        IFile file = null;
-        final IFile bookmarksFile = getProject().getExperimentsFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
-        if (!bookmarksFile.exists()) {
-            final InputStream source = new ByteArrayInputStream(new byte[0]);
-            bookmarksFile.create(source, true, null);
-        }
-        bookmarksFile.setHidden(true);
-
-        final IFolder folder = (IFolder) fResource;
-        file = folder.getFile(getName() + '_');
+    public IFile createBookmarksFile() throws CoreException {
+        IFile file = getBookmarksFile();
         if (!file.exists()) {
+            final IFile bookmarksFile = getProject().getExperimentsFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
+            if (!bookmarksFile.exists()) {
+                final InputStream source = new ByteArrayInputStream(new byte[0]);
+                bookmarksFile.create(source, true, null);
+            }
+            bookmarksFile.setHidden(true);
             file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
+            file.setHidden(true);
+            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfExperiment.class.getCanonicalName());
         }
-        file.setHidden(true);
-        file.setPersistentProperty(TmfCommonConstants.TRACETYPE, TmfExperiment.class.getCanonicalName());
+        return file;
+    }
+
+    /**
+     * Returns the file resource used to store bookmarks.
+     * The file may not exist.
+     * @return the bookmarks file
+     * @since 2.0
+     */
+    public IFile getBookmarksFile() {
+        final IFolder folder = (IFolder) fResource;
+        IFile file = folder.getFile(getName() + '_');
         return file;
     }
 

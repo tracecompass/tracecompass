@@ -94,6 +94,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     private ITmfTrace fTrace;
     private Composite fParent;
     private ListenerList fSelectionChangedListeners = new ListenerList();
+    private boolean fTraceSelected;
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
@@ -624,6 +625,10 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     @Override
     public void partActivated(IWorkbenchPart part) {
         if (part == this && fTrace != null) {
+            if (fTraceSelected) {
+                return;
+            }
+            fTraceSelected = true;
             broadcast(new TmfTraceSelectedSignal(this, fTrace));
         }
     }
@@ -637,6 +642,13 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      */
     @Override
     public void partBroughtToTop(IWorkbenchPart part) {
+        if (part == this && fTrace != null) {
+            if (fTraceSelected) {
+                return;
+            }
+            fTraceSelected = true;
+            broadcast(new TmfTraceSelectedSignal(this, fTrace));
+        }
     }
 
     /*
@@ -695,8 +707,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      */
     @TmfSignalHandler
     public void traceSelected(final TmfTraceSelectedSignal signal) {
-        if ((signal.getSource() != this) && signal.getTrace().equals(fTrace)) {
-            getSite().getPage().bringToTop(this);
+        if ((signal.getSource() != this)) {
+            if (signal.getTrace().equals(fTrace)) {
+                getSite().getPage().bringToTop(this);
+            } else {
+                fTraceSelected = false;
+            }
         }
     }
 
