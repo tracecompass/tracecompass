@@ -42,9 +42,17 @@ public class Utils {
     public enum TimeFormat {
         /** Relative to the start of the trace */
         RELATIVE,
-        /** Absolute timestamp (ie, relative to the Unix epoch) */
+
+        /**
+         * Absolute timestamp (ie, relative to the Unix epoch)
+         * @since 2.0
+         */
         CALENDAR,
-        /** timestamp displayed as a simple number */
+
+        /**
+         * Timestamp displayed as a simple number
+         * @since 2.0
+         */
         NUMBER,
     }
 
