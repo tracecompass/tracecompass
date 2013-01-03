@@ -131,11 +131,11 @@ public class TmfStatisticsTree {
     /**
      * Get the event types paths.
      *
-     * @param event
-     *            Event to get the path for.
-     * @param extraInfo
-     *            Extra information to pass along with the event
-     * @return Array of FixedArray representing the paths.
+     * @param traceName
+     *            The name of the trace (will be used as a sub-tree in the view)
+     * @param type
+     *            The event type
+     * @return Array of arrays representing the paths
      */
     protected String[][] getTypePaths(String traceName, String type) {
         String[][] paths = { new String[] {traceName, HEADER_EVENT_TYPES, type } };
@@ -145,11 +145,9 @@ public class TmfStatisticsTree {
     /**
      * Get the standard paths for an event.
      *
-     * @param event
-     *            Event to get the path for.
-     * @param extraInfo
-     *            Extra information to pass along with the event
-     * @return Array of FixedArray representing the paths.
+     * @param traceName
+     *            The name of the trace (will be used as a sub-tree in the view)
+     * @return Array of arrays representing the paths
      */
     protected String[][] getNormalPaths(String traceName) {
         String[][] paths = { new String[] { traceName } };

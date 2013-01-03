@@ -19,8 +19,14 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model;
  * @author Patrick Tasse
  */
 public class TimeEvent implements ITimeEvent {
+
+    /** TimeGraphEntry matching this time event */
     protected ITimeGraphEntry fEntry;
+
+    /** Beginning timestamp of this time event */
     protected long fTime;
+
+    /** Duration of this time event */
     protected long fDuration;
 
     /**

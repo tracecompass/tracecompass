@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Patrick Tassé - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -7,6 +19,11 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefin
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+/**
+ * Wizard for custom XML trace parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomXmlParserWizard extends Wizard implements INewWizard {
 
     CustomXmlParserInputWizardPage inputPage;
@@ -14,10 +31,19 @@ public class CustomXmlParserWizard extends Wizard implements INewWizard {
     private ISelection selection;
     CustomXmlTraceDefinition definition;
 
+    /**
+     * Default constructor
+     */
     public CustomXmlParserWizard() {
         super();
     }
 
+    /**
+     * Constructor
+     *
+     * @param definition
+     *            The trace definition
+     */
     public CustomXmlParserWizard(CustomXmlTraceDefinition definition) {
         super();
         this.definition = definition;
@@ -38,7 +64,7 @@ public class CustomXmlParserWizard extends Wizard implements INewWizard {
      */
 
     @Override
-	public void addPages() {
+    public void addPages() {
         inputPage = new CustomXmlParserInputWizardPage(selection, definition);
         addPage(inputPage);
         outputPage = new CustomXmlParserOutputWizardPage(this);
@@ -46,7 +72,7 @@ public class CustomXmlParserWizard extends Wizard implements INewWizard {
     }
 
     @Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
         this.selection = selection;
     }
 

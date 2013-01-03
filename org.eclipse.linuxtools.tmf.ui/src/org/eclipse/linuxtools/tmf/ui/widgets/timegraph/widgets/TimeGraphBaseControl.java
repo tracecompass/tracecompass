@@ -33,18 +33,21 @@ import org.eclipse.swt.widgets.Composite;
 public abstract class TimeGraphBaseControl extends Canvas implements PaintListener {
 
     /** Default left margin size */
-    static public final int MARGIN = 4;
+    public static final int MARGIN = 4;
 
     /** Default expanded size */
-    static public final int EXPAND_SIZE = 9; // the [+] or [-] control size
+    public static final int EXPAND_SIZE = 9; // the [+] or [-] control size
 
     /** Default size of the right margin */
-    static public final int RIGHT_MARGIN = 1; // 1 pixels less to make sure end time is visible
+    public static final int RIGHT_MARGIN = 1; // 1 pixels less to make sure end time is visible
 
     /** Default size for small icons */
-    static public final int SMALL_ICON_SIZE = 16;
+    public static final int SMALL_ICON_SIZE = 16;
 
+    /** Color scheme */
     protected TimeGraphColorScheme _colors;
+
+    /** Font size */
     protected int _fontHeight = 0;
 
     /**

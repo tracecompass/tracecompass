@@ -183,7 +183,9 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * Informs the given lifeline about the maximum occurrence if applicable.
      *
      * @param lifeLine
+     *            Concerned lifeline
      * @param occurrence
+     *            Occurrence number
      */
     protected void informFrame(Lifeline lifeLine, int occurrence) {
         if ((lifeLine != null) && (lifeLine.getFrame() != null) && (lifeLine.getFrame().getMaxEventOccurrence() < occurrence)) {

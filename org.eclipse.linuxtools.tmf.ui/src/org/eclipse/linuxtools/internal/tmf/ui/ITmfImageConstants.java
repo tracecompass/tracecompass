@@ -4,14 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: CommonUIImages.java,v 1.6 2010/05/05 12:32:31 paules Exp $
  *
  * Contributors:
  *     Bernd Hufmann - initial API and implementation
  *******************************************************************************/
 package org.eclipse.linuxtools.internal.tmf.ui;
 
-@SuppressWarnings("nls")
+/**
+ * Names for generic icons and buttons used in TMF
+ */
+@SuppressWarnings({"nls", "javadoc"})
 public interface ITmfImageConstants {
 
     public static final String ICONS_PATH = "icons/"; //$NON-NLS-1$

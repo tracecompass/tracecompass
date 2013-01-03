@@ -36,6 +36,11 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
+/**
+ * Base class for custom plain text traces.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
@@ -45,13 +50,35 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
     private final CustomTxtEventType fEventType;
     private BufferedRandomAccessFile fFile;
 
+    /**
+     * Basic constructor.
+     *
+     * @param definition
+     *            Text trace definition
+     */
     public CustomTxtTrace(final CustomTxtTraceDefinition definition) {
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
         setCacheSize(DEFAULT_CACHE_SIZE);
     }
 
-    public CustomTxtTrace(final IResource resource, final CustomTxtTraceDefinition definition, final String path, final int cacheSize) throws TmfTraceException {
+    /**
+     * Full constructor.
+     *
+     * @param resource
+     *            Trace's resource.
+     * @param definition
+     *            Text trace definition
+     * @param path
+     *            Path to the trace file
+     * @param cacheSize
+     *            Cache size to use
+     * @throws TmfTraceException
+     *             If we couldn't open the trace at 'path'
+     */
+    public CustomTxtTrace(final IResource resource,
+            final CustomTxtTraceDefinition definition, final String path,
+            final int cacheSize) throws TmfTraceException {
         this(definition);
         setCacheSize((cacheSize > 0) ? cacheSize : DEFAULT_CACHE_SIZE);
         initTrace(resource, path, CustomTxtEvent.class);
@@ -329,10 +356,20 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
         return event;
     }
 
+    /**
+     * @return The first few lines of the text file
+     */
     public List<InputLine> getFirstLines() {
         return fDefinition.inputs;
     }
 
+    /**
+     * Parse the first line of the trace (to recognize the type).
+     *
+     * @param context
+     *            Trace context
+     * @return The first event
+     */
     public CustomTxtEvent parseFirstLine(final CustomTxtTraceContext context) {
         final CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.ZERO, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
@@ -340,6 +377,11 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
         return event;
     }
 
+    /**
+     * Get the trace definition.
+     *
+     * @return The trace definition
+     */
     public CustomTraceDefinition getDefinition() {
         return fDefinition;
     }

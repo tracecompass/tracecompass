@@ -47,9 +47,20 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * Trace definition for custom text traces.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
+    /** Input lines */
+    public List<InputLine> inputs;
+
+    /** File name of the definition file */
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME = "custom_txt_parsers.xml"; //$NON-NLS-1$
+
+    /** Path of the definition file */
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME =
         Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
 
@@ -67,46 +78,104 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     private static final String FORMAT_ATTRIBUTE = Messages.CustomTxtTraceDefinition_format;
     private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomTxtTraceDefinition_outputColumn;
 
-    public List<InputLine> inputs;
-
+    /**
+     * Default constructor.
+     */
     public CustomTxtTraceDefinition() {
         this("", new ArrayList<InputLine>(0), new ArrayList<OutputColumn>(0), ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    public CustomTxtTraceDefinition(String logtype, List<InputLine> inputs, List<OutputColumn> outputs, String timeStampOutputFormat) {
+    /**
+     * Full constructor.
+     *
+     * @param logtype
+     *            Name of the trace type
+     * @param inputs
+     *            List of inputs
+     * @param outputs
+     *            List of output columns
+     * @param timeStampOutputFormat
+     *            The timestamp format to use
+     */
+    public CustomTxtTraceDefinition(String logtype, List<InputLine> inputs,
+            List<OutputColumn> outputs, String timeStampOutputFormat) {
         this.definitionName = logtype;
         this.inputs = inputs;
         this.outputs = outputs;
         this.timeStampOutputFormat = timeStampOutputFormat;
     }
 
+    /**
+     * Wrapper to store a line of the log file
+     */
     public static class InputLine {
+
+        /** Data columns of this line */
         public List<InputData> columns;
+
+        /** Cardinality of this line (see {@link Cardinality}) */
         public Cardinality cardinality;
-        private String regex;
-        private Pattern pattern;
+
+        /** Parent line */
         public InputLine parentInput;
+
+        /** Level of this line */
         public int level;
+
+        /** Next input line in the file */
         public InputLine nextInput;
+
+        /** Children of this line (if one "event" spans many lines) */
         public List<InputLine> childrenInputs;
 
+        private String regex;
+        private Pattern pattern;
+
+        /**
+         * Default (empty) constructor.
+         */
         public InputLine() {}
 
+        /**
+         * Constructor.
+         *
+         * @param cardinality Cardinality of this line.
+         * @param regex Regex
+         * @param columns Columns to use
+         */
         public InputLine(Cardinality cardinality, String regex, List<InputData> columns) {
             this.cardinality = cardinality;
             this.regex = regex;
             this.columns = columns;
         }
 
+        /**
+         * Set the regex of this input line
+         *
+         * @param regex
+         *            Regex to set
+         */
         public void setRegex(String regex) {
             this.regex = regex;
             this.pattern = null;
         }
 
+        /**
+         * Get the current regex
+         *
+         * @return The current regex
+         */
         public String getRegex() {
             return regex;
         }
 
+        /**
+         * Get the Pattern object of this line's regex
+         *
+         * @return The Pattern
+         * @throws PatternSyntaxException
+         *             If the regex does not parse correctly
+         */
         public Pattern getPattern() throws PatternSyntaxException {
             if (pattern == null) {
                 pattern = Pattern.compile(regex);
@@ -114,6 +183,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             return pattern;
         }
 
+        /**
+         * Add a child line to this line.
+         *
+         * @param input
+         *            The child input line
+         */
         public void addChild(InputLine input) {
             if (childrenInputs == null) {
                 childrenInputs = new ArrayList<InputLine>(1);
@@ -126,6 +201,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             input.level = this.level + 1;
         }
 
+        /**
+         * Set the next input line.
+         *
+         * @param input
+         *            The next input line
+         */
         public void addNext(InputLine input) {
             if (parentInput != null) {
                 int index = parentInput.childrenInputs.indexOf(this);
@@ -138,6 +219,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             input.level = this.level;
         }
 
+        /**
+         * Move this line up in its parent's children.
+         */
         public void moveUp() {
             if (parentInput != null) {
                 int index = parentInput.childrenInputs.indexOf(this);
@@ -149,6 +233,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
         }
 
+        /**
+         * Move this line down in its parent's children.
+         */
         public void moveDown() {
             if (parentInput != null) {
                 int index = parentInput.childrenInputs.indexOf(this);
@@ -160,6 +247,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
         }
 
+        /**
+         * Add a data column to this line
+         *
+         * @param column
+         *            The column to add
+         */
         public void addColumn(InputData column) {
             if (columns == null) {
                 columns = new ArrayList<InputData>(1);
@@ -167,6 +260,13 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             columns.add(column);
         }
 
+        /**
+         * Get the next input lines.
+         *
+         * @param countMap
+         *            The map of line "sets".
+         * @return The next list of lines.
+         */
         public List<InputLine> getNextInputs(Map<InputLine, Integer> countMap) {
             List<InputLine> nextInputs = new ArrayList<InputLine>();
             InputLine next = nextInput;
@@ -190,10 +290,20 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             return nextInputs;
         }
 
+        /**
+         * Get the minimum possible amount of entries.
+         *
+         * @return The minimum
+         */
         public int getMinCount() {
             return cardinality.min;
         }
 
+        /**
+         * Get the maximum possible amount of entries.
+         *
+         * @return The maximum
+         */
         public int getMaxCount() {
             return cardinality.max;
         }
@@ -202,38 +312,83 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         public String toString() {
             return regex + " " + cardinality; //$NON-NLS-1$
         }
-
     }
 
+    /**
+     * Data column for input lines.
+     */
     public static class InputData {
+
+        /** Name of this column */
         public String name;
+
+        /** Action id */
         public int action;
+
+        /** Format */
         public String format;
 
+        /**
+         * Default (empty) constructor
+         */
         public InputData() {}
 
+        /**
+         * Full constructor
+         *
+         * @param name Name
+         * @param action Action
+         * @param format Format
+         */
         public InputData(String name, int action, String format) {
             this.name = name;
             this.action = action;
             this.format = format;
         }
 
+        /**
+         * Constructor with default format
+         *
+         * @param name Name
+         * @param action Action
+         */
         public InputData(String name, int action) {
             this.name = name;
             this.action = action;
         }
     }
 
+    /**
+     * Input line cardinality
+     */
     public static class Cardinality {
+
+        /** Representation of infinity */
         public final static int INF = Integer.MAX_VALUE;
+
+        /** Preset for [1, 1] */
         public final static Cardinality ONE = new Cardinality(1, 1);
+
+        /** Preset for [1, inf] */
         public final static Cardinality ONE_OR_MORE = new Cardinality(1, INF);
+
+        /** Preset for [0, 1] */
         public final static Cardinality ZERO_OR_ONE = new Cardinality(0, 1);
+
+        /** Preset for [0, inf] */
         public final static Cardinality ZERO_OR_MORE = new Cardinality(0, INF);
 
         private final int min;
         private final int max;
 
+        /**
+         * Constructor.
+         *
+         * @param min
+         *            Minimum
+         * @param max
+         *            Maximum
+         */
         public Cardinality(int min, int max) {
             this.min = min;
             this.max = max;
@@ -244,9 +399,6 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             return "(" + (min >= 0 ? min : "?") + "," + (max == INF ? "\u221E" : (max >= 0 ? max : "?")) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#hashCode()
-         */
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -256,9 +408,6 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             return result;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {
@@ -281,15 +430,15 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     }
 
     @Override
-	public void save(String path) {
+    public void save(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
-            	@Override
-                public InputSource resolveEntity (String publicId, String systemId) {
+            EntityResolver resolver = new EntityResolver() {
+                @Override
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -298,15 +447,18 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
-            	@Override
+            db.setErrorHandler(new ErrorHandler() {
+                @Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             Document doc = null;
             File file = new File(path);
@@ -414,19 +566,31 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         return inputLineElement;
     }
 
+    /**
+     * Load the default text trace definitions file.
+     *
+     * @return The loaded trace definitions
+     */
     public static CustomTxtTraceDefinition[] loadAll() {
         return loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
     }
 
+    /**
+     * Load a specific text trace definition file.
+     *
+     * @param path
+     *            The path to the file to load
+     * @return The loaded trace definitions
+     */
     public static CustomTxtTraceDefinition[] loadAll(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
-            	@Override
-                public InputSource resolveEntity (String publicId, String systemId) {
+            EntityResolver resolver = new EntityResolver() {
+                @Override
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -435,15 +599,18 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
-            	@Override
+            db.setErrorHandler(new ErrorHandler() {
+                @Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             File file = new File(path);
             if (!file.canRead()) {
@@ -478,15 +645,22 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         return new CustomTxtTraceDefinition[0];
     }
 
+    /**
+     * Load a single definition.
+     *
+     * @param definitionName
+     *            Name of the definition to load
+     * @return The loaded trace definition
+     */
     public static CustomTxtTraceDefinition load(String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
-            	@Override
-                public InputSource resolveEntity (String publicId, String systemId) {
+            EntityResolver resolver = new EntityResolver() {
+                @Override
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -495,15 +669,18 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
-            	@Override
+            db.setErrorHandler(new ErrorHandler() {
+                @Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             File file = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
             Document doc = db.parse(file);
@@ -532,6 +709,13 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         return null;
     }
 
+    /**
+     * Get the definition from a definition element.
+     *
+     * @param definitionElement
+     *            The Element to extract from
+     * @return The loaded trace definition
+     */
     public static CustomTxtTraceDefinition extractDefinition(Element definitionElement) {
         CustomTxtTraceDefinition def = new CustomTxtTraceDefinition();
 
@@ -598,15 +782,21 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         return inputLine;
     }
 
+    /**
+     * Delete a definition from the currently loaded ones.
+     *
+     * @param definitionName
+     *            The name of the definition to delete
+     */
     public static void delete(String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
-            	@Override
-                public InputSource resolveEntity (String publicId, String systemId) {
+            EntityResolver resolver = new EntityResolver() {
+                @Override
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -615,15 +805,18 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
-            	@Override
+            db.setErrorHandler(new ErrorHandler() {
+                @Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+
+                @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             File file = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
             Document doc = db.parse(file);

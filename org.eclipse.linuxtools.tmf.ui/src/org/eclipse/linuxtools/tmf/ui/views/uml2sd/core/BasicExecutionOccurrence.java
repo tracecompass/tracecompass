@@ -242,7 +242,7 @@ public class BasicExecutionOccurrence extends GraphNode {
     /**
      * Rewrite this method in your extension in order to support customized fill colors
      *
-     * @param context
+     * @param context Graphics context
      * @return IColor
      */
     protected IColor setUnselectedFillColor(IGC context) {
@@ -261,7 +261,7 @@ public class BasicExecutionOccurrence extends GraphNode {
     /**
      * Rewrite this method in your extension in order to support customized stroke colors
      *
-     * @param context
+     * @param context Graphics context
      * @return IColor
      */
     protected IColor setUnselectedStrokeColor(IGC context) {

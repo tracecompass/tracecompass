@@ -371,6 +371,11 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         }
     }
 
+    /**
+     * Swap viewer preferences.
+     *
+     * @param toTemp Switch to the temporary preferences
+     */
     protected void swapPref(boolean toTemp) {
         String TAG1 = "";//$NON-NLS-1$
         String TAG2 = TEMP_TAG;

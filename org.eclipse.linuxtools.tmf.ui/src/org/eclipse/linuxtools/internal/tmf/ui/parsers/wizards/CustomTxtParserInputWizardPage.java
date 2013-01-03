@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Patrick Tassé - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
 
 import java.io.BufferedReader;
@@ -67,6 +79,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Input wizard page for custom text parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_REGEX = "\\s*(.*\\S)"; //$NON-NLS-1$
@@ -115,7 +132,16 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private String timeStampFormat;
     private boolean timestampFound;
 
-    protected CustomTxtParserInputWizardPage(ISelection selection, CustomTxtTraceDefinition definition) {
+    /**
+     * Constructor
+     *
+     * @param selection
+     *            The Selection object
+     * @param definition
+     *            The trace definition
+     */
+    protected CustomTxtParserInputWizardPage(ISelection selection,
+            CustomTxtTraceDefinition definition) {
         super("CustomParserWizardPage"); //$NON-NLS-1$
         if (definition == null) {
             setTitle(Messages.CustomTxtParserInputWizardPage_windowTitleNew);
@@ -164,7 +190,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         dateFormatHelpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_dateFormatHelp);
         dateFormatHelpButton.addSelectionListener(new SelectionAdapter() {
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 openHelpShell(SIMPLE_DATE_FORMAT_URL);
             }
         });
@@ -187,7 +213,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         removeButton.setImage(deleteImage);
         removeButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_removeLine);
         removeButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty() || selectedLine == null) {
                     return;
@@ -235,8 +261,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         addChildButton.setImage(addChildImage);
         addChildButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_addChildLine);
         addChildButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
-        	public void widgetSelected(SelectionEvent e) {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
                 InputLine inputLine = new InputLine(Cardinality.ZERO_OR_MORE, "", null); //$NON-NLS-1$
                 if (((List<?>) treeViewer.getInput()).size() == 0) {
                     definition.inputs.add(inputLine);
@@ -254,7 +280,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         moveUpButton.setImage(moveUpImage);
         moveUpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_moveUp);
         moveUpButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty()) {
                     return;
@@ -279,7 +305,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         moveDownButton.setImage(moveDownImage);
         moveDownButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_moveDown);
         moveDownButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty()) {
                     return;
@@ -368,7 +394,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         highlightAllButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         highlightAllButton.setText(Messages.CustomTxtParserInputWizardPage_highlightAll);
         highlightAllButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 updatePreviews(true);
             }
@@ -379,7 +405,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         legendButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_previewLegend);
         legendButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         legendButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 openLegend();
             }
@@ -411,12 +437,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private static class InputLineTreeNodeContentProvider implements ITreeContentProvider {
 
-    	@Override
+        @Override
         public Object[] getElements(Object inputElement) {
             return ((List<?>) inputElement).toArray();
         }
 
-    	@Override
+        @Override
         public Object[] getChildren(Object parentElement) {
             InputLine inputLine = (InputLine) parentElement;
             if (inputLine.childrenInputs == null) {
@@ -425,21 +451,21 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             return inputLine.childrenInputs.toArray();
         }
 
-    	@Override
+        @Override
         public boolean hasChildren(Object element) {
             InputLine inputLine = (InputLine) element;
             return (inputLine.childrenInputs != null && inputLine.childrenInputs.size() > 0);
         }
 
-    	@Override
+        @Override
         public void dispose() {
         }
 
-    	@Override
+        @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         }
 
-    	@Override
+        @Override
         public Object getParent(Object element) {
             InputLine inputLine = (InputLine) element;
             return inputLine.parentInput;
@@ -464,7 +490,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     }
 
     private class InputLineTreeSelectionChangedListener implements ISelectionChangedListener {
-    	@Override
+        @Override
         public void selectionChanged(SelectionChangedEvent event) {
             if (selectedLine != null) {
                 selectedLine.dispose();
@@ -474,7 +500,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 InputLine inputLine = (InputLine) selection.getFirstElement();
                 selectedLine = new Line(lineContainer, getName(inputLine), inputLine);
                 lineContainer.layout();
-                lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+                lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
                 container.layout();
                 validate();
                 updatePreviews();
@@ -511,6 +537,11 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         return getName(inputLine.parentInput) + "." + Integer.toString(inputLine.parentInput.childrenInputs.indexOf(inputLine)+1); //$NON-NLS-1$
     }
 
+    /**
+     * Get the global list of input names.
+     *
+     * @return The list of input names
+     */
     public List<String> getInputNames() {
         List<String> inputs = new ArrayList<String>();
         for (InputLine inputLine : definition.inputs) {
@@ -523,6 +554,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         return inputs;
     }
 
+    /**
+     * Get the list of input names for the given input line.
+     *
+     * @param inputLine
+     *            The input line
+     * @return The list of input names
+     */
     public List<String> getInputNames(InputLine inputLine) {
         List<String> inputs = new ArrayList<String>();
         if (inputLine.columns != null) {
@@ -877,12 +915,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         helpShell.setLayout(new FillLayout());
         helpBrowser = new Browser(helpShell, SWT.NONE);
         helpBrowser.addTitleListener(new TitleListener() {
-        	@Override
-           public void changed(TitleEvent event) {
-               helpShell.setText(event.title);
-           }
+            @Override
+            public void changed(TitleEvent event) {
+                helpShell.setText(event.title);
+            }
         });
-        helpBrowser.setBounds(0,0,600,400);
+        helpBrowser.setBounds(0, 0, 600, 400);
         helpShell.pack();
         helpShell.open();
         helpBrowser.setUrl(url);
@@ -929,19 +967,19 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private class UpdateListener implements ModifyListener, SelectionListener {
 
-    	@Override
+        @Override
         public void modifyText(ModifyEvent e) {
             validate();
             updatePreviews();
         }
 
-    	@Override
+        @Override
         public void widgetDefaultSelected(SelectionEvent e) {
             validate();
             updatePreviews();
         }
 
-    	@Override
+        @Override
         public void widgetSelected(SelectionEvent e) {
             validate();
             updatePreviews();
@@ -1002,8 +1040,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             regexHelpButton.setImage(helpImage);
             regexHelpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_regularExpressionHelp);
             regexHelpButton.addSelectionListener(new SelectionAdapter() {
-            	@Override
-            	public void widgetSelected(SelectionEvent e) {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
                     openHelpShell(PATTERN_URL);
                 }
             });
@@ -1026,13 +1064,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     Cardinality.ZERO_OR_ONE.toString(),
                     Cardinality.ONE.toString(),
                     "(?,?)"}); //$NON-NLS-1$
-            cardinalityCombo.addSelectionListener(new SelectionListener(){
-            	@Override
+            cardinalityCombo.addSelectionListener(new SelectionListener() {
+                @Override
                 public void widgetDefaultSelected(SelectionEvent e) {}
-            	@Override
+
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     switch (cardinalityCombo.getSelectionIndex()) {
-                    case 4: //(?,?)
+                    case 4: // (?,?)
                         cardinalityMinLabel.setVisible(true);
                         cardinalityMinText.setVisible(true);
                         cardinalityMaxLabel.setVisible(true);
@@ -1050,7 +1089,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     cardinalityContainer.layout();
                     validate();
                     updatePreviews();
-                }});
+                }
+            });
 
             cardinalityMinLabel = new Label(cardinalityContainer, SWT.NONE);
             cardinalityMinLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
@@ -1464,6 +1504,15 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         }
     }
 
+    /**
+     * Validate an input line.
+     *
+     * @param inputLine
+     *            The line to clean up
+     * @param name
+     *            The name of the line
+     * @return The cleaned up line
+     */
     public StringBuffer validateLine(InputLine inputLine, String name) {
         StringBuffer errors = new StringBuffer();
         Line line = null;
@@ -1552,10 +1601,20 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         return errors;
     }
 
+    /**
+     * Get the trace definition.
+     *
+     * @return The trace definition
+     */
     public CustomTxtTraceDefinition getDefinition() {
         return definition;
     }
 
+    /**
+     * Get the raw text of the input.
+     *
+     * @return The raw input text
+     */
     public char[] getInputText() {
         return inputText.getText().toCharArray();
     }

@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Patrick Tassé - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
 
 import java.io.BufferedReader;
@@ -74,6 +86,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * Input wizard page for custom XML trace parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
@@ -125,6 +142,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private int logEntriesCount;
     private boolean logEntryFound;
 
+    /**
+     * Constructor
+     *
+     * @param selection
+     *            Selection object
+     * @param definition
+     *            Trace definition
+     */
     protected CustomXmlParserInputWizardPage(ISelection selection, CustomXmlTraceDefinition definition) {
         super("CustomXmlParserWizardPage"); //$NON-NLS-1$
         if (definition == null) {
@@ -611,10 +636,22 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         super.setVisible(visible);
     }
 
+    /**
+     * Get the global list of input names.
+     *
+     * @return The list of input names
+     */
     public List<String> getInputNames() {
         return getInputNames(definition.rootInputElement);
     }
 
+    /**
+     * Get the list of input names for a given element.
+     *
+     * @param inputElement
+     *            The element
+     * @return The input names for this element
+     */
     public List<String> getInputNames(InputElement inputElement) {
         List<String> inputs = new ArrayList<String>();
         if (inputElement.inputName != null && !inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
@@ -1508,6 +1545,13 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
     }
 
+    /**
+     * Clean up the specified XML element.
+     *
+     * @param inputElement
+     *            The element to clean up
+     * @return The validated element
+     */
     public StringBuffer validateElement(InputElement inputElement) {
         StringBuffer errors = new StringBuffer();
         ElementNode elementNode = null;
@@ -1681,10 +1725,20 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         return errors;
     }
 
+    /**
+     * Get the trace definition.
+     *
+     * @return The trace definition
+     */
     public CustomXmlTraceDefinition getDefinition() {
         return definition;
     }
 
+    /**
+     * Get the raw text input.
+     *
+     * @return The raw text input.
+     */
     public char[] getInputText() {
         return inputText.getText().toCharArray();
     }

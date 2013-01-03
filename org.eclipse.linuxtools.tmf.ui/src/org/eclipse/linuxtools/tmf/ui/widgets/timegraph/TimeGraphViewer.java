@@ -204,15 +204,18 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
+    /**
+     * @return The string representing the view type
+     */
     protected String getViewTypeStr() {
         return "viewoption.threads"; //$NON-NLS-1$
     }
 
-    int getMarginWidth(int idx) {
+    int getMarginWidth() {
         return 0;
     }
 
-    int getMarginHeight(int idx) {
+    int getMarginHeight() {
         return 0;
     }
 
@@ -227,6 +230,15 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         Utils.saveIntOption(getPreferenceString("namewidth"), _nameWidth); //$NON-NLS-1$
     }
 
+    /**
+     * Create a data viewer.
+     *
+     * @param parent
+     *            Parent composite
+     * @param style
+     *            Style to use
+     * @return The new data viewer
+     */
     protected Control createDataViewer(Composite parent, int style) {
         loadOptions();
         _colors = new TimeGraphColorScheme();
@@ -307,9 +319,17 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
+     * Create a new time graph control.
+     *
+     * @param parent
+     *            The parent composite
+     * @param colors
+     *            The color scheme
+     * @return The new TimeGraphControl
      * @since 2.0
      */
-    protected TimeGraphControl createTimeGraphControl(Composite parent, TimeGraphColorScheme colors) {
+    protected TimeGraphControl createTimeGraphControl(Composite parent,
+            TimeGraphColorScheme colors) {
         return new TimeGraphControl(parent, colors);
     }
 

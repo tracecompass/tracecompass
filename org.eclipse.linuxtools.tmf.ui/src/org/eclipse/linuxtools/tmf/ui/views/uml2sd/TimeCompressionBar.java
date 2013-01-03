@@ -484,12 +484,13 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Checks for focus of children.
      *
-     * @param children Control to check
+     * @param children
+     *            Control to check
      * @return true if child is on focus else false
      */
-    protected boolean checkFocusOnChilds(Control childs) {
-        if (childs instanceof Composite) {
-            Control[] child = ((Composite) childs).getChildren();
+    protected boolean checkFocusOnChilds(Control children) {
+        if (children instanceof Composite) {
+            Control[] child = ((Composite) children).getChildren();
             for (int i = 0; i < child.length; i++) {
                 if (child[i].isFocusControl()) {
                     return true;

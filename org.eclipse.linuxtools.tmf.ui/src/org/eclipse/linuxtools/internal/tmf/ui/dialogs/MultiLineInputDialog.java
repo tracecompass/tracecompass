@@ -34,8 +34,7 @@ import org.eclipse.swt.widgets.Text;
  *
  * Overrides InputDialog to support multiple line text input.
  *
- * @author Patrick Tasse
- *
+ * @author Patrick Tassé
  */
 public class MultiLineInputDialog extends InputDialog {
 

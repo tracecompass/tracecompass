@@ -22,18 +22,55 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
+/**
+ * Trace event for custom text parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomTxtEvent extends CustomEvent {
 
+    /**
+     * Constructor
+     *
+     * @param definition
+     *            Trace definition
+     */
     public CustomTxtEvent(CustomTxtTraceDefinition definition) {
         super(definition);
         setType(new CustomTxtEventType(definition));
     }
 
+    /**
+     * Construct a custom text event from an existing TmfEvent.
+     *
+     * @param definition
+     *            Trace definition
+     * @param other
+     *            The TmfEvent object to copy
+     */
     public CustomTxtEvent(CustomTxtTraceDefinition definition, TmfEvent other) {
         super(definition, other);
     }
 
-    public CustomTxtEvent(CustomTxtTraceDefinition definition, ITmfTrace parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
+    /**
+     * Full constructor.
+     *
+     * @param definition
+     *            Trace definition
+     * @param parentTrace
+     *            Parent trace object
+     * @param timestamp
+     *            Timestamp of this event
+     * @param source
+     *            Source of this event
+     * @param type
+     *            Event type
+     * @param reference
+     *            Reference if this event
+     */
+    public CustomTxtEvent(CustomTxtTraceDefinition definition,
+            ITmfTrace parentTrace, ITmfTimestamp timestamp, String source,
+            TmfEventType type, String reference) {
         super(definition, parentTrace, timestamp, source, type, reference);
     }
 
@@ -42,6 +79,14 @@ public class CustomTxtEvent extends CustomEvent {
         super.setContent(content);
     }
 
+    /**
+     * Process an entry in the trace file
+     *
+     * @param input
+     *            The input line to read
+     * @param matcher
+     *            The regex matcher to use
+     */
     public void processGroups(InputLine input, Matcher matcher) {
     	if (input.columns == null) {
     		return;

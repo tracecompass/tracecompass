@@ -140,6 +140,7 @@ public interface ITimeDataProvider {
      * @return If the time format is calendar (true) or relative (false)
      * @deprecated replaced by {@link #getTimeFormat()}
      */
+    @Deprecated
     boolean isCalendarFormat();
 
     /**

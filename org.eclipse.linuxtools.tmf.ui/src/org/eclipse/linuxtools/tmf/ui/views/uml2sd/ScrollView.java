@@ -813,14 +813,17 @@ public class ScrollView extends Composite {
      * Called when the mouse enter the ScrollView area
      *
      * @param e
+     *            Mouse event
      */
     protected void contentsMouseExit(MouseEvent e) {
     }
 
     /**
-     * Called when the mouse enter the ScrollView area after and system defined time
+     * Called when the mouse enter the ScrollView area after and system defined
+     * time
      *
      * @param e
+     *            Mouse event
      */
     protected void contentsMouseHover(MouseEvent e) {
     }
@@ -829,6 +832,7 @@ public class ScrollView extends Composite {
      * Called when the mouse enter the ScrollView area
      *
      * @param e
+     *            Mouse event
      */
     protected void contentsMouseEnter(MouseEvent e) {
     }
@@ -837,6 +841,7 @@ public class ScrollView extends Composite {
      * Called when user double on contents area.
      *
      * @param e
+     *            Mouse event
      */
     protected void contentsMouseDoubleClickEvent(MouseEvent e) {
     }
@@ -845,6 +850,7 @@ public class ScrollView extends Composite {
      * Called when mouse is on contents area and button is pressed.
      *
      * @param e
+     *            Mouse event
      */
     protected void contentsMouseDownEvent(MouseEvent e) {
         fMouseDownX = e.x;
@@ -855,10 +861,26 @@ public class ScrollView extends Composite {
      * TimerTask for auto scroll feature.
      */
     protected static class AutoScroll extends TimerTask {
+
+        /** X delta */
         public int deltaX;
+
+        /** Y delta */
         public int deltaY;
+
+        /** ScrollView object */
         public ScrollView scrollView;
 
+        /**
+         * Constructor.
+         *
+         * @param sv
+         *            ScrollView object to use
+         * @param dx
+         *            X delta
+         * @param dy
+         *            Y delta
+         */
         public AutoScroll(ScrollView sv, int dx, int dy) {
             scrollView = sv;
             deltaX = dx;
@@ -880,6 +902,7 @@ public class ScrollView extends Composite {
      * Called when mouse is on contents area and mode.
      *
      * @param event
+     *            Mouse event
      */
     protected void contentsMouseMoveEvent(MouseEvent event) {
         if ((event.stateMask & SWT.BUTTON_MASK) != 0) {
@@ -936,6 +959,7 @@ public class ScrollView extends Composite {
      * Called when mouse is on contents area and button is released
      *
      * @param event
+     *            Mouse event
      */
     protected void contentsMouseUpEvent(MouseEvent event) {
         // reset auto scroll if it's engaged
@@ -946,14 +970,20 @@ public class ScrollView extends Composite {
     }
 
     /**
-     * Responsible to draw contents area. At least rectangle clipX must be redrawn. This rectangle is given in contents
-     * coordinates. By default, no paint is produced.
+     * Responsible to draw contents area. At least rectangle clipX must be
+     * redrawn. This rectangle is given in contents coordinates. By default, no
+     * paint is produced.
      *
      * @param gc
+     *            Graphics context
      * @param clipx
+     *            X clip
      * @param clipy
+     *            Y clip
      * @param clipw
+     *            W clip
      * @param cliph
+     *            H clip
      */
     protected void drawContents(GC gc, int clipx, int clipy, int clipw, int cliph) {
     }
@@ -1361,7 +1391,9 @@ public class ScrollView extends Composite {
     }
 
     /**
-     * setup scroll bars visibility, return true if one of visibility changed.
+     * Setup scroll bars visibility.
+     *
+     * @return True if one of visibility changed.
      */
     protected boolean updateScrollBarVisiblity() {
         boolean change = false;
@@ -1540,7 +1572,11 @@ public class ScrollView extends Composite {
     }
 
     /**
-     * Add support for arrow key, scroll the ... scroll view. But you can redefine this method for your convenience.
+     * Add support for arrow key, scroll the ... scroll view. But you can
+     * redefine this method for your convenience.
+     *
+     * @param event
+     *            Keyboard event
      */
     protected void keyPressedEvent(KeyEvent event) {
         switch (event.keyCode) {
@@ -1839,6 +1875,11 @@ public class ScrollView extends Composite {
 
         /**
          * Process overview appear
+         *
+         * @param mx
+         *            X coordinate
+         * @param my
+         *            Y coordinate
          */
         protected void overviewAppear(int mx, int my) {
             if (fOverview == null) {
@@ -2016,10 +2057,13 @@ public class ScrollView extends Composite {
         /**
          * Convert overview coordinates to global coordinates.
          *
-         * @param loc the control reference
-         * @param x The x coordinate to convert
-         * @param y The y coordinate to convert
-         * @return
+         * @param loc
+         *            the control reference
+         * @param x
+         *            The x coordinate to convert
+         * @param y
+         *            The y coordinate to convert
+         * @return The new converted Point
          */
         protected Point toGlobalCoordinates(Control loc, int x, int y) {
             Point p = new Point(x, y);

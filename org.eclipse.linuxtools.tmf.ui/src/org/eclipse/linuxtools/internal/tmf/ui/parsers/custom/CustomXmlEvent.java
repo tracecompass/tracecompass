@@ -18,17 +18,52 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
+/**
+ * Trace event for custom XML traces.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomXmlEvent extends CustomEvent {
 
+    /**
+     * Constructor defining only the trace definition
+     *
+     * @param definition
+     *            Trace definition
+     */
     public CustomXmlEvent(CustomXmlTraceDefinition definition) {
         super(definition);
         setType(new CustomXmlEventType(definition));
     }
 
+    /**
+     * Build a custom trace event from an existing TmfEvent.
+     *
+     * @param definition
+     *            Trace definition
+     * @param other
+     *            Other TmfEvent to copy
+     */
     public CustomXmlEvent(CustomXmlTraceDefinition definition, TmfEvent other) {
         super(definition, other);
     }
 
+    /**
+     * Full constructor
+     *
+     * @param definition
+     *            Trace definition
+     * @param parentTrace
+     *            Parent trace object
+     * @param timestamp
+     *            Timestamp of the event
+     * @param source
+     *            Source of the event
+     * @param type
+     *            Event type
+     * @param reference
+     *            Reference of the event
+     */
     public CustomXmlEvent(CustomXmlTraceDefinition definition, ITmfTrace parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
         super(definition, parentTrace, timestamp, source, type, reference);
     }
@@ -38,6 +73,14 @@ public class CustomXmlEvent extends CustomEvent {
         super.setContent(content);
     }
 
+    /**
+     * Parse an entry.
+     *
+     * @param value Value
+     * @param name Name
+     * @param inputAction Input action
+     * @param inputFormat Input format
+     */
     public void parseInput(String value, String name, int inputAction, String inputFormat) {
         if (value.length() == 0) {
             return;

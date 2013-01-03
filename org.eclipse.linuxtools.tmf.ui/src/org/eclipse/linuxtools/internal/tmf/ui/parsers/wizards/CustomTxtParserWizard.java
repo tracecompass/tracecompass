@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Patrick Tassé - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -7,6 +19,11 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefin
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+/**
+ * Wizard for custom text trace parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomTxtParserWizard extends Wizard implements INewWizard {
 
     CustomTxtParserInputWizardPage inputPage;
@@ -14,10 +31,19 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
     private ISelection selection;
     CustomTxtTraceDefinition definition;
 
+    /**
+     * Default constructor
+     */
     public CustomTxtParserWizard() {
         super();
     }
 
+    /**
+     * Constructor
+     *
+     * @param definition
+     *            The trace definition
+     */
     public CustomTxtParserWizard(CustomTxtTraceDefinition definition) {
         super();
         this.definition = definition;
@@ -33,19 +59,15 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
         return true;
     }
 
-    /**
-     * Adding the page to the wizard.
-     */
-
     @Override
-	public void addPages() {
+    public void addPages() {
         inputPage = new CustomTxtParserInputWizardPage(selection, definition);
         addPage(inputPage);
         outputPage = new CustomTxtParserOutputWizardPage(this);
         addPage(outputPage);
     }
 
-	@Override
+    @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
         this.selection = selection;
     }

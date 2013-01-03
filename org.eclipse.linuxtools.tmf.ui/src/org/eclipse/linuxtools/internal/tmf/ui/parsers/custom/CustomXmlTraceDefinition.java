@@ -44,13 +44,22 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * Trace definition for custom XML traces.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
+    /** "ignore" tag */
+    public static final String TAG_IGNORE = Messages.CustomXmlTraceDefinition_ignoreTag;
+
+    /** Name of the XML definitions file */
     protected static final String CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME = "custom_xml_parsers.xml"; //$NON-NLS-1$
+
+    /** Path to the XML definitions file */
     protected static final String CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME =
         Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
-
-    public static final String TAG_IGNORE = Messages.CustomXmlTraceDefinition_ignoreTag;
 
     private static final String CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomXmlTraceDefinition_definitionRootElement;
     private static final String DEFINITION_ELEMENT = Messages.CustomXmlTraceDefinition_definition;
@@ -64,33 +73,92 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     private static final String FORMAT_ATTRIBUTE = Messages.CustomXmlTraceDefinition_format;
     private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomXmlTraceDefinition_outputColumn;
 
+    /** Top-level input element */
     public InputElement rootInputElement;
 
+    /**
+     * Default constructor
+     */
     public CustomXmlTraceDefinition() {
         this("", null, new ArrayList<OutputColumn>(), ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    public CustomXmlTraceDefinition(String logtype, InputElement rootElement, List<OutputColumn> outputs, String timeStampOutputFormat) {
+    /**
+     * Full constructor
+     *
+     * @param logtype
+     *            Type of trace type
+     * @param rootElement
+     *            The top-level XML element
+     * @param outputs
+     *            The list of output columns
+     * @param timeStampOutputFormat
+     *            The timestamp format to use
+     */
+    public CustomXmlTraceDefinition(String logtype, InputElement rootElement,
+            List<OutputColumn> outputs, String timeStampOutputFormat) {
         this.definitionName = logtype;
         this.rootInputElement = rootElement;
         this.outputs = outputs;
         this.timeStampOutputFormat = timeStampOutputFormat;
     }
 
+    /**
+     * Wrapper for input XML elements
+     */
     public static class InputElement {
+
+        /** Name of the element */
         public String elementName;
+
+        /** Indicates if this is a log entry */
         public boolean logEntry;
+
+        /** Name of the input element */
         public String inputName;
+
+        /** Input action */
         public int inputAction;
+
+        /** Input format */
         public String inputFormat;
+
+        /** XML attributes of this element */
         public List<InputAttribute> attributes;
+
+        /** Parent element */
         public InputElement parentElement;
+
+        /** Following element in the file */
         public InputElement nextElement;
+
+        /** Child elements */
         public List<InputElement> childElements;
 
+        /**
+         * Default (empty) constructor
+         */
         public InputElement() {}
 
-        public InputElement(String elementName, boolean logEntry, String inputName, int inputAction, String inputFormat, List<InputAttribute> attributes) {
+        /**
+         * Constructor
+         *
+         * @param elementName
+         *            Element name
+         * @param logEntry
+         *            If this element is a log entry
+         * @param inputName
+         *            Name of the the input
+         * @param inputAction
+         *            Input action
+         * @param inputFormat
+         *            Input format
+         * @param attributes
+         *            XML attributes of this element
+         */
+        public InputElement(String elementName, boolean logEntry,
+                String inputName, int inputAction, String inputFormat,
+                List<InputAttribute> attributes) {
             this.elementName = elementName;
             this.logEntry = logEntry;
             this.inputName = inputName;
@@ -99,6 +167,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             this.attributes = attributes;
         }
 
+        /**
+         * Add a XML attribute to the element
+         *
+         * @param attribute
+         *            The attribute to add
+         */
         public void addAttribute(InputAttribute attribute) {
             if (attributes == null) {
                 attributes = new ArrayList<InputAttribute>(1);
@@ -106,6 +180,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             attributes.add(attribute);
         }
 
+        /**
+         * Add a child element to this one.
+         *
+         * @param input
+         *            The input element to add as child
+         */
         public void addChild(InputElement input) {
             if (childElements == null) {
                 childElements = new ArrayList<InputElement>(1);
@@ -117,6 +197,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             input.parentElement = this;
         }
 
+        /**
+         * Set the following input element.
+         *
+         * @param input
+         *            The input element to add as next element
+         */
         public void addNext(InputElement input) {
             if (parentElement != null) {
                 int index = parentElement.childElements.indexOf(this);
@@ -128,6 +214,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             input.parentElement = this.parentElement;
         }
 
+        /**
+         * Move this element up in its parent's list of children.
+         */
         public void moveUp() {
             if (parentElement != null) {
                 int index = parentElement.childElements.indexOf(this);
@@ -139,6 +228,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
         }
 
+        /**
+         * Move this element down in its parent's list of children.
+         */
         public void moveDown() {
             if (parentElement != null) {
                 int index = parentElement.childElements.indexOf(this);
@@ -152,15 +244,42 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
     }
 
+    /**
+     * Wrapper for XML element attributes
+     */
     public static class InputAttribute {
+
+        /** Name of the XML attribute */
         public String attributeName;
+
+        /** Input name */
         public String inputName;
+
+        /** Input action */
         public int inputAction;
+
+        /** Input format */
         public String inputFormat;
 
+        /**
+         * Default (empty) constructor
+         */
         public InputAttribute() {}
 
-        public InputAttribute(String attributeName, String inputName, int inputAction, String inputFormat) {
+        /**
+         * Constructor
+         *
+         * @param attributeName
+         *            Name of the XML attribute
+         * @param inputName
+         *            Input name
+         * @param inputAction
+         *            Input action
+         * @param inputFormat
+         *            Input format
+         */
+        public InputAttribute(String attributeName, String inputName,
+                int inputAction, String inputFormat) {
             this.attributeName = attributeName;
             this.inputName = inputName;
             this.inputAction = inputAction;
@@ -168,7 +287,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         }
     }
 
-	@Override
+    @Override
     public void save() {
         save(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
     }
@@ -180,9 +299,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
+            EntityResolver resolver = new EntityResolver() {
                 @Override
-				public InputSource resolveEntity (String publicId, String systemId) {
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -191,15 +310,18 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
+            db.setErrorHandler(new ErrorHandler() {
                 @Override
-				public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void fatalError(SAXParseException saxparseexception) throws SAXException {
+                public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             Document doc = null;
             File file = new File(path);
@@ -314,19 +436,31 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         return inputElementElement;
     }
 
+    /**
+     * Load all the XML trace definitions in the default definitions file.
+     *
+     * @return The loaded trace definitions
+     */
     public static CustomXmlTraceDefinition[] loadAll() {
         return loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
     }
 
+    /**
+     * Load all the XML trace definitions in the given definitions file.
+     *
+     * @param path
+     *            Path to the definitions file to load
+     * @return The loaded trace definitions
+     */
     public static CustomXmlTraceDefinition[] loadAll(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
+            EntityResolver resolver = new EntityResolver() {
                 @Override
-				public InputSource resolveEntity (String publicId, String systemId) {
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -335,15 +469,18 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
+            db.setErrorHandler(new ErrorHandler() {
                 @Override
-				public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void fatalError(SAXParseException saxparseexception) throws SAXException {
+                public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             File file = new File(path);
             if (!file.canRead()) {
@@ -378,15 +515,22 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         return new CustomXmlTraceDefinition[0];
     }
 
+    /**
+     * Load the given trace definition.
+     *
+     * @param definitionName
+     *            Name of the XML trace definition to load
+     * @return The loaded trace definition
+     */
     public static CustomXmlTraceDefinition load(String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
+            EntityResolver resolver = new EntityResolver() {
                 @Override
-				public InputSource resolveEntity (String publicId, String systemId) {
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -395,15 +539,18 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
+            db.setErrorHandler(new ErrorHandler() {
                 @Override
-				public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void fatalError(SAXParseException saxparseexception) throws SAXException {
+                public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             File file = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
             Document doc = db.parse(file);
@@ -432,6 +579,13 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         return null;
     }
 
+    /**
+     * Extract a trace definition from an XML element.
+     *
+     * @param definitionElement
+     *            Definition element
+     * @return The extracted trace definition
+     */
     public static CustomXmlTraceDefinition extractDefinition(Element definitionElement) {
         CustomXmlTraceDefinition def = new CustomXmlTraceDefinition();
 
@@ -506,15 +660,21 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         return inputElement;
     }
 
+    /**
+     * Delete the given trace definition from the list of currently loaded ones.
+     *
+     * @param definitionName
+     *            Name of the trace definition to delete
+     */
     public static void delete(String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
+            EntityResolver resolver = new EntityResolver() {
                 @Override
-				public InputSource resolveEntity (String publicId, String systemId) {
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -523,15 +683,18 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
+            db.setErrorHandler(new ErrorHandler() {
                 @Override
-				public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {}
+
                 @Override
-				public void fatalError(SAXParseException saxparseexception) throws SAXException {
+                public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
-                }});
+                }
+            });
 
             File file = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
             Document doc = db.parse(file);

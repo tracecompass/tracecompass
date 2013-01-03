@@ -39,6 +39,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Dialog for custom text parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class ManageCustomParsersDialog extends Dialog {
 
     private static final Image image = Activator.getDefault().getImageFromPath("/icons/etool16/customparser_wizard.gif"); //$NON-NLS-1$
@@ -52,6 +57,12 @@ public class ManageCustomParsersDialog extends Dialog {
     Button importButton;
     Button exportButton;
 
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            Parent shell of this dialog
+     */
     public ManageCustomParsersDialog(Shell parent) {
         super(parent);
         setShellStyle(SWT.RESIZE | SWT.MAX | getShellStyle());
@@ -84,31 +95,37 @@ public class ManageCustomParsersDialog extends Dialog {
         txtButton = new Button(radioContainer, SWT.RADIO);
         txtButton.setText(Messages.ManageCustomParsersDialog_TextButtonLabel);
         txtButton.setSelection(true);
-        txtButton.addSelectionListener(new SelectionListener(){
+        txtButton.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {}
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 fillParserList();
-            }});
+            }
+        });
 
         xmlButton = new Button(radioContainer, SWT.RADIO);
         xmlButton.setText("XML"); //$NON-NLS-1$
-        xmlButton.addSelectionListener(new SelectionListener(){
+        xmlButton.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 fillParserList();
-            }});
+            }
+        });
 
         parserList = new List(listContainer, SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         parserList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        parserList.addSelectionListener(new SelectionListener(){
+        parserList.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {}
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 if (parserList.getSelectionCount() == 0) {
                     editButton.setEnabled(false);
                     deleteButton.setEnabled(false);
@@ -118,7 +135,8 @@ public class ManageCustomParsersDialog extends Dialog {
                     deleteButton.setEnabled(true);
                     exportButton.setEnabled(true);
                 }
-            }});
+            }
+        });
 
         Composite buttonContainer = new Composite(composite, SWT.NULL);
         buttonContainer.setLayout(new GridLayout());
@@ -127,11 +145,12 @@ public class ManageCustomParsersDialog extends Dialog {
         newButton = new Button(buttonContainer, SWT.PUSH);
         newButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         newButton.setText(Messages.ManageCustomParsersDialog_NewButtonLabel);
-        newButton.addSelectionListener(new SelectionListener(){
+        newButton.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {}
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 WizardDialog dialog = null;
                 if (txtButton.getSelection()) {
                     dialog = new WizardDialog(getShell(), new CustomTxtParserWizard());
@@ -144,17 +163,19 @@ public class ManageCustomParsersDialog extends Dialog {
                         fillParserList();
                     }
                 }
-            }});
+            }
+        });
 
         editButton = new Button(buttonContainer, SWT.PUSH);
         editButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         editButton.setText(Messages.ManageCustomParsersDialog_EditButtonLabel);
         editButton.setEnabled(false);
-        editButton.addSelectionListener(new SelectionListener(){
+        editButton.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {}
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 WizardDialog dialog = null;
                 if (txtButton.getSelection()) {
                     dialog = new WizardDialog(getShell(),
@@ -169,17 +190,19 @@ public class ManageCustomParsersDialog extends Dialog {
                         fillParserList();
                     }
                 }
-            }});
+            }
+        });
 
         deleteButton = new Button(buttonContainer, SWT.PUSH);
         deleteButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         deleteButton.setText(Messages.ManageCustomParsersDialog_DeleteButtonLabel);
         deleteButton.setEnabled(false);
-        deleteButton.addSelectionListener(new SelectionListener(){
+        deleteButton.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {}
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 boolean confirm = MessageDialog.openQuestion(
                         getShell(),
                         Messages.ManageCustomParsersDialog_DeleteParserDialogHeader,
@@ -192,21 +215,23 @@ public class ManageCustomParsersDialog extends Dialog {
                     }
                     fillParserList();
                 }
-            }});
+            }
+        });
 
         new Label(buttonContainer, SWT.NONE); // filler
 
         importButton = new Button(buttonContainer, SWT.PUSH);
         importButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         importButton.setText(Messages.ManageCustomParsersDialog_ImportButtonLabel);
-        importButton.addSelectionListener(new SelectionListener(){
+        importButton.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {}
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText(Messages.ManageCustomParsersDialog_ImportParserSelection);
-                dialog.setFilterExtensions(new String[] {"*.xml", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
+                dialog.setFilterExtensions(new String[] { "*.xml", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();
                 if (path != null) {
                     CustomTraceDefinition[] defs = null;
@@ -222,20 +247,22 @@ public class ManageCustomParsersDialog extends Dialog {
                         fillParserList();
                     }
                 }
-            }});
+            }
+        });
 
         exportButton = new Button(buttonContainer, SWT.PUSH);
         exportButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         exportButton.setText(Messages.ManageCustomParsersDialog_ExportButtonLabel);
         exportButton.setEnabled(false);
-        exportButton.addSelectionListener(new SelectionListener(){
+        exportButton.addSelectionListener(new SelectionListener() {
             @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {}
+
             @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
                 dialog.setText(Messages.ManageCustomParsersDialog_ExportParserSelection + parserList.getSelection()[0]);
-                dialog.setFilterExtensions(new String[] {"*.xml", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
+                dialog.setFilterExtensions(new String[] { "*.xml", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();
                 if (path != null) {
                     CustomTraceDefinition def = null;
@@ -248,7 +275,8 @@ public class ManageCustomParsersDialog extends Dialog {
                         def.save(path);
                     }
                 }
-            }});
+            }
+        });
 
         fillParserList();
 

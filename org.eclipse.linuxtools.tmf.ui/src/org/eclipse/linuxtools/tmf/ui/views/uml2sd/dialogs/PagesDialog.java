@@ -1,13 +1,13 @@
 /**********************************************************************
  * Copyright (c) 2005, 2008 IBM Corporation and others.
  * Copyright (c) 2011, 2012 Ericsson.
- * 
+ *
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  * IBM - Initial API and implementation
  * Bernd Hufmann - Updated for TMF
  **********************************************************************/
@@ -30,9 +30,9 @@ import org.eclipse.ui.IViewPart;
 
 /**
  * Class implementation of the pages dialog.<br>
- * 
+ *
  * It is associated to an SDView and to a ISDAdvancedPagingProvider.<br>
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -46,16 +46,20 @@ public class PagesDialog extends Dialog {
      * viewer and provided are kept here as attributes
      */
     protected ISDAdvancedPagingProvider fProvider = null;
+
+    /** Current page */
     protected TextArea fCurrentPage;
+
+    /** Comment label */
     protected Label fTotalPageComment;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    
+
     /**
      * Standard constructor
-     * 
+     *
      * @param view The sequence diagram view reference
      * @param provider The paging provider reference
      */
@@ -114,7 +118,7 @@ public class PagesDialog extends Dialog {
     }
 
     /**
-     * Updates the comments texts. 
+     * Updates the comments texts.
      */
     protected void updateComments() {
         int pages = Math.max(0, fProvider.pagesCount());
@@ -132,7 +136,7 @@ public class PagesDialog extends Dialog {
         fTotalPageComment.setText(totalPageCommentText.toString());
     }
 
-    
+
     // ------------------------------------------------------------------------
     // Helper classes
     // ------------------------------------------------------------------------
@@ -155,7 +159,7 @@ public class PagesDialog extends Dialog {
 
         /**
          * Constructor
-         * 
+         *
          * @param parent The paren composite
          */
         public TextArea(Composite parent) {
@@ -165,7 +169,7 @@ public class PagesDialog extends Dialog {
 
         /**
          * Sets the page value.
-         * 
+         *
          * @param page The page value
          */
         public void setValue(int page) {
@@ -175,7 +179,7 @@ public class PagesDialog extends Dialog {
 
         /**
          * Returns the page value.
-         * 
+         *
          * @return the page value
          */
         public int getValue() {
@@ -191,7 +195,7 @@ public class PagesDialog extends Dialog {
 
         /**
          * Sets the minimum and maximum page values.
-         * 
+         *
          * @param min A minimum page value
          * @param max A maximum page value
          */

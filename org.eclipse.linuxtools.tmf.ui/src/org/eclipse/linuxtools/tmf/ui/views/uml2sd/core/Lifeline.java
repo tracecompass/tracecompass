@@ -164,6 +164,7 @@ public class Lifeline extends GraphNode {
      * Set the frame on which this lifeline must be drawn
      *
      * @param parentFrame
+     *            Parent frame
      */
     protected void setFrame(Frame parentFrame) {
         fFrame = parentFrame;

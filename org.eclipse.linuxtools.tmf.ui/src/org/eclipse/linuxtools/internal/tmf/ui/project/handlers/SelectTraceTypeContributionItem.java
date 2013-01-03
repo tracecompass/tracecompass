@@ -40,6 +40,11 @@ import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
+/**
+ * ContributionItem for the trace type selection.
+ *
+ * @author Patrick Tassé
+ */
 public class SelectTraceTypeContributionItem extends CompoundContributionItem {
 
     //private static final ImageDescriptor SELECTED_ICON = ImageDescriptor.createFromImage(TmfUiPlugin.getDefault().getImageFromPath("icons/elcl16/bullet.gif")); //$NON-NLS-1$

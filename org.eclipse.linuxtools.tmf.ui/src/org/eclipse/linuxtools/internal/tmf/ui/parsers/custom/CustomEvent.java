@@ -27,28 +27,74 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
+/**
+ * Base event for custom text parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomEvent extends TmfEvent {
 
-    protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F"; //$NON-NLS-1$
-    protected static final String NO_MESSAGE = ""; //$NON-NLS-1$
+    /** Default timestamp scale for text-parser events */
     public static final byte TIMESTAMP_SCALE = -3;
 
+    /** Input format key */
+    protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F"; //$NON-NLS-1$
+
+    /** Empty message */
+    protected static final String NO_MESSAGE = ""; //$NON-NLS-1$
+
+    /** The trace to which this event belongs */
     protected CustomTraceDefinition fDefinition;
+
+    /** The payload data of this event, <field name, value> */
     protected Map<String, String> fData;
+
     private TmfEventField[] fColumnData;
 
+    /**
+     * Basic constructor.
+     *
+     * @param definition
+     *            The trace definition to which this event belongs
+     */
     public CustomEvent(CustomTraceDefinition definition) {
         fDefinition = definition;
         fData = new HashMap<String, String>();
     }
 
+    /**
+     * Build a new CustomEvent from an existing TmfEvent.
+     *
+     * @param definition
+     *            The trace definition to which this event belongs
+     * @param other
+     *            The TmfEvent to copy
+     */
     public CustomEvent(CustomTraceDefinition definition, TmfEvent other) {
         super(other);
         fDefinition = definition;
         fData = new HashMap<String, String>();
     }
 
-    public CustomEvent(CustomTraceDefinition definition, ITmfTrace parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
+    /**
+     * Full constructor
+     *
+     * @param definition
+     *            Trace definition of this event
+     * @param parentTrace
+     *            Parent trace object
+     * @param timestamp
+     *            Timestamp of this event
+     * @param source
+     *            Source of the event
+     * @param type
+     *            Event type
+     * @param reference
+     *            Event reference
+     */
+    public CustomEvent(CustomTraceDefinition definition, ITmfTrace parentTrace,
+            ITmfTimestamp timestamp, String source, TmfEventType type,
+            String reference) {
         super(parentTrace, timestamp, source, type, null, reference);
         fDefinition = definition;
         fData = new HashMap<String, String>();
@@ -62,6 +108,9 @@ public class CustomEvent extends TmfEvent {
         return super.getTimestamp();
     }
 
+    /**
+     * @return The event fields
+     */
     public TmfEventField[] extractItemFields() {
         if (fData != null) {
             processData();

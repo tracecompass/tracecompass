@@ -564,9 +564,18 @@ abstract class TimeDraw {
 
     public abstract void draw(GC gc, long time, Rectangle rect);
 
+    /**
+     * Override to draw absolute time header This is for the time information
+     * not shown in the draw of each tick
+     *
+     * @param gc
+     *            Graphics context
+     * @param time
+     *            Timestamp
+     * @param absHeaderRect
+     *            Header rectangle
+     */
     public void drawAbsHeader(GC gc, long time, Rectangle absHeaderRect) {
-        // Override to draw absolute time header
-        // This is for the time information not shown in the draw of each tick
     }
 
     public abstract String hint();

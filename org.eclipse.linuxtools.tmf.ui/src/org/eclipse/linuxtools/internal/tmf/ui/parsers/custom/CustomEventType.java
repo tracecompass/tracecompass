@@ -1,13 +1,36 @@
+/*******************************************************************************
+ * Copyright (c) 2010 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Patrick Tassé - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 
+/**
+ * Event type for custom text parsers.
+ *
+ * @author Patrick Tassé
+ */
 public abstract class CustomEventType extends TmfEventType {
-    
+
     private static String CONTEXT_ID = "CustomEventType"; //$NON-NLS-1$
-    
+
+    /**
+     * Constructor
+     *
+     * @param definition
+     *            Trace definition
+     */
     public CustomEventType(CustomTraceDefinition definition) {
         super(CONTEXT_ID, definition.definitionName, getRootField(definition));
     }

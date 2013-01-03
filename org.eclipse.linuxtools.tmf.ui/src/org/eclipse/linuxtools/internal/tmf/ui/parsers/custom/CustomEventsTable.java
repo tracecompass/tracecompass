@@ -23,26 +23,44 @@ import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Events table for custom text parsers.
+ *
+ * @author Patrick Tassé
+ */
 public class CustomEventsTable extends TmfEventsTable {
 
     private final CustomTraceDefinition fDefinition;
 
+    /**
+     * Constructor.
+     *
+     * @param definition
+     *            Trace definition object
+     * @param parent
+     *            Parent composite of the view
+     * @param cacheSize
+     *            How many events to keep in cache
+     */
     public CustomEventsTable(CustomTraceDefinition definition, Composite parent, int cacheSize) {
         super(parent, cacheSize, new ColumnData[0]);
         fDefinition = definition;
         createColumnHeaders();
     }
 
+    /**
+     * Create the table's headers.
+     */
     protected void createColumnHeaders() {
-		if (fDefinition == null) {
+        if (fDefinition == null) {
             return;
         }
-    	List<ColumnData> columnData = new LinkedList<ColumnData>();
-		for (OutputColumn outputColumn : fDefinition.outputs) {
-			ColumnData column = new ColumnData(outputColumn.name, 0, SWT.LEFT);
-			columnData.add(column);
-		}
-    	setColumnHeaders(columnData.toArray(new ColumnData[0]));
+        List<ColumnData> columnData = new LinkedList<ColumnData>();
+        for (OutputColumn outputColumn : fDefinition.outputs) {
+            ColumnData column = new ColumnData(outputColumn.name, 0, SWT.LEFT);
+            columnData.add(column);
+        }
+        setColumnHeaders(columnData.toArray(new ColumnData[0]));
     }
 
     @Override
