@@ -603,8 +603,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
         ITmfStateInterval currentInterval;
         long ts, tEnd;
 
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
+        IProgressMonitor mon = monitor;
+        if (mon == null) {
+            mon = new NullProgressMonitor();
         }
 
         /* Make sure the time range makes sense */
@@ -630,7 +631,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
          */
         for (ts = t1; (currentInterval.getEndTime() != -1) && (ts < tEnd);
                 ts += resolution) {
-            if (monitor.isCanceled()) {
+            if (mon.isCanceled()) {
                 return intervals;
             }
             if (ts <= currentInterval.getEndTime()) {

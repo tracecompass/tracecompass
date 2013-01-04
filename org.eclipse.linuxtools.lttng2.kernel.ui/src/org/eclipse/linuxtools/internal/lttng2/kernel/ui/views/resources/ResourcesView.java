@@ -564,9 +564,9 @@ public class ResourcesView extends TmfView {
             long startTime, long endTime, long resolution, boolean includeNull,
             IProgressMonitor monitor) {
         ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
-        startTime = Math.max(startTime, ssq.getStartTime());
-        endTime = Math.min(endTime, ssq.getCurrentEndTime() + 1);
-        if (endTime <= startTime) {
+        final long realStart = Math.max(startTime, ssq.getStartTime());
+        final long realEnd = Math.min(endTime, ssq.getCurrentEndTime() + 1);
+        if (realEnd <= realStart) {
             return null;
         }
         List<ITimeEvent> eventList = null;
@@ -574,7 +574,7 @@ public class ResourcesView extends TmfView {
         try {
             if (entry.getType().equals(Type.CPU)) {
                 int statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
-                List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution, monitor);
+                List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, realStart, realEnd - 1, resolution, monitor);
                 eventList = new ArrayList<ITimeEvent>(statusIntervals.size());
                 long lastEndTime = -1;
                 for (ITmfStateInterval statusInterval : statusIntervals) {
@@ -597,7 +597,7 @@ public class ResourcesView extends TmfView {
                     }
                 }
             } else if (entry.getType().equals(Type.IRQ)) {
-                List<ITmfStateInterval> irqIntervals = ssq.queryHistoryRange(quark, startTime, endTime - 1, resolution, monitor);
+                List<ITmfStateInterval> irqIntervals = ssq.queryHistoryRange(quark, realStart, realEnd - 1, resolution, monitor);
                 eventList = new ArrayList<ITimeEvent>(irqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
@@ -623,7 +623,7 @@ public class ResourcesView extends TmfView {
                     lastEndTime = time + duration;
                 }
             } else if (entry.getType().equals(Type.SOFT_IRQ)) {
-                List<ITmfStateInterval> softIrqIntervals = ssq.queryHistoryRange(quark, startTime, endTime - 1, resolution, monitor);
+                List<ITmfStateInterval> softIrqIntervals = ssq.queryHistoryRange(quark, realStart, realEnd - 1, resolution, monitor);
                 eventList = new ArrayList<ITimeEvent>(softIrqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;

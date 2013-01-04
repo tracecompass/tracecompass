@@ -133,19 +133,21 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * Sets or clears the input for this time graph viewer.
      * The input array should only contain top-level elements.
      *
-     * @param input the input of this time graph viewer, or <code>null</code> if none
+     * @param input The input of this time graph viewer, or <code>null</code> if none
      */
     public void setInput(ITimeGraphEntry[] input) {
-        if (null != _stateCtrl) {
-            if (null == input) {
-                input = new ITimeGraphEntry[0];
+        ITimeGraphEntry[] realInput = input;
+
+        if (_stateCtrl != null) {
+            if (realInput == null) {
+                realInput = new ITimeGraphEntry[0];
             }
-            setTimeRange(input);
+            setTimeRange(realInput);
             _verticalScrollBar.setEnabled(true);
             setTopIndex(0);
             _selectedTime = 0;
             _selectedEntry = null;
-            refreshAllData(input);
+            refreshAllData(realInput);
         }
     }
 
@@ -406,19 +408,21 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param end
      */
     void updateInternalData(ITimeGraphEntry[] traces, long start, long end) {
-        if (null == traces) {
-            traces = new ITimeGraphEntry[0];
+        ITimeGraphEntry[] realTraces = traces;
+
+        if (null == realTraces) {
+            realTraces = new ITimeGraphEntry[0];
         }
         if ((start == 0 && end == 0) || start < 0 || end < 0) {
             // Start and end time are unspecified and need to be determined from
             // individual processes
-            setTimeRange(traces);
+            setTimeRange(realTraces);
         } else {
             _beginTime = start;
             _endTime = end;
         }
 
-        refreshAllData(traces);
+        refreshAllData(realTraces);
     }
 
     /**
@@ -495,9 +499,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     @Override
     public void setNameSpace(int width) {
         _nameWidth = width;
-        width = _stateCtrl.getClientArea().width;
-        if (_nameWidth > width - 6) {
-            _nameWidth = width - 6;
+        int w = _stateCtrl.getClientArea().width;
+        if (_nameWidth > w - 6) {
+            _nameWidth = w - 6;
         }
         if (_nameWidth < 6) {
             _nameWidth = 6;

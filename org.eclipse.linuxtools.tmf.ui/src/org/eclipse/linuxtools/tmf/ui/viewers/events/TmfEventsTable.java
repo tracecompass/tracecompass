@@ -346,9 +346,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         });
 
-        cacheSize = Math.max(cacheSize, Display.getDefault().getBounds().height / fTable.getItemHeight());
-        cacheSize = Math.min(cacheSize, MAX_CACHE_SIZE);
-        fCache = new TmfEventsCache(cacheSize, this);
+        int realCacheSize = Math.max(cacheSize, Display.getDefault().getBounds().height / fTable.getItemHeight());
+        realCacheSize = Math.min(realCacheSize, MAX_CACHE_SIZE);
+        fCache = new TmfEventsCache(realCacheSize, this);
 
         // Handle the table item requests
         fTable.addListener(SWT.SetData, new Listener() {

@@ -746,16 +746,16 @@ public class ControlFlowView extends TmfView {
     private static List<ITimeEvent> getEventList(ControlFlowEntry entry,
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor) {
-        startTime = Math.max(startTime, entry.getStartTime());
-        endTime = Math.min(endTime, entry.getEndTime());
-        if (endTime <= startTime) {
+        final long realStart = Math.max(startTime, entry.getStartTime());
+        final long realEnd = Math.min(endTime, entry.getEndTime());
+        if (realEnd <= realStart) {
             return null;
         }
         ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
         List<ITimeEvent> eventList = null;
         try {
             int statusQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.STATUS);
-            List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, startTime, endTime - 1, resolution, monitor);
+            List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, realStart, realEnd - 1, resolution, monitor);
             eventList = new ArrayList<ITimeEvent>(statusIntervals.size());
             long lastEndTime = -1;
             for (ITmfStateInterval statusInterval : statusIntervals) {

@@ -29,76 +29,80 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 public class TmfFilterMatchesNode extends TmfFilterTreeNode {
 
     public static final String NODE_NAME = "MATCHES"; //$NON-NLS-1$
-	public static final String NOT_ATTR = "not"; //$NON-NLS-1$
-	public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
-	public static final String REGEX_ATTR = "regex"; //$NON-NLS-1$
+    public static final String NOT_ATTR = "not"; //$NON-NLS-1$
+    public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
+    public static final String REGEX_ATTR = "regex"; //$NON-NLS-1$
 
-	private boolean fNot = false;
-	private String fField;
-	private String fRegex;
-	private Pattern fPattern;
+    private boolean fNot = false;
+    private String fField;
+    private String fRegex;
+    private Pattern fPattern;
 
-	/**
-	 * @param parent the parent node
-	 */
-	public TmfFilterMatchesNode(ITmfFilterTreeNode parent) {
-		super(parent);
-	}
+    /**
+     * @param parent
+     *            the parent node
+     */
+    public TmfFilterMatchesNode(ITmfFilterTreeNode parent) {
+        super(parent);
+    }
 
-	/**
-	 * @return the NOT state
-	 */
-	public boolean isNot() {
-		return fNot;
-	}
+    /**
+     * @return the NOT state
+     */
+    public boolean isNot() {
+        return fNot;
+    }
 
-	/**
-	 * @param not the NOT state
-	 */
-	public void setNot(boolean not) {
-		this.fNot = not;
-	}
+    /**
+     * @param not
+     *            the NOT state
+     */
+    public void setNot(boolean not) {
+        this.fNot = not;
+    }
 
-	/**
-	 * @return the field name
-	 */
-	public String getField() {
-		return fField;
-	}
+    /**
+     * @return the field name
+     */
+    public String getField() {
+        return fField;
+    }
 
-	/**
-	 * @param field the field name
-	 */
-	public void setField(String field) {
-		this.fField = field;
-	}
+    /**
+     * @param field
+     *            the field name
+     */
+    public void setField(String field) {
+        this.fField = field;
+    }
 
-	/**
-	 * @return the regular expression
-	 */
-	public String getRegex() {
-		return fRegex;
-	}
+    /**
+     * @return the regular expression
+     */
+    public String getRegex() {
+        return fRegex;
+    }
 
-	/**
-	 * @param regex the regular expression
-	 */
-	public void setRegex(String regex) {
-		this.fRegex = regex;
-		try {
-			this.fPattern = Pattern.compile(regex);
-		} catch (PatternSyntaxException e) {
-			this.fPattern = null;
-		}
-	}
+    /**
+     * @param regex
+     *            the regular expression
+     */
+    public void setRegex(String regex) {
+        this.fRegex = regex;
+        try {
+            this.fPattern = Pattern.compile(regex);
+        } catch (PatternSyntaxException e) {
+            this.fPattern = null;
+        }
+    }
 
-	@Override
-	public String getNodeName() {
-		return NODE_NAME;
-	}
+    @Override
+    public String getNodeName() {
+        return NODE_NAME;
+    }
 
-	@Override
-	public boolean matches(ITmfEvent event) {
+    @Override
+    public boolean matches(ITmfEvent event) {
         if (fPattern == null) {
             return false ^ fNot;
         }
@@ -110,37 +114,39 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
         String valueString = value.toString();
 
         return fPattern.matcher(valueString).matches() ^ fNot;
-	}
+    }
 
-	@Override
-	public List<String> getValidChildren() {
-		return new ArrayList<String>(0);
-	}
+    @Override
+    public List<String> getValidChildren() {
+        return new ArrayList<String>(0);
+    }
 
-	@Override
-	public String toString() {
-		return fField + (fNot ? " not" : "") + " matches \"" + fRegex + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	}
+    @Override
+    public String toString() {
+        return fField + (fNot ? " not" : "") + " matches \"" + fRegex + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    }
 
-	@Override
-	public ITmfFilterTreeNode clone() {
-		TmfFilterMatchesNode clone = (TmfFilterMatchesNode) super.clone();
-		clone.fField = fField;
-		clone.setRegex(fRegex);
-		return clone;
-	}
+    @Override
+    public ITmfFilterTreeNode clone() {
+        TmfFilterMatchesNode clone = (TmfFilterMatchesNode) super.clone();
+        clone.fField = fField;
+        clone.setRegex(fRegex);
+        return clone;
+    }
 
-	/**
-	 * @param pattern the rough regex pattern
-	 * @return the compliant regex
-	 */
-	public static String regexFix(String pattern) {
-		// if the pattern does not contain one of the expressions .* !^
-		// (at the beginning) $ (at the end), then a .* is added at the
-		// beginning and at the end of the pattern
-		if (!(pattern.indexOf(".*") >= 0 || pattern.charAt(0) == '^' || pattern.charAt(pattern.length() - 1) == '$')) { //$NON-NLS-1$
-			pattern = ".*" + pattern + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return pattern;
-	}
+    /**
+     * @param pattern
+     *            the rough regex pattern
+     * @return the compliant regex
+     */
+    public static String regexFix(String pattern) {
+        String ret = pattern;
+        // if the pattern does not contain one of the expressions .* !^
+        // (at the beginning) $ (at the end), then a .* is added at the
+        // beginning and at the end of the pattern
+        if (!(ret.indexOf(".*") >= 0 || ret.charAt(0) == '^' || ret.charAt(ret.length() - 1) == '$')) { //$NON-NLS-1$
+            ret = ".*" + ret + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return ret;
+    }
 }

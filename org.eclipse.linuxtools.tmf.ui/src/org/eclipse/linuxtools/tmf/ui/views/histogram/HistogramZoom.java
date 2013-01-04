@@ -137,22 +137,24 @@ public class HistogramZoom implements MouseWheelListener {
      * @param duration the duration
      */
     public synchronized void setNewRange(long startTime, long duration) {
-        if (startTime < fAbsoluteStartTime) {
-            startTime = fAbsoluteStartTime;
+        long realStart = startTime;
+
+        if (realStart < fAbsoluteStartTime) {
+            realStart = fAbsoluteStartTime;
         }
 
-        long endTime = startTime + duration;
+        long endTime = realStart + duration;
         if (endTime > fAbsoluteEndTime) {
             endTime = fAbsoluteEndTime;
             if (endTime - duration > fAbsoluteStartTime) {
-                startTime = endTime - duration;
+                realStart = endTime - duration;
             } else {
-                startTime = fAbsoluteStartTime;
+                realStart = fAbsoluteStartTime;
             }
         }
 
-        fRangeStartTime = startTime;
-        fRangeDuration = endTime - startTime;
+        fRangeStartTime = realStart;
+        fRangeDuration = endTime - realStart;
     }
 
     // ------------------------------------------------------------------------
@@ -184,23 +186,27 @@ public class HistogramZoom implements MouseWheelListener {
     }
 
     private long validateStart(long start) {
-        if (start < fAbsoluteStartTime) {
-            start = fAbsoluteStartTime;
+        long realStart = start;
+
+        if (realStart < fAbsoluteStartTime) {
+            realStart = fAbsoluteStartTime;
         }
-        if (start > fAbsoluteEndTime) {
-            start = fAbsoluteEndTime - fMinWindowSize;
+        if (realStart > fAbsoluteEndTime) {
+            realStart = fAbsoluteEndTime - fMinWindowSize;
         }
-        return start;
+        return realStart;
     }
 
     private long validateEnd(long start, long end) {
-        if (end > fAbsoluteEndTime) {
-            end = fAbsoluteEndTime;
+        long realEnd = end;
+
+        if (realEnd > fAbsoluteEndTime) {
+            realEnd = fAbsoluteEndTime;
         }
-        if (end < start + fMinWindowSize) {
-            end = start + fMinWindowSize;
+        if (realEnd < start + fMinWindowSize) {
+            realEnd = start + fMinWindowSize;
         }
-        return end;
+        return realEnd;
     }
 
     // ------------------------------------------------------------------------

@@ -358,8 +358,10 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     }
 
     private long floorToCalendar(long time, long timeDelta) {
+        long ret = time;
+
         if (_timeDelta >= YEAR_IN_NS) {
-            GREGORIAN_CALENDAR.setTime(new Date(time / 1000000));
+            GREGORIAN_CALENDAR.setTime(new Date(ret / 1000000));
             int year = GREGORIAN_CALENDAR.get(Calendar.YEAR);
             int yearDelta = (int) (timeDelta / YEAR_IN_NS);
             year = (year / yearDelta) * yearDelta;
@@ -370,9 +372,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             GREGORIAN_CALENDAR.set(Calendar.MINUTE, 0);
             GREGORIAN_CALENDAR.set(Calendar.SECOND, 0);
             GREGORIAN_CALENDAR.set(Calendar.MILLISECOND, 0);
-            time = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
+            ret = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
         } else if (_timeDelta >= MONTH_IN_NS) {
-            GREGORIAN_CALENDAR.setTime(new Date(time / 1000000));
+            GREGORIAN_CALENDAR.setTime(new Date(ret / 1000000));
             int month = GREGORIAN_CALENDAR.get(Calendar.MONTH);
             int monthDelta = (int) (timeDelta / MONTH_IN_NS);
             month = (month / monthDelta) * monthDelta;
@@ -382,14 +384,14 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             GREGORIAN_CALENDAR.set(Calendar.MINUTE, 0);
             GREGORIAN_CALENDAR.set(Calendar.SECOND, 0);
             GREGORIAN_CALENDAR.set(Calendar.MILLISECOND, 0);
-            time = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
+            ret = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
         } else {
-            long offset = GREGORIAN_CALENDAR.getTimeZone().getOffset(time / 1000000L) * 1000000L;
-            time += offset;
-            time = (time / timeDelta) * timeDelta;
-            time -= offset;
+            long offset = GREGORIAN_CALENDAR.getTimeZone().getOffset(ret / 1000000L) * 1000000L;
+            ret += offset;
+            ret = (ret / timeDelta) * timeDelta;
+            ret -= offset;
         }
-        return time;
+        return ret;
     }
 
     private int calculateDigits(long time0, long time1) {
@@ -586,8 +588,8 @@ class TimeDrawSec extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        time /= 1000000000;
-        Utils.drawText(gc, sep(time), rect, true);
+        long correctTime = time / 1000000000;
+        Utils.drawText(gc, sep(correctTime), rect, true);
     }
 
     @Override
@@ -601,10 +603,10 @@ class TimeDrawMillisec extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        time /= 1000000;
-        long ms = time % 1000;
-        time /= 1000;
-        Utils.drawText(gc, sep(time) + "." + pad(ms), rect, true); //$NON-NLS-1$
+        long correctTime = time / 1000000;
+        long ms = correctTime % 1000;
+        correctTime /= 1000;
+        Utils.drawText(gc, sep(correctTime) + "." + pad(ms), rect, true); //$NON-NLS-1$
     }
 
     @Override
@@ -618,12 +620,12 @@ class TimeDrawMicrosec extends TimeDraw {
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
-        time /= 1000;
-        long mcs = time % 1000;
-        time /= 1000;
-        long ms = time % 1000;
-        time /= 1000;
-        Utils.drawText(gc, sep(time) + "." + pad(ms) + " " + pad(mcs), rect, true); //$NON-NLS-1$ //$NON-NLS-2$
+        long correctTime = time / 1000;
+        long mcs = correctTime % 1000;
+        correctTime /= 1000;
+        long ms = correctTime % 1000;
+        correctTime /= 1000;
+        Utils.drawText(gc, sep(correctTime) + "." + pad(ms) + " " + pad(mcs), rect, true); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
@@ -638,12 +640,12 @@ class TimeDrawNanosec extends TimeDraw {
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
         long ns = time % 1000;
-        time /= 1000;
-        long mcs = time % 1000;
-        time /= 1000;
-        long ms = time % 1000;
-        time /= 1000;
-        Utils.drawText(gc, sep(time) + "." + pad(ms) + " " + pad(mcs) + " " + pad(ns), rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        long correctTime = time / 1000;
+        long mcs = correctTime % 1000;
+        correctTime /= 1000;
+        long ms = correctTime % 1000;
+        correctTime /= 1000;
+        Utils.drawText(gc, sep(correctTime) + "." + pad(ms) + " " + pad(mcs) + " " + pad(ns), rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override
