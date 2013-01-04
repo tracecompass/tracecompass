@@ -320,16 +320,16 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     private class ItemizeThread extends Thread {
 
         private final TimeChartAnalysisEntry fTimeAnalysisEntry;
-        private final long fStartTime;
-        private final long fStopTime;
+        private final long startTime;
+        private final long stopTime;
         private final long fMaxDuration;
 
         private ItemizeThread(TimeChartAnalysisEntry timeAnalysisEntry, long startTime, long stopTime) {
             super("Itemize Thread:" + timeAnalysisEntry.getName()); //$NON-NLS-1$
             fTimeAnalysisEntry = timeAnalysisEntry;
-            fStartTime = startTime;
-            fStopTime = stopTime;
-            fMaxDuration = 3 * (fStopTime - fStartTime) / fDisplayWidth;
+            this.startTime = startTime;
+            this.stopTime = stopTime;
+            fMaxDuration = 3 * (stopTime - startTime) / fDisplayWidth;
         }
 
         @Override
@@ -343,15 +343,15 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             boolean hasNext = true;
             while (hasNext) {
                 synchronized (timeAnalysisEntry) {
-                    while (hasNext = iterator.hasNext()) {
+                    while ((hasNext = iterator.hasNext()) == true) {
                         event = (TimeChartEvent) iterator.next();
-                        if (event.getTime() + event.getDuration() > fStartTime && event.getTime() < fStopTime && event.getDuration() > fMaxDuration
+                        if (event.getTime() + event.getDuration() > startTime && event.getTime() < stopTime && event.getDuration() > fMaxDuration
                                 && event.getNbEvents() > 1) {
                             break;
                         }
                     }
                 }
-                if (hasNext) {
+                if (hasNext && event != null) {
                     if (event.getItemizedEntry() == null) {
                         itemizeEvent(event);
                     } else {
@@ -432,12 +432,12 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             boolean hasNext = true;
             while (!interrupted && hasNext) {
                 synchronized (timeAnalysisEntry) {
-                    while (hasNext = iterator.hasNext()) {
+                    while ((hasNext = iterator.hasNext()) == true) {
                         event = (TimeChartEvent) iterator.next();
                         break;
                     }
                 }
-                if (hasNext) {
+                if (hasNext && event != null) {
                     // TODO possible concurrency problem here with ItemizeJob
                     event.setColorSettingPriority(ColorSettingsManager.PRIORITY_NONE);
                     if (event.getItemizedEntry() != null) {
@@ -459,12 +459,12 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             boolean hasNext = true;
             while (!interrupted && hasNext) {
                 synchronized (timeAnalysisEntry) {
-                    while (hasNext = iterator.hasNext()) {
+                    while ((hasNext = iterator.hasNext()) == true) {
                         event = (TimeChartEvent) iterator.next();
                         break;
                     }
                 }
-                if (hasNext) {
+                if (hasNext && event != null) {
                     // TODO possible concurrency problem here with ItemizeJob
                     if (event.getItemizedEntry() == null) {
                         decorateEvent(event);

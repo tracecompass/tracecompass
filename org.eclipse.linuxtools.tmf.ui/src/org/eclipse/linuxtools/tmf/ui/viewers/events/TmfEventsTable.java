@@ -1030,8 +1030,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (fHeaderState == HeaderState.SEARCH) {
                     stopSearchThread();
                     final TmfFilterAndNode filter = new TmfFilterAndNode(null);
-                    for (final TableColumn column : fTable.getColumns()) {
-                        final Object filterObj = column.getData(Key.SEARCH_OBJ);
+                    for (final TableColumn col : fTable.getColumns()) {
+                        final Object filterObj = col.getData(Key.SEARCH_OBJ);
                         if (filterObj instanceof ITmfFilterTreeNode) {
                             filter.addChild((ITmfFilterTreeNode) filterObj);
                         }
@@ -1048,8 +1048,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                 } else if (fHeaderState == HeaderState.FILTER) {
                     final TmfFilterAndNode filter = new TmfFilterAndNode(null);
-                    for (final TableColumn column : fTable.getColumns()) {
-                        final Object filterObj = column.getData(Key.FILTER_OBJ);
+                    for (final TableColumn col : fTable.getColumns()) {
+                        final Object filterObj = col.getData(Key.FILTER_OBJ);
                         if (filterObj instanceof ITmfFilterTreeNode) {
                             filter.addChild((ITmfFilterTreeNode) filterObj);
                         }

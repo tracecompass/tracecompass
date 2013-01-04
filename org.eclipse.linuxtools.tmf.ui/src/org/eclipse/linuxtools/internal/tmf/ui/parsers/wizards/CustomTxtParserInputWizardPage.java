@@ -496,8 +496,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 selectedLine.dispose();
             }
             if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
-                IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-                InputLine inputLine = (InputLine) selection.getFirstElement();
+                IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+                InputLine inputLine = (InputLine) sel.getFirstElement();
                 selectedLine = new Line(lineContainer, getName(inputLine), inputLine);
                 lineContainer.layout();
                 lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
@@ -593,9 +593,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private String getSelectionText() {
         if (this.selection instanceof IStructuredSelection) {
-            Object selection = ((IStructuredSelection)this.selection).getFirstElement();
-            if (selection instanceof IFile) {
-                IFile file = (IFile)selection;
+            Object sel = ((IStructuredSelection) this.selection).getFirstElement();
+            if (sel instanceof IFile) {
+                IFile file = (IFile)sel;
                 BufferedReader reader = null;
                 try {
                     reader = new BufferedReader(new InputStreamReader(file.getContents()));
@@ -756,7 +756,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                     }
                                 }
                             }
-                            if (! processed) {
+                            if (!processed && currentInput != null) {
                                 matcher = currentInput.getPattern().matcher(log);
                                 if (matcher.find()) {
                                     inputText.setStyleRange(new StyleRange(rawPos, length,
@@ -1287,17 +1287,17 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
             inputLine.columns = new ArrayList<InputData>(inputs.size());
             for (int i = 0; i < inputs.size(); i++) {
-                InputGroup group = inputs.get(i);
+                InputGroup grp = inputs.get(i);
                 InputData inputData = new InputData();
-                if (group.tagCombo.getText().equals(CustomTraceDefinition.TAG_OTHER)) {
-                    inputData.name = group.tagText.getText().trim();
+                if (grp.tagCombo.getText().equals(CustomTraceDefinition.TAG_OTHER)) {
+                    inputData.name = grp.tagText.getText().trim();
                 } else {
-                    inputData.name = group.tagCombo.getText();
-                    if (group.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
-                        inputData.format = group.tagText.getText().trim();
+                    inputData.name = grp.tagCombo.getText();
+                    if (grp.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                        inputData.format = grp.tagText.getText().trim();
                     }
                 }
-                inputData.action = group.actionCombo.getSelectionIndex();
+                inputData.action = grp.actionCombo.getSelectionIndex();
                 inputLine.columns.add(inputData);
             }
         }

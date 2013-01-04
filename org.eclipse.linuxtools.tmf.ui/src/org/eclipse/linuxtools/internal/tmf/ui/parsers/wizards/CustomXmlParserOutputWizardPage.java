@@ -124,8 +124,8 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
         super.dispose();
     }
 
-    private void loadDefinition(final CustomTraceDefinition definition) {
-        for (final OutputColumn outputColumn : definition.outputs) {
+    private void loadDefinition(final CustomTraceDefinition def) {
+        for (final OutputColumn outputColumn : def.outputs) {
             final Output output = new Output(outputsContainer, outputColumn.name);
             outputs.add(output);
         }

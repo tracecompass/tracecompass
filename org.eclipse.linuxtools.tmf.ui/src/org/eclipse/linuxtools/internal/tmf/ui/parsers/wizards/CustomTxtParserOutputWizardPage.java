@@ -123,8 +123,8 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         super.dispose();
     }
 
-    private void loadDefinition(final CustomTxtTraceDefinition definition) {
-        for (final OutputColumn outputColumn : definition.outputs) {
+    private void loadDefinition(final CustomTxtTraceDefinition def) {
+        for (final OutputColumn outputColumn : def.outputs) {
             final Output output = new Output(outputsContainer, outputColumn.name);
             outputs.add(output);
         }

@@ -68,8 +68,8 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
     }
 
     @Override
-    public void init(IWorkbench workbench, IStructuredSelection selection) {
-        this.selection = selection;
+    public void init(IWorkbench workbench, IStructuredSelection sel) {
+        this.selection = sel;
     }
 
 }

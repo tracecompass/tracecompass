@@ -1762,9 +1762,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 redraw();
                 _dragState = DRAG_NONE;
             } else if (e.button == 3 && DRAG_ZOOM == _dragState) {
-                Point size = getCtrlSize();
                 int nameWidth = _timeProvider.getNameSpace();
-                int x = e.x - nameWidth;
                 if (Math.max(_dragX, _dragX0) > nameWidth && _dragX != _dragX0) {
                     long time0 = getTimeAtX(_dragX0);
                     long time1 = getTimeAtX(_dragX);

@@ -313,7 +313,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
                             }
                         }
                     }
-                    if (! processed) {
+                    if (!processed && currentInput != null) {
                         final Matcher matcher = currentInput.getPattern().matcher(line);
                         if (matcher.find()) {
                             event.processGroups(currentInput, matcher);
