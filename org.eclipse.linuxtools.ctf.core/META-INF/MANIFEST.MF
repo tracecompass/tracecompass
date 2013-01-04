@@ -15,6 +15,7 @@ Export-Package: org.eclipse.linuxtools.ctf.core.event,
  org.eclipse.linuxtools.ctf.core.event.types,
  org.eclipse.linuxtools.ctf.core.trace,
  org.eclipse.linuxtools.internal.ctf.core;x-internal:=true,
+ org.eclipse.linuxtools.internal.ctf.core.event;x-internal:=true,
  org.eclipse.linuxtools.internal.ctf.core.event.metadata;x-internal:=true,
  org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions;x-internal:=true,
  org.eclipse.linuxtools.internal.ctf.core.trace;x-internal:=true

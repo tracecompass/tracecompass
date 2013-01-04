@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 
+import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
+import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.IOStructGen;
 import org.junit.Test;
 
@@ -386,6 +389,11 @@ public class IOstructgenTest {
         createDummyTrace(allDressedTSDL);
         CTFTrace trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
+
+        HashMap<Long, IEventDeclaration> events = trace.getEvents(0L);
+        final EventDeclaration eventDeclaration = (EventDeclaration) events.get(2L);
+        assertEquals("http://example.com/path_to_model?q=ust_tests_demo:done",
+                eventDeclaration.getCustomAttribute("model.emf.uri"));
     }
 
 }

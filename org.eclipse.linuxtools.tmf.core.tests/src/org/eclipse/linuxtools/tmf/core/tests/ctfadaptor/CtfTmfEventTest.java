@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012-2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,6 +16,9 @@ package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.Set;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
@@ -208,6 +211,19 @@ public class CtfTmfEventTest {
         assertEquals(reference,"channel0_1"); //$NON-NLS-1$
         assertEquals(source, "1"); //$NON-NLS-1$
         assertEquals(type.toString(), "lttng_statedump_vm_map"); //$NON-NLS-1$
+    }
+
+    /**
+     * Test the custom CTF attributes methods. The test trace doesn't have any,
+     * so the list of attributes should be empty.
+     */
+    @Test
+    public void testCustomAttributes() {
+        Set<String> attributes = fixture.listCustomAttributes();
+        assertEquals(0, attributes.size());
+
+        String attrib = fixture.getCustomAttribute("bozo"); //$NON-NLS-1$
+        assertNull(attrib);
     }
 
     /**

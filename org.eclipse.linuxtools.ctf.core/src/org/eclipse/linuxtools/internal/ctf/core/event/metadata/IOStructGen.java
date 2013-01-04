@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011-2013 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors: Matthew Khouzam - Initial Design and Grammar
  * Contributors: Francis Giraldeau - Initial API and implementation
+ * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.ctf.core.event.metadata;
@@ -24,7 +25,6 @@ import java.util.UUID;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
-import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
@@ -38,6 +38,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
+import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 
 /**
@@ -807,8 +808,9 @@ public class IOStructGen {
             long logLevel = parseUnaryInteger((CommonTree) rightNode.getChild(0));
             event.setLogLevel(logLevel);
         } else {
-            /* Unknown event attribute, we'll simply ignore it */
-            // FIXME log this?
+            /* Custom event attribute, we'll add it to the attributes map */
+            String right = parseUnaryString((CommonTree) rightNode.getChild(0));
+            event.setCustomAttribute(left, right);
         }
     }
 

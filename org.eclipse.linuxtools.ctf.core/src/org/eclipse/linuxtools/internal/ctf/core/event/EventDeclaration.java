@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011-2013 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -10,8 +10,14 @@
  * Contributors: Simon Marchi    - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event;
+package org.eclipse.linuxtools.internal.ctf.core.event;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
@@ -20,7 +26,7 @@ import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
  * Representation of one type of event. A bit like "int" or "long" but for trace
  * events.
  */
-public class EventDeclaration {
+public class EventDeclaration implements IEventDeclaration {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -56,6 +62,9 @@ public class EventDeclaration {
      */
     private long logLevel;
 
+    /** Map of this event type's custom CTF attributes */
+    private final Map<String, String> customAttributes = new HashMap<String, String>();
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -64,20 +73,15 @@ public class EventDeclaration {
      * Default constructor. Use the setters afterwards to set the fields
      * accordingly.
      */
-    public EventDeclaration() {}
+    public EventDeclaration() {
+    }
 
-    /**
-     * Creates an instance of EventDefinition corresponding to this declaration.
-     *
-     * @param streamInputReader
-     *            The StreamInputReader for which this definition is created.
-     * @return A new EventDefinition.
-     */
+    @Override
     public EventDefinition createDefinition(StreamInputReader streamInputReader) {
         EventDefinition event = new EventDefinition(this, streamInputReader);
 
         if (context != null) {
-            event.setContext( context.createDefinition(event, "context")); //$NON-NLS-1$
+            event.setContext(context.createDefinition(event, "context")); //$NON-NLS-1$
         }
 
         if (this.fields != null) {
@@ -90,9 +94,10 @@ public class EventDeclaration {
     /**
      * Creates a "lost" event. This is a synthetic event that is there to show
      * that there should be something there.
+     *
      * @return the lost event
      */
-    public synchronized static EventDeclaration getLostEventDeclaration(){
+    public synchronized static EventDeclaration getLostEventDeclaration() {
         EventDeclaration lostEvent = new EventDeclaration();
         lostEvent.fields = new StructDeclaration(1);
         lostEvent.id = -1L;
@@ -106,23 +111,24 @@ public class EventDeclaration {
 
     /**
      * Sets a name for an event Declaration
-     * @param name the name
+     *
+     * @param name
+     *            the name
      */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Gets the name of en event declaration
-     * @return the name
-     */
+    @Override
     public String getName() {
         return name;
     }
 
     /**
      * Sets the context for an event declaration (see CTF specification)
-     * @param context the context in structdeclaration format
+     *
+     * @param context
+     *            the context in structdeclaration format
      */
     public void setContext(StructDeclaration context) {
         this.context = context;
@@ -130,65 +136,58 @@ public class EventDeclaration {
 
     /**
      * Sets the fields of an event declaration
-     * @param fields the fields in structdeclaration format
+     *
+     * @param fields
+     *            the fields in structdeclaration format
      */
     public void setFields(StructDeclaration fields) {
         this.fields = fields;
     }
 
-    /**
-     * Gets the fields of an event declaration
-     * @return fields the fields in structdeclaration format
-     */
+    @Override
     public StructDeclaration getFields() {
         return fields;
     }
 
-    /**
-     * Gets the context of an event declaration
-     * @return context the fields in structdeclaration format
-     */
+    @Override
     public StructDeclaration getContext() {
         return context;
     }
 
     /**
      * Sets the id of am event declaration
-     * @param id the id
+     *
+     * @param id
+     *            the id
      */
     public void setId(long id) {
         this.id = id;
     }
 
-    /**
-     * Gets the id of am event declaration return id the id
-     *
-     * @return The EventDeclaration ID
-     */
+    @Override
     public Long getId() {
         return id;
     }
 
     /**
      * Sets the stream of am event declaration
-     * @param stream the stream
+     *
+     * @param stream
+     *            the stream
      * @since 2.0
      */
     public void setStream(Stream stream) {
         this.stream = stream;
     }
 
-    /**
-     * Gets the stream of am event declaration
-     * @return stream the stream
-     * @since 2.0
-     */
+    @Override
     public Stream getStream() {
         return stream;
     }
 
     /**
      * Is the name of the event declaration set
+     *
      * @return is the name set?
      */
     public boolean nameIsSet() {
@@ -197,6 +196,7 @@ public class EventDeclaration {
 
     /**
      * Is the context set
+     *
      * @return is the context set
      */
     public boolean contextIsSet() {
@@ -205,6 +205,7 @@ public class EventDeclaration {
 
     /**
      * Is a field set?
+     *
      * @return Is the field set?
      */
     public boolean fieldsIsSet() {
@@ -213,6 +214,7 @@ public class EventDeclaration {
 
     /**
      * Is the id set?
+     *
      * @return is the id set?
      */
     public boolean idIsSet() {
@@ -221,26 +223,49 @@ public class EventDeclaration {
 
     /**
      * Is the stream set?
+     *
      * @return is the stream set?
      */
     public boolean streamIsSet() {
         return stream != null;
     }
 
-    /**
-     * What is the log level of this event
-     * @return the log level.
-     */
+    @Override
     public long getLogLevel() {
         return logLevel;
     }
 
     /**
      * Sets the log level
-     * @param level the log level
+     *
+     * @param level
+     *            the log level
      */
-    public void setLogLevel( long level){
+    public void setLogLevel(long level) {
         logLevel = level;
+    }
+
+    @Override
+    public Set<String> getCustomAttributes() {
+        return customAttributes.keySet();
+    }
+
+    @Override
+    public String getCustomAttribute(String key) {
+        return customAttributes.get(key);
+    }
+
+    /**
+     * Sets a custom attribute value.
+     *
+     * @param key
+     *            the key of the attribute
+     * @param value
+     *            the value of the attribute
+     * @since 2.0
+     */
+    public void setCustomAttribute(String key, String value) {
+        customAttributes.put(key, value);
     }
 
     // ------------------------------------------------------------------------
@@ -294,6 +319,9 @@ public class EventDeclaration {
         } else if (!stream.equals(other.stream)) {
             return false;
         }
+        if (!customAttributes.equals(other.customAttributes)) {
+            return false;
+        }
         return true;
     }
 
@@ -307,6 +335,7 @@ public class EventDeclaration {
         result = (prime * result) + ((id == null) ? 0 : id.hashCode());
         result = (prime * result) + ((name == null) ? 0 : name.hashCode());
         result = (prime * result) + ((stream == null) ? 0 : stream.hashCode());
+        result = (prime * result) + ((customAttributes == null) ? 0 : customAttributes.hashCode());
         return result;
     }
 

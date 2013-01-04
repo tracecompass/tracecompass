@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011-2013 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -37,8 +37,8 @@ import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
-import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
@@ -147,7 +147,7 @@ public class CTFTrace implements IDefinitionScope {
                                                                                          // fieldJavadoc
 
     /** map of all the event types */
-    private final Map<Long,HashMap<Long, EventDeclaration>> eventDecs = new HashMap<Long, HashMap<Long,EventDeclaration>>();
+    private final Map<Long,HashMap<Long, IEventDeclaration>> eventDecs = new HashMap<Long, HashMap<Long,IEventDeclaration>>();
     /** map of all the event types */
     private final Map<StreamInput,HashMap<Long, EventDefinition>> eventDefs = new HashMap<StreamInput, HashMap<Long,EventDefinition>>();
     /** map of all the indexes */
@@ -223,12 +223,12 @@ public class CTFTrace implements IDefinitionScope {
                 /*
                  * Copy the events
                  */
-                Iterator<Entry<Long, EventDeclaration>> it = s.getStream()
+                Iterator<Entry<Long, IEventDeclaration>> it = s.getStream()
                         .getEvents().entrySet().iterator();
                 while (it.hasNext()) {
-                    Map.Entry<Long, EventDeclaration> pairs = it.next();
+                    Entry<Long, IEventDeclaration> pairs = it.next();
                     Long eventNum = pairs.getKey();
-                    EventDeclaration eventDec = pairs.getValue();
+                    IEventDeclaration eventDec = pairs.getValue();
                     getEvents(s.getStream().getId()).put(eventNum, eventDec);
                 }
 
@@ -268,7 +268,7 @@ public class CTFTrace implements IDefinitionScope {
      *            The ID of the stream from which to read
      * @return The Hash map with the event declarations
      */
-    public HashMap<Long, EventDeclaration> getEvents(Long streamId) {
+    public HashMap<Long, IEventDeclaration> getEvents(Long streamId) {
         return eventDecs.get(streamId);
     }
 
@@ -305,8 +305,9 @@ public class CTFTrace implements IDefinitionScope {
      * @param id
      *            the ID of the event
      * @return the event declaration
+     * @since 2.0
      */
-    public EventDeclaration getEventType(long streamId, long id) {
+    public IEventDeclaration getEventType(long streamId, long id) {
         return getEvents(streamId).get(id);
     }
 
@@ -646,7 +647,7 @@ public class CTFTrace implements IDefinitionScope {
 
         /* It should be ok now. */
         streams.put(stream.getId(), stream);
-        eventDecs.put(stream.getId(), new HashMap<Long,EventDeclaration>());
+        eventDecs.put(stream.getId(), new HashMap<Long,IEventDeclaration>());
     }
 
     /**
@@ -811,10 +812,10 @@ public class CTFTrace implements IDefinitionScope {
      * @param id the id of a stream
      * @return the hashmap containing events.
      */
-    public HashMap<Long, EventDeclaration> createEvents(Long id){
-        HashMap<Long, EventDeclaration> value = eventDecs.get(id);
+    public HashMap<Long, IEventDeclaration> createEvents(Long id){
+        HashMap<Long, IEventDeclaration> value = eventDecs.get(id);
         if( value == null ) {
-            value = new HashMap<Long, EventDeclaration>();
+            value = new HashMap<Long, IEventDeclaration>();
             eventDecs.put(id, value);
         }
         return value;

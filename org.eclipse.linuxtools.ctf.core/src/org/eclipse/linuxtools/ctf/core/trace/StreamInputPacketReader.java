@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011-2013 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -17,8 +17,8 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.SimpleDatatypeDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
+import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
@@ -136,9 +137,9 @@ public class StreamInputPacketReader implements IDefinitionScope {
         }
 
         /* Create event definitions */
-        Collection<EventDeclaration> eventDecls = streamInputReader.getStreamInput().getStream().getEvents().values();
+        Collection<IEventDeclaration> eventDecls = streamInputReader.getStreamInput().getStream().getEvents().values();
 
-        for (EventDeclaration event : eventDecls) {
+        for (IEventDeclaration event : eventDecls) {
             if (!events.containsKey(event.getId())) {
                 EventDefinition eventDef = event.createDefinition(streamInputReader);
                 events.put(event.getId(), eventDef);

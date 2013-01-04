@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011-2013 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 
@@ -53,7 +53,7 @@ public class Stream {
     /**
      * Maps event ids to events
      */
-    private HashMap<Long, EventDeclaration> events = new HashMap<Long, EventDeclaration>();
+    private HashMap<Long, IEventDeclaration> events = new HashMap<Long, IEventDeclaration>();
 
     /**
      * The inputs associated to this stream
@@ -196,7 +196,7 @@ public class Stream {
      *
      * @return all the event declarations for this stream, using the id as a key for the hashmap.
      */
-    public HashMap<Long, EventDeclaration> getEvents() {
+    public HashMap<Long, IEventDeclaration> getEvents() {
         return events;
     }
 
@@ -219,7 +219,7 @@ public class Stream {
      *             If there was a problem reading the event or adding it to the
      *             stream
      */
-    public void addEvent(EventDeclaration event) throws ParseException {
+    public void addEvent(IEventDeclaration event) throws ParseException {
         /*
          * If there is an event without id (the null key), it must be the only
          * one

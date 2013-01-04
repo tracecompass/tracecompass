@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.nio.channels.FileChannel;
 import java.util.Set;
 
-import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
@@ -16,6 +15,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
