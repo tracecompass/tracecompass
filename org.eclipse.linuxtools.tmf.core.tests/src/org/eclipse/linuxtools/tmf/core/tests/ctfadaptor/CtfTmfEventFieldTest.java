@@ -123,7 +123,7 @@ public class CtfTmfEventFieldTest {
         CtfTmfEventField result;
         result = CtfTmfEventField.parseField(fixture.lookupArray(ARRAY), NAME);
         String result2 = CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test={ 2, 2}"); //$NON-NLS-1$
+        assertEquals( result2, "test=[2, 2]"); //$NON-NLS-1$
     }
 
     /**
@@ -145,7 +145,18 @@ public class CtfTmfEventFieldTest {
         Definition fieldDef = fixture.lookupDefinition(SEQ);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         String result2 =CtfTmfEventField.copyFrom(result).toString();
-        assertEquals( result2, "test={ 2, 2}"); //$NON-NLS-1$
+        assertEquals( result2, "test=[2, 2]"); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test.
+     */
+    @Test
+    public void testParseField_sequence_value() {
+        Definition fieldDef = fixture.lookupDefinition(SEQ);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        String result2 = CtfTmfEventField.copyFrom(result).getValue().toString();
+        assertEquals( result2, "[2, 2]"); //$NON-NLS-1$
     }
 
     /**
