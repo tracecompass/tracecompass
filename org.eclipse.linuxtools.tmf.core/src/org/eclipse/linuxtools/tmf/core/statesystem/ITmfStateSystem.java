@@ -54,9 +54,7 @@ public interface ITmfStateSystem {
      *
      * This method blocks the calling thread until the history back-end is done
      * building. If it's already built (ie, opening a pre-existing file) this
-     * should return immediately. It's an alternative to listening to the
-     * {@link org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted}
-     * signal.
+     * should return immediately.
      *
      * @return If the build was successful. If false is returned, this either
      *         means there was a problem during the build, or it got cancelled

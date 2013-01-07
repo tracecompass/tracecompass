@@ -96,7 +96,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         final File htFile = new File(supplDirectory + File.separator + STATS_STATE_FILENAME);
         final IStateChangeInput htInput = new StatsStateProvider(trace);
 
-        this.stats = StateSystemManager.loadStateHistory(htFile, htInput, STATE_ID, false);
+        this.stats = StateSystemManager.loadStateHistory(htFile, htInput, false);
     }
 
     /**
@@ -114,7 +114,7 @@ public class TmfStateStatistics implements ITmfStatistics {
     public TmfStateStatistics(ITmfTrace trace, File historyFile) throws TmfTraceException {
         this.trace = trace;
         final IStateChangeInput htInput = new StatsStateProvider(trace);
-        this.stats = StateSystemManager.loadStateHistory(historyFile, htInput, STATE_ID, true);
+        this.stats = StateSystemManager.loadStateHistory(historyFile, htInput, true);
     }
 
     // ------------------------------------------------------------------------

@@ -20,10 +20,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.core.signal.TmfStateSystemBuildCompleted;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
@@ -48,7 +46,6 @@ public class HistoryBuilder extends TmfComponent {
     private final IStateChangeInput sci;
     private final StateSystem ss;
     private final IStateHistoryBackend hb;
-    private final String id;
     private boolean started = true; /* Don't handle signals until we're ready */
 
     /**
@@ -58,10 +55,6 @@ public class HistoryBuilder extends TmfComponent {
      *            The input plugin to use. This is required.
      * @param backend
      *            The backend storage to use.
-     * @param id
-     *            The ID (or name) of the state system that will be built. This
-     *            can be useful in cases where there are more than 1 state
-     *            system per trace/experiment.
      * @param buildManually
      *            Should we build this history in-band or not. True means we
      *            will start the building ourselves and block the caller until
@@ -73,14 +66,13 @@ public class HistoryBuilder extends TmfComponent {
      *             backend)
      */
     public HistoryBuilder(IStateChangeInput stateChangeInput,
-            IStateHistoryBackend backend, String id, boolean buildManually)
+            IStateHistoryBackend backend, boolean buildManually)
             throws IOException {
         if (stateChangeInput == null || backend == null) {
             throw new IllegalArgumentException();
         }
         sci = stateChangeInput;
         hb = backend;
-        this.id = id;
         ss = new StateSystem(hb, true);
 
         sci.assignTargetStateSystem(ss);
@@ -224,18 +216,10 @@ public class HistoryBuilder extends TmfComponent {
     }
 
     void close(boolean deleteFiles) {
-        TmfSignal doneSig;
-
         sci.dispose();
         if (deleteFiles) {
             hb.removeFiles();
-            /* We won't broadcast the signal if the request was cancelled */
-        } else {
-            /* Broadcast the signal saying the history is done building */
-            doneSig = new TmfStateSystemBuildCompleted(this, sci.getTrace(), id);
-            TmfSignalManager.dispatchSignal(doneSig);
         }
-
         dispose();
     }
 }
