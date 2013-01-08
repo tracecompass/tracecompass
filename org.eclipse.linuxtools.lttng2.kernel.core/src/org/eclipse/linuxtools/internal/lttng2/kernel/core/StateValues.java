@@ -32,10 +32,11 @@ public class StateValues {
 
     /* Process status */
     public static final int PROCESS_STATUS_UNKNOWN = 0;
-    public static final int PROCESS_STATUS_WAIT = 1;
+    public static final int PROCESS_STATUS_WAIT_BLOCKED = 1;
     public static final int PROCESS_STATUS_RUN_USERMODE = 2;
     public static final int PROCESS_STATUS_RUN_SYSCALL = 3;
     public static final int PROCESS_STATUS_INTERRUPTED = 4;
+    public static final int PROCESS_STATUS_WAIT_FOR_CPU = 5;
 
     /* SoftIRQ-specific stuff. -1: null/disabled, >= 0: running on that CPU */
     public static final int SOFT_IRQ_RAISED = -2;

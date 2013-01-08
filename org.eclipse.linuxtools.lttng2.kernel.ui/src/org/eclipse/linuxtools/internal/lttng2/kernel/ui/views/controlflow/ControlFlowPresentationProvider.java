@@ -42,11 +42,12 @@ import org.eclipse.swt.graphics.Rectangle;
 public class ControlFlowPresentationProvider extends TimeGraphPresentationProvider {
 
     private enum State {
-        UNKNOWN     (new RGB(100, 100, 100)),
-        WAIT        (new RGB(200, 200, 0)),
-        USERMODE    (new RGB(0, 200, 0)),
-        SYSCALL     (new RGB(0, 0, 200)),
-        INTERRUPTED (new RGB(200, 100, 100));
+        UNKNOWN      (new RGB(100, 100, 100)),
+        WAIT_BLOCKED (new RGB(200, 200,   0)),
+        WAIT_FOR_CPU (new RGB(200, 100,   0)),
+        USERMODE     (new RGB(  0, 200,   0)),
+        SYSCALL      (new RGB(  0,   0, 200)),
+        INTERRUPTED  (new RGB(200,   0, 100));
 
         public final RGB rgb;
 
@@ -74,15 +75,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof ControlFlowEvent) {
             int status = ((ControlFlowEvent) event).getStatus();
-            if (status == StateValues.PROCESS_STATUS_WAIT) {
-                return State.WAIT.ordinal();
-            } else if (status == StateValues.PROCESS_STATUS_RUN_USERMODE) {
-                return State.USERMODE.ordinal();
-            } else if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
-                return State.SYSCALL.ordinal();
-            } else if (status == StateValues.PROCESS_STATUS_INTERRUPTED) {
-                return State.INTERRUPTED.ordinal();
-            }
+            return getMatchingState(status).ordinal();
         }
         return State.UNKNOWN.ordinal();
     }
@@ -91,17 +84,26 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     public String getEventName(ITimeEvent event) {
         if (event instanceof ControlFlowEvent) {
             int status = ((ControlFlowEvent) event).getStatus();
-            if (status == StateValues.PROCESS_STATUS_WAIT) {
-                return State.WAIT.toString();
-            } else if (status == StateValues.PROCESS_STATUS_RUN_USERMODE) {
-                return State.USERMODE.toString();
-            } else if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
-                return State.SYSCALL.toString();
-            } else if (status == StateValues.PROCESS_STATUS_INTERRUPTED) {
-                return State.INTERRUPTED.toString();
-            }
+            return getMatchingState(status).toString();
         }
         return State.UNKNOWN.toString();
+    }
+
+    private static State getMatchingState(int status) {
+        switch (status) {
+        case StateValues.PROCESS_STATUS_WAIT_BLOCKED:
+            return State.WAIT_BLOCKED;
+        case StateValues.PROCESS_STATUS_WAIT_FOR_CPU:
+            return State.WAIT_FOR_CPU;
+        case StateValues.PROCESS_STATUS_RUN_USERMODE:
+            return State.USERMODE;
+        case StateValues.PROCESS_STATUS_RUN_SYSCALL:
+            return State.SYSCALL;
+        case StateValues.PROCESS_STATUS_INTERRUPTED:
+            return State.INTERRUPTED;
+        default:
+            return State.UNKNOWN;
+        }
     }
 
     @Override
