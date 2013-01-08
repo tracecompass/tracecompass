@@ -83,8 +83,8 @@ public class RequestBenchmark extends TmfEventRequest {
     }
 
     @Override
-    public void handleData(final ITmfEvent event) {
-        super.handleData(event);
+    public synchronized void handleEvent(final ITmfEvent event) {
+        super.handleEvent(event);
         nbEvent++;
 
     }
@@ -92,7 +92,7 @@ public class RequestBenchmark extends TmfEventRequest {
     static long prev;
     static long done = 0;
     @Override
-    public void handleCompleted() {
+    public synchronized void handleCompleted() {
         final long next = System.nanoTime();
         double val = next - prev;
         final int nbEvent2 = nbEvent;

@@ -19,9 +19,9 @@ import org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 /**
  * Test suite for the TmfRequestExecutor class.
  */
-@SuppressWarnings({ "nls" })
+@SuppressWarnings("nls")
 public class TmfRequestExecutorTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -145,7 +145,7 @@ public class TmfRequestExecutorTest extends TestCase {
         public void broadcast(TmfSignal signal) {
         }
         @Override
-        public void sendRequest(ITmfDataRequest request) {
+        public void sendRequest(ITmfRequest request) {
         }
         @Override
         public void fireRequest() {
@@ -159,18 +159,18 @@ public class TmfRequestExecutorTest extends TestCase {
             return context.getRank() >= 0 ? fEvent : null;
         }
         @Override
-        public ITmfContext armRequest(ITmfDataRequest request) {
+        public ITmfContext armRequest(ITmfRequest request) {
             return new MyContext(request.getNbRequested());
         }
 	}
 
 	// Dummy request
-    private static class MyRequest extends TmfDataRequest {
-        public MyRequest(ExecutionType priority, int requested) {
-            super(ITmfEvent.class, 0, requested, priority);
+    private static class MyRequest extends TmfRequest {
+        public MyRequest(TmfRequestPriority priority, int requested) {
+            super(TmfTimeRange.ETERNITY, 0, requested, priority);
         }
         @Override
-        public void done() {
+        public synchronized void done() {
             synchronized (monitor) {
                 monitor.notifyAll();
             }
@@ -179,7 +179,7 @@ public class TmfRequestExecutorTest extends TestCase {
 
     // Dummy thread
     private static class MyThread extends TmfEventThread {
-        public MyThread(TmfDataProvider provider, ITmfDataRequest request) {
+        public MyThread(TmfDataProvider provider, ITmfRequest request) {
             super(provider, request);
         }
     }
@@ -191,11 +191,11 @@ public class TmfRequestExecutorTest extends TestCase {
 	 */
 	public void testExecute() {
         MyProvider provider = new MyProvider();
-        MyRequest  request1 = new MyRequest(ExecutionType.BACKGROUND, Integer.MAX_VALUE /  5);
+        MyRequest  request1 = new MyRequest(ITmfRequest.TmfRequestPriority.NORMAL, Integer.MAX_VALUE /  50);
         MyThread   thread1  = new MyThread(provider, request1);
-        MyRequest  request2 = new MyRequest(ExecutionType.FOREGROUND, Integer.MAX_VALUE / 10);
+        MyRequest  request2 = new MyRequest(ITmfRequest.TmfRequestPriority.HIGH, Integer.MAX_VALUE / 100);
         MyThread   thread2  = new MyThread(provider, request2);
-        MyRequest  request3 = new MyRequest(ExecutionType.FOREGROUND, Integer.MAX_VALUE / 10);
+        MyRequest  request3 = new MyRequest(ITmfRequest.TmfRequestPriority.HIGH, Integer.MAX_VALUE / 100);
         MyThread   thread3  = new MyThread(provider, request3);
 
         // Start thread1

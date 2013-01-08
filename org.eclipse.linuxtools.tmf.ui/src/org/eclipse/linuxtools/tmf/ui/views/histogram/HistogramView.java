@@ -56,6 +56,7 @@ import org.eclipse.ui.IEditorPart;
  * @version 2.0
  * @author Francois Chouinard
  */
+@SuppressWarnings("deprecation")
 public class HistogramView extends TmfView {
 
     // ------------------------------------------------------------------------

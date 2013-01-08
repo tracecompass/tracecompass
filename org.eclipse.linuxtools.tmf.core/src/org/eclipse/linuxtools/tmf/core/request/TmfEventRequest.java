@@ -22,13 +22,14 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * @version 1.0
  * @author Francois Chouinard
  */
+@SuppressWarnings("deprecation")
 public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEventRequest {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final TmfTimeRange fRange;	// The requested events time range
+    private final TmfRangeFilter fRangeFilter;  // The requested events time range
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -157,7 +158,8 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
      */
     public TmfEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
     	super(dataType, index, nbRequested, blockSize, priority);
-    	fRange = range;
+    	fRangeFilter = new TmfRangeFilter(range);
+    	addEventFilter(fRangeFilter);
 
         if (TmfCoreTracer.isRequestTraced()) {
             String type = getClass().getName();
@@ -181,7 +183,7 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
      */
     @Override
 	public TmfTimeRange getRange() {
-        return fRange;
+        return fRangeFilter.getTimeRange();
     }
 
     // ------------------------------------------------------------------------
@@ -213,7 +215,7 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
     public boolean equals(Object other) {
     	if (other instanceof TmfEventRequest) {
     		TmfEventRequest request = (TmfEventRequest) other;
-    		return super.equals(other) && request.fRange.equals(fRange);
+    		return super.equals(other) && request.fRangeFilter.getTimeRange().equals(fRangeFilter.getTimeRange());
     	}
     	return false;
     }

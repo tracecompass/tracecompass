@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfEventThread;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest.TmfRequestPriority;
 
 /**
  * A simple, straightforward request executor.
@@ -41,7 +41,7 @@ public class TmfRequestExecutor implements Executor {
 
 	// The request queues
 	private final Queue<TmfEventThread> fHighPriorityTasks = new ArrayBlockingQueue<TmfEventThread>(100);
-    private final Queue<TmfEventThread> fLowPriorityTasks  = new ArrayBlockingQueue<TmfEventThread>(100);
+    private final Queue<TmfEventThread> fNormPriorityTasks = new ArrayBlockingQueue<TmfEventThread>(100);
 
 	// The tasks
 	private TmfEventThread fActiveTask;
@@ -81,7 +81,7 @@ public class TmfRequestExecutor implements Executor {
 	 */
     @Deprecated
 	public synchronized int getNbPendingRequests() {
-		return fHighPriorityTasks.size() + fLowPriorityTasks.size();
+		return fHighPriorityTasks.size() + fNormPriorityTasks.size();
 	}
 
 	/**
@@ -128,13 +128,13 @@ public class TmfRequestExecutor implements Executor {
         };
 
         // Add the thread to the appropriate queue
-        ExecutionType priority = thread.getExecType();
-        (priority == ExecutionType.FOREGROUND ? fHighPriorityTasks : fLowPriorityTasks).offer(wrapper);
+        TmfRequestPriority priority = thread.getExecType();
+        (priority == TmfRequestPriority.HIGH ? fHighPriorityTasks : fNormPriorityTasks).offer(wrapper);
 
         // Schedule or preempt as appropriate
         if (fActiveTask == null) {
             scheduleNext();
-        } else if (priority == ExecutionType.FOREGROUND && priority != fActiveTask.getExecType()) {
+        } else if (priority == TmfRequestPriority.HIGH && priority != fActiveTask.getExecType()) {
             fActiveTask.getThread().suspend();
             fSuspendedTask = fActiveTask;
             scheduleNext();
@@ -152,7 +152,7 @@ public class TmfRequestExecutor implements Executor {
 	                fActiveTask = fSuspendedTask;
 	                fSuspendedTask = null;
 	                fActiveTask.getThread().resume();
-	            } else if ((fActiveTask = fLowPriorityTasks.poll()) != null) {
+	            } else if ((fActiveTask = fNormPriorityTasks.poll()) != null) {
 	                fExecutor.execute(fActiveTask);
 	            }
 	        }

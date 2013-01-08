@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Francois Chouinard
  * <p>
  */
+@SuppressWarnings("deprecation")
 public class HistogramRequest extends TmfEventRequest {
 
     // ------------------------------------------------------------------------
@@ -81,6 +82,7 @@ public class HistogramRequest extends TmfEventRequest {
      * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
      */
     @Override
+    @SuppressWarnings("javadoc")
     public void handleData(ITmfEvent event) {
         super.handleData(event);
         if (event != null) {
@@ -95,7 +97,8 @@ public class HistogramRequest extends TmfEventRequest {
      * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleCompleted()
      */
     @Override
-    public void handleCompleted() {
+    @SuppressWarnings("javadoc")
+    public synchronized void handleCompleted() {
         fHistogram.complete();
         super.handleCompleted();
     }

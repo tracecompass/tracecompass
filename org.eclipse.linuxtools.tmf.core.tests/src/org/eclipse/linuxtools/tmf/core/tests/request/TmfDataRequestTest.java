@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
  * <p>
  * Test suite for the TmfDataRequest class.
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings({"nls","javadoc", "deprecation"})
 public class TmfDataRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------
@@ -53,7 +53,6 @@ public class TmfDataRequestTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		TmfDataRequest.reset();
 		fRequest1  = new TmfDataRequestStub(TmfEvent.class, 10, 100, 200);
 		fRequest2  = new TmfDataRequestStub(TmfEvent.class, 20, 100, 200);
 		fRequest3  = new TmfDataRequestStub(TmfEvent.class, 20, 200, 200);
@@ -72,7 +71,7 @@ public class TmfDataRequestTest extends TestCase {
 
 		TmfDataRequest request = new TmfDataRequestStub(TmfEvent.class, 10, 100, 200) {
 		    @Override
-			public void handleCompleted() {
+			public synchronized void handleCompleted() {
 		    	super.handleCompleted();
 		    	flags[0] = true;
 		    }
@@ -211,10 +210,10 @@ public class TmfDataRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() {
-        String expected1 = "[TmfDataRequest(0,TmfEvent,10,100,200)]";
-        String expected2 = "[TmfDataRequest(1,TmfEvent,20,100,200)]";
-        String expected3 = "[TmfDataRequest(2,TmfEvent,20,200,200)]";
-        String expected4 = "[TmfDataRequest(3,TmfEvent,20,200,300)]";
+        String expected1 = "[TmfDataRequest(" + fRequest1.getRequestId() + ",TmfEvent,10,100,200)]";
+        String expected2 = "[TmfDataRequest(" + fRequest2.getRequestId() + ",TmfEvent,20,100,200)]";
+        String expected3 = "[TmfDataRequest(" + fRequest3.getRequestId() + ",TmfEvent,20,200,200)]";
+        String expected4 = "[TmfDataRequest(" + fRequest4.getRequestId() + ",TmfEvent,20,200,300)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

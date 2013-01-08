@@ -27,8 +27,8 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfBlockFilter;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
@@ -424,7 +424,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getNbEvents()
      */
     @Override
-    public synchronized long getNbEvents() {
+    public long getNbEvents() {
         return fNbEvents;
     }
 
@@ -697,20 +697,20 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @since 2.0
      */
     @Override
-    public synchronized ITmfContext armRequest(final ITmfDataRequest request) {
+    public synchronized ITmfContext armRequest(final ITmfRequest request) {
         if (executorIsShutdown()) {
             return null;
         }
-        if ((request instanceof ITmfEventRequest)
-            && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest) request).getRange().getStartTime())
-            && (request.getIndex() == 0))
-        {
-            final ITmfContext context = seekEvent(((ITmfEventRequest) request).getRange().getStartTime());
-            ((ITmfEventRequest) request).setStartIndex((int) context.getRank());
-            return context;
 
+        ITmfTimestamp startTime = request.getTimeRange().getStartTime();
+        long startindex = request.getStartIndex();
+        if (!TmfTimestamp.BIG_BANG.equals(startTime) && startindex == 0) {
+            final ITmfContext context = seekEvent(request.getTimeRange().getStartTime());
+            request.addEventFilter(new TmfBlockFilter(context.getRank(), request.getNbRequested()));
+            return context;
         }
-        return seekEvent(request.getIndex());
+
+        return seekEvent(request.getStartIndex());
     }
 
     // ------------------------------------------------------------------------
@@ -829,7 +829,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      */
     @Override
     @SuppressWarnings("nls")
-    public synchronized String toString() {
+    public String toString() {
         return "TmfTrace [fPath=" + fPath + ", fCacheSize=" + fCacheSize
                 + ", fNbEvents=" + fNbEvents + ", fStartTime=" + fStartTime
                 + ", fEndTime=" + fEndTime + ", fStreamingInterval=" + fStreamingInterval + "]";

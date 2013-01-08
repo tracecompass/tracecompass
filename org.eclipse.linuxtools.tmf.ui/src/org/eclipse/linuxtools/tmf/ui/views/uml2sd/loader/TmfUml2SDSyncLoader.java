@@ -98,6 +98,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * @version 1.0
  * @author Bernd Hufmann
  */
+@SuppressWarnings("deprecation")
 public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, ISDFindProvider, ISDFilterProvider, ISDAdvancedPagingProvider, ISelectionListener  {
 
     // ------------------------------------------------------------------------
@@ -303,8 +304,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                  * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
                  */
                 @Override
-                public void handleData(ITmfEvent event) {
-                    super.handleData(event);
+                public synchronized void handleEvent(ITmfEvent event) {
+                    super.handleEvent(event);
 
                     ITmfSyncSequenceDiagramEvent sdEvent = getSequnceDiagramEvent(event);
 
@@ -375,7 +376,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                  * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleCompleted()
                  */
                 @Override
-                public void handleCompleted() {
+                public synchronized void handleCompleted() {
                     if (fEvents.isEmpty()) {
                         fFrame = new Frame();
                         fView.setFrameSync(fFrame);
@@ -1137,8 +1138,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             private final List<ITmfSyncSequenceDiagramEvent> fSdEvent = new ArrayList<ITmfSyncSequenceDiagramEvent>();
 
             @Override
-            public void handleData(ITmfEvent event) {
-                super.handleData(event);
+            public synchronized void handleEvent(ITmfEvent event) {
+                super.handleEvent(event);
 
                 ITmfSyncSequenceDiagramEvent sdEvent = getSequnceDiagramEvent(event);
 
@@ -1429,8 +1430,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
          * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.event.TmfData)
          */
         @Override
-        public void handleData(ITmfEvent event) {
-            super.handleData(event);
+        public synchronized void handleEvent(ITmfEvent event) {
+            super.handleEvent(event);
 
             if ((fMonitor!= null) && fMonitor.isCanceled()) {
                 super.cancel();

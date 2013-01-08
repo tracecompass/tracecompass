@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,7 +8,8 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Francois Chouinard - Replace background requests by pre-emptable requests
+ *   Francois Chouinard - Replace background requests by pre-emptible requests
+ *   Francois Chouinard - Rebased on TmfCoalescedRequest:s
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.component;
@@ -21,19 +22,18 @@ import java.util.concurrent.SynchronousQueue;
 import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfEventThread;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
-import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedDataRequest;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedRequest;
 import org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest.TmfRequestPriority;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 
 /**
- * An abstract base class that implements ITmfDataProvider.
+ * An abstract base class that implements ITmfEventProvider.
  * <p>
  * This abstract class implements the housekeeping methods to register/
  * de-register the event provider and to handle generically the event requests.
@@ -45,7 +45,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * @author Francois Chouinard
  * @version 1.1
  */
-public abstract class TmfDataProvider extends TmfComponent implements ITmfDataProvider {
+public abstract class TmfDataProvider extends TmfComponent implements ITmfEventProvider {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -83,6 +83,9 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
 
     private int fRequestPendingCounter = 0;
 
+    /** List of coalesced requests */
+    protected Vector<TmfCoalescedRequest> fPendingCoalescedRequests = new Vector<TmfCoalescedRequest>();
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -114,7 +117,6 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
         fSignalDepth = 0;
 
         fLogData = TmfCoreTracer.isEventTraced();
-//        fLogError = TmfCoreTracer.isErrorTraced();
 
         TmfProviderManager.register(fType, this);
     }
@@ -163,7 +165,6 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
         TmfProviderManager.deregister(fType, this);
         fExecutor.stop();
         super.dispose();
-        // if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "stopped");
     }
 
     // ------------------------------------------------------------------------
@@ -192,8 +193,14 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
     // ITmfRequestHandler
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider#sendRequest(org.eclipse.linuxtools.tmf.core.request.ITmfRequest)
+     */
+    /**
+     * @since 2.0
+     */
     @Override
-    public void sendRequest(final ITmfDataRequest request) {
+    public void sendRequest(final ITmfRequest request) {
         synchronized (fLock) {
             if (fSignalDepth > 0) {
                 coalesceDataRequest(request);
@@ -203,6 +210,9 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider#fireRequest()
+     */
     @Override
     public void fireRequest() {
         synchronized (fLock) {
@@ -210,7 +220,7 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
                 return;
             }
             if (fPendingCoalescedRequests.size() > 0) {
-                for (TmfDataRequest request : fPendingCoalescedRequests) {
+                for (ITmfRequest request : fPendingCoalescedRequests) {
                     dispatchRequest(request);
                 }
                 fPendingCoalescedRequests.clear();
@@ -251,21 +261,16 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
     // Coalescing (primitive test...)
     // ------------------------------------------------------------------------
 
-    /** List of coalesced requests */
-    protected Vector<TmfCoalescedDataRequest> fPendingCoalescedRequests = new Vector<TmfCoalescedDataRequest>();
-
     /**
      * Create a new request from an existing one, and add it to the coalesced
      * requests
      *
-     * @param request
-     *            The request to copy
+     * @param request The request to copy
+     * @since 2.0
      */
-    protected void newCoalescedDataRequest(ITmfDataRequest request) {
+    protected void newCoalescedDataRequest(ITmfRequest request) {
         synchronized (fLock) {
-            TmfCoalescedDataRequest coalescedRequest = new TmfCoalescedDataRequest(request.getDataType(), request.getIndex(),
-                    request.getNbRequested(), request.getBlockSize(), request.getExecType());
-            coalescedRequest.addRequest(request);
+            TmfCoalescedRequest coalescedRequest = new TmfCoalescedRequest(request);
             if (TmfCoreTracer.isRequestTraced()) {
                 TmfCoreTracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
                 TmfCoreTracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
@@ -277,12 +282,12 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
     /**
      * Add an existing requests to the list of coalesced ones
      *
-     * @param request
-     *            The request to add to the list
+     * @param request The request to add to the list
+     * @since 2.0
      */
-    protected void coalesceDataRequest(ITmfDataRequest request) {
+    protected void coalesceDataRequest(ITmfRequest request) {
         synchronized (fLock) {
-            for (TmfCoalescedDataRequest coalescedRequest : fPendingCoalescedRequests) {
+            for (TmfCoalescedRequest coalescedRequest : fPendingCoalescedRequests) {
                 if (coalescedRequest.isCompatible(request)) {
                     coalescedRequest.addRequest(request);
                     if (TmfCoreTracer.isRequestTraced()) {
@@ -300,21 +305,21 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
     // Request processing
     // ------------------------------------------------------------------------
 
-    private void dispatchRequest(final ITmfDataRequest request) {
-        if (request.getExecType() == ExecutionType.FOREGROUND) {
+    private void dispatchRequest(final ITmfRequest request) {
+        if (request.getRequestPriority() == TmfRequestPriority.HIGH) {
             queueRequest(request);
         } else {
-            queueBackgroundRequest(request, request.getBlockSize(), true);
+            queueBackgroundRequest(request, true);
         }
     }
 
     /**
      * Queue a request.
      *
-     * @param request
-     *            The data request
+     * @param request The data request
+     * @since 2.0
      */
-    protected void queueRequest(final ITmfDataRequest request) {
+    protected void queueRequest(final ITmfRequest request) {
 
         if (fExecutor.isShutdown()) {
             request.cancel();
@@ -333,14 +338,12 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
     /**
      * Queue a background request
      *
-     * @param request
-     *            The request
-     * @param blockSize
-     *            The request should be split in chunks of this size
-     * @param indexing
-     *            Should we index the chunks
+     * @param request The request
+     * @param indexing Should we index the chunks
+     *
+     * @since 2.0
      */
-    protected void queueBackgroundRequest(final ITmfDataRequest request, final int blockSize, final boolean indexing) {
+    protected void queueBackgroundRequest(final ITmfRequest request, final boolean indexing) {
         queueRequest(request);
     }
 
@@ -354,7 +357,7 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
      *         serviced
      * @since 2.0
      */
-    public abstract ITmfContext armRequest(ITmfDataRequest request);
+    public abstract ITmfContext armRequest(ITmfRequest request);
 
 //    /**
 //     * Return the next event based on the context supplied. The context
@@ -369,12 +372,16 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
      * Checks if the data meets the request completion criteria.
      *
      * @param request the request
-     * @param data the data to verify
+     * @param event the event to check
      * @param nbRead the number of events read so far
      * @return true if completion criteria is met
+     *
+     * @since 2.0
      */
-    public boolean isCompleted(ITmfDataRequest request, ITmfEvent data, int nbRead) {
-        return request.isCompleted() || nbRead >= request.getNbRequested();
+    public boolean isCompleted(ITmfRequest request, ITmfEvent event, int nbRead) {
+        return request.isCompleted() ||
+               nbRead >= request.getNbRequested() ||
+               request.getTimeRange().getEndTime().compareTo(event.getTimestamp()) < 0;
     }
 
     // ------------------------------------------------------------------------

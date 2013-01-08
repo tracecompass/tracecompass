@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
-import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
+import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
@@ -47,7 +47,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 /**
  * Test suite for the TmfTrace class.
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings({"nls","javadoc", "deprecation"})
 public class TmfTraceTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -1233,7 +1233,7 @@ public class TmfTraceTest extends TestCase {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1262,7 +1262,7 @@ public class TmfTraceTest extends TestCase {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1292,7 +1292,7 @@ public class TmfTraceTest extends TestCase {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1323,7 +1323,7 @@ public class TmfTraceTest extends TestCase {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1351,7 +1351,7 @@ public class TmfTraceTest extends TestCase {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1385,7 +1385,7 @@ public class TmfTraceTest extends TestCase {
                 }
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 

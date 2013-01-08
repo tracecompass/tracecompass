@@ -25,10 +25,9 @@ import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest.TmfRequestPriority;
+import org.eclipse.linuxtools.tmf.core.request.TmfRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 
 /**
@@ -74,7 +73,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     /**
      * The indexing request
      */
-    private ITmfEventRequest fIndexingRequest = null;
+    private ITmfRequest fIndexingRequest = null;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -170,15 +169,14 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
 
         // Build a background request for all the trace data. The index is
         // updated as we go by readNextEvent().
-        fIndexingRequest = new TmfEventRequest(ITmfEvent.class,
-                range, offset, TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
+        fIndexingRequest = new TmfRequest(range, offset, ITmfRequest.ALL_EVENTS, TmfRequestPriority.NORMAL)
         {
             @Override
-            public void handleData(final ITmfEvent event) {
-                super.handleData(event);
+            public synchronized void handleEvent(final ITmfEvent event) {
+                super.handleEvent(event);
                 if (event != null) {
                     // Update the trace status at regular intervals
-                    if ((getNbRead() % fCheckpointInterval) == 0) {
+                    if ((getNbEventsRead() % fCheckpointInterval) == 0) {
                         updateTraceStatus();
                     }
                 }
@@ -190,7 +188,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
             }
 
             @Override
-            public void handleCompleted() {
+            public synchronized void handleCompleted() {
                 job.cancel();
                 super.handleCompleted();
                 fIsIndexing = false;

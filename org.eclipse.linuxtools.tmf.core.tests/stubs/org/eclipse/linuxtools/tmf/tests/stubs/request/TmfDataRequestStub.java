@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 /**
  *
  */
+@SuppressWarnings("deprecation")
 public class TmfDataRequestStub extends TmfDataRequest {
 
     /**

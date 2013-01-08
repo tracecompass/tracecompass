@@ -41,6 +41,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
  * @author alexmont
  *
  */
+@SuppressWarnings("deprecation")
 public class HistoryBuilder extends TmfComponent {
 
     private final IStateChangeInput sci;
@@ -233,6 +234,7 @@ class StateSystemBuildRequest extends TmfEventRequest {
     private final IStateChangeInput sci;
     private final ITmfTrace trace;
 
+    @SuppressWarnings("deprecation")
     StateSystemBuildRequest(HistoryBuilder builder) {
         super(builder.getInputPlugin().getExpectedEventType(),
                 TmfTimeRange.ETERNITY,
@@ -245,6 +247,7 @@ class StateSystemBuildRequest extends TmfEventRequest {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void handleData(final ITmfEvent event) {
         super.handleData(event);
         if (event != null) {

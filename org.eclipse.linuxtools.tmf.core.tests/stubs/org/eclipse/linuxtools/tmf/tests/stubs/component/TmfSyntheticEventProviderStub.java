@@ -15,13 +15,12 @@ package org.eclipse.linuxtools.tmf.tests.stubs.component;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
-import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
+import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -32,7 +31,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
  * <p>
  * TODO: Implement me. Please.
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings({"nls","javadoc", "deprecation"})
 public class TmfSyntheticEventProviderStub extends TmfEventProvider {
 
     public static final int BLOCK_SIZE = 100;
@@ -43,17 +42,11 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider {
     }
 
     @Override
-    public ITmfContext armRequest(final ITmfDataRequest request) {
+    public ITmfContext armRequest(final ITmfRequest request) {
 
         // Get the TmfSyntheticEventStub provider
-        final ITmfDataProvider[] eventProviders = TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-        final ITmfDataProvider provider = eventProviders[0];
-
-        // make sure we have the right type of request
-        if (!(request instanceof ITmfEventRequest)) {
-            request.cancel();
-            return null;
-        }
+        final ITmfEventProvider[] eventProviders = TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
+        final ITmfEventProvider provider = eventProviders[0];
 
         final TmfEventRequest eventRequest = (TmfEventRequest) request;
         final TmfTimeRange range = eventRequest.getRange();
