@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * capability of handling data requests.
  *
  * @author Francois Chouinard
- * @version 1.0
+ * @version 2.0
  * @since 2.0
  *
  * @see TmfDataProvider
@@ -60,4 +60,5 @@ public interface ITmfDataProvider extends ITmfComponent {
      * @return the event referred to by context
      */
     public ITmfEvent getNext(ITmfContext context);
+
 }

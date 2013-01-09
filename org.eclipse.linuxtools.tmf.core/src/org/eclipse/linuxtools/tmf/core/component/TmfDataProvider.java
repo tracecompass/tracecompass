@@ -213,6 +213,9 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfEventP
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider#fireRequest()
      */
+    /**
+     * @since 2.0
+     */
     @Override
     public void fireRequest() {
         synchronized (fLock) {
@@ -340,7 +343,10 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfEventP
      *
      * @param request The request
      * @param indexing Should we index the chunks
+<<<<<<< Upstream, based on master
      *
+=======
+>>>>>>> f5b88da Refactor TmfRequest
      * @since 2.0
      */
     protected void queueBackgroundRequest(final ITmfRequest request, final boolean indexing) {
@@ -375,7 +381,10 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfEventP
      * @param event the event to check
      * @param nbRead the number of events read so far
      * @return true if completion criteria is met
+<<<<<<< Upstream, based on master
      *
+=======
+>>>>>>> f5b88da Refactor TmfRequest
      * @since 2.0
      */
     public boolean isCompleted(ITmfRequest request, ITmfEvent event, int nbRead) {

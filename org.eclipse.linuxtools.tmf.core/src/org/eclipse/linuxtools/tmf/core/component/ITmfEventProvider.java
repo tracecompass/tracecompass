@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * capability of handling event requests.
  *
  * @author Francois Chouinard
- * @version 1.0
+ * @version 2.0
  * @since 2.0
  *
  * @see TmfDataProvider

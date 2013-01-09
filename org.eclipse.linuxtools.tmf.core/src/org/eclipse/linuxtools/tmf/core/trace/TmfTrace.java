@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
@@ -626,6 +627,65 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             context.setRank(ITmfContext.UNKNOWN_RANK);
         }
         return context;
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfTrace - Iterator operations
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#iterator()
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Iterator<ITmfEvent> iterator() {
+        return new TmfTraceIterator(this);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#iterator(org.eclipse.linuxtools.tmf.core.trace.ITmfLocation)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Iterator<ITmfEvent> iterator(ITmfLocation location) {
+        return new TmfTraceIterator(this, location);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#iterator(long)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Iterator<ITmfEvent> iterator(long rank) {
+        return new TmfTraceIterator(this, rank);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#iterator(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Iterator<ITmfEvent> iterator(ITmfTimestamp timestamp) {
+        return new TmfTraceIterator(this, timestamp);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#iterator(double)
+     */
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Iterator<ITmfEvent> iterator(double ratio) {
+        return new TmfTraceIterator(this, ratio);
     }
 
     // ------------------------------------------------------------------------

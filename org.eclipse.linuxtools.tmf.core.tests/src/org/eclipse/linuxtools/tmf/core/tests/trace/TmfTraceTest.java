@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
 import junit.framework.TestCase;
@@ -1214,6 +1215,124 @@ public class TmfTraceTest extends TestCase {
         ITmfContext context2 = fTrace.seekEvent(location);
         ITmfEvent event = fTrace.getNext(context2);
         assertNull("Event", event);
+    }
+
+    // ------------------------------------------------------------------------
+    // Iterate over trace
+    // ------------------------------------------------------------------------
+
+    public void testIterateOverAllEvents() {
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
+
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfTrace trace = (ITmfTrace) providers[0];
+        final Iterator<ITmfEvent> it = trace.iterator();
+        while (it.hasNext()) {
+            requestedEvents.add(it.next());
+        }
+
+        // Validate results
+        assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
+        for (int i = 0; i < NB_EVENTS; i++) {
+            assertEquals("Distinct events", i + 1, requestedEvents.get(i).getTimestamp().getValue());
+        }
+    }
+
+    public void testIterateOverNbEvents() {
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
+        final int nbRequestedEvents = 100;
+
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfTrace trace = (ITmfTrace) providers[0];
+        final Iterator<ITmfEvent> it = trace.iterator();
+        int nbEventsToRead = nbRequestedEvents;
+        while (it.hasNext() && nbEventsToRead-- > 0) {
+            requestedEvents.add(it.next());
+        }
+
+        // Validate results
+        assertEquals("nbEvents", nbRequestedEvents, requestedEvents.size());
+        for (int i = 0; i < nbRequestedEvents; i++) {
+            assertEquals("Distinct events", i + 1, requestedEvents.get(i).getTimestamp().getValue());
+        }
+    }
+
+    public void testIterateOverNbEventsByRank() {
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
+        final int startEventRank = 100;
+        final int nbRequestedEvents = 100;
+
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfTrace trace = (ITmfTrace) providers[0];
+        final Iterator<ITmfEvent> it = trace.iterator(startEventRank);
+        int nbEventsToRead = nbRequestedEvents;
+        while (it.hasNext() && nbEventsToRead-- > 0) {
+            requestedEvents.add(it.next());
+        }
+
+        // Validate results
+        assertEquals("nbEvents", nbRequestedEvents, requestedEvents.size());
+        for (int i = 0; i < nbRequestedEvents; i++) {
+            assertEquals("Distinct events", startEventRank + i + 1, requestedEvents.get(i).getTimestamp().getValue());
+        }
+    }
+
+    public void testIterateOverNbEventsByTimestamp() {
+        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
+        final ITmfTimestamp startEventTimestamp = new TmfTimestamp(100, SCALE);
+        final int nbRequestedEvents = 100;
+
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfTrace trace = (ITmfTrace) providers[0];
+        final Iterator<ITmfEvent> it = trace.iterator(startEventTimestamp);
+        int nbEventsToRead = nbRequestedEvents;
+        while (it.hasNext() && nbEventsToRead-- > 0) {
+            requestedEvents.add(it.next());
+        }
+
+        // Validate results
+        assertEquals("nbEvents", nbRequestedEvents, requestedEvents.size());
+        for (int i = 0; i < nbRequestedEvents; i++) {
+            assertEquals("Distinct events", startEventTimestamp.getValue() + i, requestedEvents.get(i).getTimestamp().getValue());
+        }
+    }
+
+    public void testIterateOverEventsMixed() {
+        final Vector<ITmfEvent> requestedEvents1 = new Vector<ITmfEvent>();
+        final Vector<ITmfEvent> requestedEvents2 = new Vector<ITmfEvent>();
+        final int nbRequestedEvents = 100;
+
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfTrace trace = (ITmfTrace) providers[0];
+
+        final Iterator<ITmfEvent> it1 = trace.iterator();
+        final Iterator<ITmfEvent> it2 = trace.iterator();
+
+        int nbEventsToRead = nbRequestedEvents;
+        while (it1.hasNext() && nbEventsToRead-- > 0) {
+            requestedEvents1.add(it1.next());
+            if (nbEventsToRead % 2 == 0) {
+                requestedEvents2.add(it2.next());
+            }
+        }
+
+        // Intermediate validation
+        assertEquals("nbEvents", nbRequestedEvents, requestedEvents1.size());
+        assertEquals("nbEvents", nbRequestedEvents / 2, requestedEvents2.size());
+
+        // Finish the job
+        nbEventsToRead = nbRequestedEvents / 2;
+        while (it2.hasNext() && nbEventsToRead-- > 0) {
+            requestedEvents2.add(it2.next());
+        }
+
+        // Final validation
+        assertEquals("nbEvents", nbRequestedEvents, requestedEvents1.size());
+        assertEquals("nbEvents", nbRequestedEvents, requestedEvents2.size());
+        for (int i = 0; i < nbRequestedEvents; i++) {
+            assertEquals("Distinct events", i + 1, requestedEvents1.get(i).getTimestamp().getValue());
+            assertEquals("Distinct events", i + 1, requestedEvents2.get(i).getTimestamp().getValue());
+        }
     }
 
     // ------------------------------------------------------------------------
