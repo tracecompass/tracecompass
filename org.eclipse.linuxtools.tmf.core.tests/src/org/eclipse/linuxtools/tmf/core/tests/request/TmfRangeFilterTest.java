@@ -154,8 +154,6 @@ public class TmfRangeFilterTest extends TestCase {
         TmfRangeFilter filter1 = new TmfRangeFilter(range1);
         TmfRangeFilter filter2 = new TmfRangeFilter(range2);
 
-        assertEquals("hashCode", filter1.hashCode(), filter1.hashCode());
-        assertEquals("hashCode", filter2.hashCode(), filter2.hashCode());
         assertFalse("hashCode",  filter1.hashCode() == filter2.hashCode());
     }
 

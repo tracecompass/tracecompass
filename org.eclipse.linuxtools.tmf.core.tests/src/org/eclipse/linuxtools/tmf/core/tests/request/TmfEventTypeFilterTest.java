@@ -138,8 +138,6 @@ public class TmfEventTypeFilterTest extends TestCase {
         TmfEventTypeFilter filter1 = new TmfEventTypeFilter(ITmfEvent.class);
         TmfEventTypeFilter filter2 = new TmfEventTypeFilter(TmfEvent.class);
 
-        assertEquals("hashCode", filter1.hashCode(), filter1.hashCode());
-        assertEquals("hashCode", filter2.hashCode(), filter2.hashCode());
         assertFalse("hashCode",  filter1.hashCode() == filter2.hashCode());
     }
 

@@ -155,8 +155,6 @@ public class TmfBlockFilterTest extends TestCase {
         TmfBlockFilter filter1 = new TmfBlockFilter( 0, 1000);
         TmfBlockFilter filter2 = new TmfBlockFilter(10, 1000);
 
-        assertEquals("hashCode", filter1.hashCode(), filter1.hashCode());
-        assertEquals("hashCode", filter2.hashCode(), filter2.hashCode());
         assertFalse("hashCode",  filter1.hashCode() == filter2.hashCode());
     }
 
