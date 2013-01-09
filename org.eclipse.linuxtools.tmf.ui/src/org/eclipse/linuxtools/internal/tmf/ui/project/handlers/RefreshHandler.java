@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -44,12 +44,16 @@ public class RefreshHandler extends AbstractHandler {
 
     	// Check if we are closing down
     	IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-    	if (window == null)
-    		return null;
+    	if (window == null) {
+            return null;
+        }
 
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
+        if (part == null) {
+            return false;
+        }
         ISelection selection = part.getSite().getSelectionProvider().getSelection();
         if (selection instanceof TreeSelection) {
             TreeSelection treeSelection = (TreeSelection) selection;

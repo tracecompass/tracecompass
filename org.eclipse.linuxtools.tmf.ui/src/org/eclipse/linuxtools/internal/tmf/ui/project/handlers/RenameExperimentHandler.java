@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -33,7 +33,7 @@ import org.eclipse.ui.PlatformUI;
 public class RenameExperimentHandler extends AbstractHandler {
 
 	private TmfExperimentElement fExperiment = null;
-	
+
 	// ------------------------------------------------------------------------
     // isEnabled
     // ------------------------------------------------------------------------
@@ -43,15 +43,20 @@ public class RenameExperimentHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
-        ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (part == null) {
             return false;
+        }
+        ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
+        if (selectionProvider == null) {
+            return false;
+        }
         ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only selection and that it is an experiment
@@ -76,8 +81,9 @@ public class RenameExperimentHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return null;
+        }
 
         // Fire the Rename Experiment dialog
         Shell shell = window.getShell();

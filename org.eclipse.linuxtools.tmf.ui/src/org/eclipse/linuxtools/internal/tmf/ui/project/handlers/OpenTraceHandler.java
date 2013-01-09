@@ -70,6 +70,9 @@ public class OpenTraceHandler extends AbstractHandler {
         // Get the selection
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         final IWorkbenchPart part = page.getActivePart();
+        if (part == null) {
+            return false;
+        }
         final ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
         if (selectionProvider == null) {
             return false;

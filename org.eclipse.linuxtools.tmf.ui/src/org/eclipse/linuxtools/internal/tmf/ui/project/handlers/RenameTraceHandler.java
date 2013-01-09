@@ -69,6 +69,9 @@ public class RenameTraceHandler extends AbstractHandler {
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
+        if (part == null) {
+            return false;
+        }
         ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
         if (selectionProvider == null) {
             return false;
