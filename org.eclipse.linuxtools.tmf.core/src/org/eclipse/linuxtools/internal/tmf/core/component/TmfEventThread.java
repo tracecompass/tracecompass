@@ -172,10 +172,10 @@ public class TmfEventThread implements Runnable {
             TmfCoreTracer.traceRequest(fRequest, "read first event"); //$NON-NLS-1$
 
             while (event != null && !fProvider.isCompleted(fRequest, event, nbRead)) {
-                if (isPaused) {
+                while (isPaused) {
                     try {
-                        while (isPaused) {
-                            synchronized (object) {
+                        synchronized (object) {
+                            if (isPaused) {
                                 object.wait();
                             }
                         }

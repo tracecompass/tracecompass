@@ -57,11 +57,11 @@ public class TmfRequestTest extends TestCase {
 	// Variables
 	// ------------------------------------------------------------------------
 
-	private static ITmfRequest fRequest1;
-    private static ITmfRequest fRequest1b;
-    private static ITmfRequest fRequest1c;
+	private ITmfRequest fRequest1;
+    private ITmfRequest fRequest1b;
+    private ITmfRequest fRequest1c;
 
-    private static ITmfRequest fRequest2;
+    private ITmfRequest fRequest2;
 
 	private static int fLastRequestId;
 

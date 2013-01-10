@@ -222,7 +222,7 @@ public class TmfCoalescedRequest extends TmfRequest {
      * @see org.eclipse.linuxtools.tmf.core.request.ITmfRequest#notifyParent(org.eclipse.linuxtools.tmf.core.request.ITmfRequest)
      */
     @Override
-    public void notifyParent(ITmfRequest child) {
+    public synchronized void notifyParent(ITmfRequest child) {
         if (--fNbSubRequests <= 0) {
             done();
             super.notifyParent(this);

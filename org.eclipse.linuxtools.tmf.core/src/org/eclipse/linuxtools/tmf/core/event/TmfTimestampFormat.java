@@ -281,7 +281,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     /**
      * @param pattern the new default time pattern
      */
-    public static void setDefaultTimeFormat(final String pattern) {
+    public static synchronized void setDefaultTimeFormat(final String pattern) {
         fDefaultTimePattern = pattern;
         fDefaultTimeFormat = new TmfTimestampFormat(fDefaultTimePattern);
         TmfSignalManager.dispatchSignal(new TmfTimestampFormatUpdateSignal(null));
@@ -290,7 +290,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     /**
      * @return the default time format pattern
      */
-    public static TmfTimestampFormat getDefaulTimeFormat() {
+    public static synchronized TmfTimestampFormat getDefaulTimeFormat() {
         if (fDefaultTimeFormat == null) {
             fDefaultTimeFormat = new TmfTimestampFormat(DEFAULT_TIME_PATTERN);
         }
@@ -300,7 +300,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     /**
      * @param pattern the new default interval pattern
      */
-    public static void setDefaultIntervalFormat(final String pattern) {
+    public static synchronized void setDefaultIntervalFormat(final String pattern) {
         fDefaultIntervalPattern = pattern;
         fDefaultIntervalFormat = new TmfTimestampFormat(fDefaultIntervalPattern);
         TmfSignalManager.dispatchSignal(new TmfTimestampFormatUpdateSignal(null));
@@ -309,7 +309,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     /**
      * @return the default interval format pattern
      */
-    public static TmfTimestampFormat getDefaulIntervalFormat() {
+    public static synchronized TmfTimestampFormat getDefaulIntervalFormat() {
         if (fDefaultIntervalFormat == null) {
             fDefaultIntervalFormat = new TmfTimestampFormat(DEFAULT_INTERVAL_PATTERN);
         }
@@ -610,6 +610,87 @@ public class TmfTimestampFormat extends SimpleDateFormat {
             sb.delete(l + pt.length() - 1, l + pt.length());
             sb.delete(l, l + 1);
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see java.text.SimpleDateFormat#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fCloseBracket == null) ? 0 : fCloseBracket.hashCode());
+        result = prime * result + ((fOpenBracket == null) ? 0 : fOpenBracket.hashCode());
+        result = prime * result + ((fPattern == null) ? 0 : fPattern.hashCode());
+        result = prime * result + ((fSupplPatternLetters == null) ? 0 : fSupplPatternLetters.hashCode());
+        result = prime * result + ((fSupplPatterns == null) ? 0 : fSupplPatterns.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.text.SimpleDateFormat#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof TmfTimestampFormat)) {
+            return false;
+        }
+        TmfTimestampFormat other = (TmfTimestampFormat) obj;
+        if (fCloseBracket == null) {
+            if (other.fCloseBracket != null) {
+                return false;
+            }
+        } else if (!fCloseBracket.equals(other.fCloseBracket)) {
+            return false;
+        }
+        if (fOpenBracket == null) {
+            if (other.fOpenBracket != null) {
+                return false;
+            }
+        } else if (!fOpenBracket.equals(other.fOpenBracket)) {
+            return false;
+        }
+        if (fPattern == null) {
+            if (other.fPattern != null) {
+                return false;
+            }
+        } else if (!fPattern.equals(other.fPattern)) {
+            return false;
+        }
+        if (fSupplPatternLetters == null) {
+            if (other.fSupplPatternLetters != null) {
+                return false;
+            }
+        } else if (!fSupplPatternLetters.equals(other.fSupplPatternLetters)) {
+            return false;
+        }
+        if (fSupplPatterns == null) {
+            if (other.fSupplPatterns != null) {
+                return false;
+            }
+        } else if (!fSupplPatterns.equals(other.fSupplPatterns)) {
+            return false;
+        }
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    @SuppressWarnings("nls")
+    public String toString() {
+        return "TmfTimestampFormat [fPattern=" + fPattern + ", fSupplPatterns=" + fSupplPatterns + ", fSupplPatternLetters=" + fSupplPatternLetters + ", fOpenBracket=" + fOpenBracket + ", fCloseBracket=" + fCloseBracket + "]";
     }
 
 }

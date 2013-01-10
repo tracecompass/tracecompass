@@ -69,7 +69,7 @@ public class TmfCoreTracer {
     static Boolean EVENT_CLASS_ENABLED     = Boolean.FALSE;
 
     // Trace log file
-    private static BufferedWriter fTraceFile;
+    private static volatile BufferedWriter fTraceFile;
 
     // ------------------------------------------------------------------------
     // Start/stop tracing - controlled by the plug-in

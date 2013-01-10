@@ -90,7 +90,7 @@ public class TmfRequestExecutorTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	// Dummy context
-	private static class MyContext implements ITmfContext {
+	private static class MyContext implements ITmfContext, Cloneable {
 	    private long fNbRequested;
         private long fRank;
 
@@ -197,7 +197,9 @@ public class TmfRequestExecutorTest extends TestCase {
         @Override
         public synchronized void resume() {
             super.resume();
-            monitor.notifyAll();
+            synchronized (monitor) {
+                monitor.notifyAll();
+            }
         }
     }
 
@@ -214,6 +216,7 @@ public class TmfRequestExecutorTest extends TestCase {
 	 */
 	public void testExecute() {
 	    final long TIMEOUT = 100;
+	    final long ONE_MINUTE = 60 * 1000;
 
         MyProvider provider = new MyProvider();
         MyRequest  request1 = new MyRequest(ITmfRequest.TmfRequestPriority.NORMAL, Integer.MAX_VALUE /  10, reqmon1);
@@ -224,20 +227,20 @@ public class TmfRequestExecutorTest extends TestCase {
         MyThread   thread3  = new MyThread(provider, request3, thrmon3);
 
         // Start thread1
-        fExecutor.execute(thread1);
         synchronized (reqmon1) {
             try {
-                reqmon1.wait();
+                fExecutor.execute(thread1);
+                reqmon1.wait(ONE_MINUTE);
                 assertTrue("isRunning", thread1.isRunning());
             } catch (InterruptedException e) {
             }
         }
 
         // Start higher priority thread2
-        fExecutor.execute(thread2);
         synchronized (reqmon2) {
             try {
-                reqmon2.wait();
+                fExecutor.execute(thread2);
+                reqmon2.wait(ONE_MINUTE);
                 assertFalse("isRunning", thread1.isRunning());
                 assertTrue("isRunning", thread2.isRunning());
             } catch (InterruptedException e) {
@@ -247,7 +250,7 @@ public class TmfRequestExecutorTest extends TestCase {
         // Wait for end of thread2
         try {
             synchronized (reqmon2) {
-                reqmon2.wait();
+                reqmon2.wait(ONE_MINUTE);
                 assertTrue("isCompleted", thread2.isCompleted());
             }
             synchronized (thrmon1) {
@@ -258,10 +261,10 @@ public class TmfRequestExecutorTest extends TestCase {
         }
 
         // Start higher priority thread3
-        fExecutor.execute(thread3);
         synchronized (reqmon3) {
             try {
-                reqmon3.wait();
+                fExecutor.execute(thread3);
+                reqmon3.wait(ONE_MINUTE);
                 assertFalse("isRunning", thread1.isRunning());
                 assertTrue("isRunning", thread3.isRunning());
             } catch (InterruptedException e) {
@@ -271,7 +274,7 @@ public class TmfRequestExecutorTest extends TestCase {
         // Wait for end of thread3
         try {
             synchronized (reqmon3) {
-                reqmon3.wait();
+                reqmon3.wait(ONE_MINUTE);
                 assertTrue("isCompleted", thread3.isCompleted());
             }
             synchronized (thrmon1) {
@@ -284,7 +287,7 @@ public class TmfRequestExecutorTest extends TestCase {
         // Wait for thread1 completion
         try {
             synchronized (reqmon1) {
-                reqmon1.wait();
+                reqmon1.wait(ONE_MINUTE);
                 assertTrue("isCompleted", thread1.isCompleted());
             }
         } catch (InterruptedException e) {
