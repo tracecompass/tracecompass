@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.core.statesystem;
+package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends;
 
 import java.io.File;
 import java.io.FileInputStream;

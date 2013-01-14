@@ -20,8 +20,8 @@ import org.junit.runners.Suite;
  * <p>
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ ActivatorTest.class,
-    org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider.CtfKernelStateInputTest.class,
-    org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider.StateSystemFullHistoryTest.class
+@Suite.SuiteClasses({
+    ActivatorTest.class,
+    org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider.TestAll.class
 })
 public class AllTests { }

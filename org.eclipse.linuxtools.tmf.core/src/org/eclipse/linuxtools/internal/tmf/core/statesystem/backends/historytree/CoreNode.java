@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
+package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;
 
 import java.nio.ByteBuffer;
 

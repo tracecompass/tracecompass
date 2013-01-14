@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.HistoryBuilder;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryTreeBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree.HistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;

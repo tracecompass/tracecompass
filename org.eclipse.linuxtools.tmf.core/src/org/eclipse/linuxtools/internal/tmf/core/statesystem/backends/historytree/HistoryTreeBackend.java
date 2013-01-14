@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree;
+package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;

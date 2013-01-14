@@ -16,9 +16,11 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.HistoryBuilder;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.IStateHistoryBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.HistoryTreeBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.historytree.ThreadedHistoryTreeBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.InMemoryBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.NullBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree.HistoryTreeBackend;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 
@@ -100,6 +102,49 @@ public abstract class StateSystemManager extends TmfComponent {
              */
             throw new TmfTraceException(e.toString(), e);
         }
+        return builder.getStateSystemQuerier();
+    }
+
+    /**
+     * Create a new state system using a null history back-end. This means that
+     * no history intervals will be saved anywhere, and as such only
+     * {@link ITmfStateSystem#queryOngoingState} will be available.
+     *
+     * This has to be built "manually" (which means you should call
+     * input.processEvent() to update the ongoing state of the state system).
+     *
+     * @param input
+     *            The input plugin to build the history
+     * @return Reference to the history-less state system that got built
+     * @since 2.0
+     */
+    public static ITmfStateSystem newNullHistory(IStateChangeInput input) {
+        IStateHistoryBackend backend = new NullBackend();
+        HistoryBuilder builder = new HistoryBuilder(input, backend, true);
+        ITmfStateSystem ss = builder.getStateSystemQuerier();
+        return ss;
+    }
+
+    /**
+     * Create a new state system using in-memory interval storage. This should
+     * only be done for very small state system, and will be naturally limited
+     * to 2^31 intervals.
+     *
+     * This will block the caller while the construction is ongoing.
+     *
+     * @param input
+     *            The state change input to use
+     * @param buildManually
+     *            Set to true to block the caller and build without using TMF
+     *            signals (for test programs most of the time). Use false if you
+     *            are using the TMF facilities (experiments, etc.)
+     * @return Reference to the state system that just got built
+     * @since 2.0
+     */
+    public static ITmfStateSystem newInMemHistory(IStateChangeInput input,
+            boolean buildManually) {
+        IStateHistoryBackend backend = new InMemoryBackend(input.getStartTime());
+        HistoryBuilder builder = new HistoryBuilder(input, backend, buildManually);
         return builder.getStateSystemQuerier();
     }
 }
