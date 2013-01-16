@@ -11,6 +11,7 @@
  *   Patrick Tasse - Factored out from events view
  *   Francois Chouinard - Replaced Table by TmfVirtualTable
  *   Patrick Tasse - Filter implementation (inspired by www.eclipse.org/mat)
+ *   Ansgar Radermacher - Support navigation to model URIs (Bug 396956)
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
@@ -27,12 +28,17 @@ import java.util.regex.PatternSyntaxException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -44,6 +50,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -56,6 +63,8 @@ import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.dialogs.MultiLineInputDialog;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfCustomAttributes;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
@@ -114,7 +123,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.themes.ColorUtil;
 
@@ -566,6 +577,56 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         };
 
+        final IAction navigateToEventAction = new Action(Messages.TmfEventsTable_NavigateToModelActionText) {
+            @Override
+            public void run() {
+
+                final TableItem items[] = fTable.getSelection();
+                if (items.length != 1) {
+                    return;
+                }
+                final TableItem item = items[0];
+
+                final Object eventData = item.getData();
+                if (eventData instanceof CtfTmfEvent) {
+                    String modelURI = ((CtfTmfEvent) eventData).getCustomAttribute(CtfCustomAttributes.MODEL_URI_KEY);
+
+                    if (modelURI != null) {
+                        IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+                        IFile file = null;
+                        final URI uri = URI.createURI(modelURI);
+                        if (uri.isPlatformResource()) {
+                            IPath path = new Path(uri.toPlatformString(true));
+                            file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+                        } else if (uri.isFile() && !uri.isRelative()) {
+                            file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
+                                    new Path(uri.toFileString()));
+                        }
+
+                        if (file != null) {
+                            try {
+                                /*
+                                 * create a temporary validation marker on the
+                                 * model file, remove it afterwards thus,
+                                 * navigation works with all model editors
+                                 * supporting the navigation to a marker
+                                 */
+                                IMarker marker = file.createMarker(EValidator.MARKER);
+                                marker.setAttribute(EValidator.URI_ATTRIBUTE, modelURI);
+                                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
+
+                                IDE.openEditor(activePage, marker, OpenStrategy.activateOnOpen());
+                                marker.delete();
+                            }
+                            catch (CoreException e) {
+                                displayException(e);
+                            }
+                        }
+                    }
+                }
+            }
+        };
         final IAction showSearchBarAction = new Action(Messages.TmfEventsTable_ShowSearchBarActionText) {
             @Override
             public void run() {
@@ -647,6 +708,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     tablePopupMenu.add(showRawAction);
                 }
                 tablePopupMenu.add(new Separator());
+                if (item != null) {
+                    // add navigation action, if event meta data contain a model URI
+                    final Object eventData = item.getData();
+                    if (eventData instanceof CtfTmfEvent) {
+                        if (((CtfTmfEvent) eventData).listCustomAttributes().contains(CtfCustomAttributes.MODEL_URI_KEY)) {
+                            tablePopupMenu.add(navigateToEventAction);
+                            tablePopupMenu.add(new Separator());
+                        }
+                    }
+                }
                 tablePopupMenu.add(clearFiltersAction);
                 final ITmfFilterTreeNode[] savedFilters = FilterManager.getSavedFilters();
                 if (savedFilters.length > 0) {
