@@ -356,8 +356,8 @@ public class StreamInputPacketReader implements IDefinitionScope {
         }
 
         /* Read the event context. */
-        if (eventDef.getContext() != null) {
-            eventDef.getContext().read(currentBitBuffer);
+        if (eventDef.getEventContext() != null) {
+            eventDef.getEventContext().read(currentBitBuffer);
         }
 
         /* Read the event fields. */
@@ -420,7 +420,6 @@ public class StreamInputPacketReader implements IDefinitionScope {
 
     @Override
     public Definition lookupDefinition(String lookupPath) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

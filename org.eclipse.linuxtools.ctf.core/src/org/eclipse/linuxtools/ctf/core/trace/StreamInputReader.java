@@ -426,4 +426,9 @@ public class StreamInputReader {
         return true;
     }
 
+    @Override
+    public String toString() {
+        // this helps debugging
+        return this.name + ' ' + this.currentEvent.toString();
+    }
 }
