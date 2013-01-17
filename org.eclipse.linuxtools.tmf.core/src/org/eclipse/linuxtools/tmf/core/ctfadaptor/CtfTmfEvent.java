@@ -186,12 +186,8 @@ public final class CtfTmfEvent implements ITmfEvent, IAdaptable, Cloneable {
         /* There is only one reference to the trace, so we can shallow-copy it */
         this.fTrace = other.getTrace();
 
-        /*
-         * Copy the timestamp
-         * FIXME This can be switched to a shallow-copy once timestamps are
-         * made immutable.
-         */
-        this.fTimestamp = new CtfTmfTimestamp(other.fTimestamp.getValue());
+        /* Copy the timestamp (immutable) */
+        this.fTimestamp = other.fTimestamp;
 
         /* Primitives, those will be copied by value */
         this.sourceCPU = other.sourceCPU;
@@ -201,8 +197,8 @@ public final class CtfTmfEvent implements ITmfEvent, IAdaptable, Cloneable {
         this.eventName = other.eventName;
         this.fileName = other.fileName;
 
-        /* Copy the fields over */
-        this.fContent = other.fContent.clone();
+        /* Copy the fields over (immutable) */
+        this.fContent = other.fContent;
 
         /*
          * Copy the reference to the custom attributes (should be the same

@@ -247,7 +247,7 @@ public class TmfEvent implements ITmfEvent, IAdaptable, Cloneable {
             clone.fTimestamp = fTimestamp;
             clone.fSource = fSource;
             clone.fType = fType != null ? fType.clone() : null;
-            clone.fContent = fContent != null ? fContent.clone() : null;
+            clone.fContent = fContent;
             clone.fReference = fReference;
         } catch (final CloneNotSupportedException e) {
         }

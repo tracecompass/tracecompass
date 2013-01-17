@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Event Model 1.0
@@ -15,10 +15,10 @@ package org.eclipse.linuxtools.tmf.core.event;
 
 /**
  * A basic implementation of ITmfEventType.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  * @see ITmfEvent
  * @see ITmfEventField
  */
@@ -45,7 +45,7 @@ public class TmfEventType implements ITmfEventType, Cloneable {
 
     /**
      * Full constructor
-     * 
+     *
      * @param context the type context
      * @param typeId the type name
      * @param root the root field
@@ -64,7 +64,7 @@ public class TmfEventType implements ITmfEventType, Cloneable {
 
     /**
      * Copy constructor
-     * 
+     *
      * @param type the other type
      */
     public TmfEventType(final ITmfEventType type) {
@@ -134,7 +134,7 @@ public class TmfEventType implements ITmfEventType, Cloneable {
             clone = (TmfEventType) super.clone();
             clone.fContext = fContext;
             clone.fTypeId = fTypeId;
-            clone.fRootField = (fRootField != null) ? fRootField.clone() : null;
+            clone.fRootField = fRootField;
         }
         catch (final CloneNotSupportedException e) {
         }

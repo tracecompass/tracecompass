@@ -34,6 +34,20 @@ public class CustomEventContent extends TmfEventField {
         super(ITmfEventField.ROOT_FIELD_ID, content);
     }
 
+    /**
+     * Create a new event field with sub-fields.
+     *
+     * @param name
+     *            Field name
+     * @param content
+     *            Event content
+     * @param fields
+     *            The array of sub-fields
+     */
+    public CustomEventContent(String name, Object content, ITmfEventField[] fields) {
+        super(name, content, fields);
+    }
+
     @Override
     public int hashCode() {
         return super.hashCode();
@@ -52,15 +66,4 @@ public class CustomEventContent extends TmfEventField {
         }
         return true;
     }
-
-    /**
-     * Modify the fields to the given value.
-     *
-     * @param fields
-     *            The array of fields to use as event content
-     */
-    public void setFields(ITmfEventField[] fields) {
-        super.setValue(getValue(), fields);
-    }
-
 }

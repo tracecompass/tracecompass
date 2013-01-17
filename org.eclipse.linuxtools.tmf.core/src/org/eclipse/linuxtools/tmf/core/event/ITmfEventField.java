@@ -75,9 +75,4 @@ public interface ITmfEventField {
      */
     public ITmfEventField getField(int index);
 
-    /**
-     * @return a clone of the event field
-     */
-    public ITmfEventField clone();
-
 }
