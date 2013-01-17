@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
@@ -269,6 +270,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
 
+        ITmfRequest indexRequest = null;
         fLock.lock();
         try {
             // Update the trace reference
@@ -283,12 +285,9 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             job.setUser(false);
             job.schedule();
 
-            if (fIndexRequest != null && !fIndexRequest.isCompleted()) {
-                fIndexRequest.cancel();
-            }
+            indexRequest = fIndexRequest;
 
             cancelOngoingRequests();
-            resetLoader();
 
             TmfTimeRange window = TmfTimeRange.ETERNITY;
 
@@ -386,10 +385,14 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 }
             };
 
-            fTrace.sendRequest(fIndexRequest);
         } finally {
             fLock.unlock();
         }
+        if (indexRequest != null && !indexRequest.isCompleted()) {
+            indexRequest.cancel();
+        }
+        resetLoader();
+        fTrace.sendRequest(fIndexRequest);
 
     }
 
@@ -404,14 +407,11 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         if (signal.getTrace() != fTrace) {
             return;
         }
+        ITmfRequest indexRequest = null;
         fLock.lock();
         try {
-            if (fIndexRequest != null) {
-                if (!fIndexRequest.isCompleted()) {
-                    fIndexRequest.cancel();
-                }
-                fIndexRequest = null;
-            }
+            indexRequest = fIndexRequest;
+            fIndexRequest = null;
 
             cancelOngoingRequests();
 
@@ -420,12 +420,15 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             }
 
             FilterListDialog.deactivateSavedGlobalFilters();
-
-            resetLoader();
         } finally {
             fTrace = null;
             fLock.unlock();
         }
+        if (indexRequest != null && !indexRequest.isCompleted()) {
+            indexRequest.cancel();
+        }
+
+        resetLoader();
     }
 
     /**
@@ -518,6 +521,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     @Override
     public void dispose() {
        super.dispose();
+       ITmfRequest indexRequest = null;
        fLock.lock();
        try {
            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -526,12 +530,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                window.getSelectionService().removePostSelectionListener(this);
            }
 
-           if (fIndexRequest != null) {
-               if (!fIndexRequest.isCompleted()) {
-                   fIndexRequest.cancel();
-               }
-               fIndexRequest = null;
-           }
+           indexRequest = fIndexRequest;
+           fIndexRequest = null;
            cancelOngoingRequests();
 
            fView.setSDFindProvider(null);
@@ -540,6 +540,9 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
            fView = null;
        } finally {
            fLock.unlock();
+       }
+       if (indexRequest != null && !indexRequest.isCompleted()) {
+           indexRequest.cancel();
        }
     }
 
@@ -870,6 +873,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      */
     protected void cancelOngoingRequests() {
         fLock.lock();
+        ITmfRequest pageRequest = null;
         try {
             // Cancel the search thread
             if (fFindJob != null) {
@@ -880,14 +884,13 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             fFindCriteria = null;
             fCurrentFindIndex = 0;
 
-            if (fPageRequest != null) {
-                if (!fPageRequest.isCompleted()) {
-                    fPageRequest.cancel();
-                }
-                fPageRequest = null;
-            }
+            pageRequest = fPageRequest;
+            fPageRequest = null;
         } finally {
             fLock.unlock();
+        }
+        if (pageRequest != null && !pageRequest.isCompleted()) {
+            pageRequest.cancel();
         }
     }
 
