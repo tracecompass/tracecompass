@@ -1364,15 +1364,15 @@ public class TmfTraceTest {
             assertEquals("getInitialRangeOffset", defaultInitRange, trace.getInitialRangeOffset());
             trace.setInitialRangeOffset(new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE));
             trace.indexTrace(true);
+
+            TmfTimestamp initRange = new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE);
+            assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
+
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
             fail("IOException");
         }
-        assertFalse ("Open trace", trace == null);
-
-        TmfTimestamp initRange = new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE);
-        assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
     }
 
     /**

@@ -88,6 +88,15 @@
             name="%callstack.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.ui.views.synchronization.TmfSynchronizationView"
+            icon="icons/eview16/synced.gif"
+            id="org.eclipse.linuxtools.tmf.ui.views.synchronization"
+            name="%synchronization.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -663,6 +672,30 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.synchronize_traces"
+               icon="icons/obj16/add_obj.gif"
+               label="%command.synchronize_traces"
+               mnemonic="%command.synchronize_traces.mnemonic"
+               style="push"
+               tooltip="%commands.synchronize_traces.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
          <separator
                name="org.eclipse.linuxtools.tmf.ui.separator5"
                visible="true">
@@ -743,6 +776,12 @@
             description="%command.select_traces.description"
             id="org.eclipse.linuxtools.tmf.ui.command.select_traces"
             name="%command.select_traces">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.synchronize_traces.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.synchronize_traces"
+            name="%command.synchronize_traces">
       </command>
       <category
             description="%commands.parser.category.description"
@@ -1049,6 +1088,23 @@
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTracesHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.select_traces">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SynchronizeTracesHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.synchronize_traces">
          <activeWhen>
             <and>
                <count

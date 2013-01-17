@@ -3,6 +3,7 @@
 /ctf-testsuite
 /kernel
 /kernel_vm
+/synctraces
 /trace2
 *.ht
 

@@ -120,7 +120,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                     return;
                 }
 
-                /* Unlike traces, there is no instanceExperiment, so we call this function
+                /* FIXME Unlike traces, there is no instanceExperiment, so we call this function
                  * here alone.  Maybe it would be better to do this on experiment's element
                  * constructor?
                  */
@@ -128,6 +128,7 @@ public class OpenExperimentHandler extends AbstractHandler {
 
                 // Instantiate the experiment's traces
                 final List<TmfTraceElement> traceEntries = experimentElement.getTraces();
+                experimentElement.refreshSupplementaryFolder();
                 final int nbTraces = traceEntries.size();
                 int cacheSize = Integer.MAX_VALUE;
                 String commonEditorId = null;

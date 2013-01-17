@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
  * Base class for project elements who will have folder elements
  * under them to store supplementary files.
  *
- * @author gbastien
+ * @author Geneviève Bastien
  * @since 2.0
  */
 public abstract class TmfWithFolderElement extends TmfProjectModelElement {
@@ -239,7 +239,7 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
                     if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
                         member.delete(true, null);
                     }
-                    if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
+                    else if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
                         member.delete(true, null);
                     }
                 }
