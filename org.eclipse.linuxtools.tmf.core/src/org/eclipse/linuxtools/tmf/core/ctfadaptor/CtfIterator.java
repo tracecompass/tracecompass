@@ -103,8 +103,8 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     public CtfTmfEvent getCurrentEvent() {
         final StreamInputReader top = super.prio.peek();
         if (top != null) {
-            return new CtfTmfEvent(top.getCurrentEvent(), top.getFilename(),
-                    ctfTmfTrace);
+            return CtfTmfEventFactory.createEvent(top.getCurrentEvent(),
+                    top.getFilename(), ctfTmfTrace);
         }
         return null;
     }
