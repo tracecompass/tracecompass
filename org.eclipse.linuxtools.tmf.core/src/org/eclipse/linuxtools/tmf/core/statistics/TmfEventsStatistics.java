@@ -42,7 +42,6 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-@SuppressWarnings("deprecation")
 public class TmfEventsStatistics implements ITmfStatistics {
 
     /* All timestamps should be stored in nanoseconds in the statistics backend */
@@ -264,8 +263,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
         }
 
         @Override
-        public synchronized void handleEvent(final ITmfEvent event) {
-            super.handleEvent(event);
+        public void handleData(final ITmfEvent event) {
+            super.handleData(event);
             if (event != null) {
                 if (event.getTrace() == trace) {
                     processEvent(event);
@@ -325,8 +324,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
         }
 
         @Override
-        public synchronized void handleEvent(ITmfEvent event) {
-            super.handleEvent(event);
+        public void handleData(ITmfEvent event) {
+            super.handleData(event);
             if ((event != null)  && (event.getTrace() == trace)) {
                 long ts = event.getTimestamp().normalize(0, SCALE).getValue();
                 Long key = results.floorKey(ts);

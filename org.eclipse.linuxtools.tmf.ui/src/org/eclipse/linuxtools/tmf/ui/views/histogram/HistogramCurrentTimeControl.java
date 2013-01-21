@@ -35,13 +35,6 @@ import org.eclipse.swt.widgets.Composite;
 public class HistogramCurrentTimeControl extends HistogramTextControl {
 
     // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    @SuppressWarnings("unused")
-    private long fTraceStartTime;
-
-    // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
 

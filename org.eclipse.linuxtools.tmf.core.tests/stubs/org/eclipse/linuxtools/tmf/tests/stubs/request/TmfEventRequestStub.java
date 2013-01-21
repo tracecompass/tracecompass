@@ -70,7 +70,7 @@ public class TmfEventRequestStub extends TmfEventRequest {
      * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
      */
     @Override
-    public synchronized void handleEvent(final ITmfEvent data) {
-        super.handleEvent(data);
+    public void handleData(final ITmfEvent data) {
+        super.handleData(data);
     }
 }

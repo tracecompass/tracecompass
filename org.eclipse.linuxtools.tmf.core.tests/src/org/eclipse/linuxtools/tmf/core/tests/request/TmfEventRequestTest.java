@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfEventRequestStub;
  * <p>
  * Test suite for the TmfEventRequest class.
  */
-@SuppressWarnings({"nls","javadoc", "deprecation"})
+@SuppressWarnings({"nls","javadoc"})
 public class TmfEventRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------
@@ -59,6 +59,7 @@ public class TmfEventRequestTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		TmfDataRequest.reset();
 		fRequest1  = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
 		fRequest2  = new TmfEventRequestStub(TmfEvent.class, range2, 100, 200);
 		fRequest3  = new TmfEventRequestStub(TmfEvent.class, range2, 200, 200);
@@ -76,8 +77,8 @@ public class TmfEventRequestTest extends TestCase {
 	private static TmfEventRequest setupTestRequest(final boolean[] flags) {
 
 		TmfEventRequest request = new TmfEventRequestStub(TmfEvent.class, new TmfTimeRange(TmfTimeRange.ETERNITY), 100, 200) {
-            @Override
-			public synchronized void handleCompleted() {
+		    @Override
+			public void handleCompleted() {
 		    	super.handleCompleted();
 		    	flags[0] = true;
 		    }
@@ -231,10 +232,10 @@ public class TmfEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() {
-        String expected1 = "[TmfEventRequest(" + fRequest1.getRequestId() + ",TmfEvent," + range1 + ",0,100,200)]";
-        String expected2 = "[TmfEventRequest(" + fRequest2.getRequestId() + ",TmfEvent," + range2 + ",0,100,200)]";
-        String expected3 = "[TmfEventRequest(" + fRequest3.getRequestId() + ",TmfEvent," + range2 + ",0,200,200)]";
-        String expected4 = "[TmfEventRequest(" + fRequest4.getRequestId() + ",TmfEvent," + range2 + ",0,200,300)]";
+        String expected1 = "[TmfEventRequest(0,TmfEvent," + range1 + ",0,100,200)]";
+        String expected2 = "[TmfEventRequest(1,TmfEvent," + range2 + ",0,100,200)]";
+        String expected3 = "[TmfEventRequest(2,TmfEvent," + range2 + ",0,200,200)]";
+        String expected4 = "[TmfEventRequest(3,TmfEvent," + range2 + ",0,200,300)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

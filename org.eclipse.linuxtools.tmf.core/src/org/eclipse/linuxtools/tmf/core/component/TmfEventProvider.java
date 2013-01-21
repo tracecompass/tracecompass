@@ -13,7 +13,12 @@
 
 package org.eclipse.linuxtools.tmf.core.component;
 
+import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
+import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 
 /**
  * An extension of TmfDataProvider timestamped events providers.
@@ -79,31 +84,31 @@ public abstract class TmfEventProvider extends TmfDataProvider {
     // TmfDataProvider
     // ------------------------------------------------------------------------
 
-//    @Override
-//    public boolean isCompleted(ITmfDataRequest request, ITmfEvent data, int nbRead) {
-//        boolean requestCompleted = super.isCompleted(request, data, nbRead);
-//        if (!requestCompleted && request instanceof ITmfEventRequest) {
-//            ITmfTimestamp endTime = ((ITmfEventRequest) request).getRange().getEndTime();
-//            return data.getTimestamp().compareTo(endTime, false) > 0;
-//        }
-//        return requestCompleted;
-//    }
-//
-//    @Override
-//    protected synchronized void newCoalescedDataRequest(ITmfDataRequest request) {
-//        if (request instanceof ITmfEventRequest) {
-//            ITmfEventRequest eventRequest = (ITmfEventRequest) request;
-//            TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(eventRequest.getDataType(), eventRequest.getRange(),
-//                    eventRequest.getIndex(), (int) eventRequest.getNbRequested(), eventRequest.getBlockSize(), eventRequest.getExecType());
-//            coalescedRequest.addRequest(eventRequest);
-//            if (TmfCoreTracer.isRequestTraced()) {
-//                TmfCoreTracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
-//                TmfCoreTracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
-//            }
-//            fPendingCoalescedRequests.add(coalescedRequest);
-//        } else {
-//            super.newCoalescedDataRequest(request);
-//        }
-//    }
+    @Override
+    public boolean isCompleted(ITmfDataRequest request, ITmfEvent data, int nbRead) {
+        boolean requestCompleted = super.isCompleted(request, data, nbRead);
+        if (!requestCompleted && request instanceof ITmfEventRequest) {
+            ITmfTimestamp endTime = ((ITmfEventRequest) request).getRange().getEndTime();
+            return data.getTimestamp().compareTo(endTime, false) > 0;
+        }
+        return requestCompleted;
+    }
+
+    @Override
+    protected synchronized void newCoalescedDataRequest(ITmfDataRequest request) {
+        if (request instanceof ITmfEventRequest) {
+            ITmfEventRequest eventRequest = (ITmfEventRequest) request;
+            TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(eventRequest.getDataType(), eventRequest.getRange(),
+                    eventRequest.getIndex(), eventRequest.getNbRequested(), eventRequest.getBlockSize(), eventRequest.getExecType());
+            coalescedRequest.addRequest(eventRequest);
+            if (TmfCoreTracer.isRequestTraced()) {
+                TmfCoreTracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                TmfCoreTracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
+            }
+            fPendingCoalescedRequests.add(coalescedRequest);
+        } else {
+            super.newCoalescedDataRequest(request);
+        }
+    }
 
 }

@@ -24,8 +24,8 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfBlockFilter;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfClearExperimentSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
@@ -202,22 +202,24 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
      * @since 2.0
      */
     @Override
-    public synchronized ITmfContext armRequest(final ITmfRequest request) {
+    public synchronized ITmfContext armRequest(final ITmfDataRequest request) {
 
         // Make sure we have something to read from
         if (fTraces == null) {
             return null;
         }
 
-        ITmfTimestamp startTime = request.getTimeRange().getStartTime();
-        long startindex = request.getStartIndex();
-        if (!TmfTimestamp.BIG_BANG.equals(startTime) && startindex == 0) {
-            final ITmfContext context = seekEvent(request.getTimeRange().getStartTime());
-            request.addEventFilter(new TmfBlockFilter(context.getRank(), request.getNbRequested()));
+        if (request instanceof ITmfEventRequest
+            && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest) request).getRange().getStartTime())
+            && request.getIndex() == 0)
+        {
+            final ITmfContext context = seekEvent(((ITmfEventRequest) request).getRange().getStartTime());
+            ((ITmfEventRequest) request).setStartIndex((int) context.getRank());
             return context;
+
         }
 
-        return seekEvent(request.getStartIndex());
+        return seekEvent(request.getIndex());
     }
 
     // ------------------------------------------------------------------------
@@ -409,7 +411,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
      */
     @Override
     @SuppressWarnings("nls")
-    public String toString() {
+    public synchronized String toString() {
         return "[TmfExperiment (" + getName() + ")]";
     }
 

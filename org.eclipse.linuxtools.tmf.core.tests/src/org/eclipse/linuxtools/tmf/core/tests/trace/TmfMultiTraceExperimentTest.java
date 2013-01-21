@@ -42,7 +42,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 /**
  * Test suite for the TmfExperiment class (multiple traces).
  */
-@SuppressWarnings({"nls","javadoc", "deprecation"})
+@SuppressWarnings({"nls","javadoc"})
 public class TmfMultiTraceExperimentTest extends TestCase {
 
     // ------------------------------------------------------------------------

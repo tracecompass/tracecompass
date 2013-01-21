@@ -18,9 +18,9 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
-import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 
 /**
@@ -38,8 +38,8 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
  * <li><strong>Event</strong>: TMF trace events
  * </ul>
  *
- * @author Francois Chouinard
  * @version 1.0
+ * @author Francois Chouinard
  */
 @SuppressWarnings("nls")
 public class TmfCoreTracer {
@@ -69,7 +69,7 @@ public class TmfCoreTracer {
     static Boolean EVENT_CLASS_ENABLED     = Boolean.FALSE;
 
     // Trace log file
-    private static volatile BufferedWriter fTraceFile;
+    private static BufferedWriter fTraceFile;
 
     // ------------------------------------------------------------------------
     // Start/stop tracing - controlled by the plug-in
@@ -209,7 +209,7 @@ public class TmfCoreTracer {
     }
 
     @SuppressWarnings("javadoc")
-    public static void traceRequest(ITmfRequest request, String msg) {
+    public static void traceRequest(ITmfDataRequest request, String msg) {
         if (REQUEST_CLASS_ENABLED) {
             String message = ("[REQ] Req=" + request.getRequestId() + " " + msg);
             trace(message);
@@ -226,7 +226,7 @@ public class TmfCoreTracer {
     }
 
     @SuppressWarnings("javadoc")
-    public static void traceEvent(ITmfEventProvider provider, ITmfRequest request, ITmfEvent event) {
+    public static void traceEvent(ITmfDataProvider provider, ITmfDataRequest request, ITmfEvent event) {
         if (EVENT_CLASS_ENABLED) {
             String message = ("[EVT] Provider=" + provider.toString()
                     + ", Req=" + request.getRequestId() + ", Event=" + event.getTimestamp());

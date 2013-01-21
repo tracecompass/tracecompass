@@ -154,20 +154,6 @@ public final class TmfTimeRange {
                         : fEndTime);
     }
 
-    /**
-     * Get the union of two time ranges
-     *
-     * @param range the other time range
-     * @return the intersection time range, or null if no intersection exists
-     *
-     * @since 2.0
-     */
-    public TmfTimeRange getUnion(final TmfTimeRange range) {
-        ITmfTimestamp start = (fStartTime.compareTo(range.fStartTime, true) < 0) ? fStartTime : range.fStartTime;
-        ITmfTimestamp end   = (fEndTime.compareTo(range.fEndTime, true) < 0)     ? fEndTime   : range.fEndTime;
-        return new TmfTimeRange(start, end);
-    }
-
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------

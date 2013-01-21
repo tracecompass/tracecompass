@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 
 /**
@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * <p>
  * Test suite for the TmfProviderManager class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls" })
 public class TmfProviderManagerTest extends TestCase {
 
 	/**
@@ -54,8 +54,8 @@ public class TmfProviderManagerTest extends TestCase {
 		public TestProvider1(Class<TmfEvent> type) {
 			super("TestProvider1", type);
 		}
-        @Override
-		public ITmfContext armRequest(ITmfRequest request) {
+		@Override
+		public ITmfContext armRequest(ITmfDataRequest request) {
 			return null;
 		}
 		@Override
@@ -63,7 +63,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public boolean isCompleted(ITmfRequest request, ITmfEvent data, int nbRead) {
+		public boolean isCompleted(ITmfDataRequest request, ITmfEvent data, int nbRead) {
 			return false;
 		}
 	}
@@ -73,7 +73,7 @@ public class TmfProviderManagerTest extends TestCase {
 			super("TestProvider2", type);
 		}
 		@Override
-		public ITmfContext armRequest(ITmfRequest request) {
+		public ITmfContext armRequest(ITmfDataRequest request) {
 			return null;
 		}
 		@Override
@@ -81,7 +81,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public boolean isCompleted(ITmfRequest request, ITmfEvent data, int nbRead) {
+		public boolean isCompleted(ITmfDataRequest request, ITmfEvent data, int nbRead) {
 			return false;
 		}
 	}
@@ -98,7 +98,7 @@ public class TmfProviderManagerTest extends TestCase {
 			super("TestProvider3", type);
 		}
 		@Override
-		public ITmfContext armRequest(ITmfRequest request) {
+		public ITmfContext armRequest(ITmfDataRequest request) {
 			return null;
 		}
 		@Override
@@ -106,7 +106,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public boolean isCompleted(ITmfRequest request, ITmfEvent data, int nbRead) {
+		public boolean isCompleted(ITmfDataRequest request, ITmfEvent data, int nbRead) {
 			return false;
 		}
 	}

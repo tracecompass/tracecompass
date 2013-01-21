@@ -13,11 +13,11 @@
 package org.eclipse.linuxtools.internal.tmf.core.component;
 
 import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
-import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfRequest.TmfRequestPriority;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 
 /**
@@ -41,12 +41,12 @@ public class TmfEventThread implements Runnable {
     /**
      * The wrapped event request
      */
-    private final ITmfRequest fRequest;
+    private final ITmfDataRequest fRequest;
 
     /**
      * The request execution priority
      */
-    private final TmfRequestPriority fExecType;
+    private final ExecutionType   fExecType;
 
     /**
      * The wrapped thread (if applicable)
@@ -74,12 +74,12 @@ public class TmfEventThread implements Runnable {
      * @param provider the event provider
      * @param request the request to process
      */
-    public TmfEventThread(TmfDataProvider provider, ITmfRequest request) {
+    public TmfEventThread(TmfDataProvider provider, ITmfDataRequest request) {
         assert provider != null;
         assert request  != null;
         fProvider = provider;
         fRequest  = request;
-        fExecType = request.getRequestPriority();
+        fExecType = request.getExecType();
         fThread   = null;
     }
 
@@ -109,21 +109,21 @@ public class TmfEventThread implements Runnable {
     /**
      * @return The event provider
      */
-    public ITmfEventProvider getProvider() {
+    public ITmfDataProvider getProvider() {
         return fProvider;
     }
 
     /**
      * @return The event request
      */
-    public ITmfRequest getRequest() {
+    public ITmfDataRequest getRequest() {
         return fRequest;
     }
 
     /**
      * @return The request execution priority
      */
-    public TmfRequestPriority getExecType() {
+    public ExecutionType getExecType() {
         return fExecType;
     }
 
@@ -155,7 +155,7 @@ public class TmfEventThread implements Runnable {
 
         // Extract the generic information
         fRequest.start();
-        long nbRequested = fRequest.getNbRequested();
+        int nbRequested = fRequest.getNbRequested();
         int nbRead = 0;
         isCompleted = false;
 
@@ -172,10 +172,10 @@ public class TmfEventThread implements Runnable {
             TmfCoreTracer.traceRequest(fRequest, "read first event"); //$NON-NLS-1$
 
             while (event != null && !fProvider.isCompleted(fRequest, event, nbRead)) {
-                while (isPaused) {
+                if (isPaused) {
                     try {
-                        synchronized (object) {
-                            if (isPaused) {
+                        while (isPaused) {
+                            synchronized (object) {
                                 object.wait();
                             }
                         }
@@ -184,7 +184,9 @@ public class TmfEventThread implements Runnable {
                 }
 
                 TmfCoreTracer.traceEvent(fProvider, fRequest, event);
-                fRequest.handleEvent(event);
+                if (fRequest.getDataType().isInstance(event)) {
+                    fRequest.handleData(event);
+                }
 
                 // To avoid an unnecessary read passed the last event requested
                 if (++nbRead < nbRequested) {

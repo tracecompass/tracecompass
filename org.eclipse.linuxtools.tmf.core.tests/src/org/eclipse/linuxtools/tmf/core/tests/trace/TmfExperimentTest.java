@@ -48,7 +48,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 /**
  * Test suite for the TmfExperiment class (single trace).
  */
-@SuppressWarnings({"nls","javadoc", "deprecation"})
+@SuppressWarnings({"nls","javadoc"})
 public class TmfExperimentTest extends TestCase {
 
     // ------------------------------------------------------------------------

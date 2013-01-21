@@ -353,14 +353,6 @@ public class TmfTimestamp implements ITmfTimestamp {
      */
     @Override
     public String toString(final TmfTimestampFormat format) {
-        // Check the border cases
-        if (equals(BIG_BANG)) {
-            return "BIG_BANG"; //$NON-NLS-1$
-        }
-        if (equals(BIG_CRUNCH)) {
-            return "BIG_CRUNCH"; //$NON-NLS-1$
-        }
-        // Format the timestamp
         try {
             ITmfTimestamp ts = normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
             return format.format(ts.getValue());

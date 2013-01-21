@@ -19,9 +19,9 @@ import org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 /**
  * Test suite for the TmfRequestExecutor class.
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({ "nls" })
 public class TmfRequestExecutorTest extends TestCase {
 
     // ------------------------------------------------------------------------
@@ -86,11 +86,11 @@ public class TmfRequestExecutorTest extends TestCase {
 	}
 
 	// ------------------------------------------------------------------------
-	// execute with pre-emption
+	// execute
 	// ------------------------------------------------------------------------
 
 	// Dummy context
-	private static class MyContext implements ITmfContext, Cloneable {
+	private static class MyContext implements ITmfContext {
 	    private long fNbRequested;
         private long fRank;
 
@@ -145,7 +145,7 @@ public class TmfRequestExecutorTest extends TestCase {
         public void broadcast(TmfSignal signal) {
         }
         @Override
-        public void sendRequest(ITmfRequest request) {
+        public void sendRequest(ITmfDataRequest request) {
         }
         @Override
         public void fireRequest() {
@@ -159,28 +159,18 @@ public class TmfRequestExecutorTest extends TestCase {
             return context.getRank() >= 0 ? fEvent : null;
         }
         @Override
-        public ITmfContext armRequest(ITmfRequest request) {
+        public ITmfContext armRequest(ITmfDataRequest request) {
             return new MyContext(request.getNbRequested());
         }
 	}
 
 	// Dummy request
-    private static class MyRequest extends TmfRequest {
-        private final Object monitor;
-        public MyRequest(TmfRequestPriority priority, int requested, Object mon) {
-            super(TmfTimeRange.ETERNITY, 0, requested, priority);
-            monitor = mon;
+    private static class MyRequest extends TmfDataRequest {
+        public MyRequest(ExecutionType priority, int requested) {
+            super(ITmfEvent.class, 0, requested, priority);
         }
         @Override
-        public synchronized void done() {
-            super.done();
-            synchronized (monitor) {
-                monitor.notifyAll();
-            }
-        }
-        @Override
-        public synchronized void handleStarted() {
-            super.handleStarted();
+        public void done() {
             synchronized (monitor) {
                 monitor.notifyAll();
             }
@@ -189,109 +179,81 @@ public class TmfRequestExecutorTest extends TestCase {
 
     // Dummy thread
     private static class MyThread extends TmfEventThread {
-        private final Object monitor;
-        public MyThread(TmfDataProvider provider, ITmfRequest request, Object mon) {
+        public MyThread(TmfDataProvider provider, ITmfDataRequest request) {
             super(provider, request);
-            monitor = mon;
-        }
-        @Override
-        public synchronized void resume() {
-            super.resume();
-            synchronized (monitor) {
-                monitor.notifyAll();
-            }
         }
     }
 
-    private final static Object reqmon1 = new Object();
-    private final static Object reqmon2 = new Object();
-    private final static Object reqmon3 = new Object();
-
-    private final static Object thrmon1 = new Object();
-    private final static Object thrmon2 = new Object();
-    private final static Object thrmon3 = new Object();
+    private final static Object monitor = new Object();
 
     /**
 	 * Test method for {@link org.eclipse.linuxtools.internal.tmf.core.request.TmfRequestExecutor#execute(java.lang.Runnable)}.
 	 */
 	public void testExecute() {
-	    final long TIMEOUT = 100;
-	    final long ONE_MINUTE = 60 * 1000;
-
         MyProvider provider = new MyProvider();
-        MyRequest  request1 = new MyRequest(ITmfRequest.TmfRequestPriority.NORMAL, Integer.MAX_VALUE /  10, reqmon1);
-        MyThread   thread1  = new MyThread(provider, request1, thrmon1);
-        MyRequest  request2 = new MyRequest(ITmfRequest.TmfRequestPriority.HIGH,   Integer.MAX_VALUE / 100, reqmon2);
-        MyThread   thread2  = new MyThread(provider, request2, thrmon2);
-        MyRequest  request3 = new MyRequest(ITmfRequest.TmfRequestPriority.HIGH,   Integer.MAX_VALUE / 100, reqmon3);
-        MyThread   thread3  = new MyThread(provider, request3, thrmon3);
+        MyRequest  request1 = new MyRequest(ExecutionType.BACKGROUND, Integer.MAX_VALUE /  5);
+        MyThread   thread1  = new MyThread(provider, request1);
+        MyRequest  request2 = new MyRequest(ExecutionType.FOREGROUND, Integer.MAX_VALUE / 10);
+        MyThread   thread2  = new MyThread(provider, request2);
+        MyRequest  request3 = new MyRequest(ExecutionType.FOREGROUND, Integer.MAX_VALUE / 10);
+        MyThread   thread3  = new MyThread(provider, request3);
 
         // Start thread1
-        synchronized (reqmon1) {
-            try {
-                fExecutor.execute(thread1);
-                reqmon1.wait(ONE_MINUTE);
-                assertTrue("isRunning", thread1.isRunning());
-            } catch (InterruptedException e) {
-            }
+        fExecutor.execute(thread1);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
         }
+       assertTrue("isRunning", thread1.isRunning());
 
         // Start higher priority thread2
-        synchronized (reqmon2) {
-            try {
-                fExecutor.execute(thread2);
-                reqmon2.wait(ONE_MINUTE);
-                assertFalse("isRunning", thread1.isRunning());
-                assertTrue("isRunning", thread2.isRunning());
-            } catch (InterruptedException e) {
-            }
+        fExecutor.execute(thread2);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
         }
+        assertFalse("isRunning", thread1.isRunning());
+        assertTrue("isRunning", thread2.isRunning());
 
         // Wait for end of thread2
         try {
-            synchronized (reqmon2) {
-                reqmon2.wait(ONE_MINUTE);
-                assertTrue("isCompleted", thread2.isCompleted());
-            }
-            synchronized (thrmon1) {
-                thrmon1.wait(TIMEOUT); // Use a timeout in case we already missed the signal
-                assertTrue("isRunning", thread1.isRunning());
+            synchronized (monitor) {
+                monitor.wait();
+                Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
         }
+        assertTrue("isCompleted", thread2.isCompleted());
+        assertTrue("isRunning", thread1.isRunning());
 
         // Start higher priority thread3
-        synchronized (reqmon3) {
-            try {
-                fExecutor.execute(thread3);
-                reqmon3.wait(ONE_MINUTE);
-                assertFalse("isRunning", thread1.isRunning());
-                assertTrue("isRunning", thread3.isRunning());
-            } catch (InterruptedException e) {
-            }
+        fExecutor.execute(thread3);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
         }
+        assertFalse("isRunning", thread1.isRunning());
+        assertTrue("isRunning", thread3.isRunning());
 
         // Wait for end of thread3
         try {
-            synchronized (reqmon3) {
-                reqmon3.wait(ONE_MINUTE);
-                assertTrue("isCompleted", thread3.isCompleted());
-            }
-            synchronized (thrmon1) {
-                thrmon1.wait(TIMEOUT); // Use a timeout in case we already missed the signal
-                assertTrue("isRunning", thread1.isRunning());
+            synchronized (monitor) {
+                monitor.wait();
+                Thread.sleep(500);
             }
         } catch (InterruptedException e) {
         }
+        assertTrue("isCompleted", thread3.isCompleted());
+        assertTrue("isRunning", thread1.isRunning());
 
         // Wait for thread1 completion
         try {
-            synchronized (reqmon1) {
-                reqmon1.wait(ONE_MINUTE);
-                assertTrue("isCompleted", thread1.isCompleted());
+            synchronized (monitor) {
+                monitor.wait();
             }
         } catch (InterruptedException e) {
         }
+        assertTrue("isCompleted", thread1.isCompleted());
     }
 
 	// ------------------------------------------------------------------------
