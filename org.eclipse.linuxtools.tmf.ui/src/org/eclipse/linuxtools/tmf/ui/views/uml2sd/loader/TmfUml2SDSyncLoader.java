@@ -33,7 +33,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
@@ -269,7 +268,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
 
-        ITmfRequest indexRequest = null;
+        ITmfEventRequest indexRequest = null;
         fLock.lock();
         try {
             // Update the trace reference
@@ -406,7 +405,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         if (signal.getTrace() != fTrace) {
             return;
         }
-        ITmfRequest indexRequest = null;
+        ITmfEventRequest indexRequest = null;
         fLock.lock();
         try {
             indexRequest = fIndexRequest;
@@ -520,7 +519,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     @Override
     public void dispose() {
        super.dispose();
-       ITmfRequest indexRequest = null;
+       ITmfEventRequest indexRequest = null;
        fLock.lock();
        try {
            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -872,7 +871,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      */
     protected void cancelOngoingRequests() {
         fLock.lock();
-        ITmfRequest pageRequest = null;
+        ITmfEventRequest pageRequest = null;
         try {
             // Cancel the search thread
             if (fFindJob != null) {
