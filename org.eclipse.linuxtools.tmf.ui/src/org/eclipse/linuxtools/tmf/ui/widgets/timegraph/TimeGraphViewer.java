@@ -1,4 +1,3 @@
-
 /*****************************************************************************
  * Copyright (c) 2007, 2008 Intel Corporation, 2009, 2010, 2011, 2012 Ericsson.
  * All rights reserved. This program and the accompanying materials
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
@@ -1446,6 +1446,22 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         _stateCtrl.removeTimeEventMenuListener(listener);
     }
 
+    /**
+     * @param filter The filter object to be attached to the view
+     * @since 2.0
+     */
+    public void addFilter(ViewerFilter filter) {
+        _stateCtrl.addFilter(filter);
+        refresh();
+    }
 
+    /**
+     * @param filter The filter object to be attached to the view
+     * @since 2.0
+     */
+    public void removeFilter(ViewerFilter filter) {
+        _stateCtrl.removeFilter(filter);
+        refresh();
+    }
 
 }

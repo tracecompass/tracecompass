@@ -15,7 +15,10 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -27,6 +30,11 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.dialogs.TimeGraphFilterDialog;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -76,8 +84,17 @@ public class TimeGraphCombo extends Composite {
     // The time viewer
     private TimeGraphViewer fTimeGraphViewer;
 
+    // The top-level input (children excluded)
+    private List<? extends ITimeGraphEntry> fTopInput;
+
+    // All the inputs (children included)
+    private List<? extends ITimeGraphEntry> fAllInput;
+
     // The selection listener map
     private final HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper>();
+
+    // The map of viewer filters
+    private final Map<ViewerFilter, ViewerFilter> fViewerFilterMap = new HashMap<ViewerFilter, ViewerFilter>();
 
     // Flag to block the tree selection changed listener when triggered by the time graph combo
     private boolean fInhibitTreeSelection = false;
@@ -87,6 +104,15 @@ public class TimeGraphCombo extends Composite {
 
     // Calculated item height for Linux workaround
     private int fLinuxItemHeight = 0;
+
+    // The button that opens the filter dialog
+    private Action showFilterAction;
+
+    // The filter dialog
+    private TimeGraphFilterDialog fFilterDialog;
+
+    // The filter generated from the filter dialog
+    private RawViewerFilter fFilter;
 
     // ------------------------------------------------------------------------
     // Classes
@@ -240,6 +266,52 @@ public class TimeGraphCombo extends Composite {
         }
     }
 
+    /**
+     * The ViewerFilterWrapper is used to intercept the filler items from
+     * the time graph combo's real ViewerFilters. These filler items should
+     * always be visible.
+     */
+    private class ViewerFilterWrapper extends ViewerFilter {
+
+        ViewerFilter fWrappedFilter;
+
+        ViewerFilterWrapper(ViewerFilter filter) {
+            super();
+            this.fWrappedFilter = filter;
+        }
+
+        @Override
+        public boolean select(Viewer viewer, Object parentElement, Object element) {
+            if (element instanceof ITimeGraphEntry) {
+                return fWrappedFilter.select(viewer, parentElement, element);
+            }
+            return true;
+        }
+
+    }
+
+    /**
+     * This filter simply keeps a list of elements that should be shown
+     * All the other elements will be filtered
+     */
+    private class RawViewerFilter extends ViewerFilter {
+
+        private List<Object> fNonFiltered = new ArrayList<Object>();
+
+        public void setNonFiltered(List<Object> objects) {
+            fNonFiltered = objects;
+        }
+
+        public List<Object> getNonFiltered() {
+            return fNonFiltered;
+        }
+
+        @Override
+        public boolean select(Viewer viewer, Object parentElement, Object element) {
+            return fNonFiltered.contains(element);
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -267,6 +339,11 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
         fTimeGraphViewer.setNameWidthPref(0);
+
+        fFilter = new RawViewerFilter();
+        addFilter(fFilter);
+
+        fFilterDialog = new TimeGraphFilterDialog(getShell());
 
         // Feature in Windows. The tree vertical bar reappears when
         // the control is resized so we need to hide it again.
@@ -544,6 +621,60 @@ public class TimeGraphCombo extends Composite {
         return fTimeGraphViewer;
     }
 
+    /**
+     * Callback for the show filter action
+     *
+     * @since 2.0
+     */
+    public void showFilterDialog() {
+        if(fTopInput != null) {
+            fFilterDialog.setInput(fTopInput.toArray(new ITimeGraphEntry[0]));
+            fFilterDialog.setTitle(Messages.TmfTimeFilterDialog_WINDOW_TITLE);
+            fFilterDialog.setMessage(Messages.TmfTimeFilterDialog_MESSAGE);
+            fFilterDialog.setInitialElementSelections(fFilter.getNonFiltered());
+            fFilterDialog.setExpandedElements(fAllInput.toArray());
+            fFilterDialog.create();
+            fFilterDialog.open();
+            // Process selected elements
+            if (fFilterDialog.getResult() != null) {
+                fInhibitTreeSelection = true;
+                fFilter.setNonFiltered(new ArrayList<Object>(Arrays.asList(fFilterDialog.getResult())));
+                fTreeViewer.refresh();
+                fTreeViewer.expandAll();
+                fTimeGraphViewer.refresh();
+                fInhibitTreeSelection = false;
+                // Reset selection to first entry
+                if (fFilterDialog.getResult().length > 0) {
+                    setSelection((ITimeGraphEntry) fFilterDialog.getResult()[0]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the show filter action.
+     *
+     * @return The Action object
+     * @since 2.0
+     */
+    public Action getShowFilterAction() {
+        if (showFilterAction == null) {
+            // showFilter
+            showFilterAction = new Action() {
+                @Override
+                public void run() {
+                    showFilterDialog();
+                }
+            };
+            showFilterAction.setText(Messages.TmfTimeGraphCombo_FilterActionNameText);
+            showFilterAction.setToolTipText(Messages.TmfTimeGraphCombo_FilterActionToolTipText);
+            // TODO find a nice, distinctive icon
+            showFilterAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
+        }
+
+        return showFilterAction;
+    }
+
     // ------------------------------------------------------------------------
     // Control
     // ------------------------------------------------------------------------
@@ -580,6 +711,26 @@ public class TimeGraphCombo extends Composite {
     }
 
     /**
+     * Sets the tree content provider used by the filter dialog
+     *
+     * @param contentProvider the tree content provider
+     * @since 2.0
+     */
+    public void setFilterContentProvider(ITreeContentProvider contentProvider) {
+        fFilterDialog.setContentProvider(contentProvider);
+    }
+
+    /**
+     * Sets the tree label provider used by the filter dialog
+     *
+     * @param labelProvider the tree label provider
+     * @since 2.0
+     */
+    public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
+        fFilterDialog.setLabelProvider(labelProvider);
+    }
+
+    /**
      * Sets the tree columns for this time graph combo.
      *
      * @param columnNames the tree column names
@@ -591,6 +742,16 @@ public class TimeGraphCombo extends Composite {
             column.setText(columnName);
             column.pack();
         }
+    }
+
+    /**
+     * Sets the tree columns for this time graph combo's filter dialog.
+     *
+     * @param columnNames the tree column names
+     * @since 2.0
+     */
+    public void setFilterColumns(String[] columnNames) {
+        fFilterDialog.setColumnNames(columnNames);
     }
 
     /**
@@ -609,6 +770,9 @@ public class TimeGraphCombo extends Composite {
      * @param input the input of this time graph combo, or <code>null</code> if none
      */
     public void setInput(ITimeGraphEntry[] input) {
+        fTopInput = new ArrayList<ITimeGraphEntry>(Arrays.asList(input));
+        fAllInput = listAllInputs(fTopInput);
+        fFilter.setNonFiltered(new ArrayList<Object>(fAllInput));
         fInhibitTreeSelection = true;
         fTreeViewer.setInput(input);
         for (SelectionListenerWrapper listenerWrapper : fSelectionListenerMap.values()) {
@@ -620,6 +784,28 @@ public class TimeGraphCombo extends Composite {
         fTreeViewer.getTree().getVerticalBar().setVisible(false);
         fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree()));
         fTimeGraphViewer.setInput(input);
+    }
+
+    /**
+     * @param filter The filter object to be attached to the view
+     * @since 2.0
+     */
+    public void addFilter(ViewerFilter filter) {
+        ViewerFilter wrapper = new ViewerFilterWrapper(filter);
+        fTreeViewer.addFilter(wrapper);
+        fTimeGraphViewer.addFilter(wrapper);
+        fViewerFilterMap.put(filter, wrapper);
+    }
+
+    /**
+     * @param filter The filter object to be removed from the view
+     * @since 2.0
+     */
+    public void removeFilter(ViewerFilter filter) {
+        ViewerFilter wrapper = fViewerFilterMap.get(filter);
+        fTreeViewer.removeFilter(wrapper);
+        fTimeGraphViewer.removeFilter(wrapper);
+        fViewerFilterMap.remove(filter);
     }
 
     /**
@@ -737,6 +923,23 @@ public class TimeGraphCombo extends Composite {
             items.add(item);
             if (item.getExpanded()) {
                 items.addAll(getVisibleExpandedItems(item));
+            }
+        }
+        return items;
+    }
+
+    /**
+     * Explores the list of top-level inputs and returns all the inputs
+     *
+     * @param inputs The top-level inputs
+     * @return All the inputs
+     */
+    private List<? extends ITimeGraphEntry> listAllInputs(List<? extends ITimeGraphEntry> inputs) {
+        ArrayList<ITimeGraphEntry> items = new ArrayList<ITimeGraphEntry>();
+        for (ITimeGraphEntry entry : inputs) {
+            items.add(entry);
+            if (entry.hasChildren()) {
+                items.addAll(listAllInputs(entry.getChildren()));
             }
         }
         return items;

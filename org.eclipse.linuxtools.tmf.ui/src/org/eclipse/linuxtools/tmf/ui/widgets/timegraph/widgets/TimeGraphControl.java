@@ -25,6 +25,7 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTreeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
@@ -114,6 +115,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     private final List<MenuDetectListener> _timeEventMenuListeners = new ArrayList<MenuDetectListener>();
     private final Cursor _dragCursor3;
     private final Cursor _WaitCursor;
+    private final List<ViewerFilter> _filters = new ArrayList<ViewerFilter>();
 
     // Vertical formatting formatting for the state control view
     private final boolean _visibleVerticalScroll = true;
@@ -1979,6 +1981,24 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     }
 
+    /**
+     * @param filter The filter object to be attached to the view
+     * @since 2.0
+     */
+    public void addFilter(ViewerFilter filter) {
+        if (!_filters.contains(filter)) {
+            _filters.add(filter);
+        }
+    }
+
+    /**
+     * @param filter The filter object to be attached to the view
+     * @since 2.0
+     */
+    public void removeFilter(ViewerFilter filter) {
+        _filters.remove(filter);
+    }
+
     private class ItemData {
         public Item[] _expandedItems = new Item[0];
         public Item[] _items = new Item[0];
@@ -2058,10 +2078,20 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         }
 
         private void refreshExpanded(List<Item> expandedItemList, Item item) {
-            expandedItemList.add(item);
-            if (item._hasChildren && item._expanded) {
-                for (Item child : item.children) {
-                    refreshExpanded(expandedItemList, child);
+            // Check for filters
+            boolean display = true;
+            for (ViewerFilter filter : _filters) {
+                if (!filter.select(null, item._trace.getParent(), item._trace)) {
+                    display = false;
+                    break;
+                }
+            }
+            if (display) {
+                expandedItemList.add(item);
+                if (item._hasChildren && item._expanded) {
+                    for (Item child : item.children) {
+                        refreshExpanded(expandedItemList, child);
+                    }
                 }
             }
         }
