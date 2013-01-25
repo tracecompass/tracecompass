@@ -1,6 +1,5 @@
 package org.eclipse.linuxtools.ctf.core.tests.types;
 
-import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -13,24 +12,26 @@ import org.junit.runners.Suite;
  * @version $Revision: 1.0 $
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ StructDefinitionTest.class, IntegerDeclarationTest.class,
-        EnumDefinitionTest.class, SequenceDeclarationTest.class,
-        StructDeclarationTest.class, DefinitionTest.class,
-        IntegerDefinitionTest.class, SequenceDefinitionTest.class,
-        ArrayDefinitionTest.class, EnumDeclarationTest.class,
-        StringDeclarationTest.class, ArrayDeclarationTest.class,
-        FloatDefinitionTest.class, FloatDeclarationTest.class,
-        VariantDefinitionTest.class, VariantDeclarationTest.class,
-        StringDefinitionTest.class, EventDeclarationTest.class, })
+@Suite.SuiteClasses({
+    ArrayDeclarationTest.class,
+    ArrayDefinitionTest.class,
+    DefinitionTest.class,
+    EnumDeclarationTest.class,
+    EnumDefinitionTest.class,
+    EventDeclarationTest.class,
+    FloatDeclarationTest.class,
+    FloatDefinitionTest.class,
+    IntegerDeclarationTest.class,
+    IntegerDefinitionTest.class,
+    SequenceDeclarationTest.class,
+    SequenceDefinitionTest.class,
+    StringDeclarationTest.class,
+    StringDefinitionTest.class,
+    StructDeclarationTest.class,
+    StructDefinitionTest.class,
+    VariantDeclarationTest.class,
+    VariantDefinitionTest.class,
+})
 public class TestAll {
 
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        JUnitCore.runClasses(new Class[] { TestAll.class });
-    }
 }

@@ -1,6 +1,5 @@
 package org.eclipse.linuxtools.ctf.core.tests.event;
 
-import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -13,16 +12,10 @@ import org.junit.runners.Suite;
  * @version $Revision: 1.0 $
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ CTFEventFieldTest.class, CTFCallsiteTest.class })
+@Suite.SuiteClasses({
+    CTFCallsiteTest.class,
+    CTFEventFieldTest.class
+})
 public class TestAll {
 
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(final String[] args) {
-        JUnitCore.runClasses(new Class[] { TestAll.class });
-    }
 }

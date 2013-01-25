@@ -12,8 +12,8 @@ import org.junit.Test;
 
 /**
  * The class <code>UtilsTest</code> contains tests for the class
- * <code>{@link Utils}</code>.
- * 
+ * {@link Utils}.
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -21,7 +21,7 @@ public class UtilsTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
