@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,29 +8,29 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-@SuppressWarnings("javadoc")
+/**
+ * Runner for the LTTng2.core unit tests
+ */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    BaseEventInfoTest.class,
+    ChannelInfoTest.class,
+    DomainInfoTest.class,
+    EventInfoTest.class,
+    FieldInfoTest.class,
+    ProbeEventInfoTest.class,
+    SessionInfoTest.class,
+    TraceInfoTest.class,
+    UstProviderInfoTest.class
+})
 public class AllTests {
 
-    public static Test suite() {
-
-        TestSuite suite = new TestSuite(AllTests.class.getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(FieldInfoTest.class);
-        suite.addTestSuite(BaseEventInfoTest.class);
-        suite.addTestSuite(DomainInfoTest.class);
-        suite.addTestSuite(EventInfoTest.class);
-        suite.addTestSuite(ProbeEventInfoTest.class);
-        suite.addTestSuite(ChannelInfoTest.class);
-        suite.addTestSuite(SessionInfoTest.class);
-        suite.addTestSuite(TraceInfoTest.class);
-        suite.addTestSuite(UstProviderInfoTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 }

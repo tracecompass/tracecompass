@@ -17,45 +17,38 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * Tests for the LTTng 2.0 kernel state provider
  *
- * @author alexmont
- *
+ * @author Alexandre Montplaisir
  */
-@SuppressWarnings("javadoc")
 public class CtfKernelStateInputTest {
 
     static IStateChangeInput input;
 
+    /**
+     * Set-up.
+     *
+     * @throws TmfTraceException
+     *             If we can't find the test traces
+     */
     @BeforeClass
     public static void initialize() throws TmfTraceException {
         input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
 
     }
 
-    @AfterClass
-    public static void cleanup() {
-        //
-    }
-
+    /**
+     * Test loading the state provider.
+     */
     @Test
     public void testOpening() {
         long testStartTime;
         testStartTime = input.getStartTime();
         assertEquals(testStartTime, CtfTestFiles.startTime);
     }
-
-    //FIXME re-enable once we offer history-less state systems again
-//    @Test
-//    public void testRunning() {
-//        StateSystem ss = new StateSystem();
-//        input.assignTargetStateSystem(ss);
-//        input.run();
-//    }
 
 }

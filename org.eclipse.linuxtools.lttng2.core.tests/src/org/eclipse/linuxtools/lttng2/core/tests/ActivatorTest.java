@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,61 +8,26 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.core.tests;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * <b><u>ActivatorTest</u></b>
- * <p>
- * Test suite for the Activator class
- * <p>
+ * Test stubs for the Activator.
  */
-@SuppressWarnings("javadoc")
-public class ActivatorTest extends TestCase {
-
-    // ------------------------------------------------------------------------
-    // JUnit
-    // ------------------------------------------------------------------------
-
-    @BeforeClass
-    public static void setUpBeforeClass() {
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    @Override
-    public void setUp() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    @Override
-    public void tearDown() throws Exception {
-    }
+public class ActivatorTest {
 
     // ------------------------------------------------------------------------
     // Tests
     // ------------------------------------------------------------------------
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.core.Activator#Activator()}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.core.Activator#Activator()}.
      */
     @Test
     public void testActivator() {
@@ -70,7 +35,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.core.Activator#getDefault()}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.core.Activator#getDefault()}.
      */
     @Test
     public void testGetDefault() {
@@ -78,7 +43,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.core.Activator#start(org.osgi.framework.BundleContext)}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.core.Activator#start(org.osgi.framework.BundleContext)}.
      */
     @Test
     public void testStartBundleContext() {
@@ -86,7 +51,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.core.Activator#stop(org.osgi.framework.BundleContext)}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.core.Activator#stop(org.osgi.framework.BundleContext)}.
      */
     @Test
     public void testStopBundleContext() {

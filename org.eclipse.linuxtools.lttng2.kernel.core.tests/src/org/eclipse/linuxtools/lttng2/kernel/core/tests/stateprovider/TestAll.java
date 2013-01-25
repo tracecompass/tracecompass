@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,12 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * The class <code>TestAll</code> builds a suite that can be used to run all of
- * the tests within its package as well as within any subpackages of its
- * package.
- *
- * @author ematkho
- * @version $Revision: 1.0 $
+ * Runner for the LTTng kernel state system tests.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

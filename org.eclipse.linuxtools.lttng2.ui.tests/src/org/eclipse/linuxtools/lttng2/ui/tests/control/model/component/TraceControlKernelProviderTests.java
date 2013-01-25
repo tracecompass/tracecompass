@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,15 +8,17 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -44,39 +46,30 @@ import org.eclipse.rse.core.model.ISystemProfile;
 import org.eclipse.rse.core.model.ISystemRegistry;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.FrameworkUtil;
 
 /**
- * The class <code>TraceControlKernelProviderTests</code> contains UST provider handling
- * test cases.
+ * The class <code>TraceControlKernelProviderTests</code> contains UST provider
+ * handling test cases.
  */
-@SuppressWarnings({"nls", "javadoc"})
-public class TraceControlKernelProviderTests extends TestCase {
+@SuppressWarnings("nls")
+public class TraceControlKernelProviderTests {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
     private static final String TEST_STREAM = "CreateTreeTest.cfg";
     private static final String SCEN_SCENARIO1_TEST = "Scenario1";
 
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
+
     private TraceControlTestFacility fFacility;
     private TestRemoteSystemProxy fProxy;
     private String fTestFile;
-
-    // ------------------------------------------------------------------------
-    // Static methods
-    // ------------------------------------------------------------------------
-
-    /**
-     * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class
-     */
-    public static Test suite() {
-        return new ModelImplTestSetup(new TestSuite(TraceControlKernelProviderTests.class));
-    }
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -87,9 +80,7 @@ public class TraceControlKernelProviderTests extends TestCase {
      *
      * @throws Exception
      *         if the initialization fails for some reason
-     *
      */
-    @Override
     @Before
     public void setUp() throws Exception {
         fFacility = TraceControlTestFacility.getInstance();
@@ -101,22 +92,20 @@ public class TraceControlKernelProviderTests extends TestCase {
 
     /**
      * Perform post-test clean-up.
-     *
-     * @throws Exception
-     *         if the clean-up fails for some reason
-     *
      */
-    @Override
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         fFacility.waitForJobs();
     }
 
     /**
      * Run the TraceControlComponent.
+     *
+     * @throws Exception
+     *             Would fail the test
      */
+    @Test
     public void testKernelProviderTree() throws Exception {
-
 
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(TraceControlTestFacility.SCEN_INIT_TEST);

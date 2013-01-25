@@ -8,28 +8,34 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
+
+import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IDomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.SessionInfo;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link SessionInfo}</code>.
- *
+ * The class <code>ChannelInfoTest</code> contains tests for the class
+ * <code>{@link SessionInfo}</code>.
  */
-@SuppressWarnings({"nls", "javadoc"})
-public class SessionInfoTest extends TestCase {
+@SuppressWarnings("nls")
+public class SessionInfoTest {
+
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
+
     private ISessionInfo fSessionInfo1 = null;
     private ISessionInfo fSessionInfo2 = null;
 
@@ -42,29 +48,14 @@ public class SessionInfoTest extends TestCase {
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws Exception
-     *         if the initialization fails for some reason
-     *
      */
-    @Override
+    @Before
     public void setUp() {
         ModelImplFactory factory = new ModelImplFactory();
         fSessionInfo1 = factory.getSessionInfo1();
         fDomainInfo1 = factory.getDomainInfo1();
         fSessionInfo2 = factory.getSessionInfo2();
         fDomainInfo2 = factory.getDomainInfo2();
-    }
-
-    /**
-     * Perform post-test clean-up.
-     *
-     * @throws Exception
-     *         if the clean-up fails for some reason
-     *
-     */
-    @Override
-    public void tearDown() {
     }
 
     // ------------------------------------------------------------------------
@@ -77,8 +68,8 @@ public class SessionInfoTest extends TestCase {
 
     /**
      * Run the ChannelInfo() constructor test.
-     *
      */
+    @Test
     public void testSessionInfo() {
         ISessionInfo result = new SessionInfo("test");
         assertNotNull(result);
@@ -93,6 +84,10 @@ public class SessionInfoTest extends TestCase {
         assertEquals(0, result.getDomains().length);
     }
 
+    /**
+     * Test copy constructor.
+     */
+    @Test
     public void testSessionInfoCopy() {
         SessionInfo sessionInfo = new SessionInfo((SessionInfo)fSessionInfo1);
 
@@ -107,6 +102,10 @@ public class SessionInfoTest extends TestCase {
         }
     }
 
+    /**
+     * Test copy constructor.
+     */
+    @Test
     public void testSessionCopy2() {
         try {
             SessionInfo session = null;
@@ -120,8 +119,8 @@ public class SessionInfoTest extends TestCase {
 
     /**
      * Run the long getNumberOfSubBuffers() method test.
-     *
      */
+    @Test
     public void testGetAndSetters() {
 
         // Note that addDomain() has been executed in setUp()
@@ -181,6 +180,10 @@ public class SessionInfoTest extends TestCase {
         assertEquals(0, state.ordinal());
     }
 
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
     public void testToString_1() {
         ISessionInfo fixture = new SessionInfo("sessionName");
 
@@ -192,8 +195,8 @@ public class SessionInfoTest extends TestCase {
 
     /**
      * Run the String toString() method test.
-     *
      */
+    @Test
     public void testToString_2() {
         String result = fSessionInfo1.toString();
 
@@ -205,6 +208,10 @@ public class SessionInfoTest extends TestCase {
     // equals
     // ------------------------------------------------------------------------
 
+    /**
+     * Run the {@link SessionInfo#equals} method test.
+     */
+    @Test
     public void testEqualsReflexivity() {
         assertTrue("equals", fSessionInfo1.equals(fSessionInfo1));
         assertTrue("equals", fSessionInfo2.equals(fSessionInfo2));
@@ -213,6 +220,10 @@ public class SessionInfoTest extends TestCase {
         assertTrue("equals", !fSessionInfo2.equals(fSessionInfo1));
     }
 
+    /**
+     * Run the {@link SessionInfo#equals} method test.
+     */
+    @Test
     public void testEqualsSymmetry() {
         SessionInfo event1 = new SessionInfo((SessionInfo)fSessionInfo1);
         SessionInfo event2 = new SessionInfo((SessionInfo)fSessionInfo2);
@@ -224,6 +235,10 @@ public class SessionInfoTest extends TestCase {
         assertTrue("equals", fSessionInfo2.equals(event2));
     }
 
+    /**
+     * Run the {@link SessionInfo#equals} method test.
+     */
+    @Test
     public void testEqualsTransivity() {
         SessionInfo channel1 = new SessionInfo((SessionInfo)fSessionInfo1);
         SessionInfo channel2 = new SessionInfo((SessionInfo)fSessionInfo1);
@@ -234,6 +249,10 @@ public class SessionInfoTest extends TestCase {
         assertTrue("equals", channel1.equals(channel3));
     }
 
+    /**
+     * Run the {@link SessionInfo#equals} method test.
+     */
+    @Test
     public void testEqualsNull() {
         assertTrue("equals", !fSessionInfo1.equals(null));
         assertTrue("equals", !fSessionInfo2.equals(null));
@@ -243,6 +262,10 @@ public class SessionInfoTest extends TestCase {
     // hashCode
     // ------------------------------------------------------------------------
 
+    /**
+     * Run the {@link SessionInfo#hashCode} method test.
+     */
+    @Test
     public void testHashCode() {
         SessionInfo channel1 = new SessionInfo((SessionInfo)fSessionInfo1);
         SessionInfo channel2 = new SessionInfo((SessionInfo)fSessionInfo2);
@@ -252,4 +275,5 @@ public class SessionInfoTest extends TestCase {
 
         assertTrue("hashCode", fSessionInfo1.hashCode() != channel2.hashCode());
         assertTrue("hashCode", fSessionInfo2.hashCode() != channel1.hashCode());
-    }}
+    }
+}

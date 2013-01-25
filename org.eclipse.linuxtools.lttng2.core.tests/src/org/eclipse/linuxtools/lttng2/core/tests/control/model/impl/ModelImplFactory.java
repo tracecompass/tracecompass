@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
 
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;

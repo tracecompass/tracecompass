@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,27 +8,33 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
+
+import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IDomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.DomainInfo;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link DomainInfo}</code>.
- *
+ * The class <code>ChannelInfoTest</code> contains tests for the class
+ * <code>{@link DomainInfo}</code>.
  */
-@SuppressWarnings({"nls", "javadoc"})
-public class DomainInfoTest extends TestCase {
+@SuppressWarnings("nls")
+public class DomainInfoTest {
+
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
+
     private IDomainInfo fDomainInfo1 = null;
     private IDomainInfo fDomainInfo2 = null;
     private IChannelInfo fChannelInfo1 = null;
@@ -40,12 +46,8 @@ public class DomainInfoTest extends TestCase {
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws Exception
-     *         if the initialization fails for some reason
-     *
      */
-    @Override
+    @Before
     public void setUp() {
         // Get test instances from the factory
         ModelImplFactory factory = new ModelImplFactory();
@@ -53,17 +55,6 @@ public class DomainInfoTest extends TestCase {
         fChannelInfo2 = factory.getChannel2();
         fDomainInfo1 =  factory.getDomainInfo1();
         fDomainInfo2 =  factory.getDomainInfo2();
-    }
-
-    /**
-     * Perform post-test clean-up.
-     *
-     * @throws Exception
-     *         if the clean-up fails for some reason
-     *
-     */
-    @Override
-    public void tearDown() {
     }
 
     // ------------------------------------------------------------------------
@@ -76,8 +67,8 @@ public class DomainInfoTest extends TestCase {
 
     /**
      * Run the ChannelInfo() constructor test.
-     *
      */
+    @Test
     public void testDomainInfo() {
         DomainInfo result = new DomainInfo("test");
         assertNotNull(result);
@@ -86,6 +77,10 @@ public class DomainInfoTest extends TestCase {
         assertEquals(0, result.getChannels().length);
     }
 
+    /**
+     * Test the copy constructor.
+     */
+    @Test
     public void testDomainInfoCopy() {
         DomainInfo channelInfo = new DomainInfo((DomainInfo)fDomainInfo1);
         IChannelInfo[] orignalEvents = fDomainInfo1.getChannels();
@@ -95,6 +90,10 @@ public class DomainInfoTest extends TestCase {
         }
     }
 
+    /**
+     * Test the copy constructor.
+     */
+    @Test
     public void testDomainlCopy2() {
         try {
             DomainInfo domain = null;
@@ -108,8 +107,8 @@ public class DomainInfoTest extends TestCase {
 
     /**
      * Run the long getNumberOfSubBuffers() method test.
-     *
      */
+    @Test
     public void testGetAndSetters() {
 
         // Note that addChannel() has been executed in setUp()
@@ -130,6 +129,10 @@ public class DomainInfoTest extends TestCase {
         assertEquals(fChannelInfo2, result[1]);
     }
 
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
     public void testToString_1() {
         DomainInfo fixture = new DomainInfo("domain");
 
@@ -140,8 +143,8 @@ public class DomainInfoTest extends TestCase {
 
     /**
      * Run the String toString() method test.
-     *
      */
+    @Test
     public void testToString_2() {
         String result = fDomainInfo1.toString();
 
@@ -152,6 +155,10 @@ public class DomainInfoTest extends TestCase {
     // equals
     // ------------------------------------------------------------------------
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsReflexivity() {
         assertTrue("equals", fDomainInfo1.equals(fDomainInfo1));
         assertTrue("equals", fDomainInfo2.equals(fDomainInfo2));
@@ -160,6 +167,10 @@ public class DomainInfoTest extends TestCase {
         assertTrue("equals", !fDomainInfo2.equals(fDomainInfo1));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsSymmetry() {
         DomainInfo event1 = new DomainInfo((DomainInfo)fDomainInfo1);
         DomainInfo event2 = new DomainInfo((DomainInfo)fDomainInfo2);
@@ -171,6 +182,10 @@ public class DomainInfoTest extends TestCase {
         assertTrue("equals", fDomainInfo2.equals(event2));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsTransivity() {
         DomainInfo channel1 = new DomainInfo((DomainInfo)fDomainInfo1);
         DomainInfo channel2 = new DomainInfo((DomainInfo)fDomainInfo1);
@@ -181,6 +196,10 @@ public class DomainInfoTest extends TestCase {
         assertTrue("equals", channel1.equals(channel3));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsNull() {
         assertTrue("equals", !fDomainInfo1.equals(null));
         assertTrue("equals", !fDomainInfo2.equals(null));
@@ -190,6 +209,10 @@ public class DomainInfoTest extends TestCase {
     // hashCode
     // ------------------------------------------------------------------------
 
+    /**
+     * Run the hashCode() method test.
+     */
+    @Test
     public void testHashCode() {
         DomainInfo channel1 = new DomainInfo((DomainInfo)fDomainInfo1);
         DomainInfo channel2 = new DomainInfo((DomainInfo)fDomainInfo2);

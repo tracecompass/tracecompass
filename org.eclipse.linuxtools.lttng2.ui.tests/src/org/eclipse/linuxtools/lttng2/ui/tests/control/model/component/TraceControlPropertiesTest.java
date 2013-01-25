@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,15 +8,15 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
+
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -52,67 +52,33 @@ import org.eclipse.rse.core.model.ISystemProfile;
 import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.FrameworkUtil;
 
-
 /**
- * The class <code>TraceControlPropertiesTest</code> contains tests for the all property class</code>.
- *
+ * The class <code>TraceControlPropertiesTest</code> contains tests for the all
+ * property class</code>.
  */
 @SuppressWarnings("nls")
-public class TraceControlPropertiesTest extends TestCase {
+public class TraceControlPropertiesTest {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "ListInfoTest.cfg";
     private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
-
-
-    // ------------------------------------------------------------------------
-    // Test data
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
-    // Static methods
-    // ------------------------------------------------------------------------
-
-    /**
-     * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class
-     */
-    public static Test suite() {
-        return new ModelImplTestSetup(new TestSuite(TraceControlPropertiesTest.class));
-    }
 
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
 
     /**
-     * Perform pre-test initialization.
-     *
-     * @throws Exception
-     *         if the initialization fails for some reason
-     *
-     */
-    @Override
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    /**
      * Perform post-test clean-up.
-     *
-     * @throws Exception
-     *         if the clean-up fails for some reason
-     *
      */
-    @Override
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         TraceControlTestFacility.getInstance().waitForJobs();
     }
 
@@ -122,6 +88,7 @@ public class TraceControlPropertiesTest extends TestCase {
      * @throws Exception
      *             This will fail the test
      */
+    @Test
     public void testComponentProperties() throws Exception {
 
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();

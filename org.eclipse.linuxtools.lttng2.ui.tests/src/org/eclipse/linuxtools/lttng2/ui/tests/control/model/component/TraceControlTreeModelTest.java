@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,15 +8,20 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -47,13 +52,15 @@ import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.FrameworkUtil;
 
 /**
- * The class <code>TraceControlTreeModelTest</code> contains tests for the tree component classes.
+ * The class <code>TraceControlTreeModelTest</code> contains tests for the tree
+ * component classes.
  */
 @SuppressWarnings("nls")
-public class TraceControlTreeModelTest extends TestCase {
+public class TraceControlTreeModelTest {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -71,18 +78,6 @@ public class TraceControlTreeModelTest extends TestCase {
     private String fTestFile;
 
     // ------------------------------------------------------------------------
-    // Static methods
-    // ------------------------------------------------------------------------
-
-    /**
-     * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class
-     */
-    public static Test suite() {
-        return new ModelImplTestSetup(new TestSuite(TraceControlTreeModelTest.class));
-    }
-
-    // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
 
@@ -91,9 +86,7 @@ public class TraceControlTreeModelTest extends TestCase {
      *
      * @throws Exception
      *         if the initialization fails for some reason
-     *
      */
-    @Override
     @Before
     public void setUp() throws Exception {
         fProxy = new TestRemoteSystemProxy();
@@ -104,14 +97,9 @@ public class TraceControlTreeModelTest extends TestCase {
 
     /**
      * Perform post-test clean-up.
-     *
-     * @throws Exception
-     *         if the clean-up fails for some reason
-     *
      */
-    @Override
     @After
-    public void tearDown()  throws Exception {
+    public void tearDown() {
         TraceControlTestFacility.getInstance().waitForJobs();
     }
 
@@ -121,6 +109,7 @@ public class TraceControlTreeModelTest extends TestCase {
      * @throws Exception
      *             This will fail the test
      */
+    @Test
     public void testTraceControlComponents() throws Exception {
 
         fProxy.setTestFile(fTestFile);

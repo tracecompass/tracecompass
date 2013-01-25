@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,30 +8,23 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.ui.tests;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
- * <b><u>AllTests</u></b>
- * <p>
+ * Runner for the lttng2.ui unit tests.
  */
-@SuppressWarnings("javadoc")
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    ActivatorTest.class,
+    org.eclipse.linuxtools.lttng2.ui.tests.control.model.component.AllTests.class,
+    org.eclipse.linuxtools.lttng2.ui.tests.control.service.AllTests.class
+})
 public class AllTests {
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite(AllTests.class.getName());
-        // $JUnit-BEGIN$
-
-        // Plug-in
-        suite.addTestSuite(ActivatorTest.class);
-        suite.addTest(org.eclipse.linuxtools.lttng2.ui.tests.control.service.AllTests.suite());
-        suite.addTest(org.eclipse.linuxtools.lttng2.ui.tests.control.model.component.AllTests.suite());
-
-        // $JUnit-END$
-        return suite;
-    }
 }

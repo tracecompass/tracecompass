@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,51 +8,44 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.FieldInfo;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * The class <code>FieldInfoTest</code> contains test for the class <code>{@link FieldInfo}</code>.
+ * The class <code>FieldInfoTest</code> contains test for the class
+ * <code>{@link FieldInfo}</code>.
  */
-@SuppressWarnings({"nls", "javadoc"})
-public class FieldInfoTest extends TestCase {
+@SuppressWarnings("nls")
+public class FieldInfoTest {
 
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
+
     private IFieldInfo fFieldInfo1 = null;
     private IFieldInfo fFieldInfo2 = null;
 
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
+
     /**
      * Perform pre-test initialization.
-     *
-     * @throws Exception if the initialization fails for some reason
-     *
      */
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         ModelImplFactory factory = new ModelImplFactory();
         fFieldInfo1 = factory.getFieldInfo1();
         fFieldInfo2 = factory.getFieldInfo2();
-    }
-
-    /**
-     * Perform post-test clean-up.
-     *
-     * @throws Exception if the clean-up fails for some reason
-     *
-     */
-    @Override
-    public void tearDown() throws Exception {
     }
 
     // ------------------------------------------------------------------------
@@ -61,8 +54,8 @@ public class FieldInfoTest extends TestCase {
 
     /**
      * Run the BaseEventInfo() constructor test.
-     *
      */
+    @Test
     public void testFiledInfo() {
         FieldInfo fixture = new FieldInfo("field");
         assertNotNull(fixture);
@@ -74,6 +67,7 @@ public class FieldInfoTest extends TestCase {
     /**
      * Test Copy Constructor
      */
+    @Test
     public void testEventInfoCopy() {
         FieldInfo info = new FieldInfo((FieldInfo)fFieldInfo1);
 
@@ -84,6 +78,7 @@ public class FieldInfoTest extends TestCase {
     /**
      * Test Copy Constructor
      */
+    @Test
     public void testEventCopy2() {
         try {
             FieldInfo info = null;
@@ -97,10 +92,8 @@ public class FieldInfoTest extends TestCase {
 
     /**
      * Run the TraceEventType getEventType() method test.
-     *
-     * @throws Exception
-     *
      */
+    @Test
     public void testSetFieldType() {
         FieldInfo info = new FieldInfo((FieldInfo)fFieldInfo1);
 
@@ -108,6 +101,10 @@ public class FieldInfoTest extends TestCase {
         assertEquals("string", info.getFieldType());
     }
 
+    /**
+     * Run the toString() method test.
+     */
+    @Test
     public void testToString() {
         String result = fFieldInfo1.toString();
 
@@ -119,6 +116,10 @@ public class FieldInfoTest extends TestCase {
     // equals
     // ------------------------------------------------------------------------
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsReflexivity() {
         assertTrue("equals", fFieldInfo1.equals(fFieldInfo1));
         assertTrue("equals", fFieldInfo2.equals(fFieldInfo2));
@@ -127,6 +128,10 @@ public class FieldInfoTest extends TestCase {
         assertTrue("equals", !fFieldInfo2.equals(fFieldInfo1));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsSymmetry() {
         FieldInfo info1 = new FieldInfo((FieldInfo)fFieldInfo1);
         FieldInfo info2 = new FieldInfo((FieldInfo)fFieldInfo2);
@@ -138,6 +143,10 @@ public class FieldInfoTest extends TestCase {
         assertTrue("equals", fFieldInfo2.equals(info2));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsTransivity() {
         FieldInfo info1 = new FieldInfo((FieldInfo)fFieldInfo1);
         FieldInfo info2 = new FieldInfo((FieldInfo)fFieldInfo1);
@@ -148,6 +157,10 @@ public class FieldInfoTest extends TestCase {
         assertTrue("equals", info1.equals(info3));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsNull() {
         assertTrue("equals", !fFieldInfo1.equals(null));
         assertTrue("equals", !fFieldInfo2.equals(null));
@@ -157,6 +170,10 @@ public class FieldInfoTest extends TestCase {
     // hashCode
     // ------------------------------------------------------------------------
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testHashCode() {
         FieldInfo info1 = new FieldInfo((FieldInfo)fFieldInfo1);
         FieldInfo info2 = new FieldInfo((FieldInfo)fFieldInfo2);

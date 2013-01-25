@@ -8,25 +8,31 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.lttng2.core.tests.control.model.impl;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IProbeEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ProbeEventInfo;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * The class <code>BaseEventInfoTest</code> contains test for the class <code>{@link BaseEventInfo}</code>.
+ * The class <code>ProbEventInfoTest</code> contains test for the class
+ * <code>{@link ProbeEventInfo}</code>.
  */
-@SuppressWarnings({"nls", "javadoc"})
-public class ProbeEventInfoTest extends TestCase {
+@SuppressWarnings("nls")
+public class ProbeEventInfoTest {
 
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
+
     private IProbeEventInfo fEventInfo1 = null;
     private IProbeEventInfo fEventInfo2 = null;
 
@@ -35,25 +41,12 @@ public class ProbeEventInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     /**
      * Perform pre-test initialization.
-     *
-     * @throws Exception if the initialization fails for some reason
-     *
      */
-    @Override
-    public void setUp() throws Exception {
+    @Before
+    public void setUp() {
         ModelImplFactory factory = new ModelImplFactory();
         fEventInfo1 = factory.getProbeEventInfo1();
         fEventInfo2 = factory.getProbeEventInfo2();
-    }
-
-    /**
-     * Perform post-test clean-up.
-     *
-     * @throws Exception if the clean-up fails for some reason
-     *
-     */
-    @Override
-    public void tearDown() throws Exception {
     }
 
     // ------------------------------------------------------------------------
@@ -62,8 +55,8 @@ public class ProbeEventInfoTest extends TestCase {
 
     /**
      * Run the BaseEventInfo() constructor test.
-     *
      */
+    @Test
     public void testBaseEventInfo() {
         ProbeEventInfo fixture = new ProbeEventInfo("event");
         assertNotNull(fixture);
@@ -90,6 +83,7 @@ public class ProbeEventInfoTest extends TestCase {
     /**
      * Test Copy Constructor
      */
+    @Test
     public void testEventInfoCopy() {
         ProbeEventInfo info = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
 
@@ -104,6 +98,7 @@ public class ProbeEventInfoTest extends TestCase {
     /**
      * Test Copy Constructor
      */
+    @Test
     public void testEventCopy2() {
         try {
             ProbeEventInfo info = null;
@@ -118,6 +113,7 @@ public class ProbeEventInfoTest extends TestCase {
     /**
      *  Getter/Setter tests
      */
+    @Test
     public void testGetAndSetter() {
         ProbeEventInfo fixture = new ProbeEventInfo("event");
 
@@ -143,6 +139,7 @@ public class ProbeEventInfoTest extends TestCase {
     /**
      * Run the String toString() method test.
      */
+    @Test
     public void testToString_1() {
         assertEquals("[ProbeEventInfo([EventInfo([BaseEventInfo([TraceInfo(Name=probeEvent1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)],fAddress=0xc1231234)]", fEventInfo1.toString());
         assertEquals("[ProbeEventInfo([EventInfo([BaseEventInfo([TraceInfo(Name=probeEvent2)],type=UNKNOWN,level=TRACE_DEBUG)],State=DISABLED)],fOffset=0x100,fSymbol=init_post)]", fEventInfo2.toString());
@@ -151,6 +148,11 @@ public class ProbeEventInfoTest extends TestCase {
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
+
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsReflexivity() {
         assertTrue("equals", fEventInfo1.equals(fEventInfo1));
         assertTrue("equals", fEventInfo2.equals(fEventInfo2));
@@ -159,6 +161,10 @@ public class ProbeEventInfoTest extends TestCase {
         assertTrue("equals", !fEventInfo2.equals(fEventInfo1));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsSymmetry() {
         ProbeEventInfo info1 = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
         ProbeEventInfo info2 = new ProbeEventInfo((ProbeEventInfo)fEventInfo2);
@@ -170,6 +176,10 @@ public class ProbeEventInfoTest extends TestCase {
         assertTrue("equals", fEventInfo2.equals(info2));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsTransivity() {
         ProbeEventInfo info1 = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
         ProbeEventInfo info2 = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
@@ -180,6 +190,10 @@ public class ProbeEventInfoTest extends TestCase {
         assertTrue("equals", info1.equals(info3));
     }
 
+    /**
+     * Run the equals() method test.
+     */
+    @Test
     public void testEqualsNull() {
         assertTrue("equals", !fEventInfo1.equals(null));
         assertTrue("equals", !fEventInfo2.equals(null));
@@ -189,6 +203,10 @@ public class ProbeEventInfoTest extends TestCase {
     // hashCode
     // ------------------------------------------------------------------------
 
+    /**
+     * Run the hashCode() method test.
+     */
+    @Test
     public void testHashCode() {
         ProbeEventInfo info1 = new ProbeEventInfo((ProbeEventInfo)fEventInfo1);
         ProbeEventInfo info2 = new ProbeEventInfo((ProbeEventInfo)fEventInfo2);
