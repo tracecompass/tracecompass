@@ -29,7 +29,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventField;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,16 +52,6 @@ public class CtfTmfEventFieldTest {
     private static final String NAME = "test";
 
     private StructDefinition fixture;
-
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfTmfEventFieldTest.class);
-    }
 
     /**
      * Perform pre-test initialization.
@@ -93,14 +82,6 @@ public class CtfTmfEventFieldTest {
         bb.put((byte) 0);
         bb.position(0);
         fixture.read(new BitBuffer(bb));
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

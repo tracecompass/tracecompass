@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,15 +8,18 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  ******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.statesystem;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
@@ -29,6 +32,9 @@ import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Unit tests for stack-attributes in the Generic State System (using
@@ -36,7 +42,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  *
  * @author Alexandre Montplaisir
  */
-public class StateSystemPushPopTest extends TestCase {
+public class StateSystemPushPopTest {
 
     private ITmfStateSystemBuilder ss;
 
@@ -57,13 +63,10 @@ public class StateSystemPushPopTest extends TestCase {
     /**
      * Test case constructor
      *
-     * @param name
-     *            The test name
      * @throws IOException
      *             If we couldn't create the state history test file
      */
-    public StateSystemPushPopTest(final String name) throws IOException {
-        super(name);
+    public StateSystemPushPopTest() throws IOException {
         testHtFile = File.createTempFile("test", ".ht"); //$NON-NLS-1$ //$NON-NLS-2$
         testHtFile.deleteOnExit();
     }
@@ -82,7 +85,7 @@ public class StateSystemPushPopTest extends TestCase {
      * @throws StateValueTypeException
      *             Fails the test
      */
-    @Override
+    @Before
     public void setUp() throws IOException, TimeRangeException,
             AttributeNotFoundException, StateValueTypeException {
         ITmfStateValue value;
@@ -134,7 +137,7 @@ public class StateSystemPushPopTest extends TestCase {
     /**
      * Clean-up after running a test. Delete the .ht file we created.
      */
-    @Override
+    @After
     public void tearDown() {
         testHtFile.delete();
     }
@@ -143,6 +146,7 @@ public class StateSystemPushPopTest extends TestCase {
      * Test that the value of the stack-attribute at the start and end of the
      * history are correct.
      */
+    @Test
     public void testBeginEnd() {
         try {
             interval = ss.querySingleState(0, attribute);
@@ -167,6 +171,7 @@ public class StateSystemPushPopTest extends TestCase {
     /**
      * Run single queries on the attribute stacks (with .querySingleState()).
      */
+    @Test
     public void testSingleQueries() {
         try {
             final int subAttribute1 = ss.getQuarkRelative(attribute, "1"); //$NON-NLS-1$
@@ -203,6 +208,7 @@ public class StateSystemPushPopTest extends TestCase {
     /**
      * Test the .querySingletStackTop() convenience method.
      */
+    @Test
     public void testStackTop() {
         try {
             interval = ss.querySingleStackTop(10, attribute);
@@ -231,6 +237,7 @@ public class StateSystemPushPopTest extends TestCase {
     /**
      * Test the places where the stack is empty.
      */
+    @Test
     public void testEmptyStack() {
         try {
             /* At the start */
@@ -265,6 +272,7 @@ public class StateSystemPushPopTest extends TestCase {
     /**
      * Test full-queries (.queryFullState()) on the attribute stacks.
      */
+    @Test
     public void testFullQueries() {
         List<ITmfStateInterval> state;
         try {

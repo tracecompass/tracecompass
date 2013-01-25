@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
-import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -30,22 +29,13 @@ import org.junit.runners.Suite;
     CtfIteratorTest.class,
     CtfLocationDataTest.class,
     CtfLocationTest.class,
+    CtfTmfLightweightContextTest.class,
     CtfTmfEventFieldTest.class,
     CtfTmfEventTest.class,
     CtfTmfEventTypeTest.class,
     CtfTmfTimestampTest.class,
     CtfTmfTraceTest.class,
-    CtfTmfLightweightContextTest.class
 })
-public class TestAll {
+public class AllTests {
 
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        JUnitCore.runClasses(new Class[] { TestAll.class });
-    }
 }

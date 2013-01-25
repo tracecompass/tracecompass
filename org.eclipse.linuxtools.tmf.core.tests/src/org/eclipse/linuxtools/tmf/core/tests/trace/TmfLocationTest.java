@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 2012 Ericsson
+ * Copyright (c) 2009, 2010, 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,66 +8,59 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.trace;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTimestampLocation;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test suite for the TmfLocation class.
  */
 @SuppressWarnings({"nls","javadoc"})
-public class TmfLocationTest extends TestCase {
+public class TmfLocationTest {
 
     // ------------------------------------------------------------------------
     // Variables
     // ------------------------------------------------------------------------
 
-    String aString = "some location";
-    Long aLong = 12345L;
-    TmfTimestamp aTimestamp = new TmfTimestamp();
+    private String aString = "some location";
+    private Long aLong = 12345L;
+    private TmfTimestamp aTimestamp = new TmfTimestamp();
 
-    TmfStringLocation fLocation1;
-    TmfStringLocation fLocation2;
-    TmfLongLocation fLocation3;
-    TmfTimestampLocation fLocation4;
+    private TmfStringLocation fLocation1;
+    private TmfStringLocation fLocation2;
+    private TmfLongLocation fLocation3;
+    private TmfTimestampLocation fLocation4;
 
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    /**
-     * @param name
-     *            the test name
-     */
-    public TmfLocationTest(String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         fLocation1 = new TmfStringLocation((String) null);
         fLocation2 = new TmfStringLocation(aString);
         fLocation3 = new TmfLongLocation(aLong);
         fLocation4 = new TmfTimestampLocation(aTimestamp);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
+    @Test
     public void testTmfLocation() {
         assertNull("TmfLocation", fLocation1.getLocationInfo());
         assertEquals("TmfLocation", aString, fLocation2.getLocationInfo());
@@ -75,6 +68,7 @@ public class TmfLocationTest extends TestCase {
         assertEquals("TmfLocation", aTimestamp, fLocation4.getLocationInfo());
     }
 
+    @Test
     public void testTmfLocationCopy() {
         TmfStringLocation location1 = new TmfStringLocation(fLocation1);
         TmfStringLocation location2 = new TmfStringLocation(fLocation2);
@@ -91,6 +85,7 @@ public class TmfLocationTest extends TestCase {
     // hashCode
     // ------------------------------------------------------------------------
 
+    @Test
     public void testHashCode() {
         TmfStringLocation location1 = new TmfStringLocation((String) null);
         TmfStringLocation location2 = new TmfStringLocation(aString);
@@ -114,6 +109,7 @@ public class TmfLocationTest extends TestCase {
         }
     }
 
+    @Test
     public void testEqualsWrongTypes() {
         ITmfLocation location1 = new TmfStringLocation(aString);
         TmfLocation2 location2 = new TmfLocation2(aString);
@@ -122,6 +118,7 @@ public class TmfLocationTest extends TestCase {
         assertFalse("equals", location2.equals(location1));
     }
 
+    @Test
     public void testEqualsWithNulls() {
         TmfStringLocation location1 = new TmfStringLocation(aString);
         TmfStringLocation location2 = new TmfStringLocation((String) null);
@@ -130,6 +127,7 @@ public class TmfLocationTest extends TestCase {
         assertFalse("equals", location2.equals(location1));
     }
 
+    @Test
     public void testEqualsReflexivity() {
         assertTrue("equals", fLocation2.equals(fLocation2));
         assertTrue("equals", fLocation3.equals(fLocation3));
@@ -138,6 +136,7 @@ public class TmfLocationTest extends TestCase {
         assertTrue("equals", !fLocation3.equals(fLocation2));
     }
 
+    @Test
     public void testEqualsSymmetry() {
         TmfStringLocation location2 = new TmfStringLocation(aString);
         TmfLongLocation location3 = new TmfLongLocation(aLong);
@@ -149,6 +148,7 @@ public class TmfLocationTest extends TestCase {
         assertTrue("equals", fLocation3.equals(location3));
     }
 
+    @Test
     public void testEqualsTransivity() {
         TmfStringLocation location1 = new TmfStringLocation(aString);
         TmfStringLocation location2 = new TmfStringLocation(aString);
@@ -159,6 +159,7 @@ public class TmfLocationTest extends TestCase {
         assertTrue("equals", location3.equals(location1));
     }
 
+    @Test
     public void testEqualsNull() {
         assertTrue("equals", !fLocation2.equals(null));
         assertTrue("equals", !fLocation2.equals(null));
@@ -168,19 +169,19 @@ public class TmfLocationTest extends TestCase {
     // toString
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("hiding")
+    @Test
     public void testToString() {
-        String aString = "some location";
-        Long aLong = 12345L;
-        TmfTimestamp aTimestamp = new TmfTimestamp();
+        String str = "some location";
+        Long lng = 12345L;
+        TmfTimestamp ts = new TmfTimestamp();
 
-        TmfStringLocation location1 = new TmfStringLocation(aString);
-        TmfLongLocation location2 = new TmfLongLocation(aLong);
-        TmfTimestampLocation location3 = new TmfTimestampLocation(aTimestamp);
+        TmfStringLocation location1 = new TmfStringLocation(str);
+        TmfLongLocation location2 = new TmfLongLocation(lng);
+        TmfTimestampLocation location3 = new TmfTimestampLocation(ts);
 
-        String expected1 = "TmfLocation [fLocation=" + aString + "]";
-        String expected2 = "TmfLocation [fLocation=" + aLong + "]";
-        String expected3 = "TmfLocation [fLocation=" + aTimestamp + "]";
+        String expected1 = "TmfLocation [fLocation=" + str + "]";
+        String expected2 = "TmfLocation [fLocation=" + lng + "]";
+        String expected3 = "TmfLocation [fLocation=" + ts + "]";
 
         assertEquals("toString", expected1, location1.toString());
         assertEquals("toString", expected2, location2.toString());

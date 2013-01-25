@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,35 +8,30 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4, enable CTF and statistics tests
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
- * <b><u>AllTmfCoreTests</u></b>
- * <p>
  * Master test suite for TMF Core.
  */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    TmfCorePluginTest.class,
+    org.eclipse.linuxtools.tmf.core.tests.component.AllTests.class,
+    //org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.event.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.request.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.statesystem.AllTests.class,
+    //org.eclipse.linuxtools.tmf.core.tests.statistics.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.trace.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.uml2sd.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.util.AllTests.class
+})
 public class AllTmfCoreTests {
 
-	/**
-	 * @return the TMF Core test suite
-	 */
-	public static Test suite() {
-		TestSuite suite = new TestSuite(AllTmfCoreTests.class.getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(TmfCorePluginTest.class);
-		suite.addTest(org.eclipse.linuxtools.tmf.core.tests.event.AllTests.suite());
-		suite.addTest(org.eclipse.linuxtools.tmf.core.tests.request.AllTests.suite());
-		suite.addTest(org.eclipse.linuxtools.tmf.core.tests.component.AllTests.suite());
-		suite.addTest(org.eclipse.linuxtools.tmf.core.tests.statesystem.AllTests.suite());
-		suite.addTest(org.eclipse.linuxtools.tmf.core.tests.trace.AllTests.suite());
-		suite.addTest(org.eclipse.linuxtools.tmf.core.tests.uml2sd.AllTests.suite());
-		suite.addTest(org.eclipse.linuxtools.tmf.core.tests.util.AllTests.suite());
-		//$JUnit-END$
-		return suite;
-	}
 }

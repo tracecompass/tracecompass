@@ -51,16 +51,6 @@ public class CtfTmfTraceTest {
     private CtfTmfTrace fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfTmfTraceTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      *
      * @throws TmfTraceException

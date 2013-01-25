@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,13 +8,15 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.component;
 
-import java.util.Vector;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import java.io.IOException;
+import java.util.Vector;
 
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
@@ -28,35 +30,37 @@ import org.eclipse.linuxtools.tmf.tests.stubs.component.TmfEventProviderStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.component.TmfSyntheticEventProviderStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * <b><u>TmfClientTest</u></b>
- * <p>
  * Test suite for the TmfEventProvider class.
  */
-@SuppressWarnings({ "nls" })
-public class TmfEventProviderTest extends TestCase {
+@SuppressWarnings("nls")
+public class TmfEventProviderTest {
 
-    TmfEventProviderStub fEventProvider;
-    TmfSyntheticEventProviderStub fSyntheticEventProvider;
+    private TmfEventProviderStub fEventProvider;
+    private TmfSyntheticEventProviderStub fSyntheticEventProvider;
 
     /**
-     * @param name the test anme
+     * Initialization
+     *
+     * @throws IOException
+     *             If we can't find the test trace (they are committed in the
+     *             tree, so it shouldn't happen).
      */
-    public TmfEventProviderTest(String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws IOException {
         fEventProvider = new TmfEventProviderStub();
         fSyntheticEventProvider = new TmfSyntheticEventProviderStub();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    /**
+     * Clean-up
+     */
+    @After
+    public void tearDown() {
         fEventProvider.dispose();
         fSyntheticEventProvider.dispose();
     }
@@ -66,10 +70,10 @@ public class TmfEventProviderTest extends TestCase {
     // ------------------------------------------------------------------------
 
     /**
-     *
+     * Test getProviders
      */
+    @Test
     public void testGetProviders() {
-
         // There should be 2 TmfEvent providers: a TmfTraceStub and a
         // TmfEventProviderStub
         ITmfDataProvider[] eventProviders = TmfProviderManager.getProviders(ITmfEvent.class);
@@ -91,10 +95,10 @@ public class TmfEventProviderTest extends TestCase {
     // ------------------------------------------------------------------------
 
     /**
-     *
+     * Test getPlainEvents
      */
+    @Test
     public void testGetPlainEvents() {
-
         final int BLOCK_SIZE = 100;
         final int NB_EVENTS = 1000;
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
@@ -131,8 +135,9 @@ public class TmfEventProviderTest extends TestCase {
     }
 
     /**
-     *
+     * Test canceling requests.
      */
+    @Test
     public void testCancelRequests() {
 
         final int BLOCK_SIZE = 100;
@@ -278,10 +283,9 @@ public class TmfEventProviderTest extends TestCase {
     }
 
     /**
-     *
+     * Test getSyntheticEvents for equal block sizes.
      */
-    // The following tests are the same but for the size of the requested blocks
-    // with regards to the size of the TmfSyntheticEventProviderStub block
+    @Test
     public void testGetSyntheticEvents_EqualBlockSizes() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         try {
@@ -292,8 +296,9 @@ public class TmfEventProviderTest extends TestCase {
     }
 
     /**
-     *
+     * Test getSyntheticEvents for smaller block sizes.
      */
+    @Test
     public void testGetSyntheticEvents_SmallerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         try {
@@ -304,8 +309,9 @@ public class TmfEventProviderTest extends TestCase {
     }
 
     /**
-     *
+     * Test getSyntheticEvents for larger block sizes.
      */
+    @Test
     public void testGetSyntheticEvents_LargerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         try {
@@ -316,8 +322,9 @@ public class TmfEventProviderTest extends TestCase {
     }
 
     /**
-     *
+     * Test getSyntheticEvents
      */
+    @Test
     public void testGetSyntheticEvents_TimeRange() {
         TmfTimestamp start = new TmfTimestamp(1, (byte) -3, 0);
         TmfTimestamp end = new TmfTimestamp(1000, (byte) -3, 0);
@@ -353,13 +360,10 @@ public class TmfEventProviderTest extends TestCase {
 //        }
 //    }
 
-    // ------------------------------------------------------------------------
-    // getProviders (more a sanity check than a test)
-    // ------------------------------------------------------------------------
-
     /**
-     *
+     * Test getProviders (more a sanity check than a test)
      */
+    @Test
     public void testGetProviders2() {
 
         // There should be 2 TmfEvent providers: a TmfTraceStub and a

@@ -17,7 +17,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationData;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,31 +30,12 @@ public class CtfLocationDataTest {
     private CtfLocationData fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfLocationDataTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      */
     @Before
     public void setUp() {
         fixture = new CtfLocationData(1, 0);
     }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
-    }
-
 
     /**
      * Test for the .getTimestamp() and .getIndex() methods

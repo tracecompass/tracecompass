@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 2012 Ericsson
+ * Copyright (c) 2009, 2010, 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,11 +9,16 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adapted for TMF Trace Model 1.0
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.trace;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -21,57 +26,38 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
+import org.junit.Test;
 
 /**
  * Test suite for the TmfCheckpoint class.
  */
 @SuppressWarnings({"nls","javadoc"})
-public class TmfCheckpointTest extends TestCase {
+public class TmfCheckpointTest {
 
     // ------------------------------------------------------------------------
     // Variables
     // ------------------------------------------------------------------------
 
-    ITmfTimestamp fTimestamp1 = new TmfTimestamp();
-    ITmfTimestamp fTimestamp2 = TmfTimestamp.BIG_BANG;
-    ITmfTimestamp fTimestamp3 = TmfTimestamp.BIG_CRUNCH;
+    private ITmfTimestamp fTimestamp1 = new TmfTimestamp();
+    private ITmfTimestamp fTimestamp2 = TmfTimestamp.BIG_BANG;
+    private ITmfTimestamp fTimestamp3 = TmfTimestamp.BIG_CRUNCH;
 
-    Long aLong1 = 12345L;
-    Long aLong2 = 23456L;
-    Long aLong3 = 34567L;
-    ITmfLocation fLocation1 = new TmfLongLocation(aLong1);
-    ITmfLocation fLocation2 = new TmfLongLocation(aLong2);
-    ITmfLocation fLocation3 = new TmfLongLocation(aLong3);
+    private Long aLong1 = 12345L;
+    private Long aLong2 = 23456L;
+    private Long aLong3 = 34567L;
+    private ITmfLocation fLocation1 = new TmfLongLocation(aLong1);
+    private ITmfLocation fLocation2 = new TmfLongLocation(aLong2);
+    private ITmfLocation fLocation3 = new TmfLongLocation(aLong3);
 
-    TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation1));
-    TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, new TmfContext(fLocation2));
-    TmfCheckpoint fCheckpoint3 = new TmfCheckpoint(fTimestamp3, new TmfContext(fLocation3));
-
-    // ------------------------------------------------------------------------
-    // Housekeeping
-    // ------------------------------------------------------------------------
-
-    /**
-     * @param name the test name
-     */
-    public TmfCheckpointTest(final String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
+    private TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation1));
+    private TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, new TmfContext(fLocation2));
+    private TmfCheckpoint fCheckpoint3 = new TmfCheckpoint(fTimestamp3, new TmfContext(fLocation3));
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
+    @Test
     public void testTmfCheckpoint() {
         assertEquals("TmfCheckpoint", fTimestamp1, fCheckpoint1.getTimestamp());
         assertEquals("TmfCheckpoint", fLocation1,  fCheckpoint1.getLocation());
@@ -84,6 +70,7 @@ public class TmfCheckpointTest extends TestCase {
         assertEquals("TmfCheckpoint", fLocation1,  checkpoint.getLocation());
     }
 
+    @Test
     public void testTmfLocationCopy2() {
         try {
             new TmfCheckpoint(null);
@@ -101,6 +88,7 @@ public class TmfCheckpointTest extends TestCase {
     // clone
     // ------------------------------------------------------------------------
 
+    @Test
     public void testClone() {
         try {
             TmfCheckpoint checkpoint1 = fCheckpoint1.clone();
@@ -132,6 +120,7 @@ public class TmfCheckpointTest extends TestCase {
     // compareTo
     // ------------------------------------------------------------------------
 
+    @Test
     public void testCompareTo() {
         assertEquals("compareTo",  0, fCheckpoint1.compareTo(fCheckpoint1));
         assertEquals("compareTo",  1, fCheckpoint1.compareTo(fCheckpoint2));
@@ -146,6 +135,7 @@ public class TmfCheckpointTest extends TestCase {
         assertEquals("compareTo",  0, fCheckpoint3.compareTo(fCheckpoint3));
     }
 
+    @Test
     public void testCompareToNull() {
         final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, new TmfContext(fLocation1));
         final TmfCheckpoint checkpoint2 = new TmfCheckpoint(null, new TmfContext(fLocation2));
@@ -173,6 +163,7 @@ public class TmfCheckpointTest extends TestCase {
     // hashCode
     // ------------------------------------------------------------------------
 
+    @Test
     public void testHashCode() {
         final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fCheckpoint1);
         final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fCheckpoint2);
@@ -184,6 +175,7 @@ public class TmfCheckpointTest extends TestCase {
         assertTrue("hashCode", fCheckpoint2.hashCode() != checkpoint1.hashCode());
     }
 
+    @Test
     public void testHashCodeNull() {
         final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, new TmfContext(fLocation1));
         final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp1, null);
@@ -201,6 +193,7 @@ public class TmfCheckpointTest extends TestCase {
     // equals
     // ------------------------------------------------------------------------
 
+    @Test
     public void testEqualsReflexivity() {
         assertTrue("equals", fCheckpoint1.equals(fCheckpoint1));
         assertTrue("equals", fCheckpoint2.equals(fCheckpoint2));
@@ -209,6 +202,7 @@ public class TmfCheckpointTest extends TestCase {
         assertTrue("equals", !fCheckpoint2.equals(fCheckpoint1));
     }
 
+    @Test
     public void testEqualsSymmetry() {
         final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fCheckpoint1);
         final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fCheckpoint2);
@@ -220,6 +214,7 @@ public class TmfCheckpointTest extends TestCase {
         assertTrue("equals", fCheckpoint2.equals(checkpoint2));
     }
 
+    @Test
     public void testEqualsTransivity() {
         final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fCheckpoint1);
         final TmfCheckpoint checkpoint2 = new TmfCheckpoint(checkpoint1);
@@ -230,6 +225,7 @@ public class TmfCheckpointTest extends TestCase {
         assertTrue("equals", checkpoint1.equals(checkpoint3));
     }
 
+    @Test
     public void testNotEqual() {
         // Various checkpoints
         final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation1));
@@ -259,6 +255,7 @@ public class TmfCheckpointTest extends TestCase {
     // toString
     // ------------------------------------------------------------------------
 
+    @Test
     public void testToString() {
         final String expected1 = "TmfCheckpoint [fContext=" + fCheckpoint1.getContext() +
                 ", fTimestamp=" + fCheckpoint1.getTimestamp() + "]";

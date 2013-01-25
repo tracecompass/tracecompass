@@ -20,7 +20,6 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationData;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,31 +35,12 @@ public class CtfLocationTest {
     private CtfLocation fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfLocationTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      */
     @Before
     public void setUp() {
         fixture = new CtfLocation(new CtfLocationData(1, 0));
     }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
-    }
-
 
     /**
      * Run the CtfLocation(Long) constructor test.

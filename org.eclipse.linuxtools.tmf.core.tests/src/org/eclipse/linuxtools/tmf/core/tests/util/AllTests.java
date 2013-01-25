@@ -1,26 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Alexandre Montplaisir - Port to JUnit4
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.tests.util;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import org.eclipse.linuxtools.internal.tmf.core.Activator;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
- * <b><u>AllTests</u></b>
- * <p>
- * <p>
+ * Unit tests for tmf.core.util
  */
-@SuppressWarnings({ "nls" })
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    PairTest.class
+})
 public class AllTests {
 
-	/**
-	 * @return the test suite
-	 */
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test suite for " + Activator.PLUGIN_ID + ".util"); //$NON-NLS-1$);
-		//$JUnit-BEGIN$
-		suite.addTestSuite(PairTest.class);
-		//$JUnit-END$
-		return suite;
-	}
 }

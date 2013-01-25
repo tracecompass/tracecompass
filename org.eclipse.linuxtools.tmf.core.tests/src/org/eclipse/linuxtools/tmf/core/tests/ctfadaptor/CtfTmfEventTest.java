@@ -26,7 +26,6 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,16 +41,6 @@ public class CtfTmfEventTest {
     private CtfTmfEvent fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CtfTmfEventTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      *
      * @throws TmfTraceException
@@ -63,14 +52,6 @@ public class CtfTmfEventTest {
         CtfIterator tr = new CtfIterator(trace);
         tr.advance();
         fixture = tr.getCurrentEvent();
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

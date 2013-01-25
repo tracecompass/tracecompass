@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,102 +8,96 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.request;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * <b><u>TmfDataRequestTest</u></b>
- * <p>
  * Test suite for the TmfDataRequest class.
  */
-@SuppressWarnings({"nls","javadoc"})
-public class TmfDataRequestTest extends TestCase {
-
-	// ------------------------------------------------------------------------
-	// Variables
-	// ------------------------------------------------------------------------
-
-	private static TmfDataRequest fRequest1;
-	private static TmfDataRequest fRequest1b;
-	private static TmfDataRequest fRequest1c;
-	private static TmfDataRequest fRequest2;
-	private static TmfDataRequest fRequest3;
-	private static TmfDataRequest fRequest4;
-
-	private static int fRequestCount;
+@SuppressWarnings({ "nls", "javadoc" })
+public class TmfDataRequestTest {
 
     // ------------------------------------------------------------------------
-	// Housekeeping
-	// ------------------------------------------------------------------------
+    // Variables
+    // ------------------------------------------------------------------------
 
-    /**
-     * @param name the test name
-     */
-	public TmfDataRequestTest(String name) {
-		super(name);
-	}
+    private static TmfDataRequest fRequest1;
+    private static TmfDataRequest fRequest1b;
+    private static TmfDataRequest fRequest1c;
+    private static TmfDataRequest fRequest2;
+    private static TmfDataRequest fRequest3;
+    private static TmfDataRequest fRequest4;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		TmfDataRequest.reset();
-		fRequest1  = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
-		fRequest2  = new TmfDataRequestStub(ITmfEvent.class, 20, 100, 200);
-		fRequest3  = new TmfDataRequestStub(ITmfEvent.class, 20, 200, 200);
-		fRequest4  = new TmfDataRequestStub(ITmfEvent.class, 20, 200, 300);
-    	fRequest1b = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
-		fRequest1c = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
-		fRequestCount = fRequest1c.getRequestId() + 1;
-	}
+    private static int fRequestCount;
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+    // ------------------------------------------------------------------------
+    // Housekeeping
+    // ------------------------------------------------------------------------
 
-	private static TmfDataRequest setupTestRequest(final boolean[] flags) {
+    @Before
+    public void setUp() {
+        TmfDataRequest.reset();
+        fRequest1 = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
+        fRequest2 = new TmfDataRequestStub(ITmfEvent.class, 20, 100, 200);
+        fRequest3 = new TmfDataRequestStub(ITmfEvent.class, 20, 200, 200);
+        fRequest4 = new TmfDataRequestStub(ITmfEvent.class, 20, 200, 300);
+        fRequest1b = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
+        fRequest1c = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
+        fRequestCount = fRequest1c.getRequestId() + 1;
+    }
 
-		TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200) {
-		    @Override
-			public void handleCompleted() {
-		    	super.handleCompleted();
-		    	flags[0] = true;
-		    }
-		    @Override
-		    public void handleSuccess() {
-		    	super.handleSuccess();
-		    	flags[1] = true;
-		    }
-		    @Override
-		    public void handleFailure() {
-		    	super.handleFailure();
-		    	flags[2] = true;
-		    }
-		    @Override
-		    public void handleCancel() {
-		    	super.handleCancel();
-		    	flags[3] = true;
-		    }
-		};
-		return request;
-	}
+    private static TmfDataRequest setupTestRequest(final boolean[] flags) {
 
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
+        TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200) {
+            @Override
+            public void handleCompleted() {
+                super.handleCompleted();
+                flags[0] = true;
+            }
 
-	public void testTmfDataRequest() {
+            @Override
+            public void handleSuccess() {
+                super.handleSuccess();
+                flags[1] = true;
+            }
+
+            @Override
+            public void handleFailure() {
+                super.handleFailure();
+                flags[2] = true;
+            }
+
+            @Override
+            public void handleCancel() {
+                super.handleCancel();
+                flags[3] = true;
+            }
+        };
+        return request;
+    }
+
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+
+    @Test
+    public void testTmfDataRequest() {
         TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
+        assertEquals("getDataType", ITmfEvent.class, request.getDataType());
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
@@ -113,13 +107,14 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
-	}
+    }
 
-	public void testTmfDataRequestIndex() {
+    @Test
+    public void testTmfDataRequestIndex() {
         TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
+        assertEquals("getDataType", ITmfEvent.class, request.getDataType());
 
         assertEquals("getIndex", 10, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
@@ -129,13 +124,14 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
-	}
+    }
 
-	public void testTmfDataRequestIndexNbRequested() {
+    @Test
+    public void testTmfDataRequestIndexNbRequested() {
         TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
+        assertEquals("getDataType", ITmfEvent.class, request.getDataType());
 
         assertEquals("getIndex", 10, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
@@ -145,13 +141,14 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
-	}
+    }
 
-	public void testTmfDataRequestIndexNbEventsBlocksize() {
+    @Test
+    public void testTmfDataRequestIndexNbEventsBlocksize() {
         TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
+        assertEquals("getDataType", ITmfEvent.class, request.getDataType());
 
         assertEquals("getIndex", 10, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
@@ -161,21 +158,23 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
-	}
+    }
 
-	// ------------------------------------------------------------------------
-	// equals
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // equals
+    // ------------------------------------------------------------------------
 
-	public void testEqualsReflexivity() {
+    @Test
+    public void testEqualsReflexivity() {
         assertTrue("equals", fRequest1.equals(fRequest1));
         assertTrue("equals", fRequest2.equals(fRequest2));
 
         assertFalse("equals", fRequest1.equals(fRequest2));
         assertFalse("equals", fRequest2.equals(fRequest1));
-	}
+    }
 
-	public void testEqualsSymmetry() {
+    @Test
+    public void testEqualsSymmetry() {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1));
 
@@ -183,34 +182,38 @@ public class TmfDataRequestTest extends TestCase {
         assertFalse("equals", fRequest2.equals(fRequest3));
         assertFalse("equals", fRequest3.equals(fRequest1));
         assertFalse("equals", fRequest3.equals(fRequest2));
-	}
+    }
 
-	public void testEqualsTransivity() {
+    @Test
+    public void testEqualsTransivity() {
         assertTrue("equals", fRequest1.equals(fRequest1b));
         assertTrue("equals", fRequest1b.equals(fRequest1c));
         assertTrue("equals", fRequest1.equals(fRequest1c));
-	}
+    }
 
-	public void testEqualsNull() {
+    @Test
+    public void testEqualsNull() {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));
-	}
+    }
 
-	// ------------------------------------------------------------------------
-	// hashCode
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // hashCode
+    // ------------------------------------------------------------------------
 
-	public void testHashCode() {
+    @Test
+    public void testHashCode() {
         assertTrue("hashCode", fRequest1.hashCode() == fRequest1.hashCode());
         assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
-		assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
-	}
+        assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
+    }
 
-	// ------------------------------------------------------------------------
-	// toString
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // toString
+    // ------------------------------------------------------------------------
 
-	public void testToString() {
+    @Test
+    public void testToString() {
         String expected1 = "[TmfDataRequest(0,ITmfEvent,10,100,200)]";
         String expected2 = "[TmfDataRequest(1,ITmfEvent,20,100,200)]";
         String expected3 = "[TmfDataRequest(2,ITmfEvent,20,200,200)]";
@@ -220,70 +223,66 @@ public class TmfDataRequestTest extends TestCase {
         assertEquals("toString", expected2, fRequest2.toString());
         assertEquals("toString", expected3, fRequest3.toString());
         assertEquals("toString", expected4, fRequest4.toString());
-	}
+    }
 
-	// ------------------------------------------------------------------------
-	// done
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // done
+    // ------------------------------------------------------------------------
 
-	public void testDone() {
+    @Test
+    public void testDone() {
+        final boolean[] flags = new boolean[4];
+        TmfDataRequest request = setupTestRequest(flags);
+        request.done();
 
-		final boolean[] flags = new boolean[4];
-		TmfDataRequest request = setupTestRequest(flags);
-		request.done();
+        assertTrue("isCompleted", request.isCompleted());
+        assertFalse("isFailed", request.isFailed());
+        assertFalse("isCancelled", request.isCancelled());
 
-		assertTrue ("isCompleted", request.isCompleted());
-		assertFalse("isFailed",    request.isFailed());
-		assertFalse("isCancelled", request.isCancelled());
+        assertTrue("handleCompleted", flags[0]);
+        assertTrue("handleSuccess", flags[1]);
+        assertFalse("handleFailure", flags[2]);
+        assertFalse("handleCancel", flags[3]);
+    }
 
-		assertTrue ("handleCompleted", flags[0]);
-		assertTrue ("handleSuccess",   flags[1]);
-		assertFalse("handleFailure",   flags[2]);
-		assertFalse("handleCancel",    flags[3]);
-	}
+    // ------------------------------------------------------------------------
+    // fail
+    // ------------------------------------------------------------------------
 
-	// ------------------------------------------------------------------------
-	// fail
-	// ------------------------------------------------------------------------
+    @Test
+    public void testFail() {
+        final boolean[] flags = new boolean[4];
+        TmfDataRequest request = setupTestRequest(flags);
+        request.fail();
 
-	public void testFail() {
+        assertTrue("isCompleted", request.isCompleted());
+        assertTrue("isFailed", request.isFailed());
+        assertFalse("isCancelled", request.isCancelled());
 
-		final boolean[] flags = new boolean[4];
-		TmfDataRequest request = setupTestRequest(flags);
-		request.fail();
+        assertTrue("handleCompleted", flags[0]);
+        assertFalse("handleSuccess", flags[1]);
+        assertTrue("handleFailure", flags[2]);
+        assertFalse("handleCancel", flags[3]);
+    }
 
-		assertTrue ("isCompleted", request.isCompleted());
-		assertTrue ("isFailed",    request.isFailed());
-		assertFalse("isCancelled", request.isCancelled());
+    // ------------------------------------------------------------------------
+    // cancel
+    // ------------------------------------------------------------------------
 
-		assertTrue ("handleCompleted", flags[0]);
-		assertFalse("handleSuccess",   flags[1]);
-		assertTrue ("handleFailure",   flags[2]);
-		assertFalse("handleCancel",    flags[3]);
-	}
+    @Test
+    public void testCancel() {
+        final boolean[] flags = new boolean[4];
+        TmfDataRequest request = setupTestRequest(flags);
+        request.cancel();
 
-	// ------------------------------------------------------------------------
-	// cancel
-	// ------------------------------------------------------------------------
+        assertTrue("isCompleted", request.isCompleted());
+        assertFalse("isFailed", request.isFailed());
+        assertTrue("isCancelled", request.isCancelled());
 
-	public void testCancel() {
-
-		final boolean[] flags = new boolean[4];
-		TmfDataRequest request = setupTestRequest(flags);
-		request.cancel();
-
-		assertTrue ("isCompleted", request.isCompleted());
-		assertFalse("isFailed",    request.isFailed());
-		assertTrue ("isCancelled", request.isCancelled());
-
-		assertTrue ("handleCompleted", flags[0]);
-		assertFalse("handleSuccess",   flags[1]);
-		assertFalse("handleFailure",   flags[2]);
-		assertTrue ("handleCancel",    flags[3]);
-	}
-
-	// ------------------------------------------------------------------------
-	// waitForCompletion
-	// ------------------------------------------------------------------------
+        assertTrue("handleCompleted", flags[0]);
+        assertFalse("handleSuccess", flags[1]);
+        assertFalse("handleFailure", flags[2]);
+        assertTrue("handleCancel", flags[3]);
+    }
 
 }
