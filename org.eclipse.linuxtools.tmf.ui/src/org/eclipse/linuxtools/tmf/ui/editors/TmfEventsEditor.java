@@ -141,7 +141,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             int cacheSize = Integer.MAX_VALUE;
                             final ITmfTrace[] traces = new ITmfTrace[nbTraces];
                             for (int i = 0; i < nbTraces; i++) {
-                                final TmfTraceElement traceElement = traceEntries.get(i);
+                                final TmfTraceElement traceElement = traceEntries.get(i).getElementUnderTraceFolder();
                                 final ITmfTrace trace = traceElement.instantiateTrace();
                                 final ITmfEvent traceEvent = traceElement.instantiateEvent();
                                 if ((trace == null) || (traceEvent == null)) {
