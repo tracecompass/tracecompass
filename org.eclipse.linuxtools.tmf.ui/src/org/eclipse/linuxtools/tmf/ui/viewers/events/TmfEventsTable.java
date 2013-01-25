@@ -1618,6 +1618,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     if (foundTimestamp != null) {
                         broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, foundTimestamp));
                     }
+                    fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, getSelection()));
                     synchronized (fSearchSyncObj) {
                         fSearchThread = null;
                     }
@@ -2005,6 +2006,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             } else if (rank >= fTable.getItemCount()) {
                 fPendingGotoRank = rank;
             }
+            fSelectedRank = rank;
             fTable.setSelection(index + 1); // +1 for header row
         }
     }
