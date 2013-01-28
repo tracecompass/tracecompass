@@ -337,6 +337,7 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
      * Get an iterator to the trace
      *
      * @return an iterator to the trace
+     * @since 2.0
      */
     public CtfIterator createIterator(){
         return new CtfIterator(this);
