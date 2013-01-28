@@ -1150,6 +1150,17 @@ public class LTTngControlService implements ILttngControlService {
     }
 
 
+    /**
+     * Parse a field's information.
+     *
+     * @param output
+     *            A command output array
+     * @param currentIndex
+     *            The current index in the command output array
+     * @param fields
+     *            List for returning the field information
+     * @return The new current index in the command output array
+     */
     protected int getFieldInfo(String[] output, int currentIndex, List<IFieldInfo> fields) {
         int index = currentIndex;
         IFieldInfo fieldInfo = null;
