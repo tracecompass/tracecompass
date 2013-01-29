@@ -26,7 +26,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
  *
  * @see ITmfLocation
  */
-public interface ITmfContext {
+public interface ITmfContext extends Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants

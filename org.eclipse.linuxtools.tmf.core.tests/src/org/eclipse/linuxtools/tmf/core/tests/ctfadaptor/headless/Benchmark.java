@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfLightweightContext;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfContext;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 
@@ -55,7 +55,7 @@ public class Benchmark {
 
             start = System.nanoTime();
             if (nbEvent != -1) {
-                final CtfTmfLightweightContext traceReader = (CtfTmfLightweightContext) trace.seekEvent(0);
+                final CtfTmfContext traceReader = (CtfTmfContext) trace.seekEvent(0);
 
                 start = System.nanoTime();
                 CtfTmfEvent current = traceReader.getCurrentEvent();

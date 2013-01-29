@@ -24,7 +24,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
  *
  * @see ITmfLocation
  */
-public class TmfContext implements ITmfContext, Cloneable {
+public class TmfContext implements ITmfContext {
 
     // ------------------------------------------------------------------------
     // Attributes
