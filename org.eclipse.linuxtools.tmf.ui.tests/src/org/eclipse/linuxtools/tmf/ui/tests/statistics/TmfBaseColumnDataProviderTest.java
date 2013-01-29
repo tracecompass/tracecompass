@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,12 +9,17 @@
  * Contributors:
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *   Bernd Hufmann - Fixed header and warnings
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.tests.statistics;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -30,22 +35,26 @@ import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData.
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
+import org.junit.Test;
 
 /**
  * TmfBaseColumnDataProvider test cases.
  */
 @SuppressWarnings("nls")
-public class TmfBaseColumnDataProviderTest extends TestCase {
+public class TmfBaseColumnDataProviderTest {
 
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
+
+    private static final double DELTA = 1e-15;
+
     private final static String LEVEL_COLUMN = Messages.TmfStatisticsView_LevelColumn;
     private final static String EVENTS_COUNT_COLUMN = Messages.TmfStatisticsView_NbEventsColumn;
 
     private TmfBaseColumnDataProvider provider;
 
-    private String fTestName;
+    private static final String fTestName = "ColumnDataProviderTest";
 
     private final String fContext = "UnitTest";
 
@@ -85,13 +94,8 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
 
     /**
      * Constructor
-     * @param name trace name to set
      */
-    public TmfBaseColumnDataProviderTest(final String name) {
-        super(name);
-
-        fTestName = name;
-
+    public TmfBaseColumnDataProviderTest() {
         fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some content");
         fEvent1 = new TmfEvent(null, fTimestamp1, fSource, fType1, fContent1, fReference);
 
@@ -116,9 +120,11 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
     // ------------------------------------------------------------------------
     // Get Column Data
     // ------------------------------------------------------------------------
+
     /**
      * Method with test cases.
      */
+    @Test
     public void testGetColumnData() {
         List<TmfBaseColumnData> columnsData = provider.getColumnData();
         assertNotNull("getColumnData", columnsData);
@@ -159,7 +165,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
                 assertNull("getColumnData", percentProvider);
             } else if (columnData.getHeader().compareTo(EVENTS_COUNT_COLUMN) == 0) {
                 double percentage = (double) treeNode1.getValues().getTotal() / parentNode.getValues().getTotal();
-                assertEquals("getColumnData", percentage, percentProvider.getPercentage(treeNode1));
+                assertEquals("getColumnData", percentage, percentProvider.getPercentage(treeNode1), DELTA);
             }
         }
     }

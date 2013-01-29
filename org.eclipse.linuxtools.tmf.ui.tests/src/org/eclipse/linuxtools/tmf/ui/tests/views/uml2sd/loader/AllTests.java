@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2011-2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,31 +8,28 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  *  Test suite for testing the TmfUml2SDSyncLoader class.
- *  @author Bernd Hufmann
+ *
+ * @author Bernd Hufmann
  */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    TmfUml2SDSyncLoaderExpTest.class,
+    TmfUml2SDSyncLoaderFilterTest.class,
+    TmfUml2SDSyncLoaderFindTest.class,
+    TmfUml2SDSyncLoaderPagesTest.class,
+    TmfUml2SDSyncLoaderSignalTest.class,
+    TmfUml2SDSyncLoaderTimeTest.class
+})
 public class AllTests {
 
-    /**
-     * @return the test suite.
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite(AllTests.class.getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(TmfUml2SDSyncLoaderExpTest.class);
-        suite.addTestSuite(TmfUml2SDSyncLoaderPagesTest.class);
-        suite.addTestSuite(TmfUml2SDSyncLoaderTimeTest.class);
-        suite.addTestSuite(TmfUml2SDSyncLoaderSignalTest.class);
-        suite.addTestSuite(TmfUml2SDSyncLoaderFindTest.class);
-        suite.addTestSuite(TmfUml2SDSyncLoaderFilterTest.class);
-        //$JUnit-END$
-        return new Uml2SDTestSetup(suite);
-    }
 }

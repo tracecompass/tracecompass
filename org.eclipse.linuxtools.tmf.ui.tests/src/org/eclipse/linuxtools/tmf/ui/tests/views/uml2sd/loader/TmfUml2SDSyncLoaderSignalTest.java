@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2011-2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,92 +8,74 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Test cases for signal handling.
  *
  * @author Bernd Hufmann
- *
  */
-public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
+@SuppressWarnings("nls")
+public class TmfUml2SDSyncLoaderSignalTest {
 
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-    private Uml2SDTestFacility fFacility;
-    private Uml2SDSignalValidator fTmfComponent;
+    private static Uml2SDTestFacility fFacility;
+    private static Uml2SDSignalValidator fTmfComponent;
 
-    // ------------------------------------------------------------------------
-    // Static methods
-    // ------------------------------------------------------------------------
+    private static TmfTimeRange range;
+    private static TmfTimestamp rangeWindow;
+    private static TmfTimestamp currentTime;
 
     /**
-     * Returns test setup used when executing test case stand-alone.
-     * @return Test setup class
+     * Initialization
      */
-    public static Test suite() {
-        return new Uml2SDTestSetup(new TestSuite(TmfUml2SDSyncLoaderSignalTest.class));
-    }
-
-    // ------------------------------------------------------------------------
-    // Constructors
-    // ------------------------------------------------------------------------
-    /**
-     * Constructor
-     */
-    public TmfUml2SDSyncLoaderSignalTest() {
-    }
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeClass
+    public static void setUpClass() {
         fFacility = Uml2SDTestFacility.getInstance();
         fFacility.selectExperiment();
-    }
 
-    @Override
-    public void tearDown() throws Exception {
-        fFacility.disposeExperiment();
-        fFacility = null;
-        super.tearDown();
-    }
-
-    /**
-     * Main method with test cases.
-     */
-    @SuppressWarnings("nls")
-    public void testSignalHandling() {
-
-        TmfTimeRange range = new TmfTimeRange(new Uml2SDTestTimestamp(9789689220871L), new Uml2SDTestTimestamp(9789773881426L));
+        range = new TmfTimeRange(new Uml2SDTestTimestamp(9789689220871L), new Uml2SDTestTimestamp(9789773881426L));
         // Get range window for tests below
-        TmfTimestamp rangeWindow = (TmfTimestamp) range.getEndTime().getDelta(range.getStartTime());
-        TmfTimestamp currentTime = new Uml2SDTestTimestamp(9789773782043L);
+        rangeWindow = (TmfTimestamp) range.getEndTime().getDelta(range.getStartTime());
+        currentTime = new Uml2SDTestTimestamp(9789773782043L);
 
-        fFacility.getTrace().broadcast(new TmfRangeSynchSignal(this, range, currentTime));
+        fFacility.getTrace().broadcast(new TmfRangeSynchSignal(fFacility, range, currentTime));
         fFacility.delay(IUml2SDTestConstants.BROADCAST_DELAY);
 
         fTmfComponent = new Uml2SDSignalValidator();
+    }
 
-        /*
-         * Test Case: 001
-         * Description: Verify that time range signal is send with correct values when going to first page
-         * Verified Methods: broadcast()
-         * Expected result: Time range sync signal is sent with correct range and current time.
-         */
+    /**
+     * Cleanup
+     */
+    @AfterClass
+    public static void tearDownClass() {
+        fFacility.disposeExperiment();
+        fFacility = null;
+    }
+
+    /**
+     * Test Case: 001
+     * Description: Verify that time range signal is send with correct values when going to first page
+     * Verified Methods: broadcast()
+     * Expected result: Time range sync signal is sent with correct range and current time.
+     */
+    @Test
+    public void verifyFirstPageSignal() {
         currentTime = new Uml2SDTestTimestamp(9788641608418L);
         range = new TmfTimeRange(currentTime, new Uml2SDTestTimestamp(currentTime.getValue() + rangeWindow.getValue()));
 
@@ -114,13 +96,16 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isCurrentTimeError());
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isSourceError());
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isRangeError());
+    }
 
-        /*
-         * Test Case: 002
-         * Description: Verify that time sync signal is sent correctly after selection
-         * Verified Methods: loader.broadcast(), testSelectionChanged
-         * Expected result: Time sync signal is sent with correct current time.
-         */
+    /**
+     * Test Case: 002
+     * Description: Verify that time sync signal is sent correctly after selection
+     * Verified Methods: loader.broadcast(), testSelectionChanged
+     * Expected result: Time sync signal is sent with correct current time.
+     */
+    @Test
+    public void verifySelectionSignal() {
         fTmfComponent.setSignalReceived(false);
 
         int count = fFacility.getSdView().getFrame().syncMessageCount();

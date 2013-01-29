@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2011-2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,36 +8,36 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.dialogs;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.regex.Pattern;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.Criteria;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDGraphNodeSupporter;
+import org.junit.Test;
 
 /**
  *  Test cases to test Criteria class.
  */
 @SuppressWarnings("nls")
-public class CriteriaTest extends TestCase {
-
-    @Override
-    public void setUp() throws Exception {
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-    }
+public class CriteriaTest {
 
     /**
      * Test default constructor.
      */
+    @Test
     public void testCriteria() {
         Criteria criteria = new Criteria();
         assertFalse("testCriteria", criteria.isAsyncMessageReturnSelected());
@@ -54,6 +54,7 @@ public class CriteriaTest extends TestCase {
     /**
      * Test copy constructor.
      */
+    @Test
     public void testCriteriaCriteria() {
         Criteria criteria = new Criteria();
         criteria.setExpression("test");
@@ -76,6 +77,7 @@ public class CriteriaTest extends TestCase {
     /**
      * Test accessor methods.
      */
+    @Test
     public void testAccessors() {
         Criteria criteria = new Criteria();
         criteria.setAsyncMessageReturnSelected(true);
@@ -125,6 +127,7 @@ public class CriteriaTest extends TestCase {
     /**
      * Test compartTo method.
      */
+    @Test
     public void testCompareTo() {
         Criteria criteria = new Criteria();
         criteria.setExpression("test");
@@ -158,6 +161,7 @@ public class CriteriaTest extends TestCase {
     /**
      * Test save to disk.
      */
+    @Test
     public void testSave() {
         DialogSettings settings = new DialogSettings("mysettings");
 
@@ -183,6 +187,7 @@ public class CriteriaTest extends TestCase {
     /**
      * Test restore from disk.
      */
+    @Test
     public void testLoad() {
         DialogSettings settings = new DialogSettings("mysettings");
 
@@ -205,6 +210,7 @@ public class CriteriaTest extends TestCase {
     /**
      * Test graph node summary usage.
      */
+    @Test
     public void testGetGraphNodeSummary() {
 
         // Create a dummy provider
@@ -264,6 +270,7 @@ public class CriteriaTest extends TestCase {
     /**
      * Test matches algorithm.
      */
+    @Test
     public void testMatches() {
         Criteria criteria = new Criteria();
         criteria.setExpression("BALL_.*");

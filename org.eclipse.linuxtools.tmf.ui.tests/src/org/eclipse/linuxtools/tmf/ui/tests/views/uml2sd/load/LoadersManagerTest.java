@@ -1,54 +1,50 @@
 /**********************************************************************
- * Copyright (c) 2011 Ericsson.
+ * Copyright (c) 2011, 2013 Ericsson.
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * Bernd Hufmann - Initial API and implementation
+ *   Bernd Hufmann - Initial API and implementation
+ *   Alexandre Montplaisir - Port to JUnit4
  **********************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.load;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.junit.Test;
 
 /**
  *  Test cases class to test loader manager of UML2SD extension point.
  */
-public class LoadersManagerTest extends TestCase {
+@SuppressWarnings("nls")
+public class LoadersManagerTest {
 
-    private final static String SDVIEW_WITH_ONE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader"; //$NON-NLS-1$
-    private final static String SDVIEW_WITH_MULTIPLE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders"; //$NON-NLS-1$
-    private final static String TEST_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.tests.uml2sd.load.TestLoaders"; //$NON-NLS-1$
-    private final static String TMF_UML2SD_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader"; //$NON-NLS-1$
+    private final static String SDVIEW_WITH_ONE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader";
+    private final static String SDVIEW_WITH_MULTIPLE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders";
+    private final static String TEST_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.tests.uml2sd.load.TestLoaders";
+    private final static String TMF_UML2SD_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader";
 
-    private static final String LOADER_TAG = "uml2SDLoader"; //$NON-NLS-1$
-    private static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
+    private static final String LOADER_TAG = "uml2SDLoader";
+    private static final String LOADER_PREFIX = LOADER_TAG + ".";
 
     /**
      * Tests of loader manager singleton class.
      */
-    @SuppressWarnings("nls")
+    @Test
     public void testLoaderManager() {
-
         SDView view = null;
         try {
 
@@ -152,26 +148,6 @@ public class LoadersManagerTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
             fail();
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private static void delay(long waitTimeMillis) {
-        Display display = Display.getCurrent();
-        if (display != null) {
-            long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
-            while(System.currentTimeMillis() < endTimeMillis) {
-                if (!display.readAndDispatch()) {
-                    display.sleep();
-                }
-                display.update();
-            }
-        } else {
-            try {
-                Thread.sleep(waitTimeMillis);
-            } catch (InterruptedException e) {
-                // Ignored
-            }
         }
     }
 

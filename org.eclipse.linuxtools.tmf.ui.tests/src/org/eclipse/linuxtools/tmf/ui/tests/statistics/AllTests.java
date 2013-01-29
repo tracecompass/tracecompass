@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,32 +9,27 @@
  * Contributors:
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *   Bernd Hufmann - Fixed suite name
+ *   Alexandre Montplaisir - Port to JUnit4
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.tests.statistics;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * Test suite for statistic tests.
  */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    TmfBaseColumnDataProviderTest.class,
+    TmfBaseColumnDataTest.class,
+    TmfBaseStatisticsDataTest.class,
+    TmfStatisticsTest.class,
+    TmfStatisticsTreeNodeTest.class,
+    TmfStatisticsTreeManagerTest.class,
+    TmfTreeContentProviderTest.class
+})
 public class AllTests {
 
-    /**
-     * @return the test suite
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite(AllTests.class.getName());
-        // $JUnit-BEGIN$
-        suite.addTestSuite(TmfBaseColumnDataProviderTest.class);
-        suite.addTestSuite(TmfBaseColumnDataTest.class);
-        suite.addTestSuite(TmfBaseStatisticsDataTest.class);
-        suite.addTestSuite(TmfStatisticsTreeNodeTest.class);
-        suite.addTestSuite(TmfStatisticsTreeManagerTest.class);
-        suite.addTestSuite(TmfTreeContentProviderTest.class);
-        suite.addTestSuite(TmfStatisticsTest.class);
-        // $JUnit-END$
-        return suite;
-    }
 }
