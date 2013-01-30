@@ -115,6 +115,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     private final Cursor _dragCursor3;
     private final Cursor _WaitCursor;
     private final List<ViewerFilter> _filters = new ArrayList<ViewerFilter>();
+    private MenuDetectEvent fPendingMenuDetectEvent = null;
 
     // Vertical formatting formatting for the state control view
     private final boolean _visibleVerticalScroll = true;
@@ -1143,7 +1144,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         if (DRAG_SPLIT_LINE == _dragState) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.BLACK));
             gc.drawLine(bounds.x + nameSpace, bounds.y, bounds.x + nameSpace, bounds.y + bounds.height - 1);
-        } else if (DRAG_ZOOM == _dragState && Math.max(_dragX, _dragX0) > nameSpace) {
+        } else if (DRAG_ZOOM == _dragState && Math.max(_dragX, _dragX0) > nameSpace && _dragX != _dragX0) {
             gc.setForeground(_colors.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
             gc.drawLine(_dragX0, bounds.y, _dragX0, bounds.y + bounds.height - 1);
             gc.drawLine(_dragX, bounds.y, _dragX, bounds.y + bounds.height - 1);
@@ -1738,6 +1739,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
     @Override
     public void mouseUp(MouseEvent e) {
+        if (fPendingMenuDetectEvent != null && e.button == 3) {
+            menuDetected(fPendingMenuDetectEvent);
+        }
         if (DRAG_NONE != _dragState) {
             setCapture(false);
             if (e.button == 1 && DRAG_TRACE_ITEM == _dragState) {
@@ -2140,6 +2144,24 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     public void menuDetected(MenuDetectEvent e) {
         if (null == _timeProvider) {
             return;
+        }
+        if (e.detail == SWT.MENU_MOUSE) {
+            if (fPendingMenuDetectEvent == null) {
+                /* Feature in Linux. The MenuDetectEvent is received before mouseDown.
+                 * Store the event and trigger it later just before handling mouseUp.
+                 * This allows for the method to detect if mouse is used to drag zoom.
+                 */
+                fPendingMenuDetectEvent = e;
+                return;
+            }
+            fPendingMenuDetectEvent = null;
+            if (_dragState != DRAG_ZOOM || _dragX != _dragX0) {
+                return;
+            }
+        } else {
+            if (_dragState != DRAG_NONE) {
+                return;
+            }
         }
         Point p = toControl(e.x, e.y);
         int idx = getItemIndexAtY(p.y);
