@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.core.tests.request;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
@@ -60,12 +60,12 @@ public class TmfEventRequestTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		TmfDataRequest.reset();
-		fRequest1  = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
-		fRequest2  = new TmfEventRequestStub(TmfEvent.class, range2, 100, 200);
-		fRequest3  = new TmfEventRequestStub(TmfEvent.class, range2, 200, 200);
-		fRequest4  = new TmfEventRequestStub(TmfEvent.class, range2, 200, 300);
-		fRequest1b = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
-		fRequest1c = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
+		fRequest1  = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
+		fRequest2  = new TmfEventRequestStub(ITmfEvent.class, range2, 100, 200);
+		fRequest3  = new TmfEventRequestStub(ITmfEvent.class, range2, 200, 200);
+		fRequest4  = new TmfEventRequestStub(ITmfEvent.class, range2, 200, 300);
+		fRequest1b = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
+		fRequest1c = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
 		fRequestCount = fRequest1c.getRequestId() + 1;
 	}
 
@@ -76,7 +76,7 @@ public class TmfEventRequestTest extends TestCase {
 
 	private static TmfEventRequest setupTestRequest(final boolean[] flags) {
 
-		TmfEventRequest request = new TmfEventRequestStub(TmfEvent.class, new TmfTimeRange(TmfTimeRange.ETERNITY), 100, 200) {
+		TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class, new TmfTimeRange(TmfTimeRange.ETERNITY), 100, 200) {
 		    @Override
 			public void handleCompleted() {
 		    	super.handleCompleted();
@@ -106,10 +106,10 @@ public class TmfEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testTmfEventRequest() {
-        TmfEventRequest request = new TmfEventRequestStub(TmfEvent.class);
+        TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
+        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
 
         assertEquals("StartTime", TmfTimestamp.BIG_BANG,   request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
@@ -126,10 +126,10 @@ public class TmfEventRequestTest extends TestCase {
 
 	public void testTmfEventRequestTimeRange() {
         TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
-        TmfEventRequest request = new TmfEventRequestStub(TmfEvent.class, range);
+        TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class, range);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
+        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
 
         assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
@@ -146,10 +146,10 @@ public class TmfEventRequestTest extends TestCase {
 
 	public void testTmfEventRequestTimeRangeNbRequested() {
         TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
-        TmfEventRequest request = new TmfEventRequestStub(TmfEvent.class, range, 100);
+        TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class, range, 100);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
+        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
 
         assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
@@ -166,10 +166,10 @@ public class TmfEventRequestTest extends TestCase {
 
 	public void testTmfEventRequestTimeRangeNbRequestedBlocksize() {
         TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
-        TmfEventRequest request = new TmfEventRequestStub(TmfEvent.class, range, 100, 200);
+        TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class, range, 100, 200);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
-        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
+        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
 
         assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
@@ -232,10 +232,10 @@ public class TmfEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() {
-        String expected1 = "[TmfEventRequest(0,TmfEvent," + range1 + ",0,100,200)]";
-        String expected2 = "[TmfEventRequest(1,TmfEvent," + range2 + ",0,100,200)]";
-        String expected3 = "[TmfEventRequest(2,TmfEvent," + range2 + ",0,200,200)]";
-        String expected4 = "[TmfEventRequest(3,TmfEvent," + range2 + ",0,200,300)]";
+        String expected1 = "[TmfEventRequest(0,ITmfEvent," + range1 + ",0,100,200)]";
+        String expected2 = "[TmfEventRequest(1,ITmfEvent," + range2 + ",0,100,200)]";
+        String expected3 = "[TmfEventRequest(2,ITmfEvent," + range2 + ",0,200,200)]";
+        String expected4 = "[TmfEventRequest(3,ITmfEvent," + range2 + ",0,200,300)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

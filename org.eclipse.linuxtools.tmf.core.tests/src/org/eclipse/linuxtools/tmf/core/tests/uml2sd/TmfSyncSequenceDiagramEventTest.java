@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.tmf.core.tests.uml2sd;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
@@ -41,7 +42,7 @@ public class TmfSyncSequenceDiagramEventTest extends TestCase {
     private final TmfEventType fType       = new TmfEventType(fContext, fTypeId, TmfEventField.makeRoot(fLabels));
     private final String       fReference  = "Some reference";
 
-    private final TmfEvent fEvent1;
+    private final ITmfEvent fEvent1;
     private final TmfEventField fContent1;
 
     public TmfSyncSequenceDiagramEventTest () {

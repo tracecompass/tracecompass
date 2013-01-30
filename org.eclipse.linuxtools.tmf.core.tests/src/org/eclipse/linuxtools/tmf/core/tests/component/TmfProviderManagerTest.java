@@ -51,7 +51,7 @@ public class TmfProviderManagerTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	private class TestProvider1 extends TmfDataProvider {
-		public TestProvider1(Class<TmfEvent> type) {
+		public TestProvider1(Class<ITmfEvent> type) {
 			super("TestProvider1", type);
 		}
 		@Override
@@ -59,7 +59,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public TmfEvent getNext(ITmfContext context) {
+		public ITmfEvent getNext(ITmfContext context) {
 			return null;
 		}
 		@Override
@@ -69,7 +69,7 @@ public class TmfProviderManagerTest extends TestCase {
 	}
 
 	private class TestProvider2 extends TmfDataProvider {
-		public TestProvider2(Class<TmfEvent> type) {
+		public TestProvider2(Class<ITmfEvent> type) {
 			super("TestProvider2", type);
 		}
 		@Override
@@ -77,7 +77,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public TmfEvent getNext(ITmfContext context) {
+		public ITmfEvent getNext(ITmfContext context) {
 			return null;
 		}
 		@Override
@@ -119,10 +119,10 @@ public class TmfProviderManagerTest extends TestCase {
 	 *
 	 */
 	public void testRegister_0() {
-		TmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class);
+		TmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 0, providers.length);
 	}
 
@@ -132,23 +132,23 @@ public class TmfProviderManagerTest extends TestCase {
 	public void testRegister_Unregister_1() {
 
 		// Register a single provider
-		TestProvider1 testProvider1 = new TestProvider1(TmfEvent.class);
+		TestProvider1 testProvider1 = new TestProvider1(ITmfEvent.class);
 
-		TmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class);
+		TmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider1, providers[0]);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider1, providers[0]);
 
 		// Unregister it
 		testProvider1.dispose();
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 0, providers.length);
 	}
 
@@ -158,10 +158,10 @@ public class TmfProviderManagerTest extends TestCase {
 	public void testRegister_Unregister_2() {
 
 		// Register 2 providers, same data type
-		TestProvider1 testProvider1 = new TestProvider1(TmfEvent.class);
-		TestProvider2 testProvider2 = new TestProvider2(TmfEvent.class);
+		TestProvider1 testProvider1 = new TestProvider1(ITmfEvent.class);
+		TestProvider2 testProvider2 = new TestProvider2(ITmfEvent.class);
 
-		TmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class);
+		TmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 2, providers.length);
 		assertTrue(providers.length == 2);
 		if (providers[0] == testProvider1) {
@@ -172,38 +172,38 @@ public class TmfProviderManagerTest extends TestCase {
 			assertEquals("getProviders", testProvider1, providers[1]);
 		}
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider1, providers[0]);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider2.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider2, providers[0]);
 
 		// Remove one
 		testProvider1.dispose();
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider2, providers[0]);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider2.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider2, providers[0]);
 
 		// Remove the other
 		testProvider2.dispose();
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider2.class);
 		assertEquals("getProviders", 0, providers.length);
 	}
 
@@ -213,11 +213,11 @@ public class TmfProviderManagerTest extends TestCase {
 	public void testRegister_Unregister_3() {
 
 		// Register 3 providers, mixed data types
-		TestProvider1 testProvider1 = new TestProvider1(TmfEvent.class);
-		TestProvider2 testProvider2 = new TestProvider2(TmfEvent.class);
+		TestProvider1 testProvider1 = new TestProvider1(ITmfEvent.class);
+		TestProvider2 testProvider2 = new TestProvider2(ITmfEvent.class);
 		TestProvider3 testProvider3 = new TestProvider3(TmfEvent3.class);
 
-		TmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class);
+		TmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 2, providers.length);
 		if (providers[0] == testProvider1) {
 			assertEquals("getProviders", testProvider2, providers[1]);
@@ -231,11 +231,11 @@ public class TmfProviderManagerTest extends TestCase {
 		assertEquals("getProviders", 1, providers3.length);
 		assertEquals("getProviders", testProvider3, providers3[0]);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider1, providers[0]);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider2.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider2, providers[0]);
 
@@ -246,14 +246,14 @@ public class TmfProviderManagerTest extends TestCase {
 		// Remove one
 		testProvider1.dispose();
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider2, providers[0]);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider2.class);
 		assertEquals("getProviders", 1, providers.length);
 		assertEquals("getProviders", testProvider2, providers[0]);
 
@@ -268,13 +268,13 @@ public class TmfProviderManagerTest extends TestCase {
 		// Remove another one
 		testProvider2.dispose();
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider2.class);
 		assertEquals("getProviders", 0, providers.length);
 
 		providers3 = TmfProviderManager.getProviders(TmfEvent3.class);
@@ -288,13 +288,13 @@ public class TmfProviderManagerTest extends TestCase {
 		// Remove the last one
 		testProvider3.dispose();
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider1.class);
 		assertEquals("getProviders", 0, providers.length);
 
-		providers = TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
+		providers = TmfProviderManager.getProviders(ITmfEvent.class, TestProvider2.class);
 		assertEquals("getProviders", 0, providers.length);
 
 		providers3 = TmfProviderManager.getProviders(TmfEvent3.class);
@@ -310,11 +310,11 @@ public class TmfProviderManagerTest extends TestCase {
 	public void testGetProvider() {
 
 		// Register 3 providers, mixed data types
-		TestProvider1 testProvider1 = new TestProvider1(TmfEvent.class);
-		TestProvider2 testProvider2 = new TestProvider2(TmfEvent.class);
+		TestProvider1 testProvider1 = new TestProvider1(ITmfEvent.class);
+		TestProvider2 testProvider2 = new TestProvider2(ITmfEvent.class);
 		TestProvider3 testProvider3 = new TestProvider3(TmfEvent3.class);
 
-		TmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, null);
+		TmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, null);
 		assertEquals("getProviders", 2, providers.length);
 		if (providers[0] == testProvider1) {
 			assertEquals("getProviders", testProvider2, providers[1]);

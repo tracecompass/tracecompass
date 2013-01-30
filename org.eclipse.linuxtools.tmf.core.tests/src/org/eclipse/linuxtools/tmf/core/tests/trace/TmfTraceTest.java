@@ -28,7 +28,6 @@ import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -128,7 +127,7 @@ public class TmfTraceTest extends TestCase {
         }
 
         assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  TmfEvent.class, trace.getType());
+        assertEquals("getType",  ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -158,7 +157,7 @@ public class TmfTraceTest extends TestCase {
         }
 
         assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  TmfEvent.class, trace.getType());
+        assertEquals("getType",  ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -182,7 +181,7 @@ public class TmfTraceTest extends TestCase {
             fail("IOException");
         }
 
-        assertEquals("getType",  TmfEvent.class, trace.getType());
+        assertEquals("getType",  ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
         assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
@@ -212,7 +211,7 @@ public class TmfTraceTest extends TestCase {
         }
 
         assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  TmfEvent.class, trace.getType());
+        assertEquals("getType",  ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
         assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
@@ -243,7 +242,7 @@ public class TmfTraceTest extends TestCase {
         }
 
         assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  TmfEvent.class, trace.getType());
+        assertEquals("getType",  ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
         assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
@@ -275,7 +274,7 @@ public class TmfTraceTest extends TestCase {
         }
 
         assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  TmfEvent.class, trace.getType());
+        assertEquals("getType",  ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
         assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
@@ -309,7 +308,7 @@ public class TmfTraceTest extends TestCase {
         final TmfTraceStub trace = new TmfTraceStub();
 
         try {
-            trace.initialize(null, null, TmfEvent.class);
+            trace.initialize(null, null, ITmfEvent.class);
             fail("TmfTrace.initialize() - no exception thrown");
         } catch (TmfTraceException e) {
             // Success
@@ -326,12 +325,12 @@ public class TmfTraceTest extends TestCase {
         // Path == trace name
         String path = "TraceName";
         try {
-            trace.initialize(null, path, TmfEvent.class);
+            trace.initialize(null, path, ITmfEvent.class);
         } catch (Exception e) {
             fail("TmfTrace.initialize() - Exception thrown");
         }
 
-        assertEquals("getType", TmfEvent.class, trace.getType());
+        assertEquals("getType", ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -354,12 +353,12 @@ public class TmfTraceTest extends TestCase {
         String name = "TraceName";
         String path = "/my/trace/path/" + name;
         try {
-            trace.initialize(null, path, TmfEvent.class);
+            trace.initialize(null, path, ITmfEvent.class);
         } catch (Exception e) {
             fail("TmfTrace.initialize() - Exception thrown");
         }
 
-        assertEquals("getType", TmfEvent.class, trace.getType());
+        assertEquals("getType", ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -396,7 +395,7 @@ public class TmfTraceTest extends TestCase {
         assertTrue("validate", trace.validate(null, testfile.getPath()));
 
         // InitTrace and wait for indexing completion...
-        trace.initTrace(null, testfile.toURI().getPath(), TmfEvent.class);
+        trace.initTrace(null, testfile.toURI().getPath(), ITmfEvent.class);
         trace.indexTrace();
         int nbSecs = 0;
         while (trace.getNbEvents() < NB_EVENTS && nbSecs < 10) {
@@ -407,7 +406,7 @@ public class TmfTraceTest extends TestCase {
             fail("indexing");
         }
 
-        assertEquals("getType",  TmfEvent.class, trace.getType());
+        assertEquals("getType", ITmfEvent.class, trace.getType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
@@ -1226,14 +1225,14 @@ public class TmfTraceTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1255,14 +1254,14 @@ public class TmfTraceTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1285,14 +1284,14 @@ public class TmfTraceTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1316,14 +1315,14 @@ public class TmfTraceTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, startIndex, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, startIndex, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1344,14 +1343,14 @@ public class TmfTraceTest extends TestCase {
         final int NB_EVENTS  = 1000;
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
-        final TmfDataRequest request = new TmfDataRequest(TmfEvent.class, startIndex, NB_EVENTS) {
+        final TmfDataRequest request = new TmfDataRequest(ITmfEvent.class, startIndex, NB_EVENTS) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1374,7 +1373,7 @@ public class TmfTraceTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             int nbRead = 0;
             @Override
             public void handleData(final ITmfEvent event) {
@@ -1385,7 +1384,7 @@ public class TmfTraceTest extends TestCase {
                 }
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1400,7 +1399,7 @@ public class TmfTraceTest extends TestCase {
 
     public void testDefaultTmfTraceStub() {
         assertFalse ("Open trace", fTrace == null);
-        assertEquals("getType",  TmfEvent.class, fTrace.getType());
+        assertEquals("getType",  ITmfEvent.class, fTrace.getType());
         assertNull  ("getResource", fTrace.getResource());
         assertEquals("getCacheSize", BLOCK_SIZE, fTrace.getCacheSize());
         assertEquals("getStreamingInterval", 0, fTrace.getStreamingInterval());

@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
@@ -57,8 +58,8 @@ public class TmfTreeContentProviderTest extends TestCase {
 
     private final String fReference = "Some reference";
 
-    private final TmfEvent fEvent1;
-    private final TmfEvent fEvent2;
+    private final ITmfEvent fEvent1;
+    private final ITmfEvent fEvent2;
 
     private final TmfEventField fContent1;
     private final TmfEventField fContent2;

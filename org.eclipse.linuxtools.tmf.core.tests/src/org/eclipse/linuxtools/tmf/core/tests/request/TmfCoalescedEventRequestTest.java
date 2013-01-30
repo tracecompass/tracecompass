@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -81,13 +80,13 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		TmfDataRequest.reset();
-		fRequest1  = new TmfCoalescedEventRequest(TmfEvent.class, range1, 100, 200);
-		fRequest2  = new TmfCoalescedEventRequest(TmfEvent.class, range2, 100, 200);
-		fRequest3  = new TmfCoalescedEventRequest(TmfEvent.class, range2, 200, 200);
-		fRequest4  = new TmfCoalescedEventRequest(TmfEvent.class, range2, 200, 300);
+		fRequest1  = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 100, 200);
+		fRequest2  = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 100, 200);
+		fRequest3  = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 200, 200);
+		fRequest4  = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 200, 300);
 
-		fRequest1b = new TmfCoalescedEventRequest(TmfEvent.class, range1, 100, 200);
-		fRequest1c = new TmfCoalescedEventRequest(TmfEvent.class, range1, 100, 200);
+		fRequest1b = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 100, 200);
+		fRequest1c = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 100, 200);
 
 		fRequestCount = fRequest1c.getRequestId() + 1;
 	}
@@ -99,7 +98,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
 	private TmfCoalescedEventRequest setupTestRequest(final boolean[] flags) {
 
-		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(TmfEvent.class, range1, 100, 200) {
+		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 100, 200) {
 		    @Override
 			public void handleCompleted() {
 		    	super.handleCompleted();
@@ -129,7 +128,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testTmfCoalescedEventRequest() {
-		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(TmfEvent.class);
+		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
@@ -145,7 +144,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	}
 
 	public void testTmfCoalescedEventRequestIndex() {
-		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(TmfEvent.class, range1);
+		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
@@ -161,7 +160,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	}
 
 	public void testTmfCoalescedEventRequestIndexNbRequested() {
-		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(TmfEvent.class, range1, 100);
+		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 100);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
@@ -177,7 +176,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	}
 
 	public void testTmfCoalescedEventRequestIndexNbEventsBlocksize() {
-		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(TmfEvent.class, range1, 100, 200);
+		TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 100, 200);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
@@ -271,10 +270,10 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
 	@SuppressWarnings("hiding")
 	public void testIsCompatible() {
-		TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(TmfEvent.class, range1, 100, 200);
-		TmfEventRequest request1 = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
-		TmfEventRequest request2 = new TmfEventRequestStub(TmfEvent.class, range2, 100, 200);
-		TmfEventRequest request3 = new TmfEventRequestStub(TmfEvent.class, range1, 101, 200);
+		TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 100, 200);
+		TmfEventRequest request1 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
+		TmfEventRequest request2 = new TmfEventRequestStub(ITmfEvent.class, range2, 100, 200);
+		TmfEventRequest request3 = new TmfEventRequestStub(ITmfEvent.class, range1, 101, 200);
 
         assertTrue("isCompatible", coalescedRequest.isCompatible(request1));
         assertTrue("isCompatible", coalescedRequest.isCompatible(request2));
@@ -287,9 +286,9 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
     @SuppressWarnings("hiding")
     public void testAddEvent1() {
-        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(TmfEvent.class, range1, 0, 2147483647, 200, ExecutionType.FOREGROUND);
-        TmfEventRequest request1 = new TmfEventRequestStub(TmfEvent.class, range1, 0, 2147483647, 200);
-        TmfEventRequest request2 = new TmfEventRequestStub(TmfEvent.class, range1, 1, 2147483647, 200);
+        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 2147483647, 200, ExecutionType.FOREGROUND);
+        TmfEventRequest request1 = new TmfEventRequestStub(ITmfEvent.class, range1, 0, 2147483647, 200);
+        TmfEventRequest request2 = new TmfEventRequestStub(ITmfEvent.class, range1, 1, 2147483647, 200);
 
         assertTrue("isCompatible", coalescedRequest.isCompatible(request1));
         assertTrue("isCompatible", coalescedRequest.isCompatible(request2));
@@ -305,9 +304,9 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
     @SuppressWarnings("hiding")
     public void testAddEvent2() {
-        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(TmfEvent.class, range1, 1, 2147483647, 200, ExecutionType.FOREGROUND);
-        TmfEventRequest request1 = new TmfEventRequestStub(TmfEvent.class, range1, 1, 2147483647, 200);
-        TmfEventRequest request2 = new TmfEventRequestStub(TmfEvent.class, range1, 0, 2147483647, 200);
+        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 1, 2147483647, 200, ExecutionType.FOREGROUND);
+        TmfEventRequest request1 = new TmfEventRequestStub(ITmfEvent.class, range1, 1, 2147483647, 200);
+        TmfEventRequest request2 = new TmfEventRequestStub(ITmfEvent.class, range1, 0, 2147483647, 200);
 
         assertTrue("isCompatible", coalescedRequest.isCompatible(request1));
         assertTrue("isCompatible", coalescedRequest.isCompatible(request2));
@@ -330,8 +329,8 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 		// Test request
 		final boolean[] crFlags = new boolean[4];
 		TmfCoalescedEventRequest request = setupTestRequest(crFlags);
-		TmfEventRequest subRequest1 = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
-		TmfEventRequest subRequest2 = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
+		TmfEventRequest subRequest1 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
+		TmfEventRequest subRequest2 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
 		request.addRequest(subRequest1);
 		request.addRequest(subRequest2);
 
@@ -366,8 +365,8 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
 		final boolean[] crFlags = new boolean[4];
 		TmfCoalescedEventRequest request = setupTestRequest(crFlags);
-		TmfEventRequest subRequest1 = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
-		TmfEventRequest subRequest2 = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
+		TmfEventRequest subRequest1 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
+		TmfEventRequest subRequest2 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
 		request.addRequest(subRequest1);
 		request.addRequest(subRequest2);
 
@@ -402,8 +401,8 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
 		final boolean[] crFlags = new boolean[4];
 		TmfCoalescedEventRequest request = setupTestRequest(crFlags);
-		TmfEventRequest subRequest1 = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
-		TmfEventRequest subRequest2 = new TmfEventRequestStub(TmfEvent.class, range1, 100, 200);
+		TmfEventRequest subRequest1 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
+		TmfEventRequest subRequest2 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
 		request.addRequest(subRequest1);
 		request.addRequest(subRequest2);
 
@@ -485,7 +484,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         final long REQUEST_OFFSET = 1000;
 
         requestedEvents1 = new Vector<ITmfEvent>();
-        request1 = new TmfEventRequest(TmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
+        request1 = new TmfEventRequest(ITmfEvent.class, range, signal.fIndex, NB_EVENTS, BLOCK_SIZE) {
         	int nbRead = 0;
             @Override
             public void handleData(ITmfEvent event) {
@@ -500,7 +499,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         };
 
         requestedEvents2 = new Vector<ITmfEvent>();
-        request2 = new TmfEventRequest(TmfEvent.class, range, signal.fIndex + REQUEST_OFFSET, NB_EVENTS, BLOCK_SIZE) {
+        request2 = new TmfEventRequest(ITmfEvent.class, range, signal.fIndex + REQUEST_OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(ITmfEvent event) {
         		super.handleData(event);
@@ -511,7 +510,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         };
 
         requestedEvents3 = new Vector<ITmfEvent>();
-        request3 = new TmfEventRequest(TmfEvent.class, range, signal.fIndex + 2 * REQUEST_OFFSET, NB_EVENTS, BLOCK_SIZE) {
+        request3 = new TmfEventRequest(ITmfEvent.class, range, signal.fIndex + 2 * REQUEST_OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(ITmfEvent event) {
         		super.handleData(event);
@@ -521,7 +520,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
             }
         };
 
-        providers = TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request1);
         providers[0].sendRequest(request2);
         providers[0].sendRequest(request3);

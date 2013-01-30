@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.trace;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 public class TmfExperimentStub extends TmfExperiment {
 
     public TmfExperimentStub(String name, ITmfTrace[] traces, int blockSize) {
-        super(TmfEvent.class, name, traces, blockSize);
+        super(ITmfEvent.class, name, traces, blockSize);
         setIndexer(new TmfIndexerStub(this, blockSize));
     }
 

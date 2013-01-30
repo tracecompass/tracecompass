@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentLocation;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -121,12 +120,12 @@ public class TmfExperimentTest extends TestCase {
 
     public void testSimpleTmfExperimentConstructor() {
 
-        TmfExperiment experiment = new TmfExperiment(TmfEvent.class, EXPERIMENT, fTestTraces);
+        TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, fTestTraces);
         assertEquals("GetId", EXPERIMENT, experiment.getName());
         assertEquals("GetCacheSize", TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, experiment.getCacheSize());
         experiment.dispose();
 
-        experiment = new TmfExperiment(TmfEvent.class, EXPERIMENT, null);
+        experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, null);
         experiment.dispose();
     }
 
@@ -205,7 +204,7 @@ public class TmfExperimentTest extends TestCase {
     }
 
     public void testSeekNoTrace() {
-        TmfExperiment experiment = new TmfExperiment(TmfEvent.class, EXPERIMENT, null);
+        TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, null);
         ITmfContext context = experiment.seekEvent((TmfExperimentLocation) null);
         assertNull("seekEvent", context);
         experiment.dispose();
@@ -837,7 +836,7 @@ public class TmfExperimentTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, nbEvents, blockSize) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -865,7 +864,7 @@ public class TmfExperimentTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, nbEvents, blockSize) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -894,7 +893,7 @@ public class TmfExperimentTest extends TestCase {
         final long nbExpectedEvents = NB_EVENTS;
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, nbEvents, blockSize) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -926,7 +925,7 @@ public class TmfExperimentTest extends TestCase {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(TmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, nbEvents, blockSize) {
             int nbRead = 0;
             @Override
             public void handleData(final ITmfEvent event) {

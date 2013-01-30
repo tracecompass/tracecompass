@@ -18,7 +18,6 @@ import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
@@ -46,7 +45,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider {
     public ITmfContext armRequest(final ITmfDataRequest request) {
 
         // Get the TmfSyntheticEventStub provider
-        final ITmfDataProvider[] eventProviders = TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
+        final ITmfDataProvider[] eventProviders = TmfProviderManager.getProviders(ITmfEvent.class, TmfEventProviderStub.class);
         final ITmfDataProvider provider = eventProviders[0];
 
         // make sure we have the right type of request
@@ -58,7 +57,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider {
         final TmfEventRequest eventRequest = (TmfEventRequest) request;
         final TmfTimeRange range = eventRequest.getRange();
         final TmfEventRequest subRequest =
-                new TmfEventRequest(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+                new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);

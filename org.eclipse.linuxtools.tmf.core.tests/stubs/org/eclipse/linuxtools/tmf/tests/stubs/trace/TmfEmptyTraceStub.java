@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.trace;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -64,7 +64,7 @@ public class TmfEmptyTraceStub extends TmfTraceStub {
     }
 
     @Override
-    public TmfEvent parseEvent(final ITmfContext context) {
+    public ITmfEvent parseEvent(final ITmfContext context) {
         return null;
     }
 
