@@ -29,10 +29,9 @@ public class ControlFlowEntry implements ITimeGraphEntry {
     private final CtfKernelTrace fTrace;
     private ControlFlowEntry fParent = null;
     private final ArrayList<ControlFlowEntry> fChildren = new ArrayList<ControlFlowEntry>();
-    private final String fName;
+    private String fName;
     private final int fThreadId;
     private final int fParentThreadId;
-    private long fBirthTime = -1;
     private long fStartTime = -1;
     private long fEndTime = -1;
     private List<ITimeEvent> fEventList = new ArrayList<ITimeEvent>();
@@ -51,21 +50,17 @@ public class ControlFlowEntry implements ITimeGraphEntry {
      *            The TID of the thread
      * @param parentThreadId
      *            the Parent_TID of this thread
-     * @param birthTime
-     *            The birth time of this entry (this allows separating different
-     *            process that could have the same TID)
      * @param startTime
      *            The start time of this process's lifetime
      * @param endTime
      *            The end time of this process
      */
-    public ControlFlowEntry(int threadQuark, CtfKernelTrace trace, String execName, int threadId, int parentThreadId, long birthTime, long startTime, long endTime) {
+    public ControlFlowEntry(int threadQuark, CtfKernelTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
         fThreadQuark = threadQuark;
         fTrace = trace;
         fName = execName;
         fThreadId = threadId;
         fParentThreadId = parentThreadId;
-        fBirthTime = birthTime;
         fStartTime = startTime;
         fEndTime = endTime;
     }
@@ -88,6 +83,14 @@ public class ControlFlowEntry implements ITimeGraphEntry {
     @Override
     public String getName() {
         return fName;
+    }
+
+    /**
+     * Update the entry name
+     * @param execName the updated entry name
+     */
+    public void setName(String execName) {
+        fName = execName;
     }
 
     @Override
@@ -149,15 +152,6 @@ public class ControlFlowEntry implements ITimeGraphEntry {
      */
     public int getParentThreadId() {
         return fParentThreadId;
-    }
-
-    /**
-     * Get the birth time of this entry/process
-     *
-     * @return The birth time
-     */
-    public long getBirthTime() {
-        return fBirthTime;
     }
 
     /**

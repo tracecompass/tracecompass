@@ -232,7 +232,7 @@ public class ControlFlowView extends TmfView {
                     return Integer.toString(entry.getParentThreadId());
                 }
             } else if (columnIndex == 3) {
-                return Utils.formatTime(entry.getBirthTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
+                return Utils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
             } else if (columnIndex == 4) {
                 return entry.getTrace().getName();
             }
@@ -660,7 +660,7 @@ public class ControlFlowView extends TmfView {
                         if (monitor.isCanceled()) {
                             return;
                         }
-                        long birthTime = -1;
+                        ControlFlowEntry entry = null;
                         for (ITmfStateInterval execNameInterval : execNameIntervals) {
                             if (monitor.isCanceled()) {
                                 return;
@@ -669,19 +669,21 @@ public class ControlFlowView extends TmfView {
                                 String execName = execNameInterval.getStateValue().unboxStr();
                                 long startTime = execNameInterval.getStartTime();
                                 long endTime = execNameInterval.getEndTime() + 1;
-                                if (birthTime == -1) {
-                                    birthTime = startTime;
-                                }
                                 int ppid = -1;
                                 if (ppidQuark != -1) {
                                     ITmfStateInterval ppidInterval = ssq.querySingleState(startTime, ppidQuark);
                                     ppid = ppidInterval.getStateValue().unboxInt();
                                 }
-                                ControlFlowEntry entry = new ControlFlowEntry(threadQuark, ctfKernelTrace, execName, threadId, ppid, birthTime, startTime, endTime);
-                                entryList.add(entry);
+                                if (entry == null) {
+                                    entry = new ControlFlowEntry(threadQuark, ctfKernelTrace, execName, threadId, ppid, startTime, endTime);
+                                    entryList.add(entry);
+                                } else {
+                                    // update the name of the entry to the latest execName
+                                    entry.setName(execName);
+                                }
                                 entry.addEvent(new TimeEvent(entry, startTime, endTime - startTime));
                             } else {
-                                birthTime = -1;
+                                entry = null;
                             }
                         }
                     } catch (AttributeNotFoundException e) {
