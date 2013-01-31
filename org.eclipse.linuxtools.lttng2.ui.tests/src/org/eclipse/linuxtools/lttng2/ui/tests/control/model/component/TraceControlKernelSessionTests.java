@@ -90,6 +90,7 @@ public class TraceControlKernelSessionTests {
     @Before
     public void setUp() throws Exception {
         fFacility = TraceControlTestFacility.getInstance();
+        fFacility.init();
         fProxy = new TestRemoteSystemProxy();
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
@@ -102,6 +103,7 @@ public class TraceControlKernelSessionTests {
     @After
     public void tearDown() {
         fFacility.waitForJobs();
+        fFacility.dispose();
     }
 
     /**
@@ -116,7 +118,7 @@ public class TraceControlKernelSessionTests {
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(TraceControlTestFacility.SCEN_INIT_TEST);
 
-        ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
+        ITraceControlComponent root = fFacility.getControlView().getTraceControlRoot();
 
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
         ISystemProfile profile =  registry.createSystemProfile("myProfile", true);
