@@ -23,11 +23,11 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     TmfCorePluginTest.class,
     org.eclipse.linuxtools.tmf.core.tests.component.AllTests.class,
-    //org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.event.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.request.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.statesystem.AllTests.class,
-    //org.eclipse.linuxtools.tmf.core.tests.statistics.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.statistics.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.trace.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.uml2sd.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.util.AllTests.class
