@@ -422,6 +422,9 @@ public class ControlFlowView extends TmfView {
                 traceSelected(new TmfTraceSelectedSignal(this, trace));
             }
         }
+
+        // make selection available to other views
+        getSite().setSelectionProvider(fTimeGraphCombo.getTreeViewer());
     }
 
     /* (non-Javadoc)
