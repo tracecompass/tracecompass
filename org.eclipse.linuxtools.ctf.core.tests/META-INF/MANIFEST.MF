@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.ctf.core.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit4
+Require-Bundle: org.junit;bundle-version="4.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Fragment-Host: org.eclipse.linuxtools.ctf.core
