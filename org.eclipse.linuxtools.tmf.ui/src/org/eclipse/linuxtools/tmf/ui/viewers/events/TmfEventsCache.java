@@ -178,7 +178,7 @@ public class TmfEventsCache {
         if (index == fCacheEndIndex) {
             int i = index - fCacheStartIndex;
             if (i < fCache.length) {
-                fCache[i] = new CachedEvent(event.clone(), rank);
+                fCache[i] = new CachedEvent(event, rank);
                 fCacheEndIndex++;
             }
         }
@@ -348,7 +348,7 @@ public class TmfEventsCache {
                                     if (monitor.isCanceled()) {
                                         return;
                                     }
-                                    fCache[count] = new CachedEvent(event.clone(), rank);
+                                    fCache[count] = new CachedEvent(event, rank);
                                     count++;
                                     fCacheEndIndex++;
                                 }

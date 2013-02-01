@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -36,7 +37,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @see ITmfEventField
  * @see TmfEvent
  */
-public interface ITmfEvent {
+public interface ITmfEvent extends IAdaptable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -105,10 +106,5 @@ public interface ITmfEvent {
      * @return the event reference
      */
     public String getReference();
-
-    /**
-     * @return a clone of the event
-     */
-    public ITmfEvent clone();
 
 }

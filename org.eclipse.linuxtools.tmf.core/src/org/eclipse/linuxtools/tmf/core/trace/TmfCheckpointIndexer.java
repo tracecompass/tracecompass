@@ -353,7 +353,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         ITmfEvent[] trcEvts = expCtx.getEvents();
         for (int i = 0; i < size; i++) {
             ITmfEvent event = expContext.getEvents()[i];
-            trcEvts[i] = (event != null) ? event.clone() : null;
+            trcEvts[i] = event;
         }
         return expCtx;
     }
@@ -383,7 +383,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         ITmfEvent[] trcEvts = expContext.getEvents();
         for (int i = 0; i < size; i++) {
             ITmfEvent event = trcEvts[i];
-            ctx.getEvents()[i] = (event != null) ? event.clone() : null;
+            ctx.getEvents()[i] = event;
         }
         return ctx;
     }

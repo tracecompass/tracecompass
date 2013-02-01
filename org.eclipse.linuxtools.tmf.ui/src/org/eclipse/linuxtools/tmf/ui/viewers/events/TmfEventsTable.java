@@ -1313,7 +1313,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         final long rank = fFilterCheckCount;
                         final int index = (int) fFilterMatchCount;
                         fFilterMatchCount++;
-                        fCache.storeEvent(event.clone(), rank, index);
+                        fCache.storeEvent(event, rank, index);
                         refreshTable();
                     } else if ((fFilterCheckCount % 100) == 0) {
                         refreshTable();

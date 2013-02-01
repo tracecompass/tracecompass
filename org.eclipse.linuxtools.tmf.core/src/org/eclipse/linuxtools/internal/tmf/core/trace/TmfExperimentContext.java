@@ -135,7 +135,7 @@ public class TmfExperimentContext extends TmfContext {
     private ITmfEvent[] cloneEvents() {
         final ITmfEvent[] events = new ITmfEvent[fEvents.length];
         for (int i = 0; i < fEvents.length; i++) {
-            events[i] = (fEvents[i] != null) ? fEvents[i].clone() : null;
+            events[i] = fEvents[i];
         }
         return events;
     }
