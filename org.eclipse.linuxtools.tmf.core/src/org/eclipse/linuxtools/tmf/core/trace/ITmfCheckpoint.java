@@ -45,18 +45,10 @@ public interface ITmfCheckpoint extends Comparable<ITmfCheckpoint> {
      */
     public ITmfLocation getLocation();
 
-    /**
-     * @return a clone of the checkpoint
-     */
-    public ITmfCheckpoint clone();
-
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(ITmfCheckpoint checkpoint);
 

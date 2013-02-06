@@ -16,7 +16,6 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -81,38 +80,6 @@ public class TmfCheckpointTest {
         }
         catch (final Exception e) {
             fail("wrong exception");
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // clone
-    // ------------------------------------------------------------------------
-
-    @Test
-    public void testClone() {
-        try {
-            TmfCheckpoint checkpoint1 = fCheckpoint1.clone();
-            TmfCheckpoint checkpoint2 = fCheckpoint1.clone();
-            TmfCheckpoint checkpoint3 = fCheckpoint1.clone();
-
-            assertEquals("clone", checkpoint1, fCheckpoint1);
-            assertEquals("clone", checkpoint2, fCheckpoint1);
-            assertEquals("clone", checkpoint3, fCheckpoint1);
-
-            checkpoint1 = new TmfCheckpoint(fTimestamp1, null);
-            checkpoint2 = checkpoint1.clone();
-            assertEquals("clone", checkpoint1, checkpoint2);
-            assertNull(checkpoint1.getContext());
-            assertNull(checkpoint2.getContext());
-
-            checkpoint1 = new TmfCheckpoint(null, new TmfContext(fLocation1));
-            checkpoint3 = checkpoint1.clone();
-            assertEquals("clone", checkpoint1, checkpoint3);
-            assertNull(checkpoint1.getTimestamp());
-            assertNull(checkpoint3.getTimestamp());
-
-        } catch (final InternalError e) {
-            fail("clone()");
         }
     }
 

@@ -25,28 +25,21 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
  * @see ITmfLocation
  * @see ITmfTimestamp
  */
-public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
+public class TmfCheckpoint implements ITmfCheckpoint {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     // The checkpoint context
-    private ITmfContext fContext;
+    private final ITmfContext fContext;
 
     // The checkpoint timestamp
-    private ITmfTimestamp fTimestamp;
+    private final ITmfTimestamp fTimestamp;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-
-    /**
-     * Default constructor
-     */
-    @SuppressWarnings("unused")
-    private TmfCheckpoint() {
-    }
 
     /**
      * Full constructor
@@ -70,25 +63,6 @@ public class TmfCheckpoint implements ITmfCheckpoint, Cloneable {
         }
         fTimestamp = other.fTimestamp;
         fContext = other.fContext;
-    }
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    public TmfCheckpoint clone() {
-        TmfCheckpoint clone = null;
-        try {
-            clone = (TmfCheckpoint) super.clone();
-            clone.fContext = (fContext != null) ? fContext.clone() : null;
-            clone.fTimestamp = fTimestamp;
-        } catch (final CloneNotSupportedException e) {
-        }
-        return clone;
     }
 
     // ------------------------------------------------------------------------
