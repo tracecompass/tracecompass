@@ -91,6 +91,11 @@ public abstract class AbstractStateChangeInput implements IStateChangeInput {
     }
 
     @Override
+    public ITmfStateSystem getAssignedStateSystem() {
+        return ss;
+    }
+
+    @Override
     public void dispose() {
         /* Insert a null event in the queue to stop the event handler's thread. */
         try {

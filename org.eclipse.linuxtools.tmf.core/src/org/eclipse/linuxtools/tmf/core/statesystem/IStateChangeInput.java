@@ -69,6 +69,15 @@ public interface IStateChangeInput {
     public void assignTargetStateSystem(ITmfStateSystemBuilder ssb);
 
     /**
+     * Return the currently assigned target state system.
+     *
+     * @return Reference to the currently assigned state system, or null if no
+     *         SS is assigned yet
+     * @since 2.0
+     */
+    public ITmfStateSystem getAssignedStateSystem();
+
+    /**
      * Send an event to this input plugin for processing. The implementation
      * should check the contents, and call the state-modifying methods of its
      * IStateSystemBuilder object accordingly.
