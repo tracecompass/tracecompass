@@ -46,7 +46,7 @@ public class CtfTmfContext implements ITmfContext {
      */
     public CtfTmfContext(CtfTmfTrace ctfTmfTrace) {
         fTrace = ctfTmfTrace;
-        curLocation = new CtfLocation(new CtfLocationData(0, 0));
+        curLocation = new CtfLocation(new CtfLocationInfo(0, 0));
     }
 
     // -------------------------------------------
@@ -117,7 +117,7 @@ public class CtfTmfContext implements ITmfContext {
      * @return success or not
      */
     public synchronized boolean advance() {
-        final CtfLocationData curLocationData = this.curLocation.getLocationInfo();
+        final CtfLocationInfo curLocationData = this.curLocation.getLocationInfo();
         boolean retVal = getIterator().advance();
         CtfTmfEvent currentEvent = getIterator().getCurrentEvent();
 
@@ -160,7 +160,7 @@ public class CtfTmfContext implements ITmfContext {
      * @return success or not
      * @since 2.0
      */
-    public synchronized boolean seek(final CtfLocationData location) {
+    public synchronized boolean seek(final CtfLocationInfo location) {
         curLocation = new CtfLocation(location);
         return getIterator().seek(location);
     }

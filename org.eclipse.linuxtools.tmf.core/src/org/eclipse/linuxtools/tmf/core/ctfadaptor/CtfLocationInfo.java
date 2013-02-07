@@ -11,12 +11,12 @@
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 /**
- * CtfLocationData, the data in a CTF location.
+ * The data object to go in a {@link CtfLocation}.
  *
  * @author Matthew Khouzam
  * @since 2.0
  */
-public class CtfLocationData implements Comparable<CtfLocationData> {
+public class CtfLocationInfo implements Comparable<CtfLocationInfo> {
 
     private final long timestamp;
     private final long index;
@@ -28,7 +28,7 @@ public class CtfLocationData implements Comparable<CtfLocationData> {
      *            Index of this event (if there are N elements with the same
      *            timestamp, which one is it.)
      */
-    public CtfLocationData(long ts, long index) {
+    public CtfLocationInfo(long ts, long index) {
         this.timestamp = ts;
         this.index = index;
     }
@@ -47,11 +47,10 @@ public class CtfLocationData implements Comparable<CtfLocationData> {
         return index;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#hashCode()
-     */
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -61,11 +60,6 @@ public class CtfLocationData implements Comparable<CtfLocationData> {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -74,10 +68,10 @@ public class CtfLocationData implements Comparable<CtfLocationData> {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof CtfLocationData)) {
+        if (!(obj instanceof CtfLocationInfo)) {
             return false;
         }
-        CtfLocationData other = (CtfLocationData) obj;
+        CtfLocationInfo other = (CtfLocationInfo) obj;
         if (index != other.index) {
             return false;
         }
@@ -87,18 +81,17 @@ public class CtfLocationData implements Comparable<CtfLocationData> {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return "Element [" + timestamp + '/' + index + ']'; //$NON-NLS-1$
     }
 
+    // ------------------------------------------------------------------------
+    // Comparable
+    // ------------------------------------------------------------------------
+
     @Override
-    public int compareTo(CtfLocationData other) {
+    public int compareTo(CtfLocationInfo other) {
         if (this.timestamp > other.getTimestamp()) {
             return 1;
         }

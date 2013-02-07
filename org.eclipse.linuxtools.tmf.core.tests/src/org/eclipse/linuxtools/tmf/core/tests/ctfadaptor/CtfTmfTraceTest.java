@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationData;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationInfo;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
@@ -200,7 +200,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetLocationRatio() {
-        final CtfLocationData location2 = new CtfLocationData(1, 0);
+        final CtfLocationInfo location2 = new CtfLocationInfo(1, 0);
         CtfLocation location = new CtfLocation(location2);
         double result = fixture.getLocationRatio(location);
 
@@ -334,7 +334,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testSeekEvent_location() {
-        final CtfLocationData location2 = new CtfLocationData(1L, 0L);
+        final CtfLocationInfo location2 = new CtfLocationInfo(1L, 0L);
         CtfLocation ctfLocation = new CtfLocation(location2);
         ITmfContext result = fixture.seekEvent(ctfLocation);
         assertNotNull(result);

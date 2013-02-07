@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationData;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationInfo;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.junit.Before;
@@ -39,7 +39,7 @@ public class CtfLocationTest {
      */
     @Before
     public void setUp() {
-        fixture = new CtfLocation(new CtfLocationData(1, 0));
+        fixture = new CtfLocation(new CtfLocationInfo(1, 0));
     }
 
     /**
@@ -47,7 +47,7 @@ public class CtfLocationTest {
      */
     @Test
     public void testCtfLocation_long() {
-        CtfLocationData location = new CtfLocationData(1, 0);
+        CtfLocationInfo location = new CtfLocationInfo(1, 0);
         CtfLocation result = new CtfLocation(location);
 
         assertNotNull(result);
@@ -82,7 +82,7 @@ public class CtfLocationTest {
      */
     @Test
     public void testGetLocation() {
-        CtfLocationData location = fixture.getLocationInfo();
+        CtfLocationInfo location = fixture.getLocationInfo();
         Long result = location.getTimestamp();
         assertNotNull(result);
         assertEquals("1", result.toString()); //$NON-NLS-1$
@@ -99,7 +99,7 @@ public class CtfLocationTest {
      */
     @Test
     public void testSetLocation() {
-        CtfLocationData location = new CtfLocationData(1337, 7331);
+        CtfLocationInfo location = new CtfLocationInfo(1337, 7331);
         fixture = new CtfLocation(location);
     }
 
@@ -108,7 +108,7 @@ public class CtfLocationTest {
      */
     @Test
     public void testToString_valid(){
-        CtfLocation fixture2 = new CtfLocation(new CtfLocationData(1337, 7331));
+        CtfLocation fixture2 = new CtfLocation(new CtfLocationInfo(1337, 7331));
         assertEquals("CtfLocation: Element [1337/7331]",fixture2.toString()); //$NON-NLS-1$
     }
 
@@ -117,7 +117,7 @@ public class CtfLocationTest {
      */
     @Test
     public void testToString_invalid(){
-        CtfLocation fixture2 = new CtfLocation(new CtfLocationData(-1, -1));
+        CtfLocation fixture2 = new CtfLocation(new CtfLocationInfo(-1, -1));
         assertEquals("CtfLocation: INVALID",fixture2.toString()); //$NON-NLS-1$
     }
 }

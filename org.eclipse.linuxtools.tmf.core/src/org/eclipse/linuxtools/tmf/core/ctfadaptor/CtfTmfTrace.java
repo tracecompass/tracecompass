@@ -154,7 +154,7 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
         final CtfTmfContext context = new CtfTmfContext(this);
         context.setLocation(curLocation);
         context.seek(curLocation.getLocationInfo());
-        final CtfLocationData currentTime = ((CtfLocationData)context.getLocation().getLocationInfo());
+        final CtfLocationInfo currentTime = ((CtfLocationInfo)context.getLocation().getLocationInfo());
         final long startTime = getIterator(this, context).getStartTime();
         final long endTime = getIterator(this, context).getEndTime();
         return ((double) currentTime.getTimestamp() - startTime)
@@ -181,7 +181,7 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
          * by rank for now.
          */
         if (currentLocation == null) {
-            currentLocation = new CtfLocation(new CtfLocationData(0L, 0L));
+            currentLocation = new CtfLocation(new CtfLocationInfo(0L, 0L));
             context.setRank(0);
         }
         if (currentLocation.getLocationInfo() == CtfLocation.INVALID_LOCATION) {

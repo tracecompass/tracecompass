@@ -23,12 +23,12 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
  */
 public final class CtfLocation implements ITmfLocation {
 
-    private final CtfLocationData fLocation;
+    private final CtfLocationInfo fLocation;
 
     /**
      * An invalid location
      */
-    public static final CtfLocationData INVALID_LOCATION = new CtfLocationData(-1, -1);
+    public static final CtfLocationInfo INVALID_LOCATION = new CtfLocationInfo(-1, -1);
 
     /**
      * Constructor for CtfLocation. Uses a default index of 0.
@@ -63,7 +63,7 @@ public final class CtfLocation implements ITmfLocation {
      * @since 2.0
      */
     public CtfLocation(final long timestampValue, final long index) {
-       this(new CtfLocationData(timestampValue, index));
+       this(new CtfLocationInfo(timestampValue, index));
     }
 
     /**
@@ -73,7 +73,7 @@ public final class CtfLocation implements ITmfLocation {
      *            Other location to copy
      * @since 2.0
      */
-    public CtfLocation(final CtfLocationData location) {
+    public CtfLocation(final CtfLocationInfo location) {
         fLocation = location;
     }
 
@@ -85,13 +85,13 @@ public final class CtfLocation implements ITmfLocation {
      * @since 2.0
      */
     @Override
-    public CtfLocationData getLocationInfo() {
+    public CtfLocationInfo getLocationInfo() {
         return fLocation;
     }
 
     @Override
     public CtfLocation clone() {
-        return new CtfLocation(new CtfLocationData(fLocation.getTimestamp(), fLocation.getIndex()));
+        return new CtfLocation(new CtfLocationInfo(fLocation.getTimestamp(), fLocation.getIndex()));
     }
 
 
