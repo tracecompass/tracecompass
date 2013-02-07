@@ -67,17 +67,6 @@ public class CtfLocationTest {
     }
 
     /**
-     * Run the CtfLocation clone() method test.
-     */
-    @Test
-    public void testClone() {
-        CtfLocation result = fixture.clone();
-
-        assertNotNull(result);
-        assertEquals(Long.valueOf(1), (Long)result.getLocationInfo().getTimestamp());
-    }
-
-    /**
      * Run the Long getLocation() method test.
      */
     @Test
@@ -109,7 +98,7 @@ public class CtfLocationTest {
     @Test
     public void testToString_valid(){
         CtfLocation fixture2 = new CtfLocation(new CtfLocationInfo(1337, 7331));
-        assertEquals("CtfLocation: Element [1337/7331]",fixture2.toString()); //$NON-NLS-1$
+        assertEquals("CtfLocation [fLocationInfo=Element [1337/7331]]", fixture2.toString()); //$NON-NLS-1$
     }
 
     /**
@@ -118,6 +107,6 @@ public class CtfLocationTest {
     @Test
     public void testToString_invalid(){
         CtfLocation fixture2 = new CtfLocation(new CtfLocationInfo(-1, -1));
-        assertEquals("CtfLocation: INVALID",fixture2.toString()); //$NON-NLS-1$
+        assertEquals("CtfLocation [INVALID]", fixture2.toString()); //$NON-NLS-1$
     }
 }

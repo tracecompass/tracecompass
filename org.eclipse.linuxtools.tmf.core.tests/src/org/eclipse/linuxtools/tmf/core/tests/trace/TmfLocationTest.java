@@ -179,9 +179,9 @@ public class TmfLocationTest {
         TmfLongLocation location2 = new TmfLongLocation(lng);
         TmfTimestampLocation location3 = new TmfTimestampLocation(ts);
 
-        String expected1 = "TmfLocation [fLocation=" + str + "]";
-        String expected2 = "TmfLocation [fLocation=" + lng + "]";
-        String expected3 = "TmfLocation [fLocation=" + ts + "]";
+        String expected1 = "TmfStringLocation [fLocationInfo=" + str + "]";
+        String expected2 = "TmfLongLocation [fLocationInfo=" + lng + "]";
+        String expected3 = "TmfTimestampLocation [fLocationInfo=" + ts + "]";
 
         assertEquals("toString", expected1, location1.toString());
         assertEquals("toString", expected2, location2.toString());
