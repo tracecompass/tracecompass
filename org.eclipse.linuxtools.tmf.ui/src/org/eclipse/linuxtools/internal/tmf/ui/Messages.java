@@ -68,11 +68,15 @@ public class Messages extends NLS {
     public static String TmfEventsTable_AddBookmarkDialogTitle;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
     public static String TmfEventsTable_ClearFiltersActionText;
-    public static String TmfEventsTable_NavigateToModelActionText;
     public static String TmfEventsTable_ContentColumnHeader;
     public static String TmfEventsTable_FilterHint;
     public static String TmfEventsTable_HideRawActionText;
     public static String TmfEventsTable_HideTableActionText;
+    public static String TmfEventsTable_OpenCallsiteActionText;
+    public static String TmfEventsTable_OpenCallsiteNotFound;
+    public static String TmfEventsTable_OpenCallsiteSelectFileDialogTitle;
+    public static String TmfEventsTable_OpenModelActionText;
+    public static String TmfEventsTable_OpenModelUnsupportedURI;
     public static String TmfEventsTable_ReferenceColumnHeader;
     public static String TmfEventsTable_RemoveBookmarkActionText;
     public static String TmfEventsTable_SearchHint;

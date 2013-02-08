@@ -18,10 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
-import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
@@ -36,10 +34,12 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public abstract class CtfTmfEventFactory {
+public final class CtfTmfEventFactory {
 
-    /* Prefix for context information stored as CtfTmfEventfield's */
-    private static final String CONTEXT_FIELD_PREFIX = "context."; //$NON-NLS-1$
+    /**
+     * Don't let anyone instantiate this class.
+     */
+    private CtfTmfEventFactory() {}
 
     /**
      * Factory method to instantiate new {@link CtfTmfEvent}'s.
@@ -63,7 +63,7 @@ public abstract class CtfTmfEventFactory {
         int sourceCPU = eventDef.getCPU();
 
         ITmfEventField content = new TmfEventField(
-                ITmfEventField.ROOT_FIELD_ID, parseFields(originTrace, eventDef));
+                ITmfEventField.ROOT_FIELD_ID, parseFields(eventDef));
 
         String reference = fileName == null ? CtfTmfEvent.NO_STREAM : fileName;
 
@@ -99,7 +99,7 @@ public abstract class CtfTmfEventFactory {
      * Extract the field information from the structDefinition haze-inducing
      * mess, and put them into something ITmfEventField can cope with.
      */
-    private static CtfTmfEventField[] parseFields(CtfTmfTrace trace, EventDefinition eventDef) {
+    private static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
         List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
 
         StructDefinition structFields = eventDef.getFields();
@@ -117,7 +117,6 @@ public abstract class CtfTmfEventFactory {
         }
 
         /* Add context information as CtfTmfEventField */
-        long ip = -1;
         StructDefinition structContext = eventDef.getContext();
         if (structContext != null) {
             definitions = structContext.getDefinitions();
@@ -127,30 +126,11 @@ public abstract class CtfTmfEventFactory {
             it = definitions.entrySet().iterator();
             while(it.hasNext()) {
                 Entry<String, Definition> entry = it.next();
-                /* This is to get the instruction pointer if available */
-                if (entry.getKey().equals("_ip") && //$NON-NLS-1$
-                        (entry.getValue() instanceof IntegerDefinition)) {
-                    ip = ((IntegerDefinition) entry.getValue()).getValue();
-                }
-                /* Prefix field name to */
-                curContextName = CONTEXT_FIELD_PREFIX + entry.getKey();
+                /* Prefix field name */
+                curContextName = CtfConstants.CONTEXT_FIELD_PREFIX + entry.getKey();
                 curContextDef = entry.getValue();
                 curContext = CtfTmfEventField.parseField(curContextDef, curContextName);
                 fields.add(curContext);
-            }
-        }
-        /* Add callsite */
-        final String name = eventDef.getDeclaration().getName();
-        List<CTFCallsite> eventList = trace.getCTFTrace().getCallsiteCandidates(name);
-        if (!eventList.isEmpty()) {
-            final String callsite = "callsite"; //$NON-NLS-1$
-            if (eventList.size() == 1 || ip == -1) {
-                CTFCallsite cs = eventList.get(0);
-                fields.add(new CTFStringField(cs.toString(), callsite));
-            } else {
-                fields.add(new CTFStringField(
-                        trace.getCTFTrace().getCallsite(name, ip).toString(),
-                        callsite));
             }
         }
         return fields.toArray(new CtfTmfEventField[fields.size()]);
