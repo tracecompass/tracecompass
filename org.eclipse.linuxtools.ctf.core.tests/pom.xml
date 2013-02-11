@@ -39,32 +39,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.2</version>
           <executions>
             <execution>
               <id>prepare</id>
               <phase>validate</phase>
               <configuration>
-                <tasks>
-                  <echo message="prepare phase" />
-                  <!-- Download traces -->
-                  <get src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2" dest="traces/sample-ctf-trace-20120412.tar.bz2"/>
-                  <get src="http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2" dest="traces/trace2.tar.bz2"/>
-
-                  <!-- Unzip Traces -->
-                  <bunzip2 src="traces/sample-ctf-trace-20120412.tar.bz2" dest="traces/" />
-                  <bunzip2 src="traces/trace2.tar.bz2" dest="traces/" />
-
-                  <!-- Extract traces -->
-                  <untar src="traces/sample-ctf-trace-20120412.tar" dest="traces/" />
-                  <untar src="traces/trace2.tar" dest="traces/" />
-
-                  <!-- Delete unnecessary files -->
-                  <delete>
-                    <fileset dir="traces" includes="**/*.tar.bz2"/>
-                    <fileset dir="traces" includes="**/*.tar"/>
-                  </delete>
-                </tasks>
+                <target>
+                 <ant antfile="get-traces.xml" dir="traces" />
+                </target>
               </configuration>
               <goals>
                 <goal>run</goal>
