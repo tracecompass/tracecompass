@@ -2,6 +2,7 @@ package org.eclipse.linuxtools.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
@@ -93,6 +94,7 @@ public class VariantDeclarationTest {
     }
 
     private static IDefinitionScope createDefinitionScope() throws CTFReaderException {
+        assumeTrue(TestParams.tracesExist());
         VariantDeclaration declaration = new VariantDeclaration();
         declaration.setTag(""); //$NON-NLS-1$
         VariantDeclaration variantDeclaration = new VariantDeclaration();

@@ -2,6 +2,7 @@ package org.eclipse.linuxtools.ctf.core.tests.trace;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ public class StreamTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
+        assumeTrue(TestParams.tracesExist());
         fixture = new Stream(TestParams.createTrace());
         fixture.setEventContext(new StructDeclaration(1L));
         fixture.setPacketContext(new StructDeclaration(1L));

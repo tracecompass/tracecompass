@@ -2,6 +2,7 @@ package org.eclipse.linuxtools.ctf.core.tests.trace;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 import java.util.Random;
@@ -64,6 +65,7 @@ public class CTFTraceCallsitePerformanceTest {
     @Before
     public void setup() throws CTFReaderException, SecurityException,
             IllegalArgumentException {
+        assumeTrue(TestParams.tracesExist());
         fTrace = new CTFTrace(TestParams.getTraceFile().getParentFile());
     }
 

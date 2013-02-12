@@ -14,11 +14,10 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     CtfCorePluginTest.class,
-    /* All the tests below depend on the CTF tests traces */
-//    org.eclipse.linuxtools.ctf.core.tests.event.TestAll.class,
-//    org.eclipse.linuxtools.ctf.core.tests.io.TestAll.class,
-//    org.eclipse.linuxtools.ctf.core.tests.trace.TestAll.class,
-//    org.eclipse.linuxtools.ctf.core.tests.types.TestAll.class
+    org.eclipse.linuxtools.ctf.core.tests.event.TestAll.class,
+    org.eclipse.linuxtools.ctf.core.tests.io.TestAll.class,
+    org.eclipse.linuxtools.ctf.core.tests.trace.TestAll.class,
+    org.eclipse.linuxtools.ctf.core.tests.types.TestAll.class
 })
 public class AllCtfCoreTests {
 

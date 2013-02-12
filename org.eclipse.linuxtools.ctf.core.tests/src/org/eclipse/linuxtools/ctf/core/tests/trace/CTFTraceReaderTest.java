@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
@@ -43,6 +44,7 @@ public class CTFTraceReaderTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
+        assumeTrue(TestParams.tracesExist());
         fixture = new CTFTraceReader(TestParams.createTrace());
     }
 

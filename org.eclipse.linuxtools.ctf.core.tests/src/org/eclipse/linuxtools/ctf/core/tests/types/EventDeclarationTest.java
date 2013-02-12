@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
@@ -47,6 +48,7 @@ public class EventDeclarationTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
+        assumeTrue(TestParams.tracesExist());
         fixture = new EventDeclaration();
         fixture.setContext(new StructDeclaration(1L));
         fixture.setId(1L);

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +49,7 @@ public class StreamInputTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
+        assumeTrue(TestParams.tracesExist());
         fixture = new StreamInput(new Stream(TestParams.createTrace()),
                 (FileChannel) null, createFile());
         fixture.setTimestampEnd(1L);

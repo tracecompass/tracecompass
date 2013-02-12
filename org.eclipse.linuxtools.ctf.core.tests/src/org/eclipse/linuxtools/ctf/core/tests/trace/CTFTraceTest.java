@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.nio.ByteOrder;
@@ -50,6 +51,7 @@ public class CTFTraceTest {
      */
     @Before
     public void setUp() {
+        assumeTrue(TestParams.tracesExist());
         fixture = TestParams.createTraceFromFile();
         fixture.setMinor(1L);
         fixture.setUUID(UUID.randomUUID());
