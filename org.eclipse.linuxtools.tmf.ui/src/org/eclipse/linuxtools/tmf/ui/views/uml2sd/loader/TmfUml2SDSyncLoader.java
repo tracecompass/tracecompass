@@ -304,7 +304,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 public void handleData(ITmfEvent event) {
                     super.handleData(event);
 
-                    ITmfSyncSequenceDiagramEvent sdEvent = getSequnceDiagramEvent(event);
+                    ITmfSyncSequenceDiagramEvent sdEvent = getSequenceDiagramEvent(event);
 
                     if (sdEvent != null) {
                         ++fNbSeqEvents;
@@ -1142,7 +1142,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             public void handleData(ITmfEvent event) {
                 super.handleData(event);
 
-                ITmfSyncSequenceDiagramEvent sdEvent = getSequnceDiagramEvent(event);
+                ITmfSyncSequenceDiagramEvent sdEvent = getSequenceDiagramEvent(event);
 
                 if (sdEvent != null) {
                     fSdEvent.add(sdEvent);
@@ -1439,7 +1439,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 return;
             }
 
-            ITmfSyncSequenceDiagramEvent sdEvent = getSequnceDiagramEvent(event);
+            ITmfSyncSequenceDiagramEvent sdEvent = getSequenceDiagramEvent(event);
 
             if (sdEvent != null) {
 
@@ -1529,15 +1529,16 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      *
      * @param tmfEvent Event to parse for sequence diagram event details
      * @return sequence diagram event if details are available else null
+     * @since 2.0
      */
-    protected ITmfSyncSequenceDiagramEvent getSequnceDiagramEvent(ITmfEvent tmfEvent){
+    protected ITmfSyncSequenceDiagramEvent getSequenceDiagramEvent(ITmfEvent tmfEvent){
         //type = .*RECEIVE.* or .*SEND.*
         //content = sender:<sender name>:receiver:<receiver name>,signal:<signal name>
         String eventType = tmfEvent.getType().toString();
-        if (eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeSend) || eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeReceive)) {
-            Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSender);
-            Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldReceiver);
-            Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSignal);
+        if (eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeSend) || eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeReceive)) {
+            Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSender);
+            Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldReceiver);
+            Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSignal);
             if ((sender instanceof ITmfEventField) && (receiver instanceof ITmfEventField) && (name instanceof ITmfEventField)) {
                 ITmfSyncSequenceDiagramEvent sdEvent = new TmfSyncSequenceDiagramEvent(tmfEvent,
                                 ((ITmfEventField) sender).getValue().toString(),
