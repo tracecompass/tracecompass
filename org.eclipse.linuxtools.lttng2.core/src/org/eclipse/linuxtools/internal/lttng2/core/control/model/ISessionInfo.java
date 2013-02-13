@@ -65,4 +65,16 @@ public interface ISessionInfo extends ITraceInfo {
      * @param domainInfo domain information to add.
      */
     public void addDomain(IDomainInfo domainInfo);
+
+    /**
+     * Returns if session is streamed over network
+     * @return <code>true</code> if streamed over network else <code>false</code>
+     */
+    public boolean isStreamedTrace();
+
+    /**
+     * Sets whether the trace is streamed or not
+     * @param isStreamedTrace <code>true</code> if streamed over network else <code>false</code>
+     */
+    public void setStreamedTrace(boolean isStreamedTrace);
 }

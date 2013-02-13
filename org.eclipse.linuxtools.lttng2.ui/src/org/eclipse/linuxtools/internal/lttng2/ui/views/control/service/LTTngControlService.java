@@ -184,6 +184,11 @@ public class LTTngControlService implements ILttngControlService {
                 continue;
             }
 
+            matcher = LTTngControlServiceConstants.TRACE_NETWORK_PATH_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                sessionInfo.setStreamedTrace(true);
+            }
+
             matcher = LTTngControlServiceConstants.TRACE_SESSION_PATH_PATTERN.matcher(line);
             if (matcher.matches()) {
                 sessionInfo.setSessionPath(matcher.group(1).trim());
@@ -349,6 +354,12 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public ISessionInfo createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException {
+        return createSession(sessionName, sessionPath, false, false, monitor);
+    }
+
+    @Override
+    public ISessionInfo createSession(String sessionName, String sessionPath, boolean noConsumer, boolean disableConsumer,
+            IProgressMonitor monitor) throws ExecutionException {
 
         String newName = formatParameter(sessionName);
         String newPath = formatParameter(sessionPath);
@@ -358,6 +369,12 @@ public class LTTngControlService implements ILttngControlService {
         if (newPath != null && !"".equals(newPath)) { //$NON-NLS-1$
             command.append(LTTngControlServiceConstants.OPTION_OUTPUT_PATH);
             command.append(newPath);
+        }
+
+        if (noConsumer) {
+            command.append(LTTngControlServiceConstants.OPTION_NO_CONSUMER);
+        } else if (disableConsumer) {
+            command.append(LTTngControlServiceConstants.OPTION_DISABLE_CONSUMER);
         }
 
         ICommandResult result = executeCommand(command.toString(), monitor);
@@ -379,33 +396,109 @@ public class LTTngControlService implements ILttngControlService {
                     formatOutput(result));
         }
 
-        if ((name == null) || (!name.equals(sessionName))) {
+        if ((name == null) || (!"".equals(sessionName) && !name.equals(sessionName))) { //$NON-NLS-1$
             // Unexpected name returned
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.TraceControl_UnexpectedNameError + ": " + name); //$NON-NLS-1$
         }
 
-        // Get and verify session path
-        matcher = LTTngControlServiceConstants.CREATE_SESSION_PATH_PATTERN.matcher(output[1]);
-        String path = null;
+        SessionInfo sessionInfo = new SessionInfo(name);
+
+        if (!noConsumer) {
+            // Get and verify session path
+            matcher = LTTngControlServiceConstants.CREATE_SESSION_PATH_PATTERN.matcher(output[1]);
+            String path = null;
+
+            if (matcher.matches()) {
+                path = String.valueOf(matcher.group(1).trim());
+            } else {
+                // Output format not expected
+                throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+                        Messages.TraceControl_UnexpectedCommandOutputFormat + ":\n" + //$NON-NLS-1$
+                        formatOutput(result));
+            }
+
+            if ((path == null) || ((sessionPath != null) && (!path.contains(sessionPath)))) {
+                // Unexpected path
+                throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+                        Messages.TraceControl_UnexpectedPathError + ": " + name); //$NON-NLS-1$
+            }
+            sessionInfo.setSessionPath(path);
+        }
+
+        return sessionInfo;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#createSession(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean, boolean, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl,
+            String dataUrl, boolean noConsumer, boolean disableConsumer, IProgressMonitor monitor) throws ExecutionException {
+
+        String newName = formatParameter(sessionName);
+        StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_CREATE_SESSION, newName);
+
+        if (networkUrl != null) {
+            command.append(LTTngControlServiceConstants.OPTION_NETWORK_URL);
+            command.append(networkUrl);
+        } else {
+            command.append(LTTngControlServiceConstants.OPTION_CONTROL_URL);
+            command.append(controlUrl);
+
+            command.append(LTTngControlServiceConstants.OPTION_DATA_URL);
+            command.append(dataUrl);
+        }
+
+        if (noConsumer) {
+            command.append(LTTngControlServiceConstants.OPTION_NO_CONSUMER);
+        } else if (disableConsumer) {
+            command.append(LTTngControlServiceConstants.OPTION_DISABLE_CONSUMER);
+        }
+
+        ICommandResult result = executeCommand(command.toString(), monitor);
+
+        //Session myssession2 created.
+        //Traces will be written in /home/user/lttng-traces/myssession2-20120209-095418
+        String[] output = result.getOutput();
+
+        // Get and verify session name
+        Matcher matcher = LTTngControlServiceConstants.CREATE_SESSION_NAME_PATTERN.matcher(output[0]);
+        String name = null;
 
         if (matcher.matches()) {
-            path = String.valueOf(matcher.group(1).trim());
+            name = String.valueOf(matcher.group(1).trim());
         } else {
             // Output format not expected
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.TraceControl_UnexpectedCommandOutputFormat + ":\n" + //$NON-NLS-1$
                     formatOutput(result));
         }
-
-        if ((path == null) || ((sessionPath != null) && (!path.contains(sessionPath)))) {
-            // Unexpected path
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
-                    Messages.TraceControl_UnexpectedPathError + ": " + name); //$NON-NLS-1$
-        }
+        // Get and verify session path
+        matcher = LTTngControlServiceConstants.CREATE_SESSION_PATH_PATTERN.matcher(output[1]);
+        String path = null;
 
         SessionInfo sessionInfo = new SessionInfo(name);
-        sessionInfo.setSessionPath(path);
+        if (!noConsumer && (networkUrl != null)) {
+            if (matcher.matches()) {
+                path = String.valueOf(matcher.group(1).trim());
+            } else {
+                // Output format not expected
+                throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+                        Messages.TraceControl_UnexpectedCommandOutputFormat + ":\n" + //$NON-NLS-1$
+                        formatOutput(result));
+            }
+
+            if (path == null) {
+                // Unexpected path
+                throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+                        Messages.TraceControl_UnexpectedPathError + ": " + name); //$NON-NLS-1$
+            }
+            sessionInfo.setSessionPath(path);
+        }
+        sessionInfo.setStreamedTrace(true);
 
         return sessionInfo;
     }
@@ -1181,8 +1274,6 @@ public class LTTngControlService implements ILttngControlService {
         }
         return index;
     }
-
-
 
     /**
      * Formats a command parameter for the command execution i.e. adds quotes

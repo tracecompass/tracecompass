@@ -90,7 +90,7 @@ public class ImportHandler extends BaseControlViewHandler {
             final IImportDialog dialog = TraceControlDialogFactory.getInstance().getImportDialog();
             dialog.setSession(param.getSession());
 
-            if (dialog.open() != Window.OK) {
+            if ((dialog.open() != Window.OK) || param.getSession().isStreamedTrace()) {
                 return null;
             }
 

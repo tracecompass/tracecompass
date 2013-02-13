@@ -44,6 +44,10 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
      * The domains information of this session.
      */
     private final List<IDomainInfo> fDomains = new ArrayList<IDomainInfo>();
+    /**
+     * Flag to indicate whether trace is streamed over network or not.
+     */
+    private boolean fIsStreamedTrace = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -64,6 +68,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         super(other);
         fState = other.fState;
         fSessionPath = other.fSessionPath;
+        fIsStreamedTrace = other.fIsStreamedTrace;
 
         for (Iterator<IDomainInfo> iterator = other.fDomains.iterator(); iterator.hasNext();) {
             IDomainInfo domain = iterator.next();
@@ -148,6 +153,25 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo#isStreamedTrace()
+     */
+    @Override
+    public boolean isStreamedTrace() {
+        return fIsStreamedTrace;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo#setIsStreamedTrace(boolean)
+     */
+
+    @Override
+    public void setStreamedTrace(boolean isStreamedTrace) {
+        fIsStreamedTrace = isStreamedTrace;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -162,21 +186,22 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#hashCode()
      */
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((fDomains == null) ? 0 : fDomains.hashCode());
+        result = prime * result + (fIsStreamedTrace ? 1231 : 1237);
         result = prime * result + ((fSessionPath == null) ? 0 : fSessionPath.hashCode());
-        result = prime * result + ((fState == null) ? 0 : (fState.ordinal() + 1));
+        result = prime * result + ((fState == null) ? 0 : fState.hashCode());
         return result;
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
+     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
@@ -195,6 +220,9 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
                 return false;
             }
         } else if (!fDomains.equals(other.fDomains)) {
+            return false;
+        }
+        if (fIsStreamedTrace != other.fIsStreamedTrace) {
             return false;
         }
         if (fSessionPath == null) {

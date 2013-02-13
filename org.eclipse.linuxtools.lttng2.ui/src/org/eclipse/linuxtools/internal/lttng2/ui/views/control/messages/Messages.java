@@ -98,6 +98,29 @@ final public class Messages extends NLS {
     public static String TraceControl_CreateSessionNameTooltip;
     public static String TraceControl_CreateSessionPathLabel;
     public static String TraceControl_CreateSessionPathTooltip;
+
+    public static String TraceControl_CreateSessionConfigureStreamingButtonText;
+    public static String TraceControl_CreateSessionConfigureStreamingButtonTooltip;
+    public static String TraceControl_CreateSessionNoStreamingButtonText;
+    public static String TraceControl_CreateSessionNoStreamingButtonTooltip;
+    public static String TraceControl_CreateSessionLinkButtonText;
+    public static String TraceControl_CreateSessionLinkButtonTooltip;
+    public static String TraceControl_CreateSessionProtocolLabelText;
+    public static String TraceControl_CreateSessionAddressLabelText;
+    public static String TraceControl_CreateSessionPortLabelText;
+    public static String TraceControl_CreateSessionControlUrlLabel;
+    public static String TraceControl_CreateSessionDataUrlLabel;
+    public static String TraceControl_CreateSessionCommonProtocolTooltip;
+    public static String TraceControl_CreateSessionControlAddressTooltip;
+    public static String TraceControl_CreateSessionControlPortTooltip;
+    public static String TraceControl_CreateSessionProtocolTooltip;
+    public static String TraceControl_CreateSessionDataAddressTooltip;
+    public static String TraceControl_CreateSessionDataPortTooltip;
+    public static String TraceControl_CreateSessionNoConsumertText;
+    public static String TraceControl_CreateSessionNoConsumertTooltip;
+    public static String TraceControl_CreateSessionDisableConsumertText;
+    public static String TraceControl_CreateSessionDisableConsumertTooltip;
+
     public static String TraceControl_InvalidSessionNameError;
     public static String TraceControl_SessionAlreadyExistsError;
     public static String TraceControl_SessionPathAlreadyExistsError;

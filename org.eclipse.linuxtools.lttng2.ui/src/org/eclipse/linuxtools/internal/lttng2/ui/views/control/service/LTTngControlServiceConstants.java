@@ -201,7 +201,26 @@ public class LTTngControlServiceConstants {
      * Command line option for configuring event's filter
      */
     public final static String OPTION_FILTER = " --filter "; //$NON-NLS-1$
-
+    /**
+     * Command line option for configuring the streaming network URL (common for control and data channel).
+     */
+    public final static String OPTION_NETWORK_URL = " -U "; //$NON-NLS-1$
+    /**
+     * Command line option for configuring the streaming control URL.
+     */
+    public final static String OPTION_CONTROL_URL = " -C "; //$NON-NLS-1$
+    /**
+     * Command line option for configuring the streaming data URL.
+     */
+    public final static String OPTION_DATA_URL = " -D "; //$NON-NLS-1$
+    /**
+     * Command line option for configuring of no consumer.
+     */
+    public final static String OPTION_NO_CONSUMER = " --no-consumer "; //$NON-NLS-1$
+    /**
+     * Command line option for disabling the consumer.
+     */
+    public final static String OPTION_DISABLE_CONSUMER = " --disable-consumer "; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Parsing constants
@@ -226,6 +245,10 @@ public class LTTngControlServiceConstants {
      * Pattern to match for session path information (lttng list <session>)
      */
     public final static Pattern TRACE_SESSION_PATH_PATTERN = Pattern.compile("\\s*Trace\\s+path\\:\\s+(.*)"); //$NON-NLS-1$
+    /**
+     * Patter to match session path for network tracing (lttng list <session>)
+     */
+    public final static Pattern TRACE_NETWORK_PATH_PATTERN = Pattern.compile("\\s*Trace\\s+path\\:\\s+(net|net6|file|tcp|tcp6|)\\:\\/\\/(.*)(\\:(\\d*)\\/(.*)\\[data\\:\\s+(\\d*)\\]){0,1}"); //$NON-NLS-1$
     /**
      * Pattern to match for kernel domain information (lttng list <session>)
      */
@@ -335,4 +358,5 @@ public class LTTngControlServiceConstants {
      * Pattern to match error line if no kernel tracer is available or installed.
      */
     public final static Pattern LIST_KERNEL_NO_KERNEL_PROVIDER_PATTERN = Pattern.compile("\\s*Error:\\s+Unable\\s+to\\s+list\\s+kernel\\s+events.*"); //$NON-NLS-1$;
+
 }

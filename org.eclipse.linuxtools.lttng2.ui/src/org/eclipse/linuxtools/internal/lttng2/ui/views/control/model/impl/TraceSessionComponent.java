@@ -165,6 +165,22 @@ public class TraceSessionComponent extends TraceControlComponent {
         fSessionInfo.setSessionPath(sessionPath);
     }
 
+    /**
+     * Returns if session is streamed over network
+     * @return <code>true</code> if streamed over network else <code>false</code>
+     */
+    public boolean isStreamedTrace() {
+        return fSessionInfo.isStreamedTrace();
+    }
+
+    /**
+     * Sets whether the trace is streamed or not
+     * @param isStreamedTrace <code>true</code> if streamed over network else <code>false</code>
+     */
+    public void setIsStreamedTrace(boolean isStreamedTrace) {
+        fSessionInfo.setStreamedTrace(isStreamedTrace);
+    }
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)

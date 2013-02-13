@@ -83,6 +83,7 @@ public class LTTngControlServiceTest {
     private static final String SCEN_CONTEXT_HANDLING = "ContextHandling";
     private static final String SCEN_CONTEXT_ERROR_HANDLING = "ContextErrorHandling";
     private static final String SCEN_CALIBRATE_HANDLING = "CalibrateHandling";
+    private static final String SCEN_CREATE_SESSION_2_1 = "CreateSessionLttng2.1";
 
     // ------------------------------------------------------------------------
     // Test data
@@ -948,4 +949,67 @@ public class LTTngControlServiceTest {
         }
     }
 
+    public void testCreateSession2_1() {
+
+        try {
+            fShell.setScenario(SCEN_CREATE_SESSION_2_1);
+
+            ISessionInfo info = fService.createSession("mysession", null, true, false, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("", info.getSessionPath());
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+            info = fService.createSession("mysession", "file:///tmp", null, null, true, false, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("", info.getSessionPath());
+            assertTrue(info.isStreamedTrace());
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+            info = fService.createSession("mysession", "net://172.0.0.1", null, null, false, true, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("net://172.0.0.1", info.getSessionPath());
+            assertTrue(info.isStreamedTrace());
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+            info = fService.createSession("mysession", null, false, true, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            // >>> no way to verify provided by tracer!!!
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+            info = fService.createSession("mysession", "file:///tmp", null, null, false, false, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("file:///tmp", info.getSessionPath());
+            assertTrue(info.isStreamedTrace());
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+            info = fService.createSession("mysession", "file:///tmp", null, null, false, false, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("file:///tmp", info.getSessionPath());
+            assertTrue(info.isStreamedTrace());
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+            info = fService.createSession("mysession", null, "tcp://172.0.0.1", "tcp://172.0.0.1:5343", false, false, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("", info.getSessionPath()); // TODO: currently there is a bug in LTTng tracer and it returns string null
+            assertTrue(info.isStreamedTrace());
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+            info = fService.createSession("mysession", "net://172.0.0.1:1234:2345", null, null, false, false, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("net://172.0.0.1:1234:2345", info.getSessionPath());
+            assertTrue(info.isStreamedTrace());
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
 }
