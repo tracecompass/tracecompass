@@ -13,10 +13,11 @@
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,17 +28,17 @@ import org.junit.Test;
  */
 public class CtfKernelStateInputTest {
 
-    static IStateChangeInput input;
+    private final static int TRACE_INDEX = 1;
+
+    private static IStateChangeInput input;
 
     /**
      * Set-up.
-     *
-     * @throws TmfTraceException
-     *             If we can't find the test traces
      */
     @BeforeClass
-    public static void initialize() throws TmfTraceException {
-        input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
+    public static void initialize() {
+        assumeTrue(CtfTmfTestTraces.tracesExist());
+        input = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
 
     }
 
@@ -48,7 +49,7 @@ public class CtfKernelStateInputTest {
     public void testOpening() {
         long testStartTime;
         testStartTime = input.getStartTime();
-        assertEquals(testStartTime, CtfTestFiles.startTime);
+        assertEquals(testStartTime, StateSystemTest.startTime);
     }
 
 }

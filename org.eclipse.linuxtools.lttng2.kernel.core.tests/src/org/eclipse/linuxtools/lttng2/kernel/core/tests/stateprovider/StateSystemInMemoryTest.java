@@ -12,9 +12,11 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
+import static org.junit.Assume.assumeTrue;
+
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
 import org.junit.BeforeClass;
 
 /**
@@ -29,11 +31,8 @@ public class StateSystemInMemoryTest extends StateSystemTest {
      */
     @BeforeClass
     public static void initialize() {
-        try {
-            input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-            ssq = StateSystemManager.newInMemHistory(input, true);
-        } catch (TmfTraceException e) {
-            e.printStackTrace();
-        }
+        assumeTrue(CtfTmfTestTraces.tracesExist());
+        input = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
+        ssq = StateSystemManager.newInMemHistory(input, true);
     }
 }

@@ -14,15 +14,17 @@ package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
-import org.junit.AfterClass;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,28 +44,20 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
      */
     @BeforeClass
     public static void initialize() {
+        assumeTrue(CtfTmfTestTraces.tracesExist());
         try {
             stateFile = File.createTempFile("test", ".ht"); //$NON-NLS-1$ //$NON-NLS-2$
             stateFileBenchmark = File.createTempFile("test", ".ht.benchmark"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
+            input = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
             ssq = StateSystemManager.loadStateHistory(stateFile, input, true);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Delete the temp files after we're done
-     */
-    @AfterClass
-    public static void cleanup() {
-        boolean ret1, ret2;
-        ret1 = stateFile.delete();
-        ret2 = stateFileBenchmark.delete();
-        if ( !(ret1 && ret2) ) {
-            System.err.println("Error cleaning up during unit testing, " + //$NON-NLS-1$
-                    "you might have leftovers state history files in /tmp"); //$NON-NLS-1$
+        } catch (TmfTraceException e) {
+            e.printStackTrace();
+        } finally {
+            stateFile.deleteOnExit();
+            stateFileBenchmark.deleteOnExit();
         }
     }
 
@@ -83,11 +77,11 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         IStateChangeInput input2;
         ITmfStateSystem ssb2;
 
-        input2 = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
+        input2 = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
         ssb2 = StateSystemManager.loadStateHistory(stateFileBenchmark, input2, true);
 
-        assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());
-        assertEquals(CtfTestFiles.endTime, ssb2.getCurrentEndTime());
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
     }
 
     /**
@@ -104,8 +98,8 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         ssb2 = StateSystemManager.loadStateHistory(stateFile, null, true);
 
         assertNotNull(ssb2);
-        assertEquals(CtfTestFiles.startTime, ssb2.getStartTime());
-        assertEquals(CtfTestFiles.endTime, ssb2.getCurrentEndTime());
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
     }
 
 }

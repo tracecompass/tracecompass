@@ -37,6 +37,18 @@ import org.junit.Test;
 @SuppressWarnings({"nls", "javadoc"})
 public abstract class StateSystemTest {
 
+    /** Index of the test trace used for these tests */
+    protected static final int TRACE_INDEX = 1;
+
+    /** Expected start time of the test trace/state history */
+    protected static final long startTime = 1331668247314038062L;
+
+    /** Expected end time of the state history built from the test trace */
+    protected static final long endTime = 1331668259054285979L;
+
+    /** Number of nanoseconds in one second */
+    private static final long NANOSECS_PER_SEC = 1000000000L;
+
     protected static IStateChangeInput input;
     protected static ITmfStateSystem ssq;
 
@@ -96,7 +108,7 @@ public abstract class StateSystemTest {
             StateSystemDisposedException {
 
         long time1 = interestingTimestamp1;
-        long time2 = time1 + 1L * CtfTestFiles.NANOSECS_PER_SEC;
+        long time2 = time1 + 1L * NANOSECS_PER_SEC;
         int quark;
         List<ITmfStateInterval> intervals;
 
@@ -119,7 +131,7 @@ public abstract class StateSystemTest {
 
         int quark = ssq.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
         long ts1 = ssq.getStartTime(); /* start of the trace */
-        long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid, but ignored */
+        long ts2 = startTime + 20L * NANOSECS_PER_SEC; /* invalid, but ignored */
 
         intervals = ssq.queryHistoryRange(quark, ts1, ts2);
 
@@ -136,7 +148,7 @@ public abstract class StateSystemTest {
             StateSystemDisposedException {
 
         long time1 = interestingTimestamp1;
-        long time2 = time1 + 1L * CtfTestFiles.NANOSECS_PER_SEC;
+        long time2 = time1 + 1L * NANOSECS_PER_SEC;
         long resolution = 1000000; /* One query every millisecond */
         int quark;
         List<ITmfStateInterval> intervals;
@@ -154,14 +166,14 @@ public abstract class StateSystemTest {
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime1() throws TimeRangeException,
             StateSystemDisposedException {
-        long ts = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC;
+        long ts = startTime + 20L * NANOSECS_PER_SEC;
         ssq.queryFullState(ts);
     }
 
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime2() throws TimeRangeException,
             StateSystemDisposedException {
-        long ts = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC;
+        long ts = startTime - 20L * NANOSECS_PER_SEC;
         ssq.queryFullState(ts);
     }
 
@@ -171,7 +183,7 @@ public abstract class StateSystemTest {
             StateSystemDisposedException {
 
         int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC;
+        long ts = startTime + 20L * NANOSECS_PER_SEC;
         ssq.querySingleState(ts, quark);
     }
 
@@ -181,7 +193,7 @@ public abstract class StateSystemTest {
             StateSystemDisposedException {
 
         int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC;
+        long ts = startTime - 20L * NANOSECS_PER_SEC;
         ssq.querySingleState(ts, quark);
     }
 
@@ -190,8 +202,8 @@ public abstract class StateSystemTest {
             TimeRangeException, StateSystemDisposedException {
 
         int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts1 = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long ts2 = CtfTestFiles.startTime + 1L * CtfTestFiles.NANOSECS_PER_SEC; /* valid */
+        long ts1 = startTime - 20L * NANOSECS_PER_SEC; /* invalid */
+        long ts2 = startTime + 1L * NANOSECS_PER_SEC; /* valid */
 
         ssq.queryHistoryRange(quark, ts1, ts2);
     }
@@ -201,8 +213,8 @@ public abstract class StateSystemTest {
             AttributeNotFoundException, StateSystemDisposedException {
 
         int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts1 = CtfTestFiles.startTime - 1L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts1 = startTime - 1L * NANOSECS_PER_SEC; /* invalid */
+        long ts2 = startTime + 20L * NANOSECS_PER_SEC; /* invalid */
 
         ssq.queryHistoryRange(quark, ts1, ts2);
     }
