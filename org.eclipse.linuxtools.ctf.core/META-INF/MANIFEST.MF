@@ -14,10 +14,10 @@ Export-Package: org.eclipse.linuxtools.ctf.core.event,
  org.eclipse.linuxtools.ctf.core.event.io,
  org.eclipse.linuxtools.ctf.core.event.types,
  org.eclipse.linuxtools.ctf.core.trace,
- org.eclipse.linuxtools.internal.ctf.core;x-internal:=true,
- org.eclipse.linuxtools.internal.ctf.core.event;x-internal:=true,
- org.eclipse.linuxtools.internal.ctf.core.event.metadata;x-internal:=true,
- org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions;x-internal:=true,
- org.eclipse.linuxtools.internal.ctf.core.trace;x-internal:=true
+ org.eclipse.linuxtools.internal.ctf.core;x-friends:="org.eclipse.linuxtools.ctf.core.tests",
+ org.eclipse.linuxtools.internal.ctf.core.event;x-friends:="org.eclipse.linuxtools.ctf.core.tests",
+ org.eclipse.linuxtools.internal.ctf.core.event.metadata;x-friends:="org.eclipse.linuxtools.ctf.core.tests",
+ org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions;x-friends:="org.eclipse.linuxtools.ctf.core.tests",
+ org.eclipse.linuxtools.internal.ctf.core.trace;x-friends:="org.eclipse.linuxtools.ctf.core.tests"
 Import-Package: org.antlr.runtime;version="3.2.0",
  org.antlr.runtime.tree;version="3.2.0"

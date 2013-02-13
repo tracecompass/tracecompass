@@ -4,9 +4,11 @@ Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
-Bundle-SymbolicName: org.eclipse.linuxtools.ctf.core.tests
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit;bundle-version="4.0.0"
+Bundle-SymbolicName: org.eclipse.linuxtools.ctf.core.tests;singleton:=true
+Bundle-Activator: org.eclipse.linuxtools.ctf.core.tests.CtfCoreTestPlugin
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
-Fragment-Host: org.eclipse.linuxtools.ctf.core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit;bundle-version="4.0.0",
+ org.eclipse.core.runtime;bundle-version="3.8.0",
+ org.eclipse.linuxtools.ctf.core;bundle-version="2.0.0"
+Export-Package: org.eclipse.linuxtools.ctf.core.tests.shared

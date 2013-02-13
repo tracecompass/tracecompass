@@ -11,7 +11,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +25,8 @@ import org.junit.Test;
  * @version $Revision: 1.0 $
  */
 public class VariantDeclarationTest {
+
+    private static final int TRACE_INDEX = 0;
 
     private VariantDeclaration fixture;
 
@@ -94,13 +96,13 @@ public class VariantDeclarationTest {
     }
 
     private static IDefinitionScope createDefinitionScope() throws CTFReaderException {
-        assumeTrue(TestParams.tracesExist());
+        assumeTrue(CtfTestTraces.tracesExist());
         VariantDeclaration declaration = new VariantDeclaration();
         declaration.setTag(""); //$NON-NLS-1$
         VariantDeclaration variantDeclaration = new VariantDeclaration();
         variantDeclaration.setTag(""); //$NON-NLS-1$
         VariantDefinition variantDefinition = new VariantDefinition(
-                variantDeclaration, TestParams.createTrace(), ""); //$NON-NLS-1$
+                variantDeclaration, CtfTestTraces.getTestTrace(TRACE_INDEX), ""); //$NON-NLS-1$
         IDefinitionScope definitionScope = new StructDefinition(
                 new StructDeclaration(1L), variantDefinition, ""); //$NON-NLS-1$
         String fieldName = ""; //$NON-NLS-1$
