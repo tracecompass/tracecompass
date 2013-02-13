@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Set;
 
@@ -27,7 +28,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventFactory;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -42,6 +43,8 @@ import org.junit.Test;
  */
 public class CtfTmfEventTest {
 
+    private static final int TRACE_INDEX = 0;
+
     private static CtfTmfEvent nullEvent;
     private CtfTmfEvent fixture;
 
@@ -55,13 +58,11 @@ public class CtfTmfEventTest {
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws TmfTraceException
-     *             If the test trace is not found
      */
     @Before
-    public void setUp() throws TmfTraceException {
-        CtfTmfTrace trace = TestParams.createTrace();
+    public void setUp() {
+        assumeTrue(CtfTmfTestTraces.tracesExist());
+        CtfTmfTrace trace = CtfTmfTestTraces.getTestTrace(TRACE_INDEX);
         CtfIterator tr = new CtfIterator(trace);
         tr.advance();
         fixture = tr.getCurrentEvent();
@@ -152,11 +153,11 @@ public class CtfTmfEventTest {
         String reference = fixture.getReference();
         String source = fixture.getSource();
         ITmfEventType type = fixture.getType();
-        assertEquals(rank, ITmfContext.UNKNOWN_RANK);
-        assertEquals(trace.getName(), "test"); //$NON-NLS-1$
-        assertEquals(reference,"channel0_1"); //$NON-NLS-1$
-        assertEquals(source, "1"); //$NON-NLS-1$
-        assertEquals(type.toString(), "lttng_statedump_vm_map"); //$NON-NLS-1$
+        assertEquals(ITmfContext.UNKNOWN_RANK, rank);
+        assertEquals("test", trace.getName()); //$NON-NLS-1$
+        assertEquals("channel0_1", reference); //$NON-NLS-1$
+        assertEquals("1", source); //$NON-NLS-1$
+        assertEquals("lttng_statedump_vm_map", type.toString()); //$NON-NLS-1$
     }
 
     /**
