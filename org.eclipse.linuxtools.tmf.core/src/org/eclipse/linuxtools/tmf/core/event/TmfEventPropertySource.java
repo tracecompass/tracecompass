@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.core.event;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;

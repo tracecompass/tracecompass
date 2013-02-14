@@ -14,7 +14,7 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
  * A basic implementation of ITmfCheckpoint. It simply maps an event timestamp
@@ -46,7 +46,7 @@ public class TmfCheckpoint implements ITmfCheckpoint {
      * Full constructor
      *
      * @param timestamp the checkpoint timestamp
-     * @param location the checkpoint location
+     * @param location the corresponding trace location
      * @since 2.0
      */
     public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfLocation location) {
@@ -71,8 +71,8 @@ public class TmfCheckpoint implements ITmfCheckpoint {
     // ITmfCheckpoint
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint#getTimestamp()
+    /**
+     * @since 2.0
      */
     @Override
     public ITmfTimestamp getTimestamp() {

@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 
 /**
  * The CTF adapter for the TMF timestamp. It's basically the same as a

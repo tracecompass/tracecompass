@@ -13,8 +13,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -213,6 +213,7 @@ public class DrawableToolTip implements PaintListener {
      * @param value the current in the scale
      * @param min the scale min
      * @param max the scale max
+     * @since 2.0
      */
     public void showToolTip(ITmfTimestamp value, ITmfTimestamp min, ITmfTimestamp max) {
         fMinMaxRange = new TmfTimeRange(min, max);

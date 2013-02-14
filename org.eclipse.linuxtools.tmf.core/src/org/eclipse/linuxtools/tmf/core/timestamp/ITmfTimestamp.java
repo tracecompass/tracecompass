@@ -10,7 +10,9 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.event;
+package org.eclipse.linuxtools.tmf.core.timestamp;
+
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
  * The fundamental time reference in the TMF.
@@ -28,8 +30,9 @@ package org.eclipse.linuxtools.tmf.core.event;
  * timestamps in different scales). Default: 0.
  * </ul>
  *
- * @version 2.0
  * @author Francois Chouinard
+ * @version 2.0
+ * @since 2.0
  *
  * @see ITmfEvent
  * @see TmfTimeRange

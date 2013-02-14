@@ -13,7 +13,7 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
  * The basic trace checkpoint structure in TMF. The purpose of the checkpoint is
@@ -32,7 +32,8 @@ public interface ITmfCheckpoint extends Comparable<ITmfCheckpoint> {
     // ------------------------------------------------------------------------
 
     /**
-     * @return the timestamp of the event referred to by the checkpoint
+     * @return the timestamp of the event referred to by the context
+     * @since 2.0
      */
     public ITmfTimestamp getTimestamp();
 

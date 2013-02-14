@@ -13,8 +13,8 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import java.util.Comparator;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
@@ -48,6 +48,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncMessageComparato
  * @see Lifeline Lifeline for more event occurence details
  * @version 1.0
  * @author sveyrier
+ * @since 2.0
  */
 public class AsyncMessage extends BaseMessage implements ITimeRange {
 
@@ -399,6 +400,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * Set the time when the message end
      *
      * @param time the time when the message end
+     * @since 2.0
      */
     public void setEndTime(ITmfTimestamp time) {
         fEndTime = time;
@@ -414,6 +416,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * Set the time when the message start
      *
      * @param time the time when the message start
+     * @since 2.0
      */
     public void setStartTime(ITmfTimestamp time) {
         fStartTime = time;
@@ -425,28 +428,22 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#getEndTime()
+    /**
+     * @since 2.0
      */
     @Override
     public ITmfTimestamp getEndTime() {
         return fEndTime;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#getStartTime()
+    /**
+     * @since 2.0
      */
     @Override
     public ITmfTimestamp getStartTime() {
         return fStartTime;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#hasTimeInfo()
-     */
     @Override
     public boolean hasTimeInfo() {
         return fHasTime;

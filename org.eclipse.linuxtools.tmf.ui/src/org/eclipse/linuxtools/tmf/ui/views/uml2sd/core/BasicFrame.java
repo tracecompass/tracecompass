@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
@@ -392,6 +392,7 @@ public class BasicFrame extends GraphNode {
      * Return the minimum time stored in the frame taking all GraphNodes into account
      *
      * @return the minimum GraphNode time
+     * @since 2.0
      */
     public ITmfTimestamp getMinTime() {
         if (fLastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
@@ -410,6 +411,7 @@ public class BasicFrame extends GraphNode {
      *
      * @param min
      *            The minimum timestamp
+     * @since 2.0
      */
     public void setMin(ITmfTimestamp min) {
         fMinTime = min;
@@ -421,6 +423,7 @@ public class BasicFrame extends GraphNode {
      *
      * @param max
      *            The maximum timestamp
+     * @since 2.0
      */
     public void setMax(ITmfTimestamp max) {
         fMaxTime = max;
@@ -439,6 +442,7 @@ public class BasicFrame extends GraphNode {
      * Return the maximum time stored in the frame taking all GraphNodes into account
      *
      * @return the maximum GraphNode time
+     * @since 2.0
      */
     public ITmfTimestamp getMaxTime() {
         if (fLastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
@@ -483,6 +487,7 @@ public class BasicFrame extends GraphNode {
      * Returns the minimum time between consecutive messages.
      *
      * @return the minimum time between consecutive messages
+     * @since 2.0
      */
     public ITmfTimestamp getSDMinTime() {
         computeMaxMinTime();
@@ -493,6 +498,7 @@ public class BasicFrame extends GraphNode {
      * Returns the maximum time between consecutive messages.
      *
      * @return the maximum time between consecutive messages
+     * @since 2.0
      */
     public ITmfTimestamp getSDMaxTime() {
         computeMaxMinTime();

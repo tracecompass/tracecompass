@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
@@ -43,6 +43,7 @@ public final class CtfLocation extends TmfLocation {
      *
      * @param timestamp
      *            The timestamp of this location
+     * @since 2.0
      */
     public CtfLocation(final ITmfTimestamp timestamp) {
         this(timestamp.getValue(), 0);

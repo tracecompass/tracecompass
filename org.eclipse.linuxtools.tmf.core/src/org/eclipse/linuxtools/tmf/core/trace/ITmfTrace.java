@@ -19,11 +19,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
 /**
  * The event stream structure in TMF. In its basic form, a trace has:
@@ -212,16 +212,19 @@ public interface ITmfTrace extends ITmfDataProvider {
 
     /**
      * @return the trace time range
+     * @since 2.0
      */
     public TmfTimeRange getTimeRange();
 
     /**
      * @return the timestamp of the first trace event
+     * @since 2.0
      */
     public ITmfTimestamp getStartTime();
 
     /**
      * @return the timestamp of the last trace event
+     * @since 2.0
      */
     public ITmfTimestamp getEndTime();
 
@@ -292,6 +295,7 @@ public interface ITmfTrace extends ITmfDataProvider {
      *
      * @param timestamp the timestamp of desired event
      * @return a context which can later be used to read the corresponding event
+     * @since 2.0
      */
     public ITmfContext seekEvent(ITmfTimestamp timestamp);
 

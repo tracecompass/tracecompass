@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.internal.tmf.core.trace;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 /**

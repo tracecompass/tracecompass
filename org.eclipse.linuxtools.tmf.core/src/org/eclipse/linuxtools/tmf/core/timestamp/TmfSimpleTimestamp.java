@@ -11,13 +11,14 @@
  *   Francois Chouinard - Standardize on the default toString()
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.event;
+package org.eclipse.linuxtools.tmf.core.timestamp;
 
 /**
  * A simplified timestamp where scale and precision are set to 0.
  *
- * @version 1.1
  * @author Francois Chouinard
+ * @version 1.1
+ * @since 2.0
  */
 public class TmfSimpleTimestamp extends TmfTimestamp {
 

@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
  * A new current time is selected (for component synchronization)
@@ -31,6 +31,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
      *            Object sending this signal
      * @param ts
      *            Synchronize to which timestamp
+     * @since 2.0
      */
     public TmfTimeSynchSignal(Object source, ITmfTimestamp ts) {
         super(source);
@@ -39,6 +40,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
 
     /**
      * @return The synchronization timestamp of this signal
+     * @since 2.0
      */
     public ITmfTimestamp getCurrentTime() {
         return fCurrentTime;

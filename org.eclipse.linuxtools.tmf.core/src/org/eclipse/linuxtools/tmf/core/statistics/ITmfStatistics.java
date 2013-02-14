@@ -15,8 +15,8 @@ package org.eclipse.linuxtools.tmf.core.statistics;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStatsUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
  * Provider for statistics, which is assigned to a trace. This can be used to

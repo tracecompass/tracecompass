@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.core.request;
 
 import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
 /**
  * An extension of TmfDataRequest for timestamped events.
@@ -178,6 +178,7 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
 
     /**
      * @return the requested time range
+     * @since 2.0
      */
     @Override
 	public TmfTimeRange getRange() {

@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -37,6 +37,7 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
      *            The trace that was updated
      * @param range
      *            The new time range of the trace
+     * @since 2.0
      */
     public TmfTraceUpdatedSignal(Object source, ITmfTrace trace, TmfTimeRange range) {
         super(source);
@@ -53,6 +54,7 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
 
     /**
      * @return The time range indicated by this signal
+     * @since 2.0
      */
     public TmfTimeRange getRange() {
         return fTimeRange;

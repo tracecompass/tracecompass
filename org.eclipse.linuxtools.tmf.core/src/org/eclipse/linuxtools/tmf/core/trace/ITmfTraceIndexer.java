@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
 /**
  * The generic trace indexer in TMF with support for incremental indexing.
@@ -66,6 +66,7 @@ public interface ITmfTraceIndexer {
      * @param waitForCompletion
      *            Should we block the calling thread until the build is
      *            complete?
+     * @since 2.0
      */
     public void buildIndex(long offset, TmfTimeRange range, boolean waitForCompletion);
 
@@ -82,6 +83,7 @@ public interface ITmfTraceIndexer {
      *
      * @param context The trace context to save
      * @param timestamp The timestamp matching this context
+     * @since 2.0
      */
     public void updateIndex(ITmfContext context, ITmfTimestamp timestamp);
 
@@ -91,6 +93,7 @@ public interface ITmfTraceIndexer {
      *
      * @param timestamp the requested timestamp
      * @return the checkpoint context
+     * @since 2.0
      */
     public ITmfContext seekIndex(ITmfTimestamp timestamp);
 

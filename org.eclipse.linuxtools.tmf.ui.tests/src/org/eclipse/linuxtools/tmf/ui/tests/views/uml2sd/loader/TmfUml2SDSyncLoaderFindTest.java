@@ -20,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.Criteria;
