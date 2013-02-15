@@ -10,12 +10,15 @@
  *  Matthew Khouzam - Initial API and implementation
  *  Alexendre Montplaisir - Initial API and implementation, extend TmfEventField
  *  Bernd Hufmann - Add Enum field handling
+ *  Geneviève Bastien - Add support for Struct fields
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
@@ -27,6 +30,8 @@ import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 /**
@@ -56,6 +61,9 @@ public abstract class CtfTmfEventField extends TmfEventField {
 
     /** @since 2.0 */
     protected static final int FIELDTYPE_ENUM = 4;
+
+    /** @since 2.0 */
+    protected static final int FIELDTYPE_STRUCT = 5;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -151,6 +159,21 @@ public abstract class CtfTmfEventField extends TmfEventField {
             }
             /* Add other Sequence types here */
 
+        } else if (fieldDef instanceof StructDefinition) {
+            StructDefinition strDef = (StructDefinition) fieldDef;
+
+            String curFieldName = null;
+            Definition curFieldDef;
+            CtfTmfEventField curField;
+            List<ITmfEventField> list = new ArrayList<ITmfEventField>();
+            /* Recursively parse the fields */
+            for (Entry<String, Definition> entry : strDef.getDefinitions().entrySet()) {
+                curFieldName = entry.getKey();
+                curFieldDef = entry.getValue();
+                curField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
+                list.add(curField);
+            }
+            field = new CTFStructField(fieldName, list.toArray(new CtfTmfEventField[list.size()]));
         }
         return field;
     }
@@ -359,6 +382,41 @@ final class CTFEnumField extends CtfTmfEventField {
     @Override
     public CtfEnumPair getValue() {
         return (CtfEnumPair) super.getValue();
+    }
+}
+
+/**
+ * The CTF field implementation for struct fields with sub-types
+ *
+ * @author gbastien
+ */
+final class CTFStructField extends CtfTmfEventField {
+
+    /**
+     * Constructor for CTFStringField.
+     *
+     * @param strValue
+     *            The string value of this field
+     * @param name
+     *            The name of this field
+     */
+    CTFStructField(String name, CtfTmfEventField[] fields) {
+        super(name, fields);
+    }
+
+    @Override
+    public int getFieldType() {
+        return FIELDTYPE_STRUCT;
+    }
+
+    @Override
+    public CtfTmfEventField[] getValue() {
+        return (CtfTmfEventField[]) super.getValue();
+    }
+
+    @Override
+    public String toString() {
+        return getName() + '=' + Arrays.toString(getValue());
     }
 }
 
