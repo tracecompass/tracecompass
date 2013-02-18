@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Copied and adapted from NewFolderDialog
  *******************************************************************************/
@@ -87,7 +87,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // Dialog
     // ------------------------------------------------------------------------
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
@@ -144,7 +144,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
     }
 
     private void validateNewExperimentName() {
-        
+
     	String name = fNewExperimentName.getText();
         IWorkspace workspace = fExperimentFolder.getWorkspace();
         IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
@@ -153,12 +153,12 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         	updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
         	return;
         }
-        
+
         if (!nameStatus.isOK()) {
         	updateStatus(nameStatus);
         	return;
         }
-        
+
         IPath path = new Path(name);
         if (fExperimentFolder.getFolder(path).exists() || fExperimentFolder.getFile(path).exists()) {
             updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_ExistingNameError, null));
@@ -220,6 +220,8 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
+                    // Copy supplementary files first
+                    fExperiment.copySupplementaryFolder(newName);
                     fExperiment.getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
                     // Delete any bookmarks file found in copied experiment folder
                     IFolder folder = fExperimentFolder.getFolder(newName);

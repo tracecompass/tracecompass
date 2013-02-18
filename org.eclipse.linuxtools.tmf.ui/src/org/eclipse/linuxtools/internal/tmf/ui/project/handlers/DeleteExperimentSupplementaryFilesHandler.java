@@ -79,13 +79,16 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
 
                 TmfExperimentElement trace = (TmfExperimentElement) element;
 
+                IResource[] resources = trace.getSupplementaryResources();
+                resourcesList.addAll(Arrays.asList(resources));
+
                 for (TmfTraceElement aTrace : trace.getTraces()) {
 
                     // If trace is under an experiment, use the original trace from the traces folder
                     aTrace = aTrace.getElementUnderTraceFolder();
 
                     // Delete the selected resources
-                    IResource[] resources = aTrace.getSupplementaryResources();
+                    resources = aTrace.getSupplementaryResources();
                     resourcesList.addAll(Arrays.asList(resources));
                 }
 

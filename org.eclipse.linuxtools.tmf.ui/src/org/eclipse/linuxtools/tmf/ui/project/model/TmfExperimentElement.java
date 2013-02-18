@@ -35,7 +35,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * @author Francois Chouinard
  *
  */
-public class TmfExperimentElement extends TmfProjectModelElement implements IPropertySource2 {
+public class TmfExperimentElement extends TmfWithFolderElement implements IPropertySource2 {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -46,6 +46,7 @@ public class TmfExperimentElement extends TmfProjectModelElement implements IPro
     private static final String sfName = "name"; //$NON-NLS-1$
     private static final String sfPath = "path"; //$NON-NLS-1$
     private static final String sfLocation = "location"; //$NON-NLS-1$
+    private static final String sfFolderSuffix = "_exp"; //$NON-NLS-1$
 
     private static final TextPropertyDescriptor sfNameDescriptor = new TextPropertyDescriptor(sfName, sfName);
     private static final TextPropertyDescriptor sfPathDescriptor = new TextPropertyDescriptor(sfPath, sfPath);
@@ -228,6 +229,15 @@ public class TmfExperimentElement extends TmfProjectModelElement implements IPro
     @Override
     public boolean isPropertySet(Object id) {
         return false;
+    }
+
+    /**
+     * Return the suffix for resource names
+     * @return The folder suffix
+     */
+    @Override
+    public String getSuffix() {
+        return sfFolderSuffix;
     }
 
 }
