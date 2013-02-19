@@ -39,7 +39,7 @@
             </fileset>
             <stylesheet url="book.css" />
         </wikitext-to-eclipse-help>
-    <antcall target="test" />
+        <antcall target="test" />
     </target>
 
    <target name="test" description="Verify that all of the HTML files are well-formed XML">
@@ -56,7 +56,7 @@
     </target>
 
     <target name ="clean" description="Delete all generated files">
-      <delete>
+      <delete failonerror="false">
         <fileset dir="doc" includes="**/*.html" />
         <fileset dir="doc" includes="**/*.xml" />
       </delete>
