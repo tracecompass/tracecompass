@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,12 +9,17 @@
  * Contributors:
  *   Matthew Khouzam - Initial generation with CodePro tools
  *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *   Patrick Tasse - Fix for local time zone
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.junit.Test;
@@ -26,6 +31,7 @@ import org.junit.Test;
  * @author ematkho
  * @version 1.0
  */
+@SuppressWarnings({"nls"})
 public class CtfTmfTimestampTest {
 
     /**
@@ -34,11 +40,13 @@ public class CtfTmfTimestampTest {
     @Test
     public void testCtfTmfTimestamp() {
         long timestamp = 1L;
+        DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+        Date d = new Date(timestamp / 1000000);
 
         CtfTmfTimestamp result = new CtfTmfTimestamp(timestamp);
 
         assertNotNull(result);
-        //assertEquals("00:00:00.000 000 001", result.toString()); //$NON-NLS-1$
+        assertEquals(df.format(d) + " 000 001", result.toString()); //$NON-NLS-1$
         assertEquals(0, result.getPrecision());
         assertEquals(-9, result.getScale());
         assertEquals(1L, result.getValue());
