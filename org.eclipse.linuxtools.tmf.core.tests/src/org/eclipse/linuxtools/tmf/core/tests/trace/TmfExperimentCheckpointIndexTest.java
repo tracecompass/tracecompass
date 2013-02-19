@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Alexandre Montplaisir - Port to JUnit4
+ *   Patrick Tasse - Updated for ranks in experiment location
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.trace;
@@ -24,9 +25,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
-import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentLocation;
-import org.eclipse.linuxtools.internal.tmf.core.trace.TmfLocationArray;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -34,8 +32,8 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.junit.After;
@@ -128,16 +126,10 @@ public class TmfExperimentCheckpointIndexTest {
         // Validate that each checkpoint points to the right event
         for (int i = 0; i < checkpoints.size(); i++) {
             ITmfCheckpoint checkpoint = checkpoints.get(i);
-            TmfExperimentLocation expLocation = (TmfExperimentLocation) checkpoint.getLocation();
-            TmfLocationArray locations = expLocation.getLocationInfo();
-            ITmfContext[] trcContexts = new ITmfContext[2];
-            trcContexts[0] = new TmfContext(locations.getLocation(0), (i * pageSize) / 2);
-            trcContexts[1] = new TmfContext(locations.getLocation(1), (i * pageSize) / 2);
-            TmfExperimentContext expContext = new TmfExperimentContext(trcContexts);
-            expContext.getEvents()[0] = fTestTraces[0].getNext(fTestTraces[0].seekEvent((i * pageSize) / 2));
-            expContext.getEvents()[1] = fTestTraces[1].getNext(fTestTraces[1].seekEvent((i * pageSize) / 2));
-            ITmfEvent event = fExperiment.parseEvent(expContext);
-            assertTrue(expContext.getRank() == i * pageSize);
+            ITmfLocation location = checkpoint.getLocation();
+            ITmfContext context = fExperiment.seekEvent(location);
+            ITmfEvent event = fExperiment.parseEvent(context);
+            assertTrue(context.getRank() == i * pageSize);
             assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
         }
     }
@@ -186,16 +178,10 @@ public class TmfExperimentCheckpointIndexTest {
         assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE, checkpoints.size());
         for (int i = 0; i < checkpoints.size(); i++) {
             ITmfCheckpoint checkpoint = checkpoints.get(i);
-            TmfExperimentLocation expLocation = (TmfExperimentLocation) checkpoint.getLocation();
-            TmfLocationArray locations = expLocation.getLocationInfo();
-            ITmfContext[] trcContexts = new ITmfContext[2];
-            trcContexts[0] = new TmfContext(locations.getLocation(0), (i * pageSize) / 2);
-            trcContexts[1] = new TmfContext(locations.getLocation(1), (i * pageSize) / 2);
-            TmfExperimentContext expContext = new TmfExperimentContext(trcContexts);
-            expContext.getEvents()[0] = testTraces[0].getNext(testTraces[0].seekEvent((i * pageSize) / 2));
-            expContext.getEvents()[1] = testTraces[1].getNext(testTraces[1].seekEvent((i * pageSize) / 2));
-            ITmfEvent event = experiment.parseEvent(expContext);
-            assertTrue(expContext.getRank() == i * pageSize);
+            ITmfLocation location = checkpoint.getLocation();
+            ITmfContext context = experiment.seekEvent(location);
+            ITmfEvent event = experiment.parseEvent(context);
+            assertTrue(context.getRank() == i * pageSize);
             assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
             assertEquals("Checkpoint value", i * pageSize + 1, checkpoint.getTimestamp().getValue());
         }

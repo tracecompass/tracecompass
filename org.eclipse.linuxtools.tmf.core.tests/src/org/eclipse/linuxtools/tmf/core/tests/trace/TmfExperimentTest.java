@@ -10,6 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adjusted for new Trace Model
  *   Alexandre Montplaisir - Port to JUnit4
+ *   Patrick Tasse - Updated for rank in experiment location
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.trace;
@@ -261,23 +262,17 @@ public class TmfExperimentTest {
         // First event
         ITmfContext context = fExperiment.seekEvent((ITmfLocation) null);
         double ratio = fExperiment.getLocationRatio(context.getLocation());
-        context = fExperiment.seekEvent(ratio);
-        double ratio2 = fExperiment.getLocationRatio(context.getLocation());
-        assertEquals("getLocationRatio", ratio, ratio2, DELTA);
+        assertEquals("getLocationRatio", 0.0, ratio, DELTA);
 
         // Middle event
         context = fExperiment.seekEvent(NB_EVENTS / 2);
         ratio = fExperiment.getLocationRatio(context.getLocation());
-        context = fExperiment.seekEvent(ratio);
-        ratio2 = fExperiment.getLocationRatio(context.getLocation());
-        assertEquals("getLocationRatio", ratio, ratio2, DELTA);
+        assertEquals("getLocationRatio", (double) (NB_EVENTS / 2) / NB_EVENTS, ratio, DELTA);
 
         // Last event
         context = fExperiment.seekEvent(NB_EVENTS - 1);
         ratio = fExperiment.getLocationRatio(context.getLocation());
-        context = fExperiment.seekEvent(ratio);
-        ratio2 = fExperiment.getLocationRatio(context.getLocation());
-        assertEquals("getLocationRatio", ratio, ratio2, DELTA);
+        assertEquals("getLocationRatio", (double) (NB_EVENTS - 1) / NB_EVENTS, ratio, DELTA);
     }
 
 //    @SuppressWarnings("rawtypes")

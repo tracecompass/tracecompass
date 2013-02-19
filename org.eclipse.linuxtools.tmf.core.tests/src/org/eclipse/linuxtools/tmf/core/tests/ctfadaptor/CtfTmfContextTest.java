@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,12 +9,11 @@
  * Contributors:
  *   Matthew Khouzam - Initial implementation
  *   Alexandre Montplaisir
+ *   Patrick Tasse - Updated for removal of context clone
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -123,21 +122,5 @@ public class CtfTmfContextTest {
             assertTrue(val >= begin);
             assertTrue(val <= end);
         }
-    }
-
-    /**
-     * Test for clone method
-     */
-    @Test
-    public void testClone() {
-        CtfTmfContext fixture1 = new CtfTmfContext(trace);
-        CtfTmfContext fixture2 = fixture1.clone();
-        //assertTrue(fixture1.equals(fixture2)); FIXME no .equals() override!
-        assertNotSame(fixture1, fixture2);
-
-        /* Make sure clone() did its job */
-        assertSame(fixture1.getTrace(), fixture2.getTrace());
-        assertSame(fixture1.getLocation(), fixture2.getLocation());
-        assertSame(fixture1.getRank(), fixture2.getRank());
     }
 }

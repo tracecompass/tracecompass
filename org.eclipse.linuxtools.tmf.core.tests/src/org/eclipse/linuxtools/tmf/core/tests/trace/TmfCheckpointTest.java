@@ -10,6 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adapted for TMF Trace Model 1.0
  *   Alexandre Montplaisir - Port to JUnit4
+ *   Patrick Tasse - Updated for location in checkpoint
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.trace;
@@ -23,7 +24,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
 import org.junit.Test;
 
@@ -48,9 +48,9 @@ public class TmfCheckpointTest {
     private ITmfLocation fLocation2 = new TmfLongLocation(aLong2);
     private ITmfLocation fLocation3 = new TmfLongLocation(aLong3);
 
-    private TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation1));
-    private TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, new TmfContext(fLocation2));
-    private TmfCheckpoint fCheckpoint3 = new TmfCheckpoint(fTimestamp3, new TmfContext(fLocation3));
+    private TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, fLocation1);
+    private TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, fLocation2);
+    private TmfCheckpoint fCheckpoint3 = new TmfCheckpoint(fTimestamp3, fLocation3);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -104,10 +104,10 @@ public class TmfCheckpointTest {
 
     @Test
     public void testCompareToNull() {
-        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, new TmfContext(fLocation1));
-        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(null, new TmfContext(fLocation2));
-        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(null, new TmfContext(fLocation3));
-        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(null, new TmfContext(fLocation1));
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(null, fLocation2);
+        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(null, fLocation3);
+        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(null, fLocation1);
 
         // Test the various 'null' vs. '!null' combinations
         assertEquals("compareTo",  0, checkpoint1.compareTo(fCheckpoint1));
@@ -144,7 +144,7 @@ public class TmfCheckpointTest {
 
     @Test
     public void testHashCodeNull() {
-        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, new TmfContext(fLocation1));
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1);
         final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp1, null);
         final TmfCheckpoint checkpoint3 = new TmfCheckpoint(checkpoint1);
         final TmfCheckpoint checkpoint4 = new TmfCheckpoint(checkpoint2);
@@ -195,11 +195,11 @@ public class TmfCheckpointTest {
     @Test
     public void testNotEqual() {
         // Various checkpoints
-        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation1));
-        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp2, new TmfContext(fLocation1));
-        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(fTimestamp1, new TmfContext(fLocation2));
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fTimestamp1, fLocation1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp2, fLocation1);
+        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(fTimestamp1, fLocation2);
         final TmfCheckpoint checkpoint4 = new TmfCheckpoint(fTimestamp1, null);
-        final TmfCheckpoint checkpoint5 = new TmfCheckpoint(null, new TmfContext(fLocation1));
+        final TmfCheckpoint checkpoint5 = new TmfCheckpoint(null, fLocation1);
 
         // Null check
         assertFalse("equals", checkpoint1.equals(null));
@@ -224,11 +224,11 @@ public class TmfCheckpointTest {
 
     @Test
     public void testToString() {
-        final String expected1 = "TmfCheckpoint [fContext=" + fCheckpoint1.getContext() +
+        final String expected1 = "TmfCheckpoint [fLocation=" + fCheckpoint1.getLocation() +
                 ", fTimestamp=" + fCheckpoint1.getTimestamp() + "]";
-        final String expected2 = "TmfCheckpoint [fContext=" + fCheckpoint2.getContext() +
+        final String expected2 = "TmfCheckpoint [fLocation=" + fCheckpoint2.getLocation() +
                 ", fTimestamp=" + fCheckpoint2.getTimestamp() + "]";
-        final String expected3 = "TmfCheckpoint [fContext=" + fCheckpoint3.getContext() +
+        final String expected3 = "TmfCheckpoint [fLocation=" + fCheckpoint3.getLocation() +
                 ", fTimestamp=" + fCheckpoint3.getTimestamp() + "]";
 
         assertEquals("toString", expected1, fCheckpoint1.toString());

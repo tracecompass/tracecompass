@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 2012 Ericsson
+ * Copyright (c) 2009, 2010, 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  * Francois Chouinard - Initial API and implementation
  * Francois Chouinard - Updated as per TMF Trace Model 1.0
+ * Patrick Tasse - Updated for ranks in experiment location
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.trace;
@@ -57,18 +58,6 @@ public final class TmfExperimentLocation implements ITmfLocation {
         this(location.getLocationInfo());
     }
 
-    /**
-     * The "update" constructor. Copies the array of locations and updates
-     * a single entry.
-     *
-     * @param exp_location the experiment location
-     * @param index the entry to modify
-     * @param location the new entry
-     */
-    public TmfExperimentLocation(TmfExperimentLocation exp_location, int index, ITmfLocation location) {
-        fLocation = new TmfLocationArray(exp_location.fLocation, index, location);
-    }
-
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
@@ -79,13 +68,8 @@ public final class TmfExperimentLocation implements ITmfLocation {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-        int index = 0;
-        ITmfLocation location = getLocationInfo().getLocation(index);
-        while (location != null) {
-            result.append("[" + location + "]");
-            location = getLocationInfo().getLocation(++index);
-        }
+        StringBuilder result = new StringBuilder("TmfExperimentLocation [");
+        result.append(fLocation.toString());
         result.append("]");
         return result.toString();
     }

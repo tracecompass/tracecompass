@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Patrick Tasse - Updated for removal of context clone
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.tests.stubs.trace;
@@ -316,7 +317,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
         try {
             // parseNextEvent will update the context
             if (fTrace != null && getParser() != null && context != null) {
-                final ITmfEvent event = getParser().parseEvent(context.clone());
+                final ITmfEvent event = getParser().parseEvent(context);
                 return event;
             }
         } finally {

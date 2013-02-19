@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Patrick Tasse - Updated for location in checkpoint
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace;
@@ -31,17 +32,12 @@ public interface ITmfCheckpoint extends Comparable<ITmfCheckpoint> {
     // ------------------------------------------------------------------------
 
     /**
-     * @return the timestamp of the event referred to by the context
+     * @return the timestamp of the event referred to by the checkpoint
      */
     public ITmfTimestamp getTimestamp();
 
     /**
-     * @return the location of the event referred to by the context
-     */
-    public ITmfContext getContext();
-
-    /**
-     * @return the location of the event referred to by the context
+     * @return the location of the event referred to by the checkpoint
      */
     public ITmfLocation getLocation();
 
