@@ -45,6 +45,8 @@ public class EnumDefinitionTest {
         EnumDeclaration declaration = new EnumDeclaration(
                 new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
                         Encoding.ASCII, null, 8));
+        declaration.add(0, 10, "a"); //$NON-NLS-1$
+        declaration.add(11, 20, "b"); //$NON-NLS-1$
         String fieldName = ""; //$NON-NLS-1$
 
         fixture = new EnumDefinition(declaration, null, fieldName);
@@ -108,5 +110,16 @@ public class EnumDefinitionTest {
         BitBuffer input = new BitBuffer(ByteBuffer.allocateDirect(128));
 
         fixture.read(input);
+    }
+
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
+    public void testToString() {
+        fixture.setIntegerValue(16);
+        String result = fixture.toString();
+
+        assertEquals("{ value = b, container = 16 }", result); //$NON-NLS-1$
     }
 }

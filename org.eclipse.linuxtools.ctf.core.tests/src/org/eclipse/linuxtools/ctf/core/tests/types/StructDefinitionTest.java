@@ -1,5 +1,6 @@
 package org.eclipse.linuxtools.ctf.core.tests.types;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -56,6 +57,10 @@ public class StructDefinitionTest {
 
     private StructDefinition fixture;
 
+    private StructDefinition emptyStruct;
+
+    private StructDefinition simpleStruct;
+
     private static final String VAR_FIELD_NAME = "SomeVariant"; //$NON-NLS-1$
 
     /**
@@ -97,6 +102,16 @@ public class StructDefinitionTest {
         EnumDefinition eDef = tagDec.createDefinition(fixture, TAG_ID);
         VariantDefinition vd = varDec.createDefinition(fixture,VAR_FIELD_NAME );
         vd.setTagDefinition(eDef);
+
+        // Create an empty struct
+        StructDeclaration esDec = new StructDeclaration(32);
+        emptyStruct = esDec.createDefinition(null, TEST_STRUCT_ID);
+
+        // Create a simple struct with two items
+        StructDeclaration ssDec = new StructDeclaration(32);
+        ssDec.addField(INT_ID, id);
+        ssDec.addField(STRING_ID, sd);
+        simpleStruct = ssDec.createDefinition(null, TEST_STRUCT_ID);
 
     }
 
@@ -240,5 +255,11 @@ public class StructDefinitionTest {
     public void testToString() {
         String result = fixture.toString();
         assertNotNull(result);
+
+        result = emptyStruct.toString();
+        assertEquals("{  }", result); //$NON-NLS-1$
+
+        result = simpleStruct.toString();
+        assertEquals("{ _id = 0, _args = \"\" }", result); //$NON-NLS-1$
     }
 }

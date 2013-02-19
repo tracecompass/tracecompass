@@ -114,4 +114,10 @@ public class EnumDefinition extends SimpleDatatypeDefinition {
         value = declaration.query(val);
     }
 
+    @Override
+    public String toString() {
+        return "{ value = " + getValue() + //$NON-NLS-1$
+                ", container = " + integerValue.toString() + //$NON-NLS-1$
+                " }"; //$NON-NLS-1$
+    }
 }
