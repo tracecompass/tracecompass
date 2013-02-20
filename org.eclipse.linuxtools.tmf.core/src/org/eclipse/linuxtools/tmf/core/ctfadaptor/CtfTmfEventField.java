@@ -77,14 +77,15 @@ public abstract class CtfTmfEventField extends TmfEventField {
      *            The name of this field
      * @param value
      *            The value of this field. Its type should match the field type.
+     * @param fields
+     *            The children fields. Useful for composite fields
      * @since 2.0
      */
-    protected CtfTmfEventField(String name, Object value) {
+    protected CtfTmfEventField(String name, Object value, ITmfEventField[] fields) {
         super(/* Strip the underscore from the field name if there is one */
                 name.startsWith("_") ? name.substring(1) : name, //$NON-NLS-1$
                 value,
-                /* CTF fields do not have sub-fields */
-                null);
+                fields);
     }
 
     // ------------------------------------------------------------------------
@@ -215,7 +216,7 @@ final class CTFIntegerField extends CtfTmfEventField {
      *            The name of this field
      */
     CTFIntegerField(String name, long longValue, int base) {
-        super(name, longValue);
+        super(name, longValue, null);
         this.base = base;
     }
 
@@ -279,7 +280,7 @@ final class CTFStringField extends CtfTmfEventField {
      *            The name of this field
      */
     CTFStringField(String name, String strValue) {
-        super(name, strValue);
+        super(name, strValue, null);
     }
 
     @Override
@@ -310,7 +311,7 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
      *            The name of this field
      */
     CTFIntegerArrayField(String name, List<Long> longValues) {
-        super(name, longValues);
+        super(name, longValues, null);
     }
 
     @Override
@@ -340,7 +341,7 @@ final class CTFFloatField extends CtfTmfEventField {
      *            The name of this field
      */
     protected CTFFloatField(String name, double value) {
-        super(name, value);
+        super(name, value, null);
     }
 
     @Override
@@ -371,7 +372,7 @@ final class CTFEnumField extends CtfTmfEventField {
      */
     CTFEnumField(String name, CtfEnumPair enumValue) {
         super(name, new CtfEnumPair(enumValue.getFirst(),
-                                    enumValue.getSecond().longValue()));
+                                    enumValue.getSecond().longValue()), null);
     }
 
     @Override
@@ -401,7 +402,7 @@ final class CTFStructField extends CtfTmfEventField {
      *            The name of this field
      */
     CTFStructField(String name, CtfTmfEventField[] fields) {
-        super(name, fields);
+        super(name, fields, fields);
     }
 
     @Override
