@@ -118,7 +118,7 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
      */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
+        return Arrays.copyOf(sfDescriptors, sfDescriptors.length);
     }
 
     /*

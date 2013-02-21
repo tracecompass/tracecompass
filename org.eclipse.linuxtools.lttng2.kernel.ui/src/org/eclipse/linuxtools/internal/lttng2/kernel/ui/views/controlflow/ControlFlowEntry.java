@@ -72,7 +72,7 @@ public class ControlFlowEntry implements ITimeGraphEntry {
 
     @Override
     public boolean hasChildren() {
-        return fChildren != null && fChildren.size() > 0;
+        return fChildren.size() > 0;
     }
 
     @Override

@@ -171,7 +171,7 @@ public class TmfExperimentElement extends TmfProjectModelElement implements IPro
      */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
+        return Arrays.copyOf(sfDescriptors, sfDescriptors.length);
     }
 
     /*

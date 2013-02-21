@@ -527,7 +527,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
      */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
+        return Arrays.copyOf(sfDescriptors, sfDescriptors.length);
     }
 
     /*

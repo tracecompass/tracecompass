@@ -123,7 +123,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((fChannels == null) ? 0 : fChannels.hashCode());
+        result = prime * result + fChannels.hashCode();
         result = prime * result + (fIsKernel ? 1231 : 1237);
         return result;
     }
@@ -144,11 +144,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
             return false;
         }
         DomainInfo other = (DomainInfo) obj;
-        if (fChannels == null) {
-            if (other.fChannels != null) {
-                return false;
-            }
-        } else if (!fChannels.equals(other.fChannels)) {
+        if (!fChannels.equals(other.fChannels)) {
             return false;
         }
         if (fIsKernel != other.fIsKernel) {

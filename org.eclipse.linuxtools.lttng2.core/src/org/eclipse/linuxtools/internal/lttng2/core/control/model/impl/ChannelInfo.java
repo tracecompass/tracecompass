@@ -282,7 +282,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((fEvents == null) ? 0 : fEvents.hashCode());
+        result = prime * result + fEvents.hashCode();
         result = prime * result + fNumberOfSubBuffers;
         result = prime * result + ((fOutputType == null) ? 0 : fOutputType.hashCode());
         result = prime * result + (fOverwriteMode ? 1231 : 1237);
@@ -309,11 +309,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
             return false;
         }
         ChannelInfo other = (ChannelInfo) obj;
-        if (fEvents == null) {
-            if (other.fEvents != null) {
-                return false;
-            }
-        } else if (!fEvents.equals(other.fEvents)) {
+        if (!fEvents.equals(other.fEvents)) {
             return false;
         }
         if (fNumberOfSubBuffers != other.fNumberOfSubBuffers) {

@@ -132,7 +132,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((fEvents == null) ? 0 : fEvents.hashCode());
+        result = prime * result + fEvents.hashCode();
         result = prime * result + fPid;
         return result;
     }
@@ -153,11 +153,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
             return false;
         }
         UstProviderInfo other = (UstProviderInfo) obj;
-        if (fEvents == null) {
-            if (other.fEvents != null) {
-                return false;
-            }
-        } else if (!fEvents.equals(other.fEvents)) {
+        if (!fEvents.equals(other.fEvents)) {
             return false;
         }
         if (fPid != other.fPid) {

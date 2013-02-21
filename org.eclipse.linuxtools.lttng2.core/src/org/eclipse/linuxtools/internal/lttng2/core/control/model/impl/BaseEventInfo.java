@@ -68,14 +68,12 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     public BaseEventInfo(BaseEventInfo other) {
         super(other);
         fEventType = other.fEventType;
-        if(other.fFields != null) {
-            for (Iterator<IFieldInfo> iterator = other.fFields.iterator(); iterator.hasNext();) {
-                IFieldInfo field = iterator.next();
-                if (field instanceof FieldInfo) {
-                    fFields.add(new FieldInfo((FieldInfo)field));
-                } else {
-                    fFields.add(field);
-                }
+        for (Iterator<IFieldInfo> iterator = other.fFields.iterator(); iterator.hasNext();) {
+            IFieldInfo field = iterator.next();
+            if (field instanceof FieldInfo) {
+                fFields.add(new FieldInfo((FieldInfo)field));
+            } else {
+                fFields.add(field);
             }
         }
         fFilterExpression = other.fFilterExpression;
@@ -238,7 +236,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((fEventType == null) ? 0 : fEventType.hashCode());
-        result = prime * result + ((fFields == null) ? 0 : fFields.hashCode());
+        result = prime * result + fFields.hashCode();
         result = prime * result + ((fFilterExpression == null) ? 0 : fFilterExpression.hashCode());
         result = prime * result + ((fLogLevel == null) ? 0 : fLogLevel.hashCode());
         return result;
@@ -263,11 +261,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
         if (fEventType != other.fEventType) {
             return false;
         }
-        if (fFields == null) {
-            if (other.fFields != null) {
-                return false;
-            }
-        } else if (!fFields.equals(other.fFields)) {
+        if (!fFields.equals(other.fFields)) {
             return false;
         }
         if (fFilterExpression == null) {
@@ -297,7 +291,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             output.append(fEventType);
             output.append(",level=");
             output.append(fLogLevel);
-            if ((fFields != null) && (!fFields.isEmpty())) {
+            if (!fFields.isEmpty()) {
                 output.append(",Fields=");
                 for (Iterator<IFieldInfo> iterator = fFields.iterator(); iterator.hasNext();) {
                     IFieldInfo field = iterator.next();

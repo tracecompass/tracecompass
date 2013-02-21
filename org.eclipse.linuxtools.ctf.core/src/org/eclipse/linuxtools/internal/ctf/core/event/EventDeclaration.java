@@ -335,7 +335,7 @@ public class EventDeclaration implements IEventDeclaration {
         result = (prime * result) + ((id == null) ? 0 : id.hashCode());
         result = (prime * result) + ((name == null) ? 0 : name.hashCode());
         result = (prime * result) + ((stream == null) ? 0 : stream.hashCode());
-        result = (prime * result) + ((customAttributes == null) ? 0 : customAttributes.hashCode());
+        result = (prime * result) + customAttributes.hashCode();
         return result;
     }
 

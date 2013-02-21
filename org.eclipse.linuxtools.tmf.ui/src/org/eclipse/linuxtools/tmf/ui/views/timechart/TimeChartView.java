@@ -612,9 +612,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        if (fTimeAnalysisEntries == null) {
-            return;
-        }
         final ITmfTrace trace = signal.getTrace();
         final IFile bookmarksFile = signal.getBookmarksFile();
         TimeChartAnalysisEntry timeAnalysisEntry = null;
@@ -643,9 +640,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
-        if (fTimeAnalysisEntries == null) {
-            return;
-        }
         final ITmfTrace trace = signal.getTrace();
         for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
             if (fTimeAnalysisEntries.get(i).getTrace().equals(trace)) {
@@ -674,7 +668,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        if (signal.getSource() != this && fTimeAnalysisEntries != null) {
+        if (signal.getSource() != this) {
             ITmfTrace trace = signal.getTrace();
             for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
                 if (fTimeAnalysisEntries.get(i).getTrace().equals(trace)) {
@@ -694,9 +688,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      */
     @TmfSignalHandler
     public void traceUpdated(TmfTraceUpdatedSignal signal) {
-        if (fTimeAnalysisEntries == null) {
-            return;
-        }
         final ITmfTrace trace = signal.getTrace();
         for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
             TimeChartAnalysisEntry timeAnalysisEntry = fTimeAnalysisEntries.get(i);
