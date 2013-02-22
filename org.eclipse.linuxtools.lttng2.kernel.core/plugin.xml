@@ -23,5 +23,14 @@
                class="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.linuxtools.lttng2.kernel.core.cpuusage.LttngKernelCpuUsageAnalysis"
+            id="org.eclipse.linuxtools.lttng2.kernel.core.cpuusage"
+            name="%cpuusage.lttng.kernel">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
+         </tracetype>
+      </module>
    </extension>
 </plugin>
