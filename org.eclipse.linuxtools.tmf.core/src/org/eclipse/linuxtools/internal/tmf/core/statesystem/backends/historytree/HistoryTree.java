@@ -73,7 +73,7 @@ class HistoryTree {
      * Create a new State History from scratch, using a SHTConfig object for
      * configuration
      */
-    private HistoryTree(HTConfig conf) throws IOException {
+    HistoryTree(HTConfig conf) throws IOException {
         /*
          * Simple check to make sure we have enough place in the 0th block
          * for the tree configuration
@@ -93,18 +93,6 @@ class HistoryTree {
         /* Add the first node to the tree */
         CoreNode firstNode = initNewCoreNode(-1, conf.treeStart);
         latestBranch.add(firstNode);
-    }
-
-    /**
-     * "New State History" constructor, which doesn't use HTConfig but the
-     * individual values separately. Kept for now for backwards compatibility,
-     * but you should definitely consider using SHTConfig instead (since its
-     * contents can then change without directly affecting SHT's API).
-     */
-    @Deprecated
-    HistoryTree(File newStateFile, int blockSize, int maxChildren,
-            long startTime) throws IOException {
-        this(new HTConfig(newStateFile, blockSize, maxChildren, startTime));
     }
 
     /**
