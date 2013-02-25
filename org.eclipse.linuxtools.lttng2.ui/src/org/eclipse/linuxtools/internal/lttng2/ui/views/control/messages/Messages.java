@@ -103,6 +103,8 @@ final public class Messages extends NLS {
     public static String TraceControl_CreateSessionConfigureStreamingButtonTooltip;
     public static String TraceControl_CreateSessionNoStreamingButtonText;
     public static String TraceControl_CreateSessionNoStreamingButtonTooltip;
+    public static String TraceControl_CreateSessionTracePathText;
+    public static String TraceControl_CreateSessionTracePathTooltip;
     public static String TraceControl_CreateSessionLinkButtonText;
     public static String TraceControl_CreateSessionLinkButtonTooltip;
     public static String TraceControl_CreateSessionProtocolLabelText;

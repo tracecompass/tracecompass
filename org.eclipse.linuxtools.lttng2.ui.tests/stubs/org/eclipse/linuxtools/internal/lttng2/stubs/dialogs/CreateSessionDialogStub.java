@@ -27,8 +27,6 @@ public class CreateSessionDialogStub implements ICreateSessionDialog {
     private String fNetworkUrl = null;
     private String fControlUrl = null;
     private String fDataUrl = null;
-    private boolean fIsNoConsumer = false;
-    private boolean fIsDisableConsumer = false;
 
     @Override
     public String getSessionName() {
@@ -99,20 +97,4 @@ public class CreateSessionDialogStub implements ICreateSessionDialog {
         this.fDataUrl = fDataUrl;
     }
 
-    @Override
-    public boolean isNoConsumer() {
-        return fIsNoConsumer;
-    }
-    public void setNoConsumer(boolean isNoConsumer) {
-        fIsNoConsumer = isNoConsumer;
-    }
-
-    @Override
-    public boolean isDisableConsumer() {
-        return fIsDisableConsumer;
-    }
-
-    public void setDisableConsumer(boolean isDisableConsumer) {
-        fIsDisableConsumer = isDisableConsumer;
-    }
 }

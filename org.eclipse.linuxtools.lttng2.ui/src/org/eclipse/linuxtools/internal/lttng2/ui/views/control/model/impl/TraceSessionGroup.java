@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 
@@ -108,15 +109,11 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a session name to create
      * @param sessionPath
      *            - a path for storing the traces (use null for default)
-     * @param noConsumer
-     *            - a flag to indicate no consumer
-     * @param disableConsumer
-     *            - a flag to disable consumer
      * @throws ExecutionException
      *             If the command fails
      */
-    public void createSession(String sessionName, String sessionPath, boolean noConsumer, boolean disableConsumer) throws ExecutionException {
-        createSession(sessionName, sessionPath, noConsumer, disableConsumer, new NullProgressMonitor());
+    public void createSession(String sessionName, String sessionPath) throws ExecutionException {
+        createSession(sessionName, sessionPath, new NullProgressMonitor());
     }
 
     /**
@@ -126,17 +123,13 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a session name to create
      * @param sessionPath
      *            - a path for storing the traces (use null for default)
-     * @param noConsumer
-     *            - a flag to indicate no consumer
-     * @param disableConsumer
-     *            - a flag to disable consumer
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void createSession(String sessionName, String sessionPath, boolean noConsumer, boolean disableConsumer, IProgressMonitor monitor) throws ExecutionException {
-        ISessionInfo sessionInfo = getControlService().createSession(sessionName, sessionPath, noConsumer, disableConsumer, monitor);
+    public void createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException {
+        ISessionInfo sessionInfo = getControlService().createSession(sessionName, sessionPath, monitor);
 
         if (sessionInfo != null) {
             TraceSessionComponent session = new TraceSessionComponent(
@@ -158,15 +151,11 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
      * @param dataUrl
      *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
-     * @param noConsumer
-     *            - a flag to indicate no consumer
-     * @param disableConsumer
-     *            - a flag to disable consumer
      * @throws ExecutionException
      *             If the command fails
      */
-    public void createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, boolean noConsumer, boolean disableConsumer) throws ExecutionException {
-        createSession(sessionName, networkUrl, controlUrl, dataUrl, noConsumer, disableConsumer, new NullProgressMonitor());
+    public void createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl) throws ExecutionException {
+        createSession(sessionName, networkUrl, controlUrl, dataUrl, new NullProgressMonitor());
     }
 
     /**
@@ -181,17 +170,13 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
      * @param dataUrl
      *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
-     * @param noConsumer
-     *            - a flag to indicate no consumer
-     * @param disableConsumer
-     *            - a flag to disable consumer
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, boolean noConsumer, boolean disableConsumer, IProgressMonitor monitor) throws ExecutionException {
-        ISessionInfo sessionInfo = getControlService().createSession(sessionName, networkUrl, controlUrl, dataUrl, noConsumer, disableConsumer, monitor);
+    public void createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, IProgressMonitor monitor) throws ExecutionException {
+        ISessionInfo sessionInfo = getControlService().createSession(sessionName, networkUrl, controlUrl, dataUrl, monitor);
 
         if (sessionInfo != null) {
             TraceSessionComponent session = new TraceSessionComponent(sessionInfo.getName(), TraceSessionGroup.this);

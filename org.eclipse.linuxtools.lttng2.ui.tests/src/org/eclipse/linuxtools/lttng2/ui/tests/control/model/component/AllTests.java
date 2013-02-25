@@ -22,6 +22,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TraceControlComponentTest.class,
+    TraceControlCreateSessionTests.class,
     TraceControlKernelProviderTests.class,
     TraceControlKernelSessionTests.class,
     TraceControlPropertiesTest.class,

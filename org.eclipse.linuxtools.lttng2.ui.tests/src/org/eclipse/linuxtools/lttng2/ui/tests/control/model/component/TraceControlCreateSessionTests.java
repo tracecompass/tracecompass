@@ -50,11 +50,10 @@ public class TraceControlCreateSessionTests {
     // Constants
     // ------------------------------------------------------------------------
     private static final String TEST_STREAM = "CreateSessionTest.cfg";
-    private static final String SCEN_SCENARIO_NO_CONSUMER_TEST = "CreateSessionNoConsumer";
-    private static final String SCEN_SCENARIO_DISABLE_CONSUMER_TEST = "CreateSessionDisableConsumer";
     private static final String SCEN_SCENARIO_FILE_PROTO_TEST = "CreateSessionFileProto";
     private static final String SCEN_SCENARIO_CONTROL_DATA_TEST = "CreateSessionControlData";
     private static final String SCEN_SCENARIO_NETWORK_TEST = "CreateSessionNetwork";
+    private static final String SCEN_SCENARIO_NETWORK2_TEST = "CreateSessionNetwork2";
 
     // ------------------------------------------------------------------------
     // Test data
@@ -77,6 +76,7 @@ public class TraceControlCreateSessionTests {
     @Before
     public void setUp() throws Exception {
         fFacility = TraceControlTestFacility.getInstance();
+        fFacility.init();
         fProxy = new TestRemoteSystemProxy();
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
@@ -135,49 +135,6 @@ public class TraceControlCreateSessionTests {
         TraceControlDialogFactory.getInstance().setCreateSessionDialog(sessionDialogStub);
         TraceControlDialogFactory.getInstance().setConfirmDialog(new DestroyConfirmDialogStub());
 
-        // Initialize session handling scenario
-        fProxy.setScenario(SCEN_SCENARIO_NO_CONSUMER_TEST);
-
-        // ------------------------------------------------------------------------
-        // Create session (--no-consumer) and destroy
-        // ------------------------------------------------------------------------
-        // Initialize session handling scenario
-        fProxy.setScenario(SCEN_SCENARIO_NO_CONSUMER_TEST);
-        sessionDialogStub.setNoConsumer(true);
-        TraceSessionComponent session = fFacility.createSession(groups[1]);
-
-        // Verify that session was created
-        assertNotNull(session);
-        assertEquals("mysession", session.getName());
-        assertEquals("", session.getSessionPath());
-        assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
-        sessionDialogStub.setNoConsumer(false);
-
-        fFacility.destroySession(session);
-
-        // Verify that no more session components exist
-        assertEquals(0, groups[1].getChildren().length);
-
-        // ------------------------------------------------------------------------
-        // Create session (--disable-consumer) and destroy
-        // ------------------------------------------------------------------------
-        // Initialize session handling scenario
-        fProxy.setScenario(SCEN_SCENARIO_DISABLE_CONSUMER_TEST);
-
-        sessionDialogStub.setDisableConsumer(true);
-        session = fFacility.createSession(groups[1]);
-
-        // Verify that session was created
-        assertNotNull(session);
-        assertEquals("mysession", session.getName());
-        assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
-        sessionDialogStub.setDisableConsumer(false);
-
-        fFacility.destroySession(session);
-
-        // Verify that no more session components exist
-        assertEquals(0, groups[1].getChildren().length);
-
         // ------------------------------------------------------------------------
         // Create session (--U file://...) and destroy
         // ------------------------------------------------------------------------
@@ -186,13 +143,13 @@ public class TraceControlCreateSessionTests {
 
         sessionDialogStub.setNetworkUrl("file:///tmp");
         sessionDialogStub.setStreamedTrace(true);
-        session = fFacility.createSession(groups[1]);
+        TraceSessionComponent session = fFacility.createSession(groups[1]);
 
         // Verify that session was created
         assertNotNull(session);
         assertEquals("mysession", session.getName());
         assertEquals("file:///tmp", session.getSessionPath());
-        assertTrue(session.isStreamedTrace());
+        assertTrue(!session.isStreamedTrace());
         assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
         sessionDialogStub.setNetworkUrl(null);
         sessionDialogStub.setStreamedTrace(false);
@@ -230,7 +187,7 @@ public class TraceControlCreateSessionTests {
         assertEquals(0, groups[1].getChildren().length);
 
         // ------------------------------------------------------------------------
-        // Create session (--U file://,,, and destroy
+        // Create session (--U file://... and destroy
         // ------------------------------------------------------------------------
         // Initialize session handling scenario
         fProxy.setScenario(SCEN_SCENARIO_NETWORK_TEST);
@@ -252,6 +209,31 @@ public class TraceControlCreateSessionTests {
 
         // Verify that no more session components exist
         assertEquals(0, groups[1].getChildren().length);
+
+        // ------------------------------------------------------------------------
+        // Create session (--U net6://[...] and destroy
+        // ------------------------------------------------------------------------
+        // Initialize session handling scenario
+        fProxy.setScenario(SCEN_SCENARIO_NETWORK2_TEST);
+
+        sessionDialogStub.setNetworkUrl("net6://[ffff::eeee:dddd:cccc:0]");
+        sessionDialogStub.setStreamedTrace(true);
+
+        session = fFacility.createSession(groups[1]);
+
+        // Verify that session was created
+        assertNotNull(session);
+        assertEquals("mysession", session.getName());
+        assertEquals("net://[ffff::eeee:dddd:cccc:0]:5342/mysession-20130221-144451 [data: 5343]", session.getSessionPath());
+        assertTrue(session.isStreamedTrace());
+        assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
+        sessionDialogStub.setNetworkUrl(null);
+
+        fFacility.destroySession(session);
+
+        // Verify that no more session components exist
+        assertEquals(0, groups[1].getChildren().length);
+
 
         //-------------------------------------------------------------------------
         // Disconnect node

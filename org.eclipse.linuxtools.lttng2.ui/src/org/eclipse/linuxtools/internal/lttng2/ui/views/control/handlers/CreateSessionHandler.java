@@ -74,11 +74,10 @@ public class CreateSessionHandler extends BaseControlViewHandler {
                     try {
                         if (dialog.isStreamedTrace()) {
                             sessionGroup.createSession(dialog.getSessionName(), dialog.getNetworkUrl(), dialog.getControlUrl(),
-                                    dialog.getDataUrl(), dialog.isNoConsumer(), dialog.isDisableConsumer(), monitor);
+                                    dialog.getDataUrl(), monitor);
                         } else {
                             String sessionPath = dialog.isDefaultSessionPath() ? null : dialog.getSessionPath();
-                            sessionGroup.createSession(dialog.getSessionName(), sessionPath, dialog.isNoConsumer(),
-                                    dialog.isDisableConsumer(), monitor);
+                            sessionGroup.createSession(dialog.getSessionName(), sessionPath, monitor);
                         }
                     } catch (ExecutionException e) {
                         return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);

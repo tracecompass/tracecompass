@@ -118,29 +118,7 @@ public interface ILttngControlService {
      * @throws ExecutionException
      *             If the command fails
      */
-    public ISessionInfo createSession(String sessionName, String sessionPath,
-            IProgressMonitor monitor) throws ExecutionException;
-
-    /**
-     * Creates a session with given session name and location.
-     *
-     * @param sessionName
-     *            - a session name to create
-     * @param sessionPath
-     *            - a path for storing the traces (use null for default)
-     * @param noConsumer
-     *            - a flag to indicate no consumer
-     * @param disableConsumer
-     *            - a flag to disable consumer
-     * @param monitor
-     *            - a progress monitor
-     * @return the session information
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    public ISessionInfo createSession(String sessionName, String sessionPath, boolean noConsumer, boolean disableConsumer,
-            IProgressMonitor monitor) throws ExecutionException;
-
+    public ISessionInfo createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Creates a session with given session name and location.
@@ -154,18 +132,13 @@ public interface ILttngControlService {
      *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
      * @param dataUrl
      *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
-     * @param noConsumer
-     *            - a flag to indicate no consumer
-     * @param disableConsumer
-     *            - a flag to disable consumer
      * @param monitor
      *            - a progress monitor
      * @return the session information
      * @throws ExecutionException
      *             If the command fails
      */
-    public ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, boolean noConsumer, boolean disableConsumer,
-            IProgressMonitor monitor) throws ExecutionException;
+    public ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Destroys a session with given session name.
