@@ -44,6 +44,12 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  */
 class StatsStateProvider extends AbstractStateChangeInput {
 
+    /**
+     * Version number of this input handler. Please bump this if you modify the
+     * contents of the generated state history in some way.
+     */
+    private static final int VERSION = 0;
+
     /* Commonly-used attributes */
     private int typeAttribute = -1;
 
@@ -55,6 +61,11 @@ class StatsStateProvider extends AbstractStateChangeInput {
      */
     public StatsStateProvider(ITmfTrace trace) {
         super(trace, ITmfEvent.class ,"TMF Statistics"); //$NON-NLS-1$
+    }
+
+    @Override
+    public int getVersion() {
+        return VERSION;
     }
 
     @Override

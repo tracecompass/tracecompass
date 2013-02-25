@@ -56,6 +56,10 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *            The maximum number of children allowed for each core node
      * @param startTime
      *            The earliest timestamp stored in the history
+     * @param providerVersion
+     *            Version of of the state provider. We will only try to reopen
+     *            existing files if this version matches the one in the
+     *            framework.
      * @param queueSize
      *            The size of the interval insertion queue. 2000 - 10000 usually
      *            works well
@@ -63,8 +67,9 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *             If there was a problem opening the history file for writing
      */
     public ThreadedHistoryTreeBackend(File newStateFile, int blockSize,
-            int maxChildren, long startTime, int queueSize) throws IOException {
-        super(newStateFile, blockSize, maxChildren, startTime);
+            int maxChildren, long startTime, int providerVersion, int queueSize)
+                    throws IOException {
+        super(newStateFile, blockSize, maxChildren, providerVersion, startTime);
 
         intervalQueue = new ArrayBlockingQueue<HTInterval>(queueSize);
         shtThread = new Thread(this, "History Tree Thread"); //$NON-NLS-1$
@@ -80,6 +85,10 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *            in ".ht"
      * @param startTime
      *            The earliest timestamp stored in the history
+     * @param providerVersion
+     *            Version of of the state provider. We will only try to reopen
+     *            existing files if this version matches the one in the
+     *            framework.
      * @param queueSize
      *            The size of the interval insertion queue. 2000 - 10000 usually
      *            works well
@@ -87,8 +96,8 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *             If there was a problem opening the history file for writing
      */
     public ThreadedHistoryTreeBackend(File newStateFile, long startTime,
-            int queueSize) throws IOException {
-        super(newStateFile, startTime);
+            int providerVersion, int queueSize) throws IOException {
+        super(newStateFile, providerVersion, startTime);
 
         intervalQueue = new ArrayBlockingQueue<HTInterval>(queueSize);
         shtThread = new Thread(this, "History Tree Thread"); //$NON-NLS-1$

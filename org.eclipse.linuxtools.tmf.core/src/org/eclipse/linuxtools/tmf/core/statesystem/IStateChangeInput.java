@@ -28,6 +28,25 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 public interface IStateChangeInput {
 
     /**
+     * Special state provider version number that will tell the backend to
+     * ignore the version check and open an existing file even if the versions
+     * don't match.
+     * @since 2.0
+     */
+    public final static int IGNORE_PROVIDER_VERSION = -42;
+
+    /**
+     * Event handler plugins should provide a version number. This is used to
+     * determine if a potential existing file can be re-opened later (if the
+     * versions in the file and in the viewer match), or if the file should be
+     * rebuilt from scratch (if the versions don't match).
+     *
+     * @return The version number of the input plugin
+     * @since 2.0
+     */
+    public int getVersion();
+
+    /**
      * Get the trace with which this state input plugin is associated.
      *
      * @return The associated trace

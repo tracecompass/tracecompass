@@ -23,6 +23,7 @@ import java.nio.channels.FileChannel;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
 
 /**
  * Meta-container for the History Tree. This structure contains all the
@@ -35,12 +36,8 @@ class HistoryTree {
 
     private static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
-    /*
-     * File format version. Increment minor on backwards-compatible changes.
-     * Increment major + set minor back to 0 when breaking compatibility.
-     */
-    private static final int MAJOR_VERSION = 3;
-    private static final byte MINOR_VERSION = 0;
+    /** File format version. Increment when breaking compatibility. */
+    private static final int FILE_VERSION = 3;
 
     // ------------------------------------------------------------------------
     // Tree-specific configuration
@@ -101,9 +98,11 @@ class HistoryTree {
      *
      * @param existingFileName
      *            Path/filename of the history-file we are to open
+     * @param expProviderVersion
+     *            The expected version of the state provider
      * @throws IOException
      */
-    HistoryTree(File existingStateFile) throws IOException {
+    HistoryTree(File existingStateFile, int expProviderVersion) throws IOException {
         /*
          * Open the file ourselves, get the tree header information we need,
          * then pass on the descriptor to the TreeIO object.
@@ -117,8 +116,7 @@ class HistoryTree {
             throw new IOException("Selected state file does not exist"); //$NON-NLS-1$
         }
         if (existingStateFile.length() <= 0) {
-            throw new IOException("Invalid state file selected, " + //$NON-NLS-1$
-                    "target file is empty"); //$NON-NLS-1$
+            throw new IOException("Empty target file"); //$NON-NLS-1$
         }
 
         FileInputStream fis = new FileInputStream(existingStateFile);
@@ -137,20 +135,28 @@ class HistoryTree {
         if (res != HISTORY_FILE_MAGIC_NUMBER) {
             fc.close();
             fis.close();
-            throw new IOException("Selected file does not" + //$NON-NLS-1$
-                    "look like a History Tree file"); //$NON-NLS-1$
+            throw new IOException("Wrong magic number"); //$NON-NLS-1$
         }
 
-        res = buffer.getInt(); /* Major version number */
-        if (res != MAJOR_VERSION) {
+        res = buffer.getInt(); /* File format version number */
+        if (res != FILE_VERSION) {
             fc.close();
             fis.close();
-            throw new IOException("Select History Tree file is of an older " //$NON-NLS-1$
-                    + "format. Please use a previous version of " //$NON-NLS-1$
-                    + "the parser to open it."); //$NON-NLS-1$
+            throw new IOException("Mismatching History Tree file format versions"); //$NON-NLS-1$
         }
 
-        res = buffer.getInt(); /* Minor version number */
+        res = buffer.getInt(); /* Event handler's version number */
+        if (res != expProviderVersion &&
+                expProviderVersion != IStateChangeInput.IGNORE_PROVIDER_VERSION) {
+            /*
+             * The existing history was built using a event handler that doesn't
+             * match the current one in the framework. Information could be all
+             * wrong, so we'll force a rebuild of the history file instead.
+             */
+            fc.close();
+            fis.close();
+            throw new IOException("Mismatching event handler versions"); //$NON-NLS-1$
+        }
 
         bs = buffer.getInt(); /* Block Size */
         maxc = buffer.getInt(); /* Max nb of children per node */
@@ -159,7 +165,7 @@ class HistoryTree {
         rootNodeSeqNb = buffer.getInt();
         startTime = buffer.getLong();
 
-        this.config = new HTConfig(existingStateFile, bs, maxc, startTime);
+        this.config = new HTConfig(existingStateFile, bs, maxc, expProviderVersion, startTime);
         fc.close();
         fis.close();
         /*
@@ -226,8 +232,8 @@ class HistoryTree {
 
             buffer.putInt(HISTORY_FILE_MAGIC_NUMBER);
 
-            buffer.putInt(MAJOR_VERSION);
-            buffer.putInt(MINOR_VERSION);
+            buffer.putInt(FILE_VERSION);
+            buffer.putInt(config.providerVersion);
 
             buffer.putInt(config.blockSize);
             buffer.putInt(config.maxChildren);

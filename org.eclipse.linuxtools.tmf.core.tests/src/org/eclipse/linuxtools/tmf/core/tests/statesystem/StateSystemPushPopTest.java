@@ -90,7 +90,7 @@ public class StateSystemPushPopTest {
             AttributeNotFoundException, StateValueTypeException {
         ITmfStateValue value;
 
-        IStateHistoryBackend backend = new HistoryTreeBackend(testHtFile, 0);
+        IStateHistoryBackend backend = new HistoryTreeBackend(testHtFile, 0, 0L);
         ss = new StateSystem(backend, true);
 
         /* Build the thing */
