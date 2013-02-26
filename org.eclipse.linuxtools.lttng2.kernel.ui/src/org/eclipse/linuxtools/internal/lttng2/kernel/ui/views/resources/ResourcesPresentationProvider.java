@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -53,7 +53,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     private long fLastThreadId = -1; // used to draw the process name label only once per thread id
 
     private enum State {
-        UNKNOWN         (new RGB(100, 100, 100)),
         IDLE            (new RGB(200, 200, 200)),
         USERMODE        (new RGB(0, 200, 0)),
         SYSCALL         (new RGB(0, 0, 200)),
@@ -121,10 +120,10 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 }
                 return State.SOFT_IRQ_ACTIVE.ordinal();
             } else {
-                return -1; // NULL
+                return INVISIBLE; // NULL
             }
         }
-        return State.UNKNOWN.ordinal();
+        return TRANSPARENT;
     }
 
     @Override
@@ -156,7 +155,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 return null;
             }
         }
-        return State.UNKNOWN.toString();
+        return Messages.ResourcesView_multipleStates;
     }
 
     @Override

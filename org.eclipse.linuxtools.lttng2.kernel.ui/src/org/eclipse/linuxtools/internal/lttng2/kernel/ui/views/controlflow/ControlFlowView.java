@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -787,7 +787,7 @@ public class ControlFlowView extends TmfView {
                     e.printStackTrace();
                 }
                 if (lastEndTime != time && lastEndTime != -1) {
-                    eventList.add(new ControlFlowEvent(entry, lastEndTime, time - lastEndTime, 0));
+                    eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
                 }
                 eventList.add(new ControlFlowEvent(entry, time, duration, status));
                 lastEndTime = time + duration;

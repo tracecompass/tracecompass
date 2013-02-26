@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -47,5 +47,10 @@ public class ControlFlowEvent extends TimeEvent {
      */
     public int getStatus() {
         return fStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "ControlFlowEvent start=" + fTime + " end=" + (fTime + fDuration) + " duration=" + fDuration + " status=" + fStatus; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }

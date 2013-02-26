@@ -13,6 +13,7 @@ public class Messages extends NLS {
     public static String ControlFlowView_traceColumn;
 
     public static String ControlFlowView_stateTypeName;
+    public static String ControlFlowView_multipleStates;
     public static String ControlFlowView_nextProcessActionNameText;
     public static String ControlFlowView_nextProcessActionToolTipText;
     public static String ControlFlowView_previousProcessActionNameText;
@@ -22,6 +23,7 @@ public class Messages extends NLS {
     public static String ControlFlowView_attributeCpuName;
 
     public static String ResourcesView_stateTypeName;
+    public static String ResourcesView_multipleStates;
     public static String ResourcesView_nextResourceActionNameText;
     public static String ResourcesView_nextResourceActionToolTipText;
     public static String ResourcesView_previousResourceActionNameText;
