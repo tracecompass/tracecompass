@@ -198,7 +198,7 @@ Note, that traces of certain types (e.g. LTTng Kernel) are actually a composite 
 
 [[Image:images/ProjectImportTraceDialog.png]]
 
-Upon successful importing the traces will be stored in the '''Traces''' folder. If a trace type was selected in the import dialog, then the corresponding icon will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
+Upon successful importing the traces will be stored in the '''Traces''' folder. If a trace type was selected in the import dialog, then the corresponding icon will be displayed. If no trace type is selected the unknown icon [[Image:images/unknown_parser.gif]] will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
 
 Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
 
@@ -329,6 +329,8 @@ When opening a trace or experiment all currently open view will be filled which 
 Traces can be also be imported to a project by dragging from another tracing project and dropping to the project's trace folder. The trace will be copied and the trace type will be set.
 
 Any resource can be dragged and dropped from a non-tracing project, and any file or folder can be dragged from an external tool, into a tracing project's trace folder. The resource will be copied or imported as a new trace, however the trace type will be unknown and need to be set manually by the user.
+
+To import the trace as a link, use the platform-specific key modifier while dragging the source trace. A link will be created in the target project to the trace's location on the file system.
 
 It is also possible to drop a trace, resource, file or folder into an existing experiment. If the item does not already exist as a trace in the project's trace folder, it will first be copied or imported, then the trace will be added to the experiment.
 

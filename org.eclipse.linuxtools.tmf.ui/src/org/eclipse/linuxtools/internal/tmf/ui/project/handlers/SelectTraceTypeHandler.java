@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Patrick Tasse - Fix propagation to experiment traces
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
@@ -166,7 +167,7 @@ public class SelectTraceTypeHandler extends AbstractHandler {
                 for (final ITmfProjectModelElement child : experiment.getChildren()) {
                     if (child instanceof TmfTraceElement) {
                         TmfTraceElement linkedTrace = (TmfTraceElement) child;
-                        if (linkedTrace.equals(trace)) {
+                        if (linkedTrace.getName().equals(trace.getName())) {
                             IResource resource = linkedTrace.getResource();
                             setProperties(resource, bundleName, traceType, iconUrl);
                             linkedTrace.refreshTraceType();

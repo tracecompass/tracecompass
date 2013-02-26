@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2011, 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Patrick Tasse - Add support for unknown trace type icon
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -42,6 +43,7 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
 
     private static final Image fFolderIcon = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
     private static final String fTraceIconFile = "icons/elcl16/trace.gif"; //$NON-NLS-1$
+    private static final String fUnknownIconFile = "icons/elcl16/unknown_parser.gif"; //$NON-NLS-1$
     private static final String fExperimentIconFile = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
@@ -52,6 +54,7 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
     private final Image fExperimentFolderIcon = fFolderIcon;
 
     private final Image fDefaultTraceIcon;
+    private final Image fUnknownTraceIcon;
     private final Image fExperimentIcon;
 
     // ------------------------------------------------------------------------
@@ -66,6 +69,7 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
     public TmfNavigatorLabelProvider() {
         Bundle bundle = Activator.getDefault().getBundle();
         fDefaultTraceIcon = loadIcon(bundle, fTraceIconFile);
+        fUnknownTraceIcon = loadIcon(bundle, fUnknownIconFile);
         fExperimentIcon = loadIcon(bundle, fExperimentIconFile);
     }
 
@@ -94,10 +98,12 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
 
         if (element instanceof TmfTraceElement) {
             TmfTraceElement trace = (TmfTraceElement) element;
-            String icon = null;
             try {
+                if (trace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE) == null) {
+                    return fUnknownTraceIcon;
+                }
                 String name = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACEBUNDLE);
-                icon = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACEICON);
+                String icon = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACEICON);
                 if (name != null && icon != null) {
                     Bundle bundle = Platform.getBundle(name);
                     return loadIcon(bundle, icon);
