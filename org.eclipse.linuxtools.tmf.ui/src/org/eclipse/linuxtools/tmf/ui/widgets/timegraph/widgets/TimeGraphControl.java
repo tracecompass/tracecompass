@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2008 Intel Corporation, 2009, 2010, 2011, 2012 Ericsson.
+ * Copyright (c) 2007, 2008 Intel Corporation, 2009, 2010, 2011, 2012, 2013 Ericsson.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1253,11 +1253,11 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                         gc.drawPoint(stateRect.x, stateRect.y - 2);
                         stateRect.x += 1;
                     }
-                } else {
-                    lastX = x;
                 }
                 boolean timeSelected = selectedTime >= event.getTime() && selectedTime < event.getTime() + event.getDuration();
-                drawState(_colors, event, stateRect, gc, selected, timeSelected);
+                if (drawState(_colors, event, stateRect, gc, selected, timeSelected)) {
+                    lastX = x;
+                }
             }
         }
         fTimeGraphProvider.postDrawEntry(entry, rect, gc);
@@ -1379,17 +1379,30 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *            highlighted)
      * @param timeSelected
      *            Is the timestamp currently selected
+     * @return true if the state was drawn
+     * @since 2.0
      */
-    protected void drawState(TimeGraphColorScheme colors, ITimeEvent event,
+    protected boolean drawState(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc, boolean selected, boolean timeSelected) {
 
         int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
-        if (colorIdx < 0) {
-            return;
+        if (colorIdx < 0 && colorIdx != ITimeGraphPresentationProvider.TRANSPARENT) {
+            return false;
         }
         boolean visible = rect.width == 0 ? false : true;
 
         if (visible) {
+            if (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT) {
+                // Only draw the top and bottom borders
+                gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+                gc.drawLine(rect.x, rect.y, rect.x + rect.width - 1, rect.y);
+                gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1, rect.y + rect.height - 1);
+                if (rect.width == 1) {
+                    gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+                    gc.drawPoint(rect.x, rect.y - 2);
+                }
+                return false;
+            }
             Color stateColor = null;
             if (colorIdx < fEventColorMap.length) {
                 stateColor = fEventColorMap[colorIdx];
@@ -1410,38 +1423,15 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             // draw bounds
             if (!reallySelected) {
                 // Draw the top and bottom borders i.e. no side borders
-                // top
                 gc.drawLine(rect.x, rect.y, rect.x + rect.width - 1, rect.y);
-                // bottom
                 gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1, rect.y + rect.height - 1);
             }
         } else {
             gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
             gc.drawPoint(rect.x, rect.y - 2);
-            /*
-            // selected rectangle area is not visible but can be represented
-            // with a broken vertical line of specified width.
-            int width = 1;
-            rect.width = width;
-            gc.setForeground(stateColor);
-            int s = gc.getLineStyle();
-            int w = gc.getLineWidth();
-            gc.setLineStyle(SWT.LINE_DOT);
-            gc.setLineWidth(width);
-            // Trace.debug("Rectangle not visible, drawing vertical line with: "
-            // + rect.x + "," + rect.y + "," + rect.x + "," + rect.y
-            // + rect.height);
-            gc.drawLine(rect.x, rect.y, rect.x, rect.y + rect.height - 1);
-            gc.setLineStyle(s);
-            gc.setLineWidth(w);
-            if (!timeSelected) {
-                gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-                gc.drawPoint(rect.x, rect.y);
-                gc.drawPoint(rect.x, rect.y + rect.height - 1);
-            }
-            */
         }
         fTimeGraphProvider.postDrawEvent(event, rect, gc);
+        return visible;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Ericsson
+ * Copyright (c) 2010, 2011, 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.timechart;
 
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -53,6 +54,9 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
+        if (! ((TimeChartEvent) event).isVisible()) {
+            return ITimeGraphPresentationProvider.INVISIBLE;
+        }
         int priority = ((TimeChartEvent) event).getColorSettingPriority();
         if (currX == lastX) {
             priority = Math.min(priority, lastPriority);

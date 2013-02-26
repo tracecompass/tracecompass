@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,6 +27,16 @@ import org.eclipse.swt.graphics.Rectangle;
  * @author Patrick Tasse
  */
 public interface ITimeGraphPresentationProvider {
+
+    /** State table index for an invisible event
+     * @since 2.0
+     */
+    public final int INVISIBLE = -1;
+
+    /** State table index for a transparent event (only borders drawn)
+     * @since 2.0
+     */
+    public final int TRANSPARENT = -2;
 
     /**
      * Returns the name of state types.
@@ -59,12 +69,15 @@ public interface ITimeGraphPresentationProvider {
      * Returns the index in the state table corresponding to this time event.
      * The index should correspond to a state in the state table,
      * otherwise the color SWT.COLOR_BLACK will be used.
-     * If the index returned is negative, the event will not be drawn.
+     * If the index returned is TRANSPARENT, only the event borders will be drawn.
+     * If the index returned is INVISIBLE or another negative, the event will not be drawn.
      *
      * @param event the time event
      * @return the corresponding state table index
      *
      * @see #getStateTable
+     * @see #TRANSPARENT
+     * @see #INVISIBLE
      */
     public int getStateTableIndex(ITimeEvent event);
 
