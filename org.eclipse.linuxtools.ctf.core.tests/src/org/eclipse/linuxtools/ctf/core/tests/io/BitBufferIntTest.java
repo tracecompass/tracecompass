@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Ericsson
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Alexandre Montplaisir - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.ctf.core.tests.io;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +26,6 @@ import org.junit.Test;
  * These are separated from the main file because the fixture is different.
  *
  * @author alexmont
- *
  */
 public class BitBufferIntTest {
 
