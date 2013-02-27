@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011, 2012 Ericsson
- * 
+ * Copyright (c) 2009, 2012 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Copied and adapted from NewFolderDialog
  *******************************************************************************/
@@ -125,7 +125,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
     }
 
     private void validateNewExperimentName() {
-        
+
     	String name = fExperimentName.getText();
         IWorkspace workspace = fExperimentFolder.getWorkspace();
         IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
@@ -134,12 +134,12 @@ public class NewExperimentDialog extends SelectionStatusDialog {
         	updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
         	return;
         }
-        
+
         if (!nameStatus.isOK()) {
         	updateStatus(nameStatus);
         	return;
         }
-        
+
         IPath path = new Path(name);
         if (fExperimentFolder.getFolder(path).exists() || fExperimentFolder.getFile(path).exists()) {
             updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_ExistingNameError, null));

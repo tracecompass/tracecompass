@@ -1,16 +1,15 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
- * Copyright (c) 2011, 2012 Ericsson.
- * 
+ * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
- * IBM - Initial API and implementation
- * Bernd Hufmann - Updated for TMF
+ *
+ * Contributors:
+ *     IBM - Initial API and implementation
+ *     Bernd Hufmann - Updated for TMF
  **********************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
@@ -20,10 +19,10 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * Class to draw Ellipsis Message.
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class EllipsisMessage extends AsyncMessage {
 
@@ -35,7 +34,7 @@ public class EllipsisMessage extends AsyncMessage {
     public int getX() {
         if (fStartLifeline == null) {
             return super.getX() + super.getWidth() - 16;
-        } 
+        }
         return super.getX();
     }
 
@@ -60,7 +59,7 @@ public class EllipsisMessage extends AsyncMessage {
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage#drawMessage(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
-     */  
+     */
     @Override
     protected void drawMessage(IGC context) {
         // temporary store the coordinates to avoid more methods calls
@@ -123,7 +122,7 @@ public class EllipsisMessage extends AsyncMessage {
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
-     */  
+     */
     @Override
     public void draw(IGC context) {
         if (!isVisible()) {

@@ -1,16 +1,15 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
- * Copyright (c) 2011, 2012 Ericsson.
- * 
+ * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
- * IBM - Initial API and implementation
- * Bernd Hufmann - Updated for TMF
+ *
+ * Contributors:
+ *     IBM - Initial API and implementation
+ *     Bernd Hufmann - Updated for TMF
  **********************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
 import org.eclipse.jface.action.Action;
@@ -23,13 +22,13 @@ import org.eclipse.swt.SWT;
 
 /**
  * Action class implementation for 'Finding' of messages/lifelines.
- * 
+ *
  * @version 1.0
  * @author sveyrier
- * 
+ *
  */
 public class OpenSDFindDialog extends Action {
-    
+
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
@@ -61,8 +60,8 @@ public class OpenSDFindDialog extends Action {
     }
 
     /**
-     * Constructor 
-     * 
+     * Constructor
+     *
      * @param view The view reference
      */
     public OpenSDFindDialog(SDView view) {
@@ -86,10 +85,10 @@ public class OpenSDFindDialog extends Action {
         if (fView == null) {
             return;
         }
-        
+
         // Disable action while search is ongoing
         this.setEnabled(false);
-        
+
         try {
             if ((fView.getExtendedFindProvider() != null) && (fView.getExtendedFindProvider().getFindAction() != null)) {
                 fView.getExtendedFindProvider().getFindAction().run();
@@ -102,10 +101,10 @@ public class OpenSDFindDialog extends Action {
             this.setEnabled(true);
         }
     }
-    
+
     /**
      * Sets the active SD view.
-     * 
+     *
      * @param view The SD view.
      */
    public void setView(SDView view) {

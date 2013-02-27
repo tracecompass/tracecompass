@@ -1,16 +1,15 @@
 /**********************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
- * Copyright (c) 2011, 2012 Ericsson.
- * 
+ * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
- * IBM - Initial API and implementation
- * Bernd Hufmann - Updated for TMF
+ *
+ * Contributors:
+ *     IBM - Initial API and implementation
+ *     Bernd Hufmann - Updated for TMF
  **********************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd;
 
 import org.eclipse.swt.SWT;
@@ -27,7 +26,7 @@ import org.eclipse.swt.widgets.Text;
  * This class is used to reproduce the same tooltip behavior on Windows and Linux when the mouse hovers over the
  * sequence diagram
  * </p>
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -56,10 +55,10 @@ public class DiagramToolTip {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    
+
     /**
      * Create a new tooltip for the given parent control
-     * 
+     *
      * @param parent the parent control.
      */
     public DiagramToolTip(Control parent) {
@@ -76,7 +75,7 @@ public class DiagramToolTip {
 
     /**
      * Display the tooltip using the given text The tooltip will stay on screen until it is told otherwise
-     * 
+     *
      * @param value the text to display
      */
     public void showToolTip(String value) {

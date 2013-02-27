@@ -1,16 +1,15 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
- * Copyright (c) 2011, 2012 Ericsson.
- * 
+ * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
- * IBM - Initial API and implementation
- * Bernd Hufmann - Updated for TMF
+ *
+ * Contributors:
+ *     IBM - Initial API and implementation
+ *     Bernd Hufmann - Updated for TMF
  **********************************************************************/
+
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
 import java.util.Iterator;
@@ -28,7 +27,7 @@ import org.eclipse.ui.IViewPart;
 
 /**
  * Action class implementation to show end of a graph node.
- * 
+ *
  * @version 1.0
  * @author sveyrier
  */
@@ -54,7 +53,7 @@ public class ShowNodeEnd extends Action {
 
     /**
      * Constructor
-     * 
+     *
      * @param view The sequence diagram view reference
      */
     public ShowNodeEnd(IViewPart view) {
@@ -93,7 +92,7 @@ public class ShowNodeEnd extends Action {
         while (it.hasNext()) {
             selectedNode = it.next();
         }
-        
+
         if (selectedNode != null) {
             GraphNode node = (GraphNode) selectedNode;
             if ((node.getX() + node.getWidth()) * sdWidget.getZoomFactor() < sdWidget.getContentsX() + sdWidget.getVisibleWidth() / 2) {
@@ -106,7 +105,7 @@ public class ShowNodeEnd extends Action {
 
     /**
      * Sets the active SD view.
-     * 
+     *
      * @param view The SD view.
      */
    public void setView(SDView view) {

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2008 Intel Corporation, 2009, 2010, 2011, 2012 Ericsson.
+ * Copyright (c) 2007, 2013 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *   Alexander N. Alexeev, Intel - Add monitors statistics support
  *   Alvaro Sanchez-Leon - Adapted for TMF
  *   Patrick Tasse - Refactoring
- *
  *****************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
