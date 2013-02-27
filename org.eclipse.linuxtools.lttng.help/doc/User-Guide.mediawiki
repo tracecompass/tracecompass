@@ -800,6 +800,27 @@ A dialog box will open for entering information about the session to be created.
 
 Fill in the '''Session Name''' and optionally the '''Session Path''' and press '''Ok'''. Upon successful operation a new session will be created and added under the tree node '''Sessions'''.
 
+==== Creating a Tracing Session With Advanced Options ====
+LTTng Tools version v2.1.0 introduces the possibility to configure the trace output location at session creation time. The trace can be stored in the (tracer) local file system or can be transferred over the network.
+
+To create a tracing session and configure the trace output, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]]. A dialog box will open for entering information about the session to be created.
+
+[[Image:images/LTTng2CreateSessionDialog_Advanced.png]]
+
+The button '''Advanced >>>''' will only show if the remote host has LTTng Tools v2.1.0 installed. To configure the trace output select the '''Advanced >>>''' button. The Dialog box will be shown new fields to configure the trace output location.
+
+[[Image:images/LTTng2CreateSessionDialog_TracePath.png]]
+
+By default, the button '''Use same protocol and address for data and control''' is selected which allows to configure the same '''Protocol''' and '''Address''' for both data URL and control URL.
+
+If button '''Use same protocol and address for data and control''' is selected the '''Protocol''' can be '''net''' for the default network protocol which is TCP (IPv4), '''net6''' for the default network protocol which is TCP (IPv6) and '''file''' for the local file system. For '''net''' and '''net6''' the port can be configured. Enter a value in '''Port''' for data and control URL or keep them empty for the default port to be used. Using '''file''' as protocol no port can be configured and the text fields are disabled.
+
+If button '''Use same protocol and address for data and control''' is not selected the '''Protocol''' can be '''net''' for the default network protocol which is TCP (IPv4), '''net6''' for the default network protocol which is TCP (IPv6), '''tcp''' for the network protocol TCP (IPv4) and '''tcp6''' for the network protocol TCP (IPv6). Note that for '''net''' and '''net6''' always the default port is used and hence the port text fields are disabled. To configure non-default ports use '''tcp''' or '''tcp6'''.
+
+The text field '''Trace Path''' allows for specifying the path relative to the location defined by the '''relayd''' or relative to the location specified by the '''Address''' when using protocol '''file'''. For more information about the '''relayd''' see '''LTTng relayd User Manual''' in chapter [[#References | References]].
+
+To create a session with advanced options, fill in the relevant parameters and press '''Ok'''. Upon successful operation a new session will be created and added under the tree node '''Sessions'''.
+
 ==== Enabling Channels - General ====
 
 Enabling channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.
@@ -987,6 +1008,18 @@ Select a session from the '''Session List''' drop-down menu, a channel from the 
 
 [[Image:images/LTTng2AssignedEvents.png]]
 
+==== Configuring Filter Expression On UST Event Fields ====
+
+Since LTTng Tools v2.1.0 it is possible to configure a filter expression on UST event fields. To configure a filter expression on UST event fields, open the enable event dialog as described in chapters [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]], [[#Enabling Events On Domain Level | Enabling Events On Domain Level]] or [[#Enabling Events On Channel Level | Enabling Events On Channel Level]], select UST if needed, select the relevant '''Tracepoint''' event(s) and enter the filter expression in the '''Filter Expression''' text field.
+
+[[Image:images/LTTng2EnableEventWithFilter.png]]
+
+Alternatively, open the dialog box for assigning events to a session and channel described in [[#Enabling Tracepoint Events From Provider | Enabling Tracepoint Events From Provider]] (for UST providers) and enter the filter expression in the '''Filter Expression''' text field.
+
+[[Image:images/LTTng2AssignEventDialogWithFilter.png]]
+
+For the syntax of the filter expression refer to the '''LTTng Tracer Control Command Line Tool User Manual''' of chapter [[#References |References]].
+
 ==== Adding Contexts to Channels and Events of a Domain ====
 
 It is possible to add contexts to channels and events. Adding contexts on channels and events from the domain level, will enable the specified contexts to all channels of the domain and all their events. To add contexts on the domain level, select a domain, click right mouse button on a domain tree node (e.g. provider '''Kernel''') and select the menu item '''Add Context...''' from the context-sensitive menu.
@@ -1084,6 +1117,14 @@ If the existing trace should not be overwritten select, then select the '''Renam
 
 [[Image:images/LTTng2ImportRenameDialog.png]]
 
+==== Importing Network Traces to a Tracing Project ====
+
+Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project|Importing Session Traces to a Tracing Project]]. For network traces a dialog will open for selecting a  project from the list of available tracing projects within the current Eclipse workspace.
+
+[[Image:images/LTTng2ImportSelectTracingProjectDialog.png]]
+
+Select a tracing project from the drop-down menu and then click on '''Next...'''. This will open the default dialog box for importing traces to a tracing project. Follow the instructions in chapter [[#Importing Traces in a Project|Importing Traces in a Project]] to import the network traces of the current session.
+
 === Properties View ===
 
 The Control View provides property information of selected tree component. Depending on the selected tree component different properties are displayed in the property view. For example, when selecting the node level the property view will be filled as followed:
@@ -1104,6 +1145,7 @@ The Control View provides property information of selected tree component. Depen
 * '''Event''' Properties (Provider)
 ** '''Event Name''': The name of the event.
 ** '''Event Type''': The event type ('''TRACEPOINT''' only).
+** '''Fields''': Shows a list of fields defined for the selected event. (UST only, since support for LTTng Tools v2.1.0)
 ** '''Log Level''': The log level of the event.
 * '''Session''' Properties
 ** '''Session Name''': The name of the Session.
@@ -1122,9 +1164,10 @@ The Control View provides property information of selected tree component. Depen
 ** '''Switch Timer Interval''': The switch timer interval.
 * '''Event''' Properties (Channel)
 ** '''Event Name''': The name of the event.
-** '''Event Type''': The event type ('''TRACEPOINT''', '''SYSCALL''' or '''PROBE''')..
+** '''Event Type''': The event type ('''TRACEPOINT''', '''SYSCALL''' or '''PROBE''').
 ** '''Log Level''': The log level of the event.
 ** '''State''': The Event state ('''ENABLED''' or '''DISABLED''')
+** '''Filter''': Shows '''with filter''' if a filter expression is configured else property '''Filter''' is omitted. (since support for LTTng Tools v2.1.0)
 
 === LTTng Tracer Control Preferences ===
 
@@ -1328,6 +1371,7 @@ This will update all the displayed timestamps.
 = Limitations =
 
 * When parsing text traces, the timestamps are assumed to be in the local time zone. This means that when combining it to CTF binary traces, there could be offsets by a few hours depending on where the traces were taken and where they were read.
+* LTTng Tools v2.1.0 introduced the command line options ''--no-consumer'' and ''--disable-consumer'' for session creation as well as the commands ''enable-consumer'' and ''disable-consumer''. The LTTng Tracer Control in Eclipse doesn't support these options and commands because they will obsolete in LTTng Tools v2.2.0 and because the procedure for session creation offers already all relevant advanced parameters.
 
 = How to use LTTng to diagnose problems =
 
@@ -1373,7 +1417,8 @@ Alice kills the program, and immediately the server speeds up. She then goes to 
 
 * [http://www.eclipse.org/linuxtools/projectPages/lttng/ Linux Tools - LTTng integration]
 * [http://www.lttng.org/ LTTng project]
-* [http://lttng.org/files/doc/man-pages/man1/lttng.1.html LTTng 2.0 Tracer Control Command Line Tool]
+* [http://lttng.org/files/doc/man-pages/man1/lttng.1.html LTTng Tracer Control Command Line Tool User Manual]
+* [http://lttng.org/files/doc/man-pages/man8/lttng-relayd.8.html LTTng relayd User Manual]
 * [http://wiki.eclipse.org/Linux_Tools_Project/TMF/User_Guide TMF User Guide]
 
 = Updating This Document =
