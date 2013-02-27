@@ -87,9 +87,6 @@ public class TimeGraphCombo extends Composite {
     // The top-level input (children excluded)
     private List<? extends ITimeGraphEntry> fTopInput;
 
-    // All the inputs (children included)
-    private List<? extends ITimeGraphEntry> fAllInput;
-
     // The selection listener map
     private final HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper>();
 
@@ -291,12 +288,13 @@ public class TimeGraphCombo extends Composite {
     }
 
     /**
-     * This filter simply keeps a list of elements that should be shown
-     * All the other elements will be filtered
+     * This filter simply keeps a list of elements that should be shown.
+     * All the other elements will be filtered.
+     * By default and when the list is set to null, all elements are shown.
      */
     private class RawViewerFilter extends ViewerFilter {
 
-        private List<Object> fNonFiltered = new ArrayList<Object>();
+        private List<Object> fNonFiltered = null;
 
         public void setNonFiltered(List<Object> objects) {
             fNonFiltered = objects;
@@ -308,6 +306,9 @@ public class TimeGraphCombo extends Composite {
 
         @Override
         public boolean select(Viewer viewer, Object parentElement, Object element) {
+            if (fNonFiltered == null) {
+                return true;
+            }
             return fNonFiltered.contains(element);
         }
     }
@@ -628,17 +629,26 @@ public class TimeGraphCombo extends Composite {
      */
     public void showFilterDialog() {
         if(fTopInput != null) {
+            List<? extends ITimeGraphEntry> allElements = listAllInputs(fTopInput);
             fFilterDialog.setInput(fTopInput.toArray(new ITimeGraphEntry[0]));
             fFilterDialog.setTitle(Messages.TmfTimeFilterDialog_WINDOW_TITLE);
             fFilterDialog.setMessage(Messages.TmfTimeFilterDialog_MESSAGE);
-            fFilterDialog.setInitialElementSelections(fFilter.getNonFiltered());
-            fFilterDialog.setExpandedElements(fAllInput.toArray());
+            fFilterDialog.setExpandedElements(allElements.toArray());
+            if (fFilter.getNonFiltered() != null) {
+                fFilterDialog.setInitialElementSelections(fFilter.getNonFiltered());
+            } else {
+                fFilterDialog.setInitialElementSelections(allElements);
+            }
             fFilterDialog.create();
             fFilterDialog.open();
             // Process selected elements
             if (fFilterDialog.getResult() != null) {
                 fInhibitTreeSelection = true;
-                fFilter.setNonFiltered(new ArrayList<Object>(Arrays.asList(fFilterDialog.getResult())));
+                if (fFilterDialog.getResult().length != allElements.size()) {
+                    fFilter.setNonFiltered(new ArrayList<Object>(Arrays.asList(fFilterDialog.getResult())));
+                } else {
+                    fFilter.setNonFiltered(null);
+                }
                 fTreeViewer.refresh();
                 fTreeViewer.expandAll();
                 fTimeGraphViewer.refresh();
@@ -771,8 +781,7 @@ public class TimeGraphCombo extends Composite {
      */
     public void setInput(ITimeGraphEntry[] input) {
         fTopInput = new ArrayList<ITimeGraphEntry>(Arrays.asList(input));
-        fAllInput = listAllInputs(fTopInput);
-        fFilter.setNonFiltered(new ArrayList<Object>(fAllInput));
+        fFilter.setNonFiltered(null);
         fInhibitTreeSelection = true;
         fTreeViewer.setInput(input);
         for (SelectionListenerWrapper listenerWrapper : fSelectionListenerMap.values()) {
