@@ -1,0 +1,19 @@
+This describes how to build the documentation found in the o.e.l.lttng.help
+plugin.
+
+
+Your Eclipse environment first needs to have the "Mylyn Wikitext" plugin
+installed. It can be found in the default Eclipse repository, under
+"Collaboration".
+
+Once that is installed, you should be able to use the manual Eclipse builder to
+generate the doc : select the lttng.help plugin and choose, in the top-menu,
+"Project -> Build Project".
+
+It uses the build.xml Ant script, but it's recommended to run it from within
+Eclipse, since the builder will pass some environment variables that the script
+needs.
+
+You might get a warning from build.properties because of a missing file. This
+file gets generated with the rest of the doc, so once you have run these steps
+(and refreshed the project if needed), the warning should disappear.
