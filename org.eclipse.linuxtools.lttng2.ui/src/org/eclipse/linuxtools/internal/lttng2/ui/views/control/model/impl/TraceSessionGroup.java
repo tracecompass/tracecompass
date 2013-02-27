@@ -109,20 +109,6 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a session name to create
      * @param sessionPath
      *            - a path for storing the traces (use null for default)
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    public void createSession(String sessionName, String sessionPath) throws ExecutionException {
-        createSession(sessionName, sessionPath, new NullProgressMonitor());
-    }
-
-    /**
-     * Creates a session with given session name and location.
-     *
-     * @param sessionName
-     *            - a session name to create
-     * @param sessionPath
-     *            - a path for storing the traces (use null for default)
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
@@ -151,25 +137,6 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
      * @param dataUrl
      *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    public void createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl) throws ExecutionException {
-        createSession(sessionName, networkUrl, controlUrl, dataUrl, new NullProgressMonitor());
-    }
-
-    /**
-     * Creates a session with given session name and location.
-     *
-     * @param sessionName
-     *            - a session name to create
-     * @param networkUrl
-     *            - a network URL for common definition of data and control channel
-     *              or null if separate definition of data and control channel
-     * @param controlUrl
-     *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
-     * @param dataUrl
-     *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
@@ -183,19 +150,6 @@ public class TraceSessionGroup extends TraceControlComponent {
             addChild(session);
             session.getConfigurationFromNode(monitor);
         }
-    }
-
-    /**
-     * Destroys a session with given session name.
-     *
-     * @param session
-     *            - a session component to destroy
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    public void destroySession(TraceSessionComponent session)
-            throws ExecutionException {
-        destroySession(session, new NullProgressMonitor());
     }
 
     /**

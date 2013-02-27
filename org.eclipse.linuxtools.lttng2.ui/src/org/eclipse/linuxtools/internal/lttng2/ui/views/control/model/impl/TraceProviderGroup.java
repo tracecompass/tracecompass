@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IUstProviderInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
@@ -63,14 +62,6 @@ public class TraceProviderGroup extends TraceControlComponent {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
-    /**
-     * Gets the provider information from the target node.
-     * @throws ExecutionException If the command fails
-     */
-    public void getProviderFromNode() throws ExecutionException {
-        getProviderFromNode(new NullProgressMonitor());
-    }
 
     /**
      * Gets the provider information from the target node.
