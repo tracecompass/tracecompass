@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2013 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2013 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,17 +9,20 @@
  * Contributors:
  *   Bernd Hufmann - Added supplementary files handling (in class TmfTraceElement)
  *   Geneviève Bastien - Copied supplementary files handling from TmfTracElement
+ *                       Moved to this class code to copy a model element
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 
 /**
@@ -200,6 +203,46 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
         } catch (CoreException e) {
             Activator.getDefault().logError("Error setting persistant property " + TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, e); //$NON-NLS-1$
         }
+
+    }
+
+    /**
+     * Copy this model element
+     *
+     * @param newName The name of the new element
+     * @param copySuppFiles Whether to copy supplementary files or not
+     * @return the new Resource object
+     */
+    public IResource copy(final String newName, final boolean copySuppFiles) {
+
+        final IPath newPath = getParent().getResource().getFullPath().addTrailingSeparator().append(newName);
+
+        /* Copy supplementary files first, only if needed */
+        if (copySuppFiles) {
+            copySupplementaryFolder(newName);
+        }
+        /* Copy the trace */
+        try {
+            getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
+
+            /* Delete any bookmarks file found in copied trace folder */
+            IFolder folder = ((IFolder)getParent().getResource()).getFolder(newName);
+            if (folder.exists()) {
+                for (IResource member : folder.members()) {
+                    if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
+                        member.delete(true, null);
+                    }
+                    if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
+                        member.delete(true, null);
+                    }
+                }
+            }
+            return folder;
+        } catch (CoreException e) {
+
+        }
+
+        return null;
 
     }
 

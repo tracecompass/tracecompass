@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,8 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Added supplementary files handling
- *   Geneviève Bastien - Moved supplementary files handling to parent class
+ *   Geneviève Bastien - Moved supplementary files handling to parent class, added
+ *                      code to copy trace
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -467,5 +468,21 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
     public boolean isPropertySet(Object id) {
         return false;
     }
+
+    /**
+     * Copy this trace in the trace folder. No other parameters are mentioned so
+     * the trace is copied in this element's project trace folder
+     *
+     * @param string
+     *            The new trace name
+     * @return the new Resource object
+     * @since 2.0
+     */
+    public TmfTraceElement copy(String string) {
+        TmfTraceFolder folder = this.getProject().getTracesFolder();
+        IResource res = super.copy(string, false);
+        return new TmfTraceElement(string, res, folder);
+    }
+
 
 }

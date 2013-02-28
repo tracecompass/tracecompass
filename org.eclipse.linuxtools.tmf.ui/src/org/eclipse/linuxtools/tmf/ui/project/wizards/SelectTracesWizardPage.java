@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2012, 2013 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Geneviève Bastien - Moved the add and remove code to the experiment class
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
@@ -17,18 +18,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -153,19 +147,15 @@ public class SelectTracesWizardPage extends WizardPage {
             if (keys.contains(name)) {
                 fPreviousTraces.remove(name);
             } else {
-                IResource resource = trace.getResource();
-                IPath location = resource.getLocation();
-                createLink(experiment, trace, resource, location);
+                fExperiment.addTrace(trace);
             }
         }
 
         // Remove traces that were unchecked (thus left in fPreviousTraces)
         keys = fPreviousTraces.keySet();
         for (String key : keys) {
-            fExperiment.removeChild(fPreviousTraces.get(key));
-            IResource resource = experiment.findMember(key);
             try {
-                resource.delete(true, null);
+                fExperiment.removeTrace(fPreviousTraces.get(key));
             } catch (CoreException e) {
                 Activator.getDefault().logError("Error selecting traces for experiment " + experiment.getName(), e); //$NON-NLS-1$
             }
@@ -173,48 +163,6 @@ public class SelectTracesWizardPage extends WizardPage {
         fProject.refresh();
 
         return true;
-    }
-
-    /**
-     * Create a link to the actual trace and set the trace type
-     */
-    private static void createLink(IFolder experiment, TmfTraceElement trace,
-            IResource resource, IPath location) {
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        try {
-            Map<QualifiedName, String> properties = trace.getResource().getPersistentProperties();
-            String bundleName = properties.get(TmfCommonConstants.TRACEBUNDLE);
-            String traceType = properties.get(TmfCommonConstants.TRACETYPE);
-            String iconUrl = properties.get(TmfCommonConstants.TRACEICON);
-
-            if (resource instanceof IFolder) {
-                IFolder folder = experiment.getFolder(trace.getName());
-                if (workspace.validateLinkLocation(folder, location).isOK()) {
-                    folder.createLink(location, IResource.REPLACE, null);
-                    setProperties(folder, bundleName, traceType, iconUrl);
-
-                } else {
-                    Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
-                }
-            } else {
-                IFile file = experiment.getFile(trace.getName());
-                if (workspace.validateLinkLocation(file, location).isOK()) {
-                    file.createLink(location, IResource.REPLACE, null);
-                    setProperties(file, bundleName, traceType, iconUrl);
-                } else {
-                    Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
-                }
-            }
-        } catch (CoreException e) {
-            Activator.getDefault().logError("Error creating link to location " + location, e); //$NON-NLS-1$
-        }
-    }
-
-    private static void setProperties(IResource resource, String bundleName,
-            String traceType, String iconUrl) throws CoreException {
-        resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
-        resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
-        resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
     }
 
     /**
