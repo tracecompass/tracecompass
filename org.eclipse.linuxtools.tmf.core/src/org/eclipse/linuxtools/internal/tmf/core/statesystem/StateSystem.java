@@ -475,6 +475,18 @@ public class StateSystem implements ITmfStateSystemBuilder {
         transState.changeOngoingStateValue(attributeQuark, newValue);
     }
 
+    /**
+     * Modify the whole "ongoing state" (state values + start times). This can
+     * be used when "seeking" a state system to a different point in the trace
+     * (and restoring the known stateInfo at this location). Use with care!
+     *
+     * @param newStateIntervals
+     *            The new List of state values to use as ongoing state info
+     */
+    protected void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
+        transState.replaceOngoingState(newStateIntervals);
+   }
+
     //--------------------------------------------------------------------------
     //        Regular query methods (sent to the back-end)
     //--------------------------------------------------------------------------

@@ -46,9 +46,9 @@ class TransientState {
     private boolean isActive;
     private long latestTime;
 
-    private ArrayList<ITmfStateValue> ongoingStateInfo;
-    private final ArrayList<Long> ongoingStateStartTimes;
-    private final ArrayList<Byte> stateValueTypes;
+    private List<ITmfStateValue> ongoingStateInfo;
+    private List<Long> ongoingStateStartTimes;
+    private List<Byte> stateValueTypes;
 
     TransientState(IStateHistoryBackend backend) {
         this.backend = backend;
@@ -104,19 +104,27 @@ class TransientState {
     }
 
     /**
-     * Batch method of changeOngoingStateValue(), updates the complete
-     * ongoingStateInfo in one go. BE VERY CAREFUL WITH THIS! Especially with
-     * the sizes of both arrays.
+     * More advanced version of {@link #changeOngoingStateValue}. Replaces the
+     * complete {@link #ongoingStateInfo} in one go, and updates the
+     * {@link #ongoingStateStartTimes} and {@link #stateValuesTypes}
+     * accordingly. BE VERY CAREFUL WITH THIS!
      *
-     * Note that the new ongoingStateInfo will be a shallow copy of
-     * newStateInfo, so that last one must be already instantiated and all.
-     *
-     * @param newStateInfo
-     *            The List of StateValues to replace the old ongoingStateInfo
-     *            one.
+     * @param newStateIntervals
+     *            The List of intervals that will represent the new
+     *            "ongoing state". Their end times don't matter, we will only
+     *            check their value and start times.
      */
-    void changeOngoingStateInfo(ArrayList<ITmfStateValue> newStateInfo) {
-        this.ongoingStateInfo = newStateInfo;
+    synchronized void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
+        int size = newStateIntervals.size();
+        ongoingStateInfo = new ArrayList<ITmfStateValue>(size);
+        ongoingStateStartTimes = new ArrayList<Long>(size);
+        stateValueTypes = new ArrayList<Byte>(size);
+
+        for (ITmfStateInterval interval : newStateIntervals) {
+            ongoingStateInfo.add(interval.getStateValue());
+            ongoingStateStartTimes.add(interval.getStartTime());
+            stateValueTypes.add(interval.getStateValue().getType());
+        }
     }
 
     /**
