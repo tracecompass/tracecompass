@@ -108,6 +108,16 @@ public interface IStateChangeInput {
     public void processEvent(ITmfEvent event);
 
     /**
+     * Provide a non-initialized copy of this state input plugin. You will need
+     * to call {@link #assignTargetStateSystem} on it to assign its target.
+     *
+     * @return A new state change input object, of the same type, but without an
+     *         assigned target state system
+     * @since 2.0
+     */
+    public IStateChangeInput getNewInstance();
+
+    /**
      * Indicate to the state history building process that we are done (for now),
      * and that it should close its current history.
      */
