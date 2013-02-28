@@ -259,6 +259,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
      */
     @Override
     public void setEvents(List<IEventInfo> events) {
+        fEvents.clear();
         for (Iterator<IEventInfo> iterator = events.iterator(); iterator.hasNext();) {
             IEventInfo eventInfo = iterator.next();
             fEvents.add(eventInfo);

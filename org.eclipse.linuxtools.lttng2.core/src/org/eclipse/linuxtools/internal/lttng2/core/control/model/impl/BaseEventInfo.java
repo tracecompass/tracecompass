@@ -202,6 +202,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
      */
     @Override
     public void setFields(List<IFieldInfo> fields) {
+        fFields.clear();
         for (Iterator<IFieldInfo> iterator = fields.iterator(); iterator.hasNext();) {
             IFieldInfo fieldInfo = iterator.next();
             fFields.add(fieldInfo);
