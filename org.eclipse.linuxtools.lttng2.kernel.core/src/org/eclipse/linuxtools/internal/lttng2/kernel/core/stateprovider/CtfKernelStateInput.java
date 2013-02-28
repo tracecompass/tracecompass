@@ -49,12 +49,9 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
     /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
     private final HashMap<String, Integer> knownEventNames;
 
-    /* Common locations in the attribute tree */
-    private int cpusNode = -1;
-    private int threadsNode = -1;
-    private int irqsNode = -1;
-    private int softIrqsNode = -1;
-
+    // ------------------------------------------------------------------------
+    // Constructor
+    // ------------------------------------------------------------------------
 
     /**
      * Instantiate a new state provider plugin.
@@ -67,6 +64,10 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
         knownEventNames = fillEventNames();
     }
 
+    // ------------------------------------------------------------------------
+    // IStateChangeInput
+    // ------------------------------------------------------------------------
+
     @Override
     public int getVersion() {
         return VERSION;
@@ -76,7 +77,6 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
     public void assignTargetStateSystem(ITmfStateSystemBuilder ssb) {
         /* We can only set up the locations once the state system is assigned */
         super.assignTargetStateSystem(ssb);
-        setupCommonLocations();
     }
 
     @Override
@@ -96,7 +96,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
 
         try {
             /* Shortcut for the "current CPU" attribute node */
-            final Integer currentCPUNode = ss.getQuarkRelativeAndAdd(cpusNode, String.valueOf(event.getCPU()));
+            final Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(), String.valueOf(event.getCPU()));
 
             /*
              * Shortcut for the "current thread" attribute node. It requires
@@ -105,7 +105,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
             quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
             value = ss.queryOngoingState(quark);
             int thread = value.unboxInt();
-            final Integer currentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, String.valueOf(thread));
+            final Integer currentThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), String.valueOf(thread));
 
             /*
              * Feed event to the history system if it's known to cause a state
@@ -140,7 +140,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
 
                 /* Mark this IRQ as active in the resource tree.
                  * The state value = the CPU on which this IRQ is sitting */
-                quark = ss.getQuarkRelativeAndAdd(irqsNode, irqId.toString());
+                quark = ss.getQuarkRelativeAndAdd(getNodeIRQs(), irqId.toString());
                 value = TmfStateValue.newValueInt(event.getCPU());
                 ss.modifyAttribute(ts, value, quark);
 
@@ -162,7 +162,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                 Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
 
                 /* Put this IRQ back to inactive in the resource tree */
-                quark = ss.getQuarkRelativeAndAdd(irqsNode, irqId.toString());
+                quark = ss.getQuarkRelativeAndAdd(getNodeIRQs(), irqId.toString());
                 value = TmfStateValue.nullValue();
                 ss.modifyAttribute(ts, value, quark);
 
@@ -181,7 +181,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
 
                 /* Mark this SoftIRQ as active in the resource tree.
                  * The state value = the CPU on which this SoftIRQ is processed */
-                quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
+                quark = ss.getQuarkRelativeAndAdd(getNodeSoftIRQs(), softIrqId.toString());
                 value = TmfStateValue.newValueInt(event.getCPU());
                 ss.modifyAttribute(ts, value, quark);
 
@@ -203,7 +203,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                 Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
 
                 /* Put this SoftIRQ back to inactive (= -1) in the resource tree */
-                quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
+                quark = ss.getQuarkRelativeAndAdd(getNodeSoftIRQs(), softIrqId.toString());
                 value = TmfStateValue.nullValue();
                 ss.modifyAttribute(ts, value, quark);
 
@@ -222,7 +222,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
 
                 /* Mark this SoftIRQ as *raised* in the resource tree.
                  * State value = -2 */
-                quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
+                quark = ss.getQuarkRelativeAndAdd(getNodeSoftIRQs(), softIrqId.toString());
                 value = TmfStateValue.newValueInt(StateValues.SOFT_IRQ_RAISED);
                 ss.modifyAttribute(ts, value, quark);
             }
@@ -239,8 +239,8 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                 String nextProcessName = (String) content.getField(LttngStrings.NEXT_COMM).getValue();
                 Integer nextTid = ((Long) content.getField(LttngStrings.NEXT_TID).getValue()).intValue();
 
-                Integer formerThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString());
-                Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, nextTid.toString());
+                Integer formerThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), prevTid.toString());
+                Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), nextTid.toString());
 
                 /* Set the status of the process that got scheduled out. */
                 quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
@@ -307,8 +307,8 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                 Integer parentTid = ((Long) content.getField(LttngStrings.PARENT_TID).getValue()).intValue();
                 Integer childTid = ((Long) content.getField(LttngStrings.CHILD_TID).getValue()).intValue();
 
-                Integer parentTidNode = ss.getQuarkRelativeAndAdd(threadsNode, parentTid.toString());
-                Integer childTidNode = ss.getQuarkRelativeAndAdd(threadsNode, childTid.toString());
+                Integer parentTidNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), parentTid.toString());
+                Integer childTidNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), childTid.toString());
 
                 /* Assign the PPID to the new process */
                 quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.PPID);
@@ -350,7 +350,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                  * Remove the process and all its sub-attributes from the
                  * current state
                  */
-                quark = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString());
+                quark = ss.getQuarkRelativeAndAdd(getNodeThreads(), tid.toString());
                 ss.removeAttribute(ts, quark);
             }
                 break;
@@ -369,7 +369,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                  * populated with anything relevant for now.
                  */
 
-                int curThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString());
+                int curThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), tid.toString());
 
                 /* Set the process' name */
                 quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.EXEC_NAME);
@@ -431,25 +431,6 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                 break;
             } // End of big switch
 
-            /*
-             * Statistics
-             */
-
-            /* Number of events of each type, globally */
-//                 quark = ss.getQuarkAbsoluteAndAdd(Attributes.STATISTICS,
-//                         Attributes.EVENT_TYPES, eventName);
-//                 ss.incrementAttribute(ts, quark);
-
-            /* Number of events per CPU */
-//                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode,
-//                         Attributes.STATISTICS, Attributes.EVENT_TYPES, eventName);
-//                 ss.incrementAttribute(ts, quark);
-
-            /* Number of events per process */
-//                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode,
-//                         Attributes.STATISTICS, Attributes.EVENT_TYPES, eventName);
-//                 ss.incrementAttribute(ts, quark);
-
         } catch (AttributeNotFoundException ae) {
             /*
              * This would indicate a problem with the logic of the manager here,
@@ -475,12 +456,29 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
         }
     }
 
-    private void setupCommonLocations() {
-        cpusNode = ss.getQuarkAbsoluteAndAdd(Attributes.CPUS);
-        threadsNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS);
-        irqsNode = ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.IRQS);
-        softIrqsNode = ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.SOFT_IRQS);
+    // ------------------------------------------------------------------------
+    // Convenience methods for commonly-used attribute tree locations
+    // ------------------------------------------------------------------------
+
+    private int getNodeCPUs() {
+        return ss.getQuarkAbsoluteAndAdd(Attributes.CPUS);
     }
+
+    private int getNodeThreads() {
+        return ss.getQuarkAbsoluteAndAdd(Attributes.THREADS);
+    }
+
+    private int getNodeIRQs() {
+        return ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.IRQS);
+    }
+
+    private int getNodeSoftIRQs() {
+        return ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.SOFT_IRQS);
+    }
+
+    // ------------------------------------------------------------------------
+    // Workaround for the lack of switch-on-strings in Java < 7
+    // ------------------------------------------------------------------------
 
     private static HashMap<String, Integer> fillEventNames() {
         /*
@@ -508,6 +506,10 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
         Integer ret = knownEventNames.get(eventName);
         return (ret != null) ? ret : -1;
     }
+
+    // ------------------------------------------------------------------------
+    // Advanced state-setting methods
+    // ------------------------------------------------------------------------
 
     /**
      * When we want to set a process back to a "running" state, first check
