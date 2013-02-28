@@ -464,12 +464,16 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
+    public long getOngoingStartTime(int attribute)
+            throws AttributeNotFoundException {
+        return transState.getOngoingStartTime(attribute);
+    }
+
+    @Override
     public void updateOngoingState(ITmfStateValue newValue, int attributeQuark)
             throws AttributeNotFoundException {
         transState.changeOngoingStateValue(attributeQuark, newValue);
     }
-
-
 
     //--------------------------------------------------------------------------
     //        Regular query methods (sent to the back-end)

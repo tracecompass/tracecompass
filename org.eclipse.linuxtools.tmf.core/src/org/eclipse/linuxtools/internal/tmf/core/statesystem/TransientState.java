@@ -68,16 +68,18 @@ class TransientState {
         return latestTime;
     }
 
-    ITmfStateValue getOngoingStateValue(int index)
-            throws AttributeNotFoundException {
-
+    ITmfStateValue getOngoingStateValue(int index) throws AttributeNotFoundException {
         checkValidAttribute(index);
         return ongoingStateInfo.get(index);
     }
 
+    long getOngoingStartTime(int index) throws AttributeNotFoundException {
+        checkValidAttribute(index);
+        return ongoingStateStartTimes.get(index);
+    }
+
     void changeOngoingStateValue(int index, ITmfStateValue newValue)
             throws AttributeNotFoundException {
-
         checkValidAttribute(index);
         ongoingStateInfo.set(index, newValue);
     }
@@ -89,17 +91,13 @@ class TransientState {
      * @param quark
      * @throws AttributeNotFoundException
      */
-    ITmfStateInterval getOngoingInterval(int quark)
-            throws AttributeNotFoundException {
-
+    ITmfStateInterval getOngoingInterval(int quark) throws AttributeNotFoundException {
         checkValidAttribute(quark);
         return new TmfStateInterval(ongoingStateStartTimes.get(quark), -1, quark,
                 ongoingStateInfo.get(quark));
     }
 
-    private void checkValidAttribute(int quark)
-            throws AttributeNotFoundException {
-
+    private void checkValidAttribute(int quark) throws AttributeNotFoundException {
         if (quark > ongoingStateInfo.size() - 1 || quark < 0) {
             throw new AttributeNotFoundException();
         }

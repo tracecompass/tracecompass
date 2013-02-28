@@ -221,6 +221,19 @@ public interface ITmfStateSystem {
             throws AttributeNotFoundException;
 
     /**
+     * Get the start time of the current ongoing state, for the specified
+     * attribute.
+     *
+     * @param attribute
+     *            Quark of the attribute
+     * @return The current start time of the ongoing state
+     * @throws AttributeNotFoundException
+     *             If the attribute is invalid
+     */
+    public long getOngoingStartTime(int attribute)
+            throws AttributeNotFoundException;
+
+    /**
      * Load the complete state information at time 't' into the returned List.
      * You can then get the intervals for single attributes by using
      * List.get(n), where 'n' is the quark of the attribute.
