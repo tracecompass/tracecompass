@@ -79,8 +79,13 @@ public class LTTngControlServiceFactory {
         if (ControlPreferences.getInstance().isLoggingEnabled()) {
             ControlCommandLogger.log(command);
         }
+        ICommandResult result = null;
 
-        ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
+        try {
+            result = shell.executeCommand(command, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            throw new ExecutionException(Messages.TraceControl_GettingVersionError + ": " + e); //$NON-NLS-1$
+        }
 
         if (ControlPreferences.getInstance().isLoggingEnabled()) {
             ControlCommandLogger.log(LTTngControlService.formatOutput(result));

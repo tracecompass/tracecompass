@@ -43,7 +43,9 @@ final public class Messages extends NLS {
     public static String TraceControl_GettingVersionError;
 
     // Commands
+    public static String TraceControl_ErrorTitle;
     public static String TraceControl_RetrieveNodeConfigurationJob;
+    public static String TraceControl_RetrieveNodeConfigurationFailure;
     public static String TraceControl_ListSessionFailure;
     public static String TraceControl_EclipseCommandFailure;
     public static String TraceControl_NewNodeCreationFailure;
