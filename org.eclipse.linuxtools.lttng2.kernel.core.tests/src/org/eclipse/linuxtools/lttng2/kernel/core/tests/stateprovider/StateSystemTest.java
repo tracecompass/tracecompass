@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -32,7 +33,6 @@ import org.junit.Test;
  * different state back-end types or configurations.
  *
  * @author Alexandre Montplaisir
- *
  */
 @SuppressWarnings({"nls", "javadoc"})
 public abstract class StateSystemTest {
@@ -56,67 +56,91 @@ public abstract class StateSystemTest {
     private static final long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
 
     @Test
-    public void testFullQuery1() throws StateValueTypeException,
-            AttributeNotFoundException, TimeRangeException,
-            StateSystemDisposedException {
-
+    public void testFullQuery1() {
         List<ITmfStateInterval> list;
         ITmfStateInterval interval;
         int quark, valueInt;
         String valueStr;
 
-        list = ssq.queryFullState(interestingTimestamp1);
+        try {
+            list = ssq.queryFullState(interestingTimestamp1);
 
-        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        interval = list.get(quark);
-        valueInt = interval.getStateValue().unboxInt();
-        assertEquals(1397, valueInt);
+            quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            interval = list.get(quark);
+            valueInt = interval.getStateValue().unboxInt();
+            assertEquals(1397, valueInt);
 
-        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
-        interval = list.get(quark);
-        valueStr = interval.getStateValue().unboxStr();
-        assertEquals("gdbus", valueStr);
+            quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
+            interval = list.get(quark);
+            valueStr = interval.getStateValue().unboxStr();
+            assertEquals("gdbus", valueStr);
 
-        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.SYSTEM_CALL);
-        interval = list.get(quark);
-        valueStr = interval.getStateValue().unboxStr();
-        assertTrue(valueStr.equals("sys_poll"));
+            quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.SYSTEM_CALL);
+            interval = list.get(quark);
+            valueStr = interval.getStateValue().unboxStr();
+            assertTrue(valueStr.equals("sys_poll"));
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        } catch (StateValueTypeException e) {
+            fail();
+        }
     }
 
     @Test
-    public void testSingleQuery1() throws AttributeNotFoundException,
-            TimeRangeException, StateValueTypeException,
-            StateSystemDisposedException {
-
+    public void testSingleQuery1() {
         long timestamp = interestingTimestamp1;
         int quark;
         ITmfStateInterval interval;
         String valueStr;
 
-        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
-        interval = ssq.querySingleState(timestamp, quark);
-        valueStr = interval.getStateValue().unboxStr();
-        assertEquals("gdbus", valueStr);
+        try {
+            quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
+            interval = ssq.querySingleState(timestamp, quark);
+            valueStr = interval.getStateValue().unboxStr();
+            assertEquals("gdbus", valueStr);
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        } catch (StateValueTypeException e) {
+            fail();
+        }
     }
 
     /**
      * Test a range query (with no resolution parameter, so all intervals)
      */
     @Test
-    public void testRangeQuery1() throws AttributeNotFoundException,
-            TimeRangeException, StateValueTypeException,
-            StateSystemDisposedException {
-
+    public void testRangeQuery1() {
         long time1 = interestingTimestamp1;
         long time2 = time1 + 1L * NANOSECS_PER_SEC;
         int quark;
         List<ITmfStateInterval> intervals;
 
-        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        intervals = ssq.queryHistoryRange(quark, time1, time2);
-        assertEquals(487, intervals.size()); /* Number of context switches! */
-        assertEquals(1685, intervals.get(100).getStateValue().unboxInt());
-        assertEquals(1331668248427681372L, intervals.get(205).getEndTime());
+        try {
+            quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            intervals = ssq.queryHistoryRange(quark, time1, time2);
+            assertEquals(487, intervals.size()); /* Number of context switches! */
+            assertEquals(1685, intervals.get(100).getStateValue().unboxInt());
+            assertEquals(1331668248427681372L, intervals.get(205).getEndTime());
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        } catch (StateValueTypeException e) {
+            fail();
+        }
     }
 
     /**
@@ -124,40 +148,55 @@ public abstract class StateSystemTest {
      * The result should still be valid.
      */
     @Test
-    public void testRangeQuery2() throws TimeRangeException,
-            AttributeNotFoundException, StateSystemDisposedException {
-
+    public void testRangeQuery2() {
         List<ITmfStateInterval> intervals;
 
-        int quark = ssq.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
-        long ts1 = ssq.getStartTime(); /* start of the trace */
-        long ts2 = startTime + 20L * NANOSECS_PER_SEC; /* invalid, but ignored */
+        try {
+            int quark = ssq.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
+            long ts1 = ssq.getStartTime(); /* start of the trace */
+            long ts2 = startTime + 20L * NANOSECS_PER_SEC; /* invalid, but ignored */
 
-        intervals = ssq.queryHistoryRange(quark, ts1, ts2);
+            intervals = ssq.queryHistoryRange(quark, ts1, ts2);
 
-        /* Activity of IRQ 1 over the whole trace */
-        assertEquals(65, intervals.size());
+            /* Activity of IRQ 1 over the whole trace */
+            assertEquals(65, intervals.size());
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 
     /**
      * Test a range query with a resolution
      */
     @Test
-    public void testRangeQuery3() throws AttributeNotFoundException,
-            TimeRangeException, StateValueTypeException,
-            StateSystemDisposedException {
-
+    public void testRangeQuery3() {
         long time1 = interestingTimestamp1;
         long time2 = time1 + 1L * NANOSECS_PER_SEC;
         long resolution = 1000000; /* One query every millisecond */
         int quark;
         List<ITmfStateInterval> intervals;
 
-        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        intervals = ssq.queryHistoryRange(quark, time1, time2, resolution, null);
-        assertEquals(126, intervals.size()); /* Number of context switches! */
-        assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
-        assertEquals(1331668248815698779L, intervals.get(100).getEndTime());
+        try {
+            quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            intervals = ssq.queryHistoryRange(quark, time1, time2, resolution, null);
+            assertEquals(126, intervals.size()); /* Number of context switches! */
+            assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
+            assertEquals(1331668248815698779L, intervals.get(100).getEndTime());
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        } catch (StateValueTypeException e) {
+            fail();
+        }
     }
 
     /**
@@ -178,45 +217,61 @@ public abstract class StateSystemTest {
     }
 
     @Test(expected = TimeRangeException.class)
-    public void testSingleQueryInvalidTime1()
-            throws AttributeNotFoundException, TimeRangeException,
-            StateSystemDisposedException {
+    public void testSingleQueryInvalidTime1() throws TimeRangeException {
+        try {
+            int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            long ts = startTime + 20L * NANOSECS_PER_SEC;
+            ssq.querySingleState(ts, quark);
 
-        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts = startTime + 20L * NANOSECS_PER_SEC;
-        ssq.querySingleState(ts, quark);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 
     @Test(expected = TimeRangeException.class)
-    public void testSingleQueryInvalidTime2()
-            throws AttributeNotFoundException, TimeRangeException,
-            StateSystemDisposedException {
+    public void testSingleQueryInvalidTime2() throws TimeRangeException {
+        try {
+            int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            long ts = startTime - 20L * NANOSECS_PER_SEC;
+            ssq.querySingleState(ts, quark);
 
-        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts = startTime - 20L * NANOSECS_PER_SEC;
-        ssq.querySingleState(ts, quark);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 
     @Test(expected = TimeRangeException.class)
-    public void testRangeQueryInvalidTime1() throws AttributeNotFoundException,
-            TimeRangeException, StateSystemDisposedException {
+    public void testRangeQueryInvalidTime1() throws TimeRangeException {
+        try {
+            int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            long ts1 = startTime - 20L * NANOSECS_PER_SEC; /* invalid */
+            long ts2 = startTime + 1L * NANOSECS_PER_SEC; /* valid */
+            ssq.queryHistoryRange(quark, ts1, ts2);
 
-        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts1 = startTime - 20L * NANOSECS_PER_SEC; /* invalid */
-        long ts2 = startTime + 1L * NANOSECS_PER_SEC; /* valid */
-
-        ssq.queryHistoryRange(quark, ts1, ts2);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 
     @Test(expected = TimeRangeException.class)
-    public void testRangeQueryInvalidTime2() throws TimeRangeException,
-            AttributeNotFoundException, StateSystemDisposedException {
+    public void testRangeQueryInvalidTime2() throws TimeRangeException {
+        try {
+            int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            long ts1 = startTime - 1L * NANOSECS_PER_SEC; /* invalid */
+            long ts2 = startTime + 20L * NANOSECS_PER_SEC; /* invalid */
+            ssq.queryHistoryRange(quark, ts1, ts2);
 
-        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        long ts1 = startTime - 1L * NANOSECS_PER_SEC; /* invalid */
-        long ts2 = startTime + 20L * NANOSECS_PER_SEC; /* invalid */
-
-        ssq.queryHistoryRange(quark, ts1, ts2);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 
     /**
@@ -226,7 +281,6 @@ public abstract class StateSystemTest {
      */
     @Test(expected = AttributeNotFoundException.class)
     public void testQueryInvalidAttribute() throws AttributeNotFoundException {
-
         ssq.getQuarkAbsolute("There", "is", "no", "cow", "level");
     }
 
@@ -234,42 +288,61 @@ public abstract class StateSystemTest {
      * Query but with the wrong State Value type
      */
     @Test(expected = StateValueTypeException.class)
-    public void testQueryInvalidValuetype1() throws StateValueTypeException,
-            AttributeNotFoundException, TimeRangeException,
-            StateSystemDisposedException {
+    public void testQueryInvalidValuetype1() throws StateValueTypeException {
         List<ITmfStateInterval> list;
         ITmfStateInterval interval;
         int quark;
 
-        list = ssq.queryFullState(interestingTimestamp1);
-        quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        interval = list.get(quark);
+        try {
+            list = ssq.queryFullState(interestingTimestamp1);
+            quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            interval = list.get(quark);
 
-        /* This is supposed to be an int value */
-        interval.getStateValue().unboxStr();
+            /* This is supposed to be an int value */
+            interval.getStateValue().unboxStr();
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 
     @Test(expected = StateValueTypeException.class)
-    public void testQueryInvalidValuetype2() throws StateValueTypeException,
-            AttributeNotFoundException, TimeRangeException,
-            StateSystemDisposedException {
+    public void testQueryInvalidValuetype2() throws StateValueTypeException {
         List<ITmfStateInterval> list;
         ITmfStateInterval interval;
         int quark;
 
-        list = ssq.queryFullState(interestingTimestamp1);
-        quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
-        interval = list.get(quark);
+        try {
+            list = ssq.queryFullState(interestingTimestamp1);
+            quark = ssq.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
+            interval = list.get(quark);
 
-        /* This is supposed to be a String value */
-        interval.getStateValue().unboxInt();
+            /* This is supposed to be a String value */
+            interval.getStateValue().unboxInt();
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 
     @Test
-    public void testFullAttributeName() throws AttributeNotFoundException {
-        int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
-        String name = ssq.getFullAttributePath(quark);
-        assertEquals(name, "CPUs/0/Current_thread");
+    public void testFullAttributeName() {
+        try {
+            int quark = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            String name = ssq.getFullAttributePath(quark);
+            assertEquals(name, "CPUs/0/Current_thread");
+
+        } catch (AttributeNotFoundException e) {
+            fail();
+        }
     }
 
     @Test
