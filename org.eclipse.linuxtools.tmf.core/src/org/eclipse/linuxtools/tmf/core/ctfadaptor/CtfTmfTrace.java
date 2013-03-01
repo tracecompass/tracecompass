@@ -76,6 +76,8 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
          */
         setCacheSize();
 
+        super.initTrace(resource, path, eventType);
+
         @SuppressWarnings("unused")
         CtfTmfEventType type;
 
@@ -103,8 +105,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
              */
             throw new TmfTraceException(e.getMessage(), e);
         }
-
-        super.initTrace(resource, path, eventType);
     }
 
     /* (non-Javadoc)
