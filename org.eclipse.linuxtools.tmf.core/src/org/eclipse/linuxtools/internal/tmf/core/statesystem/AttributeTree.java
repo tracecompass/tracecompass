@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
  * @author alexmont
  *
  */
-final class AttributeTree {
+public class AttributeTree {
 
     /* "Magic number" for attribute tree files or file sections */
     private final static int ATTRIB_TREE_MAGIC_NUMBER = 0x06EC3671;

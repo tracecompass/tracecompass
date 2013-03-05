@@ -48,7 +48,7 @@ public abstract class AbstractStateChangeInput implements IStateChangeInput {
     private ITmfEvent currentEvent;
 
     /** State system in which to insert the state changes */
-    protected ITmfStateSystemBuilder ss;
+    protected ITmfStateSystemBuilder ss = null;
 
     /**
      * Instantiate a new state provider plugin.
