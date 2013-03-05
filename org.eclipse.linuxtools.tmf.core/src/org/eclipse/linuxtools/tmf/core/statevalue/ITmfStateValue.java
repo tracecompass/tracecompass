@@ -33,7 +33,9 @@ public interface ITmfStateValue {
         /** 32-bit integer value */
         INTEGER,
         /** Variable-length string value */
-        STRING
+        STRING,
+        /** 64-bit integer value */
+        LONG
     }
 
     /**
@@ -71,4 +73,14 @@ public interface ITmfStateValue {
      *             If the contained value cannot be read as a String
      */
     public String unboxStr() throws StateValueTypeException;
+
+    /**
+     * Read the contained value as a 'long' primitive
+     *
+     * @return The long contained in the state value
+     * @throws StateValueTypeException
+     *             If the contained value cannot be read as a long
+     * @since 2.0
+     */
+    public long unboxLong() throws StateValueTypeException;
 }

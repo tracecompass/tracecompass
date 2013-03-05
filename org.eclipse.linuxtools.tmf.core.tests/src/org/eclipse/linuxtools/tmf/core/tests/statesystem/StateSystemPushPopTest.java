@@ -59,6 +59,7 @@ public class StateSystemPushPopTest {
     private final static ITmfStateValue value2 = TmfStateValue.newValueInt(10);
     private final static ITmfStateValue value3 = TmfStateValue.nullValue();
     private final static ITmfStateValue value4 = TmfStateValue.newValueString("D"); //$NON-NLS-1$
+    private final static ITmfStateValue value5 = TmfStateValue.newValueLong(Long.MAX_VALUE);
 
     /**
      * Test case constructor
@@ -99,7 +100,11 @@ public class StateSystemPushPopTest {
         ss.pushAttribute( 2, value1, attrib);
         ss.pushAttribute( 4, value2, attrib);
         ss.pushAttribute( 6, value3, attrib);
-        ss.pushAttribute(10, value4, attrib);
+        ss.pushAttribute( 8, value4, attrib);
+        ss.pushAttribute(10, value5, attrib);
+
+        value = ss.popAttribute(11, attrib);
+        assertEquals(value5, value);
 
         value = ss.popAttribute(12, attrib);
         assertEquals(value4, value);
@@ -212,6 +217,9 @@ public class StateSystemPushPopTest {
     public void testStackTop() {
         try {
             interval = ss.querySingleStackTop(10, attribute);
+            assertEquals(value5, interval.getStateValue());
+
+            interval = ss.querySingleStackTop(9, attribute);
             assertEquals(value4, interval.getStateValue());
 
             interval = ss.querySingleStackTop(13, attribute);
@@ -281,9 +289,9 @@ public class StateSystemPushPopTest {
             final int subAttrib3 = ss.getQuarkRelative(attribute, "3"); //$NON-NLS-1$
             final int subAttrib4 = ss.getQuarkRelative(attribute, "4"); //$NON-NLS-1$
 
-            /* Stack depth = 4 */
+            /* Stack depth = 5 */
             state = ss.queryFullState(10);
-            assertEquals(4, state.get(attribute).getStateValue().unboxInt());
+            assertEquals(5, state.get(attribute).getStateValue().unboxInt());
             assertEquals(value1, state.get(subAttrib1).getStateValue());
             assertEquals(value2, state.get(subAttrib2).getStateValue());
             assertEquals(value3, state.get(subAttrib3).getStateValue());
