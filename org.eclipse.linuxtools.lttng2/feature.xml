@@ -38,7 +38,7 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.linuxtools.lttng2.core" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.linuxtools.tmf.core" version="2.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.tmf.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.ui" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.core" version="3.1.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.services" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.subsystems.files.core" version="3.2.0" match="greaterOrEqual"/>

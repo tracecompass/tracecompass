@@ -40,7 +40,7 @@
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.linuxtools.ctf.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.ctf.core" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.linuxtools.tmf.core" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
