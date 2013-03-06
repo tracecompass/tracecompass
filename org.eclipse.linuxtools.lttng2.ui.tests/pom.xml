@@ -21,7 +21,7 @@
   <version>2.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
-  <name>Linux Tools LTTng UI Unit Test Suite</name>
+  <name>Linux Tools LTTng UI Tests Plug-in</name>
 
  <build>
      <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->

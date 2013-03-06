@@ -21,7 +21,7 @@
   <version>2.0.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 
-  <name>Linux Tools LTTng TMF (Tracing and Monitoring Framework)</name>
+  <name>Linux Tools TMF (Tracing and Monitoring Framework) Feature</name>
 
   <groupId>org.eclipse.linuxtools.tmf</groupId>
   

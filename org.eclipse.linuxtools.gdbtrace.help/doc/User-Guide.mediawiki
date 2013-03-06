@@ -1,0 +1,13 @@
+
+= Overview =
+
+TODO
+
+= References =
+
+* [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng2/User_Guide LTTng User Guide]
+* [http://wiki.eclipse.org/CDT/User/FAQ#How_can_I_trace_my_application_using_C.2FC.2B.2B_Tracepoints.3F CDT FAQ - How can I trace my application using C/C++ Tracepoints?]
+
+= Updating This Document =
+
+This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit [http://wiki.eclipse.org/index.php/Linux_Tools_Project/GDB_Tracepoint_Analysis/User_Guide http://wiki.eclipse.org/Linux_Tools_Project/GDB_Tracepoint_Analysis/User_Guide]

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2013 Ericsson.
+
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+-->
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.GdbPerspectiveFactory"
+            icon="icons/obj16/gdb_icon16.png"
+            id="org.eclipse.linuxtools.gdbtrace.perspective"
+            name="%perspective.name">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetype">
+      <category
+            id="org.eclipse.linuxtools.gdbtrace.ui.category"
+            name="GDB">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.gdbtrace.ui.category"
+            event_type="org.eclipse.linuxtools.internal.gdbtrace.event.GdbTraceEvent"
+            icon="icons/obj16/gdb_icon16.png"
+            id="org.eclipse.linuxtools.gdbtrace.ui.type.gdb"
+            name="GDB Trace"
+            trace_type="org.eclipse.linuxtools.internal.gdbtrace.trace.GdbTrace">
+         <eventsTableType
+               class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventsTable">
+         </eventsTableType>
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            description="%commands.project.trace.selectexecutable.description"
+            id="org.eclipse.linuxtools.gdbtrace.ui.command.project.trace.selectexecutable"
+            name="%commands.project.trace.selectexecutable">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="org.eclipse.linuxtools.gdbtrace.ui.command.project.trace.selectexecutable"
+               label="%commands.project.trace.selectexecutable"
+               style="push"
+               tooltip="%commands.project.trace.selectexecutable.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <test
+                           property="org.eclipse.linuxtools.tmf.ui.traceType"
+                           value="org.eclipse.linuxtools.gdbtrace.ui.type.gdb">
+                     </test>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.project.handlers.SelectTraceExecutableHandler"
+            commandId="org.eclipse.linuxtools.gdbtrace.ui.command.project.trace.selectexecutable">
+         <activeWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+               </instanceof>
+            </iterate>
+         </activeWhen>
+      </handler>
+   </extension>
+
+</plugin>
