@@ -13,7 +13,10 @@
 
 package org.eclipse.linuxtools.lttng2.ui.tests.control.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.net.URL;
@@ -41,9 +44,13 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionSta
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.stubs.service.CommandShellFactory;
 import org.eclipse.linuxtools.internal.lttng2.stubs.shells.LTTngToolsFileShell;
+import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCommandLogger;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferences;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlServiceFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.FrameworkUtil;
@@ -66,11 +73,13 @@ public class LTTngControlServiceTest {
     private static final String SCEN_NO_SESSION_AVAILABLE = "NoSessionAvailable";
     private static final String SCEN_GET_SESSION_NAMES1 = "GetSessionNames1";
     private static final String SCEN_GET_SESSION_NAME_NOT_EXIST = "GetSessionNameNotExist";
+    private static final String SCEN_GET_SESSION_NAME_NOT_EXIST_VERBOSE = "GetSessionNameNotExistVerbose";
     private static final String SCEN_GET_SESSION_GARBAGE_OUT = "GetSessionGarbageOut";
     private static final String SCEN_GET_SESSION1 = "GetSession1";
     private static final String SCEN_GET_KERNEL_PROVIDER1 = "GetKernelProvider1";
     private static final String SCEN_LIST_WITH_NO_KERNEL1 = "ListWithNoKernel1";
     private static final String SCEN_LIST_WITH_NO_KERNEL2 = "ListWithNoKernel2";
+    private static final String SCEN_LIST_WITH_NO_KERNEL_VERBOSE = "ListWithNoKernelVerbose";
     private static final String SCEN_GET_UST_PROVIDER1 = "GetUstProvider1";
     private static final String SCEN_GET_UST_PROVIDER2 = "GetUstProvider2";
     private static final String SCEN_GET_UST_PROVIDER3 = "GetUstProvider3";
@@ -78,12 +87,14 @@ public class LTTngControlServiceTest {
     private static final String SCEN_CREATE_SESSION_WITH_PROMPT = "CreateSessionWithPrompt";
     private static final String SCEN_CREATE_SESSION_VARIANTS = "CreateSessionVariants";
     private static final String SCEN_DESTROY_SESSION1 = "DestroySession1";
+    private static final String SCEN_DESTROY_SESSION_VERBOSE = "DestroySessionVerbose";
     private static final String SCEN_CHANNEL_HANDLING = "ChannelHandling";
     private static final String SCEN_EVENT_HANDLING = "EventHandling";
     private static final String SCEN_CONTEXT_HANDLING = "ContextHandling";
     private static final String SCEN_CONTEXT_ERROR_HANDLING = "ContextErrorHandling";
     private static final String SCEN_CALIBRATE_HANDLING = "CalibrateHandling";
     private static final String SCEN_CREATE_SESSION_2_1 = "CreateSessionLttng2.1";
+    private static final String SCEN_CREATE_SESSION_VERBOSE_2_1 = "CreateSessionLttngVerbose2.1";
 
     // ------------------------------------------------------------------------
     // Test data
@@ -115,6 +126,14 @@ public class LTTngControlServiceTest {
         fShell = fShellFactory.getFileShell();
         fShell.loadScenarioFile(fTestfile);
         fService = new LTTngControlService(fShell);
+
+        ControlPreferences.getInstance().init(Activator.getDefault().getPreferenceStore());
+    }
+
+    @After
+    public void tearDown() {
+        disableVerbose();
+        ControlPreferences.getInstance().dispose();
     }
 
     // ------------------------------------------------------------------------
@@ -217,6 +236,21 @@ public class LTTngControlServiceTest {
 
         } catch (ExecutionException e) {
             // success
+        }
+    }
+
+    @Test
+    public void testGetSessionNotExistVerbose() {
+        try {
+            enableVerbose();
+            fShell.setScenario(SCEN_GET_SESSION_NAME_NOT_EXIST_VERBOSE);
+            fService.getSessionNames(new NullProgressMonitor());
+            fail("No exeption thrown");
+
+        } catch (ExecutionException e) {
+            // success
+        } finally {
+            disableVerbose();
         }
     }
 
@@ -409,6 +443,24 @@ public class LTTngControlServiceTest {
 
         } catch (ExecutionException e) {
             fail(e.toString());
+        }
+    }
+
+    @Test
+    public void testGetKernelProviderNoKernelVerbose() {
+        try {
+            enableVerbose();
+            fShell.setScenario(SCEN_LIST_WITH_NO_KERNEL_VERBOSE);
+            List<IBaseEventInfo> events = fService.getKernelProvider(new NullProgressMonitor());
+
+            // Verify event info
+            assertNotNull(events);
+            assertEquals(0, events.size());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        } finally {
+            disableVerbose();
         }
     }
 
@@ -655,6 +707,19 @@ public class LTTngControlServiceTest {
     }
 
     @Test
+    public void testDestroySessionVerbose() {
+        try {
+            enableVerbose();
+            fShell.setScenario(SCEN_DESTROY_SESSION_VERBOSE);
+            fService.destroySession("mysession2", new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        } finally {
+            disableVerbose();
+        }
+    }
+
+    @Test
     public void testCreateChannel() {
         try {
 
@@ -740,17 +805,6 @@ public class LTTngControlServiceTest {
             fail(e.toString());
         }
     }
-
-//    public void tesEnableChannelNoTracer() {
-//        try {
-//            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForChannelNoTracer());
-//            service.getSessionNames(new NullProgressMonitor());
-//            fail("No exeption thrown");
-//
-//        } catch (ExecutionException e) {
-//            // success
-//        }
-//    }
 
     @Test
     public void testEnableEvents() {
@@ -966,20 +1020,20 @@ public class LTTngControlServiceTest {
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("file:///tmp", info.getSessionPath());
-            assertTrue(info.isStreamedTrace());
+            assertTrue(!info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
             info = fService.createSession("mysession", "file:///tmp", null, null, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("file:///tmp", info.getSessionPath());
-            assertTrue(info.isStreamedTrace());
+            assertTrue(!info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
             info = fService.createSession("mysession", null, "tcp://172.0.0.1", "tcp://172.0.0.1:5343", new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
-            assertEquals("", info.getSessionPath()); // TODO: currently there is a bug in LTTng tracer and it returns string null
+            assertEquals("", info.getSessionPath()); // the complete network path is not available at this point
             assertTrue(info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
@@ -990,8 +1044,51 @@ public class LTTngControlServiceTest {
             assertTrue(info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
+            // verbose
+            enableVerbose();
+            info = fService.createSession("mysession", "net://172.0.0.1", null, null, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("net://172.0.0.1", info.getSessionPath());
+            assertTrue(info.isStreamedTrace());
+            disableVerbose();
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+
         } catch (ExecutionException e) {
             fail(e.toString());
         }
     }
+
+    @Test
+    public void testCreateSessionVerbose2_1() {
+        try {
+            fShell.setScenario(SCEN_CREATE_SESSION_VERBOSE_2_1);
+
+            enableVerbose();
+            ISessionInfo info = fService.createSession("mysession", "net://172.0.0.1", null, null, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession", info.getName());
+            assertEquals("net://172.0.0.1", info.getSessionPath());
+            assertTrue(info.isStreamedTrace());
+            fService.destroySession("mysession", new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        } finally {
+            disableVerbose();
+        }
+    }
+
+    private static void enableVerbose() {
+        // verbose
+        ControlCommandLogger.init(ControlPreferences.getInstance().getLogfilePath(), false);
+        ControlPreferences.getInstance().getPreferenceStore().setDefault(ControlPreferences.TRACE_CONTROL_LOG_COMMANDS_PREF, true);
+        ControlPreferences.getInstance().getPreferenceStore().setDefault(ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_PREF, ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_V_V_VERBOSE);
+    }
+
+    private static void disableVerbose() {
+        ControlPreferences.getInstance().getPreferenceStore().setDefault(ControlPreferences.TRACE_CONTROL_LOG_COMMANDS_PREF, false);
+    }
+
+
 }

@@ -242,7 +242,11 @@ public class LTTngControlServiceConstants {
      * Pattern to match session path for network tracing (lttng list <session>)
      * Note: file for protocol is not considered as network trace since local consumer will be used.
      */
-    public final static Pattern TRACE_NETWORK_PATH_PATTERN = Pattern.compile("\\s*Trace\\s+path\\:\\s+(net|net6|tcp|tcp6|)\\:\\/\\/(.*)(\\:(\\d*)\\/(.*)\\[data\\:\\s+(\\d*)\\]){0,1}"); //$NON-NLS-1$
+    public final static Pattern TRACE_NETWORK_PATH_PATTERN = Pattern.compile("\\s*Trace\\s+path\\:\\s+(net|net6|tcp|tcp6)\\:\\/\\/(.*)(\\:(\\d*)\\/(.*)\\[data\\:\\s+(\\d*)\\]){0,1}"); //$NON-NLS-1$
+    /**
+     * Sub-pattern to pattern TRACE_NETWORK_PATH_PATTERN to match file protocol
+     */
+    public final static Pattern TRACE_FILE_PROTOCOL_PATTERN = Pattern.compile("(file)\\:\\/\\/(.*)"); //$NON-NLS-1$
     /**
      * Pattern to match for kernel domain information (lttng list <session>)
      */
