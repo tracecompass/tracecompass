@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
+import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.junit.Test;
 
 /**
@@ -53,7 +54,7 @@ public abstract class StateSystemTest {
     protected static ITmfStateSystem ssq;
 
     /* Offset in the trace + start time of the trace */
-    private static final long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
+    static final long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
 
     @Test
     public void testFullQuery1() {
@@ -366,5 +367,42 @@ public abstract class StateSystemTest {
 
         /* There should be 4 sub-attributes for each Thread node */
         assertEquals(4, list.size());
+    }
+
+    // ------------------------------------------------------------------------
+    // Tests verifying the *complete* results of a full queries
+    // ------------------------------------------------------------------------
+
+    protected long getStartTimes(int idx) {
+        return TestValues.startTimes[idx];
+    }
+
+    protected long getEndTimes(int idx) {
+        return TestValues.endTimes[idx];
+    }
+
+    protected ITmfStateValue getStateValues(int idx) {
+        return TestValues.values[idx];
+    }
+
+    @Test
+    public void testFullQueryThorough() {
+        try {
+            List<ITmfStateInterval> state = ssq.queryFullState(interestingTimestamp1);
+            assertEquals(TestValues.size, state.size());
+
+            for (int i = 0; i < state.size(); i++) {
+                /* Test each component of the intervals */
+                assertEquals(getStartTimes(i), state.get(i).getStartTime());
+                assertEquals(getEndTimes(i), state.get(i).getEndTime());
+                assertEquals(i, state.get(i).getAttribute());
+                assertEquals(getStateValues(i), state.get(i).getStateValue());
+            }
+
+        } catch (TimeRangeException e) {
+            fail();
+        } catch (StateSystemDisposedException e) {
+            fail();
+        }
     }
 }
