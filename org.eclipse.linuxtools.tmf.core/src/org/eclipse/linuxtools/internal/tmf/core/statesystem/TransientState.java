@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
+import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
 
 /**
  * The Transient State is used to build intervals from punctual state changes. It
@@ -48,14 +49,14 @@ class TransientState {
 
     private List<ITmfStateValue> ongoingStateInfo;
     private List<Long> ongoingStateStartTimes;
-    private List<Byte> stateValueTypes;
+    private List<Type> stateValueTypes;
 
     TransientState(IStateHistoryBackend backend) {
         this.backend = backend;
         isActive = true;
         ongoingStateInfo = new ArrayList<ITmfStateValue>();
         ongoingStateStartTimes = new ArrayList<Long>();
-        stateValueTypes = new ArrayList<Byte>();
+        stateValueTypes = new ArrayList<Type>();
 
         if (backend != null) {
             latestTime = backend.getStartTime();
@@ -118,7 +119,7 @@ class TransientState {
         int size = newStateIntervals.size();
         ongoingStateInfo = new ArrayList<ITmfStateValue>(size);
         ongoingStateStartTimes = new ArrayList<Long>(size);
-        stateValueTypes = new ArrayList<Byte>(size);
+        stateValueTypes = new ArrayList<Type>(size);
 
         for (ITmfStateInterval interval : newStateIntervals) {
             ongoingStateInfo.add(interval.getStateValue());
@@ -140,7 +141,7 @@ class TransientState {
          * change.
          */
         ongoingStateInfo.add(TmfStateValue.nullValue());
-        stateValueTypes.add((byte) -1);
+        stateValueTypes.add(Type.NULL);
 
         if (backend == null) {
             ongoingStateStartTimes.add(0L);
@@ -187,20 +188,20 @@ class TransientState {
             AttributeNotFoundException, StateValueTypeException {
         assert (this.isActive);
 
-        byte expectedSvType = stateValueTypes.get(index);
+        Type expectedSvType = stateValueTypes.get(index);
         checkValidAttribute(index);
 
         /*
          * Make sure the state value type we're inserting is the same as the
          * one registered for this attribute.
          */
-        if (expectedSvType == -1) {
+        if (expectedSvType == Type.NULL) {
             /*
              * The value hasn't been used yet, set it to the value
              * we're currently inserting (which might be null/-1 again).
              */
             stateValueTypes.set(index, value.getType());
-        } else if ((value.getType() != -1) && (value.getType() != expectedSvType)) {
+        } else if ((value.getType() != Type.NULL) && (value.getType() != expectedSvType)) {
             /*
              * We authorize inserting null values in any type of attribute,
              * but for every other types, it needs to match our expectations!

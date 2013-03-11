@@ -28,8 +28,8 @@ final class StringStateValue extends TmfStateValue {
     }
 
     @Override
-    public byte getType() {
-        return ITmfStateValue.TYPE_STRING;
+    public Type getType() {
+        return Type.STRING;
     }
 
     @Override

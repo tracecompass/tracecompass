@@ -23,22 +23,28 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
  */
 public interface ITmfStateValue {
 
-    /** The 'byte' value associated to null state values (-1) */
-    public static final byte TYPE_NULL = -1;
-
-    /** The 'byte' value associated to integer state values (0) */
-    public static final byte TYPE_INTEGER = 0;
-
-    /** The 'byte' value associated to null state values (1) */
-    public static final byte TYPE_STRING = 1;
+    /**
+     * The supported types of state values
+     * @since 2.0
+     */
+    public enum Type {
+        /** Null value, for an interval not carrying any information */
+        NULL,
+        /** 32-bit integer value */
+        INTEGER,
+        /** Variable-length string value */
+        STRING
+    }
 
     /**
-     * Each implementation has to supply a "type" number. This will get written
-     * as-is in the History file to recognize the type, so it needs to be unique
+     * Each implementation has to define which one (among the supported types)
+     * they implement. There could be more than one implementation of each type,
+     * depending on the needs of the different users.
      *
-     * @return The unique "int8" assigned to this state value type
+     * @return The ITmfStateValue.Type enum representing the type of this value
+     * @since 2.0
      */
-    public byte getType();
+    public Type getType();
 
     /**
      * Only "null values" should return true here
