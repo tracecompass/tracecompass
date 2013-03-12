@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.ctf.core.event;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
@@ -136,7 +136,7 @@ public class EventDefinition implements IDefinitionScope {
         StructDeclaration mergedDeclaration = new StructDeclaration(1);
 
         /* Add fields from the stream */
-        HashMap<String, Definition> defs = streamContext.getDefinitions();
+        Map<String, Definition> defs = streamContext.getDefinitions();
         for (Entry<String, Definition> entry : defs.entrySet()) {
             mergedDeclaration.addField(entry.getKey(), entry.getValue().getDeclaration());
         }
@@ -239,7 +239,7 @@ public class EventDefinition implements IDefinitionScope {
 
     @Override
     public String toString() {
-        HashMap<String, Definition> definitions;
+        Map<String, Definition> definitions;
         List<String> list;
         StringBuilder retString = new StringBuilder();
         final String cr = System.getProperty("line.separator");//$NON-NLS-1$

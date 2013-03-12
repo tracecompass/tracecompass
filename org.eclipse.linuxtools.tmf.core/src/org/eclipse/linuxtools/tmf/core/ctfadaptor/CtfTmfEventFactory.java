@@ -13,9 +13,9 @@
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
@@ -103,7 +103,7 @@ public final class CtfTmfEventFactory {
         List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
 
         StructDefinition structFields = eventDef.getFields();
-        HashMap<String, Definition> definitions = structFields.getDefinitions();
+        Map<String, Definition> definitions = structFields.getDefinitions();
         String curFieldName = null;
         Definition curFieldDef;
         CtfTmfEventField curField;

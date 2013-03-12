@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNull;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
@@ -148,7 +148,7 @@ public class StructDefinitionTest {
      */
     @Test
     public void testGetDefinitions_1() {
-        HashMap<String, Definition> result = fixture.getDefinitions();
+        Map<String, Definition> result = fixture.getDefinitions();
         assertNotNull(result);
     }
 
