@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,6 +29,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferences;
 import org.eclipse.rse.services.shells.HostShellProcessAdapter;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
@@ -61,9 +62,6 @@ public class CommandShell implements ICommandShell {
 
     /** Default command separator */
     public final static char CMD_SEPARATOR = ';';
-
-    /** Default timeout value used for executing commands, in milliseconds */
-    private final static int DEFAULT_TIMEOUT_VALUE = 15000;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -212,7 +210,7 @@ public class CommandShell implements ICommandShell {
             fExecutor.execute(future);
 
             try {
-                return future.get(DEFAULT_TIMEOUT_VALUE, TimeUnit.MILLISECONDS);
+                return future.get(ControlPreferences.getInstance().getCommandTimeout(), TimeUnit.SECONDS);
             } catch (java.util.concurrent.ExecutionException ex) {
                 throw new ExecutionException(Messages.TraceControl_ExecutionFailure, ex);
             } catch (InterruptedException ex) {

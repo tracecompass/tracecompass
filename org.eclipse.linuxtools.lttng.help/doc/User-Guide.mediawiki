@@ -1171,17 +1171,21 @@ The Control View provides property information of selected tree component. Depen
 
 === LTTng Tracer Control Preferences ===
 
-Serveral LTTng 2.0 tracer control preferences exists which can be configured. To configure these preferences, select '''Window->Preferences''' from the top level menu. The preference display will open. Then select '''Tracing->LTTng Tracer Control Preferences'''. This preferences page allows the user to specify the tracing group of the user and allows the user to configure the logging of LTTng 2.0 tracer control commands and results to a file.
+Serveral LTTng 2.0 tracer control preferences exists which can be configured. To configure these preferences, select '''Window->Preferences''' from the top level menu. The preference display will open. Then select '''Tracing->LTTng Tracer Control Preferences'''. This preferences page allows the user to specify the tracing group of the user and to specify the command execution timeout as well as it allows the user to configure the logging of LTTng 2.0 tracer control commands and results to a file.
 
 [[Image:images/LTTng2Preferences.png]]
 
-To change the tracing group of the user which will be specified on each command line, enter the new group name in the '''Tracing Group''' text field and click ok. The default tracing group is '''tracing''' and can be restored by pressing the '''Restore Defaults''' button.
+To change the tracing group of the user which will be specified on each command line, enter the new group name in the '''Tracing Group''' text field and click button '''OK'''. The default tracing group is '''tracing''' and can be restored by pressing the '''Restore Defaults''' button.
 
 [[Image:images/LTTng2PreferencesGroup.png]]
 
-To configure logging of trace control commands and the corresponding command result to a file, selected the button  '''Logging'''. To append to an existing log file, select the '''Append''' button. Deselect the '''Append''' button to overwrite any existing log file. It's possible to specify a verbose level. There are 3 levels with inceasing verbosity from '''Level 1''' to '''Level 3'''. To change the verbosity level, select the relevant level or select '''None'''. If '''None''' is selected only commands and command results are logged. Then press on button '''Ok'''. The log file will be stored in the users home directory with the name ''lttng_tracer_control.log''. The name and location cannot be changed. To reset to default preferences, click on the button '''Restore Defaults'''.
+To configure logging of trace control commands and the corresponding command result to a file, selected the button  '''Logging'''. To append to an existing log file, select the '''Append''' button. Deselect the '''Append''' button to overwrite any existing log file. It's possible to specify a verbose level. There are 3 levels with inceasing verbosity from '''Level 1''' to '''Level 3'''. To change the verbosity level, select the relevant level or select '''None'''. If '''None''' is selected only commands and command results are logged. Then press on button '''OK'''. The log file will be stored in the users home directory with the name ''lttng_tracer_control.log''. The name and location cannot be changed. To reset to default preferences, click on the button '''Restore Defaults'''.
 
 [[Image:images/LTTng2PreferencesLogging.png]]
+
+To configure the LTTng command execution timeout, enter a timeout value into the text field '''Command Timeout (in seconds)''' and press on button '''OK'''. To reset to the default value of 15 seconds, click on the button '''Restore Defaults'''.
+
+[[Image:images/LTTng2PreferencesTimeout.png]]
 
 = LTTng Kernel Analysis =
 

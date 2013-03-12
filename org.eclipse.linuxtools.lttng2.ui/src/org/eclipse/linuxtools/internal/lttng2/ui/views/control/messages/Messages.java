@@ -255,6 +255,7 @@ final public class Messages extends NLS {
     public static String TraceControl_LoggingPreference;
     public static String TraceControl_LogfilePath;
     public static String TraceControl_AppendLogfilePreference;
+    public static String TraceControl_CommandTimeout;
 
     public static String TraceControl_VerboseLevelsPreference;
     public static String TraceControl_VerboseLevelNonePreference;
