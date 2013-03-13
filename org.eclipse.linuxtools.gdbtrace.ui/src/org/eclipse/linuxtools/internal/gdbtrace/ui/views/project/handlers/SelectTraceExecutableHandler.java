@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Bernd Hufmann - Improved trace selection
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.gdbtrace.ui.views.project.handlers;
@@ -30,7 +31,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * Handler for the Select Trace Excecutable command
+ * Handler for the Select Trace Executable command
  * @author Patrick Tasse
  */
 public class SelectTraceExecutableHandler extends AbstractHandler {
@@ -38,6 +39,11 @@ public class SelectTraceExecutableHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         Shell shell = HandlerUtil.getActiveShell(event);
+
+        // Get the selection before opening the dialog because otherwise the
+        // getCurrentSelection() call will always return null
+        ISelection selection = HandlerUtil.getCurrentSelection(event);
+
         SelectTraceExecutableDialog dialog = new SelectTraceExecutableDialog(shell);
         dialog.open();
         if (dialog.getReturnCode() != Window.OK) {
@@ -45,7 +51,6 @@ public class SelectTraceExecutableHandler extends AbstractHandler {
         }
         IPath tracedExecutable = dialog.getExecutablePath();
 
-        ISelection selection = HandlerUtil.getCurrentSelection(event);
         if (selection instanceof IStructuredSelection) {
             for (Object o : ((IStructuredSelection) selection).toList()) {
                 TmfTraceElement traceElement = (TmfTraceElement) o;
