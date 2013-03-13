@@ -10,6 +10,7 @@
  *   Marc Dumais - Initial implementation
  *   Francois Chouinard - Misc improvements, DSF signal handling, dynamic experiment
  *   Patrick Tasse - Updated for TMF 2.0
+ *   Bernd Hufmann - Fixed deadlock during shutdown
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.gdbtrace.trace;
@@ -33,7 +34,6 @@ import org.eclipse.cdt.dsf.debug.service.IRunControl.IContainerDMContext;
 import org.eclipse.cdt.dsf.debug.service.command.ICommandControlService;
 import org.eclipse.cdt.dsf.debug.service.command.ICommandControlService.ICommandControlDMContext;
 import org.eclipse.cdt.dsf.gdb.internal.GdbPlugin;
-import org.eclipse.cdt.dsf.gdb.internal.ui.GdbUIPlugin;
 import org.eclipse.cdt.dsf.gdb.launching.GdbLaunch;
 import org.eclipse.cdt.dsf.gdb.service.GDBTraceControl_7_2.TraceRecordSelectedChangedEvent;
 import org.eclipse.cdt.dsf.gdb.service.IGDBTraceControl;
@@ -318,17 +318,12 @@ public class DsfGdbAdaptor {
     public void dispose() {
         if (fLaunch != null && fLaunch.canTerminate() && !isTerminating) {
             isTerminating = true;
-            GdbUIPlugin.getShell().getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        fLaunch.terminate();
-                    } catch (DebugException e) {
-                        e.printStackTrace();
-                    }
-                    fLaunch = null;
-                }
-            });
+            try {
+                fLaunch.terminate();
+            } catch (DebugException e) {
+                e.printStackTrace();
+            }
+            fLaunch = null;
         }
     }
 
