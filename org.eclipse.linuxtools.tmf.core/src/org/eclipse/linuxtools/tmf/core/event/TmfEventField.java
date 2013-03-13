@@ -282,4 +282,12 @@ public class TmfEventField implements ITmfEventField {
         }
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String getFormattedValue() {
+        return getValue().toString();
+    }
+
 }

@@ -132,7 +132,7 @@ public class TmfEventPropertySource implements IPropertySource {
             if (field.getFields() != null && field.getFields().length > 0) {
                 return new ContentPropertySource(field);
             }
-            return field.getValue();
+            return field.getFormattedValue();
         }
 
         @Override
