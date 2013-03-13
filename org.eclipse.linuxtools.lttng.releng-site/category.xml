@@ -6,7 +6,7 @@
    <feature url="features/org.eclipse.linuxtools.lttng2.kernel_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng2.kernel" version="0.0.0">
       <category name="LTTng"/>
    </feature>
-   <feature url="features/org.eclipse.linuxtools.gdbtrace_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.gdbtrace" version="0.0.0.qualifier">
+   <feature url="features/org.eclipse.linuxtools.gdbtrace_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.gdbtrace" version="0.0.0">
       <category name="LTTng"/>
    </feature>
    <category-def name="LTTng" label="Linux Tracing Toolkit"/>
