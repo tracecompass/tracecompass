@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.linuxtools.internal.gdbtrace.ui.GdbTraceUiPlugin;
+import org.eclipse.linuxtools.internal.gdbtrace.ui.GdbTraceUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -51,9 +51,9 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
  */
 public class SelectTraceExecutableDialog extends SelectionStatusDialog {
 
-    private final IStatus OK_STATUS = new Status(IStatus.OK, GdbTraceUiPlugin.PLUGIN_ID, ""); //$NON-NLS-1$
-    private final IStatus PATH_ERROR_STATUS = new Status(IStatus.ERROR, GdbTraceUiPlugin.PLUGIN_ID, Messages.SelectTraceExecutableDialog_Message);
-    private final IStatus BINARY_ERROR_STATUS = new Status(IStatus.ERROR, GdbTraceUiPlugin.PLUGIN_ID, Messages.SelectTraceExecutableDialog_BinaryError);
+    private final IStatus OK_STATUS = new Status(IStatus.OK, GdbTraceUIPlugin.PLUGIN_ID, ""); //$NON-NLS-1$
+    private final IStatus PATH_ERROR_STATUS = new Status(IStatus.ERROR, GdbTraceUIPlugin.PLUGIN_ID, Messages.SelectTraceExecutableDialog_Message);
+    private final IStatus BINARY_ERROR_STATUS = new Status(IStatus.ERROR, GdbTraceUIPlugin.PLUGIN_ID, Messages.SelectTraceExecutableDialog_BinaryError);
 
     private Text fExecutableNameEntry;
     private IPath fExecutablePath;

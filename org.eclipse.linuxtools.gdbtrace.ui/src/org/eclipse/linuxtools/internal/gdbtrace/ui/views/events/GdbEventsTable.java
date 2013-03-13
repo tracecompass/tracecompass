@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.internal.gdbtrace.ui.views.events;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.linuxtools.internal.gdbtrace.event.GdbTraceEvent;
-import org.eclipse.linuxtools.internal.gdbtrace.event.GdbTraceEventContent;
-import org.eclipse.linuxtools.internal.gdbtrace.trace.GdbTrace;
+import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent;
+import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEventContent;
+import org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;

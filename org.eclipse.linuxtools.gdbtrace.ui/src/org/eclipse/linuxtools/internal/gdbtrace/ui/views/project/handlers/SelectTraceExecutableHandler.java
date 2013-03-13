@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.linuxtools.internal.gdbtrace.trace.GdbTrace;
+import org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.linuxtools.internal.gdbtrace.ui.views.project.dialogs.SelectTraceExecutableDialog;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.widgets.MessageBox;

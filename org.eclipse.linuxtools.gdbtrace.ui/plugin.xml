@@ -26,11 +26,11 @@
       </category>
       <type
             category="org.eclipse.linuxtools.gdbtrace.ui.category"
-            event_type="org.eclipse.linuxtools.internal.gdbtrace.event.GdbTraceEvent"
+            event_type="org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent"
             icon="icons/obj16/gdb_icon16.png"
             id="org.eclipse.linuxtools.gdbtrace.ui.type.gdb"
             name="GDB Trace"
-            trace_type="org.eclipse.linuxtools.internal.gdbtrace.trace.GdbTrace">
+            trace_type="org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace">
          <eventsTableType
                class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventsTable">
          </eventsTableType>

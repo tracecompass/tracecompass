@@ -14,7 +14,7 @@
 package org.eclipse.linuxtools.internal.gdbtrace.ui.views;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.linuxtools.internal.gdbtrace.ui.GdbTraceUiPlugin;
+import org.eclipse.linuxtools.internal.gdbtrace.ui.GdbTraceUIPlugin;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -31,7 +31,7 @@ public class GdbPerspectiveFactory implements IPerspectiveFactory {
     // ------------------------------------------------------------------------
 
     /** The perspective ID */
-    public static final String ID = GdbTraceUiPlugin.PLUGIN_ID + ".perspective"; //$NON-NLS-1$
+    public static final String ID = GdbTraceUIPlugin.PLUGIN_ID + ".perspective"; //$NON-NLS-1$
 
     // Folders
     private static final String EditorArea         = IPageLayout.ID_EDITOR_AREA;

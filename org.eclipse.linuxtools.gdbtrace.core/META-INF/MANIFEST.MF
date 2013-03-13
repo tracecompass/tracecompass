@@ -4,7 +4,7 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.gdbtrace.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
-Bundle-Activator: org.eclipse.linuxtools.internal.gdbtrace.GdbTraceCorePlugin
+Bundle-Activator: org.eclipse.linuxtools.internal.gdbtrace.core.GdbTraceCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.ide,
@@ -15,9 +15,9 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.eclipse.linuxtools.internal.gdbtrace;x-internal:=true,
- org.eclipse.linuxtools.internal.gdbtrace.event;x-friends:="org.eclipse.linuxtools.gdbtrace.ui",
- org.eclipse.linuxtools.internal.gdbtrace.trace;x-friends:="org.eclipse.linuxtools.gdbtrace.ui"
+Export-Package: org.eclipse.linuxtools.internal.gdbtrace.core;x-internal:=true,
+ org.eclipse.linuxtools.internal.gdbtrace.core.event;x-friends:="org.eclipse.linuxtools.gdbtrace.ui",
+ org.eclipse.linuxtools.internal.gdbtrace.core.trace;x-friends:="org.eclipse.linuxtools.gdbtrace.ui"
 Import-Package: org.eclipse.cdt.dsf.concurrent,
  org.eclipse.cdt.dsf.datamodel,
  org.eclipse.cdt.dsf.debug.service,

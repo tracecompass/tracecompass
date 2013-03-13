@@ -11,27 +11,25 @@
  *   Patrick Tasse - Updated for TMF 2.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.gdbtrace;
+package org.eclipse.linuxtools.internal.gdbtrace.ui;
 
-import org.eclipse.core.runtime.Plugin;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * GDB Tracepoint Analysis Core plug-in activator
+ * GDB Tracepoint Analysis UI plug-in activator
  * @author Francois Chouinard
  */
-public class GdbTraceCorePlugin extends Plugin {
+public class GdbTraceUIPlugin extends AbstractUIPlugin {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     /** The plug-in ID */
-    public static final String PLUGIN_ID = "org.eclipse.linuxtools.gdbtrace"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "org.eclipse.linuxtools.gdbtrace.ui"; //$NON-NLS-1$
 
-    private static GdbTraceCorePlugin plugin;
-
-    private static BundleContext fBundleContext;
+    private static GdbTraceUIPlugin plugin;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -40,18 +38,17 @@ public class GdbTraceCorePlugin extends Plugin {
     /**
      * Constructor
      */
-    public GdbTraceCorePlugin() {
+    public GdbTraceUIPlugin() {
     }
 
     // ------------------------------------------------------------------------
-    // Plugin
+    // AbstractUIPlugin
     // ------------------------------------------------------------------------
 
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        fBundleContext = context;
     }
 
     @Override
@@ -65,21 +62,12 @@ public class GdbTraceCorePlugin extends Plugin {
     // ------------------------------------------------------------------------
 
     /**
-     * Returns the GDB Tracepoints Core plug-in instance.
+     * Returns the GDB Tracepoints UI plug-in instance.
      *
-     * @return the GDB Tracepoints Core plug-in instance
+     * @return the GDB Tracepoints UI plug-in instance
      */
-    public static GdbTraceCorePlugin getDefault() {
+    public static GdbTraceUIPlugin getDefault() {
         return plugin;
-    }
-
-    /**
-     * Returns the bundle context
-     *
-     * @return the bundle context
-     */
-    public static BundleContext getBundleContext() {
-        return fBundleContext;
     }
 
 }

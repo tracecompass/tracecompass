@@ -12,14 +12,14 @@
  *   Patrick Tasse - Updated for TMF 2.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.gdbtrace.trace;
+package org.eclipse.linuxtools.internal.gdbtrace.core.trace;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.linuxtools.internal.gdbtrace.GdbTraceCorePlugin;
-import org.eclipse.linuxtools.internal.gdbtrace.event.GdbTraceEvent;
+import org.eclipse.linuxtools.internal.gdbtrace.core.GdbTraceCorePlugin;
+import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;

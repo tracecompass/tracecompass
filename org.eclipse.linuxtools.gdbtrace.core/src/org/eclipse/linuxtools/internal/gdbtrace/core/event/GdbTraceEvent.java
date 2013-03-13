@@ -11,9 +11,9 @@
  *   Patrick Tasse - Updated for TMF 2.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.gdbtrace.event;
+package org.eclipse.linuxtools.internal.gdbtrace.core.event;
 
-import org.eclipse.linuxtools.internal.gdbtrace.trace.GdbTrace;
+import org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;

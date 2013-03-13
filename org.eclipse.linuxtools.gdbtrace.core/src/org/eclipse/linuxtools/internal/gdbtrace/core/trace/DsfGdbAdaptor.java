@@ -13,7 +13,7 @@
  *   Bernd Hufmann - Fixed deadlock during shutdown
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.gdbtrace.trace;
+package org.eclipse.linuxtools.internal.gdbtrace.core.trace;
 
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -75,9 +75,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.linuxtools.internal.gdbtrace.GdbTraceCorePlugin;
-import org.eclipse.linuxtools.internal.gdbtrace.event.GdbTraceEvent;
-import org.eclipse.linuxtools.internal.gdbtrace.event.GdbTraceEventContent;
+import org.eclipse.linuxtools.internal.gdbtrace.core.GdbTraceCorePlugin;
+import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent;
+import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEventContent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
