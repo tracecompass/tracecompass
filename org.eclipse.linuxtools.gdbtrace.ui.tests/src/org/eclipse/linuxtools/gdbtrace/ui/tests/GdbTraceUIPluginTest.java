@@ -34,7 +34,7 @@ public class GdbTraceUIPluginTest {
 
     @Test
     public void testPluginId() {
-        assertEquals("Plugin ID", "org.eclipse.linuxtools.gdbtrace.core", GdbTraceUIPlugin.PLUGIN_ID);
+        assertEquals("Plugin ID", "org.eclipse.linuxtools.gdbtrace.ui", GdbTraceUIPlugin.PLUGIN_ID);
     }
 
     @Test
