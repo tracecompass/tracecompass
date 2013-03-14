@@ -73,9 +73,15 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     public void synchToTimeRange(TmfRangeSynchSignal signal) {
         // Set results so that it can be validated in the test case
         setSignalReceived(true);
-        setSourceError(getSource() != signal.getSource());
-        setCurrentTimeError(!getCurrentTime().equals(signal.getCurrentTime()));
-        setRangeError(!getCurrentRange().equals(signal.getCurrentRange()));
+        if (getSource() != null) {
+            setSourceError(getSource() != signal.getSource());
+        }
+        if (getCurrentTime() != null) {
+            setCurrentTimeError(!getCurrentTime().equals(signal.getCurrentTime()));
+        }
+        if (getCurrentRange() != null) {
+            setRangeError(!getCurrentRange().equals(signal.getCurrentRange()));
+        }
     }
 
     /**

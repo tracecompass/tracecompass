@@ -97,6 +97,7 @@ public class TmfUml2SDSyncLoaderFindTest {
     public static void setUpClass() {
         fFacility = Uml2SDTestFacility.getInstance();
         fFacility.selectExperiment();
+        fTmfComponent = new Uml2SDSignalValidator();
     }
 
     /**
@@ -104,6 +105,7 @@ public class TmfUml2SDSyncLoaderFindTest {
      */
     @AfterClass
     public static void tearDownClass() {
+        fTmfComponent.dispose();
         fFacility.disposeExperiment();
         fFacility = null;
     }
@@ -117,7 +119,8 @@ public class TmfUml2SDSyncLoaderFindTest {
      */
     @Test
     public void verifyISDGraphNodeSupporter() {
-        fTmfComponent = new Uml2SDSignalValidator();
+
+        fFacility.firstPage();
 
         assertTrue("isNodeSupported", fFacility.getLoader().isNodeSupported(ISDGraphNodeSupporter.LIFELINE));
         assertTrue("isNodeSupported", fFacility.getLoader().isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGE));
@@ -144,6 +147,8 @@ public class TmfUml2SDSyncLoaderFindTest {
      */
     @Test
     public void verifyFirstMessage() {
+        fFacility.firstPage();
+
         criteria = new Criteria();
         criteria.setSyncMessageSelected(true);
         criteria.setExpression("GAME_.*");
@@ -174,16 +179,14 @@ public class TmfUml2SDSyncLoaderFindTest {
         assertEquals("find", TC_002_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("find", TC_002_START_LIFELINE, msg.getStartLifeline().getName());
         assertEquals("find", TC_002_END_LIFELINE, msg.getEndLifeline().getName());
-    }
 
-    /**
-     * Verify 2nd message find within page.
-     *
-     * Verified Methods: loader.find(), loader.moveToMessage()
-     * Expected result: Correct message is selected
-     */
-    @Test
-    public void verifySecondMessage() {
+        /**
+         * Verify 2nd message find within page.
+         *
+         * Verified Methods: loader.find(), loader.moveToMessage()
+         * Expected result: Correct message is selected
+         */
+
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_003_TIME_VALUE);
@@ -211,16 +214,13 @@ public class TmfUml2SDSyncLoaderFindTest {
         assertEquals("find", TC_003_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("find", TC_003_START_LIFELINE, msg.getStartLifeline().getName());
         assertEquals("find", TC_003_END_LIFELINE, msg.getEndLifeline().getName());
-    }
 
-    /**
-     * Verify 1st message across page.
-     *
-     * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
-     * Expected result: Correct message is selected
-     */
-    @Test
-    public void verifyFirstMesage() {
+        /**
+         * Verify 1st message across page.
+         *
+         * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
+         * Expected result: Correct message is selected
+         */
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_004_TIME_VALUE);
@@ -255,7 +255,6 @@ public class TmfUml2SDSyncLoaderFindTest {
 
         // cancel find and go back to first page
         fFacility.getLoader().cancel();
-        fFacility.firstPage();
     }
 
     /**
@@ -266,6 +265,8 @@ public class TmfUml2SDSyncLoaderFindTest {
      */
     @Test
     public void verifyFind() {
+        fFacility.firstPage();
+
         criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.FIRST_PLAYER_NAME);
@@ -280,16 +281,13 @@ public class TmfUml2SDSyncLoaderFindTest {
         assertTrue(selection.get(0) instanceof Lifeline);
         lifeline = (Lifeline) selection.get(0);
         assertEquals("find", TC_005_LIFELINE_NAME, lifeline.getName());
-    }
 
-    /**
-     * Verify lifeline across page.
-     *
-     * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
-     * Expected result: Correct message is selected
-     */
-    @Test
-    public void verifyLifeline() {
+        /**
+         * Verify lifeline across page.
+         *
+         * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
+         * Expected result: Correct message is selected
+         */
         criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.SECOND_PLAYER_NAME);
@@ -309,10 +307,8 @@ public class TmfUml2SDSyncLoaderFindTest {
         lifeline = (Lifeline) selection.get(0);
         assertEquals("find", TC_006_LIFELINE_NAME, lifeline.getName());
 
-
         // cancel find and go back to first page
         fFacility.getLoader().cancel();
-        fFacility.firstPage();
     }
 
     /**
@@ -323,6 +319,9 @@ public class TmfUml2SDSyncLoaderFindTest {
      */
     @Test
     public void verifyCancelSearch() {
+
+        fFacility.firstPage();
+
         criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.SECOND_PLAYER_NAME);
@@ -332,6 +331,9 @@ public class TmfUml2SDSyncLoaderFindTest {
         fFacility.getLoader().cancel();
 
         assertEquals("find", 0, fFacility.getLoader().currentPage()); // we are still at the first page
-        fTmfComponent.dispose();
+
+        // cancel find and go back to first page
+        fFacility.getLoader().cancel();
+        fFacility.firstPage();
     }
 }
