@@ -101,8 +101,10 @@ public class Messages extends NLS {
     public static String TmfTimeLegend_StateTypeName;
     public static String TmfTimeFilterDialog_WINDOW_TITLE;
     public static String TmfTimeFilterDialog_MESSAGE;
-    public static String TmfTimeFilterDialog_SELECT_ALL;
-    public static String TmfTimeFilterDialog_DESELECT_ALL;
+    public static String TmfTimeFilterDialog_CHECK_ALL;
+    public static String TmfTimeFilterDialog_UNCHECK_ALL;
+    public static String TmfTimeFilterDialog_CHECK_SELECTED;
+    public static String TmfTimeFilterDialog_UNCHECK_SELECTED;
 
     public static String TmfTimeTipHandler_DURATION;
     public static String TmfTimeTipHandler_TRACE_DATE;
