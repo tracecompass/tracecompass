@@ -80,19 +80,20 @@ public class GenerateTestValues {
         writer.println("State values:");
         for (ITmfStateInterval interval : fullState) {
             ITmfStateValue val = interval.getStateValue();
+
             switch (val.getType()) {
             case NULL:
                 writer.println("TmfStateValue.nullValue(),");
                 break;
-
             case INTEGER:
                 writer.println("TmfStateValue.newValueInt(" + val.unboxInt() + "),");
                 break;
-
+            case LONG:
+                writer.println("TmfStateValue.newValueLong(" + val.unboxLong() +"),");
+                break;
             case STRING:
                 writer.println("TmfStateValue.newValueString(\"" + val.unboxStr() + "\"),");
                 break;
-
             default:
                 writer.println(val.toString());
                 break;
