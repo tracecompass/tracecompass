@@ -113,8 +113,7 @@ public class BitBufferTest {
         ByteBuffer result = fixture.getByteBuffer();
 
         assertNotNull(result);
-        assertEquals(
-                "java.nio.HeapByteBuffer[pos=0 lim=0 cap=0]", result.toString()); //$NON-NLS-1$
+        assertEquals("java.nio.HeapByteBuffer[pos=0 lim=0 cap=0]", result.toString());
         assertEquals(false, result.isDirect());
         assertEquals(true, result.hasArray());
         assertEquals(0, result.arrayOffset());
@@ -134,7 +133,7 @@ public class BitBufferTest {
         ByteOrder result = fixture.getByteOrder();
 
         assertNotNull(result);
-        assertEquals("BIG_ENDIAN", result.toString()); //$NON-NLS-1$
+        assertEquals("BIG_ENDIAN", result.toString());
     }
 
     /**
@@ -145,7 +144,7 @@ public class BitBufferTest {
         ByteOrder result = fixture.getByteOrder();
 
         assertNotNull(result);
-        assertEquals("BIG_ENDIAN", result.toString()); //$NON-NLS-1$
+        assertEquals("BIG_ENDIAN", result.toString());
     }
 
     /**

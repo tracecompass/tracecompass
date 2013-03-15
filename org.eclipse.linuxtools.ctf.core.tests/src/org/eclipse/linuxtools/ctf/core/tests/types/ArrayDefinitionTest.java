@@ -72,14 +72,14 @@ public class ArrayDefinitionTest {
     }
 
     private ArrayDefinition createLongArray() {
-        IntegerDeclaration decl = new IntegerDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none",8); //$NON-NLS-1$
+        IntegerDeclaration decl = new IntegerDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none",8);
         IntegerDefinition[] defs = createIntDefs(10, 32);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
     }
 
     private ArrayDefinition createCharArray() {
-        IntegerDeclaration decl = new IntegerDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none",8); //$NON-NLS-1$
+        IntegerDeclaration decl = new IntegerDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none",8);
         IntegerDefinition[] defs = createIntDefs(4,8);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
@@ -103,7 +103,7 @@ public class ArrayDefinitionTest {
     private ArrayDefinition setUpDeclaration(IDeclaration decl,
             Definition[] defs) {
         ArrayDeclaration ad = new ArrayDeclaration(0, decl);
-        ArrayDefinition temp = new ArrayDefinition(ad , this.trace , "Testx"); //$NON-NLS-1$
+        ArrayDefinition temp = new ArrayDefinition(ad , this.trace , "Testx");
         temp.setDefinitions(defs);
         return temp;
     }
@@ -116,7 +116,7 @@ public class ArrayDefinitionTest {
         IntegerDefinition[] defs = new IntegerDefinition[size];
         for (int i = 0; i < size; i++) {
 
-            String content = "test" + i; //$NON-NLS-1$
+            String content = "test" + i;
             defs[i] = new IntegerDefinition(new IntegerDeclaration(bits, false,
                     16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content, 24), null, content);
             defs[i].setValue(i);
@@ -136,7 +136,7 @@ public class ArrayDefinitionTest {
         StringDefinition[] defs = new StringDefinition[size];
         for (int i = 0; i < size; i++) {
 
-            String content = "test" + i; //$NON-NLS-1$
+            String content = "test" + i;
             defs[i] = new StringDefinition(
                     new StringDeclaration(Encoding.UTF8), null, content);
             defs[i].setString(new StringBuilder(content));
@@ -151,11 +151,9 @@ public class ArrayDefinitionTest {
     @Test
     public void testArrayDefinition_baseDeclaration() {
         ArrayDeclaration declaration = charArrayFixture.getDeclaration();
-        String fieldName = ""; //$NON-NLS-1$
+        String fieldName = "";
 
-        ArrayDefinition result = new ArrayDefinition(declaration, this.trace,
-                fieldName);
-
+        ArrayDefinition result = new ArrayDefinition(declaration, this.trace, fieldName);
         assertNotNull(result);
     }
 
@@ -168,11 +166,9 @@ public class ArrayDefinitionTest {
         ArrayDeclaration declaration = new ArrayDeclaration(0,
                 new StringDeclaration());
         IDefinitionScope definitionScope = null;
-        String fieldName = ""; //$NON-NLS-1$
+        String fieldName = "";
 
-        ArrayDefinition result = new ArrayDefinition(declaration,
-                definitionScope, fieldName);
-
+        ArrayDefinition result = new ArrayDefinition(declaration, definitionScope, fieldName);
         assertNotNull(result);
     }
 
@@ -223,8 +219,6 @@ public class ArrayDefinitionTest {
         assertFalse(result);
     }
 
-
-
     /**
      * Run the boolean isString() method test.
      */
@@ -233,8 +227,7 @@ public class ArrayDefinitionTest {
         final IntegerDeclaration id = new IntegerDeclaration(8, false, 16,
                 ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null, 8);
         ArrayDeclaration ad = new ArrayDeclaration(0, id);
-        ArrayDefinition ownFixture = new ArrayDefinition(ad, this.trace,
-                "Testx"); //$NON-NLS-1$
+        ArrayDefinition ownFixture = new ArrayDefinition(ad, this.trace, "Testx");
 
         int size = 4;
         int bits = 8;
@@ -245,8 +238,6 @@ public class ArrayDefinitionTest {
 
         assertTrue(result);
     }
-
-
 
     /**
      * Run the boolean isString() method test.

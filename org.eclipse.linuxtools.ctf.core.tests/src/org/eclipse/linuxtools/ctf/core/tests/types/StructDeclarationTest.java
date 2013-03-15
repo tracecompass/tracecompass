@@ -71,7 +71,7 @@ public class StructDeclarationTest {
         assertNotNull(fixture);
         assertEquals(1L, fixture.getMaxAlign());
 
-        String regex = "^\\[declaration\\] struct\\[[0-9a-f]{1,8}\\]$"; //$NON-NLS-1$
+        String regex = "^\\[declaration\\] struct\\[[0-9a-f]{1,8}\\]$";
         assertTrue(fixture.toString().matches(regex));
     }
 
@@ -80,7 +80,7 @@ public class StructDeclarationTest {
      */
     @Test
     public void testAddField() {
-        String name = ""; //$NON-NLS-1$
+        String name = "";
         IDeclaration declaration = new StringDeclaration();
         fixture.addField(name, declaration);
     }
@@ -91,7 +91,7 @@ public class StructDeclarationTest {
      */
     @Test
     public void testCreateDefinition() {
-        String fieldName = ""; //$NON-NLS-1$
+        String fieldName = "";
         StructDefinition result = fixture.createDefinition(null, fieldName);
         assertNotNull(result);
     }
@@ -132,7 +132,7 @@ public class StructDeclarationTest {
      */
     @Test
     public void testHasField() {
-        String name = ""; //$NON-NLS-1$
+        String name = "";
         boolean result = fixture.hasField(name);
 
         assertEquals(false, result);
@@ -146,6 +146,6 @@ public class StructDeclarationTest {
         String result = fixture.toString();
         String trunc = result.substring(0, 21);
 
-        assertEquals("[declaration] struct[", trunc); //$NON-NLS-1$
+        assertEquals("[declaration] struct[", trunc);
     }
 }

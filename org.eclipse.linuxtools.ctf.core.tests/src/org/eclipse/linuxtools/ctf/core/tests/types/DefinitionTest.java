@@ -82,7 +82,7 @@ public class DefinitionTest {
 
     @Test
     public void testToString() {
-        Definition fixture = new DefTest(null, "Hello"); //$NON-NLS-1$
+        Definition fixture = new DefTest(null, "Hello");
         String result = fixture.toString();
 
         assertNotNull(result);

@@ -41,19 +41,19 @@ public class CtfCorePluginTest {
     @Test
     public void testCtfCorePluginId() {
         assertEquals(
-                "Plugin ID", "org.eclipse.linuxtools.ctf", Activator.PLUGIN_ID); //$NON-NLS-1$ //$NON-NLS-2$
+                "Plugin ID", "org.eclipse.linuxtools.ctf", Activator.PLUGIN_ID);
     }
 
     @Test
     public void testGetDefault() {
         Activator plugin = Activator.getDefault();
-        assertEquals("getDefault()", plugin, fPlugin); //$NON-NLS-1$
+        assertEquals("getDefault()", plugin, fPlugin);
     }
 
     @Test
     public void testLog() {
         try {
-            Activator.getDefault().log("Some message"); //$NON-NLS-1$
+            Activator.getDefault().log("Some message");
         } catch (Exception e) {
             fail();
         }

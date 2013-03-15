@@ -88,7 +88,7 @@ public class StreamInputReaderTest {
              * For the tests, we'll use the stream input corresponding to the
              * CPU 0
              */
-            if (si.getFilename().endsWith("0_0")) { //$NON-NLS-1$
+            if (si.getFilename().endsWith("0_0")) {
                 retVal = new StreamInputReader(si);
                 break;
             }
@@ -114,7 +114,7 @@ public class StreamInputReaderTest {
     @Test(expected = CTFReaderException.class)
     public void testStreamInputReader_invalid() throws CTFReaderException {
         StreamInput streamInput = new StreamInput(
-                new Stream(new CTFTrace("")), (FileChannel) null, CtfTestTraces.getEmptyFile()); //$NON-NLS-1$
+                new Stream(new CTFTrace("")), (FileChannel) null, CtfTestTraces.getEmptyFile());
 
         StreamInputReader result = new StreamInputReader(streamInput);
         assertNotNull(result);

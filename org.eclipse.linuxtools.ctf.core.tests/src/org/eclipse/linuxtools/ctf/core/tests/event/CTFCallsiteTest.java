@@ -46,7 +46,6 @@ public class CTFCallsiteTest {
         // Add additional tear down code here
     }
 
-    @SuppressWarnings("nls")
     private static CTFCallsite GenerateCS(long ip){
         return new CTFCallsite("event name", "func name", ip, "file.java", 1);
     }
@@ -92,7 +91,7 @@ public class CTFCallsiteTest {
     @Test
     public void toStringTest(){
         CTFCallsite cs = GenerateCS(0x01);
-        assertEquals("file.java/func name:1", cs.toString()); //$NON-NLS-1$
+        assertEquals("file.java/func name:1", cs.toString());
     }
 
     /**

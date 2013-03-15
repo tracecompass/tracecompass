@@ -76,7 +76,7 @@ public class EnumDeclarationTest {
         EnumDeclaration result = new EnumDeclaration(containerType);
 
         assertNotNull(result);
-        String left = "[declaration] enum["; //$NON-NLS-1$
+        String left = "[declaration] enum[";
         assertEquals(left, result.toString().substring(0, left.length()));
     }
 
@@ -87,7 +87,7 @@ public class EnumDeclarationTest {
     public void testAdd() {
         long low = 1L;
         long high = 1L;
-        String label = ""; //$NON-NLS-1$
+        String label = "";
 
         boolean result = fixture.add(low, high, label);
 
@@ -101,7 +101,7 @@ public class EnumDeclarationTest {
     @Test
     public void testCreateDefinition() {
         IDefinitionScope definitionScope = null;
-        String fieldName = ""; //$NON-NLS-1$
+        String fieldName = "";
 
         EnumDefinition result = fixture.createDefinition(definitionScope,
                 fieldName);
@@ -127,7 +127,7 @@ public class EnumDeclarationTest {
     public void testToString() {
         String result = fixture.toString();
 
-        String left = "[declaration] enum["; //$NON-NLS-1$
+        String left = "[declaration] enum[";
         assertEquals(left, result.substring(0, left.length()));
     }
 }

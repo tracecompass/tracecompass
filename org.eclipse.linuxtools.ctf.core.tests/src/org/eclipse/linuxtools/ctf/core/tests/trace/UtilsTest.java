@@ -94,7 +94,7 @@ public class UtilsTest {
         assertNotNull(result);
         assertEquals(72339069014638592L, result.getLeastSignificantBits());
         assertEquals(72339069014638592L, result.getMostSignificantBits());
-        assertEquals("01010000-0000-0000-0101-000000000000", result.toString()); //$NON-NLS-1$
+        assertEquals("01010000-0000-0000-0101-000000000000", result.toString());
         assertEquals(0, result.variant());
         assertEquals(0, result.version());
     }
@@ -113,7 +113,7 @@ public class UtilsTest {
         assertNotNull(result);
         assertEquals(0L, result.getLeastSignificantBits());
         assertEquals(0L, result.getMostSignificantBits());
-        assertEquals("00000000-0000-0000-0000-000000000000", result.toString()); //$NON-NLS-1$
+        assertEquals("00000000-0000-0000-0000-000000000000", result.toString());
         assertEquals(0, result.variant());
         assertEquals(0, result.version());
     }

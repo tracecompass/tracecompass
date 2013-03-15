@@ -91,7 +91,7 @@ public class CTFTraceReaderTest {
      */
     @Test(expected = org.eclipse.linuxtools.ctf.core.trace.CTFReaderException.class)
     public void testOpen_nonexisting() throws CTFReaderException {
-        CTFTrace trace = new CTFTrace("badfile.bad"); //$NON-NLS-1$
+        CTFTrace trace = new CTFTrace("badfile.bad");
 
         CTFTraceReader result = new CTFTraceReader(trace);
         assertNotNull(result);
@@ -105,7 +105,7 @@ public class CTFTraceReaderTest {
      */
     @Test(expected = org.eclipse.linuxtools.ctf.core.trace.CTFReaderException.class)
     public void testOpen_invalid() throws CTFReaderException {
-        CTFTrace trace = new CTFTrace(""); //$NON-NLS-1$
+        CTFTrace trace = new CTFTrace("");
 
         CTFTraceReader result = new CTFTraceReader(trace);
         assertNotNull(result);

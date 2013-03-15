@@ -41,7 +41,6 @@ import org.junit.Test;
  *
  * @author ematkho
  */
-@SuppressWarnings("nls")
 public class CTFTraceTest {
 
     private static final int TRACE_INDEX = 0;

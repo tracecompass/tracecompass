@@ -45,7 +45,7 @@ import org.junit.Test;
 @SuppressWarnings("javadoc")
 public class CTFEventFieldTest {
 
-    private static final String fieldName = "id"; //$NON-NLS-1$
+    private static final String fieldName = "id";
 
 
     /**
@@ -83,7 +83,7 @@ public class CTFEventFieldTest {
         int len = 32;
         IntegerDeclaration id = new IntegerDeclaration(len, false, len,
                 ByteOrder.LITTLE_ENDIAN, Encoding.ASCII, null, 32);
-        String lengthName = "LengthName"; //$NON-NLS-1$
+        String lengthName = "LengthName";
         StructDeclaration structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);
         StructDefinition structDef = new StructDefinition(structDec, null,
@@ -91,7 +91,7 @@ public class CTFEventFieldTest {
 
         structDef.lookupInteger(lengthName).setValue(32);
         SequenceDeclaration sd = new SequenceDeclaration(lengthName, id);
-        Definition fieldDef = new SequenceDefinition(sd, structDef, "TestX"); //$NON-NLS-1$
+        Definition fieldDef = new SequenceDefinition(sd, structDef, "TestX");
         ByteBuffer byb = ByteBuffer.allocate(1024);
         for (int i = 0; i < 1024; i++) {
             byb.put((byte) i);
@@ -134,9 +134,9 @@ public class CTFEventFieldTest {
     public void testParseField_simple3() {
         StringDefinition fieldDef = new StringDefinition(
                 new StringDeclaration(), null, fieldName);
-        fieldDef.setString(new StringBuilder("Hello World")); //$NON-NLS-1$
+        fieldDef.setString(new StringBuilder("Hello World"));
 
-        String other = "\"Hello World\""; //$NON-NLS-1$
+        String other = "\"Hello World\"";
         assertNotNull(fieldDef);
         assertEquals(fieldDef.toString(), other);
     }
@@ -187,7 +187,7 @@ public class CTFEventFieldTest {
         ((IntegerDefinition) ((ArrayDefinition) fieldDef).getDefinitions()[11]).setValue(0);
 
         assertNotNull(fieldDef);
-        String other = "[ 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 0 ]"; //$NON-NLS-1$
+        String other = "[ 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 0 ]";
         assertEquals(other, fieldDef.toString());
     }
 }

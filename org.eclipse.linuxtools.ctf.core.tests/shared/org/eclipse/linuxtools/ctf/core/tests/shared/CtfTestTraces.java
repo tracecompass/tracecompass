@@ -21,7 +21,6 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
  *
  * @author alexmont
  */
-@SuppressWarnings("nls")
 public abstract class CtfTestTraces {
 
     /*

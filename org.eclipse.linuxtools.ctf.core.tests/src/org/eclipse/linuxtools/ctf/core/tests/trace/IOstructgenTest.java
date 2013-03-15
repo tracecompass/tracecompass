@@ -31,7 +31,6 @@ import org.junit.Test;
  *
  * @author Matthew Khouzam
  */
-@SuppressWarnings("nls")
 public class IOstructgenTest {
 
 
@@ -292,7 +291,7 @@ public class IOstructgenTest {
                 deltree(f);
             }
             f.mkdirs();
-            f = new File(tempTraceDir + "/metadata"); //$NON-NLS-1$
+            f = new File(tempTraceDir + "/metadata");
             FileWriter fw = new FileWriter(f);
             fw.write(metadata);
             fw.close();
@@ -307,7 +306,7 @@ public class IOstructgenTest {
             for (int i = 0; i < size; i++) {
                 data[i] = 0x00;
             }
-            f = new File(tempTraceDir + "/dummyChan"); //$NON-NLS-1$
+            f = new File(tempTraceDir + "/dummyChan");
             fw = new FileWriter(f);
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(magicLE);

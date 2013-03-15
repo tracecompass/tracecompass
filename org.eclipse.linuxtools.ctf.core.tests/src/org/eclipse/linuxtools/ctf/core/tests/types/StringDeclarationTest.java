@@ -67,7 +67,7 @@ public class StringDeclarationTest {
         StringDeclaration result = new StringDeclaration();
 
         assertNotNull(result);
-        String string = "[declaration] string["; //$NON-NLS-1$
+        String string = "[declaration] string[";
         assertEquals(string, result.toString().substring(0, string.length()));
     }
 
@@ -80,7 +80,7 @@ public class StringDeclarationTest {
         StringDeclaration result = new StringDeclaration(encoding);
 
         assertNotNull(result);
-        String string = "[declaration] string["; //$NON-NLS-1$
+        String string = "[declaration] string[";
         assertEquals(string, result.toString().substring(0, string.length()));
     }
 
@@ -91,7 +91,7 @@ public class StringDeclarationTest {
     @Test
     public void testCreateDefinition() {
         IDefinitionScope definitionScope = null;
-        String fieldName = "id"; //$NON-NLS-1$
+        String fieldName = "id";
         StringDefinition result = fixture.createDefinition(definitionScope,
                 fieldName);
 
@@ -106,8 +106,8 @@ public class StringDeclarationTest {
         Encoding result = fixture.getEncoding();
 
         assertNotNull(result);
-        assertEquals("ASCII", result.name()); //$NON-NLS-1$
-        assertEquals("ASCII", result.toString()); //$NON-NLS-1$
+        assertEquals("ASCII", result.name());
+        assertEquals("ASCII", result.toString());
         assertEquals(1, result.ordinal());
     }
 
@@ -126,7 +126,7 @@ public class StringDeclarationTest {
     @Test
     public void testToString() {
         String result = fixture.toString();
-        String left = "[declaration] string["; //$NON-NLS-1$
+        String left = "[declaration] string[";
         String right = result.substring(0, left.length());
 
         assertEquals(left, right);

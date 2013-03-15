@@ -78,7 +78,7 @@ public class IntegerDeclarationTest {
         assertNotNull(result);
         assertEquals(1, result.getBase());
         assertEquals(false, result.isCharacter());
-        String outputValue = "[declaration] integer["; //$NON-NLS-1$
+        String outputValue = "[declaration] integer[";
         assertEquals(outputValue,
                 result.toString().substring(0, outputValue.length()));
         assertEquals(1, result.getLength());
@@ -101,7 +101,7 @@ public class IntegerDeclarationTest {
     public void testGetByteOrder() {
         ByteOrder result = fixture.getByteOrder();
         assertNotNull(result);
-        assertEquals("BIG_ENDIAN", result.toString()); //$NON-NLS-1$
+        assertEquals("BIG_ENDIAN", result.toString());
     }
 
     /**
@@ -111,8 +111,8 @@ public class IntegerDeclarationTest {
     public void testGetEncoding() {
         Encoding result = fixture.getEncoding();
         assertNotNull(result);
-        assertEquals("ASCII", result.name()); //$NON-NLS-1$
-        assertEquals("ASCII", result.toString()); //$NON-NLS-1$
+        assertEquals("ASCII", result.name());
+        assertEquals("ASCII", result.toString());
         assertEquals(1, result.ordinal());
     }
 
@@ -175,6 +175,6 @@ public class IntegerDeclarationTest {
     public void testToString() {
         String result = fixture.toString();
         String trunc = result.substring(0, 22);
-        assertEquals("[declaration] integer[", trunc); //$NON-NLS-1$
+        assertEquals("[declaration] integer[", trunc);
     }
 }

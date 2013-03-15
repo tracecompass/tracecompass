@@ -70,7 +70,7 @@ public class ArrayDeclarationTest {
         ArrayDeclaration result = new ArrayDeclaration(length, elemType);
 
         assertNotNull(result);
-        String left = "[declaration] array["; //$NON-NLS-1$
+        String left = "[declaration] array[";
         String right = result.toString().substring(0, left.length());
         assertEquals(left, right);
         assertEquals(1, result.getLength());
@@ -82,7 +82,7 @@ public class ArrayDeclarationTest {
      */
     @Test
     public void testCreateDefinition() {
-        String fieldName = ""; //$NON-NLS-1$
+        String fieldName = "";
         IDefinitionScope definitionScope = null;
         ArrayDefinition result;
         result = fixture.createDefinition(definitionScope, fieldName);
@@ -114,7 +114,7 @@ public class ArrayDeclarationTest {
     @Test
     public void testToString() {
         String result = fixture.toString();
-        String left = "[declaration] array["; //$NON-NLS-1$
+        String left = "[declaration] array[";
         String right = result.substring(0, left.length());
 
         assertEquals(left, right);

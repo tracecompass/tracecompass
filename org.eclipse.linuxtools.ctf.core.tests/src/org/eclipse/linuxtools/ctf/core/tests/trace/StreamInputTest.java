@@ -77,7 +77,7 @@ public class StreamInputTest {
     }
 
     private static File createFile() {
-        return new File("Tests/traces/trace20m/channel_0"); //$NON-NLS-1$
+        return new File("Tests/traces/trace20m/channel_0");
     }
 
     /**
@@ -143,7 +143,7 @@ public class StreamInputTest {
      */
     @Test
     public void testLookupDefinition() {
-        Definition result = fixture.lookupDefinition("id"); //$NON-NLS-1$
+        Definition result = fixture.lookupDefinition("id");
         assertNull(result);
     }
 

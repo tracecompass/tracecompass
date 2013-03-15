@@ -60,29 +60,27 @@ public class VariantDefinitionTest {
     public static void main(String[] args) {
         new org.junit.runner.JUnitCore().run(VariantDefinitionTest.class);
     }
+
     StructDefinition structDefinition;
-    private static final String TEST_STRUCT_ID = "testStruct"; //$NON-NLS-1$
+    private static final String TEST_STRUCT_ID = "testStruct";
 
-    private static final String ENUM_7 = "g"; //$NON-NLS-1$
-    private static final String ENUM_6 = "f"; //$NON-NLS-1$
-    private static final String ENUM_5 = "e"; //$NON-NLS-1$
-    private static final String ENUM_4 = "d"; //$NON-NLS-1$
-    private static final String ENUM_3 = "c"; //$NON-NLS-1$
-    private static final String ENUM_2 = "b"; //$NON-NLS-1$
-    private static final String ENUM_1 = "a"; //$NON-NLS-1$
+    private static final String ENUM_7 = "g";
+    private static final String ENUM_6 = "f";
+    private static final String ENUM_5 = "e";
+    private static final String ENUM_4 = "d";
+    private static final String ENUM_3 = "c";
+    private static final String ENUM_2 = "b";
+    private static final String ENUM_1 = "a";
 
-    private static final String TAG_ID = "a"; //$NON-NLS-1$
+    private static final String TAG_ID = "a";
 
-//    private static final String INT_ID = "_id"; //$NON-NLS-1$
-//
-//    private static final String STRING_ID = "_args"; //$NON-NLS-1$
-//
-//    private static final String ENUM_ID = "_enumArgs"; //$NON-NLS-1$
-//
-//    private static final String SEQUENCE_ID = "_seq"; //$NON-NLS-1$
+//    private static final String INT_ID = "_id";
+//    private static final String STRING_ID = "_args";
+//    private static final String ENUM_ID = "_enumArgs";
+//    private static final String SEQUENCE_ID = "_seq";
 
-    private static final String LENGTH_SEQ = "_len"; //$NON-NLS-1$
-    private static final String VAR_FIELD_NAME = "var"; //$NON-NLS-1$
+    private static final String LENGTH_SEQ = "_len";
+    private static final String VAR_FIELD_NAME = "var";
     private static final String ENUM_8 = null;
     /**
      * Perform pre-test initialization.
@@ -147,14 +145,14 @@ public class VariantDefinitionTest {
     @Test
     public void testVariantDefinition() {
         VariantDeclaration declaration = new VariantDeclaration();
-        declaration.setTag(""); //$NON-NLS-1$
+        declaration.setTag("");
         VariantDeclaration variantDeclaration = new VariantDeclaration();
-        variantDeclaration.setTag(""); //$NON-NLS-1$
+        variantDeclaration.setTag("");
         VariantDefinition variantDefinition = new VariantDefinition(
-                variantDeclaration, structDefinition, ""); //$NON-NLS-1$
+                variantDeclaration, structDefinition, "");
         IDefinitionScope definitionScope = new StructDefinition(
-                new StructDeclaration(1L), variantDefinition, ""); //$NON-NLS-1$
-        String fieldName = ""; //$NON-NLS-1$
+                new StructDeclaration(1L), variantDefinition, "");
+        String fieldName = "";
 
         VariantDefinition result = new VariantDefinition(declaration,
                 definitionScope, fieldName);
@@ -328,7 +326,7 @@ public class VariantDefinitionTest {
         VariantDefinition vDef;
         StructDefinition structDef;
         EnumDefinition tagDefinition;
-        String fName = ""; //$NON-NLS-1$
+        String fName = "";
 
         vDecl = new VariantDeclaration();
         vDecl.setTag(fName);
@@ -347,10 +345,10 @@ public class VariantDefinitionTest {
     @Test
     public void testToString() {
         String result = fixture.toString();
-        assertEquals("{ null = null }", result); //$NON-NLS-1$
+        assertEquals("{ null = null }", result);
 
         fixture.setCurrentField(ENUM_2);
         result = fixture.toString();
-        assertEquals("{ b = 0 }", result); //$NON-NLS-1$
+        assertEquals("{ b = 0 }", result);
     }
 }

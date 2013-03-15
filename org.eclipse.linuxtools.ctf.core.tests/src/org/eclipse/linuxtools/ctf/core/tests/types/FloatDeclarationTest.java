@@ -45,6 +45,6 @@ public class FloatDeclarationTest {
     @Test
     public void toStringTest() {
         fixture = new FloatDeclaration(8, 24, ByteOrder.nativeOrder(), 0);
-        assertTrue(fixture.toString().contains("float")); //$NON-NLS-1$
+        assertTrue(fixture.toString().contains("float"));
     }
 }
