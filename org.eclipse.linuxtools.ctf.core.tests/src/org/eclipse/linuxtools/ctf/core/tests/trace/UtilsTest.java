@@ -17,8 +17,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.trace.Utils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -29,32 +27,6 @@ import org.junit.Test;
  * @version $Revision: 1.0 $
  */
 public class UtilsTest {
-
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(UtilsTest.class);
-    }
-
-    /**
-     * Perform pre-test initialization.
-     */
-    @Before
-    public void setUp() {
-        // add additional set up code here
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
-    }
 
     /**
      * Run the Utils() constructor test.

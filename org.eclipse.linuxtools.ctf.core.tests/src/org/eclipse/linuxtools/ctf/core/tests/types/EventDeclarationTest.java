@@ -26,7 +26,6 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,16 +44,6 @@ public class EventDeclarationTest {
     private EventDeclaration fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(EventDeclarationTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      *
      * @throws CTFReaderException
@@ -68,14 +57,6 @@ public class EventDeclarationTest {
         fixture.setFields(new StructDeclaration(1L));
         fixture.setStream(new Stream(CtfTestTraces.getTestTrace(TRACE_INDEX)));
         fixture.setName("");
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

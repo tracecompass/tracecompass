@@ -26,7 +26,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,16 +41,6 @@ public class SequenceDefinitionTest {
 
     private SequenceDefinition fixture;
     private final static int seqLen = 15;
-
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(SequenceDefinitionTest.class);
-    }
 
     /**
      * Perform pre-test initialization.
@@ -79,14 +68,6 @@ public class SequenceDefinitionTest {
         }
         fixture.read(input);
         assert (fixture != null);
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     private static SequenceDefinition initNonString() throws CTFReaderException {

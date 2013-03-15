@@ -17,8 +17,6 @@ import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -30,32 +28,6 @@ import org.junit.Test;
  */
 @SuppressWarnings("javadoc")
 public class DefinitionTest {
-
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(DefinitionTest.class);
-    }
-
-    /**
-     * Perform pre-test initialization.
-     */
-    @Before
-    public void setUp() {
-        // add additional set up code here
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
-    }
 
     /**
      * Since Definition is abstract, we'll minimally extend it here to

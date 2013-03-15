@@ -35,7 +35,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,16 +61,6 @@ public class StructDefinitionTest {
     private StructDefinition emptyStruct;
     private StructDefinition simpleStruct;
     private static final String VAR_FIELD_NAME = "SomeVariant";
-
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(StructDefinitionTest.class);
-    }
 
     /**
      * Perform pre-test initialization.
@@ -112,15 +101,6 @@ public class StructDefinitionTest {
         ssDec.addField(INT_ID, id);
         ssDec.addField(STRING_ID, sd);
         simpleStruct = ssDec.createDefinition(null, TEST_STRUCT_ID);
-
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

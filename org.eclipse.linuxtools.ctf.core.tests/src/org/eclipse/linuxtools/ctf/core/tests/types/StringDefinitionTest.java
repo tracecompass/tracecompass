@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,16 +32,6 @@ public class StringDefinitionTest {
     private StringDefinition fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(StringDefinitionTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      */
     @Before
@@ -50,14 +39,6 @@ public class StringDefinitionTest {
         String name = "testString";
         StringDeclaration stringDec = new StringDeclaration();
         fixture = stringDec.createDefinition(null, name);
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

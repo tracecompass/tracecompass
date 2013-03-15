@@ -24,7 +24,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,29 +41,11 @@ public class VariantDeclarationTest {
     private VariantDeclaration fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(VariantDeclarationTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      */
     @Before
     public void setUp() {
         fixture = new VariantDeclaration();
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

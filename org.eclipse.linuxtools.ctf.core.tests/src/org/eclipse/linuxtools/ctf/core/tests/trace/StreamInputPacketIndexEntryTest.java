@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,29 +30,11 @@ public class StreamInputPacketIndexEntryTest {
     private StreamInputPacketIndexEntry fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(StreamInputPacketIndexEntryTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      */
     @Before
     public void setUp() {
         fixture = new StreamInputPacketIndexEntry(1L);
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

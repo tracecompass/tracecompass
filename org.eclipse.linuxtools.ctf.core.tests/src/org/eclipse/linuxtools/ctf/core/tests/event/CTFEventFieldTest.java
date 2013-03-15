@@ -31,8 +31,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -46,33 +44,6 @@ import org.junit.Test;
 public class CTFEventFieldTest {
 
     private static final String fieldName = "id";
-
-
-    /**
-     * Perform pre-test initialization.
-     */
-    @Before
-    public void setUp() {
-        // add additional set up code here
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
-    }
-
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CTFEventFieldTest.class);
-    }
 
     /**
      * Run the CTFEventField parseField(Definition,String) method test.

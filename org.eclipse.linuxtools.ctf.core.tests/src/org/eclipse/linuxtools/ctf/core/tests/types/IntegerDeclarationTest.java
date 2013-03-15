@@ -18,7 +18,6 @@ import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,30 +33,12 @@ public class IntegerDeclarationTest {
     private IntegerDeclaration fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(IntegerDeclarationTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      */
     @Before
     public void setUp() {
         fixture = new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
                 Encoding.ASCII, null, 32);
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

@@ -20,7 +20,7 @@ import java.nio.ByteOrder;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
-import org.junit.After;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,33 +41,12 @@ public class FloatDefinitionTest {
     private static final String fieldName = "float";
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(IntegerDefinitionTest.class);
-    }
-
-    /**
-     * Perform pre-test initialization. We know the structDef won't be null (or
-     * else the tests will fail), so we can safely suppress the warning.
-     *
-     * @throws CTFReaderException
+     * Perform pre-test initialization.
      */
     @Before
     public void setUp(){
         testFloat248();
         testFloat5311();
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     @Test
@@ -120,6 +99,7 @@ public class FloatDefinitionTest {
 
         assertEquals(Double.NaN ,fixture.getValue(),0.1);
     }
+
     /**
      * Run the IntegerDeclaration getDeclaration() method test.
      */
@@ -148,7 +128,6 @@ public class FloatDefinitionTest {
         singleFixture.setValue(2.0);
         BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
         singleFixture.read(input);
-
     }
 
     /**

@@ -22,7 +22,6 @@ import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,16 +40,6 @@ public class CTFTraceReaderTest {
     private CTFTraceReader fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(CTFTraceReaderTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      *
      * @throws CTFReaderException
@@ -59,14 +48,6 @@ public class CTFTraceReaderTest {
     public void setUp() throws CTFReaderException {
         assumeTrue(CtfTestTraces.tracesExist());
         fixture = new CTFTraceReader(CtfTestTraces.getTestTrace(TRACE_INDEX));
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

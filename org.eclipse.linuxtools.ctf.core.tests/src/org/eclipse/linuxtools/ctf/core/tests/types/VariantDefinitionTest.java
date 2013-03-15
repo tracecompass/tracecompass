@@ -35,7 +35,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,20 +45,9 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
-@SuppressWarnings("javadoc")
 public class VariantDefinitionTest {
 
     private VariantDefinition fixture;
-
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(VariantDefinitionTest.class);
-    }
 
     StructDefinition structDefinition;
     private static final String TEST_STRUCT_ID = "testStruct";
@@ -82,12 +70,11 @@ public class VariantDefinitionTest {
     private static final String LENGTH_SEQ = "_len";
     private static final String VAR_FIELD_NAME = "var";
     private static final String ENUM_8 = null;
+
     /**
      * Perform pre-test initialization.
      *
      * Not sure it needs to be that complicated, oh well...
-     *
-     * @throws CTFReaderException
      */
     @Before
     public void setUp() {
@@ -130,17 +117,7 @@ public class VariantDefinitionTest {
     }
 
     /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
-    }
-
-    /**
      * Run the VariantDefinition(VariantDeclaration,DefinitionScope,String)
-     *
-     * @throws CTFReaderException
      */
     @Test
     public void testVariantDefinition() {
@@ -317,8 +294,6 @@ public class VariantDefinitionTest {
 
     /**
      * Run the void setTagDefinition(EnumDefinition) method test.
-     *
-     * @throws CTFReaderException
      */
     @Test
     public void testSetTagDefinition(){

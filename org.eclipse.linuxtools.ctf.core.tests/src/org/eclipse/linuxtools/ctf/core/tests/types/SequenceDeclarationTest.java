@@ -24,7 +24,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,24 +40,10 @@ public class SequenceDeclarationTest {
     private SequenceDeclaration fixture;
 
     static final String fieldName = "LengthName";
-    /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(SequenceDeclarationTest.class);
-    }
 
     @Before
     public void setUp() {
         fixture = new SequenceDeclaration(fieldName, new StringDeclaration());
-    }
-
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**

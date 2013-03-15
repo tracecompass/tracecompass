@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,16 +45,6 @@ public class StreamInputTest {
     private StreamInput fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(StreamInputTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      *
      * @throws CTFReaderException
@@ -66,14 +55,6 @@ public class StreamInputTest {
         fixture = new StreamInput(new Stream(CtfTestTraces.getTestTrace(TRACE_INDEX)),
                 (FileChannel) null, createFile());
         fixture.setTimestampEnd(1L);
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     private static File createFile() {

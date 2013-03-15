@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,16 +38,6 @@ public class EnumDefinitionTest {
     private EnumDefinition fixture;
 
     /**
-     * Launch the test.
-     *
-     * @param args
-     *            the command line arguments
-     */
-    public static void main(String[] args) {
-        new org.junit.runner.JUnitCore().run(EnumDefinitionTest.class);
-    }
-
-    /**
      * Perform pre-test initialization.
      */
     @Before
@@ -61,14 +50,6 @@ public class EnumDefinitionTest {
         String fieldName = "";
 
         fixture = new EnumDefinition(declaration, null, fieldName);
-    }
-
-    /**
-     * Perform post-test clean-up.
-     */
-    @After
-    public void tearDown() {
-        // Add additional tear down code here
     }
 
     /**
