@@ -55,7 +55,7 @@ import org.junit.Test;
 /**
  * Test suite for the TmfTrace class.
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings("javadoc")
 public class TmfTraceTest {
 
     // ------------------------------------------------------------------------

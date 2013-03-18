@@ -29,7 +29,7 @@ import org.junit.Test;
 /**
  * Test suite for the TmfEventTypeManager class.
  */
-@SuppressWarnings({"nls", "javadoc"})
+@SuppressWarnings("javadoc")
 public class TmfEventTypeManagerTest {
 
     // ------------------------------------------------------------------------

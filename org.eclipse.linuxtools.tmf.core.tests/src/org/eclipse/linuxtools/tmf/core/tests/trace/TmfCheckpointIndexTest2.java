@@ -42,7 +42,7 @@ import org.junit.Test;
  * Test suite for the TmfCheckpointIndexer class (events with same
  * timestamp around checkpoint).
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings("javadoc")
 public class TmfCheckpointIndexTest2 {
 
     // ------------------------------------------------------------------------

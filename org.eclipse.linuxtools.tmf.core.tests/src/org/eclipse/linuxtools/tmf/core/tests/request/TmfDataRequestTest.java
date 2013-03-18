@@ -26,7 +26,7 @@ import org.junit.Test;
 /**
  * Test suite for the TmfDataRequest class.
  */
-@SuppressWarnings({ "nls", "javadoc" })
+@SuppressWarnings("javadoc")
 public class TmfDataRequestTest {
 
     // ------------------------------------------------------------------------

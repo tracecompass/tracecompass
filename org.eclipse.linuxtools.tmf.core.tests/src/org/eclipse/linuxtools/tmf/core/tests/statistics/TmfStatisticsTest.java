@@ -47,7 +47,7 @@ public abstract class TmfStatisticsTest {
     private static final long t5 = 1332170682490949270L; /* following event here */
     private static final long t6 = 1332170682490949300L;
 
-    private static final String eventType = "lttng_statedump_process_state"; //$NON-NLS-1$
+    private static final String eventType = "lttng_statedump_process_state";
 
 
     // ------------------------------------------------------------------------

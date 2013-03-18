@@ -48,7 +48,7 @@ import org.junit.Test;
 /**
  * Test suite for the TmfCoalescedEventRequest class.
  */
-@SuppressWarnings({ "nls", "javadoc" })
+@SuppressWarnings("javadoc")
 public class TmfCoalescedEventRequestTest {
 
     // ------------------------------------------------------------------------

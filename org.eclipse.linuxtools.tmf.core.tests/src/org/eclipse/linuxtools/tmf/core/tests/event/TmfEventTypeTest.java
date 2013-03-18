@@ -28,7 +28,7 @@ import org.junit.Test;
 /**
  * Test suite for the TmfEventType class.
  */
-@SuppressWarnings({"nls", "javadoc"})
+@SuppressWarnings("javadoc")
 public class TmfEventTypeTest {
 
     // ------------------------------------------------------------------------

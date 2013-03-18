@@ -33,7 +33,6 @@ import org.junit.Test;
 /**
  * TmfBaseColumnData Test Case.
  */
-@SuppressWarnings("nls")
 public class TmfBaseColumnDataTest {
 
     // ------------------------------------------------------------------------

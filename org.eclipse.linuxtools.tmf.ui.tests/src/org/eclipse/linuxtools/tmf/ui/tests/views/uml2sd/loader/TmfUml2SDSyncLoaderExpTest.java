@@ -36,7 +36,6 @@ import org.junit.Test;
  *
  * @author Bernd Hufmann
  */
-@SuppressWarnings("nls")
 public class TmfUml2SDSyncLoaderExpTest {
 
     private static Uml2SDTestFacility fFacility;

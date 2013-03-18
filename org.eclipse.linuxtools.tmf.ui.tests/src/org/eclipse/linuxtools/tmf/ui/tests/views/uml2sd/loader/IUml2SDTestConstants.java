@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader;
  * Common constants for the TMF UML2SD test cases
  * @author Bernd Hufmann
  */
-@SuppressWarnings("nls")
 public interface IUml2SDTestConstants {
 
     /**

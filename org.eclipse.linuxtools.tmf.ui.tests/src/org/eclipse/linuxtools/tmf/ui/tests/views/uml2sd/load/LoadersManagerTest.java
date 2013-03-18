@@ -29,7 +29,6 @@ import org.junit.Test;
 /**
  *  Test cases class to test loader manager of UML2SD extension point.
  */
-@SuppressWarnings("nls")
 public class LoadersManagerTest {
 
     private final static String SDVIEW_WITH_ONE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader";

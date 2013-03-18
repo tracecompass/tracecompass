@@ -21,7 +21,6 @@ import org.osgi.framework.BundleContext;
  * <p>
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings({ "nls" })
 public class TmfCoreTestPlugin extends Plugin {
 
     // ------------------------------------------------------------------------

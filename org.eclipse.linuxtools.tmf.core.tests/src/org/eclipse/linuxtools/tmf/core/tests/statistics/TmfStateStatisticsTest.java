@@ -37,7 +37,7 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
     public static void setUpClass() {
         assumeTrue(CtfTmfTestTraces.tracesExist());
         try {
-            File htFile = File.createTempFile("stats-test", ".ht"); //$NON-NLS-1$ //$NON-NLS-2$
+            File htFile = File.createTempFile("stats-test", ".ht");
             htFile.deleteOnExit();
             CtfTmfTrace trace = CtfTmfTestTraces.getTestTrace(TRACE_INDEX);
             backend = new TmfStateStatistics(trace, htFile);

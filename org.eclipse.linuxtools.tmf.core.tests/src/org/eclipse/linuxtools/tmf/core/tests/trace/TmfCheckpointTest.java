@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * Test suite for the TmfCheckpoint class.
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings("javadoc")
 public class TmfCheckpointTest {
 
     // ------------------------------------------------------------------------

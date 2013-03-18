@@ -196,7 +196,6 @@ public class TmfUml2SDSyncLoaderPagesTest {
         verifyPage(currentPage, numMsg, hasNext, hasPrev, IUml2SDTestConstants.DEFAULT_NUM_LIFELINES);
     }
 
-    @SuppressWarnings("nls")
     private static void verifyPage(int currentPage, int numMsg, boolean hasNext,
             boolean hasPrev, int lifelineCount) {
         assertEquals("currentPage", currentPage, fFacility.getLoader().currentPage());

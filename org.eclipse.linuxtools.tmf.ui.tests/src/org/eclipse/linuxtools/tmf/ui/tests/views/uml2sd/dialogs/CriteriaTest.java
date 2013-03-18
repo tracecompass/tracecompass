@@ -31,7 +31,6 @@ import org.junit.Test;
 /**
  *  Test cases to test Criteria class.
  */
-@SuppressWarnings("nls")
 public class CriteriaTest {
 
     /**

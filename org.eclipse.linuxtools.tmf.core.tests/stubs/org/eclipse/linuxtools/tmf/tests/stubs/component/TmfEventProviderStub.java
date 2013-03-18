@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
  * <p>
  * TODO: Implement me. Please.
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings("javadoc")
 public class TmfEventProviderStub extends TmfEventProvider {
 
     private static final String DIRECTORY   = "testfiles";

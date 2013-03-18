@@ -31,7 +31,7 @@ public final class CtfTmfTestTraces {
 
     private CtfTmfTestTraces() {}
 
-    private static final File emptyFile = new File(""); //$NON-NLS-1$
+    private static final File emptyFile = new File("");
     private static CtfTmfTrace emptyTrace = new CtfTmfTrace();
 
     private static CtfTmfTrace[] testTraces = new CtfTmfTrace[2];

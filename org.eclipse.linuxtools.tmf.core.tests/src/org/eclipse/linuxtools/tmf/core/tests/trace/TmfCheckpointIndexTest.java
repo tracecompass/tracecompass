@@ -42,7 +42,7 @@ import org.junit.Test;
 /**
  * Test suite for the TmfCheckpointIndexTest class.
  */
-@SuppressWarnings({"nls","javadoc"})
+@SuppressWarnings("javadoc")
 public class TmfCheckpointIndexTest {
 
     // ------------------------------------------------------------------------

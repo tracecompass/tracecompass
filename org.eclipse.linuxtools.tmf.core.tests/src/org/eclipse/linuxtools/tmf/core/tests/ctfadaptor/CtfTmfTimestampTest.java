@@ -31,7 +31,6 @@ import org.junit.Test;
  * @author ematkho
  * @version 1.0
  */
-@SuppressWarnings({"nls"})
 public class CtfTmfTimestampTest {
 
     /**
@@ -46,7 +45,7 @@ public class CtfTmfTimestampTest {
         CtfTmfTimestamp result = new CtfTmfTimestamp(timestamp);
 
         assertNotNull(result);
-        assertEquals(df.format(d) + " 000 001", result.toString()); //$NON-NLS-1$
+        assertEquals(df.format(d) + " 000 001", result.toString());
         assertEquals(0, result.getPrecision());
         assertEquals(-9, result.getScale());
         assertEquals(1L, result.getValue());

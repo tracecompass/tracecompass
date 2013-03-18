@@ -51,14 +51,14 @@ public class StateSystemPushPopTest {
 
     private final File testHtFile;
 
-    private final static String errMsg = "Caught exception: "; //$NON-NLS-1$
+    private final static String errMsg = "Caught exception: ";
 
     /* State values that will be used */
     //private final static ITmfStateValue nullValue = TmfStateValue.nullValue();
-    private final static ITmfStateValue value1 = TmfStateValue.newValueString("A"); //$NON-NLS-1$
+    private final static ITmfStateValue value1 = TmfStateValue.newValueString("A");
     private final static ITmfStateValue value2 = TmfStateValue.newValueInt(10);
     private final static ITmfStateValue value3 = TmfStateValue.nullValue();
-    private final static ITmfStateValue value4 = TmfStateValue.newValueString("D"); //$NON-NLS-1$
+    private final static ITmfStateValue value4 = TmfStateValue.newValueString("D");
     private final static ITmfStateValue value5 = TmfStateValue.newValueLong(Long.MAX_VALUE);
 
     /**
@@ -68,7 +68,7 @@ public class StateSystemPushPopTest {
      *             If we couldn't create the state history test file
      */
     public StateSystemPushPopTest() throws IOException {
-        testHtFile = File.createTempFile("test", ".ht"); //$NON-NLS-1$ //$NON-NLS-2$
+        testHtFile = File.createTempFile("test", ".ht");
         testHtFile.deleteOnExit();
     }
 
@@ -95,7 +95,7 @@ public class StateSystemPushPopTest {
         ss = new StateSystem(backend, true);
 
         /* Build the thing */
-        final int attrib = ss.getQuarkAbsoluteAndAdd("Test", "stack"); //$NON-NLS-1$ //$NON-NLS-2$
+        final int attrib = ss.getQuarkAbsoluteAndAdd("Test", "stack");
 
         ss.pushAttribute( 2, value1, attrib);
         ss.pushAttribute( 4, value2, attrib);
@@ -136,7 +136,7 @@ public class StateSystemPushPopTest {
         assertEquals(null, value); // Stack should already be empty here.
 
         ss.closeHistory(30);
-        attribute = ss.getQuarkAbsolute("Test", "stack"); //$NON-NLS-1$ //$NON-NLS-2$
+        attribute = ss.getQuarkAbsolute("Test", "stack");
     }
 
     /**
@@ -179,8 +179,8 @@ public class StateSystemPushPopTest {
     @Test
     public void testSingleQueries() {
         try {
-            final int subAttribute1 = ss.getQuarkRelative(attribute, "1"); //$NON-NLS-1$
-            final int subAttribute2 = ss.getQuarkRelative(attribute, "2"); //$NON-NLS-1$
+            final int subAttribute1 = ss.getQuarkRelative(attribute, "1");
+            final int subAttribute2 = ss.getQuarkRelative(attribute, "2");
 
             /* Test the stack attributes themselves */
             interval = ss.querySingleState(11, attribute);
@@ -284,10 +284,10 @@ public class StateSystemPushPopTest {
     public void testFullQueries() {
         List<ITmfStateInterval> state;
         try {
-            final int subAttrib1 = ss.getQuarkRelative(attribute, "1"); //$NON-NLS-1$
-            final int subAttrib2 = ss.getQuarkRelative(attribute, "2"); //$NON-NLS-1$
-            final int subAttrib3 = ss.getQuarkRelative(attribute, "3"); //$NON-NLS-1$
-            final int subAttrib4 = ss.getQuarkRelative(attribute, "4"); //$NON-NLS-1$
+            final int subAttrib1 = ss.getQuarkRelative(attribute, "1");
+            final int subAttrib2 = ss.getQuarkRelative(attribute, "2");
+            final int subAttrib3 = ss.getQuarkRelative(attribute, "3");
+            final int subAttrib4 = ss.getQuarkRelative(attribute, "4");
 
             /* Stack depth = 5 */
             state = ss.queryFullState(10);

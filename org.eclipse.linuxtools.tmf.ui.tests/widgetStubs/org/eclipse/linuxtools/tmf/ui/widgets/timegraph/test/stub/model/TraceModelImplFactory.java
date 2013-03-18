@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.model;
 
 import java.util.Date;
 
-@SuppressWarnings({"javadoc", "nls"})
+@SuppressWarnings("javadoc")
 public class TraceModelImplFactory {
 
 	// ========================================================================

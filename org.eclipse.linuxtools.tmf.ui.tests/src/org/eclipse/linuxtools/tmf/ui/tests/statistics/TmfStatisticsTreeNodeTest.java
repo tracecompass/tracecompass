@@ -39,13 +39,13 @@ public class TmfStatisticsTreeNodeTest {
     // Fields
     // ------------------------------------------------------------------------
 
-    private final String fTypeId1 = "Some type1"; //$NON-NLS-1$
-    private final String fTypeId2 = "Some type2"; //$NON-NLS-1$
-    private final String fTypeId3 = "Some type3"; //$NON-NLS-1$
+    private final String fTypeId1 = "Some type1";
+    private final String fTypeId2 = "Some type2";
+    private final String fTypeId3 = "Some type3";
 
     private final TmfStatisticsTree fStatsTree;
 
-    private static final String fTestName = "StatisticsTreeNodeTest"; //$NON-NLS-1$
+    private static final String fTestName = "StatisticsTreeNodeTest";
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -175,7 +175,7 @@ public class TmfStatisticsTreeNodeTest {
         TmfStatisticsTreeNode parentNode = rootNode.getParent();
         assertNull(parentNode);
 
-        TmfStatisticsTreeNode newTraceNode = new TmfStatisticsTreeNode(fStatsTree, rootNode, "newly created trace node"); //$NON-NLS-1$
+        TmfStatisticsTreeNode newTraceNode = new TmfStatisticsTreeNode(fStatsTree, rootNode, "newly created trace node");
         parentNode = newTraceNode.getParent();
         assertNotNull(parentNode);
         assertTrue(fStatsTree.getRootNode() == parentNode);
@@ -209,7 +209,7 @@ public class TmfStatisticsTreeNodeTest {
         TmfStatisticsTreeNode catNode     = traceNode.getChildren().iterator().next();
         TmfStatisticsTreeNode elementNode = fStatsTree.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fTypeId1);
 
-        assertEquals(0, rootNode.getName().compareTo("root")); //$NON-NLS-1$
+        assertEquals(0, rootNode.getName().compareTo("root"));
         assertEquals(0, traceNode.getName().compareTo(fTestName));
         assertEquals(0, catNode.getName().compareTo(Messages.TmfStatisticsData_EventTypes));
         assertEquals(0, elementNode.getName().compareTo(fTypeId1));

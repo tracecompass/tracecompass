@@ -84,7 +84,7 @@ public class CtfIteratorTest {
     @Test
     public void testCtfIterator_init() {
         CtfTmfTrace trace = getTrace();
-        trace.init("test"); //$NON-NLS-1$
+        trace.init("test");
         CtfIterator result = new CtfIterator(trace);
 
         assertNotNull(result);
