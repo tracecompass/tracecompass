@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.linuxtools.internal.gdbtrace.ui.GdbTraceUIPlugin;
 import org.junit.Test;
 
-@SuppressWarnings({ "nls", "javadoc" })
+@SuppressWarnings("javadoc")
 public class GdbTraceUIPluginTest {
 
     // ------------------------------------------------------------------------
@@ -40,6 +40,6 @@ public class GdbTraceUIPluginTest {
     @Test
     public void testGetDefault() {
         Plugin plugin = GdbTraceUIPlugin.getDefault();
-        assertEquals("getDefault()", plugin, fPlugin); //$NON-NLS-1$
+        assertEquals("getDefault()", plugin, fPlugin);
     }
 }
