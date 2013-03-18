@@ -30,7 +30,6 @@ import org.junit.Test;
  * The class <code>ChannelInfoTest</code> contains tests for the class
  * <code>{@link ChannelInfo}</code>.
  */
-@SuppressWarnings("nls")
 public class ChannelInfoTest {
 
     // ------------------------------------------------------------------------

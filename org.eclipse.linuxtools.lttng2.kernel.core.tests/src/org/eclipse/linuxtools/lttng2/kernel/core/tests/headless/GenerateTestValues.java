@@ -34,7 +34,6 @@ import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
  *
  * @author Alexandre Montplaisir
  */
-@SuppressWarnings("nls")
 public class GenerateTestValues {
 
     private static final int TRACE_INDEX = 1;

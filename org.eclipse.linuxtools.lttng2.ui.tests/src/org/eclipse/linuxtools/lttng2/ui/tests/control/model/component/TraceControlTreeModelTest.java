@@ -59,7 +59,6 @@ import org.osgi.framework.FrameworkUtil;
  * The class <code>TraceControlTreeModelTest</code> contains tests for the tree
  * component classes.
  */
-@SuppressWarnings("nls")
 public class TraceControlTreeModelTest {
 
     // ------------------------------------------------------------------------

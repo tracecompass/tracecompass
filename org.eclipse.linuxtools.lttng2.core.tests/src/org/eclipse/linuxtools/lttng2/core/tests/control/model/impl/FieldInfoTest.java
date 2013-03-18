@@ -24,7 +24,6 @@ import org.junit.Test;
  * The class <code>FieldInfoTest</code> contains test for the class
  * <code>{@link FieldInfo}</code>.
  */
-@SuppressWarnings("nls")
 public class FieldInfoTest {
 
     // ------------------------------------------------------------------------

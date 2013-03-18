@@ -36,7 +36,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.UstProvide
 /**
  *  Test facility to constants across test case
  */
-@SuppressWarnings({"nls", "javadoc"})
+@SuppressWarnings("javadoc")
 public class ModelImplFactory {
 
     private ISessionInfo fSessionInfo1 = null;

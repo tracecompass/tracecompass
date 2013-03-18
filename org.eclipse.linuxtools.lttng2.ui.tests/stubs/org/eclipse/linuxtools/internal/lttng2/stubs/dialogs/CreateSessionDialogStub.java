@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 @SuppressWarnings("javadoc")
 public class CreateSessionDialogStub implements ICreateSessionDialog {
 
-    public String fName = "mysession"; //$NON-NLS-1$
+    public String fName = "mysession";
     public String fPath = null;
     private boolean fIsStreamedTrace = false;
     private String fNetworkUrl = null;

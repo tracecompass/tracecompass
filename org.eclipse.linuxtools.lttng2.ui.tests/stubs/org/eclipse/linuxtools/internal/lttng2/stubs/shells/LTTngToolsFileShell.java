@@ -35,19 +35,19 @@ public class LTTngToolsFileShell extends TestCommandShell {
     // ------------------------------------------------------------------------
     // CONSTANTS
     // ------------------------------------------------------------------------
-    private final static String SCENARIO_KEY = "<SCENARIO>"; //$NON-NLS-1$
-    private final static String SCENARIO_END_KEY = "</SCENARIO>"; //$NON-NLS-1$
-    private final static String INPUT_KEY = "<COMMAND_INPUT>"; //$NON-NLS-1$
-    private final static String INPUT_END_KEY = "</COMMAND_INPUT>"; //$NON-NLS-1$
-    private final static String RESULT_KEY = "<COMMAND_RESULT>"; //$NON-NLS-1$
+    private final static String SCENARIO_KEY = "<SCENARIO>";
+    private final static String SCENARIO_END_KEY = "</SCENARIO>";
+    private final static String INPUT_KEY = "<COMMAND_INPUT>";
+    private final static String INPUT_END_KEY = "</COMMAND_INPUT>";
+    private final static String RESULT_KEY = "<COMMAND_RESULT>";
     @SuppressWarnings("unused")
-    private final static String RESULT_END_KEY = "</COMMAND_RESULT>"; //$NON-NLS-1$
-    private final static String OUTPUT_KEY = "<COMMAND_OUTPUT>"; //$NON-NLS-1$
-    private final static String OUTPUT_END_KEY = "</COMMAND_OUTPUT>"; //$NON-NLS-1$
-    private final static String COMMENT_KEY = "#.*"; //$NON-NLS-1$
+    private final static String RESULT_END_KEY = "</COMMAND_RESULT>";
+    private final static String OUTPUT_KEY = "<COMMAND_OUTPUT>";
+    private final static String OUTPUT_END_KEY = "</COMMAND_OUTPUT>";
+    private final static String COMMENT_KEY = "#.*";
 
-    private final static Pattern LTTNG_LIST_SESSION_PATTERN =  Pattern.compile("lttng\\s+list\\s+(.+)"); //$NON-NLS-1$
-    private final static String LTTNG_LIST_PROVIDER_PATTERN = "lttng\\s+list\\s+(-u|-k)"; //$NON-NLS-1$
+    private final static Pattern LTTNG_LIST_SESSION_PATTERN =  Pattern.compile("lttng\\s+list\\s+(.+)");
+    private final static String LTTNG_LIST_PROVIDER_PATTERN = "lttng\\s+list\\s+(-u|-k)";
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -253,7 +253,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
         }
 
         String[] output = new String[1];
-        output[0] = String.valueOf("Command not found"); //$NON-NLS-1$
+        output[0] = String.valueOf("Command not found");
         CommandResult result = new CommandResult(0, null);
         // For verification of setters of class CommandResult
         result.setOutput(output);
@@ -266,7 +266,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
     // ------------------------------------------------------------------------
     private static boolean isComment(String line) {
         if (line == null) {
-            throw new RuntimeException("line is null"); //$NON-NLS-1$
+            throw new RuntimeException("line is null");
         }
         return line.matches(COMMENT_KEY);
     }

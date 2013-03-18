@@ -39,7 +39,7 @@ public class PartialStateSystemTest extends StateSystemTest {
         assumeTrue(CtfTmfTestTraces.tracesExist());
         File stateFile = null;
         try {
-            stateFile = File.createTempFile("test-partial", ".ht"); //$NON-NLS-1$ //$NON-NLS-2$
+            stateFile = File.createTempFile("test-partial", ".ht");
             stateFile.deleteOnExit();
 
             input = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));

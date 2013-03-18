@@ -47,8 +47,8 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     public static void initialize() {
         assumeTrue(CtfTmfTestTraces.tracesExist());
         try {
-            stateFile = File.createTempFile("test", ".ht"); //$NON-NLS-1$ //$NON-NLS-2$
-            stateFileBenchmark = File.createTempFile("test", ".ht.benchmark"); //$NON-NLS-1$ //$NON-NLS-2$
+            stateFile = File.createTempFile("test", ".ht");
+            stateFileBenchmark = File.createTempFile("test", ".ht.benchmark");
 
             input = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
             ssq = StateSystemManager.loadStateHistory(stateFile, input, true);

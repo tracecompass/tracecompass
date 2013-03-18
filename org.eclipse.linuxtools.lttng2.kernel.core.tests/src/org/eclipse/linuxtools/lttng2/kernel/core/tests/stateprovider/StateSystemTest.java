@@ -35,7 +35,7 @@ import org.junit.Test;
  *
  * @author Alexandre Montplaisir
  */
-@SuppressWarnings({"nls", "javadoc"})
+@SuppressWarnings("javadoc")
 public abstract class StateSystemTest {
 
     /** Index of the test trace used for these tests */

@@ -31,7 +31,6 @@ import org.junit.Test;
  * The class <code>BaseEventInfoTest</code> contains test for the class
  * <code>{@link BaseEventInfo}</code>.
  */
-@SuppressWarnings("nls")
 public class BaseEventInfoTest {
 
     // ------------------------------------------------------------------------

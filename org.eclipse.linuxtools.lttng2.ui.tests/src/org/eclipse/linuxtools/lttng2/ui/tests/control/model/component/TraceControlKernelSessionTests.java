@@ -59,7 +59,6 @@ import org.osgi.framework.FrameworkUtil;
  * The class <code>TraceControlKernelSessionTests</code> contains Kernel
  * session/channel/event handling test cases.
  */
-@SuppressWarnings("nls")
 public class TraceControlKernelSessionTests {
 
     // ------------------------------------------------------------------------

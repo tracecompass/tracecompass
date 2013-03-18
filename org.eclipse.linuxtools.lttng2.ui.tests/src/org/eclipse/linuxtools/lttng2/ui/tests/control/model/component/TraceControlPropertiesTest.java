@@ -59,7 +59,6 @@ import org.osgi.framework.FrameworkUtil;
  * The class <code>TraceControlPropertiesTest</code> contains tests for the all
  * property class</code>.
  */
-@SuppressWarnings("nls")
 public class TraceControlPropertiesTest {
 
     // ------------------------------------------------------------------------

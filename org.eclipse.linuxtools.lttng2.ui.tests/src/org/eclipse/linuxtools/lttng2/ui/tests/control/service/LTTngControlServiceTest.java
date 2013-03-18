@@ -59,7 +59,7 @@ import org.osgi.framework.FrameworkUtil;
  * The class <code>LTTngControlServiceTest</code> contains test for the class
  * <code>{@link  LTTngControlService}</code>.
  */
-@SuppressWarnings({"nls", "javadoc"})
+@SuppressWarnings("javadoc")
 public class LTTngControlServiceTest {
 
     private static final String DIRECTORY   = "testfiles";

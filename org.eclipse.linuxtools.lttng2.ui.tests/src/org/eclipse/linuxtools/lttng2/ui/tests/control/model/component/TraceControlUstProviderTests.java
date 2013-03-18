@@ -52,7 +52,6 @@ import org.osgi.framework.FrameworkUtil;
  * The class <code>TraceControlUstProviderTests</code> contains UST provider
  * handling test cases.
  */
-@SuppressWarnings("nls")
 public class TraceControlUstProviderTests {
 
     // ------------------------------------------------------------------------
