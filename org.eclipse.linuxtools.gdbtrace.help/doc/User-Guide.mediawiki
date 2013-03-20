@@ -52,7 +52,7 @@ The trace will be updated with the GDB icon [[Image:images/gdb_icon16.png]].
 
 The executable file that created the tracepoint data must be identified so that the C/C++ Postmortem Debugger can be launched properly.
 
-Right-click the GDB trace in the '''Traces''' folder and choose '''Select Trace Executable''' from the context menu. Browse to, or enter, the path of the executable file and press '''OK'''.
+Right-click the GDB trace in the '''Traces''' folder and choose '''Select Trace Executable...''' from the context menu. Browse to, or enter, the path of the executable file and press '''OK'''.
 
 The selected file must be recognized by GDB as an executable.
 
