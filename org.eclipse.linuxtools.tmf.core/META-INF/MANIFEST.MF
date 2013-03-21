@@ -24,6 +24,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse
  org.eclipse.linuxtools.tmf.core.component,
  org.eclipse.linuxtools.tmf.core.ctfadaptor,
  org.eclipse.linuxtools.tmf.core.event,
+ org.eclipse.linuxtools.tmf.core.event.lookup,
  org.eclipse.linuxtools.tmf.core.exceptions,
  org.eclipse.linuxtools.tmf.core.filter,
  org.eclipse.linuxtools.tmf.core.filter.model,
