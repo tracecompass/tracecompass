@@ -46,28 +46,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 public abstract class CtfTmfEventField extends TmfEventField {
 
     // ------------------------------------------------------------------------
-    // Class attributes
-    // ------------------------------------------------------------------------
-
-    /** @since 1.2 */
-    protected static final int FIELDTYPE_INTEGER = 0;
-
-    /** @since 1.2 */
-    protected static final int FIELDTYPE_STRING = 1;
-
-    /** @since 1.2 */
-    protected static final int FIELDTYPE_INTEGER_ARRAY = 2;
-
-    /** @since 1.2 */
-    protected static final int FIELDTYPE_FLOAT = 3;
-
-    /** @since 2.0 */
-    protected static final int FIELDTYPE_ENUM = 4;
-
-    /** @since 2.0 */
-    protected static final int FIELDTYPE_STRUCT = 5;
-
-    // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
@@ -177,6 +155,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
                 list.add(curField);
             }
             field = new CTFStructField(fieldName, list.toArray(new CtfTmfEventField[list.size()]));
+
         } else if (fieldDef instanceof VariantDefinition) {
             VariantDefinition varDef = (VariantDefinition) fieldDef;
 
@@ -200,17 +179,6 @@ public abstract class CtfTmfEventField extends TmfEventField {
     public String toString() {
         return getName() + '=' + getValue().toString();
     }
-
-    // ------------------------------------------------------------------------
-    // Abstract methods (to be implemented by each specific field type)
-    // ------------------------------------------------------------------------
-
-    /**
-     * Return the int representing this field's value type
-     *
-     * @return The field type
-     */
-    public abstract int getFieldType();
 
     /**
      * Print a numeric value as a string in a given base
@@ -272,11 +240,6 @@ final class CTFIntegerField extends CtfTmfEventField {
     }
 
     @Override
-    public int getFieldType() {
-        return FIELDTYPE_INTEGER;
-    }
-
-    @Override
     public Long getValue() {
         return (Long) super.getValue();
     }
@@ -315,11 +278,6 @@ final class CTFStringField extends CtfTmfEventField {
     }
 
     @Override
-    public int getFieldType() {
-        return FIELDTYPE_STRING;
-    }
-
-    @Override
     public String getValue() {
         return (String) super.getValue();
     }
@@ -347,11 +305,6 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
     CTFIntegerArrayField(String name, List<Long> longValues, int base) {
         super(name, longValues, null);
         this.base = base;
-    }
-
-    @Override
-    public int getFieldType() {
-        return FIELDTYPE_INTEGER_ARRAY;
     }
 
     @Override
@@ -400,11 +353,6 @@ final class CTFFloatField extends CtfTmfEventField {
     }
 
     @Override
-    public int getFieldType() {
-        return FIELDTYPE_FLOAT;
-    }
-
-    @Override
     public Double getValue() {
         return (Double) super.getValue();
     }
@@ -431,11 +379,6 @@ final class CTFEnumField extends CtfTmfEventField {
     }
 
     @Override
-    public int getFieldType() {
-        return FIELDTYPE_ENUM;
-    }
-
-    @Override
     public CtfEnumPair getValue() {
         return (CtfEnumPair) super.getValue();
     }
@@ -458,11 +401,6 @@ final class CTFStructField extends CtfTmfEventField {
      */
     CTFStructField(String name, CtfTmfEventField[] fields) {
         super(name, fields, fields);
-    }
-
-    @Override
-    public int getFieldType() {
-        return FIELDTYPE_STRUCT;
     }
 
     @Override
