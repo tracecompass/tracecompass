@@ -130,7 +130,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.ide.IDE;
@@ -644,12 +643,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         } else if (files.size() == 0){
                             displayException(new FileNotFoundException('\'' + cs.toString() + '\'' + '\n' + Messages.TmfEventsTable_OpenCallsiteNotFound));
                         }
-                    } catch (PartInitException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
                     } catch (CoreException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        displayException(e);
                     }
                 }
             }
