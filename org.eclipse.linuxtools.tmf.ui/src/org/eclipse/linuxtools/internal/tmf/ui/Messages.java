@@ -105,6 +105,8 @@ public class Messages extends NLS {
     public static String TmfTimeFilterDialog_UNCHECK_ALL;
     public static String TmfTimeFilterDialog_CHECK_SELECTED;
     public static String TmfTimeFilterDialog_UNCHECK_SELECTED;
+    public static String TmfTimeFilterDialog_CHECK_SUBTREE;
+    public static String TmfTimeFilterDialog_UNCHECK_SUBTREE;
 
     public static String TmfTimeTipHandler_DURATION;
     public static String TmfTimeTipHandler_TRACE_DATE;
