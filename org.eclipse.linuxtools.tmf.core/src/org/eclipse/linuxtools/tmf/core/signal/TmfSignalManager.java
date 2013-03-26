@@ -32,23 +32,24 @@ import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
  */
 public class TmfSignalManager {
 
-	// The set of event listeners and their corresponding handler methods.
-	// Note: listeners could be restricted to ITmfComponents but there is no
-	// harm in letting anyone use this since it is not tied to anything but
-	// the signal data type.
-	static private Map<Object, Method[]> fListeners = new HashMap<Object, Method[]>();
-    static private Map<Object, Method[]> fVIPListeners = new HashMap<Object, Method[]>();
+    // The set of event listeners and their corresponding handler methods.
+    // Note: listeners could be restricted to ITmfComponents but there is no
+    // harm in letting anyone use this since it is not tied to anything but
+    // the signal data type.
+    private static Map<Object, Method[]> fListeners = new HashMap<Object, Method[]>();
+    private static Map<Object, Method[]> fVIPListeners = new HashMap<Object, Method[]>();
 
-	// If requested, add universal signal tracer
-	// TODO: Temporary solution: should be enabled/disabled dynamically
-	private static boolean fTraceIsActive = false;
-	private static TmfSignalTracer fSignalTracer;
-	static {
-		if (fTraceIsActive) {
-			fSignalTracer = TmfSignalTracer.getInstance();
-			register(fSignalTracer);
-		}
-	}
+    // If requested, add universal signal tracer
+    // TODO: Temporary solution: should be enabled/disabled dynamically
+    private static boolean fTraceIsActive = false;
+    private static TmfSignalTracer fSignalTracer;
+
+    static {
+        if (fTraceIsActive) {
+            fSignalTracer = TmfSignalTracer.getInstance();
+            register(fSignalTracer);
+        }
+    }
 
     /**
      * Register an object to the signal manager. This object can then implement
@@ -92,52 +93,54 @@ public class TmfSignalManager {
         fListeners.remove(listener);
     }
 
-	/**
-	 * Returns the list of signal handlers in the listener. Signal handler name
-	 * is irrelevant; only the annotation (@TmfSignalHandler) is important.
-	 *
-	 * @param listener
-	 * @return
-	 */
-	static private Method[] getSignalHandlerMethods(Object listener) {
-		List<Method> handlers = new ArrayList<Method>();
-		Method[] methods = listener.getClass().getMethods();
-		for (Method method : methods) {
-			if (method.isAnnotationPresent(TmfSignalHandler.class)) {
-				handlers.add(method);
-			}
-		}
-		return handlers.toArray(new Method[handlers.size()]);
-	}
+    /**
+     * Returns the list of signal handlers in the listener. Signal handler name
+     * is irrelevant; only the annotation (@TmfSignalHandler) is important.
+     *
+     * @param listener
+     * @return
+     */
+    private static Method[] getSignalHandlerMethods(Object listener) {
+        List<Method> handlers = new ArrayList<Method>();
+        Method[] methods = listener.getClass().getMethods();
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(TmfSignalHandler.class)) {
+                handlers.add(method);
+            }
+        }
+        return handlers.toArray(new Method[handlers.size()]);
+    }
 
-	static int fSignalId = 0;
+    static int fSignalId = 0;
 
-	/**
-	 * Invokes the handling methods that listens to signals of a given type.
-	 *
-	 * The list of handlers is built on-the-fly to allow for the dynamic
-	 * creation/deletion of signal handlers. Since the number of signal
-	 * handlers shouldn't be too high, this is not a big performance issue
-	 * to pay for the flexibility.
-	 *
-	 * For synchronization purposes, the signal is bracketed by two synch signals.
-	 *
-	 * @param signal the signal to dispatch
-	 */
-	static public synchronized void dispatchSignal(TmfSignal signal) {
-		int signalId = fSignalId++;
-		sendSignal(new TmfStartSynchSignal(signalId));
-		signal.setReference(signalId);
-		sendSignal(signal);
-		sendSignal(new TmfEndSynchSignal(signalId));
-	}
+    /**
+     * Invokes the handling methods that listens to signals of a given type.
+     *
+     * The list of handlers is built on-the-fly to allow for the dynamic
+     * creation/deletion of signal handlers. Since the number of signal handlers
+     * shouldn't be too high, this is not a big performance issue to pay for the
+     * flexibility.
+     *
+     * For synchronization purposes, the signal is bracketed by two synch
+     * signals.
+     *
+     * @param signal
+     *            the signal to dispatch
+     */
+    public static synchronized void dispatchSignal(TmfSignal signal) {
+        int signalId = fSignalId++;
+        sendSignal(new TmfStartSynchSignal(signalId));
+        signal.setReference(signalId);
+        sendSignal(signal);
+        sendSignal(new TmfEndSynchSignal(signalId));
+    }
 
-    static private void sendSignal(TmfSignal signal) {
+    private static void sendSignal(TmfSignal signal) {
         sendSignal(fVIPListeners, signal);
         sendSignal(fListeners, signal);
     }
 
-    static private void sendSignal(Map<Object, Method[]> listeners, TmfSignal signal) {
+    private static void sendSignal(Map<Object, Method[]> listeners, TmfSignal signal) {
 
         if (TmfCoreTracer.isSignalTraced()) {
             TmfCoreTracer.traceSignal(signal, "(start)"); //$NON-NLS-1$
