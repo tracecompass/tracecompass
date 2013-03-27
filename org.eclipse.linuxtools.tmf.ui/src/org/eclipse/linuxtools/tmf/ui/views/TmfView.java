@@ -18,6 +18,9 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.editors.ITmfTraceEditor;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
@@ -32,60 +35,52 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class TmfView extends ViewPart implements ITmfComponent {
 
-	private final String fName;
-	/**
-	 * Action class for pinning of TmfView.
-	 * @since 2.0
-	 */
-	protected PinTmfViewAction fPinAction;
+    private final String fName;
+    /**
+     * Action class for pinning of TmfView.
+     *
+     * @since 2.0
+     */
+    protected PinTmfViewAction fPinAction;
 
-	// ------------------------------------------------------------------------
-	// Constructor
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Constructor
+    // ------------------------------------------------------------------------
 
-	/**
-	 * Constructor. Creates a TMF view and registers to the signal manager.
-	 *
-	 * @param viewName A view name
-	 */
-	public TmfView(String viewName) {
-		super();
-		fName = viewName;
-		TmfSignalManager.register(this);
-	}
+    /**
+     * Constructor. Creates a TMF view and registers to the signal manager.
+     *
+     * @param viewName
+     *            A view name
+     */
+    public TmfView(String viewName) {
+        super();
+        fName = viewName;
+        TmfSignalManager.register(this);
+    }
 
-	/**
-	 * Disposes this view and de-registers itself from the signal manager
-	 *
-	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
-	 */
-	@Override
-	public void dispose() {
-		TmfSignalManager.deregister(this);
-		super.dispose();
-	}
+    /**
+     * Disposes this view and de-registers itself from the signal manager
+     */
+    @Override
+    public void dispose() {
+        TmfSignalManager.deregister(this);
+        super.dispose();
+    }
 
-	// ------------------------------------------------------------------------
-	// ITmfComponent
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // ITmfComponent
+    // ------------------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#getName()
-	 */
-	@Override
-	public String getName() {
-		return fName;
-	}
+    @Override
+    public String getName() {
+        return fName;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#broadcast(org.eclipse.linuxtools.tmf.core.signal.TmfSignal)
-	 */
-	@Override
-	public void broadcast(TmfSignal signal) {
-		TmfSignalManager.dispatchSignal(signal);
-	}
+    @Override
+    public void broadcast(TmfSignal signal) {
+        TmfSignalManager.dispatchSignal(signal);
+    }
 
     // ------------------------------------------------------------------------
     // View pinning support
@@ -117,6 +112,22 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
             toolBarManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
             toolBarManager.add(fPinAction);
         }
+    }
+
+    /**
+     * Get the currently selected trace, or 'null' if the active editor is not a
+     * TMF trace.
+     *
+     * @return The active trace, or 'null' if not a trace
+     * @since 2.0
+     */
+    public ITmfTrace getActiveTrace() {
+        IEditorPart editor = getSite().getPage().getActiveEditor();
+        if (editor instanceof ITmfTraceEditor) {
+            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
+            return trace;
+        }
+        return null;
     }
 
 }
