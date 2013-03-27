@@ -22,9 +22,6 @@ import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
  * The definition of a integer basic data type. It will take the data
  * from a trace and store it (and make it fit) as a long.
  *
- * TODO: Reading integers with an endianness different from the trace endianness
- * is not supported
- *
  * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
@@ -105,14 +102,24 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
     public void read(BitBuffer input) {
         final long longNegBit = 0x0000000080000000L;
         int align = (int) declaration.getAlignment();
-        int pos = input.position() + ((align-(input.position() % align))%align);
+        int pos = input.position() + ((align - (input.position() % align)) % align);
         input.position(pos);
         boolean signed = declaration.isSigned();
         int length = declaration.getLength();
         long bits = 0;
 
-        // TODO: use the eventual getLong from BitBuffer
+        /*
+         * Is the endianness of this field the same as the endianness of the
+         * input buffer? If not, then temporarily set the buffer's endianness to
+         * this field's just to read the data
+         */
+        ByteOrder byteOrder = input.getByteOrder();
+        if ((this.declaration.getByteOrder() != null) &&
+                (this.declaration.getByteOrder() != input.getByteOrder())) {
+            input.setByteOrder(this.declaration.getByteOrder());
+        }
 
+        // TODO: use the eventual getLong from BitBuffer
         if (length == 64) {
             long low = input.getInt(32, false);
             low = low & 0x00000000FFFFFFFFL;
@@ -127,12 +134,19 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
             bits = input.getInt(length, signed);
             bits = bits & 0x00000000FFFFFFFFL;
             /*
-             * The previous line loses sign information but is necessary, this fixes the sign
-             * for 32 bit numbers. Sorry, in java all 64 bit ints are signed.
+             * The previous line loses sign information but is necessary, this
+             * fixes the sign for 32 bit numbers. Sorry, in java all 64 bit ints
+             * are signed.
              */
-            if( (longNegBit == (bits & longNegBit)) && signed) {
+            if ((longNegBit == (bits & longNegBit)) && signed) {
                 bits |= 0xffffffff00000000L;
             }
+        }
+        /*
+         * Put the input buffer's endianness back to original if it was changed
+         */
+        if (byteOrder != input.getByteOrder()) {
+            input.setByteOrder(byteOrder);
         }
 
         value = bits;
