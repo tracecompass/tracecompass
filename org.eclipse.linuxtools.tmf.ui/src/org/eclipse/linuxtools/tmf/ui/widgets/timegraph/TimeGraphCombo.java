@@ -381,7 +381,12 @@ public class TimeGraphCombo extends Composite {
 
             @Override
             public void treeExpanded(TreeExpansionEvent event) {
-                fTimeGraphViewer.setExpandedState((ITimeGraphEntry) event.getElement(), true);
+                ITimeGraphEntry entry = (ITimeGraphEntry) event.getElement();
+                fTimeGraphViewer.setExpandedState(entry, true);
+                for (ITimeGraphEntry child : entry.getChildren()) {
+                    boolean expanded = fTreeViewer.getExpandedState(child);
+                    fTimeGraphViewer.setExpandedState(child, expanded);
+                }
                 List<TreeItem> treeItems = getVisibleExpandedItems(tree);
                 if (treeItems.size() == 0) {
                     return;
@@ -406,7 +411,12 @@ public class TimeGraphCombo extends Composite {
 
             @Override
             public void treeExpanded(TimeGraphTreeExpansionEvent event) {
-                fTreeViewer.setExpandedState(event.getEntry(), true);
+                ITimeGraphEntry entry = event.getEntry();
+                fTreeViewer.setExpandedState(entry, true);
+                for (ITimeGraphEntry child : entry.getChildren()) {
+                    boolean expanded = fTreeViewer.getExpandedState(child);
+                    fTimeGraphViewer.setExpandedState(child, expanded);
+                }
             }
         });
 
