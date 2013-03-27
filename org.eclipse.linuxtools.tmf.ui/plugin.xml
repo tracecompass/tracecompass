@@ -39,6 +39,15 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.ui.views.statesystem.TmfStateSystemExplorer"
+            icon="icons/eview16/events_view.gif"
+            id="org.eclipse.linuxtools.tmf.ui.views.ssvisualizer"
+            name="%ssvisualizer.view.name"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.linuxtools.tmf.ui.views.colors.ColorsView"
             icon="icons/eview16/colors_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.colors"
