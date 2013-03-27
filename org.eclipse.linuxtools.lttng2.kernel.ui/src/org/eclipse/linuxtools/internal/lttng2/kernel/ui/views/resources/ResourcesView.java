@@ -44,7 +44,6 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -479,15 +478,8 @@ public class ResourcesView extends TmfView {
     private void buildEventList(final ITmfTrace trace, IProgressMonitor monitor) {
         fStartTime = Long.MAX_VALUE;
         fEndTime = Long.MIN_VALUE;
-        ITmfTrace[] traces;
-        if (trace instanceof TmfExperiment) {
-            TmfExperiment experiment = (TmfExperiment) trace;
-            traces = experiment.getTraces();
-        } else {
-            traces = new ITmfTrace[] { trace };
-        }
         ArrayList<TraceEntry> entryList = new ArrayList<TraceEntry>();
-        for (ITmfTrace aTrace : traces) {
+        for (ITmfTrace aTrace : trace.getTraces()) {
             if (monitor.isCanceled()) {
                 return;
             }

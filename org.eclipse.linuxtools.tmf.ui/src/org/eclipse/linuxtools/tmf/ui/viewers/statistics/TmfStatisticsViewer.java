@@ -564,14 +564,8 @@ public class TmfStatisticsViewer extends TmfViewer {
             // Checks if the trace is already in the statistics tree.
             int numNodeTraces = statisticsTreeNode.getNbChildren();
 
-            int numTraces = 1;
-            ITmfTrace[] trace = { fTrace };
-            // For experiment, gets all the traces within it
-            if (fTrace instanceof TmfExperiment) {
-                TmfExperiment experiment = (TmfExperiment) fTrace;
-                numTraces = experiment.getTraces().length;
-                trace = experiment.getTraces();
-            }
+            ITmfTrace[] traces = fTrace.getTraces();
+            int numTraces = traces.length;
 
             if (numTraces == numNodeTraces) {
                 boolean same = true;
@@ -580,7 +574,7 @@ public class TmfStatisticsViewer extends TmfViewer {
                  * previously selected.
                  */
                 for (int i = 0; i < numTraces; i++) {
-                    String traceName = trace[i].getName();
+                    String traceName = traces[i].getName();
                     if (!statisticsTreeNode.containsChild(traceName)) {
                         same = false;
                         break;
@@ -711,13 +705,7 @@ public class TmfStatisticsViewer extends TmfViewer {
                 statTree.resetTimeRangeValue();
             }
 
-            ITmfTrace[] traces;
-            if (trace instanceof TmfExperiment) {
-                TmfExperiment experiment = (TmfExperiment) trace;
-                traces = experiment.getTraces();
-            } else {
-                traces = new ITmfTrace[] { trace };
-            }
+            ITmfTrace[] traces = trace.getTraces();
             for (final ITmfTrace aTrace : traces) {
                 if (!isListeningTo(aTrace)) {
                     continue;
