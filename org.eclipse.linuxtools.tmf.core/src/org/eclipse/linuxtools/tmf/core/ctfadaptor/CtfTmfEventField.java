@@ -162,7 +162,8 @@ public abstract class CtfTmfEventField extends TmfEventField {
             String curFieldName = varDef.getCurrentFieldName();
             Definition curFieldDef = varDef.getDefinitions().get(curFieldName);
             if (curFieldDef != null) {
-                field = CtfTmfEventField.parseField(curFieldDef, curFieldName);
+                CtfTmfEventField subField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
+                field = new CTFVariantField(fieldName, subField);
             } else {
                 /* A safe-guard, but curFieldDef should never be null */
                 field = new CTFStringField(curFieldName, ""); //$NON-NLS-1$
@@ -177,7 +178,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
 
     @Override
     public String toString() {
-        return getName() + '=' + getValue().toString();
+        return getName() + '=' + getFormattedValue();
     }
 
     /**
@@ -249,13 +250,6 @@ final class CTFIntegerField extends CtfTmfEventField {
         return formatNumber(getValue(), base);
     }
 
-    /**
-     * Custom-format the integer values depending on their base.
-     */
-    @Override
-    public String toString() {
-        return getName() + '=' + formatNumber(getValue(), base);
-    }
 }
 
 /**
@@ -324,13 +318,6 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
         return formattedValue;
     }
 
-    /**
-     * Custom-format the integer values depending on their base.
-     */
-    @Override
-    public String toString() {
-        return getName() + '=' + getFormattedValue();
-    }
 }
 
 /**
@@ -385,17 +372,17 @@ final class CTFEnumField extends CtfTmfEventField {
 }
 
 /**
- * The CTF field implementation for struct fields with sub-types
+ * The CTF field implementation for struct fields with sub-fields
  *
  * @author gbastien
  */
 final class CTFStructField extends CtfTmfEventField {
 
     /**
-     * Constructor for CTFStringField.
+     * Constructor for CTFStructField.
      *
-     * @param strValue
-     *            The string value of this field
+     * @param fields
+     *            The children of this field
      * @param name
      *            The name of this field
      */
@@ -409,9 +396,36 @@ final class CTFStructField extends CtfTmfEventField {
     }
 
     @Override
-    public String toString() {
-        return getName() + '=' + Arrays.toString(getValue());
+    public String getFormattedValue() {
+        return Arrays.toString(getValue());
     }
+
+}
+
+/**
+ * The CTF field implementation for variant fields its child
+ *
+ * @author gbastien
+ */
+final class CTFVariantField extends CtfTmfEventField {
+
+    /**
+     * Constructor for CTFVariantField.
+     *
+     * @param field
+     *            The field selected for this variant
+     * @param name
+     *            The name of this field
+     */
+    CTFVariantField(String name, CtfTmfEventField field) {
+        super(name, field, new CtfTmfEventField[]{ field });
+    }
+
+    @Override
+    public CtfTmfEventField getValue() {
+        return (CtfTmfEventField) super.getValue();
+    }
+
 }
 
 /* Implement other possible fields types here... */
