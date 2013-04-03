@@ -30,7 +30,8 @@ import org.junit.BeforeClass;
  */
 public class TmfStateStatisticsTest extends TmfStatisticsTest {
 
-    private static File htFile;
+    private static File htFileTotals;
+    private static File htFileTypes;
 
     /**
      * Set up the fixture (build the state history, etc.) once for all tests.
@@ -39,8 +40,10 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
     public static void setUpClass() {
         assumeTrue(testTrace.exists());
         try {
-            htFile = File.createTempFile("stats-test", ".ht");
-            backend = new TmfStateStatistics(testTrace.getTrace(), htFile);
+            htFileTotals = File.createTempFile("stats-test-totals", ".ht");
+            htFileTypes = File.createTempFile("stats-test-types", ".ht");
+
+            backend = new TmfStateStatistics(testTrace.getTrace(), htFileTotals, htFileTypes);
 
         } catch (TmfTraceException e) {
             fail();
@@ -54,6 +57,7 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
      */
     @AfterClass
     public static void tearDownClass() {
-        htFile.delete();
+        htFileTotals.delete();
+        htFileTypes.delete();
     }
 }
