@@ -201,6 +201,21 @@ public interface ITmfTrace extends ITmfDataProvider {
      */
     public Collection<String> listStateSystems();
 
+    /**
+     * If a state system is not build by the trace itself, it's possible to
+     * register it if it comes from another source. It will then be accessible
+     * with {@link #getStateSystems} normally.
+     *
+     * @param id
+     *            The unique ID to assign to this state system. In case of
+     *            conflicting ID's, the new one will overwrite the previous one
+     *            (default Map behavior).
+     * @param ss
+     *            The already-built state system
+     * @since 2.0
+     */
+    public void registerStateSystem(String id, ITmfStateSystem ss);
+
     // ------------------------------------------------------------------------
     // Trace characteristics getters
     // ------------------------------------------------------------------------
