@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -72,7 +73,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
     public TimeGraphLegend(Shell parent, ITimeGraphPresentationProvider provider) {
         super(parent);
         this.provider = provider;
-        this.setShellStyle(getShellStyle());
+        this.setShellStyle(getShellStyle() | SWT.RESIZE);
     }
 
     @Override
@@ -81,7 +82,6 @@ public class TimeGraphLegend extends TitleAreaDialog {
         Composite composite = new Composite(dlgArea, SWT.NONE);
 
         GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
         composite.setLayout(layout);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         composite.setLayoutData(gd);
@@ -96,7 +96,14 @@ public class TimeGraphLegend extends TitleAreaDialog {
     }
 
     private void createStatesGroup(Composite composite) {
-        Group gs = new Group(composite, SWT.NONE);
+        ScrolledComposite sc = new ScrolledComposite(composite, SWT.V_SCROLL|SWT.H_SCROLL);
+        sc.setExpandHorizontal(true);
+        sc.setExpandVertical(true);
+        Group gs = new Group(sc, SWT.H_SCROLL);
+        sc.setContent(gs);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        sc.setLayoutData(gd);
+
         String stateTypeName = provider.getStateTypeName();
         StringBuffer buffer = new StringBuffer();
         if (!stateTypeName.isEmpty()) {
@@ -105,9 +112,6 @@ public class TimeGraphLegend extends TitleAreaDialog {
         }
         buffer.append(Messages.TmfTimeLegend_StateTypeName);
         gs.setText(buffer.toString());
-
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gs.setLayoutData(gd);
 
         GridLayout layout = new GridLayout();
         layout.numColumns = 2;
@@ -138,6 +142,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             gd.verticalIndent = 8;
             name.setLayoutData(gd);
         }
+        sc.setMinSize(gs.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     @Override
