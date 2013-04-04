@@ -17,7 +17,6 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -25,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -185,15 +183,8 @@ public class TmfExperimentTest {
     @Test
     public void testGetStateSystem() {
         /* There should not be any experiment-specific state system */
-        ITmfStateSystem ss = fExperiment.getStateSystem("something");
+        ITmfStateSystem ss = fExperiment.getStateSystems().get("something");
         assertNull(ss);
-    }
-
-    @Test
-    public void testListStateSystem() {
-        Collection<String> sss = fExperiment.listStateSystems();
-        assertNotNull(sss);
-        assertEquals(0, sss.size());
     }
 
     // ------------------------------------------------------------------------

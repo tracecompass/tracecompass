@@ -183,7 +183,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 if (status == StateValues.CPU_STATUS_IRQ) {
                     // In IRQ state get the IRQ that caused the interruption
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
-                    ITmfStateSystem ss = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+                    ITmfStateSystem ss = entry.getTrace().getStateSystems().get(CtfKernelTrace.STATE_ID);
                     int cpu = entry.getId();
 
                     try {
@@ -212,7 +212,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
                     // In SOFT_IRQ state get the SOFT_IRQ that caused the interruption
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
-                    ITmfStateSystem ss = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+                    ITmfStateSystem ss = entry.getTrace().getStateSystems().get(CtfKernelTrace.STATE_ID);
                     int cpu = entry.getId();
 
                     try {
@@ -241,7 +241,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL){
                     // In running state get the current tid
                     ResourcesEntry entry = (ResourcesEntry) event.getEntry();
-                    ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+                    ITmfStateSystem ssq = entry.getTrace().getStateSystems().get(CtfKernelTrace.STATE_ID);
 
                     try {
                         retMap.put(Messages.ResourcesView_attributeHoverTime, Utils.formatTime(hoverTime, TimeFormat.CALENDAR, Resolution.NANOSEC));
@@ -300,7 +300,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             return;
         }
         ResourcesEntry entry = (ResourcesEntry) event.getEntry();
-        ITmfStateSystem ss = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+        ITmfStateSystem ss = entry.getTrace().getStateSystems().get(CtfKernelTrace.STATE_ID);
         long time = event.getTime();
         try {
             while (time < event.getTime() + event.getDuration()) {

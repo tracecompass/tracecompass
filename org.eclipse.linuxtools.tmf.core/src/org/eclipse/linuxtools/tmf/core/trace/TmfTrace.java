@@ -15,8 +15,8 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
@@ -114,7 +114,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @since 2.0
      */
     protected final Map<String, ITmfStateSystem> fStateSystems =
-            new HashMap<String, ITmfStateSystem>();
+            new LinkedHashMap<String, ITmfStateSystem>();
 
     // ------------------------------------------------------------------------
     // Construction
@@ -405,16 +405,8 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @since 2.0
      */
     @Override
-    public final ITmfStateSystem getStateSystem(String id) {
-        return fStateSystems.get(id);
-    }
-
-    /**
-     * @since 2.0
-     */
-    @Override
-    public final Collection<String> listStateSystems() {
-        return fStateSystems.keySet();
+    public final Map<String, ITmfStateSystem> getStateSystems() {
+        return Collections.unmodifiableMap(fStateSystems);
     }
 
     /**

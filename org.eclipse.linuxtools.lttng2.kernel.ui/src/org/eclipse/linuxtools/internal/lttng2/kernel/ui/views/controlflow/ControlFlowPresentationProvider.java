@@ -111,7 +111,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         Map<String, String> retMap = new LinkedHashMap<String, String>();
         if (event instanceof ControlFlowEvent) {
             ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-            ITmfStateSystem ssq = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+            ITmfStateSystem ssq = entry.getTrace().getStateSystems().get(CtfKernelTrace.STATE_ID);
             int tid = entry.getThreadId();
 
             try {
@@ -172,7 +172,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
             return;
         }
         ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-        ITmfStateSystem ss = entry.getTrace().getStateSystem(CtfKernelTrace.STATE_ID);
+        ITmfStateSystem ss = entry.getTrace().getStateSystems().get(CtfKernelTrace.STATE_ID);
         int status = ((ControlFlowEvent) event).getStatus();
         if (status != StateValues.PROCESS_STATUS_RUN_SYSCALL) {
             return;
