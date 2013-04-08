@@ -22,15 +22,15 @@ package org.eclipse.linuxtools.tmf.core.event;
  * @see ITmfEvent
  * @see ITmfEventField
  */
-public class TmfEventType implements ITmfEventType, Cloneable {
+public class TmfEventType implements ITmfEventType {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private String fContext;
-    private String fTypeId;
-    private ITmfEventField fRootField;
+    private final String fContext;
+    private final String fTypeId;
+    private final ITmfEventField fRootField;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -118,27 +118,6 @@ public class TmfEventType implements ITmfEventType, Cloneable {
     @Override
     public String getFieldName(final int index) {
         return (fRootField != null) ? fRootField.getFieldName(index) : null;
-    }
-
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    public TmfEventType clone() {
-        TmfEventType clone = null;
-        try {
-            clone = (TmfEventType) super.clone();
-            clone.fContext = fContext;
-            clone.fTypeId = fTypeId;
-            clone.fRootField = fRootField;
-        }
-        catch (final CloneNotSupportedException e) {
-        }
-        return clone;
     }
 
     // ------------------------------------------------------------------------
