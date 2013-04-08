@@ -115,10 +115,10 @@ public class GdbEventsTable extends TmfEventsTable {
         if (event != null) {
             GdbTraceEventContent content = (GdbTraceEventContent) event.getContent();
             fields = new TmfEventField[] {
-                    new TmfEventField(TRACE_FRAME_COLUMN, content.getFrameNumber()),
-                    new TmfEventField(TRACEPOINT_COLUMN, content.getTracepointNumber()),
-                    new TmfEventField(FILE_COLUMN, event.getReference()),
-                    new TmfEventField(CONTENT_COLUMN, content.toString())
+                    new TmfEventField(TRACE_FRAME_COLUMN, content.getFrameNumber(), null),
+                    new TmfEventField(TRACEPOINT_COLUMN, content.getTracepointNumber(), null),
+                    new TmfEventField(FILE_COLUMN, event.getReference(), null),
+                    new TmfEventField(CONTENT_COLUMN, content.toString(), null)
             };
         }
         return fields;

@@ -47,26 +47,6 @@ public class TmfEventField implements ITmfEventField {
     // ------------------------------------------------------------------------
 
     /**
-     * Constructor for a structural field
-     *
-     * @param name the event field id
-     * @param fields the list of subfields
-     */
-    public TmfEventField(final String name, final ITmfEventField[] fields) {
-        this(name, null, fields);
-    }
-
-    /**
-     * Constructor for a terminal field (no subfields)
-     *
-     * @param name the event field id
-     * @param value the event field value
-     */
-    public TmfEventField(final String name, final Object value) {
-        this(name, value, null);
-    }
-
-    /**
      * Full constructor
      *
      * @param name the event field id
@@ -189,10 +169,10 @@ public class TmfEventField implements ITmfEventField {
     public final static ITmfEventField makeRoot(final String[] labels) {
         final ITmfEventField[] fields = new ITmfEventField[labels.length];
         for (int i = 0; i < labels.length; i++) {
-            fields[i] = new TmfEventField(labels[i], null);
+            fields[i] = new TmfEventField(labels[i], null, null);
         }
         // Return a new root field;
-        return new TmfEventField(ITmfEventField.ROOT_FIELD_ID, fields);
+        return new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, fields);
     }
 
     // ------------------------------------------------------------------------

@@ -214,9 +214,9 @@ public class CustomEvent extends TmfEvent {
             String value = fData.get(outputColumn.name);
             if (outputColumn.name.equals(CustomTraceDefinition.TAG_TIMESTAMP) && date != null) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat(fDefinition.timeStampOutputFormat);
-                fColumnData[i++] = new TmfEventField(outputColumn.name, dateFormat.format(date));
+                fColumnData[i++] = new TmfEventField(outputColumn.name, dateFormat.format(date), null);
             } else {
-                fColumnData[i++] = new TmfEventField(outputColumn.name, (value != null ? value : "")); //$NON-NLS-1$
+                fColumnData[i++] = new TmfEventField(outputColumn.name, (value != null ? value : ""), null); //$NON-NLS-1$
             }
         }
         CustomEventContent curContent = (CustomEventContent) getContent();

@@ -61,7 +61,7 @@ public final class CtfTmfEventFactory {
         int sourceCPU = eventDef.getCPU();
 
         ITmfEventField content = new TmfEventField(
-                ITmfEventField.ROOT_FIELD_ID, parseFields(eventDef));
+                ITmfEventField.ROOT_FIELD_ID, null, parseFields(eventDef));
 
         String reference = fileName == null ? CtfTmfEvent.NO_STREAM : fileName;
 

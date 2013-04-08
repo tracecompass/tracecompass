@@ -31,7 +31,7 @@ public class CustomEventContent extends TmfEventField {
      *            Event content
      */
     public CustomEventContent(CustomEvent parent, StringBuffer content) {
-        super(ITmfEventField.ROOT_FIELD_ID, content);
+        super(ITmfEventField.ROOT_FIELD_ID, content, null);
     }
 
     /**

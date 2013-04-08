@@ -1782,11 +1782,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             final String reference = event.getReference();
             final String content = event.getContent().toString();
             fields = new TmfEventField[] {
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, timestamp),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, source),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, type),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, reference),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, content)
+                    new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, timestamp, null),
+                    new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, source, null),
+                    new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, type, null),
+                    new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, reference, null),
+                    new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, content, null)
             };
         }
         return fields;

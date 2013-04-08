@@ -36,7 +36,7 @@ public class CtfTmfEventTypeTest {
     @Test
     public void testCtfTmfEventType() {
         String eventName = "";
-        ITmfEventField content = new TmfEventField("", new ITmfEventField[] {});
+        ITmfEventField content = new TmfEventField("", null, new ITmfEventField[] {});
         CtfTmfEventType result = new CtfTmfEventType( eventName, content);
 
         assertNotNull(result);
@@ -50,7 +50,7 @@ public class CtfTmfEventTypeTest {
      */
     @Test
     public void testToString() {
-        ITmfEventField emptyField = new TmfEventField("", new ITmfEventField[] {});
+        ITmfEventField emptyField = new TmfEventField("", null, new ITmfEventField[] {});
         CtfTmfEventType fixture = new CtfTmfEventType("", emptyField);
 
         String result = fixture.toString();

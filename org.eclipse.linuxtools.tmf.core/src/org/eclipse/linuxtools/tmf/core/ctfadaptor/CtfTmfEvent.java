@@ -93,7 +93,7 @@ public final class CtfTmfEvent extends TmfEvent implements ITmfSourceLookup, ITm
                 new CtfTmfTimestamp(-1),
                 null,
                 null,
-                new TmfEventField("", new CtfTmfEventField[0]), //$NON-NLS-1$
+                new TmfEventField("", null, new CtfTmfEventField[0]), //$NON-NLS-1$
                 NO_STREAM);
         this.sourceCPU = -1;
         this.typeId = -1;

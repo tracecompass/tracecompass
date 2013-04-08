@@ -47,9 +47,9 @@ public class GdbTraceEventContent extends TmfEventField {
         super(ITmfEventField.ROOT_FIELD_ID,
                 content.replaceAll("\r?\n", " | "), //$NON-NLS-1$ //$NON-NLS-2$
                 new ITmfEventField[] {
-                    new TmfEventField(TRACE_FRAME, frameNumber),
-                    new TmfEventField(TRACEPOINT, tracepointNumber)}
-                );
+                        new TmfEventField(TRACE_FRAME, frameNumber, null),
+                        new TmfEventField(TRACEPOINT, tracepointNumber, null)
+                });
 
         fTracepointNumber = tracepointNumber;
         fFrameNumber = frameNumber;

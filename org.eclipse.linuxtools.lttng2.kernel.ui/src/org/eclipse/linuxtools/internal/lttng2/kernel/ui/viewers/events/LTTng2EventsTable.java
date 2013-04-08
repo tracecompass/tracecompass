@@ -73,10 +73,10 @@ public class LTTng2EventsTable extends TmfEventsTable {
         ITmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
             fields = new TmfEventField[] {
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, event.getTimestamp().toString()),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, event.getReference()),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, event.getType().getName()),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, event.getContent().toString())
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, event.getTimestamp().toString(), null),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, event.getReference(), null),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, event.getType().getName(), null),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, event.getContent().toString(), null)
                     };
         }
         return fields;
