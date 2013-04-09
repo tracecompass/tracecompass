@@ -44,7 +44,7 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 0;
+    private static final int VERSION = 1;
 
     /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
     private final HashMap<String, Integer> knownEventNames;
@@ -333,6 +333,13 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
                 /* Set the process' syscall name, to be the same as the parent's */
                 quark = ss.getQuarkRelativeAndAdd(parentTidNode, Attributes.SYSTEM_CALL);
                 value = ss.queryOngoingState(quark);
+                if (value.isNull()) {
+                    /*
+                     * Maybe we were missing info about the parent? At least we
+                     * will set the child right. Let's suppose "sys_clone".
+                     */
+                    value = TmfStateValue.newValueString(LttngStrings.SYS_CLONE);
+                }
                 quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.SYSTEM_CALL);
                 ss.modifyAttribute(ts, value, quark);
             }
