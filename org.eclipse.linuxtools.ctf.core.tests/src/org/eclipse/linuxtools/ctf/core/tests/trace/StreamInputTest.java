@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
@@ -71,16 +70,11 @@ public class StreamInputTest {
 
     /**
      * Run the FileChannel getFileChannel() method test.
-     *
-     * @throws IOException
      */
     @Test
-    public void testGetFileChannel() throws IOException {
+    public void testGetFileChannel() {
         FileChannel result = fixture.getFileChannel();
         assertNull(result);
-        if (result != null) {
-            result.close();
-        }
     }
 
     /**

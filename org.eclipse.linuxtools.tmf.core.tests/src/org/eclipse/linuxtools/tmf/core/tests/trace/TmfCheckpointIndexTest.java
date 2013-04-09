@@ -144,7 +144,6 @@ public class TmfCheckpointIndexTest {
     // ------------------------------------------------------------------------
 
     @Test
-    @SuppressWarnings("null")
     public void testTmfTraceIndexing() {
         assertEquals("getCacheSize",   BLOCK_SIZE, fTrace.getCacheSize());
         assertEquals("getTraceSize",   NB_EVENTS,  fTrace.getNbEvents());
@@ -169,7 +168,6 @@ public class TmfCheckpointIndexTest {
     }
 
     @Test
-    @SuppressWarnings("null")
     public void testEmptyTmfTraceIndexing() {
         assertEquals("getCacheSize",   ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, fEmptyTrace.getCacheSize());
         assertEquals("getTraceSize",   0,  fEmptyTrace.getNbEvents());
