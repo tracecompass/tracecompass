@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,19 +26,11 @@ import org.eclipse.swt.graphics.Image;
  */
 public class TraceFolderLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
-     */
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
-     */
     @Override
     public String getColumnText(Object element, int columnIndex) {
         if (element instanceof TmfTraceElement) {

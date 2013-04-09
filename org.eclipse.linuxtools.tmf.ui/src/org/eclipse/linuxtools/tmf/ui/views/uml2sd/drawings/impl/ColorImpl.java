@@ -77,19 +77,11 @@ public class ColorImpl implements IColor {
         return new ColorImpl(Display.getDefault().getSystemColor(color));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor#getColor()
-     */
     @Override
     public Object getColor() {
         return fColor;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor#dispose()
-     */
     @Override
     public void dispose() {
         if ((fColor != null) && (fManageColor)) {

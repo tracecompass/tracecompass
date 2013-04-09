@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (c) 2012 Ericsson
+* Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -51,10 +51,6 @@ public class OpenAction extends Action {
         this.selectionProvider = selectionProvider;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.action.Action#isEnabled()
-     */
     @Override
     public boolean isEnabled() {
         ISelection selection = selectionProvider.getSelection();
@@ -71,10 +67,6 @@ public class OpenAction extends Action {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.action.Action#run()
-     */
     @Override
     public void run() {
         try {

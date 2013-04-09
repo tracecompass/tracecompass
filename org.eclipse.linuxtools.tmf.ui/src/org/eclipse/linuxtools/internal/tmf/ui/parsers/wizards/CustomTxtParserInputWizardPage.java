@@ -508,9 +508,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.DialogPage#dispose()
-     */
     @Override
     public void dispose() {
         if (fixedFont != null) {

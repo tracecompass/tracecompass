@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -205,18 +205,10 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // FocusListener
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
-     */
     @Override
     public void focusGained(FocusEvent event) {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
-     */
     @Override
     public void focusLost(FocusEvent event) {
         updateValue();
@@ -226,10 +218,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // KeyListener
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.events.KeyListener#keyPressed(org.eclipse.swt.events.KeyEvent)
-     */
     @Override
     public void keyPressed(KeyEvent event) {
         switch (event.keyCode) {
@@ -241,10 +229,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.events.KeyListener#keyReleased(org.eclipse.swt.events.KeyEvent)
-     */
     @Override
     public void keyReleased(KeyEvent e) {
     }

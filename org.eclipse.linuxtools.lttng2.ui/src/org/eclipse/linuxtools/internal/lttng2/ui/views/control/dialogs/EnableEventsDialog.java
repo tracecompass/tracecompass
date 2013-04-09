@@ -106,10 +106,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // Accessors
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isTracpoints()
-     */
     @Override
     public boolean isTracepoints() {
         if (fIsKernel) {
@@ -118,9 +114,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return fUstComposite.isTracepoints();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isAllTracePoints()
-     */
     @Override
     public boolean isAllTracePoints() {
         if (fIsKernel) {
@@ -129,10 +122,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return fUstComposite.isAllTracePoints();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isSysCalls()
-     */
     @Override
     public boolean isSysCalls() {
         if (fIsKernel) {
@@ -141,9 +130,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isAllSysCalls()
-     */
     @Override
     public boolean isAllSysCalls() {
         if (fIsKernel) {
@@ -152,9 +138,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getEventNames()
-     */
     @Override
     public List<String> getEventNames() {
         if (fIsKernel) {
@@ -162,10 +145,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
         return fUstComposite.getEventNames();
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isDynamicProbe()
-     */
+
     @Override
     public boolean isDynamicProbe() {
         if (fIsKernel) {
@@ -174,9 +154,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getProbeName()
-     */
     @Override
     public String getProbeName() {
         if (fIsKernel) {
@@ -185,9 +162,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getProbeEventName()
-     */
     @Override
     public String getProbeEventName() {
         if (fIsKernel) {
@@ -196,10 +170,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#isDynamicFunctionProbe()
-     */
     @Override
     public boolean isDynamicFunctionProbe() {
         if (fIsKernel) {
@@ -208,9 +178,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getFunctionEventName()
-     */
     @Override
     public String getFunctionEventName() {
         if (fIsKernel) {
@@ -219,10 +186,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableKernelEvents#getFunction()
-     */
     @Override
     public String getFunction() {
         if (fIsKernel) {
@@ -231,10 +194,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#isWildcard()
-     */
     @Override
     public boolean isWildcard() {
         if (!fIsKernel) {
@@ -243,62 +202,38 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getWildcard()
-     */
     @Override
     public String getWildcard() {
         if (!fIsKernel) {
             return fUstComposite.getWildcard();
         }
         return null;
-
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#isLogLevel()
-     */
     @Override
     public boolean isLogLevel() {
         if (!fIsKernel) {
             return fUstComposite.isLogLevel();
         }
         return false;
-
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getLogLevelType()
-     */
     @Override
     public LogLevelType getLogLevelType() {
         if (!fIsKernel) {
             return fUstComposite.getLogLevelType();
         }
         return null;
-
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getLogLevel()
-     */
     @Override
     public TraceLogLevel getLogLevel() {
         if (!fIsKernel) {
             return fUstComposite.getLogLevel();
         }
         return null;
-
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getLogLevelEventName()
-     */
     @Override
     public String getLogLevelEventName() {
         if (!fIsKernel) {
@@ -307,28 +242,16 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog#isKernel()
-     */
     @Override
     public boolean isKernel() {
         return fIsKernel;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog#setTraceProviderGroup(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup)
-     */
     @Override
     public void setTraceProviderGroup(TraceProviderGroup providerGroup) {
         fProviderGroup = providerGroup;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog#setTraceDomainComponent(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent)
-     */
     @Override
     public void setTraceDomainComponent(TraceDomainComponent domain) {
         fDomain = domain;
@@ -339,10 +262,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableUstEvents#getFilterExpression()
-     */
     @Override
     public String getFilterExpression() {
         if (!fIsKernel) {
@@ -354,10 +273,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
+
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -365,10 +281,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         newShell.setImage(Activator.getDefault().loadIcon(ENABLE_EVENT_ICON_FILE));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
 
@@ -448,21 +360,12 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return fDialogComposite;
     }
 
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
         createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
     @Override
     protected void okPressed() {
         fIsKernel = fKernelButton.getSelection();
@@ -484,6 +387,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+
     /**
      * Creates the kernel composite (if not existing)
      */

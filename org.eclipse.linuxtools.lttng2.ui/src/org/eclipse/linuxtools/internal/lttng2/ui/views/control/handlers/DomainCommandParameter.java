@@ -1,12 +1,12 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -16,7 +16,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 
 /**
  * Class containing parameter for the command execution.
- * 
+ *
  *  @author Bernd Hufmann
  */
 public class DomainCommandParameter extends CommandParameter {
@@ -52,15 +52,11 @@ public class DomainCommandParameter extends CommandParameter {
     public TraceDomainComponent getDomain() {
         return fDomain;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
     @Override
     public DomainCommandParameter clone() {
         DomainCommandParameter clone = (DomainCommandParameter) super.clone();

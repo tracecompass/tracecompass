@@ -64,17 +64,9 @@ public class ImportHandler extends BaseControlViewHandler {
     protected CommandParameter fParam;
 
     // ------------------------------------------------------------------------
-    // Accessors
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-     */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
@@ -121,10 +113,6 @@ public class ImportHandler extends BaseControlViewHandler {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
-     */
     @Override
     public boolean isEnabled() {
         // Get workbench page for the Control View
@@ -166,6 +154,7 @@ public class ImportHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+
     /**
      * Downloads a trace from the remote host to the given project.
      *

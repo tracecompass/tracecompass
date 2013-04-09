@@ -356,9 +356,6 @@ public class ControlFlowView extends TmfView {
     // ViewPart
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.TmfView#createPartControl(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     public void createPartControl(Composite parent) {
         fTimeGraphCombo = new TimeGraphCombo(parent, SWT.NONE);
@@ -422,9 +419,6 @@ public class ControlFlowView extends TmfView {
         getSite().setSelectionProvider(fTimeGraphCombo.getTreeViewer());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-     */
     @Override
     public void setFocus() {
         fTimeGraphCombo.setFocus();

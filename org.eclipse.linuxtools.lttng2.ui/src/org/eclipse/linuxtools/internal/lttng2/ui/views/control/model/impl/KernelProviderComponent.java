@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,18 +33,16 @@ public class KernelProviderComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
     /**
      * Path to icon file for this component.
      */
     public static final String KERNEL_PROVIDER_ICON_FILE = "icons/obj16/targets.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
     /**
      * Constructor
      * @param name - the name of the component.
@@ -59,6 +57,7 @@ public class KernelProviderComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
+
     /**
      * Sets the events information for this component.
      * @param eventInfos - events information to set.
@@ -72,10 +71,6 @@ public class KernelProviderComponent extends TraceControlComponent {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
-     */
     @Override
     public Object getAdapter(Class adapter) {
         if (adapter == IPropertySource.class) {
@@ -83,9 +78,5 @@ public class KernelProviderComponent extends TraceControlComponent {
         }
         return null;
     }
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
 
 }

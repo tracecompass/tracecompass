@@ -81,9 +81,6 @@ public class MultiLineInputDialog extends InputDialog {
         this.dialogMessage = dialogMessage;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.InputDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -138,9 +135,6 @@ public class MultiLineInputDialog extends InputDialog {
         return composite;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createContents(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createContents(Composite parent) {
         Control control = super.createContents(parent);
@@ -153,17 +147,11 @@ public class MultiLineInputDialog extends InputDialog {
         return control;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.InputDialog#getInputTextStyle()
-     */
     @Override
     protected int getInputTextStyle() {
         return SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.BORDER;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
     @Override
     protected boolean isResizable() {
         return true;

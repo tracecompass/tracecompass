@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -50,9 +50,9 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
 /**
  * Implementation of new experiment dialog that creates the experiment element.
  * <p>
+ *
  * @version 1.0
  * @author Francois Chouinard
-
  */
 public class NewExperimentDialog extends SelectionStatusDialog {
 
@@ -69,8 +69,11 @@ public class NewExperimentDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param shell The parent shell
-     * @param experimentFolder The parent experiment folder element
+     *
+     * @param shell
+     *            The parent shell
+     * @param experimentFolder
+     *            The parent experiment folder element
      */
     public NewExperimentDialog(Shell shell, TmfExperimentFolder experimentFolder) {
         super(shell);
@@ -83,10 +86,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // Dialog
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
+
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -119,25 +119,25 @@ public class NewExperimentDialog extends SelectionStatusDialog {
         fExperimentName.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
-            	validateNewExperimentName();
+                validateNewExperimentName();
             }
         });
     }
 
     private void validateNewExperimentName() {
 
-    	String name = fExperimentName.getText();
+        String name = fExperimentName.getText();
         IWorkspace workspace = fExperimentFolder.getWorkspace();
         IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
 
         if ("".equals(name)) { //$NON-NLS-1$
-        	updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
-        	return;
+            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
+            return;
         }
 
         if (!nameStatus.isOK()) {
-        	updateStatus(nameStatus);
-        	return;
+            updateStatus(nameStatus);
+            return;
         }
 
         IPath path = new Path(name);
@@ -152,28 +152,17 @@ public class NewExperimentDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // SelectionStatusDialog
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
-     */
+
     @Override
     protected void computeResult() {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#create()
-     */
     @Override
     public void create() {
         super.create();
         getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#okPressed()
-     */
     @Override
     protected void okPressed() {
         IFolder folder = createNewExperiment(fExperimentName.getText());
@@ -190,7 +179,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 
     private IFolder createNewExperiment(String experimentName) {
 
-    	final IFolder experimentFolder = createExperiment(experimentName);
+        final IFolder experimentFolder = createExperiment(experimentName);
 
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
             @Override

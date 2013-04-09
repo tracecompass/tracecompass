@@ -186,13 +186,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // ------------------------------------------------------------------------
     // WizardResourceImportPage
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.ui.dialogs.WizardResourceImportPage#createControl(org.eclipse
-     * .swt.widgets.Composite)
-     */
+
     @Override
     public void createControl(Composite parent) {
         super.createControl(parent);
@@ -203,13 +197,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.ui.dialogs.WizardResourceImportPage#createSourceGroup(org
-     * .eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createSourceGroup(Composite parent) {
         createDirectorySelectionGroup(parent);
@@ -218,13 +205,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         validateSourceGroup();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.ui.dialogs.WizardResourceImportPage#createFileSelectionGroup
-     * (org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createFileSelectionGroup(Composite parent) {
 
@@ -268,21 +248,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         });
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#getFolderProvider()
-     */
     @Override
     protected ITreeContentProvider getFolderProvider() {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.dialogs.WizardResourceImportPage#getFileProvider()
-     */
     @Override
     protected ITreeContentProvider getFileProvider() {
         return new WorkbenchContentProvider() {
@@ -328,12 +298,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.ui.dialogs.WizardResourceImportPage#getSelectedResources()
-     */
     @Override
     protected List<FileSystemElement> getSelectedResources() {
         List<FileSystemElement> resources = new ArrayList<FileSystemElement>();
@@ -439,13 +403,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Browse for the source directory
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.ui.dialogs.WizardResourceImportPage#handleEvent(org.eclipse
-     * .swt.widgets.Event)
-     */
     @Override
     public void handleEvent(Event event) {
         if (event.widget == directoryBrowseButton) {
@@ -684,13 +641,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private Button overwriteExistingResourcesCheckbox;
     private Button createLinksInWorkspaceButton;
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.ui.dialogs.WizardDataTransferPage#createOptionsGroupButtons
-     * (org.eclipse.swt.widgets.Group)
-     */
     @Override
     protected void createOptionsGroupButtons(Group optionsGroup) {
 
@@ -720,11 +670,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Determine if the finish button can be enabled
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.dialogs.WizardDataTransferPage#validateSourceGroup()
-     */
     @Override
     public boolean validateSourceGroup() {
 

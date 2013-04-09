@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,20 +51,13 @@ public abstract class BaseMessage extends GraphNode {
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getX()
-     */
+
     @Override
     public int getX() {
         // returns the exact x coordinate
         return getX(false);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getY()
-     */
     @Override
     public int getY() {
         /*
@@ -96,20 +89,12 @@ public abstract class BaseMessage extends GraphNode {
         return 0;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getWidth()
-     */
     @Override
     public int getWidth() {
         // Returns the exact width
         return getWidth(false);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getHeight()
-     */
     @Override
     public int getHeight() {
         return 0;
@@ -212,10 +197,6 @@ public abstract class BaseMessage extends GraphNode {
         return width;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#isVisible(int, int, int, int)
-     */
     @Override
     public boolean isVisible(int x, int y, int width, int height) {
         // ***Common*** syncMessages visibility
@@ -368,10 +349,6 @@ public abstract class BaseMessage extends GraphNode {
         return inActivation;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
-     */
     @Override
     public boolean contains(int xValue, int yValue) {
         int x = getX();
@@ -627,10 +604,6 @@ public abstract class BaseMessage extends GraphNode {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNodee#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
-     */
     @Override
     public void draw(IGC context) {
         if (!isVisible()) {
@@ -723,10 +696,6 @@ public abstract class BaseMessage extends GraphNode {
         context.drawPolygon(points);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#drawFocus(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
-     */
     @Override
     public void drawFocus(IGC context) {
 

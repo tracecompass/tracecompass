@@ -78,6 +78,7 @@ public class TraceEventPropertySource extends BasePropertySource {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     /**
      * The event component which this property source is for.
      */
@@ -86,6 +87,7 @@ public class TraceEventPropertySource extends BasePropertySource {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
     /**
      * Constructor
      * @param component - the base event component
@@ -97,10 +99,7 @@ public class TraceEventPropertySource extends BasePropertySource {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyDescriptors()
-     */
+
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor> ();
@@ -116,10 +115,6 @@ public class TraceEventPropertySource extends BasePropertySource {
         return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyValue(java.lang.Object)
-     */
     @Override
     public Object getPropertyValue(Object id) {
         if(TRACE_EVENT_NAME_PROPERTY_ID.equals(id)) {

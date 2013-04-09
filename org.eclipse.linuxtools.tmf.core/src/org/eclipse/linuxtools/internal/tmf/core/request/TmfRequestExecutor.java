@@ -36,15 +36,15 @@ public class TmfRequestExecutor implements Executor {
     // ------------------------------------------------------------------------
 
     // The request executor
-	private final ExecutorService fExecutor = Executors.newFixedThreadPool(2);
-	private final String fExecutorName;
+    private final ExecutorService fExecutor = Executors.newFixedThreadPool(2);
+    private final String fExecutorName;
 
-	// The request queues
-	private final Queue<TmfEventThread> fHighPriorityTasks = new ArrayBlockingQueue<TmfEventThread>(100);
-    private final Queue<TmfEventThread> fLowPriorityTasks  = new ArrayBlockingQueue<TmfEventThread>(100);
+    // The request queues
+    private final Queue<TmfEventThread> fHighPriorityTasks = new ArrayBlockingQueue<TmfEventThread>(100);
+    private final Queue<TmfEventThread> fLowPriorityTasks = new ArrayBlockingQueue<TmfEventThread>(100);
 
-	// The tasks
-	private TmfEventThread fActiveTask;
+    // The tasks
+    private TmfEventThread fActiveTask;
     private TmfEventThread fSuspendedTask;
 
     // ------------------------------------------------------------------------
@@ -65,7 +65,8 @@ public class TmfRequestExecutor implements Executor {
     /**
      * Standard constructor
      *
-     * @param executor The executor service to use
+     * @param executor
+     *            The executor service to use
      */
     @Deprecated
     public TmfRequestExecutor(ExecutorService executor) {
@@ -76,37 +77,34 @@ public class TmfRequestExecutor implements Executor {
     // Getters
     // ------------------------------------------------------------------------
 
-	/**
-	 * @return the number of pending requests
-	 */
+    /**
+     * @return the number of pending requests
+     */
     @Deprecated
-	public synchronized int getNbPendingRequests() {
-		return fHighPriorityTasks.size() + fLowPriorityTasks.size();
-	}
+    public synchronized int getNbPendingRequests() {
+        return fHighPriorityTasks.size() + fLowPriorityTasks.size();
+    }
 
-	/**
-	 * @return the shutdown state (i.e. if it is accepting new requests)
-	 */
-	public synchronized boolean isShutdown() {
-		return fExecutor.isShutdown();
-	}
+    /**
+     * @return the shutdown state (i.e. if it is accepting new requests)
+     */
+    public synchronized boolean isShutdown() {
+        return fExecutor.isShutdown();
+    }
 
-	/**
-	 * @return the termination state
-	 */
-	public synchronized boolean isTerminated() {
-		return fExecutor.isTerminated();
-	}
+    /**
+     * @return the termination state
+     */
+    public synchronized boolean isTerminated() {
+        return fExecutor.isTerminated();
+    }
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
-	/* (non-Javadoc)
-	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
-	 */
-	@Override
-	public synchronized void execute(final Runnable command) {
+    @Override
+    public synchronized void execute(final Runnable command) {
 
         // We are expecting MyEventThread:s
         if (!(command instanceof TmfEventThread)) {
@@ -139,24 +137,24 @@ public class TmfRequestExecutor implements Executor {
             fSuspendedTask = fActiveTask;
             scheduleNext();
         }
-	}
+    }
 
-	/**
-	 * Executes the next pending request, if applicable.
-	 */
-	protected synchronized void scheduleNext() {
-	       if (!isShutdown()) {
-	            if ((fActiveTask = fHighPriorityTasks.poll()) != null) {
-	                fExecutor.execute(fActiveTask);
-	            } else if (fSuspendedTask != null) {
-	                fActiveTask = fSuspendedTask;
-	                fSuspendedTask = null;
-	                fActiveTask.getThread().resume();
-	            } else if ((fActiveTask = fLowPriorityTasks.poll()) != null) {
-	                fExecutor.execute(fActiveTask);
-	            }
-	        }
-	}
+    /**
+     * Executes the next pending request, if applicable.
+     */
+    protected synchronized void scheduleNext() {
+        if (!isShutdown()) {
+            if ((fActiveTask = fHighPriorityTasks.poll()) != null) {
+                fExecutor.execute(fActiveTask);
+            } else if (fSuspendedTask != null) {
+                fActiveTask = fSuspendedTask;
+                fSuspendedTask = null;
+                fActiveTask.getThread().resume();
+            } else if ((fActiveTask = fLowPriorityTasks.poll()) != null) {
+                fExecutor.execute(fActiveTask);
+            }
+        }
+    }
 
     /**
      * Stops the executor
@@ -176,14 +174,14 @@ public class TmfRequestExecutor implements Executor {
         }
     }
 
-	// ------------------------------------------------------------------------
-	// Object
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
 
-	@Override
+    @Override
     @SuppressWarnings("nls")
-	public String toString() {
-		return "[TmfRequestExecutor(" + fExecutorName + ")]";
-	}
+    public String toString() {
+        return "[TmfRequestExecutor(" + fExecutorName + ")]";
+    }
 
 }

@@ -308,9 +308,6 @@ public class ResourcesView extends TmfView {
     // ViewPart
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.TmfView#createPartControl(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     public void createPartControl(Composite parent) {
         fTimeGraphViewer = new TimeGraphViewer(parent, SWT.NONE);
@@ -349,9 +346,6 @@ public class ResourcesView extends TmfView {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-     */
     @Override
     public void setFocus() {
         fTimeGraphViewer.setFocus();

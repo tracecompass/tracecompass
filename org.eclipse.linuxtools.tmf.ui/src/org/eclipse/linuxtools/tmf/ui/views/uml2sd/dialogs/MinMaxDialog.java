@@ -107,10 +107,6 @@ public class MinMaxDialog extends Dialog {
         return data;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite p) {
         p.getShell().setText(SDMessages._123);
@@ -162,10 +158,6 @@ public class MinMaxDialog extends Dialog {
         return parent;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
     @Override
     protected void okPressed() {
         long min = 0;
@@ -189,19 +181,12 @@ public class MinMaxDialog extends Dialog {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         super.createButtonsForButtonBar(parent);
         createButton(parent, IDialogConstants.CLIENT_ID, SDMessages._126, false);
         getButton(IDialogConstants.CLIENT_ID).addSelectionListener(new SelectionListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
+
             @Override
             public void widgetSelected(SelectionEvent e) {
                 fSdWidget.getFrame().resetCustomMinMax();
@@ -212,10 +197,6 @@ public class MinMaxDialog extends Dialog {
                 fMaxText.getParent().layout(true);
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-             */
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 // nothing to do

@@ -119,45 +119,27 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog#getSession()
-     */
+
     @Override
     public TraceSessionComponent getSession() {
         return fSessions[fSessionIndex];
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableEventsDialog#getChannel()
-     */
     @Override
     public TraceChannelComponent getChannel() {
         return fChannel;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IGetEventInfoDialog#setIsKernel(boolean)
-     */
     @Override
     public void setIsKernel(boolean isKernel) {
         fIsKernel = isKernel;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IGetEventInfoDialog#setSessions(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent[])
-     */
     @Override
     public void setSessions(TraceSessionComponent[] sessions) {
         fSessions = Arrays.copyOf(sessions, sessions.length);
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IGetEventInfoDialog#getFilterExpression()
-     */
+
     @Override
     public String getFilterExpression() {
        return fFilterExpression;
@@ -166,10 +148,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
+
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -177,10 +156,6 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         newShell.setImage(Activator.getDefault().loadIcon(TARGET_NEW_CONNECTION_ICON_FILE));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
 
@@ -279,20 +254,12 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         return fDialogComposite;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
         createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
     @Override
     protected void okPressed() {
 

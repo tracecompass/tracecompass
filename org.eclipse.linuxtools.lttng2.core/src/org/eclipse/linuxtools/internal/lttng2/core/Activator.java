@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -28,75 +28,67 @@ public class Activator extends Plugin {
     // Attributes
     // ------------------------------------------------------------------------
 
-	/**
-	 *  The plug-in ID
-	 */
-	public static final String PLUGIN_ID = "org.eclipse.linuxtools.lttng2.core"; //$NON-NLS-1$
+    /**
+     * The plug-in ID
+     */
+    public static final String PLUGIN_ID = "org.eclipse.linuxtools.lttng2.core"; //$NON-NLS-1$
 
-	/**
-	 *  The shared instance
-	 */
-	private static Activator plugin;
-	
+    /**
+     * The shared instance
+     */
+    private static Activator plugin;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
+    /**
+     * The constructor
+     */
+    public Activator() {
+    }
 
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+    /**
+     * Returns the shared instance
+     *
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return plugin;
+    }
 
     // ------------------------------------------------------------------------
     // Operators
     // ------------------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
+    @Override
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
-	
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
+
     /**
      * Logs a message with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logInfo(String message) {
         getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */
@@ -106,16 +98,16 @@ public class Activator extends Plugin {
 
     /**
      * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logWarning(String message) {
         getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */
@@ -125,16 +117,16 @@ public class Activator extends Plugin {
 
     /**
      * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logError(String message) {
         getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */

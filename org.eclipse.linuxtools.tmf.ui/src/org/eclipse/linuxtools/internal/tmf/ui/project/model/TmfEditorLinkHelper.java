@@ -41,10 +41,6 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class TmfEditorLinkHelper implements ILinkHelper {
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.navigator.ILinkHelper#findSelection(org.eclipse.ui.IEditorInput)
-     */
     @Override
     public IStructuredSelection findSelection(IEditorInput anInput) {
         IFile file = ResourceUtil.getFile(anInput);
@@ -91,10 +87,6 @@ public class TmfEditorLinkHelper implements ILinkHelper {
         return StructuredSelection.EMPTY;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.navigator.ILinkHelper#activateEditor(org.eclipse.ui.IWorkbenchPage, org.eclipse.jface.viewers.IStructuredSelection)
-     */
     @Override
     public void activateEditor(IWorkbenchPage aPage, IStructuredSelection aSelection) {
         if (aSelection == null || aSelection.isEmpty()) {

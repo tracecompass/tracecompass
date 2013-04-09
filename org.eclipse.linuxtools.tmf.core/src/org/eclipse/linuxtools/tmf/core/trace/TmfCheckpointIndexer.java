@@ -103,9 +103,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         fIsIndexing = false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#dispose()
-     */
     @Override
     public void dispose() {
         if ((fIndexingRequest != null) && !fIndexingRequest.isCompleted()) {
@@ -118,9 +115,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     // ITmfTraceIndexer - isIndexing
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#isIndexing()
-     */
     @Override
     public boolean isIndexing() {
         return fIsIndexing;
@@ -274,9 +268,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         return restoreCheckpoint(index);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#seekIndex(long)
-     */
     @Override
     public ITmfContext seekIndex(final long rank) {
 

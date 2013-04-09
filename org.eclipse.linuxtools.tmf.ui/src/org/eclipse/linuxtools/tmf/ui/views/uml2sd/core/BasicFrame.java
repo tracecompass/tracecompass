@@ -163,39 +163,22 @@ public class BasicFrame extends GraphNode {
         return fHorizontalIndex;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#addNode(org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode)
-     */
     @Override
     public void addNode(GraphNode nodeToAdd) {
         fComputeMinMax = true;
         super.addNode(nodeToAdd);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getX()
-     */
     @Override
     public int getX() {
         return Metrics.FRAME_H_MARGIN;
     }
 
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getY()
-     */
     @Override
     public int getY() {
         return Metrics.FRAME_V_MARGIN;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getWidth()
-     */
     @Override
     public int getWidth() {
         if (fHorizontalIndex == 0) {
@@ -204,10 +187,6 @@ public class BasicFrame extends GraphNode {
         return fHorizontalIndex * Metrics.swimmingLaneWidth() + Metrics.LIFELINE_H_MAGIN * 2 + 1 - Metrics.LIFELINE_SPACING;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getHeight()
-     */
     @Override
     public int getHeight() {
         // The Frame height depends on the maximum number of messages added to a lifeline
@@ -309,10 +288,6 @@ public class BasicFrame extends GraphNode {
         context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_FRAME));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
-     */
     @Override
     public void draw(IGC context) {
         draw(context, true);
@@ -581,19 +556,11 @@ public class BasicFrame extends GraphNode {
         return timeArray;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getArrayId()
-     */
     @Override
     public String getArrayId() {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
-     */
     @Override
     public boolean contains(int x, int y) {
         return false;

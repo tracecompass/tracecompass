@@ -106,10 +106,6 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
     // Methods
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createContents(Composite parent) {
         parent.setLayout(new GridLayout());
@@ -201,19 +197,11 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         return page;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
-     */
     @Override
     public void init(IWorkbench workbench) {
         fPreferences = SDViewPref.getInstance();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.PreferencePage#performApply()
-     */
     @Override
     protected void performApply() {
         // Store the prefrences in the PreferenceStore
@@ -236,20 +224,12 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         swapPref(true);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.PreferencePage#performOk()
-     */
     @Override
     public boolean performOk() {
         performApply();
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
-     */
     @Override
     protected void performDefaults() {
         fLink.loadDefault();
@@ -320,10 +300,6 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         fTextColor.load();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-     */
     @Override
     public void widgetSelected(SelectionEvent e) {
         // Store the past set font preference or else the
@@ -446,10 +422,6 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-     */
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
     }

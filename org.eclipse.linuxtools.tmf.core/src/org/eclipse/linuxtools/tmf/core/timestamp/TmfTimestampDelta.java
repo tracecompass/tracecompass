@@ -81,27 +81,17 @@ public class TmfTimestampDelta extends TmfTimestamp {
     // Operations
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#normalize(long, int)
-     */
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) {
         ITmfTimestamp nts = super.normalize(offset, scale);
         return new TmfTimestampDelta(nts.getValue(), nts.getScale(), nts.getPrecision());
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return toString(TmfTimestampFormat.getDefaulIntervalFormat());
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#toString(org.eclipse.linuxtools.tmf.core.event.TmfTimestampFormat)
-     */
     @Override
     public String toString(TmfTimestampFormat format) {
         if (getValue() < 0) {

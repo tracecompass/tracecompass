@@ -541,35 +541,17 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return _time0_;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider
-     * #setStartFinishTimeNotify(long, long)
-     */
     @Override
     public void setStartFinishTimeNotify(long time0, long time1) {
         setStartFinishTime(time0, time1);
         notifyRangeListeners(time0, time1);
     }
 
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider#notifyStartFinishTime()
-     */
     @Override
     public void notifyStartFinishTime() {
         notifyRangeListeners(_time0, _time1);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider
-     * #setStartFinishTime(long, long)
-     */
     @Override
     public void setStartFinishTime(long time0, long time1) {
         _time0 = time0;

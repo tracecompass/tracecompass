@@ -85,10 +85,7 @@ public class LTTngControlService implements ILttngControlService {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#getVersion()
-     */
+
     @Override
     public String getVersion() {
         if (fVersion == null) {
@@ -105,10 +102,6 @@ public class LTTngControlService implements ILttngControlService {
         fVersion = new Version(version);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#isVersionSupported(java.lang.String)
-     */
     @Override
     public boolean isVersionSupported(String version) {
         Version tmp = new Version(version);
@@ -119,13 +112,6 @@ public class LTTngControlService implements ILttngControlService {
     // Operations
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService
-     * #getSessionNames(org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public String[] getSessionNames(IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_LIST);
@@ -152,13 +138,6 @@ public class LTTngControlService implements ILttngControlService {
         return retArray.toArray(new String[retArray.size()]);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService
-     * #getSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public ISessionInfo getSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_LIST, sessionName);
@@ -244,13 +223,6 @@ public class LTTngControlService implements ILttngControlService {
         return sessionInfo;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService
-     * #getKernelProvider(org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public List<IBaseEventInfo> getKernelProvider(IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_LIST_KERNEL);
@@ -287,25 +259,11 @@ public class LTTngControlService implements ILttngControlService {
         return events;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService
-     * #getUstProvider()
-     */
     @Override
     public List<IUstProviderInfo> getUstProvider() throws ExecutionException {
         return getUstProvider(new NullProgressMonitor());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService
-     * #getUstProvider(org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public List<IUstProviderInfo> getUstProvider(IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_LIST_UST);
@@ -388,10 +346,6 @@ public class LTTngControlService implements ILttngControlService {
         return allProviders;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#createSession(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public ISessionInfo createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException {
 
@@ -450,10 +404,6 @@ public class LTTngControlService implements ILttngControlService {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#createSession(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, IProgressMonitor monitor) throws ExecutionException {
 
@@ -557,10 +507,6 @@ public class LTTngControlService implements ILttngControlService {
         //Session <sessionName> destroyed
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#startSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void startSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
 
@@ -573,10 +519,6 @@ public class LTTngControlService implements ILttngControlService {
         //Session <sessionName> started
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#stopSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void stopSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
         String newSessionName = formatParameter(sessionName);
@@ -588,10 +530,6 @@ public class LTTngControlService implements ILttngControlService {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#enableChannel(java.lang.String, java.util.List, boolean, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
 
@@ -650,10 +588,6 @@ public class LTTngControlService implements ILttngControlService {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#disableChannel(java.lang.String, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void disableChannels(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
 
@@ -685,10 +619,6 @@ public class LTTngControlService implements ILttngControlService {
         executeCommand(command.toString(), monitor);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#enableEvents(java.lang.String, java.lang.String, java.util.List, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
 
@@ -738,10 +668,6 @@ public class LTTngControlService implements ILttngControlService {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#enableSyscalls(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException {
 
@@ -765,10 +691,6 @@ public class LTTngControlService implements ILttngControlService {
         executeCommand(command.toString(), monitor);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#enableProbe(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableProbe(String sessionName, String channelName, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_ENABLE_EVENT);
@@ -795,10 +717,6 @@ public class LTTngControlService implements ILttngControlService {
         executeCommand(command.toString(), monitor);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#enableLogLevel(java.lang.String, java.lang.String, java.lang.String, org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType, org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableLogLevel(String sessionName, String channelName, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_ENABLE_EVENT);
@@ -828,12 +746,6 @@ public class LTTngControlService implements ILttngControlService {
         executeCommand(command.toString(), monitor);
     }
 
-
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#disableEvent(java.lang.String, java.lang.String, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_DISABLE_EVENT);
@@ -875,10 +787,6 @@ public class LTTngControlService implements ILttngControlService {
         executeCommand(command.toString(), monitor);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#getContexts(org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
 
@@ -913,10 +821,6 @@ public class LTTngControlService implements ILttngControlService {
         return contexts;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#addContexts(java.lang.String, java.lang.String, java.lang.String, boolean, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_ADD_CONTEXT);
@@ -951,10 +855,6 @@ public class LTTngControlService implements ILttngControlService {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#calibrate(boolean, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void calibrate(boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
 //        String newSessionName = formatParameter(sessionName);
@@ -977,6 +877,7 @@ public class LTTngControlService implements ILttngControlService {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+
     /**
      * Checks if command result is an error result.
      *

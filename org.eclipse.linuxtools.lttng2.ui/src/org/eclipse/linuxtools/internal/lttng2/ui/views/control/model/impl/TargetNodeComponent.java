@@ -53,6 +53,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
     /**
      * Path to icon file for this component (state connected).
      */
@@ -65,6 +66,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     /**
      * The node connection state.
      */
@@ -93,6 +95,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
     /**
      * Constructor
      * @param name - the name of the component
@@ -122,10 +125,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getImage()
-     */
+
     @Override
     public Image getImage() {
         if (fState == TargetNodeState.CONNECTED) {
@@ -134,47 +134,27 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         return fDisconnectedImage;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getTargetNodeState()
-     */
     @Override
     public TargetNodeState getTargetNodeState() {
         return fState;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#setTargetNodeState(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent.TargetNodeState)
-     */
     @Override
     public void setTargetNodeState(TargetNodeState state) {
         fState = state;
         fireComponentChanged(TargetNodeComponent.this);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getControlService()
-     */
     @Override
     public ILttngControlService getControlService() {
         return fService;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#setControlService(org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService)
-     */
     @Override
     public void setControlService(ILttngControlService service) {
         fService = service;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
-     */
     @Override
     public Object getAdapter(Class adapter) {
         if (adapter == IPropertySource.class) {
@@ -257,9 +237,6 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     // Operations
     // ------------------------------------------------------------------------
 
-   /*
-    * @see org.eclipse.rse.core.subsystems.ICommunicationsListener#communicationsStateChange(org.eclipse.rse.core.subsystems.CommunicationsEvent)
-    */
    @Override
    public void communicationsStateChange(CommunicationsEvent e) {
        if (e.getState() == CommunicationsEvent.AFTER_DISCONNECT ||
@@ -270,18 +247,11 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
        }
    }
 
-   /* (non-Javadoc)
-    * @see org.eclipse.rse.core.subsystems.ICommunicationsListener#isPassiveCommunicationsListener()
-    */
    @Override
    public boolean isPassiveCommunicationsListener() {
        return true;
    }
 
-   /*
-    * (non-Javadoc)
-    * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceControlComponent#dispose()
-    */
    @Override
    public void dispose() {
        fRemoteProxy.removeCommunicationListener(this);
@@ -378,6 +348,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     // ------------------------------------------------------------------------
     // Helper function
     // ------------------------------------------------------------------------
+
     /**
      * @return returns the control service for LTTng specific commands.
      * @throws ExecutionException

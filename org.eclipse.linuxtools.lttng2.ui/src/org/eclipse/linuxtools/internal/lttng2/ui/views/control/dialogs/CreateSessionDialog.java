@@ -226,37 +226,22 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateSessionDialog#getSessionName()
-     */
+
     @Override
     public String getSessionName() {
         return fSessionName;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateSessionDialog#getSessionPath()
-     */
     @Override
     public String getSessionPath() {
         return fSessionPath;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateSessionDialog#isDefaultSessionPath()
-     */
     @Override
     public boolean isDefaultSessionPath() {
         return fIsDefaultPath;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateSessionDialog#initialze(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionGroup)
-     */
     @Override
     public void initialize(TraceSessionGroup group) {
        fParent = group;
@@ -291,10 +276,6 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     // Operations
     // ------------------------------------------------------------------------
 
-
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createContents(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createContents(Composite parent) {
         fControl = super.createContents(parent);
@@ -306,10 +287,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
 
         return fControl;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
+
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -317,10 +295,6 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         newShell.setImage(Activator.getDefault().loadIcon(CREATE_SESSION_ICON_FILE));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
 
@@ -616,20 +590,12 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
         createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
     @Override
     protected void okPressed() {
         // Validate input data

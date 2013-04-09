@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class FilterDialog extends Dialog {
 
-	TmfFilterNode fRoot;
-	FilterViewer fViewer;
+    TmfFilterNode fRoot;
+    FilterViewer fViewer;
 
     /**
      * Constructor.
@@ -38,46 +38,44 @@ public class FilterDialog extends Dialog {
      * @param shell
      *            The shell to which this dialog is attached
      */
-	public FilterDialog(Shell shell) {
-		super(shell);
-		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
-	}
+    public FilterDialog(Shell shell) {
+        super(shell);
+        setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createDialogArea(Composite parent) {
+    @Override
+    protected Control createDialogArea(Composite parent) {
         getShell().setText(Messages.FilterDialog_FilterDialogTitle);
-		getShell().setMinimumSize(getShell().computeSize(500, 200));
+        getShell().setMinimumSize(getShell().computeSize(500, 200));
         Composite composite = (Composite) super.createDialogArea(parent);
 
         fViewer = new FilterViewer(composite, SWT.BORDER);
         fViewer.setInput(fRoot);
         return composite;
-	}
+    }
 
-	/**
-	 * @param filter the filter to set
-	 */
-	public void setFilter(ITmfFilterTreeNode filter) {
-		fRoot = new TmfFilterNode(null);
-		if (filter != null) {
-			fRoot.addChild(filter.clone());
-		}
-		if (fViewer != null) {
-			fViewer.setInput(fRoot);
-		}
-	}
+    /**
+     * @param filter
+     *            the filter to set
+     */
+    public void setFilter(ITmfFilterTreeNode filter) {
+        fRoot = new TmfFilterNode(null);
+        if (filter != null) {
+            fRoot.addChild(filter.clone());
+        }
+        if (fViewer != null) {
+            fViewer.setInput(fRoot);
+        }
+    }
 
-	/**
-	 * @return the filter
-	 */
-	public ITmfFilterTreeNode getFilter() {
-		if (fRoot != null && fRoot.hasChildren()) {
-			return fRoot.getChild(0).clone();
-		}
-		return null;
-	}
+    /**
+     * @return the filter
+     */
+    public ITmfFilterTreeNode getFilter() {
+        if (fRoot != null && fRoot.hasChildren()) {
+            return fRoot.getChild(0).clone();
+        }
+        return null;
+    }
 
 }

@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Ericsson
- * 
+ * Copyright (c) 2010, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Yuriy Vashchuk (yvashchuk@gmail.com) - Initial API and implementation
  *       based on http://smeric.developpez.com/java/cours/xml/sax/
@@ -34,19 +34,19 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * The SAX Content Handler
- * 
+ *
  * @version 1.0
  * @author Yuriy Vashchuk
  * @author Patrick Tasse
  */
 public class TmfFilterContentHandler extends DefaultHandler {
-	
+
 	private ITmfFilterTreeNode fRoot = null;
 	private Stack<ITmfFilterTreeNode> fFilterTreeStack = null;
 
 	/**
 	 * The default constructor
-	 */ 
+	 */
 	public TmfFilterContentHandler() {
 		super();
 		fFilterTreeStack = new Stack<ITmfFilterTreeNode>();
@@ -54,53 +54,50 @@ public class TmfFilterContentHandler extends DefaultHandler {
 
 	/**
 	 * Getter of tree
-	 * 
+	 *
 	 * @return The builded tree
-	 */ 
+	 */
 	public ITmfFilterTreeNode getTree() {
 		return fRoot;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
-	 */
+
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 		ITmfFilterTreeNode node = null;
-		
+
 		if (localName.equalsIgnoreCase(TmfFilterRootNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterRootNode();
-			
+
 		} else if (localName.equals(TmfFilterNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterNode(atts.getValue(TmfFilterNode.NAME_ATTR));
-			
+
 		} else if (localName.equals(TmfFilterEventTypeNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterEventTypeNode(null);
 			((TmfFilterEventTypeNode) node).setEventType(atts.getValue(TmfFilterEventTypeNode.TYPE_ATTR));
 			((TmfFilterEventTypeNode) node).setName(atts.getValue(TmfFilterEventTypeNode.NAME_ATTR));
-			
+
 		} else if (localName.equals(TmfFilterAndNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterAndNode(null);
 			String value = atts.getValue(TmfFilterAndNode.NOT_ATTR);
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
 				((TmfFilterAndNode) node).setNot(true);
 			}
-			
+
 		} else if (localName.equals(TmfFilterOrNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterOrNode(null);
 			String value = atts.getValue(TmfFilterOrNode.NOT_ATTR);
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
 				((TmfFilterOrNode) node).setNot(true);
 			}
-			
+
 		} else if (localName.equals(TmfFilterContainsNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterContainsNode(null);
 			String value = atts.getValue(TmfFilterContainsNode.NOT_ATTR);
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
@@ -112,9 +109,9 @@ public class TmfFilterContentHandler extends DefaultHandler {
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
 				((TmfFilterContainsNode) node).setIgnoreCase(true);
 			}
-			
+
 		} else if (localName.equals(TmfFilterEqualsNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterEqualsNode(null);
 			String value = atts.getValue(TmfFilterEqualsNode.NOT_ATTR);
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
@@ -126,9 +123,9 @@ public class TmfFilterContentHandler extends DefaultHandler {
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
 				((TmfFilterEqualsNode) node).setIgnoreCase(true);
 			}
-			
+
 		} else if (localName.equals(TmfFilterMatchesNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterMatchesNode(null);
 			String value = atts.getValue(TmfFilterMatchesNode.NOT_ATTR);
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
@@ -136,9 +133,9 @@ public class TmfFilterContentHandler extends DefaultHandler {
 			}
 			((TmfFilterMatchesNode) node).setField(atts.getValue(TmfFilterMatchesNode.FIELD_ATTR));
 			((TmfFilterMatchesNode) node).setRegex(atts.getValue(TmfFilterMatchesNode.REGEX_ATTR));
-			
+
 		} else if (localName.equals(TmfFilterCompareNode.NODE_NAME)) {
-			
+
 			node = new TmfFilterCompareNode(null);
 			String value = atts.getValue(TmfFilterCompareNode.NOT_ATTR);
 			if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
@@ -160,16 +157,12 @@ public class TmfFilterContentHandler extends DefaultHandler {
 				}
 			}
 			((TmfFilterCompareNode) node).setValue(atts.getValue(TmfFilterCompareNode.VALUE_ATTR));
-			
+
 		}
 
 		fFilterTreeStack.push(node);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		ITmfFilterTreeNode node = fFilterTreeStack.pop();
@@ -180,7 +173,7 @@ public class TmfFilterContentHandler extends DefaultHandler {
 				node instanceof TmfFilterTreeNode) {
 			fFilterTreeStack.lastElement().addChild(node);
 		}
-			
+
 	}
 
 }

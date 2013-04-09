@@ -62,9 +62,6 @@ public final class TmfExperimentLocation implements ITmfLocation {
     // Object
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#toString()
-     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {
@@ -74,17 +71,11 @@ public final class TmfExperimentLocation implements ITmfLocation {
         return result.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#hashCode()
-     */
     @Override
     public int hashCode() {
         return super.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfLocation#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -99,9 +90,6 @@ public final class TmfExperimentLocation implements ITmfLocation {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationData()
-     */
     @Override
     public TmfLocationArray getLocationInfo() {
         return fLocation;

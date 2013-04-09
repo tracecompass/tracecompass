@@ -68,9 +68,6 @@ public class ManageCustomParsersDialog extends Dialog {
         setShellStyle(SWT.RESIZE | SWT.MAX | getShellStyle());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
         getShell().setText(Messages.ManageCustomParsersDialog_DialogHeader);
@@ -284,9 +281,6 @@ public class ManageCustomParsersDialog extends Dialog {
         return composite;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.OK_ID, IDialogConstants.CLOSE_LABEL, false);

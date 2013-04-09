@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -45,6 +45,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
     /**
      * View ID.
      */
@@ -65,10 +66,6 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
     private ITraceControlComponent fRoot = null;
 
     // ------------------------------------------------------------------------
-    // Constructors
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
 
@@ -85,11 +82,6 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
     // Operations
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     public void createPartControl(Composite parent) {
         // Create tree viewer
@@ -112,38 +104,21 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
         RSECorePlugin.getTheSystemRegistry(); // to load RSE
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-     */
     @Override
     public void setFocus() {
         fTreeViewer.getControl().setFocus();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener#componentAdded(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent)
-     */
     @Override
     public void componentAdded(ITraceControlComponent parent, ITraceControlComponent component) {
         componentChanged(parent);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener#componentRemoved(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent)
-     */
     @Override
     public void componentRemoved(ITraceControlComponent parent, ITraceControlComponent component) {
         componentChanged(parent);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener#componentChanged(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent)
-     */
     @Override
     public void componentChanged(final ITraceControlComponent component) {
         if (fTreeViewer.getTree().isDisposed()) {

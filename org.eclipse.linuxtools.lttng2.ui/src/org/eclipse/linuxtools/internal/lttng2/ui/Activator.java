@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -69,9 +69,6 @@ public class Activator extends AbstractUIPlugin {
     // AbstractUIPlugin
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-     */
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
@@ -79,9 +76,6 @@ public class Activator extends AbstractUIPlugin {
         ControlPreferences.getInstance().init(getPreferenceStore());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-     */
     @Override
     public void stop(BundleContext context) throws Exception {
         ControlPreferences.getInstance().dispose();
@@ -89,9 +83,6 @@ public class Activator extends AbstractUIPlugin {
         super.stop(context);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#initializeImageRegistry(org.eclipse.jface.resource.ImageRegistry)
-     */
     @Override
     protected void initializeImageRegistry(ImageRegistry reg) {
     }
@@ -102,9 +93,9 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Gets an image object using given path within plug-in.
-     *  
+     *
      * @param path path to image file
-     * 
+     *
      * @return image object
      */
     public Image getImageFromPath(String path) {
@@ -113,9 +104,9 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Gets an image descriptor using given path within plug-in.
-     *  
-     * @param path path to image file 
-     * 
+     *
+     * @param path path to image file
+     *
      * @return image descriptor object
      */
     public ImageDescriptor getImageDescripterFromPath(String path) {
@@ -124,9 +115,9 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Gets a image object from the image registry based on the given path.
-     * If the image is not in the registry it will be registered.  
-     *  
-     * @param path to the image file 
+     * If the image is not in the registry it will be registered.
+     *
+     * @param path to the image file
      * @return image object
      */
     public Image getImageFromImageRegistry(String path) {
@@ -137,7 +128,7 @@ public class Activator extends AbstractUIPlugin {
         }
         return icon;
     }
-    
+
     /**
      * Loads the image in the plug-ins image registry (if necessary) and returns the image
      * @param url - URL relative to the Bundle
@@ -154,19 +145,19 @@ public class Activator extends AbstractUIPlugin {
         }
         return icon;
     }
-    
+
     /**
      * Logs a message with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logInfo(String message) {
         getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity INFO in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */
@@ -176,16 +167,16 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logWarning(String message) {
         getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */
@@ -195,16 +186,16 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      */
     public void logError(String message) {
         getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
     }
-    
+
     /**
      * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
-     * 
+     *
      * @param message A message to log
      * @param exception A exception to log
      */

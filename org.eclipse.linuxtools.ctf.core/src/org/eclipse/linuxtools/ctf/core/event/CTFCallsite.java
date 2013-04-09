@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -143,12 +143,6 @@ public class CTFCallsite implements Comparable<CTFCallsite> {
         return 0;
     }
 
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return FileName + "/" + FunctionName + ":" + LineNumber; //$NON-NLS-1$ //$NON-NLS-2$

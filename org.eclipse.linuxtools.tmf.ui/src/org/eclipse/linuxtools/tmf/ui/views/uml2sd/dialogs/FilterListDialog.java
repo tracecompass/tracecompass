@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -143,10 +143,6 @@ public class FilterListDialog extends Dialog {
         fRemove.setEnabled(count > 0);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     public Control createDialogArea(Composite parent) {
 
@@ -168,10 +164,7 @@ public class FilterListDialog extends Dialog {
         fTable.setLayoutData(new RowData(220, 84));
         fTable.setHeaderVisible(false);
         fTable.addSelectionListener(new SelectionListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-             */
+
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 int count = fTable.getSelectionCount();
@@ -183,10 +176,6 @@ public class FilterListDialog extends Dialog {
                 }
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
             @Override
             public void widgetSelected(SelectionEvent e) {
                 handleTableSelectionCount();
@@ -214,19 +203,12 @@ public class FilterListDialog extends Dialog {
         fAdd = new Button(commands, SWT.NONE);
         fAdd.setText(SDMessages._61);
         fAdd.addSelectionListener(new SelectionListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-             */
+
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 // Nothing to do
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Criteria init = new Criteria();
@@ -240,19 +222,12 @@ public class FilterListDialog extends Dialog {
         fEdit = new Button(commands, SWT.NONE);
         fEdit.setText(SDMessages._60);
         fEdit.addSelectionListener(new SelectionListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-             */
+
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 // Nothing to do
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Criteria c = openFilterDialog(((CriteriaTableItem) fTable.getSelection()[0].getData()).getCriteria(), SDMessages._63);
@@ -266,19 +241,12 @@ public class FilterListDialog extends Dialog {
         fRemove = new Button(commands, SWT.NONE);
         fRemove.setText(SDMessages._64);
         fRemove.addSelectionListener(new SelectionListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-             */
+
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 // Nothing to do
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
             @Override
             public void widgetSelected(SelectionEvent e) {
                 fTable.remove(fTable.getSelectionIndices());
@@ -311,10 +279,6 @@ public class FilterListDialog extends Dialog {
         return filter.getCriteria();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#open()
-     */
     @Override
     public int open() {
         create();
@@ -324,10 +288,6 @@ public class FilterListDialog extends Dialog {
         return super.open();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
     @Override
     public void okPressed() {
         if (fTable.getItemCount() > 0) {

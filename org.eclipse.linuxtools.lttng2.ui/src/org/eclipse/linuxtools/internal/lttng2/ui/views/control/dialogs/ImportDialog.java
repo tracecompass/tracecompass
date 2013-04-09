@@ -132,10 +132,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IImportDialog#getTracePathes()
-     */
+
     @Override
     public List<ImportFileInfo> getTracePathes() {
         List<ImportFileInfo> retList = new ArrayList<ImportFileInfo>();
@@ -143,19 +140,11 @@ public class ImportDialog extends Dialog implements IImportDialog {
         return retList;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IImportDialog#getProject()
-     */
     @Override
     public IProject getProject() {
         return fProjects.get(fProjectIndex);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IImportDialog#setSession(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent)
-     */
     @Override
     public void setSession(TraceSessionComponent session) {
         fSession = session;
@@ -164,10 +153,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
+
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -175,10 +161,6 @@ public class ImportDialog extends Dialog implements IImportDialog {
         newShell.setImage(Activator.getDefault().loadIcon(IMPORT_ICON_FILE));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
 
@@ -204,10 +186,6 @@ public class ImportDialog extends Dialog implements IImportDialog {
         return fDialogComposite;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
@@ -217,10 +195,6 @@ public class ImportDialog extends Dialog implements IImportDialog {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
     @Override
     protected void okPressed() {
         if (!fIsError) {
@@ -311,6 +285,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // ------------------------------------------------------------------------
     // Helper methods and classes
     // ------------------------------------------------------------------------
+
     /**
      * Helper class for the contents of a folder in a tracing project
      *

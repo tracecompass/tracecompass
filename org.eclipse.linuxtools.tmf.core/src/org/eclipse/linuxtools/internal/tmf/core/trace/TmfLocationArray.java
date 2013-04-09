@@ -155,9 +155,6 @@ public final class TmfLocationArray implements Comparable<TmfLocationArray> {
     // Object
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -167,9 +164,6 @@ public final class TmfLocationArray implements Comparable<TmfLocationArray> {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -191,9 +185,6 @@ public final class TmfLocationArray implements Comparable<TmfLocationArray> {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

@@ -84,28 +84,17 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#getSessionState()
-     */
+
     @Override
     public TraceSessionState getSessionState() {
         return fState;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#setSessionState(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessionState)
-     */
     @Override
     public void setSessionState(TraceSessionState state) {
         fState = state;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#setSessionState(java.lang.String)
-     */
     @Override
     public void setSessionState(String stateName) {
         if (TraceSessionState.INACTIVE.getInName().equals(stateName)) {
@@ -115,37 +104,21 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#getSessionPath()
-     */
     @Override
     public String getSessionPath() {
         return fSessionPath;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#setSessionPath(java.lang.String)
-     */
     @Override
     public void setSessionPath(String path) {
         fSessionPath = path;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#getDomains()
-     */
     @Override
     public IDomainInfo[] getDomains() {
         return fDomains.toArray(new IDomainInfo[fDomains.size()]);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#setDomains(java.util.List)
-     */
     @Override
     public void setDomains(List<IDomainInfo> domains) {
         fDomains.clear();
@@ -155,19 +128,10 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo#isStreamedTrace()
-     */
     @Override
     public boolean isStreamedTrace() {
         return fIsStreamedTrace;
     }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo#setIsStreamedTrace(boolean)
-     */
 
     @Override
     public void setStreamedTrace(boolean isStreamedTrace) {
@@ -177,19 +141,12 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo#addDomain(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo)
-     */
+
     @Override
     public void addDomain(IDomainInfo domainInfo) {
         fDomains.add(domainInfo);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -201,10 +158,6 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -236,10 +189,6 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#toString()
-     */
     @SuppressWarnings("nls")
     @Override
     public String toString() {

@@ -64,19 +64,11 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         fIsKernel = other.fIsKernel;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo#isKernel()
-     */
     @Override
     public boolean isKernel() {
         return fIsKernel;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo#setIsKernel(boolean)
-     */
     @Override
     public void setIsKernel(boolean isKernel) {
         fIsKernel = isKernel;
@@ -85,19 +77,12 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo#getChannels()
-     */
+
     @Override
     public IChannelInfo[] getChannels() {
         return fChannels.toArray(new IChannelInfo[fChannels.size()]);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo#setChannels(java.util.List)
-     */
     @Override
     public void setChannels(List<IChannelInfo> channels) {
         fChannels.clear();
@@ -107,19 +92,11 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo#addChannel(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo)
-     */
     @Override
     public void addChannel(IChannelInfo channel) {
         fChannels.add(channel);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -129,10 +106,6 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -154,10 +127,6 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#toString()
-     */
     @SuppressWarnings("nls")
     @Override
     public String toString() {

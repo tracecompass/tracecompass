@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -30,24 +30,25 @@ public abstract class TmfComponent implements ITmfComponent {
     // Attributes
     // ------------------------------------------------------------------------
 
-	private String fName;
+    private String fName;
 
-	// ------------------------------------------------------------------------
-	// Constructor
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Constructor
+    // ------------------------------------------------------------------------
 
     /**
      * Default constructor. To be used in conjunction with init()
      */
     public TmfComponent() {
-	    this(""); //$NON-NLS-1$
+        this(""); //$NON-NLS-1$
     }
 
     /**
      * Perform component initialization and register it as a signal listener.
      * Need to be called when the default constructor was used.
      *
-     * @param name the component name
+     * @param name
+     *            the component name
      */
     public void init(String name) {
         TmfCoreTracer.traceComponent(this, "created"); //$NON-NLS-1$
@@ -55,62 +56,56 @@ public abstract class TmfComponent implements ITmfComponent {
         TmfSignalManager.register(this);
     }
 
-	/**
-	 * The standard constructor
-	 *
-	 * @param name the component name
-	 */
-	public TmfComponent(String name) {
-		init(name);
-	}
+    /**
+     * The standard constructor
+     *
+     * @param name
+     *            the component name
+     */
+    public TmfComponent(String name) {
+        init(name);
+    }
 
-	/**
-	 * The copy constructor
-	 *
-	 * @param other the other component
-	 */
-	public TmfComponent(TmfComponent other) {
+    /**
+     * The copy constructor
+     *
+     * @param other
+     *            the other component
+     */
+    public TmfComponent(TmfComponent other) {
         init(other.fName);
-	}
+    }
 
     // ------------------------------------------------------------------------
     // Getters/setters
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#getName()
-     */
     @Override
     public String getName() {
         return fName;
     }
 
-	/**
-	 * @param name the new component name
-	 */
-	protected void setName(String name) {
-		fName = name;
-	}
+    /**
+     * @param name
+     *            the new component name
+     */
+    protected void setName(String name) {
+        fName = name;
+    }
 
-	// ------------------------------------------------------------------------
-	// ITmfComponent
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // ITmfComponent
+    // ------------------------------------------------------------------------
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#dispose()
-	 */
-	@Override
-	public void dispose() {
-		TmfSignalManager.deregister(this);
-		TmfCoreTracer.traceComponent(this, "disposed"); //$NON-NLS-1$
-	}
+    @Override
+    public void dispose() {
+        TmfSignalManager.deregister(this);
+        TmfCoreTracer.traceComponent(this, "disposed"); //$NON-NLS-1$
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#broadcast(org.eclipse.linuxtools.tmf.core.signal.TmfSignal)
-	 */
-	@Override
-	public void broadcast(TmfSignal signal) {
-		TmfSignalManager.dispatchSignal(signal);
-	}
+    @Override
+    public void broadcast(TmfSignal signal) {
+        TmfSignalManager.dispatchSignal(signal);
+    }
 
 }

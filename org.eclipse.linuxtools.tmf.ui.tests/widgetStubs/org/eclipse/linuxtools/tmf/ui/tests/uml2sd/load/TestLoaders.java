@@ -221,10 +221,6 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
         v.setFrame(testFrame);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.hyades.uml2sd.ui.actions.provider.ISDFindProvider#find(org.eclipse.hyades.uml2sd.ui.actions.widgets.Criteria)
-     */
     @Override
     public boolean find(Criteria toSearch) {
         Frame frame = v.getFrame();
@@ -407,10 +403,6 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.hyades.uml2sd.ui.actions.provider.ISDGraphNodeSupporter#isNodeSupported(int)
-     */
     @Override
     public boolean isNodeSupported(int nodeType) {
         switch (nodeType) {

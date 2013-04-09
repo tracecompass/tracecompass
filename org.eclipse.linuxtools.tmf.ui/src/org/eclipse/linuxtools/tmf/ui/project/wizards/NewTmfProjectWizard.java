@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -118,11 +118,6 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
     // Wizard
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.jface.wizard.Wizard#addPages()
-     */
     @Override
     public void addPages() {
         fMainPage = new NewTmfProjectMainWizardPage(Messages.NewProjectWizard_DialogHeader);
@@ -131,21 +126,11 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
         addPage(fMainPage);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.jface.wizard.Wizard#performCancel()
-     */
     @Override
     public boolean performCancel() {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.jface.wizard.Wizard#performFinish()
-     */
     @Override
     public boolean performFinish() {
         fProjectName = fMainPage.getProjectName();
@@ -206,9 +191,6 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
     // INewWizard
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
-     */
     @Override
     public void init(IWorkbench iworkbench, IStructuredSelection istructuredselection) {
     }
@@ -217,10 +199,6 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
     // IExecutableExtension
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
-     */
     @Override
     public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
         fConfigElement = config;

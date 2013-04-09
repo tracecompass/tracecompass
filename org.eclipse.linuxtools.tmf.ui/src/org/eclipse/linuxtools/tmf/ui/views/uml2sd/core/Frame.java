@@ -517,10 +517,6 @@ public class Frame extends BasicFrame {
         fHighlightColor = null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BasicFrame#computeMinMax()
-     */
     @Override
     protected void computeMinMax() {
         List<SDTimeEvent> timeArray = buildTimeArray();
@@ -645,10 +641,6 @@ public class Frame extends BasicFrame {
         addNode(message);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BasicFrame#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
-     */
     @Override
     public void draw(IGC context) {
         drawFrame(context);
@@ -709,10 +701,6 @@ public class Frame extends BasicFrame {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BasicFrame#buildTimeArray()
-     */
     @Override
     protected List<SDTimeEvent> buildTimeArray() {
 

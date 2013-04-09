@@ -407,30 +407,16 @@ public class ScrollView extends Composite {
     // Methods
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Composite#setFocus()
-     */
     @Override
     public boolean setFocus() {
         return fViewControl.forceFocus();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Control#setCursor(org.eclipse.swt.graphics.Cursor)
-     */
     @Override
     public void setCursor(Cursor cursor) {
         fViewControl.setCursor(cursor);
     }
 
-    /*
-     * Dispose controls used in scroll view
-     *
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Widget#dispose()
-     */
     @Override
     public void dispose() {
         if (fAutoScroll != null) {
@@ -460,29 +446,17 @@ public class ScrollView extends Composite {
         super.dispose();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Composite#getClientArea()
-     */
     @Override
     public Rectangle getClientArea() {
         return fViewControl.getClientArea();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Control#setBackground(org.eclipse.swt.graphics.Color)
-     */
     @Override
     public void setBackground(Color c) {
         super.setBackground(c);
         fViewControl.setBackground(c);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Control#setToolTipText(java.lang.String)
-     */
     @Override
     public void setToolTipText(String text) {
         fViewControl.setToolTipText(text);
@@ -1316,21 +1290,11 @@ public class ScrollView extends Composite {
         return true;
     }
 
-    // redefined to return our vertical bar
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Scrollable#getVerticalBar()
-     */
     @Override
     public ScrollBar getVerticalBar() {
         return fVertScrollBar.getVerticalBar();
     }
 
-    // redefined to return out horizontal bar
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Scrollable#getHorizontalBar()
-     */
     @Override
     public ScrollBar getHorizontalBar() {
         return fHorScrollBar.getHorizontalBar();
@@ -1627,10 +1591,6 @@ public class ScrollView extends Composite {
         return bh + 1;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Scrollable#computeTrim(int, int, int, int)
-     */
     @Override
     public Rectangle computeTrim(int x, int y, int w, int h) {
         Rectangle r = new Rectangle(x, y, w, h);
@@ -1657,10 +1617,6 @@ public class ScrollView extends Composite {
          */
         boolean dontLayout = false;
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite, int, int, boolean)
-         */
         @Override
         protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
             Point p = new Point(250, 250);
@@ -1673,10 +1629,6 @@ public class ScrollView extends Composite {
             return p;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite, boolean)
-         */
         @Override
         protected void layout(Composite composite, boolean flushCache) {
             if (dontLayout) {

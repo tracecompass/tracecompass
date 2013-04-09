@@ -189,9 +189,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     // ITmfTrace - Initializers
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(org.eclipse.core.resources.IResource, java.lang.String, java.lang.Class)
-     */
     @Override
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type) throws TmfTraceException {
         fIndexer = new TmfCheckpointIndexer(this, fCacheSize);
@@ -319,41 +316,26 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         return new ITmfTrace[] { this };
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getEventType()
-     */
     @Override
     public Class<ITmfEvent> getEventType() {
         return (Class<ITmfEvent>) super.getType();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getResource()
-     */
     @Override
     public IResource getResource() {
         return fResource;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getPath()
-     */
     @Override
     public String getPath() {
         return fPath;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getIndexPageSize()
-     */
     @Override
     public int getCacheSize() {
         return fCacheSize;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getStreamingInterval()
-     */
     @Override
     public long getStreamingInterval() {
         return fStreamingInterval;

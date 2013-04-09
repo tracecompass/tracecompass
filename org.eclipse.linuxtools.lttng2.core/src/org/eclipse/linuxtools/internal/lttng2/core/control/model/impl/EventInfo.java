@@ -1,12 +1,12 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
@@ -17,9 +17,9 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement
 /**
 * <p>
 * Implementation of the trace event interface (IEventInfo) to store event
-* related data. 
+* related data.
 * </p>
-* 
+*
 * @author Bernd Hufmann
 */
 public class EventInfo extends BaseEventInfo implements IEventInfo {
@@ -31,7 +31,7 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
      * The enable state of the event.
      */
     private TraceEnablement fState = TraceEnablement.DISABLED;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
     public EventInfo(String name) {
         super(name);
     }
-    
+
     /**
      * Copy constructor
      * @param other - the instance to copy
@@ -51,32 +51,21 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
         super(other);
         fState = other.fState;
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IEventInfo#getState()
-     */
+
     @Override
     public TraceEnablement getState() {
         return fState;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IEventInfo#setState(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceEnablement)
-     */
     @Override
     public void setState(TraceEnablement state) {
         fState = state;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IEventInfo#setState(java.lang.String)
-     */
     @Override
     public void setState(String stateName) {
         fState = TraceEnablement.DISABLED;
@@ -87,10 +76,6 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventInfo#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -99,10 +84,6 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventInfo#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -121,10 +102,6 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventInfo#toString()
-     */
     @SuppressWarnings("nls")
     @Override
     public String toString() {

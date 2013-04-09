@@ -1,12 +1,12 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -21,7 +21,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * <p>
  * Command handler implementation to delete a target host.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 abstract public class BaseNodeHandler extends BaseControlViewHandler {
@@ -30,17 +30,14 @@ abstract public class BaseNodeHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The target node component the command is to be executed on. 
+     * The target node component the command is to be executed on.
      */
     protected TargetNodeComponent fTargetNode = null;
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
-     */
+
     @Override
     public boolean isEnabled() {
 
@@ -69,5 +66,5 @@ abstract public class BaseNodeHandler extends BaseControlViewHandler {
         return isEnabled;
     }
 
-    
+
 }

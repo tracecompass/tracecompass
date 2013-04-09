@@ -262,10 +262,6 @@ public class SDPrintDialogUI {
             super(c, s);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#getContentsHeight()
-         */
         @Override
         public int getContentsHeight() {
             if (fSdView.getContentsHeight() > fSdView.getContentsHeight()) {
@@ -274,10 +270,6 @@ public class SDPrintDialogUI {
             return super.getContentsHeight();
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#getContentsWidth()
-         */
         @Override
         public int getContentsWidth() {
             if (fSdView.getVisibleWidth() > fSdView.getContentsWidth()) {
@@ -286,10 +278,6 @@ public class SDPrintDialogUI {
             return super.getContentsWidth();
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#contentsMouseHover(org.eclipse.swt.events.MouseEvent)
-         */
         @Override
         protected void contentsMouseHover(MouseEvent event) {
         }
@@ -372,10 +360,6 @@ public class SDPrintDialogUI {
             return over;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#drawContents(org.eclipse.swt.graphics.GC, int, int, int, int)
-         */
         @Override
         protected void drawContents(GC gc, int clipx, int clipy, int clipw, int cliph) {
 
@@ -410,13 +394,8 @@ public class SDPrintDialogUI {
             dbuffer.dispose();
             d.dispose();
             gc.dispose();
-
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#keyPressedEvent(org.eclipse.swt.events.KeyEvent)
-         */
         @Override
         protected void keyPressedEvent(KeyEvent e) {
             if (e.keyCode == SWT.CTRL) {
@@ -528,10 +507,6 @@ public class SDPrintDialogUI {
             fOverviewCanvas.redraw();
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#keyReleasedEvent(org.eclipse.swt.events.KeyEvent)
-         */
         @Override
         protected void keyReleasedEvent(KeyEvent e) {
             if (e.keyCode == SWT.CTRL) {
@@ -542,10 +517,6 @@ public class SDPrintDialogUI {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#contentsMouseDownEvent(org.eclipse.swt.events.MouseEvent)
-         */
         @Override
         protected void contentsMouseDownEvent(MouseEvent event) {
 
@@ -623,19 +594,11 @@ public class SDPrintDialogUI {
             redraw();
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget#contentsMouseMoveEvent(org.eclipse.swt.events.MouseEvent)
-         */
         @Override
         protected void contentsMouseMoveEvent(MouseEvent e) {
             fToolTip.hideToolTip();
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#resizeContents(int, int)
-         */
         @Override
         public void resizeContents(int w, int h) {
             super.resizeContents(w, h);
@@ -647,10 +610,6 @@ public class SDPrintDialogUI {
      * A traverse listener implementation.
      */
     protected static class LocalTraverseListener implements TraverseListener {
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
-         */
         @Override
         public void keyTraversed(TraverseEvent e) {
             if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
@@ -755,10 +714,6 @@ public class SDPrintDialogUI {
                 fOverviewCanvas.update();
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-             */
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 fPagesList = new int[0];
@@ -769,10 +724,6 @@ public class SDPrintDialogUI {
         };
 
         fModifyListener = new ModifyListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
-             */
             @Override
             public void modifyText(ModifyEvent e) {
                 fPagesList = new int[0];
@@ -940,28 +891,16 @@ public class SDPrintDialogUI {
         fToolTip = new DiagramToolTip(fOverviewCanvas);
 
         fOverviewCanvas.getViewControl().addMouseTrackListener(new MouseTrackListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.MouseTrackListener#mouseEnter(org.eclipse.swt.events.MouseEvent)
-             */
             @Override
             public void mouseEnter(MouseEvent e) {
                 fToolTip.hideToolTip();
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.MouseTrackListener#mouseExit(org.eclipse.swt.events.MouseEvent)
-             */
             @Override
             public void mouseExit(MouseEvent e) {
                 fToolTip.hideToolTip();
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.MouseTrackListener#mouseHover(org.eclipse.swt.events.MouseEvent)
-             */
             @Override
             public void mouseHover(MouseEvent e) {
                 int x1 = (int) (fOverviewCanvas.viewToContentsX(e.x) / fOverviewCanvas.fZoomValue / fStepX);
@@ -984,19 +923,11 @@ public class SDPrintDialogUI {
         fOverviewCanvas.addTraverseListener(new LocalTraverseListener());
 
         fOverviewCanvas.addFocusListener(new FocusListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
-             */
             @Override
             public void focusGained(FocusEvent e) {
                 fOverviewCanvas.redraw();
             }
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
-             */
             @Override
             public void focusLost(FocusEvent e) {
                 fOverviewCanvas.redraw();
@@ -1018,20 +949,11 @@ public class SDPrintDialogUI {
             fPrinterDialog.setText(SDMessages._115);
 
             fPrinterDialog.addSelectionListener(new SelectionListener() {
-
-                /*
-                 * (non-Javadoc)
-                 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-                 */
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     printButtonSelected();
                 }
 
-                /*
-                 * (non-Javadoc)
-                 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-                 */
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
                 }

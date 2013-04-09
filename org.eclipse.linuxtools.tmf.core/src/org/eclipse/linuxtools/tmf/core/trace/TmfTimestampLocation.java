@@ -40,9 +40,6 @@ public final class TmfTimestampLocation extends TmfLocation {
         super(other.getLocationInfo());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocationInfo()
-     */
     @Override
     public ITmfTimestamp getLocationInfo() {
         return (ITmfTimestamp) super.getLocationInfo();

@@ -107,11 +107,6 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.linuxtools.tmf.core.trace.TmfTrace#dispose()
-     */
     @Override
     public synchronized void dispose() {
         CtfIteratorManager.removeTrace(this);

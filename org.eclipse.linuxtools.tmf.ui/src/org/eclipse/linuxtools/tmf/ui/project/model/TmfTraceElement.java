@@ -349,10 +349,7 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
     // ------------------------------------------------------------------------
     // TmfTraceElement
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getProject()
-     */
+
     @Override
     public TmfProjectElement getProject() {
         if (getParent() instanceof TmfTraceFolder) {
@@ -373,28 +370,16 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
     // IPropertySource2
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
-     */
     @Override
     public Object getEditableValue() {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
-     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return Arrays.copyOf(sfDescriptors, sfDescriptors.length);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
-     */
     @Override
     public Object getPropertyValue(Object id) {
 
@@ -435,35 +420,19 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
         return "[no category]"; //$NON-NLS-1$
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.lang.Object)
-     */
     @Override
     public void resetPropertyValue(Object id) {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object, java.lang.Object)
-     */
     @Override
     public void setPropertyValue(Object id, Object value) {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertyResettable(java.lang.Object)
-     */
     @Override
     public boolean isPropertyResettable(Object id) {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertySet(java.lang.Object)
-     */
     @Override
     public boolean isPropertySet(Object id) {
         return false;
@@ -483,6 +452,5 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
         IResource res = super.copy(string, false);
         return new TmfTraceElement(string, res, folder);
     }
-
 
 }

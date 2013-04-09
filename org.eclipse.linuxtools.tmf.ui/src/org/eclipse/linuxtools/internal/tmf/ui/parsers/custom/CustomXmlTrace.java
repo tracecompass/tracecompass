@@ -490,9 +490,6 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
         return fDefinition;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
-     */
     @Override
     public IStatus validate(IProject project, String path) {
         if (fileExists(path)) {

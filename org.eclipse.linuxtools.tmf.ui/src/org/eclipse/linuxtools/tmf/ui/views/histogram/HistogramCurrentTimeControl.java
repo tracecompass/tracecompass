@@ -54,9 +54,6 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
         TmfSignalManager.register(this);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramTextControl#dispose()
-     */
     @Override
     public void dispose() {
         TmfSignalManager.deregister(this);

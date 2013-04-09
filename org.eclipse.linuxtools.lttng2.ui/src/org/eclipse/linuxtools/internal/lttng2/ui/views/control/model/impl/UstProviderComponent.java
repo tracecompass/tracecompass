@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -93,10 +93,6 @@ public class UstProviderComponent extends TraceControlComponent {
         fProviderInfo.setPid(pid);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
-     */
     @Override
     public Object getAdapter(Class adapter) {
         if (adapter == IPropertySource.class) {
@@ -105,10 +101,4 @@ public class UstProviderComponent extends TraceControlComponent {
         return null;
     }
 
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-
 }
-
-

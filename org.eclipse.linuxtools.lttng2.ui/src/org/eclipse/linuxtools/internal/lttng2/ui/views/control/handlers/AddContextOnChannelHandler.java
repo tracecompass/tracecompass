@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -40,10 +40,7 @@ public class AddContextOnChannelHandler extends BaseAddContextHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseAddContextHandler#addContexts(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
-     */
+
     @Override
     public void addContexts(CommandParameter param, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof ChannelCommandParameter) {
@@ -52,10 +49,6 @@ public class AddContextOnChannelHandler extends BaseAddContextHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
-     */
     @Override
     public boolean isEnabled() {
         // Get workbench page for the Control View

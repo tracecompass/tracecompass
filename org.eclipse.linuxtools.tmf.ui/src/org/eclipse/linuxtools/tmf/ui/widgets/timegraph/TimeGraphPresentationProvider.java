@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -40,10 +40,6 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     // Operations
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTypeName()
-     */
     @Override
     public String getStateTypeName() {
         return Messages.TmfTimeLegend_TRACE_STATES;
@@ -57,90 +53,52 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     public String getStateTypeName(ITimeGraphEntry entry) {
         return null;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTable()
-     */
+
     @Override
     public StateItem[] getStateTable() {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventTableIndex(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent)
-     */
     @Override
     public int getStateTableIndex(ITimeEvent event) {
         return 0;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#postDrawControl(org.eclipse.swt.graphics.Rectangle, org.eclipse.swt.graphics.GC)
-     */
     @Override
     public void postDrawControl(Rectangle bounds, GC gc) {
         // Override to add own drawing code
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#postDrawEntry(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry, org.eclipse.swt.graphics.Rectangle, org.eclipse.swt.graphics.GC)
-     */
     @Override
     public void postDrawEntry(ITimeGraphEntry entry, Rectangle bounds, GC gc) {
         // Override to add own drawing code
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#postDrawEvent(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent, org.eclipse.swt.graphics.Rectangle, org.eclipse.swt.graphics.GC)
-     */
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         // Override to add own drawing code
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getItemHeight(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry)
-     */
     @Override
     public int getItemHeight(ITimeGraphEntry entry) {
         return DEFAULT_ITEM_HEIGHT;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getItemImage(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry)
-     */
     @Override
     public Image getItemImage(ITimeGraphEntry entry) {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventName(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent)
-     */
     @Override
     public String getEventName(ITimeEvent event) {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventHoverToolTipInfo(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent)
-     */
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getEventHoverToolTipInfo(org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent, long)
-     */
     /**
      * @since 2.0
      */

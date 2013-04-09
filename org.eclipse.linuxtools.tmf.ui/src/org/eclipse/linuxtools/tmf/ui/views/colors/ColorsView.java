@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -142,9 +142,6 @@ public class ColorsView extends TmfView {
         super("Colors"); //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(Composite)
-     */
     @Override
     public void createPartControl(Composite parent) {
         fShell = parent.getShell();
@@ -205,9 +202,6 @@ public class ColorsView extends TmfView {
         fillToolBar();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-     */
     @Override
     public void setFocus() {
         fScrolledComposite.setFocus();

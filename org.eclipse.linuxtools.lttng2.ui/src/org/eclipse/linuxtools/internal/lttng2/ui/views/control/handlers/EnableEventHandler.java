@@ -1,12 +1,12 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceC
  * <p>
  * Command handler implementation to enable one or more events session, domain and channel.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class EnableEventHandler extends ChangeEventStateHandler {
@@ -30,10 +30,7 @@ public class EnableEventHandler extends ChangeEventStateHandler {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.ChangeEventStateHandler#getNewState()
-     */
+
     @Override
     protected TraceEnablement getNewState() {
         return TraceEnablement.ENABLED;
@@ -42,12 +39,9 @@ public class EnableEventHandler extends ChangeEventStateHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.ChangeEventStateHandler#changeState(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
-     */
+
     @Override
-    protected void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException{ 
+    protected void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException{
         channel.enableEvents(eventNames, monitor);
     }
 }

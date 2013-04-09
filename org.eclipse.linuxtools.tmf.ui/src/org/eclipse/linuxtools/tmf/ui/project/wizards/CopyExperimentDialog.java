@@ -50,6 +50,7 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
 /**
  * Implementation of the copy experiement dialog box.
  * <p>
+ *
  * @version 1.0
  * @author Francois Chouinard
  */
@@ -59,8 +60,8 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
     // Members
     // ------------------------------------------------------------------------
 
-	private final TmfExperimentElement fExperiment;
-	private Text fNewExperimentName;
+    private final TmfExperimentElement fExperiment;
+    private Text fNewExperimentName;
     private IFolder fExperimentFolder;
     private TmfProjectElement fProject;
 
@@ -70,8 +71,11 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
 
     /**
      * Constructor
-     * @param shell The parent shell
-     * @param experiment The TMF experiment model element
+     *
+     * @param shell
+     *            The parent shell
+     * @param experiment
+     *            The TMF experiment model element
      */
     public CopyExperimentDialog(Shell shell, TmfExperimentElement experiment) {
         super(shell);
@@ -87,10 +91,6 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
     // Dialog
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -137,25 +137,25 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         fNewExperimentName.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
-            	validateNewExperimentName();
+                validateNewExperimentName();
             }
         });
     }
 
     private void validateNewExperimentName() {
 
-    	String name = fNewExperimentName.getText();
+        String name = fNewExperimentName.getText();
         IWorkspace workspace = fExperimentFolder.getWorkspace();
         IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
 
         if ("".equals(name)) { //$NON-NLS-1$
-        	updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
-        	return;
+            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
+            return;
         }
 
         if (!nameStatus.isOK()) {
-        	updateStatus(nameStatus);
-        	return;
+            updateStatus(nameStatus);
+            return;
         }
 
         IPath path = new Path(name);
@@ -170,28 +170,17 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
     // ------------------------------------------------------------------------
     // SelectionStatusDialog
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
-     */
+
     @Override
     protected void computeResult() {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#create()
-     */
     @Override
     public void create() {
         super.create();
         getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.dialogs.SelectionStatusDialog#okPressed()
-     */
     @Override
     protected void okPressed() {
         IFolder folder = copyExperiment(fNewExperimentName.getText());
@@ -208,7 +197,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
 
     private IFolder copyExperiment(final String newName) {
 
-    	WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
+        WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
             @Override
             public void execute(IProgressMonitor monitor) throws CoreException {
                 try {

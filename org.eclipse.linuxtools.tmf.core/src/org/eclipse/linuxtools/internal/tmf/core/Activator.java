@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Ericsson
+ * Copyright (c) 2009, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,36 +26,36 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends Plugin {
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Attributes
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * The plug-in ID
      */
-	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.core"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.core"; //$NON-NLS-1$
 
-	/**
+    /**
      * The shared instance
      */
-	private static Activator fPlugin;
+    private static Activator fPlugin;
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Constructors
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-	/**
+    /**
      * Constructor
      */
-	public Activator() {
-		setDefault(this);
-	}
+    public Activator() {
+        setDefault(this);
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Accessors
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-	/**
+    /**
      * Returns the TMF Core plug-in instance.
      *
      * @return the TMF Core plug-in instance.
@@ -65,54 +65,50 @@ public class Activator extends Plugin {
     }
 
     // Sets plug-in instance
-	private static void setDefault(Activator plugin) {
-		fPlugin = plugin;
-	}
+    private static void setDefault(Activator plugin) {
+        fPlugin = plugin;
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Plugin
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		setDefault(this);
-		TmfCoreTracer.init();
-	}
+    @Override
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        setDefault(this);
+        TmfCoreTracer.init();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		TmfCoreTracer.stop();
-		setDefault(null);
-		super.stop(context);
-	}
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        TmfCoreTracer.stop();
+        setDefault(null);
+        super.stop(context);
+    }
 
-	// ------------------------------------------------------------------------
-	// Log INFO
+    // ------------------------------------------------------------------------
+    // Log INFO
     // ------------------------------------------------------------------------
 
     /**
      * Logs a message with severity INFO in the runtime log of the plug-in.
      *
-     * @param message A message to log
+     * @param message
+     *            A message to log
      */
     public static void logInfo(String message) {
         fPlugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
     }
 
     /**
-     * Logs a message and exception with severity INFO in the runtime log of the plug-in.
+     * Logs a message and exception with severity INFO in the runtime log of the
+     * plug-in.
      *
-     * @param message A message to log
-     * @param exception The corresponding exception
+     * @param message
+     *            A message to log
+     * @param exception
+     *            The corresponding exception
      */
     public static void logInfo(String message, Throwable exception) {
         fPlugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, exception));
@@ -123,19 +119,24 @@ public class Activator extends Plugin {
     // ------------------------------------------------------------------------
 
     /**
-     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
+     * Logs a message and exception with severity WARNING in the runtime log of
+     * the plug-in.
      *
-     * @param message A message to log
+     * @param message
+     *            A message to log
      */
     public static void logWarning(String message) {
         fPlugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
     }
 
     /**
-     * Logs a message and exception with severity WARNING in the runtime log of the plug-in.
+     * Logs a message and exception with severity WARNING in the runtime log of
+     * the plug-in.
      *
-     * @param message A message to log
-     * @param exception The corresponding exception
+     * @param message
+     *            A message to log
+     * @param exception
+     *            The corresponding exception
      */
     public static void logWarning(String message, Throwable exception) {
         fPlugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, exception));
@@ -146,19 +147,24 @@ public class Activator extends Plugin {
     // ------------------------------------------------------------------------
 
     /**
-     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
+     * Logs a message and exception with severity ERROR in the runtime log of
+     * the plug-in.
      *
-     * @param message A message to log
+     * @param message
+     *            A message to log
      */
     public static void logError(String message) {
         fPlugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
     }
 
     /**
-     * Logs a message and exception with severity ERROR in the runtime log of the plug-in.
+     * Logs a message and exception with severity ERROR in the runtime log of
+     * the plug-in.
      *
-     * @param message A message to log
-     * @param exception The corresponding exception
+     * @param message
+     *            A message to log
+     * @param exception
+     *            The corresponding exception
      */
     public static void logError(String message, Throwable exception) {
         fPlugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));

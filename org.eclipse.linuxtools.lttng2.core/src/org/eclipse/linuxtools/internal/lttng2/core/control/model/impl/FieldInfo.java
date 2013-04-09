@@ -55,28 +55,16 @@ public class FieldInfo extends TraceInfo implements IFieldInfo {
     // Accessors
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo#getFieldType()
-     */
     @Override
     public String getFieldType() {
         return fFieldType;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo#setFieldType(java.lang.String)
-     */
     @Override
     public void setFieldType(String fieldType) {
         fFieldType = fieldType;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -86,10 +74,6 @@ public class FieldInfo extends TraceInfo implements IFieldInfo {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.TraceInfo#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -112,10 +96,6 @@ public class FieldInfo extends TraceInfo implements IFieldInfo {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#toString()
-     */
     @SuppressWarnings("nls")
     @Override
     public String toString() {

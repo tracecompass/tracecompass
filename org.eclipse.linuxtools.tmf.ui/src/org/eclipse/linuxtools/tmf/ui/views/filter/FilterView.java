@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -82,9 +82,8 @@ public class FilterView extends TmfView {
      * @return The root of builded tree
      */
     public ITmfFilterTreeNode getFilterRoot() {
-    	return fRoot;
+        return fRoot;
     }
-
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -105,203 +104,192 @@ public class FilterView extends TmfView {
 
         fRoot = new TmfFilterRootNode();
         for (ITmfFilterTreeNode node : FilterManager.getSavedFilters()) {
-        	fRoot.addChild(node);
+            fRoot.addChild(node);
         }
-	}
+    }
 
-
-	/**
-	 * Refresh the tree widget
-	 */
-	public void refresh() {
-		fViewer.refresh();
-	}
-
-	/**
-	 * Setter for selection
-	 *
-	 * @param node The node to select
-	 */
-	public void setSelection(ITmfFilterTreeNode node) {
-		fViewer.setSelection(node, true);
-	}
-
-	// ------------------------------------------------------------------------
-	// ViewPart
-	// ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(Composite)
+    /**
+     * Refresh the tree widget
      */
-	@Override
-	public void createPartControl(Composite parent) {
+    public void refresh() {
+        fViewer.refresh();
+    }
 
-		fViewer = new FilterViewer(parent, SWT.NONE);
-		fViewer.setInput(fRoot);
-
-		contributeToActionBars();
-
-		fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
-					fDeleteAction.setEnabled(true);
-					fExportAction.setEnabled(true);
-				} else {
-					fDeleteAction.setEnabled(false);
-					fExportAction.setEnabled(false);
-				}
-			}
-		});
-	}
-
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+    /**
+     * Setter for selection
+     *
+     * @param node
+     *            The node to select
      */
+    public void setSelection(ITmfFilterTreeNode node) {
+        fViewer.setSelection(node, true);
+    }
+
+    // ------------------------------------------------------------------------
+    // ViewPart
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void createPartControl(Composite parent) {
+
+        fViewer = new FilterViewer(parent, SWT.NONE);
+        fViewer.setInput(fRoot);
+
+        contributeToActionBars();
+
+        fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
+                    fDeleteAction.setEnabled(true);
+                    fExportAction.setEnabled(true);
+                } else {
+                    fDeleteAction.setEnabled(false);
+                    fExportAction.setEnabled(false);
+                }
+            }
+        });
+    }
+
     @Override
     public void setFocus() {
         fViewer.setFocus();
     }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "[FilterView]"; //$NON-NLS-1$
-	}
-
+    @Override
+    public String toString() {
+        return "[FilterView]"; //$NON-NLS-1$
+    }
 
     /**
      * Builds the menu toolbar
      */
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		//fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
+    private void contributeToActionBars() {
+        IActionBars bars = getViewSite().getActionBars();
+        // fillLocalPullDown(bars.getMenuManager());
+        fillLocalToolBar(bars.getToolBarManager());
+    }
 
+    /**
+     * Build the popup menu
+     *
+     * @param manager
+     *            The manager to build
+     */
+    private void fillLocalToolBar(IToolBarManager manager) {
 
-	/**
-	 * Build the popup menu
-	 *
-	 * @param manager The manager to build
-	 */
-	private void fillLocalToolBar(IToolBarManager manager) {
+        fSaveAction = new SaveAction();
+        fSaveAction.setImageDescriptor(ImageDescriptor.createFromImage(SAVE_IMAGE));
+        fSaveAction.setToolTipText(Messages.FilterView_SaveActionToolTipText);
 
-		fSaveAction = new SaveAction();
-		fSaveAction.setImageDescriptor(ImageDescriptor.createFromImage(SAVE_IMAGE));
-		fSaveAction.setToolTipText(Messages.FilterView_SaveActionToolTipText);
+        fAddAction = new AddAction();
+        fAddAction.setImageDescriptor(ImageDescriptor.createFromImage(ADD_IMAGE));
+        fAddAction.setToolTipText(Messages.FilterView_AddActionToolTipText);
 
-		fAddAction = new AddAction();
-		fAddAction.setImageDescriptor(ImageDescriptor.createFromImage(ADD_IMAGE));
-		fAddAction.setToolTipText(Messages.FilterView_AddActionToolTipText);
+        fDeleteAction = new DeleteAction();
+        fDeleteAction.setImageDescriptor(ImageDescriptor.createFromImage(DELETE_IMAGE));
+        fDeleteAction.setToolTipText(Messages.FilterView_DeleteActionToolTipText);
+        fDeleteAction.setEnabled(false);
 
-		fDeleteAction = new DeleteAction();
-		fDeleteAction.setImageDescriptor(ImageDescriptor.createFromImage(DELETE_IMAGE));
-		fDeleteAction.setToolTipText(Messages.FilterView_DeleteActionToolTipText);
-		fDeleteAction.setEnabled(false);
+        fExportAction = new ExportAction();
+        fExportAction.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMAGE));
+        fExportAction.setToolTipText(Messages.FilterView_ExportActionToolTipText);
 
-		fExportAction = new ExportAction();
-		fExportAction.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMAGE));
-		fExportAction.setToolTipText(Messages.FilterView_ExportActionToolTipText);
+        fImportAction = new ImportAction();
+        fImportAction.setImageDescriptor(ImageDescriptor.createFromImage(IMPORT_IMAGE));
+        fImportAction.setToolTipText(Messages.FilterView_ImportActionToolTipText);
 
-		fImportAction = new ImportAction();
-		fImportAction.setImageDescriptor(ImageDescriptor.createFromImage(IMPORT_IMAGE));
-		fImportAction.setToolTipText(Messages.FilterView_ImportActionToolTipText);
+        manager.add(fSaveAction);
+        manager.add(new Separator());
+        manager.add(fAddAction);
+        manager.add(fDeleteAction);
+        manager.add(new Separator());
+        manager.add(fExportAction);
+        manager.add(fImportAction);
+    }
 
-		manager.add(fSaveAction);
-		manager.add(new Separator());
-		manager.add(fAddAction);
-		manager.add(fDeleteAction);
-		manager.add(new Separator());
-		manager.add(fExportAction);
-		manager.add(fImportAction);
-	}
+    private class SaveAction extends Action {
+        @Override
+        public void run() {
+            FilterManager.setSavedFilters(fRoot.getChildren());
+        }
+    }
 
-	private class SaveAction extends Action {
-		@Override
-		public void run() {
-			FilterManager.setSavedFilters(fRoot.getChildren());
-		}
-	}
+    private class AddAction extends Action {
+        @Override
+        public void run() {
 
-	private class AddAction extends Action {
-		@Override
-		public void run() {
+            TmfFilterNode newNode = new TmfFilterNode(fRoot, ""); //$NON-NLS-1$
+            refresh();
+            setSelection(newNode);
+        }
+    }
 
-			TmfFilterNode newNode = new TmfFilterNode(fRoot, ""); //$NON-NLS-1$
-			refresh();
-			setSelection(newNode);
-		}
-	}
+    private class DeleteAction extends Action {
+        @Override
+        public void run() {
+            ITmfFilterTreeNode node = fViewer.getSelection();
+            if (node != null) {
+                node.remove();
+            }
+            refresh();
+        }
+    }
 
-	private class DeleteAction extends Action {
-		@Override
-		public void run() {
-			ITmfFilterTreeNode node = fViewer.getSelection();
-			if (node != null) {
-				node.remove();
-			}
-			refresh();
-		}
-	}
+    private class ExportAction extends Action {
+        @Override
+        public void run() {
+            try {
+                FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
+                dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.filter.xml)" }); //$NON-NLS-1$
+                dlg.setFilterExtensions(new String[] { "*.filter.xml" }); //$NON-NLS-1$
 
-	private class ExportAction extends Action {
-		@Override
-		public void run() {
-			try {
-				FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
-				dlg.setFilterNames(new String[] {Messages.FilterView_FileDialogFilterName + " (*.filter.xml)"}); //$NON-NLS-1$
-				dlg.setFilterExtensions(new String[] {"*.filter.xml"}); //$NON-NLS-1$
+                String fn = dlg.open();
+                if (fn != null) {
+                    TmfFilterXMLWriter writerXML = new TmfFilterXMLWriter(fRoot);
+                    writerXML.saveTree(fn);
+                }
 
-				String fn = dlg.open();
-		        if (fn != null) {
-					TmfFilterXMLWriter writerXML = new TmfFilterXMLWriter(fRoot);
-					writerXML.saveTree(fn);
-		        }
+            } catch (ParserConfigurationException e) {
+                Activator.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
+            }
+        }
+    }
 
-			} catch (ParserConfigurationException e) {
-			    Activator.getDefault().logError("Error parsing filter xml file", e); //$NON-NLS-1$
-			}
-		}
-	}
+    private class ImportAction extends Action {
+        @Override
+        public void run() {
+            if (fViewer != null) {
+                ITmfFilterTreeNode root = null;
+                try {
+                    FileDialog dlg = new FileDialog(new Shell(), SWT.OPEN);
+                    dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.filter.xml)" }); //$NON-NLS-1$
+                    dlg.setFilterExtensions(new String[] { "*.filter.xml" }); //$NON-NLS-1$
 
-	private class ImportAction extends Action {
-		@Override
-		public void run() {
-			if (fViewer != null) {
-				ITmfFilterTreeNode root = null;
-				try {
-					FileDialog dlg = new FileDialog(new Shell(), SWT.OPEN);
-					dlg.setFilterNames(new String[] {Messages.FilterView_FileDialogFilterName + " (*.filter.xml)"}); //$NON-NLS-1$
-					dlg.setFilterExtensions(new String[] {"*.filter.xml"}); //$NON-NLS-1$
+                    TmfFilterXMLParser parserXML = null;
+                    String fn = dlg.open();
+                    if (fn != null) {
+                        parserXML = new TmfFilterXMLParser(fn);
+                        root = parserXML.getTree();
+                    }
 
-					TmfFilterXMLParser parserXML = null;
-					String fn = dlg.open();
-			        if (fn != null) {
-			        	parserXML = new TmfFilterXMLParser(fn);
-						root = parserXML.getTree();
-			        }
+                } catch (SAXException e) {
+                    Activator.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
+                } catch (IOException e) {
+                    Activator.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
+                }
 
-				} catch (SAXException e) {
-				    Activator.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
-				} catch (IOException e) {
-				    Activator.getDefault().logError("Error importing filter xml file", e); //$NON-NLS-1$
-				}
-
-				if (root != null) {
-    				for (ITmfFilterTreeNode node : root.getChildren()) {
-    					if (node instanceof TmfFilterNode) {
-    						fRoot.addChild(node);
-    						refresh();
-    						fViewer.setSelection(node);
-    					}
-    				}
-				}
-			}
-		}
-	}
+                if (root != null) {
+                    for (ITmfFilterTreeNode node : root.getChildren()) {
+                        if (node instanceof TmfFilterNode) {
+                            fRoot.addChild(node);
+                            refresh();
+                            fViewer.setSelection(node);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

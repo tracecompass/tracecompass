@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -67,10 +67,6 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
     // Wizard
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
-     */
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
         fWorkbench = workbench;
@@ -86,10 +82,6 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         setNeedsProgressMonitor(true);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.wizard.Wizard#addPages()
-     */
     @Override
     public void addPages() {
         super.addPages();
@@ -97,10 +89,6 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         addPage(fTraceImportWizardPage);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.wizard.Wizard#performFinish()
-     */
     @Override
     public boolean performFinish() {
         return fTraceImportWizardPage.finish();

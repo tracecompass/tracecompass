@@ -95,19 +95,11 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement#getResource()
-     */
     @Override
     public IFolder getResource() {
         return (IFolder) fResource;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getProject()
-     */
     @Override
     public TmfProjectElement getProject() {
         return (TmfProjectElement) getParent().getParent();
@@ -116,6 +108,7 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     /**
      * Returns a list of TmfTraceElements contained in this experiment.
      * @return a list of TmfTraceElements
@@ -251,28 +244,16 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
     // IPropertySource2
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
-     */
     @Override
     public Object getEditableValue() {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
-     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return Arrays.copyOf(sfDescriptors, sfDescriptors.length);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
-     */
     @Override
     public Object getPropertyValue(Object id) {
 
@@ -291,35 +272,19 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.lang.Object)
-     */
     @Override
     public void resetPropertyValue(Object id) {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object, java.lang.Object)
-     */
     @Override
     public void setPropertyValue(Object id, Object value) {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertyResettable(java.lang.Object)
-     */
     @Override
     public boolean isPropertyResettable(Object id) {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.views.properties.IPropertySource2#isPropertySet(java.lang.Object)
-     */
     @Override
     public boolean isPropertySet(Object id) {
         return false;

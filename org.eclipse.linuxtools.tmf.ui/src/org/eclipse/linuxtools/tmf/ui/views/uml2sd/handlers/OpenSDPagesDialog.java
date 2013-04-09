@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ public class OpenSDPagesDialog extends Action {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
     /**
      * The action ID.
      */
@@ -39,6 +40,7 @@ public class OpenSDPagesDialog extends Action {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     /**
      * The sequence diagram view reference
      */
@@ -51,6 +53,7 @@ public class OpenSDPagesDialog extends Action {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
     /**
      * Constructor
      *
@@ -70,10 +73,7 @@ public class OpenSDPagesDialog extends Action {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.action.Action#run()
-     */
+
     @Override
     public void run() {
         if (fView == null) {

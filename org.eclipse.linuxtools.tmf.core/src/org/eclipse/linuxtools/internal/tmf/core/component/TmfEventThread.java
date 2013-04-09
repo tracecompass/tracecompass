@@ -145,9 +145,6 @@ public class TmfEventThread implements Runnable {
     // Runnable
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see java.lang.Runnable#run()
-     */
     @Override
     public void run() {
 

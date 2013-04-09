@@ -57,18 +57,11 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
-     */
+
     @Override
     public void init(IWorkbench workbench) {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
-     */
     @Override
     protected void createFieldEditors() {
 
@@ -121,10 +114,6 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         addField(commandTimeout);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-     */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
 
@@ -141,10 +130,6 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         super.propertyChange(event);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performDefaults()
-     */
     @Override
     protected void performDefaults() {
         super.performDefaults();
@@ -152,10 +137,6 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         fIsAppend.setEnabled(false, getFieldEditorParent());
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performOk()
-     */
     @Override
     public boolean performOk() {
         boolean ret =  super.performOk();

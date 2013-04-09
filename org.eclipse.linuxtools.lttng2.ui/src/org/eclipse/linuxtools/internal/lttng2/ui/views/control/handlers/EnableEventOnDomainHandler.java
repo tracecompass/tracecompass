@@ -38,16 +38,9 @@ import org.eclipse.ui.IWorkbenchPage;
 public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
 
     // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableEvents(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.util.List, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
+
     @Override
     public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExression, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
@@ -55,10 +48,6 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableSyscalls(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
@@ -66,10 +55,6 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.lang.String, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableProbe(CommandParameter param, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
@@ -77,10 +62,6 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableLogLevel(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.lang.String, org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType, org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExression, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
@@ -88,10 +69,6 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#getDomain(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter)
-     */
     @Override
     public TraceDomainComponent getDomain(CommandParameter param) {
         if (param instanceof DomainCommandParameter) {
@@ -100,10 +77,6 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
-     */
     @Override
     public boolean isEnabled() {
         // Get workbench page for the Control View

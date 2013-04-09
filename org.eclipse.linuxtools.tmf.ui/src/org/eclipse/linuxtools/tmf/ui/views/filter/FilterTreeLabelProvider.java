@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,118 +33,94 @@ import org.eclipse.swt.graphics.Image;
  */
 public class FilterTreeLabelProvider implements ILabelProvider {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-	 */
-	@Override
+    @Override
     public void addListener(ILabelProviderListener listener) {
-		// TODO Auto-generated method stub
-	}
+        // TODO Auto-generated method stub
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
-	@Override
+    @Override
     public void dispose() {
-		// TODO Auto-generated method stub
-	}
+        // TODO Auto-generated method stub
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
-	 */
-	@Override
+    @Override
     public boolean isLabelProperty(Object element, String property) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-	 */
-	@Override
+    @Override
     public void removeListener(ILabelProviderListener listener) {
-		// TODO Auto-generated method stub
-	}
+        // TODO Auto-generated method stub
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
-	@Override
+    @Override
     public Image getImage(Object element) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
-	@Override
+    @Override
     public String getText(Object element) {
-		String label = null;
+        String label = null;
 
-		if (element instanceof TmfFilterNode) {
+        if (element instanceof TmfFilterNode) {
 
-			TmfFilterNode node = (TmfFilterNode) element;
-			label = node.getNodeName() + " " + node.getFilterName(); //$NON-NLS-1$
+            TmfFilterNode node = (TmfFilterNode) element;
+            label = node.getNodeName() + " " + node.getFilterName(); //$NON-NLS-1$
 
-		} else if (element instanceof TmfFilterEventTypeNode) {
+        } else if (element instanceof TmfFilterEventTypeNode) {
 
-			TmfFilterEventTypeNode node = (TmfFilterEventTypeNode) element;
-			label = "WITH " + node.getNodeName() + (node.getName() != null ? " " + node.getName() : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            TmfFilterEventTypeNode node = (TmfFilterEventTypeNode) element;
+            label = "WITH " + node.getNodeName() + (node.getName() != null ? " " + node.getName() : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		} else if (element instanceof TmfFilterAndNode) {
+        } else if (element instanceof TmfFilterAndNode) {
 
-			TmfFilterAndNode node = (TmfFilterAndNode) element;
-			label = (node.isNot() ? "NOT " : "") + node.getNodeName(); //$NON-NLS-1$ //$NON-NLS-2$
+            TmfFilterAndNode node = (TmfFilterAndNode) element;
+            label = (node.isNot() ? "NOT " : "") + node.getNodeName(); //$NON-NLS-1$ //$NON-NLS-2$
 
-		} else if (element instanceof TmfFilterOrNode) {
+        } else if (element instanceof TmfFilterOrNode) {
 
-			TmfFilterOrNode node = (TmfFilterOrNode) element;
-			label = (node.isNot() ? "NOT " : "") + node.getNodeName(); //$NON-NLS-1$ //$NON-NLS-2$
+            TmfFilterOrNode node = (TmfFilterOrNode) element;
+            label = (node.isNot() ? "NOT " : "") + node.getNodeName(); //$NON-NLS-1$ //$NON-NLS-2$
 
-		} else if (element instanceof TmfFilterContainsNode) {
+        } else if (element instanceof TmfFilterContainsNode) {
 
-			TmfFilterContainsNode node = (TmfFilterContainsNode) element;
-			label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					(node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					node.getNodeName() +
-					(node.getValue() != null && node.getValue().length() > 0 ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            TmfFilterContainsNode node = (TmfFilterContainsNode) element;
+            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    (node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    node.getNodeName() +
+                    (node.getValue() != null && node.getValue().length() > 0 ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		} else if (element instanceof TmfFilterEqualsNode) {
+        } else if (element instanceof TmfFilterEqualsNode) {
 
-			TmfFilterEqualsNode node = (TmfFilterEqualsNode) element;
-			label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					(node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					node.getNodeName() +
-					(node.getValue() != null && node.getValue().length() > 0 ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            TmfFilterEqualsNode node = (TmfFilterEqualsNode) element;
+            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    (node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    node.getNodeName() +
+                    (node.getValue() != null && node.getValue().length() > 0 ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		} else if (element instanceof TmfFilterMatchesNode) {
+        } else if (element instanceof TmfFilterMatchesNode) {
 
-			TmfFilterMatchesNode node = (TmfFilterMatchesNode) element;
-			label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					(node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					node.getNodeName() +
-					(node.getRegex() != null && node.getRegex().length() > 0 ? " \"" + node.getRegex() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            TmfFilterMatchesNode node = (TmfFilterMatchesNode) element;
+            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    (node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    node.getNodeName() +
+                    (node.getRegex() != null && node.getRegex().length() > 0 ? " \"" + node.getRegex() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		} else if (element instanceof TmfFilterCompareNode) {
+        } else if (element instanceof TmfFilterCompareNode) {
 
-			TmfFilterCompareNode node = (TmfFilterCompareNode) element;
-			label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					(node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					(node.getResult() < 0 ? "<" : (node.getResult() > 0 ? ">" : "=")) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					(node.getValue() != null && node.getValue().length() > 0 ?
-							(node.getType() == Type.ALPHA ? " \"" + node.getValue() + "\"" : //$NON-NLS-1$ //$NON-NLS-2$
-							(node.getType() == Type.TIMESTAMP ? " [" + node.getValue() + "]" : //$NON-NLS-1$ //$NON-NLS-2$
-								" " + node.getValue())) : "");  //$NON-NLS-1$//$NON-NLS-2$
+            TmfFilterCompareNode node = (TmfFilterCompareNode) element;
+            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    (node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+                    (node.getResult() < 0 ? "<" : (node.getResult() > 0 ? ">" : "=")) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    (node.getValue() != null && node.getValue().length() > 0 ?
+                            (node.getType() == Type.ALPHA ? " \"" + node.getValue() + "\"" : //$NON-NLS-1$ //$NON-NLS-2$
+                                    (node.getType() == Type.TIMESTAMP ? " [" + node.getValue() + "]" : //$NON-NLS-1$ //$NON-NLS-2$
+                                            " " + node.getValue())) : ""); //$NON-NLS-1$//$NON-NLS-2$
 
-		}
-		return label;
-	}
+        }
+        return label;
+    }
 
 }

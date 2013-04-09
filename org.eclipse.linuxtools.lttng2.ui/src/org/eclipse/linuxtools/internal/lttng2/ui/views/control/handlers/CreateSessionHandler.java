@@ -41,6 +41,7 @@ public class CreateSessionHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     /**
      * The trace session group the command is to be executed on.
      */
@@ -49,10 +50,7 @@ public class CreateSessionHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-     */
+
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
@@ -93,10 +91,6 @@ public class CreateSessionHandler extends BaseControlViewHandler {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
-     */
     @Override
     public boolean isEnabled() {
 

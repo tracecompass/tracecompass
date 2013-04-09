@@ -22,10 +22,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  * @author Bernd Hufmann
  */
 public class ControlPreferenceInitializer extends AbstractPreferenceInitializer {
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-     */
+
     @Override
     public void initializeDefaultPreferences() {
         final IPreferenceStore store = ControlPreferences.getInstance().getPreferenceStore();

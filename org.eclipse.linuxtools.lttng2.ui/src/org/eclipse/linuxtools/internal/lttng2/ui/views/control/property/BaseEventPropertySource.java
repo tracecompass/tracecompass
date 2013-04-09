@@ -89,10 +89,7 @@ public class BaseEventPropertySource extends BasePropertySource {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyDescriptors()
-     */
+
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor> ();
@@ -107,10 +104,6 @@ public class BaseEventPropertySource extends BasePropertySource {
         return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyValue(java.lang.Object)
-     */
     @Override
     public Object getPropertyValue(Object id) {
         if(BASE_EVENT_NAME_PROPERTY_ID.equals(id)) {

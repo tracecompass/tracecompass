@@ -130,9 +130,6 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
-     */
     @Override
     public void setVisible(final boolean visible) {
         if (visible) {

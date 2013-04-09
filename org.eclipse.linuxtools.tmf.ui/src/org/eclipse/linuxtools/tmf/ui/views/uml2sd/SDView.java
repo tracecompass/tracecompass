@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -157,10 +157,6 @@ public class SDView extends ViewPart {
     // Methods
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-     */
     @Override
     public void createPartControl(Composite c) {
         Composite parent = new Composite(c, SWT.NONE);
@@ -205,10 +201,6 @@ public class SDView extends ViewPart {
         setContentDescription(loader.getTitleString());
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-     */
     @Override
     public void setFocus() {
         if (fSdWidget != null) {
@@ -221,10 +213,6 @@ public class SDView extends ViewPart {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#dispose()
-     */
     @Override
     public void dispose() {
         KeyBindingsManager.getInstance().remove(this.getSite().getId());
@@ -1055,11 +1043,6 @@ public class SDView extends ViewPart {
         bar.getMenuManager().add(new Separator("UML2SD_OTHER_PLUGINS_COMMANDS")); //$NON-NLS-1$
     }
 
-    /*
-     * Gets adapter for this view for properties.
-     * (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
-     */
     @Override
     public Object getAdapter(Class adapter) {
         Object obj = super.getAdapter(adapter);
@@ -1076,10 +1059,6 @@ public class SDView extends ViewPart {
      * @version 1.0
      */
     public static class BlankUml2SdLoader implements IUml2SDLoader {
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#setViewer(org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView)
-         */
         @Override
         public void setViewer(SDView viewer) {
             // Nothing to do
@@ -1088,19 +1067,11 @@ public class SDView extends ViewPart {
             viewer.setFrame(f);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#getTitleString()
-         */
         @Override
         public String getTitleString() {
             return ""; //$NON-NLS-1$
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#dispose()
-         */
         @Override
         public void dispose() {
         }

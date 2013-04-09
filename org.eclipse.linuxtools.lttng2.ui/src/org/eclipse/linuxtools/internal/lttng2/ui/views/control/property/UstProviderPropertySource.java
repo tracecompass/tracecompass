@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -48,6 +48,7 @@ public class UstProviderPropertySource extends BasePropertySource {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     /**
      * The UST provider component which this property source is for.
      */
@@ -56,6 +57,7 @@ public class UstProviderPropertySource extends BasePropertySource {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
     /**
      * Constructor
      * @param component - the UST provider component
@@ -67,10 +69,7 @@ public class UstProviderPropertySource extends BasePropertySource {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyDescriptors()
-     */
+
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return new IPropertyDescriptor[] {
@@ -78,10 +77,6 @@ public class UstProviderPropertySource extends BasePropertySource {
                 new ReadOnlyTextPropertyDescriptor(UST_PROVIDER_PID_PROPERTY_ID, UST_PROVIDER_PID_PROPERTY_NAME)};
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyValue(java.lang.Object)
-     */
     @Override
     public Object getPropertyValue(Object id) {
         if(UST_PROVIDER_NAME_PROPERTY_ID.equals(id)) {

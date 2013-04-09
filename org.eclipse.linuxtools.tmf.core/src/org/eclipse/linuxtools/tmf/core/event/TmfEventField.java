@@ -93,33 +93,21 @@ public class TmfEventField implements ITmfEventField {
     // ITmfEventField
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getName()
-     */
     @Override
     public String getName() {
         return fName;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getValue()
-     */
     @Override
     public Object getValue() {
         return fValue;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFieldNames()
-     */
     @Override
     public String[] getFieldNames() {
         return fFieldNames;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFieldName(int)
-     */
     @Override
     public String getFieldName(final int index) {
         final ITmfEventField field = getField(index);
@@ -129,25 +117,16 @@ public class TmfEventField implements ITmfEventField {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFields()
-     */
     @Override
     public ITmfEventField[] getFields() {
         return (fFields != null) ? fFields : new ITmfEventField[0];
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(java.lang.String)
-     */
     @Override
     public ITmfEventField getField(final String name) {
         return fNameMapping.get(name);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(int)
-     */
     @Override
     public ITmfEventField getField(final int index) {
         if (fFields != null && index >= 0 && index < fFields.length) {
@@ -179,9 +158,6 @@ public class TmfEventField implements ITmfEventField {
     // Object
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -191,9 +167,6 @@ public class TmfEventField implements ITmfEventField {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -219,9 +192,6 @@ public class TmfEventField implements ITmfEventField {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         StringBuilder ret = new StringBuilder();

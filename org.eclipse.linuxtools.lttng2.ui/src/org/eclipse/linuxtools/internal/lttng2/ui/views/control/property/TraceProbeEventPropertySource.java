@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -82,10 +82,7 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyDescriptors()
-     */
+
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         IPropertyDescriptor[] superProperties = super.getPropertyDescriptors();
@@ -111,10 +108,6 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
         return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.BasePropertySource#getPropertyValue(java.lang.Object)
-     */
     @Override
     public Object getPropertyValue(Object id) {
         if(TRACE_EVENT_PROBE_ADDRESS_PROPERTY_ID.equals(id)) {

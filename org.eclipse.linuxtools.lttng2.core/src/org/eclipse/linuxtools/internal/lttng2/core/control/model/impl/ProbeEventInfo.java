@@ -1,12 +1,12 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
@@ -16,9 +16,9 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IProbeEventInfo
 /**
 * <p>
 * Implementation of the trace event interface (IProbeEventInfo) to store probe event
-* related data. 
+* related data.
 * </p>
-* 
+*
 * @author Bernd Hufmann
 */
 public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
@@ -34,13 +34,13 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
      * The dynamic probe offset (if symbol is used).
      */
     private String fOffset;
-    
+
     /**
      * The symbol name (null if address is used)
      */
     private String fSymbol;
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -51,7 +51,7 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
     public ProbeEventInfo(String name) {
         super(name);
     }
-    
+
     /**
      * Copy constructor
      * @param other - the instance to copy
@@ -62,60 +62,36 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
         fOffset = other.fOffset;
         fSymbol = other.fSymbol;
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IProbeEventInfo#getAddress()
-     */
     @Override
     public String getAddress() {
         return fAddress;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IProbeEventInfo#setAddress(java.lang.String)
-     */
     @Override
     public void setAddress(String address) {
         fAddress = address;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IProbeEventInfo#getOffset()
-     */
     @Override
     public String getOffset() {
         return fOffset;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IProbeEventInfo#setOffset(java.lang.String)
-     */
     @Override
     public void setOffset(String offset) {
         fOffset = offset;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IProbeEventInfo#getSymbol()
-     */
     @Override
     public String getSymbol() {
         return fSymbol;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IProbeEventInfo#setSymbol(java.lang.String)
-     */
     @Override
     public void setSymbol(String symbol) {
         fSymbol = symbol;
@@ -125,10 +101,6 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
     // Operation
     // ------------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventInfo#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -139,10 +111,6 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventInfo#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -179,11 +147,6 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
         return true;
     }
 
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.EventInfo#toString()
-     */
     @SuppressWarnings("nls")
     @Override
     public String toString() {

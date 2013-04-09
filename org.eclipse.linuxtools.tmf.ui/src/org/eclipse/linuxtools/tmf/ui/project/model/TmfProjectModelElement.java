@@ -89,74 +89,47 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     // ------------------------------------------------------------------------
     // ITmfProjectModelElement
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getName()
-     */
+
     @Override
     public String getName() {
         return fName;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getResource()
-     */
+
     @Override
     public IResource getResource() {
         return fResource;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getPath()
-     */
+
     @Override
     public IPath getPath() {
         return fPath;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getLocation()
-     */
+
     @Override
     public URI getLocation() {
         return fLocation;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getParent()
-     */
+
     @Override
     public ITmfProjectModelElement getParent() {
         return fParent;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#hasChildren()
-     */
+
     @Override
     public boolean hasChildren() {
         return fChildren.size() > 0;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#getChildren()
-     */
+
     @Override
     public List<ITmfProjectModelElement> getChildren() {
         return fChildren;
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#addChild(org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement)
-     */
+
     @Override
     public void addChild(ITmfProjectModelElement child) {
         fChildren.add(child);
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#removeChild(org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement)
-     */
+
     @Override
     public void removeChild(ITmfProjectModelElement child) {
         fChildren.remove(child);
@@ -165,10 +138,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
         }
         refresh();
     }
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement#refresh()
-     */
+
     @Override
     public void refresh() {
         // Do nothing by default: sub-classes override this on an "as-needed"
@@ -178,10 +148,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     // ------------------------------------------------------------------------
     // IResourceChangeListener
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
-     */
+
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
         // Do nothing by default: sub-classes override this on an "as-needed"
@@ -191,10 +158,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -202,10 +166,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
         result = prime * result + ((fPath == null) ? 0 : fPath.hashCode());
         return result;
     }
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {

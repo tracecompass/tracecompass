@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -18,10 +18,10 @@ import java.util.Map;
 /**
  * A central repository for the available event types. Types are managed by
  * context space.
- * 
+ *
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  * @see ITmfEventType
  */
 public final class TmfEventTypeManager {
@@ -63,7 +63,7 @@ public final class TmfEventTypeManager {
 
     /**
      * Add a context:type pair to the available types
-     * 
+     *
      * @param context the target context
      * @param type the type to add
      */
@@ -78,7 +78,7 @@ public final class TmfEventTypeManager {
 
     /**
      * Return the list of currently defined contexts
-     * 
+     *
      * @return the list of contexts
      */
     public synchronized String[] getContexts() {
@@ -87,7 +87,7 @@ public final class TmfEventTypeManager {
 
     /**
      * Return the list of types defined for a given context
-     * 
+     *
      * @param context the context to look into
      * @return the list of types defined for that context
      */
@@ -101,7 +101,7 @@ public final class TmfEventTypeManager {
 
     /**
      * Return an event type
-     * 
+     *
      * @param context the context to look into
      * @param typeId the type ID
      * @return the corresponding type
@@ -116,7 +116,7 @@ public final class TmfEventTypeManager {
 
     /**
      * Remove the types associated to a context
-     * 
+     *
      * @param context the context to remove
      */
     public synchronized void clear(final String context) {
@@ -134,9 +134,6 @@ public final class TmfEventTypeManager {
     // Object
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {
