@@ -13,10 +13,8 @@
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
@@ -103,36 +101,25 @@ public final class CtfTmfEventFactory {
         List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
 
         StructDefinition structFields = eventDef.getFields();
-        Map<String, Definition> definitions = structFields.getDefinitions();
-        String curFieldName = null;
-        Definition curFieldDef;
-        CtfTmfEventField curField;
-        Iterator<Entry<String, Definition>> it = definitions.entrySet().iterator();
-        while(it.hasNext()) {
-            Entry<String, Definition> entry = it.next();
-            curFieldName = entry.getKey();
-            curFieldDef = entry.getValue();
-            curField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
+        for (Map.Entry<String, Definition> entry : structFields.getDefinitions().entrySet()) {
+            String curFieldName = entry.getKey();
+            Definition curFieldDef = entry.getValue();
+            CtfTmfEventField curField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
             fields.add(curField);
         }
 
         /* Add context information as CtfTmfEventField */
         StructDefinition structContext = eventDef.getContext();
         if (structContext != null) {
-            definitions = structContext.getDefinitions();
-            String curContextName;
-            Definition curContextDef;
-            CtfTmfEventField curContext;
-            it = definitions.entrySet().iterator();
-            while(it.hasNext()) {
-                Entry<String, Definition> entry = it.next();
+            for (Map.Entry<String, Definition> entry : structContext.getDefinitions().entrySet()) {
                 /* Prefix field name */
-                curContextName = CtfConstants.CONTEXT_FIELD_PREFIX + entry.getKey();
-                curContextDef = entry.getValue();
-                curContext = CtfTmfEventField.parseField(curContextDef, curContextName);
+                String curContextName = CtfConstants.CONTEXT_FIELD_PREFIX + entry.getKey();
+                Definition curContextDef = entry.getValue();
+                CtfTmfEventField curContext = CtfTmfEventField.parseField(curContextDef, curContextName);
                 fields.add(curContext);
             }
         }
+
         return fields.toArray(new CtfTmfEventField[fields.size()]);
     }
 }
