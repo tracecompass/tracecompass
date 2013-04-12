@@ -45,25 +45,21 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
 
     /**
      * The millisecond scale factor (10e0)
-     * @since 2.0
      */
     public static final int SECOND_SCALE = 0;
 
     /**
      * The millisecond scale factor (10e-3)
-     * @since 2.0
      */
     public static final int MILLISECOND_SCALE = -3;
 
     /**
      * The microsecond scale factor (10e-6)
-     * @since 2.0
      */
     public static final int MICROSECOND_SCALE = -6;
 
     /**
      * The nanosecond scale factor (10e-9)
-     * @since 2.0
      */
     public static final int NANOSECOND_SCALE = -9;
 
@@ -116,13 +112,21 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      */
     public ITmfTimestamp getDelta(ITmfTimestamp ts);
 
+    /**
+     * Returns if this timestamp intersects the given time range. Borders are
+     * inclusive (for more fine-grained behavior, you can use
+     * {@link #compareTo(ITmfTimestamp)}.
+     *
+     * @param range
+     *            The time range to compare to
+     * @return True if this timestamp is part of the time range, false if not
+     */
+    public boolean intersects(TmfTimeRange range);
+
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     int compareTo(ITmfTimestamp ts);
 
