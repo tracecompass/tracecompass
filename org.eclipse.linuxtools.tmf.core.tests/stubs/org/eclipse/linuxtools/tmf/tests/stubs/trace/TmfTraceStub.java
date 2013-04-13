@@ -88,7 +88,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path, final int cacheSize, final long interval) throws TmfTraceException {
-        super(null, ITmfEvent.class, path, cacheSize, interval);
+        super(null, ITmfEvent.class, path, cacheSize, interval, null, null);
         try {
             fTrace = new RandomAccessFile(path, "r");
         } catch (FileNotFoundException e) {
@@ -122,7 +122,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion) throws TmfTraceException {
-        super(null, ITmfEvent.class, path, cacheSize);
+        super(null, ITmfEvent.class, path, cacheSize, 0, null, null);
         try {
             fTrace = new RandomAccessFile(path, "r");
         } catch (FileNotFoundException e) {
@@ -141,7 +141,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final IResource resource,  final String path, final int cacheSize, final boolean waitForCompletion) throws TmfTraceException {
-        super(resource, ITmfEvent.class, path, cacheSize);
+        super(resource, ITmfEvent.class, path, cacheSize, 0, null, null);
         try {
             fTrace = new RandomAccessFile(path, "r");
         } catch (FileNotFoundException e) {
@@ -159,7 +159,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser {
      */
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion,
             final ITmfEventParser parser, final ITmfTraceIndexer indexer) throws TmfTraceException {
-        super(null, ITmfEvent.class, path, cacheSize, 0, indexer);
+        super(null, ITmfEvent.class, path, cacheSize, 0, indexer, null);
         try {
             fTrace = new RandomAccessFile(path, "r");
         } catch (FileNotFoundException e) {

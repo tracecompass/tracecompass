@@ -128,65 +128,37 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     }
 
     /**
-     * The standard constructor (non-live trace). Applicable when the trace
-     * implements its own parser and if at checkpoint-based index is OK.
+     * Full constructor.
      *
-     * @param resource the resource associated to the trace
-     * @param type the trace event type
-     * @param path the trace path
-     * @param cacheSize the trace cache size
-     * @throws TmfTraceException If something failed during the opening
+     * @param resource
+     *            The resource associated to the trace
+     * @param type
+     *            The type of events that will be read from this trace
+     * @param path
+     *            The path to the trace on the filesystem
+     * @param cacheSize
+     *            The trace cache size. Pass '-1' to use the default specified
+     *            in {@link ITmfTrace#DEFAULT_TRACE_CACHE_SIZE}
+     * @param interval
+     *            The trace streaming interval. You can use '0' for post-mortem
+     *            traces.
+     * @param indexer
+     *            The trace indexer. You can pass 'null' to use a default
+     *            checkpoint indexer.
+     * @param parser
+     *            The trace event parser. Use 'null' if (and only if) the trace
+     *            object itself is also the ITmfEventParser to be used.
+     * @throws TmfTraceException
+     *             If something failed during the opening
      */
-    protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize) throws TmfTraceException {
-        this(resource, type, path, cacheSize, 0);
-    }
-
-    /**
-     * The standard constructor (live trace). Applicable when the trace
-     * implements its own parser and if at checkpoint-based index is OK.
-     *
-     * @param resource the resource associated to the trace
-     * @param type the trace event type
-     * @param path the trace path
-     * @param cacheSize the trace cache size
-     * @param interval the trace streaming interval
-     * @throws TmfTraceException If something failed during the opening
-     */
-    protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize, final long interval) throws TmfTraceException {
-        this(resource, type, path, cacheSize, interval, null);
-    }
-
-    /**
-     * The 'non-default indexer' constructor. Allows to provide a trace
-     * specific indexer.
-     *
-     * @param resource the resource associated to the trace
-     * @param type the trace event type
-     * @param path the trace path
-     * @param cacheSize the trace cache size
-     * @param interval the trace streaming interval
-     * @param indexer the trace indexer
-     * @throws TmfTraceException If something failed during the opening
-     */
-    protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize,
-            final long interval, final ITmfTraceIndexer indexer) throws TmfTraceException {
-        this(resource, type, path, cacheSize, interval, indexer, null);
-    }
-
-    /**
-     * The full constructor where trace specific indexer/parser are provided.
-     *
-     * @param resource the resource associated to the trace
-     * @param type the trace event type
-     * @param path the trace path
-     * @param cacheSize the trace cache size
-     * @param interval the trace streaming interval
-     * @param indexer the trace indexer
-     * @param parser the trace event parser
-     * @throws TmfTraceException If something failed during the opening
-     */
-    protected TmfTrace(final IResource resource, final Class<? extends ITmfEvent> type, final String path, final int cacheSize,
-            final long interval, final ITmfTraceIndexer indexer, final ITmfEventParser parser) throws TmfTraceException {
+    protected TmfTrace(final IResource resource,
+            final Class<? extends ITmfEvent> type,
+            final String path,
+            final int cacheSize,
+            final long interval,
+            final ITmfTraceIndexer indexer,
+            final ITmfEventParser parser)
+                    throws TmfTraceException {
         super();
         fCacheSize = (cacheSize > 0) ? cacheSize : ITmfTrace.DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
