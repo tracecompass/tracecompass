@@ -24,38 +24,39 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.core;
  *
  */
 @SuppressWarnings({"javadoc", "nls"})
-public abstract class LttngStrings {
+public interface LttngStrings {
 
     /* Event names */
-    public static final String EXIT_SYSCALL = "exit_syscall";
-    public static final String IRQ_HANDLER_ENTRY = "irq_handler_entry";
-    public static final String IRQ_HANDLER_EXIT = "irq_handler_exit";
-    public static final String SOFTIRQ_ENTRY = "softirq_entry";
-    public static final String SOFTIRQ_EXIT = "softirq_exit";
-    public static final String SOFTIRQ_RAISE = "softirq_raise";
-    public static final String SCHED_SWITCH = "sched_switch";
-    public static final String SCHED_PROCESS_FORK = "sched_process_fork";
-    public static final String SCHED_PROCESS_EXIT = "sched_process_exit";
-    public static final String SCHED_PROCESS_FREE = "sched_process_free";
-    public static final String STATEDUMP_PROCESS_STATE = "lttng_statedump_process_state";
+    static final String EXIT_SYSCALL = "exit_syscall";
+    static final String IRQ_HANDLER_ENTRY = "irq_handler_entry";
+    static final String IRQ_HANDLER_EXIT = "irq_handler_exit";
+    static final String SOFTIRQ_ENTRY = "softirq_entry";
+    static final String SOFTIRQ_EXIT = "softirq_exit";
+    static final String SOFTIRQ_RAISE = "softirq_raise";
+    static final String SCHED_SWITCH = "sched_switch";
+    static final String SCHED_PROCESS_FORK = "sched_process_fork";
+    static final String SCHED_PROCESS_EXIT = "sched_process_exit";
+    static final String SCHED_PROCESS_FREE = "sched_process_free";
+    static final String STATEDUMP_PROCESS_STATE = "lttng_statedump_process_state";
 
-    public static final String SYSCALL_PREFIX = "sys_";
-    public static final String COMPAT_SYSCALL_PREFIX = "compat_sys_";
+    /* System call names */
+    static final String SYSCALL_PREFIX = "sys_";
+    static final String COMPAT_SYSCALL_PREFIX = "compat_sys_";
 
     /* Field names */
-    public static final String IRQ = "irq";
-    public static final String COMM = "comm";
-    public static final String NAME = "name";
-    public static final String TID = "tid";
-    public static final String PPID = "ppid";
-    public static final String STATUS = "status";
-    public static final String VEC = "vec";
-    public static final String PREV_COMM = "prev_comm";
-    public static final String PREV_TID = "prev_tid";
-    public static final String PREV_STATE = "prev_state";
-    public static final String NEXT_COMM = "next_comm";
-    public static final String NEXT_TID = "next_tid";
-    public static final String PARENT_TID = "parent_tid";
-    public static final String CHILD_COMM = "child_comm";
-    public static final String CHILD_TID = "child_tid";
+    static final String IRQ = "irq";
+    static final String COMM = "comm";
+    static final String NAME = "name";
+    static final String TID = "tid";
+    static final String PPID = "ppid";
+    static final String STATUS = "status";
+    static final String VEC = "vec";
+    static final String PREV_COMM = "prev_comm";
+    static final String PREV_TID = "prev_tid";
+    static final String PREV_STATE = "prev_state";
+    static final String NEXT_COMM = "next_comm";
+    static final String NEXT_TID = "next_tid";
+    static final String PARENT_TID = "parent_tid";
+    static final String CHILD_COMM = "child_comm";
+    static final String CHILD_TID = "child_tid";
 }
