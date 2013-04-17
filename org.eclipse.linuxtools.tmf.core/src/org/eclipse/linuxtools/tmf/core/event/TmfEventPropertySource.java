@@ -19,9 +19,9 @@ import java.util.List;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
-import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 /**
  * Property source for events
@@ -71,9 +71,9 @@ public class TmfEventPropertySource implements IPropertySource {
         @Override
         public IPropertyDescriptor[] getPropertyDescriptors() {
             IPropertyDescriptor[] descriptors = new IPropertyDescriptor[3];
-            descriptors[0] = new PropertyDescriptor(ID_TIMESTAMP_VALUE, NAME_TIMESTAMP_VALUE);
-            descriptors[1] = new PropertyDescriptor(ID_TIMESTAMP_SCALE, NAME_TIMESTAMP_SCALE);
-            descriptors[2] = new PropertyDescriptor(ID_TIMESTAMP_PRECISION, NAME_TIMESTAMP_PRECISION);
+            descriptors[0] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_VALUE, NAME_TIMESTAMP_VALUE);
+            descriptors[1] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_SCALE, NAME_TIMESTAMP_SCALE);
+            descriptors[2] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_PRECISION, NAME_TIMESTAMP_PRECISION);
             return descriptors;
         }
 
@@ -120,7 +120,7 @@ public class TmfEventPropertySource implements IPropertySource {
             List<IPropertyDescriptor> descriptors= new ArrayList<IPropertyDescriptor>(fContent.getFields().length);
             for (ITmfEventField field : fContent.getFields()) {
                 if (field != null) {
-                    descriptors.add(new PropertyDescriptor(field, field.getName()));
+                    descriptors.add(new ReadOnlyTextPropertyDescriptor(field, field.getName()));
                 }
             }
             return descriptors.toArray(new IPropertyDescriptor[0]);
@@ -177,11 +177,11 @@ public class TmfEventPropertySource implements IPropertySource {
         public IPropertyDescriptor[] getPropertyDescriptors() {
             List<IPropertyDescriptor> descriptors= new ArrayList<IPropertyDescriptor>();
             if (fSourceLookup.getCallsite() != null) {
-                descriptors.add(new PropertyDescriptor(ID_FILE_NAME, NAME_FILE_NAME));
-                descriptors.add(new PropertyDescriptor(ID_LINE_NUMBER, NAME_LINE_NUMBER));
+                descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_FILE_NAME, NAME_FILE_NAME));
+                descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_LINE_NUMBER, NAME_LINE_NUMBER));
                 // only display function if available
                 if (fSourceLookup.getCallsite().getFunctionName() != null) {
-                    descriptors.add(new PropertyDescriptor(ID_FUNCTION_NAME, NAME_FUNCTION_NAME));
+                    descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_FUNCTION_NAME, NAME_FUNCTION_NAME));
                 }
             }
             return descriptors.toArray(new IPropertyDescriptor[0]);
@@ -233,17 +233,17 @@ public class TmfEventPropertySource implements IPropertySource {
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> descriptors= new ArrayList<IPropertyDescriptor>();
-        descriptors.add(new PropertyDescriptor(ID_TIMESTAMP, NAME_TIMESTAMP));
-        descriptors.add(new PropertyDescriptor(ID_SOURCE, NAME_SOURCE));
-        descriptors.add(new PropertyDescriptor(ID_TYPE, NAME_TYPE));
-        descriptors.add(new PropertyDescriptor(ID_REFERENCE, NAME_REFERENCE));
+        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP, NAME_TIMESTAMP));
+        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_SOURCE, NAME_SOURCE));
+        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TYPE, NAME_TYPE));
+        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_REFERENCE, NAME_REFERENCE));
         if ((fEvent instanceof ITmfSourceLookup) && (((ITmfSourceLookup)fEvent).getCallsite() != null)) {
-            descriptors.add(new PropertyDescriptor(ID_SOURCE_LOOKUP, NAME_SOURCE_LOOKUP));
+            descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_SOURCE_LOOKUP, NAME_SOURCE_LOOKUP));
         }
         if ((fEvent instanceof ITmfModelLookup) && (((ITmfModelLookup)fEvent).getModelUri() != null)) {
-            descriptors.add(new PropertyDescriptor(ID_MODEL_URI, NAME_MODEL_URI));
+            descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_MODEL_URI, NAME_MODEL_URI));
         }
-        descriptors.add(new PropertyDescriptor(ID_CONTENT, NAME_CONTENT));
+        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_CONTENT, NAME_CONTENT));
         return descriptors.toArray(new IPropertyDescriptor[0]);
     }
 
