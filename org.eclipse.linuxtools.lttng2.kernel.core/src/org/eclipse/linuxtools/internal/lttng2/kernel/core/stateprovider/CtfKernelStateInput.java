@@ -414,6 +414,25 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
             }
                 break;
 
+            case 12: // "sched_wakeup":
+            case 13: // "sched_wakeup_new":
+            /* Fields (same fields for both types):
+             * string comm, int32 pid, int32 prio, int32 success,
+             * int32 target_cpu */
+            {
+                final int tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
+                final int threadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), String.valueOf(tid));
+
+                /*
+                 * The process indicated in the event's payload is now ready to
+                 * run. Assign it to the "wait for cpu" state.
+                 */
+                quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT_FOR_CPU);
+                ss.modifyAttribute(ts, value, quark);
+            }
+                break;
+
             default:
             /* Other event types not covered by the main switch */
             {
@@ -510,6 +529,8 @@ public class CtfKernelStateInput extends AbstractStateChangeInput {
         map.put(LttngStrings.SCHED_PROCESS_EXIT, 9);
         map.put(LttngStrings.SCHED_PROCESS_FREE, 10);
         map.put(LttngStrings.STATEDUMP_PROCESS_STATE, 11);
+        map.put(LttngStrings.SCHED_WAKEUP, 12);
+        map.put(LttngStrings.SCHED_WAKEUP_NEW, 13);
 
         return map;
     }

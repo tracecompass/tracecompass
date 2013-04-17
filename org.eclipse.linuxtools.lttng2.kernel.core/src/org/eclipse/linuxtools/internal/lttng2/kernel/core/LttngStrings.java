@@ -33,6 +33,8 @@ public interface LttngStrings {
     static final String SOFTIRQ_EXIT = "softirq_exit";
     static final String SOFTIRQ_RAISE = "softirq_raise";
     static final String SCHED_SWITCH = "sched_switch";
+    static final String SCHED_WAKEUP = "sched_wakeup";
+    static final String SCHED_WAKEUP_NEW = "sched_wakeup_new";
     static final String SCHED_PROCESS_FORK = "sched_process_fork";
     static final String SCHED_PROCESS_EXIT = "sched_process_exit";
     static final String SCHED_PROCESS_FREE = "sched_process_free";
