@@ -19,7 +19,8 @@ import java.io.RandomAccessFile;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
@@ -493,7 +494,10 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
      */
     @Override
-    public boolean validate(IProject project, String path) {
-        return fileExists(path);
+    public IStatus validate(IProject project, String path) {
+        if (fileExists(path)) {
+            return Status.OK_STATUS;
+        }
+        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,31 +7,25 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
+ *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics;
+package org.eclipse.linuxtools.internal.gdbtrace.core.trace;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Messages file for statistics view strings.
  *
- * @version 2.0
- * @author Mathieu Denis
- * @since 2.0
+ * @author Matthew Khouzam
+ *
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
-
-    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.statistics.messages"; //$NON-NLS-1$
-
+    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.gdbtrace.core.trace.messages"; //$NON-NLS-1$
     /**
-     * String for the global tab name
-     * @since 2.0
+     * File not found
      */
-    public static String TmfStatisticsView_GlobalTabName;
-
+    public static String GdbTrace_FileNotFound;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -21,6 +21,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Mathieu Denis
  * @since 2.0
  */
+@SuppressWarnings("javadoc")
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.messages"; //$NON-NLS-1$

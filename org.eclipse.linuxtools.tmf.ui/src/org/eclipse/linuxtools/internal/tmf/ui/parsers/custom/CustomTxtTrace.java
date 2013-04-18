@@ -22,6 +22,8 @@ import java.util.regex.Matcher;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -390,7 +392,10 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
      */
     @Override
-    public boolean validate(IProject project, String path) {
-        return fileExists(path);
+    public IStatus validate(IProject project, String path) {
+        if( fileExists(path)) {
+            return Status.OK_STATUS;
+        }
+        return new Status(IStatus.ERROR, Activator.PLUGIN_ID ,Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
     }
 }

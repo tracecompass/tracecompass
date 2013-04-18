@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Matthew Khouzam - Improved validation
  ******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.kernel.core.trace;
@@ -17,8 +18,11 @@ import java.io.File;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.Activator;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
@@ -54,9 +58,13 @@ public class CtfKernelTrace extends CtfTmfTrace {
         super();
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public boolean validate(final IProject project, final String path) {
+    public IStatus validate(final IProject project, final String path)  {
         CTFTrace temp;
+        IStatus validStatus;
         /*
          * Make sure the trace is openable as a CTF trace. We do this here
          * instead of calling super.validate() to keep the reference to "temp".
@@ -64,16 +72,21 @@ public class CtfKernelTrace extends CtfTmfTrace {
         try {
             temp = new CTFTrace(path);
         } catch (CTFReaderException e) {
-            return false;
+            validStatus = new Status(IStatus.ERROR,  Activator.PLUGIN_ID, e.toString(), e);
+            return validStatus;
+        } catch (NullPointerException e){
+            validStatus = new Status(IStatus.ERROR,  Activator.PLUGIN_ID, e.toString(), e);
+            return validStatus;
         }
 
         /* Make sure the domain is "kernel" in the trace's env vars */
         String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
         temp.dispose();
         if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
-            return true;
+            return Status.OK_STATUS;
         }
-        return false;
+        validStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfKernelTrace_DomainError);
+        return validStatus;
     }
 
     @Override

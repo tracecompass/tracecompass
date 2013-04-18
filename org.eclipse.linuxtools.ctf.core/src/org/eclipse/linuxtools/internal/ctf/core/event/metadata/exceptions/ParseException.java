@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions;
 
+
 /**
  * <b><u>ParseException</u></b>
  */
@@ -20,7 +21,7 @@ public class ParseException extends Exception {
     private static final long serialVersionUID = 7901917601459652080L;
 
     /**
-     * Enoty constructor
+     * Empty constructor
      */
     public ParseException() {
         super();
@@ -35,4 +36,11 @@ public class ParseException extends Exception {
         super(message);
     }
 
+    /**
+     * Copy constructor
+     * @param e the exception to throw
+     */
+    public ParseException(Exception e) {
+        super(e);
+    }
 }

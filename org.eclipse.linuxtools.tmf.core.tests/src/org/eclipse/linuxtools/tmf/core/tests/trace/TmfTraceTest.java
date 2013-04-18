@@ -397,7 +397,7 @@ public class TmfTraceTest {
         // Validate
         final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
         final File testfile = new File(FileLocator.toFileURL(location).toURI());
-        assertTrue("validate", trace.validate(null, testfile.getPath()));
+        assertTrue("validate", trace.validate(null, testfile.getPath()).isOK());
 
         // InitTrace and wait for indexing completion...
         trace.initTrace(null, testfile.toURI().getPath(), ITmfEvent.class);
