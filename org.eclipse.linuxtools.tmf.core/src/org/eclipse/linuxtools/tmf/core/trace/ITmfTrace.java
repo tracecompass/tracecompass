@@ -224,6 +224,17 @@ public interface ITmfTrace extends ITmfDataProvider {
      */
     public void registerStateSystem(String id, ITmfStateSystem ss);
 
+    /**
+     * Index the trace. Depending on the trace type, this could be done at the
+     * constructor or initTrace phase too, so this could be implemented as a
+     * no-op.
+     *
+     * @param waitForCompletion
+     *            Should we block the caller until indexing is finished, or not.
+     * @since 2.0
+     */
+    public void indexTrace(boolean waitForCompletion);
+
     // ------------------------------------------------------------------------
     // Trace characteristics getters
     // ------------------------------------------------------------------------

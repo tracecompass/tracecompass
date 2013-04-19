@@ -95,7 +95,7 @@ public class TmfTraceTest {
                 final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
                 final File test = new File(FileLocator.toFileURL(location).toURI());
                 fTrace = new TmfTraceStub(test.toURI().getPath(), BLOCK_SIZE);
-                fTrace.indexTrace();
+                fTrace.indexTrace(true);
             } catch (final TmfTraceException e) {
                 e.printStackTrace();
             } catch (final URISyntaxException e) {
@@ -120,7 +120,7 @@ public class TmfTraceTest {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(testfile.toURI().getPath());
-            trace.indexTrace();
+            trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -151,7 +151,7 @@ public class TmfTraceTest {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(testfile.toURI().getPath(), 0);
-            trace.indexTrace();
+            trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -176,7 +176,7 @@ public class TmfTraceTest {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE);
-            trace.indexTrace();
+            trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -206,7 +206,7 @@ public class TmfTraceTest {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, null);
-            trace.indexTrace();
+            trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -238,7 +238,7 @@ public class TmfTraceTest {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, interval);
-            trace.indexTrace();
+            trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -271,7 +271,7 @@ public class TmfTraceTest {
             testfile = new File(FileLocator.toFileURL(location).toURI());
             original = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, new TmfCheckpointIndexer(null));
             trace = new TmfTraceStub(original);
-            trace.indexTrace();
+            trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -401,7 +401,7 @@ public class TmfTraceTest {
 
         // InitTrace and wait for indexing completion...
         trace.initTrace(null, testfile.toURI().getPath(), ITmfEvent.class);
-        trace.indexTrace();
+        trace.indexTrace(true);
         int nbSecs = 0;
         while (trace.getNbEvents() < NB_EVENTS && nbSecs < 10) {
             Thread.sleep(1000);
@@ -457,7 +457,7 @@ public class TmfTraceTest {
     @Test
     public void testSetTimeRange() throws TmfTraceException {
         final TmfTraceStub trace = new TmfTraceStub(fTrace);
-        trace.indexTrace();
+        trace.indexTrace(true);
 
         assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
@@ -476,7 +476,7 @@ public class TmfTraceTest {
     @Test
     public void testSetStartTime() throws TmfTraceException {
         final TmfTraceStub trace = new TmfTraceStub(fTrace);
-        trace.indexTrace();
+        trace.indexTrace(true);
 
         assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
@@ -495,7 +495,7 @@ public class TmfTraceTest {
     @Test
     public void testSetEndTime() throws TmfTraceException {
         final TmfTraceStub trace = new TmfTraceStub(fTrace);
-        trace.indexTrace();
+        trace.indexTrace(true);
 
         assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
@@ -514,7 +514,7 @@ public class TmfTraceTest {
     @Test
     public void testSetNbEvents() throws TmfTraceException {
         final TmfTraceStub trace = new TmfTraceStub(fTrace);
-        trace.indexTrace();
+        trace.indexTrace(true);
 
         assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
 
@@ -1456,7 +1456,7 @@ public class TmfTraceTest {
             assertEquals("getCurrentTime", TmfTimestamp.ZERO, trace.getCurrentTime());
             assertEquals("getCurrentRange", TmfTimeRange.NULL_RANGE, trace.getCurrentRange());
             trace.setInitialRangeOffset(new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE));
-            trace.indexTrace();
+            trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {

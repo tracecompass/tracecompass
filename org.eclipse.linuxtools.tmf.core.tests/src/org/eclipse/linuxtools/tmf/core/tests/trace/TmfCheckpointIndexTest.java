@@ -123,7 +123,7 @@ public class TmfCheckpointIndexTest {
                 final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
                 final File test = new File(FileLocator.toFileURL(location).toURI());
                 fTrace = new TestTrace(test.toURI().getPath(), BLOCK_SIZE);
-                fTrace.indexTrace();
+                fTrace.indexTrace(true);
             } catch (final TmfTraceException e) {
                 e.printStackTrace();
             } catch (final URISyntaxException e) {
@@ -135,7 +135,7 @@ public class TmfCheckpointIndexTest {
 
         if (fEmptyTrace == null) {
             fEmptyTrace = new EmptyTestTrace();
-            fEmptyTrace.indexTrace();
+            fEmptyTrace.indexTrace(true);
         }
     }
 
