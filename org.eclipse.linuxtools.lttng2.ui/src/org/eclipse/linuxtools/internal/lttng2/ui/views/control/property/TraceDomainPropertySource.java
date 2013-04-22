@@ -1,26 +1,26 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
 
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
+import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * <p>
  * Property source implementation for the trace domain component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceDomainPropertySource extends BasePropertySource {
@@ -34,18 +34,18 @@ public class TraceDomainPropertySource extends BasePropertySource {
      */
     public static final String TRACE_DOMAIN_NAME_PROPERTY_ID = "trace.domain.name"; //$NON-NLS-1$
     /**
-     *  The trace domain 'name' property name. 
+     *  The trace domain 'name' property name.
      */
     public static final String TRACE_DOMAIN_NAME_PROPERTY_NAME = Messages.TraceControl_DomainNamePropertyName;
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The trace domain component which this property source is for. 
+     * The trace domain component which this property source is for.
      */
     private final TraceDomainComponent fBaseEvent;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public class TraceDomainPropertySource extends BasePropertySource {
     public TraceDomainPropertySource(TraceDomainComponent component) {
         fBaseEvent = component;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -67,7 +67,7 @@ public class TraceDomainPropertySource extends BasePropertySource {
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return new IPropertyDescriptor[] {
-                new TextPropertyDescriptor(TRACE_DOMAIN_NAME_PROPERTY_ID, TRACE_DOMAIN_NAME_PROPERTY_NAME)};
+                new ReadOnlyTextPropertyDescriptor(TRACE_DOMAIN_NAME_PROPERTY_ID, TRACE_DOMAIN_NAME_PROPERTY_NAME)};
     }
 
     /*

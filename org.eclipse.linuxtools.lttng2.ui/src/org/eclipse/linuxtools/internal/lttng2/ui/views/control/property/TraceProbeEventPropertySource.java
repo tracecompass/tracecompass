@@ -18,8 +18,8 @@ import java.util.List;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceEventComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProbeEventComponent;
+import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * <p>
@@ -97,15 +97,15 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
         if (fEvent instanceof TraceProbeEventComponent) {
             TraceProbeEventComponent event = (TraceProbeEventComponent) fEvent;
             if (event.getAddress() != null) {
-                list.add(new TextPropertyDescriptor(TRACE_EVENT_PROBE_ADDRESS_PROPERTY_ID, TRACE_EVENT_PROBE_ADDRESS_PROPERTY_NAME));
+                list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_PROBE_ADDRESS_PROPERTY_ID, TRACE_EVENT_PROBE_ADDRESS_PROPERTY_NAME));
             }
 
             if (event.getOffset() != null) {
-                list.add(new TextPropertyDescriptor(TRACE_EVENT_PROBE_OFFSET_PROPERTY_ID, TRACE_EVENT_PROBE_OFFSET_PROPERTY_NAME));
+                list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_PROBE_OFFSET_PROPERTY_ID, TRACE_EVENT_PROBE_OFFSET_PROPERTY_NAME));
             }
 
             if (event.getSymbol() != null) {
-                list.add(new TextPropertyDescriptor(TRACE_EVENT_PROBE_SYMBOL_PROPERTY_ID, TRACE_EVENT_PROBE_SYMBOL_PROPERTY_NAME));
+                list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_PROBE_SYMBOL_PROPERTY_ID, TRACE_EVENT_PROBE_SYMBOL_PROPERTY_NAME));
             }
         }
         return list.toArray(new IPropertyDescriptor[list.size()]);

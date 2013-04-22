@@ -18,8 +18,8 @@ import java.util.List;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceEventComponent;
+import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * <p>
@@ -104,14 +104,14 @@ public class TraceEventPropertySource extends BasePropertySource {
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor> ();
-        list.add(new TextPropertyDescriptor(TRACE_EVENT_NAME_PROPERTY_ID, TRACE_EVENT_NAME_PROPERTY_NAME));
-        list.add(new TextPropertyDescriptor(TRACE_EVENT_TYPE_PROPERTY_ID, TRACE_EVENT_TYPE_PROPERTY_NAME));
-        list.add( new TextPropertyDescriptor(TRACE_EVENT_STATE_PROPERTY_ID, TRACE_EVENT_STATE_PROPERTY_NAME));
+        list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_NAME_PROPERTY_ID, TRACE_EVENT_NAME_PROPERTY_NAME));
+        list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_TYPE_PROPERTY_ID, TRACE_EVENT_TYPE_PROPERTY_NAME));
+        list.add( new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_STATE_PROPERTY_ID, TRACE_EVENT_STATE_PROPERTY_NAME));
         if (fEvent.getLogLevel() != TraceLogLevel.LEVEL_UNKNOWN) {
-            list.add(new TextPropertyDescriptor(TRACE_EVENT_LOGLEVEL_PROPERTY_ID, TRACE_EVENT_LOGLEVEL_PROPERTY_NAME));
+            list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_LOGLEVEL_PROPERTY_ID, TRACE_EVENT_LOGLEVEL_PROPERTY_NAME));
         }
         if (fEvent.getFilterExpression() != null) {
-            list.add(new TextPropertyDescriptor(TRACE_EVENT_FILTER_PROPERTY_ID, TRACE_EVENT_FILTER_PROPERTY_NAME));
+            list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_FILTER_PROPERTY_ID, TRACE_EVENT_FILTER_PROPERTY_NAME));
         }
         return list.toArray(new IPropertyDescriptor[list.size()]);
     }

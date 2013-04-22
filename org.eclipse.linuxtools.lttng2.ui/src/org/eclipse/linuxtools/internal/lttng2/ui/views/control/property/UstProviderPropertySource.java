@@ -1,26 +1,26 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
 
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.UstProviderComponent;
+import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * <p>
  * Property source implementation for the UST provider component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class UstProviderPropertySource extends BasePropertySource {
@@ -37,7 +37,7 @@ public class UstProviderPropertySource extends BasePropertySource {
      */
     public static final String UST_PROVIDER_PID_PROPERTY_ID = "ust.provider.pid"; //$NON-NLS-1$
     /**
-     *  The UST provider 'name' property name. 
+     *  The UST provider 'name' property name.
      */
     public static final String UST_PROVIDER_NAME_PROPERTY_NAME = Messages.TraceControl_ProviderNamePropertyName;
     /**
@@ -49,10 +49,10 @@ public class UstProviderPropertySource extends BasePropertySource {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The UST provider component which this property source is for. 
+     * The UST provider component which this property source is for.
      */
     private UstProviderComponent fUstProvider;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -63,7 +63,7 @@ public class UstProviderPropertySource extends BasePropertySource {
     public UstProviderPropertySource(UstProviderComponent component) {
         fUstProvider = component;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -74,8 +74,8 @@ public class UstProviderPropertySource extends BasePropertySource {
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return new IPropertyDescriptor[] {
-                new TextPropertyDescriptor(UST_PROVIDER_NAME_PROPERTY_ID, UST_PROVIDER_NAME_PROPERTY_NAME),
-                new TextPropertyDescriptor(UST_PROVIDER_PID_PROPERTY_ID, UST_PROVIDER_PID_PROPERTY_NAME)};
+                new ReadOnlyTextPropertyDescriptor(UST_PROVIDER_NAME_PROPERTY_ID, UST_PROVIDER_NAME_PROPERTY_NAME),
+                new ReadOnlyTextPropertyDescriptor(UST_PROVIDER_PID_PROPERTY_ID, UST_PROVIDER_PID_PROPERTY_NAME)};
     }
 
     /*

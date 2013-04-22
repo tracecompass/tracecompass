@@ -1,26 +1,26 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
 
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
+import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * <p>
  * Property source implementation for the trace session component.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public class TraceSessionPropertySource extends BasePropertySource {
@@ -41,23 +41,23 @@ public class TraceSessionPropertySource extends BasePropertySource {
      */
     public static final String TRACE_SESSION_STATE_PROPERTY_ID = "trace.session.state"; //$NON-NLS-1$
     /**
-     *  The trace session name property name. 
+     *  The trace session name property name.
      */
     public static final String TRACE_SESSION_NAME_PROPERTY_NAME = Messages.TraceControl_SessionNamePropertyName;
     /**
-     *  The trace session path property name. 
+     *  The trace session path property name.
      */
     public static final String TRACE_SESSION_PATH_PROPERTY_NAME = Messages.TraceControl_SessionPathPropertyName;
     /**
      * The trace session state property name.
      */
     public static final String TRACE_SESSION_STATE_PROPERTY_NAME = Messages.TraceControl_StatePropertyName;
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The session component which this property source is for. 
+     * The session component which this property source is for.
      */
     private final TraceSessionComponent fSession;
 
@@ -71,7 +71,7 @@ public class TraceSessionPropertySource extends BasePropertySource {
     public TraceSessionPropertySource(TraceSessionComponent component) {
         fSession = component;
     }
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -82,9 +82,9 @@ public class TraceSessionPropertySource extends BasePropertySource {
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return new IPropertyDescriptor[] {
-                new TextPropertyDescriptor(TRACE_SESSION_NAME_PROPERTY_ID, TRACE_SESSION_NAME_PROPERTY_NAME),
-                new TextPropertyDescriptor(TRACE_SESSION_PATH_PROPERTY_ID, TRACE_SESSION_PATH_PROPERTY_NAME),
-                new TextPropertyDescriptor(TRACE_SESSION_STATE_PROPERTY_ID, TRACE_SESSION_STATE_PROPERTY_NAME)};
+                new ReadOnlyTextPropertyDescriptor(TRACE_SESSION_NAME_PROPERTY_ID, TRACE_SESSION_NAME_PROPERTY_NAME),
+                new ReadOnlyTextPropertyDescriptor(TRACE_SESSION_PATH_PROPERTY_ID, TRACE_SESSION_PATH_PROPERTY_NAME),
+                new ReadOnlyTextPropertyDescriptor(TRACE_SESSION_STATE_PROPERTY_ID, TRACE_SESSION_STATE_PROPERTY_NAME)};
     }
 
     /*
