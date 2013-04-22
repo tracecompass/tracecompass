@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * Implementation of the model element for the experiment folder.
@@ -42,9 +42,9 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     private static final String sfPath = "path"; //$NON-NLS-1$
     private static final String sfLocation = "location"; //$NON-NLS-1$
 
-    private static final TextPropertyDescriptor sfNameDescriptor = new TextPropertyDescriptor(sfName, sfName);
-    private static final TextPropertyDescriptor sfPathDescriptor = new TextPropertyDescriptor(sfPath, sfPath);
-    private static final TextPropertyDescriptor sfLocationDescriptor = new TextPropertyDescriptor(sfLocation, sfLocation);
+    private static final ReadOnlyTextPropertyDescriptor sfNameDescriptor = new ReadOnlyTextPropertyDescriptor(sfName, sfName);
+    private static final ReadOnlyTextPropertyDescriptor sfPathDescriptor = new ReadOnlyTextPropertyDescriptor(sfPath, sfPath);
+    private static final ReadOnlyTextPropertyDescriptor sfLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfLocation, sfLocation);
 
     private static final IPropertyDescriptor[] sfDescriptors = { sfNameDescriptor, sfPathDescriptor, sfLocationDescriptor };
 
