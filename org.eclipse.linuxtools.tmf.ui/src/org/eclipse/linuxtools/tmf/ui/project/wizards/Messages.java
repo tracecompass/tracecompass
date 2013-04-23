@@ -19,9 +19,7 @@ import org.eclipse.osgi.util.NLS;
  *
  * @version 1.0
  * @author Francois Chouinard
- *
  */
-@SuppressWarnings("javadoc")
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.project.wizards.messages"; //$NON-NLS-1$

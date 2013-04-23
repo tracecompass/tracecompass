@@ -15,17 +15,17 @@ package org.eclipse.linuxtools.internal.gdbtrace.core.trace;
 import org.eclipse.osgi.util.NLS;
 
 /**
+ * Message bundle for gdbtrace.core.trace
  *
  * @author Matthew Khouzam
- *
  */
-@SuppressWarnings("javadoc")
 public class Messages extends NLS {
+
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.gdbtrace.core.trace.messages"; //$NON-NLS-1$
-    /**
-     * File not found
-     */
+
+    /** File not found */
     public static String GdbTrace_FileNotFound;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

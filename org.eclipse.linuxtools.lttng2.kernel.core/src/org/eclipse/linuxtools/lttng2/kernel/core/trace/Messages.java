@@ -8,23 +8,26 @@
  * Contributors:
  *     Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng2.kernel.core.trace;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Messages
+ * Message bundle for lttng2.kernel.core.trace
  *
  * @author Matthew Khouzam
  * @since 2.0
  */
-@SuppressWarnings("javadoc")
 public class Messages extends NLS {
+
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.lttng2.kernel.core.trace.messages"; //$NON-NLS-1$
+
     /**
      * The domain is not "kernel"
      */
     public static String CtfKernelTrace_DomainError;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

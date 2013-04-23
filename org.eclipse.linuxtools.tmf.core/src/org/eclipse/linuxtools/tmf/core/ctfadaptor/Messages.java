@@ -8,25 +8,27 @@
  * Contributors:
  *     Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
+ * Message bundle for tmf.core.ctfadaptor
+ *
  * @author Matthew Khouzam
  * @since 2.0
  */
-@SuppressWarnings("javadoc")
 public class Messages extends NLS {
+
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.core.ctfadaptor.messages"; //$NON-NLS-1$
-    /**
-     * And error message
-     */
+
+    /** Major version number not set */
     public static String CtfTmfTrace_MajorNotSet;
-    /**
-     * Read error
-     */
+
+    /** Reading error */
     public static String CtfTmfTrace_ReadingError;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

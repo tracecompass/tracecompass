@@ -22,7 +22,6 @@ import org.eclipse.osgi.util.NLS;
  * @version 1.0
  * @author Francois Chouinard
  */
-@SuppressWarnings("javadoc")
 public class Messages extends NLS {
 
     // ------------------------------------------------------------------------

@@ -349,7 +349,6 @@ public class CtfTmfTraceTest {
 
     /**
      * Run the boolean validate(IProject,String) method test.
-     * @throws TmfValidationException
      */
     @Test
     public void testValidate() {
