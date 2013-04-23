@@ -363,5 +363,8 @@ public class LTTngControlServiceConstants {
      * Pattern to match error line if no kernel tracer is available or installed.
      */
     public final static Pattern LIST_KERNEL_NO_KERNEL_PROVIDER_PATTERN = Pattern.compile("\\s*Error:\\s+Unable\\s+to\\s+list\\s+kernel\\s+events.*"); //$NON-NLS-1$;
-
+    /**
+     * Pattern to match error line if no ust tracer is available or installed.
+     */
+    public final static Pattern LIST_UST_NO_UST_PROVIDER_PATTERN = Pattern.compile(".*Unable\\s*to\\s*list\\s*UST\\s*event.*"); //$NON-NLS-1$;
 }

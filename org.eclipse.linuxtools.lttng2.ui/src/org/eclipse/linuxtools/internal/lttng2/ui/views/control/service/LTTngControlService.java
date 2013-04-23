@@ -314,7 +314,36 @@ public class LTTngControlService implements ILttngControlService {
             command.append(LTTngControlServiceConstants.OPTION_FIELDS);
         }
 
-        ICommandResult result = executeCommand(command.toString(), monitor);
+        ICommandResult result = executeCommand(command.toString(), monitor, false);
+        List<IUstProviderInfo> allProviders = new ArrayList<IUstProviderInfo>();
+
+        // Workaround for versions 2.0.x which causes a segmentation fault for this command
+        // if LTTng Tools is compiled without UST support.
+        if (!isVersionSupported("2.1.0") && (result.getResult() != 0)) { //$NON-NLS-1$
+            return allProviders;
+        }
+
+        if (result.getOutput() != null) {
+            // Ignore the following 2 cases:
+            // Spawning a session daemon
+            // Error: Unable to list UST events: Listing UST events failed
+            // or:
+            // Error: Unable to list UST events: Listing UST events failed
+            //
+            int index = 0;
+            while (index < result.getOutput().length) {
+                String line = result.getOutput()[index];
+                Matcher matcher = LTTngControlServiceConstants.LIST_UST_NO_UST_PROVIDER_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    return allProviders;
+                }
+                index++;
+            }
+        }
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command.toString() + "\n" + formatOutput(result)); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
         // Note that field print-outs exists for version >= 2.1.0
         //
@@ -339,7 +368,6 @@ public class LTTngControlService implements ILttngControlService {
         //    field: floatfield (float)
         //    field: stringfield (string)
 
-        List<IUstProviderInfo> allProviders = new ArrayList<IUstProviderInfo>();
         IUstProviderInfo provider = null;
 
         int index = 0;
@@ -356,7 +384,6 @@ public class LTTngControlService implements ILttngControlService {
             } else {
                 index++;
             }
-
         }
         return allProviders;
     }
