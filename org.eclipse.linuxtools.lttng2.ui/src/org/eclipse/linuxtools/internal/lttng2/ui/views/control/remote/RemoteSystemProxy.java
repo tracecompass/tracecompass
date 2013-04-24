@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -141,8 +141,24 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.util.IRemoteSystemProxy#connect(org.eclipse.rse.core.model.IRSECallback)
+    @Override
+    public int getPort() {
+        if (getShellServiceSubSystem() != null) {
+            return getShellServiceSubSystem().getConnectorService().getPort();
+        }
+        return IRemoteSystemProxy.INVALID_PORT_NUMBER;
+    }
+
+    @Override
+    public void setPort(int port) {
+        if ((getShellServiceSubSystem() != null) && (port > 0)) {
+            getShellServiceSubSystem().getConnectorService().setPort(port);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.IRemoteSystemProxy#connect(org.eclipse.rse.core.model.IRSECallback)
      */
     @Override
     public void connect(IRSECallback callback) throws ExecutionException {

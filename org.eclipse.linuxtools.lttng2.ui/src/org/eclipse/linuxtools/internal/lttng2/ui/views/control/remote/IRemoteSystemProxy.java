@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,6 +27,14 @@ import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSys
  * @author Bernd Hufmann
  */
 public interface IRemoteSystemProxy {
+
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * Invalid port number for IP based connections.
+     */
+    public final static int INVALID_PORT_NUMBER = -1;
 
     // ------------------------------------------------------------------------
     // Operations
@@ -65,6 +73,17 @@ public interface IRemoteSystemProxy {
      * @return file service subsystem, or <code>null</code> if not found.
      */
     public IFileServiceSubSystem getFileServiceSubSystem();
+
+    /**
+     * @return port of IP connection to be used
+     */
+    public int getPort();
+
+    /**
+     * Sets the port of the IP connection.
+     * @param port - the IP port to set
+     */
+    public void setPort(int port);
 
     /**
      * Connects the shell service sub system.

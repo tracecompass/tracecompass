@@ -93,6 +93,8 @@ final public class Messages extends NLS {
     public static String TraceControl_NewNodeConnectionNameTooltip;
     public static String TraceControl_NewNodeHostNameLabel;
     public static String TraceControl_NewNodeHostNameTooltip;
+    public static String TraceControl_NewNodePortLabel;
+    public static String TraceControl_NewNodePortTooltip;
     public static String TraceControl_AlreadyExistsError;
 
     public static String TraceControl_CreateSessionDialogTitle;

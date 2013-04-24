@@ -742,14 +742,11 @@ To use an existing connection definition, select the relevant entry in the drop-
 
 [[Image:images/LTTng2SelectConnection.png]]
 
-To enter the host information manually select first the button '''Edit connection information'''. Then the text fields '''Connection Name''' and '''Host Name''' will enabled. Enter the relevant information and then select '''Ok'''.
+To enter the host information manually select first the button '''Edit connection information'''. Then the text fields '''Connection Name''', '''Host Name''' and '''Port Number''' will be enabled. The '''Host Name''' holds the IP address or DNS name of the remote system. The '''Connection Name''' is the alias name to be displayed in the Control View. The '''Port Number''' is the port number to be used for the IP connection. This parameter is optional and if it is omitted the default port will be used. Enter the relevant information and then select '''Ok'''.
 
 [[Image:images/LTTng2EditConnection.png]]
 
 A new display will show for providing the user name and password. This display only opens if no password had been saved before. Enter user name and password in the '''Enter Password''' dialog box and select '''Ok'''.
-
-The '''Host Name''' holds the IP address or DNS name of the remote system.
-The '''Connection Name''' is the alias name to be displayed in the Control View.
 
 [[Image:images/LTTng2EnterPassword.png]]
 

@@ -198,6 +198,21 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     }
 
     /**
+     * @return port of IP connection (shell) to be used
+     */
+    public int getPort() {
+        return fRemoteProxy.getPort();
+    }
+
+    /**
+     * Sets the port of the IP connections of the shell
+     * @param port - the IP port to set
+     */
+    public void setPort(int port) {
+        fRemoteProxy.setPort(port);
+    }
+
+    /**
      * @return all available sessions.
      */
     public TraceSessionComponent[] getSessions() {

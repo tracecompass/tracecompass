@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson and others
+ * Copyright (c) 2012, 2013 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceCont
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TargetNodeComponent;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.IRemoteSystemProxy;
 import org.eclipse.rse.core.IRSESystemType;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
@@ -86,6 +87,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         final INewConnectionDialog dialog = TraceControlDialogFactory.getInstance().getNewConnectionDialog();
         dialog.setTraceControlParent(fRoot);
         dialog.setHosts(hosts);
+        dialog.setPort(IRemoteSystemProxy.INVALID_PORT_NUMBER);
 
         if (dialog.open() != Window.OK) {
             return null;
@@ -93,6 +95,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
 
         String hostName = dialog.getConnectionName();
         String hostAddress = dialog.getHostName();
+        int port = dialog.getPort();
 
         // get the singleton RSE registry
         IHost host = null;
@@ -129,6 +132,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
                 TargetNodeComponent node = null;
                 if (!fRoot.containsChild(hostName)) {
                     node = new TargetNodeComponent(hostName, fRoot, host);
+                    node.setPort(port);
                     fRoot.addChild(node);
                 }
                 else {
