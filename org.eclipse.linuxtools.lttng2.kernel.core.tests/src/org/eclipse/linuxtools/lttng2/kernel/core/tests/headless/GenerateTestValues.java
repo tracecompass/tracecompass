@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
  * Small program to regenerate the values used in "TestValues.java" from the
  * current LTTng-kernel state provider.
  *
- * It will write its output the a file called 'test-values*.log' in your
+ * It will write its output the a file called 'TestValues<something>.java' in your
  * temporary files directory.
  *
  * @author Alexandre Montplaisir
@@ -38,6 +38,7 @@ public class GenerateTestValues {
 
     private static final int TRACE_INDEX = 1;
     private static final long targetTimestamp = 18670067372290L + 1331649577946812237L;
+    private static final String INDENT = "    ";
 
     /**
      * Run the program
@@ -56,7 +57,7 @@ public class GenerateTestValues {
         /* Prepare the files */
         File stateFile = File.createTempFile("test-values", ".ht");
         stateFile.deleteOnExit();
-        File logFile = File.createTempFile("test-values", ".log");
+        File logFile = File.createTempFile("TestValues", ".java");
         PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);
 
         /* Build and query the state system */
@@ -64,22 +65,31 @@ public class GenerateTestValues {
         ITmfStateSystem ssq = StateSystemManager.loadStateHistory(stateFile, input, true);
         List<ITmfStateInterval> fullState = ssq.queryFullState(targetTimestamp);
 
-        /* Print the interval contents (with some convenience formatting) */
-        writer.println("Start times:");
-        for (ITmfStateInterval interval : fullState) {
-            writer.println(String.valueOf(interval.getStartTime()) + "L,");
-        }
+        /* Start printing the java file's contents */
+        writer.println("interface TestValues {");
+        writer.println();
+        writer.println(INDENT + "static final int size = " + fullState.size() +";");
         writer.println();
 
-        writer.println("End times:");
+        /* Print the array contents */
+        writer.println(INDENT + "static final long[] startTimes = {");
         for (ITmfStateInterval interval : fullState) {
-            writer.println(String.valueOf(interval.getEndTime())+ "L,");
+            writer.println(INDENT + INDENT + String.valueOf(interval.getStartTime()) + "L,");
         }
+        writer.println(INDENT + "};");
         writer.println();
 
-        writer.println("State values:");
+        writer.println(INDENT + "static final long[] endTimes = {");
+        for (ITmfStateInterval interval : fullState) {
+            writer.println(INDENT + INDENT + String.valueOf(interval.getEndTime())+ "L,");
+        }
+        writer.println(INDENT + "};");
+        writer.println();
+
+        writer.println(INDENT + "static final ITmfStateValue[] values = {");
         for (ITmfStateInterval interval : fullState) {
             ITmfStateValue val = interval.getStateValue();
+            writer.print(INDENT + INDENT);
 
             switch (val.getType()) {
             case NULL:
@@ -99,6 +109,10 @@ public class GenerateTestValues {
                 break;
             }
         }
+        writer.println(INDENT + "};");
+
+        writer.println("}");
+        writer.println();
 
         writer.close();
         System.exit(0);
