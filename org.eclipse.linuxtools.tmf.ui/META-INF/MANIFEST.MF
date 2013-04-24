@@ -41,6 +41,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.viewers.statistics.model,
  org.eclipse.linuxtools.tmf.ui.viewers.xycharts;x-internal:=true,
  org.eclipse.linuxtools.tmf.ui.viewers.xycharts.barcharts;x-internal:=true,
+ org.eclipse.linuxtools.tmf.ui.viewers.xycharts.linecharts;x-internal:=true,
  org.eclipse.linuxtools.tmf.ui.views,
  org.eclipse.linuxtools.tmf.ui.views.callstack,
  org.eclipse.linuxtools.tmf.ui.views.colors,
