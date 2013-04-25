@@ -34,6 +34,7 @@ import org.eclipse.linuxtools.ctf.parser.CTFLexer;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
 import org.eclipse.linuxtools.ctf.parser.CTFParser.parse_return;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.IOStructGen;
+import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.CtfAntlrException;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 
 /**
@@ -176,9 +177,9 @@ public class Metadata {
         } catch (ParseException e) {
             tempException = new CTFReaderException(e);
         } catch (MismatchedTokenException e) {
-            tempException = new CTFReaderException(e);
+            tempException = new CtfAntlrException(e);
         } catch (RecognitionException e) {
-            tempException = new CTFReaderException(e);
+            tempException = new CtfAntlrException(e);
         }
 
         /* Ghetto resource management. Java 7 will deliver us from this... */
