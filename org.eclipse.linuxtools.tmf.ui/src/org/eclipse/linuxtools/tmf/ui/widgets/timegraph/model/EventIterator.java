@@ -8,20 +8,19 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
- *   Patrick Tasse - Fix for split events
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.common;
+package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
 
 /**
- * An iterator for time events
+ * An iterator for time events. Events from the zoomed event list override any
+ * events from the underlying event list.
+ * @since 2.0
  */
 public class EventIterator implements Iterator<ITimeEvent> {
 
