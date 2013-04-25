@@ -775,6 +775,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         long _time0 = _timeProvider.getTime0();
         long _time1 = _timeProvider.getTime1();
         long _range = _time1 - _time0;
+        if (_range == 0) {
+            return;
+        }
         long selTime = _timeProvider.getSelectedTime();
         if (selTime <= _time0 || selTime >= _time1) {
             selTime = (_time0 + _time1) / 2;
@@ -2036,12 +2039,21 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         public void refreshData() {
             List<Item> itemList = new ArrayList<Item>();
             filteredOut.clear();
+            ITimeGraphEntry selection = getSelectedTrace();
             for (int i = 0; i < _traces.length; i++) {
                 ITimeGraphEntry entry = _traces[i];
                 refreshData(itemList, null, 0, entry);
             }
             _items = itemList.toArray(new Item[0]);
             updateExpandedItems();
+            if (selection != null) {
+                for (Item item : _expandedItems) {
+                    if (item._trace == selection) {
+                        item._selected = true;
+                        break;
+                    }
+                }
+            }
         }
 
         private void refreshData(List<Item> itemList, Item parent, int level, ITimeGraphEntry entry) {
