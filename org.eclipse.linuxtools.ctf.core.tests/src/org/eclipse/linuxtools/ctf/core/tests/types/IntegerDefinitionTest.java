@@ -42,7 +42,7 @@ public class IntegerDefinitionTest {
      */
     @Before
     public void setUp() {
-        IntegerDeclaration id = new IntegerDeclaration( 1, true, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
+        IntegerDeclaration id = new IntegerDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
         fixture = id.createDefinition(null, name);
     }
 
@@ -52,7 +52,7 @@ public class IntegerDefinitionTest {
      */
     @Test
     public void testIntegerDefinition() {
-        IntegerDeclaration declaration = new IntegerDeclaration(1, true, 1,
+        IntegerDeclaration declaration = new IntegerDeclaration(1, false, 1,
                 ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
         IDefinitionScope definitionScope = null;
         String fieldName = "";

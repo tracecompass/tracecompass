@@ -13,6 +13,16 @@
   <echo message="Attempting to download test traces"/>
   <get ignoreerrors="true" dest="sample-ctf-trace-20120412.tar.bz2" skipexisting="true" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
   <get ignoreerrors="true" dest="trace2.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2"/>
+  <exec executable = "git" failifexecutionfails="false">
+    <arg value = "clone"/>
+    <arg value = "https://github.com/efficios/ctf-testsuite.git"/>
+  </exec>
+  <condition property="testSuiteExists">
+    <and>
+      <available file="ctf-testsuite" type="dir"/>
+    </and>
+  </condition>
+  <antcall target="pullTestSuite"/>
   <condition property="tracesExist">
     <and>
       <available file="sample-ctf-trace-20120412.tar.bz2"/>
@@ -20,6 +30,12 @@
     </and>
   </condition>
   <antcall target="extractTraces"/>
+</target>
+
+<target name="pullTestSuite" if="testSuiteExists">
+  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite">
+    <arg value = "pull"/>
+  </exec>
 </target>
 
 <target name="extractTraces" if="tracesExist">

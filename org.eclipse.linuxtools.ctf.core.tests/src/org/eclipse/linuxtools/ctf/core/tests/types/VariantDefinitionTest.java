@@ -308,7 +308,7 @@ public class VariantDefinitionTest {
         vDef = new VariantDefinition(vDecl, structDefinition, fName);
         structDef = new StructDefinition(new StructDeclaration(1L), vDef, fName);
         tagDefinition = new EnumDefinition(new EnumDeclaration(
-                new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
+                new IntegerDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
                         Encoding.ASCII, fName, 8)), structDef, fName);
 
         fixture.setTagDefinition(tagDefinition);

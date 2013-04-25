@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2013 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -94,7 +94,7 @@ public class Activator extends Plugin {
      * Log a message
      * @param msg the message to log
      */
-    public void log(String msg) {
+    public static void log(String msg) {
         log(msg, null);
     }
 
@@ -103,8 +103,19 @@ public class Activator extends Plugin {
      * @param msg the message
      * @param e the exception
      */
-    public void log(String msg, Exception e) {
-        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
+    public static void log(String msg, Exception e) {
+        getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
     }
+
+    /**
+     * Log a message
+     * @param severity desired severity of the message in the log,
+     *    one of {@link IStatus#INFO}, {@link IStatus#WARNING} or {@link IStatus#ERROR}
+     * @param msg the message to log
+     */
+    public static void log(int severity, String msg) {
+        getDefault().getLog().log(new Status(severity, PLUGIN_ID, msg));
+    }
+
 
 }

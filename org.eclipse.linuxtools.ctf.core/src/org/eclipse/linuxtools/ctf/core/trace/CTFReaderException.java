@@ -50,4 +50,17 @@ public class CTFReaderException extends Exception {
         super(e);
     }
 
+    /**
+     * Constructor with an attached message and re-throw an exception into this type.
+     *
+     * @param message
+     *            The message attached to this exception
+     * @param exception
+     *            The previous Exception caught
+     * @since 2.0
+     */
+    public CTFReaderException(String message, Throwable exception) {
+        super(message, exception);
+    }
+
 }

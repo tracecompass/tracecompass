@@ -43,7 +43,7 @@ public class EnumDefinitionTest {
     @Before
     public void setUp() {
         EnumDeclaration declaration = new EnumDeclaration(
-                new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
+                new IntegerDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
                         Encoding.ASCII, null, 8));
         declaration.add(0, 10, "a");
         declaration.add(11, 20, "b");

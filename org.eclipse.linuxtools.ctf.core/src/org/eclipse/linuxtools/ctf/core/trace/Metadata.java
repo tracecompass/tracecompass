@@ -6,8 +6,9 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: Matthew Khouzam - Initial API and implementation
- * Contributors: Simon Marchi - Initial API and implementation
+ * Contributors:
+ *     Matthew Khouzam - Initial API and implementation
+ *     Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.ctf.core.trace;
@@ -344,6 +345,9 @@ public class Metadata {
 
         /* Extract the text from the packet */
         int payloadSize = ((header.contentSize / 8) - METADATA_PACKET_HEADER_SIZE);
+        if (payloadSize < 0) {
+            throw new CTFReaderException("Invalid metadata packet payload size."); //$NON-NLS-1$
+        }
         int skipSize = (header.packetSize - header.contentSize) / 8;
 
         /* Read the payload + the padding in a ByteBuffer */

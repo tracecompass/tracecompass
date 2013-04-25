@@ -91,7 +91,7 @@ public class CTFEventFieldTest {
     @Test
     public void testParseField_simple2() {
         IntegerDefinition fieldDef = new IntegerDefinition(
-                new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
+                new IntegerDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
                         Encoding.ASCII, null, 8), null, fieldName);
         fieldDef.setValue(1L);
 

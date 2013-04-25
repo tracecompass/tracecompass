@@ -1,22 +1,25 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2013 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: Matthew Khouzam - Initial API and implementation
- * Contributors: Simon Marchi - Initial API and implementation
+ * Contributors:
+ *     Matthew Khouzam - Initial API and implementation
+ *     Simon Marchi - Initial API and implementation
+ *     Marc-Andre Laperle - Add min/maximum for validation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import java.math.BigInteger;
 import java.nio.ByteOrder;
 
 /**
  * A CTF integer declaration.
- * 
+ *
  * The declaration of a integer basic data type.
  *
  * @version 1.0
@@ -53,6 +56,9 @@ public class IntegerDeclaration implements IDeclaration {
      */
     public IntegerDeclaration(int len, boolean signed, int base,
             ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
+        if (len <= 0 || len == 1 && signed) {
+            throw new IllegalArgumentException();
+        }
         this.length = len;
         this.signed = signed;
         this.base = base;
@@ -140,6 +146,33 @@ public class IntegerDeclaration implements IDeclaration {
     public String toString() {
         /* Only used for debugging */
         return "[declaration] integer[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+    }
+
+    /**
+     * Get the maximum value for this integer declaration
+     *
+     * @return The maximum value for this integer declaration
+     * @since 2.0
+     */
+    public BigInteger getMaxValue() {
+        BigInteger capacity = BigInteger.ONE.shiftLeft(length);
+        BigInteger max = signed ? capacity.divide(BigInteger.valueOf(2)) : capacity;
+        return max.subtract(BigInteger.ONE);
+    }
+
+    /**
+     * Get the minimum value for this integer declaration
+     *
+     * @return The minimum value for this integer declaration
+     * @since 2.0
+     */
+    public BigInteger getMinValue() {
+        if (!signed) {
+            return BigInteger.ZERO;
+        }
+
+        BigInteger capacity = BigInteger.ONE.shiftLeft(length);
+        return capacity.divide(BigInteger.valueOf(2)).negate();
     }
 
 }

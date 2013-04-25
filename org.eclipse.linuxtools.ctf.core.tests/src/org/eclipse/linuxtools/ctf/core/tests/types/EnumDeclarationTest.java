@@ -42,7 +42,7 @@ public class EnumDeclarationTest {
      */
     @Before
     public void setUp() {
-        fixture = new EnumDeclaration(new IntegerDeclaration(1, true, 1,
+        fixture = new EnumDeclaration(new IntegerDeclaration(1, false, 1,
                 ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8));
     }
 
@@ -51,7 +51,7 @@ public class EnumDeclarationTest {
      */
     @Test
     public void testEnumDeclaration() {
-        IntegerDeclaration containerType = new IntegerDeclaration(1, true, 1,
+        IntegerDeclaration containerType = new IntegerDeclaration(1, false, 1,
                 ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
 
         EnumDeclaration result = new EnumDeclaration(containerType);
