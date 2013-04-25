@@ -153,6 +153,8 @@ In addition to these views, the '''Tracing and Monitoring Framework (TMF)''' fea
 * [[#Filters_View | Filters View]]
 * [[#Time_Chart_View  | Time Chart View]]
 * [[#Environment_Variables_View  | Environment Variables View]]
+* [[#State_System_Explorer_View | State System Explorer View]]
+* [[#Call_Stack_View | Call Stack View]]
 
 The framework also supports user creation of [[#Custom_Parsers  | Custom Parsers]].
 
@@ -526,7 +528,33 @@ The Time Chart only supports traces that are opened in an editor. The use of an 
 == Environment Variables View ==
 A new feature of CTF traces is their ability to store user defined data that is not to be placed in an event. It is generally data that is per-trace specific, such as the tracer version and the trace domain. It will be populated when a trace is loaded if the trace has environment variables. <br>
 [[Image:images/LTTng2EnvironmentsView.png]]<br>
-The above picture shows a trace loaded that was collevcted with the '''lttng-modules''' version '''2'''.'''0'''.'''0''' tracer. It is a '''kernel''' trace of the '''3.2.0-18-generic''' '''linux''' kernel.
+The above picture shows a trace loaded that was collected with the '''lttng-modules''' version '''2'''.'''0'''.'''0''' tracer. It is a '''kernel''' trace of the '''3.2.0-18-generic''' '''linux''' kernel.
+
+== State System Explorer View ==
+
+The State System Explorer view allows the user to inspect the state interval values of every attribute of a state system at a particular time.
+
+The view shows a tree of currently selected traces and their registered state system IDs. For each state system the tree structure of attributes is displayed. The attribute name, quark, value, start and end time, and full attribute path are shown for each attribute.
+
+To modify the time of attributes shown in the view, select a different current time in other views that support time synchronization (e.g. event table, histogram view).
+
+== Call Stack View ==
+
+The Call Stack view allows the user to visualize the call stack per thread over time, if the application and trace provide this information.
+
+The view shows the call stack information for the currently selected trace.
+
+The table on the left-hand side of the view shows the threads and call stack. The function name, depth, entry and exit time and duration are shown for the call stack at the selected time.
+
+Double-clicking on a function entry in the table will zoom the time graph to the selected function's range of execution.
+
+The time graph on the right-hand side of the view shows the call stack state graphically over time. The function name is visible on each call stack event if size permits. The color of each call stack event is randomly assigned based on the function name, allowing for easy identification of repeated calls to the same function.
+
+Clicking on the time graph will set the current time and consequently update the table with the current call stack information.
+
+Double-clicking on a call stack event will zoom the time graph to the selected function's range of execution.
+
+Clicking the '''Select Next Event''' or '''Select Previous Event''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack.
 
 == Custom Parsers ==
 

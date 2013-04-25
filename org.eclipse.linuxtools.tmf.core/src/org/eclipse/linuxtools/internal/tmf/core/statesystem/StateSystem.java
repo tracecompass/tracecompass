@@ -362,9 +362,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateValueTypeException();
         }
 
-        if (stackDepth >= 10) {
+        if (stackDepth >= 100000) {
             /*
-             * Limit stackDepth to 10, to avoid having Attribute Trees grow out
+             * Limit stackDepth to 100000, to avoid having Attribute Trees grow out
              * of control due to buggy insertions
              */
             String message = "Stack limit reached, not pushing"; //$NON-NLS-1$

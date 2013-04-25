@@ -35,6 +35,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.viewers.statistics,
  org.eclipse.linuxtools.tmf.ui.viewers.statistics.model,
  org.eclipse.linuxtools.tmf.ui.views,
+ org.eclipse.linuxtools.tmf.ui.views.callstack,
  org.eclipse.linuxtools.tmf.ui.views.colors,
  org.eclipse.linuxtools.tmf.ui.views.distribution.model,
  org.eclipse.linuxtools.tmf.ui.views.environment,

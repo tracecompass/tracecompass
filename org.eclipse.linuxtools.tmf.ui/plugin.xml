@@ -89,6 +89,14 @@
             name="%histogram.view.name"
             restorable="true">
       </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.ui.views.callstack.CallStackView"
+            icon="icons/eview16/callstack_view.gif"
+            id="org.eclipse.linuxtools.tmf.ui.views.callstack"
+            name="%callstack.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
