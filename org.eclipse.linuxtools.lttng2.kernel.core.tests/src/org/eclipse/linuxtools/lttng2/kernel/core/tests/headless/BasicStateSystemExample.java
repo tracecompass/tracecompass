@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
 
 /**
@@ -44,7 +44,7 @@ public class BasicStateSystemExample {
         try {
             File newStateFile = new File("/tmp/helloworldctf.ht");
             ITmfStateProvider input = new CtfKernelStateProvider(CtfTmfTestTraces.getTestTrace(1));
-            ITmfStateSystem ss = StateSystemManager.loadStateHistory(newStateFile, input, true);
+            ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(newStateFile, input, true);
 
             requestExample(ss);
         } catch (TmfTraceException e) {

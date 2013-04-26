@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
 
 /**
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel
@@ -107,7 +107,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
         final File htFile = new File(supplDirectory + File.separator + HISTORY_TREE_FILE_NAME);
         final ITmfStateProvider htInput = new CtfKernelStateProvider(this);
 
-        ITmfStateSystem ss = StateSystemManager.loadStateHistory(htFile, htInput, false);
+        ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(htFile, htInput, false);
         fStateSystems.put(STATE_ID, ss);
     }
 

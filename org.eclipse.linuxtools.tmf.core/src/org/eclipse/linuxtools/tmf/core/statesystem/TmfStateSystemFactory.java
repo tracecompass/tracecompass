@@ -28,13 +28,16 @@ import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 
 /**
- * This abstract manager class handles loading or creating state history files
- * for use in TMF's generic state system.
+ * This class handles loading or creating state history files for use in TMF's
+ * generic state system.
  *
- * @version 1.0
  * @author Alexandre Montplaisir
+ * @since 2.0
  */
-public abstract class StateSystemManager extends TmfComponent {
+public final class TmfStateSystemFactory extends TmfComponent {
+
+    /** "static" class */
+    private TmfStateSystemFactory() {}
 
     /** Size of the blocking queue to use when building a state history */
     private final static int QUEUE_SIZE = 10000;
@@ -64,7 +67,7 @@ public abstract class StateSystemManager extends TmfComponent {
      *             See the contents of this exception for more info.
      * @since 2.0
      */
-    public static ITmfStateSystem loadStateHistory(File htFile,
+    public static ITmfStateSystem newFullHistory(File htFile,
             ITmfStateProvider stateProvider, boolean buildManually)
             throws TmfTraceException {
         IStateHistoryBackend htBackend;
@@ -163,7 +166,7 @@ public abstract class StateSystemManager extends TmfComponent {
     /**
      * Create a new state system backed with a partial history. A partial
      * history is similar to a "full" one (which you get with
-     * {@link #loadStateHistory}), except that the file on disk is much smaller,
+     * {@link #newFullHistory}), except that the file on disk is much smaller,
      * but queries are a bit slower.
      *
      * Also note that single-queries are implemented using a full-query

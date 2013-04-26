@@ -19,7 +19,7 @@ import java.io.IOException;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class PartialStateSystemTest extends StateSystemTest {
             stateFile.deleteOnExit();
 
             input = new CtfKernelStateProvider(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
-            ssq = StateSystemManager.newPartialHistory(stateFile, input, true);
+            ssq = TmfStateSystemFactory.newPartialHistory(stateFile, input, true);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (TmfTraceException e) {
