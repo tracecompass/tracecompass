@@ -42,11 +42,6 @@ final class IntegerStateValue extends TmfStateValue {
     }
 
     @Override
-    public byte[] toByteArray() {
-        return null;
-    }
-
-    @Override
     public String toString() {
         return String.format("%3d", valueInt); //$NON-NLS-1$
     }
