@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.statesystem.AbstractStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics.Attributes;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -42,7 +42,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Alexandre Montplaisir
  * @version 1.0
  */
-class StatsStateProvider extends AbstractStateChangeInput {
+class StatsStateProvider extends AbstractTmfStateProvider {
 
     /**
      * Version number of this input handler. Please bump this if you modify the

@@ -49,10 +49,10 @@ public abstract class StateSystemManager extends TmfComponent {
      *            The target name of the history file we want to use. If it
      *            exists it will be opened. If it doesn't, a new file will be
      *            created with this name/path.
-     * @param htInput
-     *            The IStateChangeInput to use for building the history file. It
-     *            may be required even if we are opening an already-existing
-     *            history (ie, for partial histories).
+     * @param stateProvider
+     *            The {@link ITmfStateProvider} to use for building the history
+     *            file. It may be required even if we are opening an
+     *            already-existing history (ie, for partial histories).
      * @param buildManually
      *            If false, the construction will wait for a signal before
      *            starting. If true, it will build everything right now and
@@ -65,7 +65,7 @@ public abstract class StateSystemManager extends TmfComponent {
      * @since 2.0
      */
     public static ITmfStateSystem loadStateHistory(File htFile,
-            IStateChangeInput htInput, boolean buildManually)
+            ITmfStateProvider stateProvider, boolean buildManually)
             throws TmfTraceException {
         IStateHistoryBackend htBackend;
 
@@ -74,9 +74,9 @@ public abstract class StateSystemManager extends TmfComponent {
         // at least if its range matches the trace's range.
         if (htFile.exists()) {
             /* Load an existing history */
-            final int version = (htInput == null) ?
-                    IStateChangeInput.IGNORE_PROVIDER_VERSION :
-                    htInput.getVersion();
+            final int version = (stateProvider == null) ?
+                    ITmfStateProvider.IGNORE_PROVIDER_VERSION :
+                    stateProvider.getVersion();
             try {
                 htBackend = new HistoryTreeBackend(htFile, version);
                 ITmfStateSystem ss = HistoryBuilder.openExistingHistory(htBackend);
@@ -93,15 +93,15 @@ public abstract class StateSystemManager extends TmfComponent {
         /* Create a new state history from scratch */
         HistoryBuilder builder;
 
-        if (htInput == null) {
+        if (stateProvider == null) {
             return null;
         }
         try {
             htBackend = new ThreadedHistoryTreeBackend(htFile,
-                    htInput.getStartTime(), htInput.getVersion(), QUEUE_SIZE);
+                    stateProvider.getStartTime(), stateProvider.getVersion(), QUEUE_SIZE);
             StateSystem ss = new StateSystem(htBackend);
-            htInput.assignTargetStateSystem(ss);
-            builder = new HistoryBuilder(htInput, ss, htBackend, buildManually);
+            stateProvider.assignTargetStateSystem(ss);
+            builder = new HistoryBuilder(stateProvider, ss, htBackend, buildManually);
         } catch (IOException e) {
             /*
              * If it fails here however, it means there was a problem writing to
@@ -118,19 +118,19 @@ public abstract class StateSystemManager extends TmfComponent {
      * {@link ITmfStateSystem#queryOngoingState} will be available.
      *
      * This has to be built "manually" (which means you should call
-     * input.processEvent() to update the ongoing state of the state system).
+     * stateProvider.processEvent() to update the ongoing state of the state system).
      *
-     * @param input
-     *            The input plugin to build the history
+     * @param stateProvider
+     *            The state provider plugin to build the history
      * @return Reference to the history-less state system that got built
      * @since 2.0
      */
-    public static ITmfStateSystem newNullHistory(IStateChangeInput input) {
+    public static ITmfStateSystem newNullHistory(ITmfStateProvider stateProvider) {
         IStateHistoryBackend backend = new NullBackend();
         StateSystem ss = new StateSystem(backend);
-        input.assignTargetStateSystem(ss);
+        stateProvider.assignTargetStateSystem(ss);
 
-        HistoryBuilder builder = new HistoryBuilder(input, ss, backend, true);
+        HistoryBuilder builder = new HistoryBuilder(stateProvider, ss, backend, true);
         return builder.getStateSystemQuerier();
     }
 
@@ -141,8 +141,8 @@ public abstract class StateSystemManager extends TmfComponent {
      *
      * This will block the caller while the construction is ongoing.
      *
-     * @param input
-     *            The state change input to use
+     * @param stateProvider
+     *            The sstateProvider to use
      * @param buildManually
      *            Set to true to block the caller and build without using TMF
      *            signals (for test programs most of the time). Use false if you
@@ -150,13 +150,13 @@ public abstract class StateSystemManager extends TmfComponent {
      * @return Reference to the state system that just got built
      * @since 2.0
      */
-    public static ITmfStateSystem newInMemHistory(IStateChangeInput input,
+    public static ITmfStateSystem newInMemHistory(ITmfStateProvider stateProvider,
             boolean buildManually) {
-        IStateHistoryBackend backend = new InMemoryBackend(input.getStartTime());
+        IStateHistoryBackend backend = new InMemoryBackend(stateProvider.getStartTime());
         StateSystem ss = new StateSystem(backend);
-        input.assignTargetStateSystem(ss);
+        stateProvider.assignTargetStateSystem(ss);
 
-        HistoryBuilder builder = new HistoryBuilder(input, ss, backend, buildManually);
+        HistoryBuilder builder = new HistoryBuilder(stateProvider, ss, backend, buildManually);
         return builder.getStateSystemQuerier();
     }
 
@@ -174,8 +174,8 @@ public abstract class StateSystemManager extends TmfComponent {
      *            The target file of the history. Since they are usually quick
      *            to build, it will overwrite any existing file, without trying
      *            to re-open it.
-     * @param realInput
-     *            The state provider input to use to build this history.
+     * @param realStateProvider
+     *            The state provider to use to build this history.
      * @param buildManually
      *            Indicates if you want to build the state system in-band
      *            ('true', for unit tests for example), or to not block the
@@ -186,23 +186,24 @@ public abstract class StateSystemManager extends TmfComponent {
      * @since 2.0
      */
     public static ITmfStateSystem newPartialHistory(File htFile,
-            IStateChangeInput realInput, boolean buildManually) throws TmfTraceException {
+            ITmfStateProvider realStateProvider, boolean buildManually)
+                    throws TmfTraceException {
         /*
          * The order of initializations is very tricky (but very important!)
          * here. We need to follow this pattern:
          * (1 is done before the call to this method)
          *
-         * 1- Instantiate realInput
+         * 1- Instantiate realStateProvider
          * 2- Instantiate realBackend
          * 3- Instantiate partialBackend, whith prereqs:
-         *  3a- Instantiate partialInput, via realInput.getNew()
+         *  3a- Instantiate partialProvider, via realProvider.getNew()
          *  3b- Instantiate nullBackend (partialSS's backend)
          *  3c- Instantiate partialSS
-         *  3d- partialInput.assignSS(partialSS)
+         *  3d- partialProvider.assignSS(partialSS)
          * 4- Instantiate realSS
          * 5- partialSS.assignUpstream(realSS)
-         * 6- realInput.assignSS(realSS)
-         * 7- Call HistoryBuilder(realInput, realSS, partialBackend) to build the thing.
+         * 6- realProvider.assignSS(realSS)
+         * 7- Call HistoryBuilder(realProvider, realSS, partialBackend) to build the thing.
          */
 
         final long granularity = 50000;
@@ -211,23 +212,23 @@ public abstract class StateSystemManager extends TmfComponent {
         IStateHistoryBackend realBackend = null;
         try {
             realBackend = new ThreadedHistoryTreeBackend(htFile,
-                    realInput.getStartTime(), realInput.getVersion(), QUEUE_SIZE);
+                    realStateProvider.getStartTime(), realStateProvider.getVersion(), QUEUE_SIZE);
         } catch (IOException e) {
             throw new TmfTraceException(e.toString(), e);
         }
 
         /* 3a */
-        IStateChangeInput partialInput = realInput.getNewInstance();
+        ITmfStateProvider partialProvider = realStateProvider.getNewInstance();
 
         /* 3b-3c, constructor automatically uses a NullBackend */
         PartialStateSystem pss = new PartialStateSystem();
 
         /* 3d */
-        partialInput.assignTargetStateSystem(pss);
+        partialProvider.assignTargetStateSystem(pss);
 
         /* 3 */
         IStateHistoryBackend partialBackend =
-                new PartialHistoryBackend(partialInput, pss, realBackend, granularity);
+                new PartialHistoryBackend(partialProvider, pss, realBackend, granularity);
 
         /* 4 */
         StateSystem realSS = new StateSystem(partialBackend);
@@ -236,10 +237,10 @@ public abstract class StateSystemManager extends TmfComponent {
         pss.assignUpstream(realSS);
 
         /* 6 */
-        realInput.assignTargetStateSystem(realSS);
+        realStateProvider.assignTargetStateSystem(realSS);
 
         /* 7 */
-        HistoryBuilder builder = new HistoryBuilder(realInput, realSS, partialBackend, buildManually);
+        HistoryBuilder builder = new HistoryBuilder(realStateProvider, realSS, partialBackend, buildManually);
         return builder.getStateSystemQuerier();
     }
 }

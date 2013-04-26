@@ -16,14 +16,14 @@ import java.io.File;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
@@ -43,7 +43,7 @@ public class BasicStateSystemExample {
         /* Read a trace and build the state system */
         try {
             File newStateFile = new File("/tmp/helloworldctf.ht");
-            IStateChangeInput input = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(1));
+            ITmfStateProvider input = new CtfKernelStateProvider(CtfTmfTestTraces.getTestTrace(1));
             ITmfStateSystem ss = StateSystemManager.loadStateHistory(newStateFile, input, true);
 
             requestExample(ss);

@@ -17,9 +17,9 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateSystemManager;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
@@ -61,7 +61,7 @@ public class GenerateTestValues {
         PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);
 
         /* Build and query the state system */
-        IStateChangeInput input = new CtfKernelStateInput(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
+        ITmfStateProvider input = new CtfKernelStateProvider(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
         ITmfStateSystem ssq = StateSystemManager.loadStateHistory(stateFile, input, true);
         List<ITmfStateInterval> fullState = ssq.queryFullState(targetTimestamp);
 

@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 
 /**
@@ -51,7 +51,7 @@ public class VerifyHistoryFile {
             TimeRangeException, AttributeNotFoundException,
             StateSystemDisposedException {
         htFile = new File(pathToHistoryFile);
-        htBackend = new HistoryTreeBackend(htFile, IStateChangeInput.IGNORE_PROVIDER_VERSION);
+        htBackend = new HistoryTreeBackend(htFile, ITmfStateProvider.IGNORE_PROVIDER_VERSION);
         ss = HistoryBuilder.openExistingHistory(htBackend);
 
         startTime = ss.getStartTime();

@@ -23,7 +23,7 @@ import java.nio.channels.FileChannel;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 
 /**
  * Meta-container for the History Tree. This structure contains all the
@@ -147,7 +147,7 @@ class HistoryTree {
 
         res = buffer.getInt(); /* Event handler's version number */
         if (res != expProviderVersion &&
-                expProviderVersion != IStateChangeInput.IGNORE_PROVIDER_VERSION) {
+                expProviderVersion != ITmfStateProvider.IGNORE_PROVIDER_VERSION) {
             /*
              * The existing history was built using a event handler that doesn't
              * match the current one in the framework. Information could be all

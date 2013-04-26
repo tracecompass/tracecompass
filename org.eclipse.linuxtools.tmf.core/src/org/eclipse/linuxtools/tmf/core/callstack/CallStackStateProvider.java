@@ -16,7 +16,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.statesystem.AbstractStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
@@ -60,7 +60,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Patrick Tasse
  * @since 2.0
  */
-public abstract class CallStackStateProvider extends AbstractStateChangeInput {
+public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
     /** CallStack state system ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.callstack"; //$NON-NLS-1$
