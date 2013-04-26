@@ -79,21 +79,6 @@ public interface ITmfStateSystem {
     public int getNbAttributes();
 
     /**
-     * Check if a given quark is the last attribute that was added to the
-     * system.
-     *
-     * This is a common case, and it's a bit clearer than
-     * " x == getNbAttributes - 1"
-     *
-     * @param quark
-     *            The quark to check for
-     * @return True if this is the last quark that was added to the system,
-     *         false if not
-     * @since 2.0
-     */
-    public boolean isLastAttribute(int quark);
-
-    /**
      * @name Read-only quark-getting methods
      */
 

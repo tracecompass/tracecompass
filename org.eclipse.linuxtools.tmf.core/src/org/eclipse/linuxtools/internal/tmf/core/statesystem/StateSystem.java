@@ -150,11 +150,6 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
-    public boolean isLastAttribute(int quark) {
-        return (quark == getNbAttributes() - 1) ? true : false;
-    }
-
-    @Override
     public String getAttributeName(int attributeQuark) {
         return getAttributeTree().getAttributeName(attributeQuark);
     }
