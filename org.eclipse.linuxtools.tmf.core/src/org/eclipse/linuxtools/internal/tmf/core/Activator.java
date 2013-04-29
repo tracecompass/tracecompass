@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.tmf.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -78,6 +79,8 @@ public class Activator extends Plugin {
         super.start(context);
         setDefault(this);
         TmfCoreTracer.init();
+        /* Initialize the trace manager */
+        TmfTraceManager.getInstance();
     }
 
     @Override

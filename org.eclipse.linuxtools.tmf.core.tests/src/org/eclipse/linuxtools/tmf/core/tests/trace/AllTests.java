@@ -30,6 +30,7 @@ import org.junit.runners.Suite;
     TmfExperimentTest.class,
     TmfLocationTest.class,
     TmfMultiTraceExperimentTest.class,
+    TmfTraceManagerTest.class,
     TmfTraceTest.class
 })
 public class AllTests {
