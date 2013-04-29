@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateProvider;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -43,7 +43,7 @@ public class BasicStateSystemExample {
         /* Read a trace and build the state system */
         try {
             File newStateFile = new File("/tmp/helloworldctf.ht");
-            ITmfStateProvider input = new CtfKernelStateProvider(CtfTmfTestTraces.getTestTrace(1));
+            ITmfStateProvider input = new LttngKernelStateProvider(CtfTmfTestTraces.getTestTrace(1));
             ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(newStateFile, input, true);
 
             requestExample(ss);

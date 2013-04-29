@@ -26,7 +26,7 @@ public class Messages extends NLS {
     /**
      * The domain is not "kernel"
      */
-    public static String CtfKernelTrace_DomainError;
+    public static String LttngKernelTrace_DomainError;
 
     static {
         // initialize resource bundle

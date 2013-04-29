@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Activator;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateProvider;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -35,10 +35,10 @@ import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel
  * traces. It uses the CtfKernelStateInput to generate the state history.
  *
- * @version 1.0
  * @author Alexandre Montplaisir
+ * @since 2.0
  */
-public class CtfKernelTrace extends CtfTmfTrace {
+public class LttngKernelTrace extends CtfTmfTrace {
 
     /**
      * The file name of the History Tree
@@ -54,7 +54,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
     /**
      * Default constructor
      */
-    public CtfKernelTrace() {
+    public LttngKernelTrace() {
         super();
     }
 
@@ -85,7 +85,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
         if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
             return Status.OK_STATUS;
         }
-        validStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfKernelTrace_DomainError);
+        validStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_DomainError);
         return validStatus;
     }
 
@@ -105,7 +105,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
         }
 
         final File htFile = new File(supplDirectory + File.separator + HISTORY_TREE_FILE_NAME);
-        final ITmfStateProvider htInput = new CtfKernelStateProvider(this);
+        final ITmfStateProvider htInput = new LttngKernelStateProvider(this);
 
         ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(htFile, htInput, false);
         fStateSystems.put(STATE_ID, ss);

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace;
+import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.EventIterator;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  */
 public class ControlFlowEntry implements ITimeGraphEntry {
     private final int fThreadQuark;
-    private final CtfKernelTrace fTrace;
+    private final LttngKernelTrace fTrace;
     private ControlFlowEntry fParent = null;
     private final ArrayList<ControlFlowEntry> fChildren = new ArrayList<ControlFlowEntry>();
     private String fName;
@@ -55,7 +55,7 @@ public class ControlFlowEntry implements ITimeGraphEntry {
      * @param endTime
      *            The end time of this process
      */
-    public ControlFlowEntry(int threadQuark, CtfKernelTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
+    public ControlFlowEntry(int threadQuark, LttngKernelTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
         fThreadQuark = threadQuark;
         fTrace = trace;
         fName = execName;
@@ -132,7 +132,7 @@ public class ControlFlowEntry implements ITimeGraphEntry {
      *
      * @return The trace
      */
-    public CtfKernelTrace getTrace() {
+    public LttngKernelTrace getTrace() {
         return fTrace;
     }
 

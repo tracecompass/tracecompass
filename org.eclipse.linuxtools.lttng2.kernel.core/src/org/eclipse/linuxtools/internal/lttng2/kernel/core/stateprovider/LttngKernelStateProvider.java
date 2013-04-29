@@ -38,7 +38,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  * @author alexmont
  *
  */
-public class CtfKernelStateProvider extends AbstractTmfStateProvider {
+public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
     /**
      * Version number of this state provider. Please bump this if you modify the
@@ -59,7 +59,7 @@ public class CtfKernelStateProvider extends AbstractTmfStateProvider {
      * @param trace
      *            The LTTng 2.0 kernel trace directory
      */
-    public CtfKernelStateProvider(CtfTmfTrace trace) {
+    public LttngKernelStateProvider(CtfTmfTrace trace) {
         super(trace, CtfTmfEvent.class, "LTTng Kernel"); //$NON-NLS-1$
         knownEventNames = fillEventNames();
     }
@@ -80,8 +80,8 @@ public class CtfKernelStateProvider extends AbstractTmfStateProvider {
     }
 
     @Override
-    public CtfKernelStateProvider getNewInstance() {
-        return new CtfKernelStateProvider((CtfTmfTrace) this.getTrace());
+    public LttngKernelStateProvider getNewInstance() {
+        return new LttngKernelStateProvider((CtfTmfTrace) this.getTrace());
     }
 
     @Override

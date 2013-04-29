@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace;
+import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.EventIterator;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -40,7 +40,7 @@ public class ResourcesEntry implements ITimeGraphEntry {
         SOFT_IRQ }
 
     private final int fQuark;
-    private final CtfKernelTrace fTrace;
+    private final LttngKernelTrace fTrace;
     private ITimeGraphEntry fParent = null;
     private final List<ITimeGraphEntry> children = null;
     private final String fName;
@@ -64,7 +64,7 @@ public class ResourcesEntry implements ITimeGraphEntry {
      * @param id
      *            The integer id associated with this entry or row
      */
-    public ResourcesEntry(int quark, CtfKernelTrace trace, Type type, int id) {
+    public ResourcesEntry(int quark, LttngKernelTrace trace, Type type, int id) {
         fQuark = quark;
         fTrace = trace;
         fType = type;
@@ -142,7 +142,7 @@ public class ResourcesEntry implements ITimeGraphEntry {
      *
      * @return The LTTng 2 kernel trace
      */
-    public CtfKernelTrace getTrace() {
+    public LttngKernelTrace getTrace() {
         return fTrace;
     }
 

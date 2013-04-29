@@ -20,7 +20,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateProvider;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
@@ -50,7 +50,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
             stateFile = File.createTempFile("test", ".ht");
             stateFileBenchmark = File.createTempFile("test", ".ht.benchmark");
 
-            input = new CtfKernelStateProvider(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
+            input = new LttngKernelStateProvider(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
             ssq = TmfStateSystemFactory.newFullHistory(stateFile, input, true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     @Test
     public void testBuild() {
         try {
-            ITmfStateProvider input2 = new CtfKernelStateProvider(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
+            ITmfStateProvider input2 = new LttngKernelStateProvider(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
             ITmfStateSystem ssb2 = TmfStateSystemFactory.newFullHistory(stateFileBenchmark, input2, true);
 
             assertEquals(startTime, ssb2.getStartTime());
