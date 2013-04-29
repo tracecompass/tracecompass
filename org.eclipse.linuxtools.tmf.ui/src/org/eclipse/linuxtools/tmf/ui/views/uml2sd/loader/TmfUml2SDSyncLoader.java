@@ -43,6 +43,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.core.uml2sd.ITmfSyncSequenceDiagramEvent;
 import org.eclipse.linuxtools.tmf.core.uml2sd.TmfSyncSequenceDiagramEvent;
 import org.eclipse.linuxtools.tmf.ui.editors.ITmfTraceEditor;
@@ -1147,7 +1148,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     protected TmfTimeRange getSignalTimeRange(ITmfTimestamp startTime) {
         fLock.lock();
         try {
-            long offset = fTrace == null ? 0 : fTrace.getCurrentRange().getEndTime().getDelta(fTrace.getCurrentRange().getStartTime()).normalize(0, startTime.getScale()).getValue();
+            TmfTimeRange currentRange = TmfTraceManager.getInstance().getCurrentRange();
+            long offset = fTrace == null ? 0 : currentRange.getEndTime().getDelta(currentRange.getStartTime()).normalize(0, startTime.getScale()).getValue();
             TmfTimestamp initialEndOfWindow = new TmfTimestamp(startTime.getValue() + offset, startTime.getScale(), startTime.getPrecision());
             return new TmfTimeRange(startTime, initialEndOfWindow);
         }

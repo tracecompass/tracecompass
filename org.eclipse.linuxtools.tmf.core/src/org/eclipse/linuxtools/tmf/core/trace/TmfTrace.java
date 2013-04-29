@@ -27,9 +27,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
@@ -99,12 +97,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
     // The trace's statistics
     private ITmfStatistics fStatistics;
-
-    // The current selected time
-    private ITmfTimestamp fCurrentTime = TmfTimestamp.ZERO;
-
-    // The current selected range
-    private TmfTimeRange fCurrentRange = TmfTimeRange.NULL_RANGE;
 
     /**
      * The collection of state systems that are registered with this trace. Each
@@ -204,7 +196,10 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      *
      * @throws TmfTraceException If something failed during the initialization
      */
-    protected void initialize(final IResource resource, final String path, final Class<? extends ITmfEvent> type) throws TmfTraceException {
+    protected void initialize(final IResource resource,
+            final String path,
+            final Class<? extends ITmfEvent> type)
+                    throws TmfTraceException {
         if (path == null) {
             throw new TmfTraceException("Invalid trace path"); //$NON-NLS-1$
         }
@@ -415,22 +410,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @since 2.0
      */
     @Override
-    public ITmfTimestamp getCurrentTime() {
-        return fCurrentTime;
-    }
-
-    /**
-     * @since 2.0
-     */
-    @Override
-    public TmfTimeRange getCurrentRange() {
-        return fCurrentRange;
-    }
-
-    /**
-     * @since 2.0
-     */
-    @Override
     public ITmfTimestamp getInitialRangeOffset() {
         final long DEFAULT_INITIAL_OFFSET_VALUE = (1L * 100 * 1000 * 1000); // .1sec
         return new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
@@ -622,13 +601,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || (fEndTime.compareTo(timestamp, false) < 0)) {
             fEndTime = timestamp;
         }
-        if (fCurrentRange == TmfTimeRange.NULL_RANGE) {
-            fCurrentTime = timestamp;
-            ITmfTimestamp initialOffset = getInitialRangeOffset();
-            long endValue = timestamp.getValue() + initialOffset.normalize(0, timestamp.getScale()).getValue();
-            ITmfTimestamp endTimestamp = new TmfTimestamp(endValue, timestamp.getScale());
-            fCurrentRange = new TmfTimeRange(timestamp, endTimestamp);
-        }
         if (context.hasValidRank()) {
             long rank = context.getRank();
             if (fNbEvents <= rank) {
@@ -740,35 +712,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     public void traceRangeUpdated(final TmfTraceRangeUpdatedSignal signal) {
         if (signal.getTrace() == this) {
             getIndexer().buildIndex(getNbEvents(), signal.getRange(), false);
-        }
-    }
-
-    /**
-     * Signal handler for the TmfTimeSynchSignal signal
-     *
-     * @param signal The incoming signal
-     * @since 2.0
-     */
-    @TmfSignalHandler
-    public void synchToTime(final TmfTimeSynchSignal signal) {
-        if (signal.getCurrentTime().compareTo(fStartTime) >= 0 && signal.getCurrentTime().compareTo(fEndTime) <= 0) {
-            fCurrentTime = signal.getCurrentTime();
-        }
-    }
-
-    /**
-     * Signal handler for the TmfRangeSynchSignal signal
-     *
-     * @param signal The incoming signal
-     * @since 2.0
-     */
-    @TmfSignalHandler
-    public void synchToRange(final TmfRangeSynchSignal signal) {
-        if (signal.getCurrentTime().compareTo(fStartTime) >= 0 && signal.getCurrentTime().compareTo(fEndTime) <= 0) {
-            fCurrentTime = signal.getCurrentTime();
-        }
-        if (signal.getCurrentRange().getIntersection(getTimeRange()) != null) {
-            fCurrentRange = signal.getCurrentRange().getIntersection(getTimeRange());
         }
     }
 

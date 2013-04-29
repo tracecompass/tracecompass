@@ -1453,8 +1453,6 @@ public class TmfTraceTest {
             // verify initial values
             TmfTimestamp defaultInitRange = new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
             assertEquals("getInitialRangeOffset", defaultInitRange, trace.getInitialRangeOffset());
-            assertEquals("getCurrentTime", TmfTimestamp.ZERO, trace.getCurrentTime());
-            assertEquals("getCurrentRange", TmfTimeRange.NULL_RANGE, trace.getCurrentRange());
             trace.setInitialRangeOffset(new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE));
             trace.indexTrace(true);
         } catch (final URISyntaxException e) {
@@ -1466,12 +1464,5 @@ public class TmfTraceTest {
 
         TmfTimestamp initRange = new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE);
         assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
-        assertEquals("getCurrentTime", trace.getTimeRange().getStartTime(), trace.getCurrentTime());
-
-        ITmfTimestamp startTimestamp = trace.getTimeRange().getStartTime();
-        long endValue = startTimestamp.getValue() + initRange.normalize(0, startTimestamp.getScale()).getValue();
-        ITmfTimestamp endTimestamp = new TmfTimestamp(endValue, startTimestamp.getScale());
-        TmfTimeRange expectedRange = new TmfTimeRange(startTimestamp, endTimestamp);
-        assertEquals("getCurrentRange", expectedRange, trace.getCurrentRange());
     }
 }

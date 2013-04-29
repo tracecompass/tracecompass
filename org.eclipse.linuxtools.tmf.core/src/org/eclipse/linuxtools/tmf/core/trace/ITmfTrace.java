@@ -353,20 +353,4 @@ public interface ITmfTrace extends ITmfDataProvider {
      * @since 2.0
      */
     public ITmfTimestamp getInitialRangeOffset();
-
-    /**
-     * Return the current selected time.
-     *
-     * @return the current time stamp
-     * @since 2.0
-     */
-    public ITmfTimestamp getCurrentTime();
-
-    /**
-     * Return the current selected range.
-     *
-     * @return the current time range
-     * @since 2.0
-     */
-    public TmfTimeRange getCurrentRange();
 }

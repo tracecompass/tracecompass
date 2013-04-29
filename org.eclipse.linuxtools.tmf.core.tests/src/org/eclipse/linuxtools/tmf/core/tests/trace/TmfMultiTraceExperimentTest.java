@@ -126,14 +126,6 @@ public class TmfMultiTraceExperimentTest {
 
         TmfTimestamp initRange = new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
         assertEquals("getInitialRangeOffset", initRange, fExperiment.getInitialRangeOffset());
-
-        assertEquals("getCurrentTime", fExperiment.getTimeRange().getStartTime(), fExperiment.getCurrentTime());
-
-        ITmfTimestamp startTimestamp = fExperiment.getTimeRange().getStartTime();
-        long endValue = startTimestamp.getValue() + initRange.normalize(0, startTimestamp.getScale()).getValue();
-        ITmfTimestamp endTimestamp = new TmfTimestamp(endValue, startTimestamp.getScale());
-        TmfTimeRange expectedRange = new TmfTimeRange(startTimestamp, endTimestamp);
-        assertEquals("getCurrentRange", expectedRange, fExperiment.getCurrentRange());
     }
 
     // ------------------------------------------------------------------------
@@ -834,8 +826,6 @@ public class TmfMultiTraceExperimentTest {
         // verify initial values
         TmfTimestamp initRange = new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
         assertEquals("getInitialRangeOffset", initRange, exp.getInitialRangeOffset());
-        assertEquals("getCurrentTime", TmfTimestamp.ZERO, exp.getCurrentTime());
-        assertEquals("getCurrentRange", TmfTimeRange.NULL_RANGE, exp.getCurrentRange());
 
         exp.dispose();
     }
