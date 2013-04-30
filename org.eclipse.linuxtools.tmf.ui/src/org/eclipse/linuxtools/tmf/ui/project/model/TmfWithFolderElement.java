@@ -188,6 +188,13 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
         }
     }
 
+    /**
+     * Deletes all supplementary resources in the supplementary directory
+     */
+    public void deleteSupplementaryResources() {
+        deleteSupplementaryResources(getSupplementaryResources());
+    }
+
     private void createSupplementaryDirectory() {
         IFolder supplFolder = getTraceSupplementaryFolder(getResourceName());
         if (!supplFolder.exists()) {
