@@ -71,7 +71,14 @@ public class OpenAction extends Action {
     public void run() {
         try {
             IHandlerService handlerService = (IHandlerService) page.getActivePart().getSite().getService(IHandlerService.class);
-            if (element instanceof TmfTraceElement || element instanceof TmfExperimentElement) {
+            boolean executeCommand = (element instanceof TmfTraceElement);
+
+            if (!executeCommand && element instanceof TmfExperimentElement) {
+                TmfExperimentElement experiment = (TmfExperimentElement) element;
+                executeCommand = (experiment.getTraces().size() > 0);
+            }
+
+            if (executeCommand) {
                 handlerService.executeCommand(OPEN_COMMAND_ID, null);
             }
         } catch (ExecutionException e) {

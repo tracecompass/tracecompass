@@ -89,7 +89,7 @@ public class OpenExperimentHandler extends AbstractHandler {
         }
 
         // We only enable opening from the Traces folder for now
-        return (fExperiment != null);
+        return ((fExperiment != null) && (fExperiment.getTraces().size() > 0));
     }
 
     // ------------------------------------------------------------------------
