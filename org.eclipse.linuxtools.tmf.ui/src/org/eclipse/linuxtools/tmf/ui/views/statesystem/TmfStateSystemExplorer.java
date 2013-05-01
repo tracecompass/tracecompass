@@ -135,7 +135,7 @@ public class TmfStateSystemExplorer extends TmfView {
             }
         });
 
-        for (final ITmfTrace currentTrace : fTrace.getTraces()) {
+        for (final ITmfTrace currentTrace : fTraceManager.getActiveTraceSet()) {
             /*
              * We will first do all the queries for this trace, then update that
              * sub-tree in the UI thread.
@@ -228,7 +228,7 @@ public class TmfStateSystemExplorer extends TmfView {
      * column as-is, but update the values to the ones at a new timestamp.
      */
     private synchronized void updateTable() {
-        ITmfTrace[] traces = fTrace.getTraces();
+        ITmfTrace[] traces = fTraceManager.getActiveTraceSet();
         long ts = fCurrentTimestamp;
 
         /* For each trace... */

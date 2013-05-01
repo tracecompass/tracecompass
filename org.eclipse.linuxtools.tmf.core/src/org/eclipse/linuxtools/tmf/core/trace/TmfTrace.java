@@ -302,14 +302,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     // ITmfTrace - Basic getters
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
-    @Override
-    public ITmfTrace[] getTraces() {
-        return new ITmfTrace[] { this };
-    }
-
     @Override
     public Class<ITmfEvent> getEventType() {
         return (Class<ITmfEvent>) super.getType();
@@ -650,7 +642,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
         ITmfTrace trace = null;
-        for (ITmfTrace expTrace : signal.getTrace().getTraces()) {
+        /* The signal's trace should already be the active one in the manager */
+        TmfTraceManager tm = TmfTraceManager.getInstance();
+        for (ITmfTrace expTrace : tm.getActiveTraceSet()) {
             if (expTrace == this) {
                 trace = expTrace;
                 break;

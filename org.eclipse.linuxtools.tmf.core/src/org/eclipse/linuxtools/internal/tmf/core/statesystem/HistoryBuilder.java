@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 
 /**
  * This is the high-level wrapper around the State History and its provider and
@@ -158,20 +159,9 @@ public class HistoryBuilder extends TmfComponent {
      */
     @TmfSignalHandler
     public void traceRangeUpdated(final TmfTraceRangeUpdatedSignal signal) {
-        /*
-         * Check if this signal is for this trace, or for an experiment
-         * containing this trace.
-         */
         ITmfTrace sender = signal.getTrace();
-        ITmfTrace target = null;
-        for (ITmfTrace trace : sender.getTraces()) {
-            if (trace == sp.getTrace()) {
-                target = trace;
-                break;
-            }
-        }
 
-        if (target == null) {
+        if (!signalIsForUs(sender)) {
             return;
         }
 
@@ -190,21 +180,30 @@ public class HistoryBuilder extends TmfComponent {
      */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
-        /*
-         * Check if this signal is for this trace, or for an experiment
-         * containing this trace.
-         */
-        boolean found = false;
-        for (ITmfTrace trace : signal.getTrace().getTraces()) {
-            if (trace == sp.getTrace()) {
-                found = true;
-                break;
-            }
-        }
+        ITmfTrace sender = signal.getTrace();
 
-        if (found && !started) {
+        if (signalIsForUs(sender) && !started) {
             close(true);
         }
+    }
+
+    /**
+     * Check if this signal is for this trace, or for an experiment containing
+     * this trace.
+     */
+    private boolean signalIsForUs(ITmfTrace sender) {
+        if (sender instanceof TmfExperiment) {
+            /* Yeah doing a lazy instanceof check here, but it's a special case! */
+            TmfExperiment exp = (TmfExperiment) sender;
+            for (ITmfTrace childTrace : exp.getTraces()) {
+                if (childTrace == sp.getTrace()) {
+                    return true;
+                }
+            }
+        } else if (sender == sp.getTrace()) {
+            return true;
+        }
+        return false;
     }
 
     // ------------------------------------------------------------------------

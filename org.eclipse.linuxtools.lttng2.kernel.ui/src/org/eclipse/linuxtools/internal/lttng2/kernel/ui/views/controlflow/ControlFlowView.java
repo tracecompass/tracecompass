@@ -498,7 +498,7 @@ public class ControlFlowView extends TmfView {
         final long time = signal.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
 
         int thread = -1;
-        for (ITmfTrace trace : fTrace.getTraces()) {
+        for (ITmfTrace trace : fTraceManager.getActiveTraceSet()) {
             if (thread > 0) {
                 break;
             }
@@ -596,7 +596,7 @@ public class ControlFlowView extends TmfView {
         fStartTime = Long.MAX_VALUE;
         fEndTime = Long.MIN_VALUE;
         ArrayList<ControlFlowEntry> rootList = new ArrayList<ControlFlowEntry>();
-        for (ITmfTrace aTrace : trace.getTraces()) {
+        for (ITmfTrace aTrace : fTraceManager.getActiveTraceSet()) {
             if (monitor.isCanceled()) {
                 return;
             }

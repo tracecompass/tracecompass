@@ -235,9 +235,8 @@ public class TmfStatisticsView extends TmfView {
 
             String traceName;
             IResource traceResource;
-            ITmfTrace[] traces = fTrace.getTraces();
             // Creates a statistics viewer for each trace.
-            for (ITmfTrace trace : traces) {
+            for (ITmfTrace trace : fTraceManager.getActiveTraceSet()) {
                 traceName = trace.getName();
                 traceResource = trace.getResource();
                 TmfStatisticsViewer viewer = getStatisticsViewer(traceResource);

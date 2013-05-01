@@ -76,9 +76,7 @@ public class TmfEnvironmentView extends TmfView {
             return;
         }
 
-        ITmfTrace[] traces = fTrace.getTraces();
-
-        for (ITmfTrace trace : traces) {
+        for (ITmfTrace trace : fTraceManager.getActiveTraceSet()) {
             if (trace instanceof CtfTmfTrace) {
                 TreeItem item = new TreeItem(fTree, SWT.NONE);
                 item.setText(0, trace.getName());
