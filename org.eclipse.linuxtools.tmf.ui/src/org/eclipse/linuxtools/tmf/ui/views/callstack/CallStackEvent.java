@@ -46,6 +46,7 @@ public class CallStackEvent extends TimeEvent {
      *
      * @return The integer value
      */
+    @Override
     public int getValue() {
         return fValue;
     }
