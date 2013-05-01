@@ -181,10 +181,7 @@ public final class TmfTraceManager {
      */
     @TmfSignalHandler
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
-        TmfTraceContext ret = fTraces.remove(signal.getTrace());
-        if (ret == null) {
-            throw new RuntimeException();
-        }
+        fTraces.remove(signal.getTrace());
         if (fTraces.size() == 0) {
             fCurrentTrace = null;
             /*

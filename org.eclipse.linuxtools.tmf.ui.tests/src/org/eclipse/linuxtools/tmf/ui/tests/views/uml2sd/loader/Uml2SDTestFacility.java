@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -295,6 +296,7 @@ public class Uml2SDTestFacility {
         final ITmfTrace traces[] = new ITmfTrace[1];
         traces[0] = fTrace;
         fExperiment = new TmfExperiment(ITmfEvent.class, "TestExperiment", traces);
+        fTrace.broadcast(new TmfTraceOpenedSignal(this, fExperiment, null));
         fTrace.broadcast(new TmfTraceSelectedSignal(this, fExperiment));
         if (wait) {
             while (fExperiment.getNbEvents() == 0) {
