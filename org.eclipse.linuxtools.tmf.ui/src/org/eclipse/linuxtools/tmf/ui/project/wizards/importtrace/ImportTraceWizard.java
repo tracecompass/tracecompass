@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.project.wizards;
+package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
 
 import java.util.List;
 
@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.ui.project.wizards.Messages;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.ide.IDE;
@@ -29,6 +30,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * <p>
  * @version 1.0
  * @author Francois Chouinard
+ * @since 2.0
  */
 public class ImportTraceWizard extends Wizard implements IImportWizard {
 

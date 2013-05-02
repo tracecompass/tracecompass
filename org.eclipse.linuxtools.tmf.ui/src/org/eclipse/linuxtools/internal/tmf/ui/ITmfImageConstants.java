@@ -51,4 +51,7 @@ public interface ITmfImageConstants {
     public static final String IMG_UI_ZOOM_OUT = ICONS_PATH + "obj16/zoomout_obj.bmp";
     public static final String IMG_UI_ARROW_COLLAPSE_OBJ = ICONS_PATH + "obj16/arrow_colapse.bmp";
     public static final String IMG_UI_ARROW_UP_OBJ = ICONS_PATH + "obj16/arrow_up.bmp";
+
+    /* wizban */
+    public static final String IMG_UI_CONFLICT = ICONS_PATH + "wizban/conflict_stat.gif";
 }
