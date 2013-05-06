@@ -248,6 +248,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     public void propertyChanged(final Object source, final int propId) {
         if (propId == IEditorPart.PROP_INPUT && getEditorInput() instanceof TmfEditorInput) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
+            fTraceSelected = false;
             fFile = ((TmfEditorInput) getEditorInput()).getFile();
             fTrace = ((TmfEditorInput) getEditorInput()).getTrace();
             /* change the input to a FileEditorInput to allow open handlers to find this editor */
