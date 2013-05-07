@@ -72,9 +72,9 @@ public class Messages extends NLS {
     public static String TmfEventsTable_FilterHint;
     public static String TmfEventsTable_HideRawActionText;
     public static String TmfEventsTable_HideTableActionText;
-    public static String TmfEventsTable_OpenCallsiteActionText;
-    public static String TmfEventsTable_OpenCallsiteNotFound;
-    public static String TmfEventsTable_OpenCallsiteSelectFileDialogTitle;
+    public static String TmfEventsTable_OpenSourceCodeActionText;
+    public static String TmfEventsTable_OpenSourceCodeNotFound;
+    public static String TmfEventsTable_OpenSourceCodeSelectFileDialogTitle;
     public static String TmfEventsTable_OpenModelActionText;
     public static String TmfEventsTable_OpenModelUnsupportedURI;
     public static String TmfEventsTable_ReferenceColumnHeader;

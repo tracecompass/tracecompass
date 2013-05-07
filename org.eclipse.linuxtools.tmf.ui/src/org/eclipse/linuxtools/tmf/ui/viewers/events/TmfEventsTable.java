@@ -584,7 +584,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         };
 
-        final IAction openCallsiteAction = new Action(Messages.TmfEventsTable_OpenCallsiteActionText) {
+        final IAction openCallsiteAction = new Action(Messages.TmfEventsTable_OpenSourceCodeActionText) {
             @Override
             public void run() {
                 final TableItem items[] = fTable.getSelection();
@@ -625,8 +625,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 }
                             });
                             dialog.setInput(files);
-                            dialog.setTitle(Messages.TmfEventsTable_OpenCallsiteSelectFileDialogTitle);
-                            dialog.setMessage(Messages.TmfEventsTable_OpenCallsiteSelectFileDialogTitle + '\n' + cs.toString());
+                            dialog.setTitle(Messages.TmfEventsTable_OpenSourceCodeSelectFileDialogTitle);
+                            dialog.setMessage(Messages.TmfEventsTable_OpenSourceCodeSelectFileDialogTitle + '\n' + cs.toString());
                             dialog.open();
                             Object[] result = dialog.getResult();
                             if (result != null && result.length > 0) {
@@ -641,7 +641,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), marker);
                             marker.delete();
                         } else if (files.size() == 0){
-                            displayException(new FileNotFoundException('\'' + cs.toString() + '\'' + '\n' + Messages.TmfEventsTable_OpenCallsiteNotFound));
+                            displayException(new FileNotFoundException('\'' + cs.toString() + '\'' + '\n' + Messages.TmfEventsTable_OpenSourceCodeNotFound));
                         }
                     } catch (CoreException e) {
                         displayException(e);
