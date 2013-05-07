@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
+import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -133,11 +134,18 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
         IStatus validTrace = Status.OK_STATUS;
         try {
             final CTFTrace temp = new CTFTrace(path);
-            boolean valid = temp.majortIsSet(); // random test
-            temp.dispose();
-            if (!valid) {
+            if (!temp.majortIsSet()) {
                 validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
+            } else {
+                CTFTraceReader ctfTraceReader = new CTFTraceReader(temp);
+                if (!ctfTraceReader.hasMoreEvents()) {
+                    // TODO: This will need an additional check when we support live traces
+                    // because having no event is valid for a live trace
+                    validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_NoEvent);
+                }
+                ctfTraceReader.dispose();
             }
+            temp.dispose();
         } catch (final CTFReaderException e) {
             validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError +": " + e.toString()); //$NON-NLS-1$
         }

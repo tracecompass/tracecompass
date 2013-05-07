@@ -195,6 +195,11 @@ public class CTFTraceReader {
      * lower next event timestamp.
      */
     private void populateStreamInputReaderHeap() {
+        if (this.streamInputReaders.isEmpty()) {
+            this.prio = new PriorityQueue<StreamInputReader>();
+            return;
+        }
+
         /*
          * Create the priority queue with a size twice as bigger as the number
          * of reader in order to avoid constant resizing.

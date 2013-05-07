@@ -29,6 +29,9 @@ public class Messages extends NLS {
     /** Reading error */
     public static String CtfTmfTrace_ReadingError;
 
+    /** No event */
+    public static String CtfTmfTrace_NoEvent;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
