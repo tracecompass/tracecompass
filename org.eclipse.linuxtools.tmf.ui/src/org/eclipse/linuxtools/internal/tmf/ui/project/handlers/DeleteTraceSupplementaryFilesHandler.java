@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Initial API and implementation
+ *   Patrick Tasse - Close editors to release resources
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
@@ -30,9 +31,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>DeleteTraceSupplementaryFilesHandler</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * Handler for Delete Supplementary Files command on trace
  */
 public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
 
@@ -80,6 +79,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
                     return null;
                 }
 
+                trace.closeEditors();
                 trace.deleteSupplementaryResources(dialog.getResources());
 
                 // Refresh project

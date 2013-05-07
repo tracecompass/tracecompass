@@ -9,8 +9,9 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Added supplementary files handling
- *   Geneviève Bastien - Moved supplementary files handling to parent class, added
- *                      code to copy trace
+ *   Geneviève Bastien - Moved supplementary files handling to parent class,
+ *                       added code to copy trace
+ *   Patrick Tasse - Close editors to release resources
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -41,6 +42,13 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.ui.IActionFilter;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
 
@@ -478,4 +486,43 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
         return new TmfTraceElement(string, res, folder);
     }
 
+    /**
+     * Close opened editors associated with this trace.
+     * @since 2.0
+     */
+    public void closeEditors() {
+        // Close the trace if open
+        IFile file = getBookmarksFile();
+        FileEditorInput input = new FileEditorInput(file);
+        IWorkbench wb = PlatformUI.getWorkbench();
+        for (IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {
+            for (IWorkbenchPage wbPage : wbWindow.getPages()) {
+                for (IEditorReference editorReference : wbPage.getEditorReferences()) {
+                    try {
+                        if (editorReference.getEditorInput().equals(input)) {
+                            wbPage.closeEditor(editorReference.getEditor(false), false);
+                        }
+                    } catch (PartInitException e) {
+                        Activator.getDefault().logError("Error closing editor for trace " + getName(), e); //$NON-NLS-1$
+                    }
+                }
+            }
+        }
+
+        // Close experiments that contain the trace if open
+        if (getParent() instanceof TmfTraceFolder) {
+            TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
+            for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
+                for (ITmfProjectModelElement child : experiment.getChildren()) {
+                    if (child.getName().equals(getName())) {
+                        ((TmfExperimentElement) experiment).closeEditors();
+                        break;
+                    }
+                }
+            }
+        } else if (getParent() instanceof TmfExperimentElement) {
+            TmfExperimentElement experiment = (TmfExperimentElement) getParent();
+            experiment.closeEditors();
+        }
+    }
 }

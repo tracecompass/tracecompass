@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Copied and adapted from NewFolderDialog
+ *   Patrick Tasse - Close editors to release resources
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
@@ -43,14 +44,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
-import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * Implementation of a dialog box to rename an experiment.
@@ -214,18 +210,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
                         throw new OperationCanceledException();
                     }
                     // Close the experiment if open
-                    IFile file = fExperiment.getBookmarksFile();
-                    FileEditorInput input = new FileEditorInput(file);
-                    IWorkbench wb = PlatformUI.getWorkbench();
-                    for (IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {
-                        for (IWorkbenchPage wbPage : wbWindow.getPages()) {
-                            for (IEditorReference editorReference : wbPage.getEditorReferences()) {
-                                if (editorReference.getEditorInput().equals(input)) {
-                                    wbPage.closeEditor(editorReference.getEditor(false), false);
-                                }
-                            }
-                        }
-                    }
+                    fExperiment.closeEditors();
 
                     IFolder folder = fExperiment.getResource();
                     IFile bookmarksFile = fExperiment.getBookmarksFile();

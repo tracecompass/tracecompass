@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,13 +7,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Initial API and implementation
+ *   Patrick Tasse - Close editors to release resources
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -36,9 +38,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>DeleteExperimentSupplementaryFilesHandler</u></b>
- * <p>
- * TODO: Implement me. Please.
+ * Handler for Delete Supplementary Files command on experiment
  */
 public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
 
@@ -77,19 +77,26 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
 
             if (element instanceof TmfExperimentElement) {
 
-                TmfExperimentElement trace = (TmfExperimentElement) element;
+                TmfExperimentElement experiment = (TmfExperimentElement) element;
 
-                IResource[] resources = trace.getSupplementaryResources();
+                IResource[] resources = experiment.getSupplementaryResources();
                 resourcesList.addAll(Arrays.asList(resources));
 
-                for (TmfTraceElement aTrace : trace.getTraces()) {
+                // Map to know which trace to close for each resource
+                HashMap<IResource, TmfTraceElement> traceMap = new HashMap<IResource, TmfTraceElement>();
+
+                for (TmfTraceElement aTrace : experiment.getTraces()) {
 
                     // If trace is under an experiment, use the original trace from the traces folder
                     aTrace = aTrace.getElementUnderTraceFolder();
 
-                    // Delete the selected resources
+                    // Add the trace supplementary resources for the dialog
                     resources = aTrace.getSupplementaryResources();
                     resourcesList.addAll(Arrays.asList(resources));
+
+                    for (IResource resource : resources) {
+                        traceMap.put(resource, aTrace);
+                    }
                 }
 
                 SelectSupplementaryResourcesDialog dialog = new SelectSupplementaryResourcesDialog(window.getShell(), resourcesList.toArray(new IResource[resourcesList.size()]));
@@ -100,15 +107,17 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
 
                 IResource[] resourcesToDelete = dialog.getResources();
 
-                for (int i = 0; i < resourcesToDelete.length; i++) {
+                // Delete the selected resources
+                for (IResource resource : resourcesToDelete) {
+                    traceMap.get(resource).closeEditors();
                     try {
-                        resourcesToDelete[i].delete(true, new NullProgressMonitor());
+                        resource.delete(true, new NullProgressMonitor());
                     } catch (CoreException e) {
-                        Activator.getDefault().logError("Error deleting supplementary resource " + resourcesToDelete[i], e); //$NON-NLS-1$
+                        Activator.getDefault().logError("Error deleting supplementary resource " + resource, e); //$NON-NLS-1$
                     }
                 }
 
-                IResource resource = trace.getProject().getResource();
+                IResource resource = experiment.getProject().getResource();
                 if (resource != null) {
                     try {
                         resource.refreshLocal(IResource.DEPTH_INFINITE, null);
