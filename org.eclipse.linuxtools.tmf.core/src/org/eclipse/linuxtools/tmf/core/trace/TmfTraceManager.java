@@ -104,19 +104,14 @@ public final class TmfTraceManager {
     }
 
     /**
-     * Get the currently active trace set. For a 'normal' trace, this is simply
-     * an array with only that trace in it. For trace experiments, this will be
-     * an array containing the 'real' child traces in the experiment.
+     * Get the trace set of the currently active trace.
      *
      * @return The active trace set
+     * @see #getTraceSet(ITmfTrace)
      */
     public synchronized ITmfTrace[] getActiveTraceSet() {
         final ITmfTrace trace = fCurrentTrace;
-        if (trace instanceof TmfExperiment) {
-            final TmfExperiment exp = (TmfExperiment) trace;
-            return exp.getTraces();
-        }
-        return new ITmfTrace[] { trace };
+        return getTraceSet(trace);
     }
 
     private TmfTraceContext getCurrentTraceContext() {
@@ -126,6 +121,26 @@ public final class TmfTraceManager {
             return TmfTraceContext.NULL_CONTEXT;
         }
         return curCtx;
+    }
+
+    /**
+     * Get the trace set of a given trace. For a standard trace, this is simply
+     * an array with only that trace in it. For experiments, this is an array of
+     * all the traces contained in this experiment.
+     *
+     * @param trace
+     *            The trace or experiment
+     * @return The corresponding trace set
+     */
+    public static ITmfTrace[] getTraceSet(ITmfTrace trace) {
+        if (trace == null) {
+            return null;
+        }
+        if (trace instanceof TmfExperiment) {
+            TmfExperiment exp = (TmfExperiment) trace;
+            return exp.getTraces();
+        }
+        return new ITmfTrace[] { trace };
     }
 
     // ------------------------------------------------------------------------
