@@ -18,9 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -34,6 +31,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 
 /**
  * Implementation of ITmfStatistics which uses a state history for storing its
@@ -81,19 +79,10 @@ public class TmfStateStatistics implements ITmfStatistics {
      *             If something went wrong trying to initialize the statistics
      */
     public TmfStateStatistics(ITmfTrace trace) throws TmfTraceException {
-        /* Set up the path to the history tree file we'll use */
         this.trace = trace;
-        IResource resource = trace.getResource();
-        String supplDirectory = null;
 
-        try {
-            // get the directory where the history file will be stored.
-            supplDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
-        } catch (CoreException e) {
-            throw new TmfTraceException(e.toString(), e);
-        }
-
-        final File htFile = new File(supplDirectory + File.separator + STATS_STATE_FILENAME);
+        String directory = TmfTraceManager.getSupplementaryFileDir(trace);
+        final File htFile = new File(directory + STATS_STATE_FILENAME);
         final ITmfStateProvider htInput = new StatsStateProvider(trace);
 
         this.stats = TmfStateSystemFactory.newFullHistory(htFile, htInput, false);

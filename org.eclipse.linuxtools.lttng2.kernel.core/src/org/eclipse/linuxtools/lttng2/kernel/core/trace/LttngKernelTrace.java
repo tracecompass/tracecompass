@@ -16,20 +16,18 @@ package org.eclipse.linuxtools.lttng2.kernel.core.trace;
 import java.io.File;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Activator;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 
 /**
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel
@@ -93,18 +91,9 @@ public class LttngKernelTrace extends CtfTmfTrace {
     protected void buildStateSystem() throws TmfTraceException {
         super.buildStateSystem();
 
-        /* Set up the path to the history tree file we'll use */
-        IResource resource = this.getResource();
-        String supplDirectory = null;
-
-        try {
-            // get the directory where the history file will be stored.
-            supplDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
-        } catch (CoreException e) {
-            throw new TmfTraceException(e.toString(), e);
-        }
-
-        final File htFile = new File(supplDirectory + File.separator + HISTORY_TREE_FILE_NAME);
+        /* Build the state system specific to LTTng kernel traces */
+        String directory = TmfTraceManager.getSupplementaryFileDir(this);
+        final File htFile = new File(directory + HISTORY_TREE_FILE_NAME);
         final ITmfStateProvider htInput = new LttngKernelStateProvider(this);
 
         ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(htFile, htInput, false);
