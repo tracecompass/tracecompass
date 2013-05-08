@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -81,7 +81,7 @@ public class SDPrintDialog extends Dialog {
 
     @Override
     protected Control createDialogArea(Composite p) {
-        p.getShell().setText(SDMessages._114);
+        p.getShell().setText(Messages.SequenceDiagram_Print);
         Composite parent = (Composite) super.createDialogArea(p);
 
         fDialogUI.createDialogArea(parent);
@@ -107,7 +107,7 @@ public class SDPrintDialog extends Dialog {
     protected void createButtonsForButtonBar(Composite parent) {
 
         super.createButtonsForButtonBar(parent);
-        createButton(parent, IDialogConstants.CLIENT_ID, SDMessages._115, false);
+        createButton(parent, IDialogConstants.CLIENT_ID, Messages.SequenceDiagram_Printer, false);
 
         getButton(IDialogConstants.CLIENT_ID).addSelectionListener(new SelectionListener() {
             @Override

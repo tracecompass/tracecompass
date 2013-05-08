@@ -60,7 +60,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPagingPro
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPropertiesProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
@@ -474,12 +474,12 @@ public class SDView extends ViewPart {
             GraphNode node = getSDWidget().fCurrentGraphNode;
             if ((node instanceof SyncMessageReturn) && (((SyncMessageReturn) node).getMessage() != null)) {
                 Action goToMessage = new MoveToMessage(this);
-                goToMessage.setText(SDMessages._39);
+                goToMessage.setText(Messages.SequenceDiagram_GoToMessage);
                 manager.add(goToMessage);
             }
             if ((node instanceof SyncMessage) && (((SyncMessage) node).getMessageReturn() != null)) {
                 Action goToMessage = new MoveToMessage(this);
-                goToMessage.setText(SDMessages._40);
+                goToMessage.setText(Messages.SequenceDiagram_GoToMessageReturn);
                 manager.add(goToMessage);
             }
         }
@@ -542,17 +542,17 @@ public class SDView extends ViewPart {
         bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", zoomOut);//$NON-NLS-1$
         bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", zoomOut); //$NON-NLS-1$
 
-        MenuManager navigation = new MenuManager(SDMessages._77);
+        MenuManager navigation = new MenuManager(Messages.SequenceDiagram_Navigation);
 
         ShowNodeStart showNodeStart = new ShowNodeStart(this);
-        showNodeStart.setText(SDMessages.uml_25);
+        showNodeStart.setText(Messages.SequenceDiagram_ShowNodeStart);
 
         showNodeStart.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart");//$NON-NLS-1$
         showNodeStart.setActionDefinitionId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart");//$NON-NLS-1$
         navigation.add(showNodeStart);
 
         ShowNodeEnd showNodeEnd = new ShowNodeEnd(this);
-        showNodeEnd.setText(SDMessages.uml_23);
+        showNodeEnd.setText(Messages.SequenceDiagram_ShowNodeEnd);
 
         showNodeEnd.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeEnd");//$NON-NLS-1$
         showNodeEnd.setActionDefinitionId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeEnd");//$NON-NLS-1$
@@ -561,7 +561,7 @@ public class SDView extends ViewPart {
         bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", navigation); //$NON-NLS-1$
 
         ConfigureMinMax minMax = new ConfigureMinMax(this);
-        minMax.setText(SDMessages.uml_45);
+        minMax.setText(Messages.SequenceDiagram_ConfigureMinMax);
         minMax.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ConfigureMinMax");//$NON-NLS-1$
         bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", minMax); //$NON-NLS-1$
 
@@ -605,7 +605,7 @@ public class SDView extends ViewPart {
                     action.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
                 }
                 if (action.getText() == null || action.getText().length() == 0) {
-                    action.setText(SDMessages._42);
+                    action.setText(Messages.SequenceDiagram_EditFilters);
                 }
                 bar.getMenuManager().prependToGroup("UML2SD_FILTERING", action); //$NON-NLS-1$
                 bar.getToolBarManager().prependToGroup("UML2SD_FILTERING", action); //$NON-NLS-1$
@@ -637,7 +637,7 @@ public class SDView extends ViewPart {
                     action.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
                 }
                 if (action.getText() == null) {
-                    action.setText(SDMessages._41);
+                    action.setText(Messages.SequenceDiagram_Find + "..."); //$NON-NLS-1$
                 }
                 bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", action); //$NON-NLS-1$
                 bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", action); //$NON-NLS-1$

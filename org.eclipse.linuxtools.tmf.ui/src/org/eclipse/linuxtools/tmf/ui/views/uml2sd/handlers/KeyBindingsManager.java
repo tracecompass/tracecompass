@@ -20,7 +20,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerActivation;
@@ -215,7 +215,7 @@ public class KeyBindingsManager {
         fHandlerActivations.add(activation);
 
         fShowNodeStartForKeyBinding = new ShowNodeStart();
-        fShowNodeStartForKeyBinding.setText(SDMessages.uml_25);
+        fShowNodeStartForKeyBinding.setText(Messages.SequenceDiagram_ShowNodeStart);
 
         fShowNodeStartForKeyBinding.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart");//$NON-NLS-1$
         fShowNodeStartForKeyBinding.setActionDefinitionId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart");//$NON-NLS-1$
@@ -231,7 +231,7 @@ public class KeyBindingsManager {
         fHandlerActivations.add(activation);
 
         fShowNodeEndForKeyBinding = new ShowNodeEnd();
-        fShowNodeEndForKeyBinding.setText(SDMessages.uml_23);
+        fShowNodeEndForKeyBinding.setText(Messages.SequenceDiagram_ShowNodeEnd);
         fShowNodeEndForKeyBinding.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeEnd");//$NON-NLS-1$
         fShowNodeEndForKeyBinding.setActionDefinitionId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeEnd");//$NON-NLS-1$
 

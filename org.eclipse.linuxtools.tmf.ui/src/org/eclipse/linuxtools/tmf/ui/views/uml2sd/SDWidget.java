@@ -40,7 +40,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDCollapseP
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -291,23 +291,23 @@ public class SDWidget extends ScrollView implements SelectionListener,
                 } else {
                     if (getFocusNode() != null) {
                         if (getFocusNode() instanceof Lifeline) {
-                            e.result = MessageFormat.format(SDMessages._1, new Object[] { String.valueOf(getFocusNode().getName()) });
+                            e.result = MessageFormat.format(Messages.SequenceDiagram_LifelineNode, new Object[] { String.valueOf(getFocusNode().getName()) });
                         }
                         if (getFocusNode() instanceof BaseMessage) {
                             BaseMessage mes = (BaseMessage) getFocusNode();
                             if ((mes.getStartLifeline() != null) && (mes.getEndLifeline() != null)) {
                                 e.result = MessageFormat.format(
-                                        SDMessages._2,
+                                        Messages.SequenceDiagram_MessageNode,
                                         new Object[] { String.valueOf(mes.getName()), String.valueOf(mes.getStartLifeline().getName()), Integer.valueOf(mes.getStartOccurrence()), String.valueOf(mes.getEndLifeline().getName()),
                                                 Integer.valueOf(mes.getEndOccurrence()) });
                             } else if ((mes.getStartLifeline() == null) && (mes.getEndLifeline() != null)) {
-                                e.result = MessageFormat.format(SDMessages._4, new Object[] { String.valueOf(mes.getName()), String.valueOf(mes.getEndLifeline().getName()), Integer.valueOf(mes.getEndOccurrence()) });
+                                e.result = MessageFormat.format(Messages.SequenceDiagram_FoundMessageNode, new Object[] { String.valueOf(mes.getName()), String.valueOf(mes.getEndLifeline().getName()), Integer.valueOf(mes.getEndOccurrence()) });
                             } else if ((mes.getStartLifeline() != null) && (mes.getEndLifeline() == null)) {
-                                e.result = MessageFormat.format(SDMessages._3, new Object[] { String.valueOf(mes.getName()), String.valueOf(mes.getStartLifeline().getName()), Integer.valueOf(mes.getStartOccurrence()) });
+                                e.result = MessageFormat.format(Messages.SequenceDiagram_LostMessageNode, new Object[] { String.valueOf(mes.getName()), String.valueOf(mes.getStartLifeline().getName()), Integer.valueOf(mes.getStartOccurrence()) });
                             }
                         } else if (getFocusNode() instanceof BasicExecutionOccurrence) {
                             BasicExecutionOccurrence exec = (BasicExecutionOccurrence) getFocusNode();
-                            e.result = MessageFormat.format(SDMessages._5,
+                            e.result = MessageFormat.format(Messages.SequenceDiagram_ExecutionOccurrenceWithParams,
                                     new Object[] { String.valueOf(exec.getName()), String.valueOf(exec.getLifeline().getName()), Integer.valueOf(exec.getStartOccurrence()), Integer.valueOf(exec.getEndOccurrence()) });
                         }
 
@@ -943,7 +943,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
 
         fPrinter = new Printer(data);
 
-        String jobName = MessageFormat.format(SDMessages._116, new Object[] { String.valueOf(fSite.getContentDescription()), String.valueOf(fFrame.getName()) });
+        String jobName = MessageFormat.format(Messages.SequenceDiagram_plus, new Object[] { String.valueOf(fSite.getContentDescription()), String.valueOf(fFrame.getName()) });
         fPrinter.startJob(jobName);
 
         GC gc = new GC(fPrinter);
@@ -1179,7 +1179,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
             postfix.append(" -> "); //$NON-NLS-1$
             postfix.append(fCurrentGraphNode.getName());
             postfix.append("\n"); //$NON-NLS-1$
-            postfix.append(SDMessages._138);
+            postfix.append(Messages.SequenceDiagram_Delta);
             postfix.append(" "); //$NON-NLS-1$
 
             //double delta = ((ITimeRange)toolTipNode).getLastTime()-((ITimeRange)currentGraphNode).getLastTime();

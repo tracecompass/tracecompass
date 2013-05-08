@@ -16,7 +16,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 
 /**
  * Action class implementation to move the focus to the next page of the whole sequence diagram.
@@ -54,8 +54,8 @@ public class NextPage extends Action {
     public NextPage(SDView view) {
         super();
         fView = view;
-        setText(SDMessages._36);
-        setToolTipText(SDMessages._38);
+        setText(Messages.SequenceDiagram_NextPage);
+        setToolTipText(Messages.SequenceDiagram_GoToNextPage);
         setId(ID);
         setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_PAGE));
     }

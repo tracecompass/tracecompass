@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
@@ -732,7 +732,7 @@ public class ScrollView extends Composite {
             ovr.useControl(b);
             b.setData(ovr);
             cc = b;
-            b.setToolTipText(SDMessages._78);
+            b.setToolTipText(Messages.SequenceDiagram_OpenOverviewTooltip);
         }
         setCornerControl(cc);
     }

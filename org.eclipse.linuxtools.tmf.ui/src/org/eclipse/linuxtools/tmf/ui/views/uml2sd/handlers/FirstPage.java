@@ -15,7 +15,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 
 /**
  * Action class implementation to move the focus to the first page of the whole sequence diagram.
@@ -55,8 +55,8 @@ public class FirstPage extends Action {
     public FirstPage(SDView view) {
         super();
         fView = view;
-        setText(SDMessages._139);
-        setToolTipText(SDMessages._140);
+        setText(Messages.SequenceDiagram_FirstPage);
+        setToolTipText(Messages.SequenceDiagram_GoToFirstPage);
         setId(ID);
         setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FIRST_PAGE));
     }

@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IFont;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.impl.ColorImpl;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.impl.FontImpl;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontData;
@@ -63,7 +63,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     /**
      * A 2nd array of preference names
      */
-    private static final String[] FONT_LIST2 = { SDMessages._88, SDMessages._89, SDMessages._90, SDMessages._91, SDMessages._92, SDMessages._93, SDMessages._94, SDMessages._95, SDMessages._96 };
+    private static final String[] FONT_LIST2 = { Messages.SequenceDiagram_Lifeline, Messages.SequenceDiagram_ExecutionOccurrence, Messages.SequenceDiagram_SyncMessage, Messages.SequenceDiagram_SyncMessageReturn, Messages.SequenceDiagram_AsyncMessage, Messages.SequenceDiagram_AsyncMessageReturn, Messages.SequenceDiagram_Frame, Messages.SequenceDiagram_LifelineHeader, Messages.SequenceDiagram_FrameTitle };
     /**
      * Array of background color preference names
      */

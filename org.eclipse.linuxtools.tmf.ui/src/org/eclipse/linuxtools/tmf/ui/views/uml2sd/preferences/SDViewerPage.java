@@ -21,7 +21,7 @@ import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FontFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -116,21 +116,21 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         page.setLayoutData(pageLayoutdata);
         page.setLayout(pageLayout);
 
-        fTooltip = new BooleanFieldEditor(ISDPreferences.PREF_TOOLTIP, SDMessages._97, page);
+        fTooltip = new BooleanFieldEditor(ISDPreferences.PREF_TOOLTIP, Messages.SequenceDiagram_ShowTooltips, page);
         fTooltip.setPreferenceStore(fPreferences.getPreferenceStore());
         fTooltip.load();
 
         // link font with zoom pref
-        fLink = new BooleanFieldEditor(ISDPreferences.PREF_LINK_FONT, SDMessages._82, page);
+        fLink = new BooleanFieldEditor(ISDPreferences.PREF_LINK_FONT, Messages.SequenceDiagram_IncreaseFontSizeWhenZooming, page);
         fLink.setPreferenceStore(fPreferences.getPreferenceStore());
         fLink.load();
 
-        fNoExternalTime = new BooleanFieldEditor(ISDPreferences.PREF_EXCLUDE_EXTERNAL_TIME, SDMessages._83, page);
+        fNoExternalTime = new BooleanFieldEditor(ISDPreferences.PREF_EXCLUDE_EXTERNAL_TIME, Messages.SequenceDiagram_ExcludeExternalTime, page);
         fNoExternalTime.setPreferenceStore(fPreferences.getPreferenceStore());
         fNoExternalTime.load();
 
         // use gradient color pref
-        fUseGrad = new BooleanFieldEditor(ISDPreferences.PREF_USE_GRADIENT, SDMessages._84, page);
+        fUseGrad = new BooleanFieldEditor(ISDPreferences.PREF_USE_GRADIENT, Messages.SequenceDiagram_UseGradientColor, page);
         fUseGrad.setPreferenceStore(fPreferences.getPreferenceStore());
         fUseGrad.load();
 
@@ -145,7 +145,7 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         prefPage.setLayout(prefPageLayout);
 
         // swimLane width pref
-        fLifelineWidth = new IntegerFieldEditor(ISDPreferences.PREF_LIFELINE_WIDTH, SDMessages._80, prefPage);
+        fLifelineWidth = new IntegerFieldEditor(ISDPreferences.PREF_LIFELINE_WIDTH, Messages.SequenceDiagram_LifelineWidth, prefPage);
         fLifelineWidth.setPreferenceStore(fPreferences.getPreferenceStore());
         fLifelineWidth.setValidRange(119, 500);
         fLifelineWidth.load();
@@ -175,20 +175,20 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         // font selector initialise for the lifeline font pref
         String[] fontList = SDViewPref.getFontList();
         fFont = new FontFieldEditor(fontList[0], "",//$NON-NLS-1$
-                SDMessages._81, fButtonArea);
+                Messages.SequenceDiagram_AaBbYyZz, fButtonArea);
         fFont.getPreviewControl().setSize(500, 500);
         fFont.setPreferenceStore(fPreferences.getPreferenceStore());
         fFont.load();
 
-        fBackGroundColor = new ColorFieldEditor(fontList[0] + SDViewPref.BACK_COLOR_POSTFIX, SDMessages._85, fButtonArea);
+        fBackGroundColor = new ColorFieldEditor(fontList[0] + SDViewPref.BACK_COLOR_POSTFIX, Messages.SequenceDiagram_Background, fButtonArea);
         fBackGroundColor.setPreferenceStore(fPreferences.getPreferenceStore());
         fBackGroundColor.load();
 
-        fLineColor = new ColorFieldEditor(fontList[0] + SDViewPref.FORE_COLOR_POSTFIX, SDMessages._86, fButtonArea);
+        fLineColor = new ColorFieldEditor(fontList[0] + SDViewPref.FORE_COLOR_POSTFIX, Messages.SequenceDiagram_Lines, fButtonArea);
         fLineColor.setPreferenceStore(fPreferences.getPreferenceStore());
         fLineColor.load();
 
-        fTextColor = new ColorFieldEditor(fontList[0] + SDViewPref.TEXT_COLOR_POSTFIX, SDMessages._87, fButtonArea);
+        fTextColor = new ColorFieldEditor(fontList[0] + SDViewPref.TEXT_COLOR_POSTFIX, Messages.SequenceDiagram_Text, fButtonArea);
         fTextColor.setPreferenceStore(fPreferences.getPreferenceStore());
         fTextColor.load();
         swapPref(true);

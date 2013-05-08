@@ -20,7 +20,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.DiagramToolTip;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.NGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -764,19 +764,19 @@ public class SDPrintDialogUI {
         parent.setLayout(parentLayout);
 
         Group g1 = new Group(parent, SWT.SHADOW_NONE);
-        g1.setText(SDMessages._113);
+        g1.setText(Messages.SequenceDiagram_ZoomOption);
         g1.setLayoutData(newGridData(3));
         GridLayout g1layout = new GridLayout();
         g1layout.numColumns = 2;
         g1.setLayout(g1layout);
 
         fUseCurrentZoom = new Button(g1, SWT.RADIO);
-        fUseCurrentZoom.setText(SDMessages._112);
+        fUseCurrentZoom.setText(Messages.SequenceDiagram_UseCurrentZoom);
         fUseCurrentZoom.setLayoutData(newGridData(2));
         fUseCurrentZoom.addSelectionListener(fSelectionListener);
 
         fSetHPagesNumber = new Button(g1, SWT.RADIO);
-        fSetHPagesNumber.setText(SDMessages._110);
+        fSetHPagesNumber.setText(Messages.SequenceDiagram_NumberOfHorizontalPages);
         fSetHPagesNumber.setLayoutData(newGridData(1));
         fSetHPagesNumber.addSelectionListener(fSelectionListener);
 
@@ -784,7 +784,7 @@ public class SDPrintDialogUI {
         fHorPagesNum.addModifyListener(fModifyListener);
 
         fSetVPagesNumber = new Button(g1, SWT.RADIO);
-        fSetVPagesNumber.setText(SDMessages._111);
+        fSetVPagesNumber.setText(Messages.SequenceDiagram_NumberOfVerticalPages);
         fSetVPagesNumber.setLayoutData(newGridData(1));
         fSetVPagesNumber.addSelectionListener(fSelectionListener);
 
@@ -792,14 +792,14 @@ public class SDPrintDialogUI {
         fVertPagesNum.addModifyListener(fModifyListener);
 
         Label nbTotal = new Label(g1, SWT.SHADOW_NONE | SWT.RIGHT);
-        nbTotal.setText(SDMessages._109);
+        nbTotal.setText(Messages.TotalNumberOfPages);
         // nbTotal.setLayoutData(newGridData(1));
 
         fTotalPages = new Text(g1, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
         // nbHV.addModifyListener(modifListener);
 
         Group g2 = new Group(parent, SWT.SHADOW_NONE);
-        g2.setText(SDMessages._119);
+        g2.setText(Messages.SequenceDiagram_Preview);
         GridData data = new GridData(GridData.GRAB_VERTICAL | GridData.VERTICAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL);
         data.horizontalSpan = 3;
         data.verticalSpan = 2;
@@ -853,38 +853,38 @@ public class SDPrintDialogUI {
         fCurrentSelection.setLayoutData(newGridData(1));
 
         Group g3 = new Group(parent, SWT.SHADOW_NONE);
-        g3.setText(SDMessages._118);
+        g3.setText(Messages.SequenceDiagram_PrintRange);
         g3.setLayoutData(newGridData(3));
         GridLayout g3layout = new GridLayout();
         g3layout.numColumns = 4;
         g3.setLayout(g3layout);
 
         fAllPages = new Button(g3, SWT.RADIO);
-        fAllPages.setText(SDMessages._108);
+        fAllPages.setText(Messages.SequenceDiagram_AllPages);
         fAllPages.setLayoutData(newGridData(4));
         fAllPages.addSelectionListener(fSelectionListener);
 
         fCurrentPage = new Button(g3, SWT.RADIO);
-        fCurrentPage.setText(SDMessages._107);
+        fCurrentPage.setText(Messages.SequenceDiagram_CurrentView);
         fCurrentPage.setLayoutData(newGridData(4));
         fCurrentPage.setEnabled(true);
         fCurrentPage.setSelection(true);
         fCurrentPage.addSelectionListener(fSelectionListener);
 
         fPageList = new Button(g3, SWT.RADIO);
-        fPageList.setText(SDMessages._106);
+        fPageList.setText(Messages.SequenceDiagram_SelectedPages);
         fPageList.setLayoutData(newGridData(4));
         fPageList.addSelectionListener(fSelectionListener);
 
         fPageRange = new Button(g3, SWT.RADIO);
-        fPageRange.setText(SDMessages._103);
+        fPageRange.setText(Messages.SequenceDiagram_FromPage);
         fPageRange.setLayoutData(newGridData(1));
         fPageRange.addSelectionListener(fSelectionListener);
 
         fFromPage = new Text(g3, SWT.SINGLE | SWT.BORDER);
 
         Label labelTo = new Label(g3, SWT.CENTER);
-        labelTo.setText(SDMessages._105);
+        labelTo.setText(Messages.SequenceDiagram_to);
 
         fToPage = new Text(g3, SWT.SINGLE | SWT.BORDER);
 
@@ -946,7 +946,7 @@ public class SDPrintDialogUI {
             Label label = new Label(printerDlg, SWT.NONE);
             label.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
             fPrinterDialog = new Button(printerDlg, SWT.PUSH);
-            fPrinterDialog.setText(SDMessages._115);
+            fPrinterDialog.setText(Messages.SequenceDiagram_Printer);
 
             fPrinterDialog.addSelectionListener(new SelectionListener() {
                 @Override
@@ -989,22 +989,22 @@ public class SDPrintDialogUI {
                 fFrom = Integer.valueOf(fFromPage.getText()).intValue();
                 fTo = Integer.valueOf(fToPage.getText()).intValue();
                 if (fFrom > maxNumOfPages() || fTo > maxNumOfPages() || fFrom <= 0 || fTo <= 0) {
-                    MessageDialog.openError(getShell(), SDMessages._98, SDMessages._99);
+                    MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
                     return false;
                 }
             } else if (fSetHPagesNumber.getSelection() && fNbPages <= 0) {
-                MessageDialog.openError(getShell(), SDMessages._98, SDMessages._101);
+                MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidNbHorizontal);
                 return false;
             } else if (fSetVPagesNumber.getSelection() && fNbPages <= 0) {
-                MessageDialog.openError(getShell(), SDMessages._98, SDMessages._100);
+                MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidNbVertical);
                 return false;
             } else if (fPrintSelection && getPageList().length <= 0) {
-                MessageDialog.openError(getShell(), SDMessages._98, SDMessages._102);
+                MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_NoPageSelected);
                 return false;
             }
 
         } catch (Exception e) {
-            MessageDialog.openError(getShell(), SDMessages._98, SDMessages._99);
+            MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
             fFrom = 0;
             fTo = 0;
             return false;
@@ -1300,7 +1300,7 @@ public class SDPrintDialogUI {
      */
     protected void displayPageNum() {
         if (fPageNum > 0) {
-            String message = MessageFormat.format(SDMessages._117, new Object[] { Integer.valueOf(fPageNum) });
+            String message = MessageFormat.format(Messages.SequenceDiagram_Page, new Object[] { Integer.valueOf(fPageNum) });
             fCurrentSelection.setText(message);
             fCurrentSelection.getParent().layout();
         }
@@ -1400,7 +1400,7 @@ public class SDPrintDialogUI {
             // used in the wizard dialog
             if (fPrinterData == null) {
                 // show error message and disable Finish button
-                fParentWizardPage.setErrorMessage(SDMessages._135);
+                fParentWizardPage.setErrorMessage(Messages.SequenceDiagram_NoPrinterSelected);
                 fParentWizardPage.setPageComplete(false);
             } else {
                 // clear error message and enable Finish button
@@ -1411,7 +1411,7 @@ public class SDPrintDialogUI {
             // used in the print dialog
             if (fPrinterData == null) {
                 // show error message and disable OK button
-                fParentDialog.setErrorMessage(SDMessages._135);
+                fParentDialog.setErrorMessage(Messages.SequenceDiagram_NoPrinterSelected);
                 fParentDialog.setPageComplete(false);
             } else {
                 // clear error message and enable OK button
