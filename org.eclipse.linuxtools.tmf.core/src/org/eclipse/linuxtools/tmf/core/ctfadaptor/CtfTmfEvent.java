@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
+import org.eclipse.linuxtools.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
@@ -36,7 +37,8 @@ import org.eclipse.ui.views.properties.IPropertySource;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public final class CtfTmfEvent extends TmfEvent implements ITmfSourceLookup, ITmfModelLookup {
+public final class CtfTmfEvent extends TmfEvent
+        implements ITmfSourceLookup, ITmfModelLookup, ITmfCustomAttributes {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -152,12 +154,9 @@ public final class CtfTmfEvent extends TmfEvent implements ITmfSourceLookup, ITm
     }
 
     /**
-     * List the custom CTF attributes for events of this type.
-     *
-     * @return The list of custom attribute names. Should not be null, but could
-     *         be empty.
      * @since 2.0
      */
+    @Override
     public Set<String> listCustomAttributes() {
         if (fDeclaration == null) {
             return new HashSet<String>();
@@ -166,14 +165,9 @@ public final class CtfTmfEvent extends TmfEvent implements ITmfSourceLookup, ITm
     }
 
     /**
-     * Get the value of a custom CTF attributes for this event's type.
-     *
-     * @param name
-     *            Name of the the custom attribute
-     * @return Value of this attribute, or null if there is no attribute with
-     *         that name
      * @since 2.0
      */
+    @Override
     public String getCustomAttribute(String name) {
         if (fDeclaration == null) {
             return null;
