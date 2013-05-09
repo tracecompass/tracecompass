@@ -9,6 +9,7 @@
  * Contributors:
  *     Matthew Khouzam - Initial API and implementation
  *     Alexandre Montplaisir - Initial API and implementation
+ *     Simon Delisle - Replace LinkedList by TreeSet in callsitesByName attribute
  *******************************************************************************/
 
 package org.eclipse.linuxtools.ctf.core.trace;
@@ -23,13 +24,11 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -47,6 +46,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.internal.ctf.core.event.CTFCallsiteComparator;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndex;
 
@@ -144,7 +144,9 @@ public class CTFTrace implements IDefinitionScope {
     private final Map<StreamInput, StreamInputPacketIndex> indexes = new HashMap<StreamInput, StreamInputPacketIndex>();
 
     /** Callsite helpers */
-    private Map<String, LinkedList<CTFCallsite>> callsitesByName = new HashMap<String, LinkedList<CTFCallsite>>();
+    private CTFCallsiteComparator ctfCallsiteComparator = new CTFCallsiteComparator();
+
+    private Map<String, TreeSet<CTFCallsite>> callsitesByName = new HashMap<String, TreeSet<CTFCallsite>>();
 
     /** Callsite helpers */
     private TreeSet<CTFCallsite> callsitesByIP = new TreeSet<CTFCallsite>();
@@ -837,37 +839,29 @@ public class CTFTrace implements IDefinitionScope {
             String fileName, long lineNumber) {
         final CTFCallsite cs = new CTFCallsite(eventName, funcName, ip,
                 fileName, lineNumber);
-        LinkedList<CTFCallsite> csl = callsitesByName.get(eventName);
+        TreeSet<CTFCallsite> csl = callsitesByName.get(eventName);
         if (csl == null) {
-            csl = new LinkedList<CTFCallsite>();
+            csl = new TreeSet<CTFCallsite>(ctfCallsiteComparator);
             callsitesByName.put(eventName, csl);
         }
 
-        ListIterator<CTFCallsite> iter = csl.listIterator();
-        int index = 0;
-        for (; index < csl.size(); index++) {
-            if (iter.next().compareTo(cs) < 0) {
-                break;
-            }
-        }
-
-        csl.add(index, cs);
+        csl.add(cs);
 
         callsitesByIP.add(cs);
     }
 
     /**
-     * Gets the list of callsites associated to an event name. O(1)
+     * Gets the set of callsites associated to an event name. O(1)
      *
      * @param eventName
      *            the event name
-     * @return the callsite list can be empty
-     * @since 1.2
+     * @return the callsite set can be empty
+     * @since 3.0
      */
-    public List<CTFCallsite> getCallsiteCandidates(String eventName) {
-        LinkedList<CTFCallsite> retVal = callsitesByName.get(eventName);
-        if( retVal == null ) {
-            retVal = new LinkedList<CTFCallsite>();
+    public TreeSet<CTFCallsite> getCallsiteCandidates(String eventName) {
+        TreeSet<CTFCallsite> retVal = callsitesByName.get(eventName);
+        if (retVal == null) {
+            retVal = new TreeSet<CTFCallsite>(ctfCallsiteComparator);
         }
         return retVal;
     }
@@ -881,9 +875,9 @@ public class CTFTrace implements IDefinitionScope {
      * @since 1.2
      */
     public CTFCallsite getCallsite(String eventName) {
-        LinkedList<CTFCallsite> callsites = callsitesByName.get(eventName);
+        TreeSet<CTFCallsite> callsites = callsitesByName.get(eventName);
         if (callsites != null) {
-            return callsites.getFirst();
+            return callsites.first();
         }
         return null;
     }
@@ -912,15 +906,14 @@ public class CTFTrace implements IDefinitionScope {
      * @return the closest matching callsite, can be null
      */
     public CTFCallsite getCallsite(String eventName, long ip) {
-        final LinkedList<CTFCallsite> candidates = callsitesByName.get(eventName);
+        final TreeSet<CTFCallsite> candidates = callsitesByName.get(eventName);
         final CTFCallsite dummyCs = new CTFCallsite(null, null, ip, null, -1);
-        final int pos = Collections.binarySearch(candidates, dummyCs)+1;
-        if( pos >= candidates.size()) {
-            return null;
+        final CTFCallsite callsite = candidates.ceiling(dummyCs);
+        if (callsite == null) {
+            return candidates.floor(dummyCs);
         }
-        return candidates.get(pos);
+        return callsite;
     }
-
 }
 
 class MetadataFileFilter implements FileFilter {

@@ -15,8 +15,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
@@ -93,7 +93,7 @@ public class CTFTraceCallsitePerformanceTest {
     }
 
     private long testMain() {
-        List<CTFCallsite> l = fTrace.getCallsiteCandidates(callsites[0]);
+        TreeSet<CTFCallsite> l = fTrace.getCallsiteCandidates(callsites[0]);
         CTFCallsite cs = fTrace.getCallsite(1);
         CTFCallsite cs1 = fTrace.getCallsite(callsites[0]);
         CTFCallsite cs2 = fTrace.getCallsite(callsites[0], 1);

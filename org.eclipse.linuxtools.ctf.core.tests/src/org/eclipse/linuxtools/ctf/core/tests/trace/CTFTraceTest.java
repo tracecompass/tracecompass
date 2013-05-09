@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Khouzam - Initial API and implementation
  *     Marc-Andre Laperle - Test in traces directory recursively
+ *     Simon Delisle - Add test for getCallsite(eventName, ip)
  *******************************************************************************/
 
 package org.eclipse.linuxtools.ctf.core.tests.trace;
@@ -449,6 +450,28 @@ public class CTFTraceTest {
                 parseTracesInDirectory(file, expectException);
             }
         }
+    }
+
+    /**
+     * Test for getCallsite(eventName, ip)
+     */
+    @Test
+    public void callsitePosition(){
+        long ip1 = 2;
+        long ip2 = 5;
+        long ip3 = 7;
+        CTFTrace callsiteTest = CtfTestTraces.getTestTraceFromFile(TRACE_INDEX);
+        callsiteTest.addCallsite("testEvent", null, ip1, null, 23);
+        callsiteTest.addCallsite("testEvent", null, ip2, null, 50);
+        callsiteTest.addCallsite("testEvent", null, ip3, null, 15);
+
+        assertEquals(2, (callsiteTest.getCallsite("testEvent", 1)).getIp());
+        assertEquals(2, (callsiteTest.getCallsite("testEvent", 2)).getIp());
+        assertEquals(5, (callsiteTest.getCallsite("testEvent", 3)).getIp());
+        assertEquals(5, (callsiteTest.getCallsite("testEvent", 5)).getIp());
+        assertEquals(7, (callsiteTest.getCallsite("testEvent", 6)).getIp());
+        assertEquals(7, (callsiteTest.getCallsite("testEvent", 7)).getIp());
+        assertEquals(7, (callsiteTest.getCallsite("testEvent", 8)).getIp());
     }
 
 }
