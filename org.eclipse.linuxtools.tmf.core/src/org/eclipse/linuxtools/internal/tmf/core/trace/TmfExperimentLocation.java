@@ -73,7 +73,10 @@ public final class TmfExperimentLocation implements ITmfLocation {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((fLocation != null) ? fLocation.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -81,10 +84,18 @@ public final class TmfExperimentLocation implements ITmfLocation {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (obj == null) {
             return false;
         }
         if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TmfExperimentLocation other = (TmfExperimentLocation) obj;
+        if (fLocation == null) {
+            if (other.fLocation != null) {
+                return false;
+            }
+        } else if (!fLocation.equals(other.fLocation)) {
             return false;
         }
         return true;

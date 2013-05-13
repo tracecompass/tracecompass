@@ -102,7 +102,7 @@ public abstract class TmfLocation implements ITmfLocation {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return getClass().getSimpleName() + " [fLocationInfo=" + fLocationInfo.toString() + "]";
+        return getClass().getSimpleName() + " [fLocationInfo=" + fLocationInfo + "]";
     }
 
 }
