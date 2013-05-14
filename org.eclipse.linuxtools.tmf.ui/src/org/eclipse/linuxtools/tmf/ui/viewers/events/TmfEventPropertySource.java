@@ -7,19 +7,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Patrick Tasse - Initial API and implementation
- *   Bernd Hufmann - Added call site and model URI properties
+ *     Patrick Tasse - Initial API and implementation
+ *     Bernd Hufmann - Added call site and model URI properties
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.event;
+package org.eclipse.linuxtools.tmf.ui.viewers.events;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfCustomAttributes;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 

@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.linuxtools.tmf.core.util.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
 

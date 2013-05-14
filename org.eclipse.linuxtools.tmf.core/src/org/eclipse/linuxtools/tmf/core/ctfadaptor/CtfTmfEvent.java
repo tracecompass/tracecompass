@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2013 Ericsson
+ * Copyright (c) 2011, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -23,11 +23,9 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventPropertySource;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * A wrapper class around CTF's Event Definition/Declaration that maps all
@@ -211,14 +209,4 @@ public final class CtfTmfEvent extends TmfEvent
         return getCustomAttribute(CtfConstants.MODEL_URI_KEY);
     }
 
-    /**
-     * @since 2.0
-     */
-    @Override
-    public Object getAdapter(Class adapter) {
-        if (adapter == IPropertySource.class) {
-            return new TmfEventPropertySource(this);
-        }
-        return null;
-    }
 }

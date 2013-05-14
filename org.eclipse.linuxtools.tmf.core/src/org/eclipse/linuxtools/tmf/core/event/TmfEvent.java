@@ -7,17 +7,17 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
- *   Francois Chouinard - Updated as per TMF Event Model 1.0
- *   Alexandre Montplaisir - Made immutable
+ *     Francois Chouinard - Initial API and implementation
+ *     Francois Chouinard - Updated as per TMF Event Model 1.0
+ *     Alexandre Montplaisir - Made immutable
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * A basic implementation of ITmfEvent.
@@ -29,8 +29,8 @@ import org.eclipse.ui.views.properties.IPropertySource;
  * @see ITmfEventType
  * @see ITmfEventField
  * @see ITmfTrace
-*/
-public class TmfEvent implements ITmfEvent {
+ */
+public class TmfEvent extends PlatformObject implements ITmfEvent {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -246,14 +246,4 @@ public class TmfEvent implements ITmfEvent {
                 + "]";
     }
 
-    /**
-     * @since 2.0
-     */
-    @Override
-    public Object getAdapter(Class adapter) {
-        if (adapter == IPropertySource.class) {
-            return new TmfEventPropertySource(this);
-        }
-        return null;
-    }
 }
