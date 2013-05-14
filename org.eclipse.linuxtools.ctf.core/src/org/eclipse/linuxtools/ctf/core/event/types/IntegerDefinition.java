@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import java.math.BigInteger;
 import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
@@ -19,8 +20,8 @@ import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 /**
  * A CTF integer definition.
  *
- * The definition of a integer basic data type. It will take the data
- * from a trace and store it (and make it fit) as a long.
+ * The definition of a integer basic data type. It will take the data from a
+ * trace and store it (and make it fit) as a long.
  *
  * @version 1.0
  * @author Matthew Khouzam
@@ -41,9 +42,13 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
 
     /**
      * Constructor
-     * @param declaration the parent declaration
-     * @param definitionScope the parent scope
-     * @param fieldName the field name
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param fieldName
+     *            the field name
      */
     public IntegerDefinition(IntegerDeclaration declaration,
             IDefinitionScope definitionScope, String fieldName) {
@@ -57,6 +62,7 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
 
     /**
      * Gets the value of the integer
+     *
      * @return the value of the integer (in long)
      */
     public long getValue() {
@@ -65,7 +71,9 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
 
     /**
      * Sets the value of an integer
-     * @param val the value
+     *
+     * @param val
+     *            the value
      */
     public void setValue(long val) {
         value = val;
@@ -75,8 +83,6 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
     public IntegerDeclaration getDeclaration() {
         return declaration;
     }
-
-
 
     // ------------------------------------------------------------------------
     // Operations
@@ -152,6 +158,54 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
             char c = (char) value;
             return Character.toString(c);
         }
-        return String.valueOf(value);
+        return formatNumber(value, declaration.getBase(), declaration.isSigned());
+    }
+
+    /**
+     * Print a numeric value as a string in a given base
+     *
+     * @param value
+     *            The value to print as string
+     * @param base
+     *            The base for this value
+     * @param signed
+     *            Is the value signed or not
+     * @return formatted number string
+     * @since 3.0
+     */
+    public static final String formatNumber(long value, int base, boolean signed) {
+        String s;
+        /* Format the number correctly according to the integer's base */
+        switch (base) {
+        case 2:
+            s = "0b" + Long.toBinaryString(value); //$NON-NLS-1$
+            break;
+        case 8:
+            s = "0" + Long.toOctalString(value); //$NON-NLS-1$
+            break;
+        case 16:
+            s = "0x" + Long.toHexString(value); //$NON-NLS-1$
+            break;
+        case 10:
+        default:
+            /* For non-standard base, we'll just print it as a decimal number */
+            if (!signed && value < 0) {
+                /*
+                 * Since there are no 'unsigned long', handle this case with
+                 * BigInteger
+                 */
+                BigInteger bigInteger = BigInteger.valueOf(value);
+                /*
+                 * we add 2^64 to the negative number to get the real unsigned
+                 * value
+                 */
+                bigInteger = bigInteger.add(BigInteger.valueOf(1).shiftLeft(64));
+                s = bigInteger.toString();
+            } else {
+                s = Long.toString(value);
+            }
+            break;
+        }
+        return s;
     }
 }
