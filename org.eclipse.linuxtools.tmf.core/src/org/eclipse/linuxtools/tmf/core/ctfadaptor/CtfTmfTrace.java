@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -39,7 +40,8 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
  * @version 1.0
  * @author Matthew khouzam
  */
-public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
+public class CtfTmfTrace extends TmfTrace
+        implements ITmfEventParser, ITmfTraceProperties {
 
     // -------------------------------------------
     // Constants
@@ -278,16 +280,14 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
     }
 
     // -------------------------------------------
-    // Environment Parameters
+    // ITmfTraceProperties
     // -------------------------------------------
 
     /**
-     * Get the map of environment variables of this trace.
-     *
-     * @return The map of env vars
      * @since 2.0
      */
-    public Map<String, String> getEnvironment() {
+    @Override
+    public Map<String, String> getTraceProperties() {
         return Collections.unmodifiableMap(fTrace.getEnvironment());
     }
 
