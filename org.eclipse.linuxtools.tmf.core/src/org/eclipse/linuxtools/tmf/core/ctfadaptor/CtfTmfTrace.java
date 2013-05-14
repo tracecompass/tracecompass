@@ -13,6 +13,9 @@
 
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
@@ -277,34 +280,15 @@ public class CtfTmfTrace extends TmfTrace implements ITmfEventParser {
     // -------------------------------------------
     // Environment Parameters
     // -------------------------------------------
-    /**
-     * Method getNbEnvVars.
-     *
-     * @return int
-     */
-    public int getNbEnvVars() {
-        return this.fTrace.getEnvironment().size();
-    }
 
     /**
-     * Method getEnvNames.
+     * Get the map of environment variables of this trace.
      *
-     * @return String[]
+     * @return The map of env vars
+     * @since 2.0
      */
-    public String[] getEnvNames() {
-        final String[] s = new String[getNbEnvVars()];
-        return this.fTrace.getEnvironment().keySet().toArray(s);
-    }
-
-    /**
-     * Method getEnvValue.
-     *
-     * @param key
-     *            String
-     * @return String
-     */
-    public String getEnvValue(final String key) {
-        return this.fTrace.getEnvironment().get(key);
+    public Map<String, String> getEnvironment() {
+        return Collections.unmodifiableMap(fTrace.getEnvironment());
     }
 
     // -------------------------------------------
