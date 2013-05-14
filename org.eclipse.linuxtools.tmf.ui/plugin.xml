@@ -1080,12 +1080,24 @@
             class="org.eclipse.linuxtools.internal.tmf.ui.editors.handlers.AddBookmarkHandler"
             commandId="org.eclipse.ui.edit.addBookmark">
          <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor">
-               </instanceof>
-            </with>
+            <and>
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor">
+                  </instanceof>
+               </with>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.core.event.ITmfEvent">
+                  </instanceof>
+               </iterate>
+            </and>
          </activeWhen>
       </handler>
       <handler
