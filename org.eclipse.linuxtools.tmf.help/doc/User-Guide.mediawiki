@@ -45,7 +45,7 @@ view    CDATA #REQUIRED
 default (true | false)
 </pre>
 
-*id - A unique identifier for this uml2SDLoader. This is not mandatory as long as the id attribute cannot be retrieved by the provider plug-in. The class attribute is the one on which the underlying algorythm relies.
+*id - A unique identifier for this uml2SDLoader. This is not mandatory as long as the id attribute cannot be retrieved by the provider plug-in. The class attribute is the one on which the underlying algorithm relies.
 *name - An name of the extension instance.
 *class - The implementation of this UML2 SD viewer loader. The class must implement org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader.
 *view - The view ID of the view that this loader aims to populate. Either org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView itself or a extension of org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView.
@@ -383,13 +383,13 @@ To add time information in sequence diagram the timestamp has to be set for each
 <pre>
     private void createFrame() {
         //...
-        start.setTime(new TmfTimestamp(1000, (byte) -3));
-        syn1.setTime(new TmfTimestamp(1005, (byte) -3));
-        synReturn1.setTime(new TmfTimestamp(1050, (byte) -3));
-        asyn1.setStartTime(new TmfTimestamp(1060, (byte) -3));
-        asyn1.setEndTime(new TmfTimestamp(1070, (byte) -3));
-        asynReturn1.setStartTime(new TmfTimestamp(1060, (byte) -3));
-        asynReturn1.setEndTime(new TmfTimestamp(1070, (byte) -3));
+        start.setTime(new TmfTimestamp(1000, -3));
+        syn1.setTime(new TmfTimestamp(1005, -3));
+        synReturn1.setTime(new TmfTimestamp(1050, -3));
+        asyn1.setStartTime(new TmfTimestamp(1060, -3));
+        asyn1.setEndTime(new TmfTimestamp(1070, -3));
+        asynReturn1.setStartTime(new TmfTimestamp(1060, -3));
+        asynReturn1.setEndTime(new TmfTimestamp(1070, -3));
         //...
     }
 </pre>
@@ -526,7 +526,7 @@ To use the advanced paging provider, the interface ''ISDAdvancePagingProvider'' 
  
 ==== Using the Find Provider Interface ====
 
-For finding nodes in a sequence diagram two interfaces exists. One for basic finding and one for extended finding. The basic find comes with a dialog box for entering find criterias as regular expressions. This find criteria can be used to execute the find. Find criterias a persisted in the Eclipse workspace.
+For finding nodes in a sequence diagram two interfaces exists. One for basic finding and one for extended finding. The basic find comes with a dialog box for entering find criteria as regular expressions. This find criteria can be used to execute the find. Find criteria a persisted in the Eclipse workspace.
 <br>
 For the extended find provider interface a ''org.eclipse.jface.action.Action'' class has to be provided. The actual find handling has to be implemented and triggered by the action.
 <br>
@@ -617,7 +617,7 @@ Note that the find dialog will be opened by typing the key shortcut CRTL+F.
 
 ==== Using the Filter Provider Interface ====
 
-For filtering of sequence diagram elements two interfaces exists. One basic for filtering and one for extended filtering. The basic filtering comes with two dialog for entering filter criterias as regular expressions and one for selecting the filter to be used. Multiple filters can be active at a time. Filter criterias are persisted in the Eclipse workspace. 
+For filtering of sequence diagram elements two interfaces exists. One basic for filtering and one for extended filtering. The basic filtering comes with two dialog for entering filter criteria as regular expressions and one for selecting the filter to be used. Multiple filters can be active at a time. Filter criteria are persisted in the Eclipse workspace.
 <br>
 To use the basic filter provider, first the interface method of the ''ISDFilterProvider'' has to be implemented by a class. Typically, this is implemented in the loader class. Add the ''ISDFilterProvider'' to the list of implemented interfaces, implement the method ''filter()''and set the provider in the ''setViewer()'' method as well as remove the provider in the ''dispose()'' method of the loader class. Please note that the ''ISDFindProvider'' extends the interface ''ISDGraphNodeSupporter'' which methods (''isNodeSupported()'' and ''getNodeName()'') have to be implemented, too. <br>
 Note that no example implementation of ''filter()'' is provided. 
@@ -805,7 +805,7 @@ public class OpenSDView extends AbstractHandler {
 
 === Downloading the Tutorial ===
 
-Use the following link to download the source code of the tutorial [[Media:SamplePlugin.zip | Plug-in of Tutorial]] 
+Use the following link to download the source code of the tutorial [http://wiki.eclipse.org/images/e/e6/SamplePlugin.zip Plug-in of Tutorial].
 
 == Integration of Tracing and Monitoring Framework with Sequence Diagram Framework ==
 
@@ -865,20 +865,20 @@ A third type of event request is issued for finding specific data across pages.
 ==== TMF Signal Framework ====
 
 The reference loader extends the class ''TmfComponent''. By doing that the loader is register as TMF signal handler for sending and receiving TMF signals. The loader implements signal handlers for the following TMF signals:
-*''TmfExperimentSelectedSignal''
-This signal indicates that a Experiment was selected. When receiving this signal the indexing request is initiated and the first page is displayed after receiving the relevant information.
-*''TmfExperimentDisposedSignal''
-This signal indicates that a Experiment was disposed. When receiving this signal the loader resets its data and a blank page is loaded in the Sequence Diagram View.
+*''TmfTraceSelectedSignal''
+This signal indicates that a trace or experiment was selected. When receiving this signal the indexing request is initiated and the first page is displayed after receiving the relevant information.
+*''traceClosed''
+This signal indicates that a trace or experiment was closed. When receiving this signal the loader resets its data and a blank page is loaded in the Sequence Diagram View.
 *''TmfTimeSynchSignal''
-This signal indicates that a event with a certain time stamp is selected. When receiving this signal the corresponding message is selected in the Sequence Diagram View. If necessary, the page is changed. 
+This signal indicates that a event with a certain timestamp is selected. When receiving this signal the corresponding message is selected in the Sequence Diagram View. If necessary, the page is changed.
 *''TmfRangeSynchSignal''
 This signal indicates that a new time range is in focus. When receiving this signal the loader loads the page which corresponds to the start time of the time range signal. The message with the start time will be in focus.
 
-Besides acting on receiving signals, the reference loader is also sending signals. A ''TmfTimeSynchSignal'' is broadcasted with the time stamp of the message which was selected in the Sequence Diagram View. ''TmfRangeSynchSignal'' is sent when a page is changed in the Sequence Diagram View. The start timestamp of the time range sent is the timestamp of the first message. The end timestamp sent is the timestamp of the first message plus the current time range window. The current time range window is the time window that was indicated in the last received ''TmfRangeSynchSignal''.
+Besides acting on receiving signals, the reference loader is also sending signals. A ''TmfTimeSynchSignal'' is broadcasted with the timestamp of the message which was selected in the Sequence Diagram View. ''TmfRangeSynchSignal'' is sent when a page is changed in the Sequence Diagram View. The start timestamp of the time range sent is the timestamp of the first message. The end timestamp sent is the timestamp of the first message plus the current time range window. The current time range window is the time window that was indicated in the last received ''TmfRangeSynchSignal''.
 
 === Supported Traces ===
 
-The reference implementation is able to analyze traces from a single component that traces the interaction between other components. For example, a server node could have trace information about its interaction with client nodes. The server node could be traced and then analyzed using TMF and the Sequence Diagram Framework of TMF could used to visualize the interactions with the client nodes.<br> 
+The reference implementation is able to analyze traces from a single component that traces the interaction with other components. For example, a server node could have trace information about its interaction with client nodes. The server node could be traced and then analyzed using TMF and the Sequence Diagram Framework of TMF could used to visualize the interactions with the client nodes.<br>
 
 Note that combined traces of multiple components, that contain the trace information about the same interactions are not supported in the reference implementation!
 
@@ -891,14 +891,14 @@ The reference implementation in class ''TmfUml2SDSyncLoader'' in package ''org.e
      * @param tmfEvent Event to parse for sequence diagram event details
      * @return sequence diagram event if details are available else null
      */
-    protected ITmfSyncSequenceDiagramEvent getSequnceDiagramEvent(TmfEvent tmfEvent){
+    protected ITmfSyncSequenceDiagramEvent getSequenceDiagramEvent(ITmfEvent tmfEvent){
         //type = .*RECEIVE.* or .*SEND.*
         //content = sender:<sender name>:receiver:<receiver name>,signal:<signal name>
         String eventType = tmfEvent.getType().toString();
-        if (eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeSend) || eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeReceive)) {
-            Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSender);
-            Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldReceiver);
-            Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSignal);
+        if (eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeSend) || eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeReceive)) {
+            Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSender);
+            Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldReceiver);
+            Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSignal);
             if ((sender instanceof ITmfEventField) && (receiver instanceof ITmfEventField) && (name instanceof ITmfEventField)) {
                 ITmfSyncSequenceDiagramEvent sdEvent = new TmfSyncSequenceDiagramEvent(tmfEvent,
                                 ((ITmfEventField) sender).getValue().toString(),
@@ -909,7 +909,7 @@ The reference implementation in class ''TmfUml2SDSyncLoader'' in package ''org.e
             }
         }
         return null;
-    }    
+    }
 </pre>
 
 The analysis looks for event type Strings containing ''SEND'' and ''RECEIVE''. If event type matches these key words, the analyzer will look for strings ''sender'', ''receiver'' and ''signal'' in the event fields of type ''ITmfEventField''. If all the data is found a sequence diagram event from can be created. Note that Sync Messages are assumed, which means start and end time are the same.
@@ -930,10 +930,9 @@ Run the Reference Application. To launch the Eclipse Application select the ''Ov
 To open the Reference Sequence Diagram View, select '''Windows -> Show View -> Other... -> TMF -> Sequence Diagram''' <br> 
 [[Image:images/ShowTmfSDView.png]]<br>
 
-An blank Sequence Diagram View will open. Open also the TMF Events View by selecting '''Windows -> Show View -> Other... -> TMF -> Events''' <br>
-[[Image:images/ShowEventsView.png]]<br>
+An blank Sequence Diagram View will open. 
 
-Select the '''Select Experiment''' button of the toolbar to load the sequence diagram from the data provided in the trace file. What this does is open the file ''tracesets/sdEvents'', parse this file through TMF and analyze all events of type ''TmfEvent'' and generates the Sequence Digram out of it.  <br>
+Select the '''Select Experiment''' button of the toolbar to load the sequence diagram from the data provided in the trace file. What this does is open the file ''tracesets/sdEvents'', parse this file through TMF and analyze all events of type ''TmfEvent'' and generates the Sequence Diagram out of it.  <br>
 [[Image:images/ReferenceSeqDiagram.png]]<br>
 
 Now the reference application can be explored. To demonstrate the view features try the following things:
@@ -951,7 +950,7 @@ To dispose the diagram, select the '''Dispose Experiment''' button of the toolba
 In some case it might be necessary to change the implementation of the analysis of each ''TmfEvent'' for the generation of ''Sequence Diagram Events''. For that just extend the class ''TmfUml2SDSyncLoader'' and overwrite the method ''protected ITmfSyncSequenceDiagramEvent getSequnceDiagramEvent(TmfEvent tmfEvent)'' with your own implementation.
 
 === Downloading the Reference Plug-in ===
-To download the reference plug-in that demonstrates the reference loader, use the following link: [[Media:ReferencePlugin.zip | Reference Plug-in]]. Just extract the zip file and import the extracted Eclipse plug-in (plug-in name: ''org.eclipse.linuxtools.tmf.reference.ui'') to your Eclipse workspace. <br>
+To download the reference plug-in that demonstrates the reference loader, use the following link: [http://wiki.eclipse.org/images/d/d3/ReferencePlugin.zip Reference Plug-in]. Just extract the zip file and import the extracted Eclipse plug-in (plug-in name: ''org.eclipse.linuxtools.tmf.reference.ui'') to your Eclipse workspace. <br>
 
 =CTF Parser=
 
