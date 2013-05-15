@@ -25,6 +25,8 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -35,7 +37,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -353,6 +354,19 @@ public class TmfVirtualTable extends Composite {
                     }
                 }
                 );
+
+        /*
+         * When a partially visible table item is selected, sometimes the top index
+         * or the origin is changed to ensure the selected item is fully visible.
+         * This leaves a blank space at the bottom of the virtual table and hides
+         * the first row. The solution is to ensure that the top index is set to 0.
+         */
+        fTable.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e) {
+                fTable.setTopIndex(0);
+            }
+        });
     }
 
     /**
@@ -364,42 +378,6 @@ public class TmfVirtualTable extends Composite {
             fSelectedEventRank = selectedRow;
         } else {
             fSelectedEventRank = fTableTopEventRank + selectedRow;
-        }
-
-        /*
-         * Feature in Windows. When a partially visible table item is selected,
-         * after ~500 ms the top index is changed to ensure the selected item is
-         * fully visible. This leaves a blank space at the bottom of the virtual
-         * table. The workaround is to update the top event rank, refresh the
-         * table and reset the top index to 0 after a sufficient delay.
-         */
-        if (selectedRow >= fFullyVisibleRows) {
-            final Display display = fTable.getDisplay();
-            Thread thread = new Thread("Top index check") { //$NON-NLS-1$
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(600);
-                    } catch (InterruptedException e) {
-                    }
-                    display.asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (fTable.isDisposed()) {
-                                return;
-                            }
-                            int topIndex = fTable.getTopIndex();
-                            if (topIndex != 0) {
-                                fTableTopEventRank += topIndex;
-                                refreshTable();
-                                fSlider.setSelection(fTableTopEventRank);
-                                fTable.setTopIndex(0);
-                            }
-                        }
-                    });
-                }
-            };
-            thread.start();
         }
     }
 
