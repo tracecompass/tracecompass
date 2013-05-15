@@ -33,7 +33,6 @@ import org.junit.Test;
  */
 public class IOstructgenTest {
 
-
     private static final String metadataDecs = "typealias integer { size = 8; align = 8; signed = false; } := uint8_t;\n"
             + "typealias integer { size = 16; align = 8; signed = false; } := uint16_t;\n"
             + "typealias integer { size = 32; align = 8; signed = false; } := uint32_t;\n"
@@ -86,54 +85,53 @@ public class IOstructgenTest {
             + "\n";
 
     private static final String ctfStart =
-              "typealias integer {\n"
-            + "    size = 27; align = 1; signed = false;\n"
-            + "    map = clock.monotonic.value;\n"
-            + "} := uint27_clock_monotonic_t;\n"
-            + "\n"
-            + "typealias integer {\n"
-            + "    size = 32; align = 8; signed = false;\n"
-            + "    map = clock.monotonic.value;\n"
-            + "} := uint32_clock_monotonic_t;\n"
-            + "\n"
-            + "typealias integer {\n"
-            + "    size = 64; align = 8; signed = false;\n"
-            + "    map = clock.monotonic.value;\n"
-            + "} := uint64_clock_monotonic_t;\n"
-            + "\n";
-
+            "typealias integer {\n"
+                    + "    size = 27; align = 1; signed = false;\n"
+                    + "    map = clock.monotonic.value;\n"
+                    + "} := uint27_clock_monotonic_t;\n"
+                    + "\n"
+                    + "typealias integer {\n"
+                    + "    size = 32; align = 8; signed = false;\n"
+                    + "    map = clock.monotonic.value;\n"
+                    + "} := uint32_clock_monotonic_t;\n"
+                    + "\n"
+                    + "typealias integer {\n"
+                    + "    size = 64; align = 8; signed = false;\n"
+                    + "    map = clock.monotonic.value;\n"
+                    + "} := uint64_clock_monotonic_t;\n"
+                    + "\n";
 
     private static final String ctfHeaders =
-              "struct packet_context {\n"
-            + "    uint64_clock_monotonic_t timestamp_begin;\n"
-            + "    uint64_clock_monotonic_t timestamp_end;\n"
-            + "    uint64_t content_size;\n"
-            + "    uint64_t packet_size;\n"
-            + "    unsigned long events_discarded;\n"
-            + "    uint32_t cpu_id;\n"
-            + "};\n"
-            + "\n"
-            + "struct event_header_compact {\n"
-            + "    enum : uint5_t { compact = 0 ... 30, extended = 31 } id;\n"
-            + "    variant <id> {\n"
-            + "        struct {\n"
-            + "            uint27_clock_monotonic_t timestamp;\n"
-            + "        } compact;\n"
-            + "        struct {\n"
-            + "            uint32_t id;\n"
-            + "            uint64_clock_monotonic_t timestamp;\n"
-            + "        } extended;\n"
-            + "    } v;\n"
-            + "} align(8);\n"
-            + "\n"
-            + "struct event_header_large {\n"
-            + "    enum : uint16_t { compact = 0 ... 65534, extended = 65535 } id;\n"
-            + "    variant <id> {\n" + "        struct {\n"
-            + "            uint32_clock_monotonic_t timestamp;\n"
-            + "        } compact;\n" + "        struct {\n"
-            + "            uint32_t id;\n"
-            + "            uint64_clock_monotonic_t timestamp;\n"
-            + "        } extended;\n" + "    } v;\n" + "} align(8);\n" + "\n";
+            "struct packet_context {\n"
+                    + "    uint64_clock_monotonic_t timestamp_begin;\n"
+                    + "    uint64_clock_monotonic_t timestamp_end;\n"
+                    + "    uint64_t content_size;\n"
+                    + "    uint64_t packet_size;\n"
+                    + "    unsigned long events_discarded;\n"
+                    + "    uint32_t cpu_id;\n"
+                    + "};\n"
+                    + "\n"
+                    + "struct event_header_compact {\n"
+                    + "    enum : uint5_t { compact = 0 ... 30, extended = 31 } id;\n"
+                    + "    variant <id> {\n"
+                    + "        struct {\n"
+                    + "            uint27_clock_monotonic_t timestamp;\n"
+                    + "        } compact;\n"
+                    + "        struct {\n"
+                    + "            uint32_t id;\n"
+                    + "            uint64_clock_monotonic_t timestamp;\n"
+                    + "        } extended;\n"
+                    + "    } v;\n"
+                    + "} align(8);\n"
+                    + "\n"
+                    + "struct event_header_large {\n"
+                    + "    enum : uint16_t { compact = 0 ... 65534, extended = 65535 } id;\n"
+                    + "    variant <id> {\n" + "        struct {\n"
+                    + "            uint32_clock_monotonic_t timestamp;\n"
+                    + "        } compact;\n" + "        struct {\n"
+                    + "            uint32_t id;\n"
+                    + "            uint64_clock_monotonic_t timestamp;\n"
+                    + "        } extended;\n" + "    } v;\n" + "} align(8);\n" + "\n";
 
     private static final String ctfBody = "stream {\n"
             + "    id = 0;\n"
@@ -201,58 +199,58 @@ public class IOstructgenTest {
             + "\n";
 
     private static final String enumMd =
-              "typealias integer { size = 32; align = 8; signed = false; } := int;\n"
-            + "typealias enum { ONE = 0, a,b,c=10, d} := useless_enum;\n"
-            + "struct useless{ \n"
-            + "    enum : uint8_t { A=0, \"B\",} enum3;\n"
-            + "    useless_enum enum2;"
-            + "    enum { C, D, E } enum4;\n"
-            + "    uint16_t val;\n"
-            + "} ;\n"
-            + "\n"
-            + "event {\n"
-            + "   name = \"enumEvent\";\n"
-            + "   id = 6;\n"
-            + "   stream_id = 0;\n"
-            + "   loglevel = 5;\n"
-            + "   fields := struct{\n"
-            + "       uint16_t _some_field;\n"
-//            + "       useless junk;\n"
-//            + "       bad_enum a;\n"
-            + "       enum {A, B, C = 3 , } _other_enum;\n"
-            + "   };\n"
-            + "};\n"
-            + "\n";
+            "typealias integer { size = 32; align = 8; signed = false; } := int;\n"
+                    + "typealias enum { ONE = 0, a,b,c=10, d} := useless_enum;\n"
+                    + "struct useless{ \n"
+                    + "    enum : uint8_t { A=0, \"B\",} enum3;\n"
+                    + "    useless_enum enum2;"
+                    + "    enum { C, D, E } enum4;\n"
+                    + "    uint16_t val;\n"
+                    + "} ;\n"
+                    + "\n"
+                    + "event {\n"
+                    + "   name = \"enumEvent\";\n"
+                    + "   id = 6;\n"
+                    + "   stream_id = 0;\n"
+                    + "   loglevel = 5;\n"
+                    + "   fields := struct{\n"
+                    + "       uint16_t _some_field;\n"
+                    // + "       useless junk;\n"
+                    // + "       bad_enum a;\n"
+                    + "       enum {A, B, C = 3 , } _other_enum;\n"
+                    + "   };\n"
+                    + "};\n"
+                    + "\n";
 
     private final static String contextMD =
             "event {\n" +
-            "   name = \"someOtherEvent\";\n" +
-            "   id = 5;\n" +
-            "   stream_id = 0;\n" +
-            "   loglevel = 5;\n" +
-            "   context := struct{\n" +
-            "       uint16_t _someContext;\n" +
-            "   };\n" +
-            "   fields := struct{\n" +
-            "       uint16_t _somefield;\n" +
-            "   };\n" +
-            "};\n " +
-            "\n" ;
+                    "   name = \"someOtherEvent\";\n" +
+                    "   id = 5;\n" +
+                    "   stream_id = 0;\n" +
+                    "   loglevel = 5;\n" +
+                    "   context := struct{\n" +
+                    "       uint16_t _someContext;\n" +
+                    "   };\n" +
+                    "   fields := struct{\n" +
+                    "       uint16_t _somefield;\n" +
+                    "   };\n" +
+                    "};\n " +
+                    "\n";
 
     private static final String callsiteMD =
-              "callsite {\n"
-            + "    name = \"ust_tests_demo2:loop\";\n"
-            + "    func = \"main\";\n" + "    ip = 0x400a29;\n"
-            + "    file = \"demo.c\";\n" + "    line = 59;\n" + "};\n" + "\n"
-            + "callsite {\n" + "    name = \"ust_tests_demo3:done\";\n"
-            + "    func = \"main\";\n" + "    ip = 0x400a6c;\n"
-            + "    file = \"demo.c\";\n" + "    line = 62;\n" + "};\n" + "\n"
-            + "callsite {\n" + "    name = \"ust_tests_demo:done\";\n"
-            + "    func = \"main\";\n" + "    ip = 0x400aaf;\n"
-            + "    file = \"demo.c\";\n" + "    line = 61;\n" + "};\n" + "\n"
-            + "callsite {\n" + "    name = \"ust_tests_demo:starting\";\n"
-            + "    func = \"main\";\n" + "    ip = 0x400af2;\n"
-            + "    file = \"demo.c\";\n" + "    line = 55;\n" + "};\n";
+            "callsite {\n"
+                    + "    name = \"ust_tests_demo2:loop\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400a29;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 59;\n" + "};\n" + "\n"
+                    + "callsite {\n" + "    name = \"ust_tests_demo3:done\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400a6c;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 62;\n" + "};\n" + "\n"
+                    + "callsite {\n" + "    name = \"ust_tests_demo:done\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400aaf;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 61;\n" + "};\n" + "\n"
+                    + "callsite {\n" + "    name = \"ust_tests_demo:starting\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400af2;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 55;\n" + "};\n";
 
     private static final String simpleTSDL = metadataDecs + ctfStart + ctfHeaders
             + ctfBody;
@@ -263,11 +261,11 @@ public class IOstructgenTest {
     private static final String envTSDL = metadataDecs + environmentMD + ctfStart
             + ctfHeaders + ctfBody;
     private static final String contextTSDL = metadataDecs + environmentMD + ctfStart
-            + ctfHeaders + ctfBody +contextMD;
+            + ctfHeaders + ctfBody + contextMD;
     private static final String callsiteTSDL = metadataDecs + ctfStart + ctfHeaders
             + ctfBody + callsiteMD;
     private static final String allDressedTSDL = metadataDecs + environmentMD + clockMD
-            + ctfStart +  ctfHeaders + ctfBody +enumMd+ callsiteMD;
+            + ctfStart + ctfHeaders + ctfBody + enumMd + callsiteMD;
 
     static final String tempTraceDir = System.getProperty("java.io.tmpdir")
             + "/" + "tempTrace";
@@ -325,7 +323,9 @@ public class IOstructgenTest {
 
     /**
      * Simple test (only the minimum)
-     * @throws CTFReaderException something wrong happened
+     *
+     * @throws CTFReaderException
+     *             something wrong happened
      */
     @Test
     public void TSDLSimpleTest() throws CTFReaderException {
@@ -337,7 +337,9 @@ public class IOstructgenTest {
 
     /**
      * Test with environment variables
-     * @throws CTFReaderException something wrong happened
+     *
+     * @throws CTFReaderException
+     *             something wrong happened
      */
     @Test
     public void TSDLEnvironmentTest() throws CTFReaderException {
@@ -348,7 +350,9 @@ public class IOstructgenTest {
 
     /**
      * Test with Clocks
-     * @throws CTFReaderException something wrong happened
+     *
+     * @throws CTFReaderException
+     *             something wrong happened
      */
     @Test
     public void TSDLEnumTest() throws CTFReaderException {
@@ -359,7 +363,9 @@ public class IOstructgenTest {
 
     /**
      * Test with Clocks
-     * @throws CTFReaderException something wrong happened
+     *
+     * @throws CTFReaderException
+     *             something wrong happened
      */
     @Test
     public void TSDLClockTest() throws CTFReaderException {
@@ -370,7 +376,9 @@ public class IOstructgenTest {
 
     /**
      * Test with Contexts
-     * @throws CTFReaderException something wrong happened
+     *
+     * @throws CTFReaderException
+     *             something wrong happened
      */
     @Test
     public void TSDLContextTest() throws CTFReaderException {
@@ -381,7 +389,9 @@ public class IOstructgenTest {
 
     /**
      * Test with Callsites
-     * @throws CTFReaderException something wrong happened
+     *
+     * @throws CTFReaderException
+     *             something wrong happened
      */
     @Test
     public void TSDLCallsiteTest() throws CTFReaderException {
@@ -392,7 +402,9 @@ public class IOstructgenTest {
 
     /**
      * Test everything
-     * @throws CTFReaderException something wrong happened
+     *
+     * @throws CTFReaderException
+     *             something wrong happened
      */
     @Test
     public void TSDLAllTest() throws CTFReaderException {
