@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.NonModalWizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -48,7 +47,7 @@ public class BatchImportTraceHandler extends ImportTraceHandler {
 
                 BatchImportTraceWizard wizard = new BatchImportTraceWizard();
                 wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(traceFolder));
-                WizardDialog dialog = new NonModalWizardDialog(shell, wizard);
+                WizardDialog dialog = new WizardDialog(shell, wizard);
                 dialog.open();
 
                 traceFolder.refresh();
