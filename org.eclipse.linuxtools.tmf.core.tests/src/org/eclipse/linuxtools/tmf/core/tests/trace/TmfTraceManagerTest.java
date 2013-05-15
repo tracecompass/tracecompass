@@ -12,9 +12,13 @@
 
 package org.eclipse.linuxtools.tmf.core.tests.trace;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assume.assumeTrue;
+
+import java.io.File;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
@@ -99,6 +103,13 @@ public class TmfTraceManagerTest {
 
     private void closeTrace(ITmfTrace trace) {
         TmfSignalManager.dispatchSignal(new TmfTraceClosedSignal(this, trace));
+        /*
+         * In TMF, the next tab would now be selected (if there are some), which
+         * would select another trace automatically.
+         */
+        if (tm.getOpenedTraces().size() > 0) {
+            selectTrace(tm.getOpenedTraces().toArray(new ITmfTrace[0])[0]);
+        }
     }
 
     private void selectTrace(ITmfTrace trace) {
@@ -124,6 +135,55 @@ public class TmfTraceManagerTest {
     public void testInitialize() {
         TmfTraceManager mgr = TmfTraceManager.getInstance();
         assertNotNull(mgr);
+        assertSame(tm, mgr);
+    }
+
+    /**
+     * Test the contents of a trace set with one trace.
+     */
+    @Test
+    public void testTraceSet() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace2);
+
+        ITmfTrace[] expected = new ITmfTrace[] { trace2 };
+        ITmfTrace[] actual = tm.getActiveTraceSet();
+
+        assertEquals(1, actual.length);
+        assertArrayEquals(expected, actual);
+    }
+
+    /**
+     * Test the contents of a trace set with an experiment.
+     */
+    @Test
+    public void testTraceSetExperiment() {
+        TmfExperiment exp = createExperiment(trace1, trace2);
+        openTrace(trace1);
+        openTrace(exp);
+
+        ITmfTrace[] expected = new ITmfTrace[] { trace1, trace2 };
+        ITmfTrace[] actual = tm.getActiveTraceSet();
+
+        assertEquals(2, actual.length);
+        assertArrayEquals(expected, actual);
+    }
+
+    /**
+     * Test the {@link TmfTraceManager#getSupplementaryFileDir} method.
+     */
+    @Test
+    public void testSupplementaryFileDir() {
+        String name1 = trace1.getName();
+        String name2 = trace2.getName();
+        String basePath = System.getProperty("java.io.tmpdir") + File.separator;
+
+        String expected1 = basePath + name1 + File.separator;
+        String expected2 = basePath + name2 + File.separator;
+
+        assertEquals(expected1, TmfTraceManager.getSupplementaryFileDir(trace1));
+        assertEquals(expected2, TmfTraceManager.getSupplementaryFileDir(trace2));
     }
 
     // ------------------------------------------------------------------------
@@ -256,12 +316,243 @@ public class TmfTraceManagerTest {
     }
 
     // ------------------------------------------------------------------------
-    // Test multiple traces in parallel
+    // Test multiple, non-overlapping traces in parallel
     // ------------------------------------------------------------------------
+
+    /**
+     * Test, with two traces in parallel, when we select a timestamp that is
+     * part of the first trace.
+     *
+     * The first trace's timestamp should be updated, but the second trace's one
+     * should not change.
+     */
+    @Test
+    public void testTwoTracesTimestampValid() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace1);
+        TmfTimestamp ts = new TmfTimestamp(t1start + ONE_SECOND, SCALE);
+        selectTimestamp(ts);
+
+        /* Timestamp of trace1 should have been updated */
+        assertEquals(ts, tm.getCurrentTime());
+
+        /* Timestamp of trace2 should not have changed */
+        selectTrace(trace2);
+        assertEquals(trace2.getStartTime(), tm.getCurrentTime());
+    }
+
+    /**
+     * Test, with two traces in parallel, when we select a timestamp that is
+     * between two traces.
+     *
+     * None of the trace's timestamps should be updated (we are not in an
+     * experiment!)
+     */
+    @Test
+    public void testTwoTracesTimestampInBetween() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace1);
+        TmfTimestamp ts = new TmfTimestamp(t1end + ONE_SECOND, SCALE);
+        selectTimestamp(ts);
+
+        /* Timestamp of trace1 should not have changed */
+        assertEquals(trace1.getStartTime(), tm.getCurrentTime());
+
+        /* Timestamp of trace2 should not have changed */
+        selectTrace(trace2);
+        assertEquals(trace2.getStartTime(), tm.getCurrentTime());
+    }
+
+    /**
+     * Test, with two traces in parallel, when we select a timestamp that is
+     * completely out of the trace's range.
+     *
+     * None of the trace's timestamps should be updated.
+     */
+    @Test
+    public void testTwoTracesTimestampInvalid() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace1);
+        TmfTimestamp ts = new TmfTimestamp(t2end + ONE_SECOND, SCALE);
+        selectTimestamp(ts);
+
+        /* Timestamp of trace1 should not have changed */
+        assertEquals(trace1.getStartTime(), tm.getCurrentTime());
+
+        /* Timestamp of trace2 should not have changed */
+        selectTrace(trace2);
+        assertEquals(trace2.getStartTime(), tm.getCurrentTime());
+    }
+
+    /**
+     * Test, with two traces opened in parallel (not in an experiment), if we
+     * select a time range valid in one of them. That trace's time range should
+     * be updated, but not the other one.
+     */
+    @Test
+    public void testTwoTracesTimeRangeAllInOne() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace1);
+        TmfTimeRange range = new TmfTimeRange(
+                new TmfTimestamp(t1start + ONE_SECOND, SCALE),
+                new TmfTimestamp(t1end - ONE_SECOND, SCALE));
+        selectTimeRange(range);
+
+        /* Range of trace1 should be equal to the requested one */
+        assertEquals(range, tm.getCurrentRange());
+
+        /* The range of trace 2 should not have changed */
+        selectTrace(trace2);
+        assertEquals(getInitialRange(trace2), tm.getCurrentRange());
+    }
+
+    /**
+     * Test, with two traces in parallel, when we select a time range that is
+     * only partially valid for one of the traces.
+     *
+     * The first trace's time range should be clamped to a valid range, and the
+     * second one's should not change.
+     */
+    @Test
+    public void testTwoTracesTimeRangePartiallyInOne() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace1);
+        TmfTimeRange range = new TmfTimeRange(
+                new TmfTimestamp(t1start + ONE_SECOND, SCALE),
+                new TmfTimestamp(t1end + ONE_SECOND, SCALE));
+        selectTimeRange(range);
+
+        /* Range of trace1 should get clamped to its end time */
+        TmfTimeRange expectedRange = new TmfTimeRange(
+                new TmfTimestamp(t1start + ONE_SECOND, SCALE),
+                new TmfTimestamp(t1end, SCALE));
+        assertEquals(expectedRange, tm.getCurrentRange());
+
+        /* Range of trace2 should not have changed */
+        selectTrace(trace2);
+        assertEquals(getInitialRange(trace2), tm.getCurrentRange());
+    }
+
+    /**
+     * Test, with two traces in parallel, when we select a time range that is
+     * only partially valid for both traces.
+     *
+     * Each trace's time range should get clamped to respectively valid ranges.
+     */
+    @Test
+    public void testTwoTracesTimeRangeInBoth() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace1);
+        TmfTimeRange range = new TmfTimeRange(
+                new TmfTimestamp(t1end - ONE_SECOND, SCALE),
+                new TmfTimestamp(t2start + ONE_SECOND, SCALE));
+        selectTimeRange(range);
+
+        /* Range of trace1 should be clamped to its end time */
+        TmfTimeRange expectedRange = new TmfTimeRange(
+                new TmfTimestamp(t1end - ONE_SECOND, SCALE),
+                new TmfTimestamp(t1end, SCALE));
+        assertEquals(expectedRange, tm.getCurrentRange());
+
+        /* Range of trace2 should be clamped to its start time */
+        selectTrace(trace2);
+        expectedRange = new TmfTimeRange(
+                new TmfTimestamp(t2start, SCALE),
+                new TmfTimestamp(t2start + ONE_SECOND, SCALE));
+        assertEquals(expectedRange, tm.getCurrentRange());
+    }
+
+    /**
+     * Test, with two traces in parallel, when we select a time range that is
+     * not valid for any trace.
+     *
+     * Each trace's time range should not be modified.
+     */
+    @Test
+    public void testTwoTracesTimeRangeInBetween() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace1);
+        TmfTimeRange range = new TmfTimeRange(
+                new TmfTimestamp(t1end + ONE_SECOND, SCALE),
+                new TmfTimestamp(t1end - ONE_SECOND, SCALE));
+        selectTimeRange(range);
+
+        /* Range of trace1 should not have changed */
+        TmfTimeRange expectedRange = getInitialRange(trace1);
+        TmfTimeRange curRange = tm.getCurrentRange();
+        assertEquals(expectedRange.getStartTime(), curRange.getStartTime());
+        assertEquals(expectedRange.getEndTime(), curRange.getEndTime());
+
+        /* Range of trace2 should not have changed */
+        selectTrace(trace2);
+        expectedRange = getInitialRange(trace2);
+        curRange = tm.getCurrentRange();
+        assertEquals(expectedRange.getStartTime(), curRange.getStartTime());
+        assertEquals(expectedRange.getEndTime(), curRange.getEndTime());
+    }
 
     // ------------------------------------------------------------------------
     // Test an experiment
     // ------------------------------------------------------------------------
+
+    /**
+     * Test in an experiment when we select a timestamp that is part of one of
+     * the experiment's traces.
+     *
+     * The experiment's current time should be correctly updated.
+     */
+    @Test
+    public void testExperimentTimestampInTrace() {
+        TmfExperiment exp = createExperiment(trace1, trace2);
+        openTrace(exp);
+        TmfTimestamp ts = new TmfTimestamp(t1start + ONE_SECOND, SCALE);
+        selectTimestamp(ts);
+
+        /* The experiment's current time should be updated. */
+        assertEquals(ts, tm.getCurrentTime());
+    }
+
+    /**
+     * Test in an experiment when we select a timestamp that is between two
+     * traces in the experiment.
+     *
+     * The experiment's current time should still be updated, since the
+     * timestamp is valid in the experiment itself.
+     */
+    @Test
+    public void testExperimentTimestampInBetween() {
+        TmfExperiment exp = createExperiment(trace1, trace2);
+        openTrace(exp);
+        TmfTimestamp ts = new TmfTimestamp(t1end + ONE_SECOND, SCALE);
+        selectTimestamp(ts);
+
+        /* The experiment's current time should be updated. */
+        assertEquals(ts, tm.getCurrentTime());
+    }
+
+    /**
+     * Test in an experiment when we select a timestamp that is outside of the
+     * total range of the experiment.
+     *
+     * The experiment's current time should not be updated.
+     */
+    @Test
+    public void testExperimentTimestampInvalid() {
+        TmfExperiment exp = createExperiment(trace1, trace2);
+        openTrace(exp);
+        TmfTimestamp ts = new TmfTimestamp(t2end + ONE_SECOND, SCALE);
+        selectTimestamp(ts);
+
+        /* The experiment's current time should NOT be updated. */
+        assertEquals(trace1.getStartTime(), tm.getCurrentTime());
+    }
 
     /**
      * Test the initial range of an experiment.
@@ -274,18 +565,29 @@ public class TmfTraceManagerTest {
          * The initial range should be == to the initial range of the earliest
          * trace (here trace1).
          */
-        final TmfTimeRange traceInitialRange = new TmfTimeRange(
-                trace1.getStartTime(),
-                calculateOffset(trace1.getStartTime(), trace1.getInitialRangeOffset()));
-
-        final TmfTimeRange expInitialRange = new TmfTimeRange(
-                exp.getStartTime(),
-                calculateOffset(exp.getStartTime(), exp.getInitialRangeOffset()));
-
         final TmfTimeRange actualRange = tm.getCurrentRange();
 
-        assertEquals(traceInitialRange, actualRange);
-        assertEquals(expInitialRange, actualRange);
+        assertEquals(getInitialRange(trace1), actualRange);
+        assertEquals(getInitialRange(exp), actualRange);
+    }
+
+    /**
+     * Test the range clamping with the start time of the range outside of the
+     * earliest trace's range. Only that start time should get clamped.
+     */
+    @Test
+    public void testExperimentRangeClampingOne() {
+        TmfExperiment exp = createExperiment(trace1, trace2);
+        openTrace(exp);
+
+        final TmfTimeRange range = new TmfTimeRange(
+                new TmfTimestamp(t1start - ONE_SECOND, SCALE),
+                new TmfTimestamp(t1end - ONE_SECOND, SCALE));
+        selectTimeRange(range);
+
+        TmfTimeRange actualRange = tm.getCurrentRange();
+        assertEquals(t1start, actualRange.getStartTime().getValue());
+        assertEquals(t1end - ONE_SECOND, actualRange.getEndTime().getValue());
     }
 
     /**
@@ -336,6 +638,12 @@ public class TmfTraceManagerTest {
         TmfExperiment exp = new TmfExperiment(ITmfEvent.class, "test-exp", traces);
         exp.indexTrace(true);
         return exp;
+    }
+
+    private static TmfTimeRange getInitialRange(ITmfTrace trace) {
+        return new TmfTimeRange(
+                trace.getStartTime(),
+                calculateOffset(trace.getStartTime(), trace.getInitialRangeOffset()));
     }
 
     /**
