@@ -28,7 +28,7 @@ public class EllipsisMessage extends AsyncMessage {
 
     @Override
     public int getX() {
-        if (fStartLifeline == null) {
+        if (getStartLifeline() == null) {
             return super.getX() + super.getWidth() - 16;
         }
         return super.getX();
@@ -53,7 +53,7 @@ public class EllipsisMessage extends AsyncMessage {
         int height = getHeight();
 
         // UML2 found message (always drawn from left to right)
-        if (fStartLifeline == null && fEndLifeline != null) {
+        if (getStartLifeline() == null && getEndLifeline() != null) {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
@@ -75,7 +75,7 @@ public class EllipsisMessage extends AsyncMessage {
             context.setBackground(storedColor);
         }
         // UML2 lost message (always drawn from left to right)
-        else if (fEndLifeline == null && fStartLifeline != null) {
+        else if (getEndLifeline() == null && getStartLifeline() != null) {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label

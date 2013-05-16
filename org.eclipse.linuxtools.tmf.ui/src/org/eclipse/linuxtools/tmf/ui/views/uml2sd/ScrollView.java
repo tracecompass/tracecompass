@@ -62,7 +62,6 @@ public class ScrollView extends Composite {
     // Attributes
     // ------------------------------------------------------------------------
 
-    // Value for scroll bar mode, default is AUTO
     /**
      * Scroll bar mode AUTO
      */
@@ -86,101 +85,100 @@ public class ScrollView extends Composite {
     /**
      * Value of the contents height property.
      */
-    protected int fContentsHeight = 0;
+    private int fContentsHeight = 0;
     /**
      * Value of the contents width property.
      */
-    protected int fContentsWidth = 0;
+    private int fContentsWidth = 0;
     /**
      * Value of the contents x coordinate property
      */
-    protected int fContentsX = 0;
+    private int fContentsX = 0;
     /**
      * Value of the contents y coordinate property
      */
-    protected int fContentsY = 0;
+    private int fContentsY = 0;
     /**
      * Scroll bar mode of horizontal scroll bar.
      */
-    protected int fHorScrollbarMode = AUTO;
+    private int fHorScrollbarMode = AUTO;
     /**
      * Scroll bar mode of vertical scroll bar.
      */
-    protected int fVertScrollbarMode = AUTO;
+    private int fVertScrollbarMode = AUTO;
     /**
      * Increment for the horizontal scroll bar.
      */
-    protected int fHorScrollbarIncrement = 10;
+    private int fHorScrollbarIncrement = 10;
     /**
      * Increment for the vertical scroll bar.
      */
-    protected int fVertScrollbarIncrement = 10;
+    private int fVertScrollbarIncrement = 10;
     /**
      * Flag whether auto scroll is enabled or not.
      */
-    protected boolean fAutoScrollEnabled = true;
+    private boolean fAutoScrollEnabled = true;
     /**
      * Value of the auto scroll period.
      */
-    protected int fAutoScrollPeriod = 75;
+    private int fAutoScrollPeriod = 75;
     /**
      * The local paint listener reference.
      */
-    protected PaintListener fLocalPaintListener = null;
+    private PaintListener fLocalPaintListener = null;
     /**
      * The local mouse move listener reference.
      */
-    protected MouseMoveListener fLocalMouseMoveListener = null;
+    private MouseMoveListener fLocalMouseMoveListener = null;
     /**
      * The local mouse listener reference.
      */
-    protected MouseListener fLocalMouseListener = null;
+    private MouseListener fLocalMouseListener = null;
     /**
      * The local control listener reference.
      */
-    protected ControlListener fLocalControlListener = null;
+    private ControlListener fLocalControlListener = null;
     /**
      * The local key listener reference.
      */
-    protected KeyListener fLocalKeyListener = null;
+    private KeyListener fLocalKeyListener = null;
     // Canvas for vertical/horizontal Scroll Bar only ... because new ScrollBar() does works.
     /**
      * Canvas for horizontal scroll bar.
      */
-    protected Canvas fHorScrollBar;
+    private Canvas fHorScrollBar;
     /**
      * Canvas for vertical scroll bar.
      */
-    protected Canvas fVertScrollBar;
+    private Canvas fVertScrollBar;
     /**
      * Canvas for the view control.
      */
-    protected Canvas fViewControl;
+    private Canvas fViewControl;
     /**
      * Control used in the bottom right corner @see setCornerControl() and @see setOverviewEnabled(true)
      */
-    protected Control fCornerControl;
+    private Control fCornerControl;
     /**
      * Size of overview widget.
      */
-    protected int fOverviewSize = 100; // default size for overview
+    private int fOverviewSize = 100; // default size for overview
     /**
      * Timer for auto_scroll feature
      */
-    protected AutoScroll fAutoScroll = null;
+    private AutoScroll fAutoScroll = null;
     /**
      * TimerTask for auto_scroll feature !=null when auto scroll is running
      */
-    protected Timer fAutoScrollTimer = null;
+    private Timer fAutoScrollTimer = null;
     /**
      * where mouse down appear on contents area (x coordinate)
      */
-    protected int fMouseDownX = -1;
+    private int fMouseDownX = -1;
     /**
      * where mouse down appear on contents area (y coordinate)
      */
-    protected int fMousDownY = -1;
-
+    private int fMousDownY = -1;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -206,7 +204,7 @@ public class ScrollView extends Composite {
      * @param mouseWheel Flag to force scrollView to handles mouse wheel
      */
     public ScrollView(Composite c, int style, boolean mouseWheel) {
-        super(c, SWT.NONE); // style&(~(SWT.H_SCROLL|SWT.V_SCROLL)));
+        super(c, SWT.NONE);
 
         fHorScrollBar = new Canvas(this, SWT.H_SCROLL);
         if (mouseWheel) {
@@ -222,10 +220,6 @@ public class ScrollView extends Composite {
             fViewControl.getHorizontalBar().setVisible(false);
         }
         fVertScrollBar = new Canvas(this, SWT.V_SCROLL);
-        // make fVerScrollBar able to receive mouse wheel
-        // does not help as we can't set a MouseListener on fVerScrollBar.getVerticalBar()
-        // to set focus on viewcontrol_
-        // fVerScrollBar.addKeyListener( new KeyAdapter() {});
 
         setLayout(new SVLayout());
 
@@ -304,8 +298,10 @@ public class ScrollView extends Composite {
             @Override
             public void mouseDown(MouseEvent e) {
                 int ox = e.x, oy = e.y;
-                e.x = fMouseDownX = viewToContentsX(e.x);
-                e.y = fMousDownY = viewToContentsY(e.y);
+                e.x = viewToContentsX(e.x);
+                fMouseDownX = e.x;
+                e.y = viewToContentsY(e.y);
+                fMousDownY = e.y;
                 contentsMouseDownEvent(e);
                 e.x = ox;
                 e.y = oy;
@@ -319,8 +315,9 @@ public class ScrollView extends Composite {
                 contentsMouseUpEvent(e);
                 e.x = ox;
                 e.y = oy;
-                // here because class extenting me can catch mouse Up and want to scroll...
-                fMouseDownX = fMousDownY = -1;
+                // here because class extending me can catch mouse Up and want to scroll...
+                fMouseDownX = -1;
+                fMousDownY = -1;
             }
         };
         fViewControl.addMouseListener(fLocalMouseListener);
@@ -836,13 +833,13 @@ public class ScrollView extends Composite {
     protected static class AutoScroll extends TimerTask {
 
         /** X delta */
-        public int deltaX;
+        private int deltaX;
 
         /** Y delta */
-        public int deltaY;
+        private int deltaY;
 
         /** ScrollView object */
-        public ScrollView scrollView;
+        private ScrollView scrollView;
 
         /**
          * Constructor.
@@ -886,23 +883,23 @@ public class ScrollView extends Composite {
 
             int sx = 0, sy = 0;
 
-            int v_right = getContentsX() + getVisibleWidth();
-            int v_bottom = getContentsY() + getVisibleHeight();
+            int vRight = getContentsX() + getVisibleWidth();
+            int vBottom = getContentsY() + getVisibleHeight();
 
             // auto scroll... ?
             if (event.x < getContentsX()) {
                 sx = (getContentsX() - event.x);
                 fMouseDownX = getContentsX();
-            } else if (event.x > v_right) {
-                sx = -event.x + v_right;
-                fMouseDownX = v_right;
+            } else if (event.x > vRight) {
+                sx = -event.x + vRight;
+                fMouseDownX = vRight;
             }
             if (event.y < getContentsY()) {
                 sy = (getContentsY() - event.y);
                 fMousDownY = getContentsY();
-            } else if (event.y > v_bottom) {
-                sy = -event.y + v_bottom;
-                fMousDownY = v_bottom;
+            } else if (event.y > vBottom) {
+                sy = -event.y + vBottom;
+                fMousDownY = vBottom;
             }
 
             if (sx != 0 || sy != 0) {
@@ -994,13 +991,13 @@ public class ScrollView extends Composite {
             oldW = s;
         }
 
-        int vis_width = getVisibleWidth();
-        int vis_height = getVisibleHeight();
-        if (oldW < vis_width) {
-            if (localWidth > vis_width) {
-                localWidth = vis_width;
+        int visWidth = getVisibleWidth();
+        int visHeight = getVisibleHeight();
+        if (oldW < visWidth) {
+            if (localWidth > visWidth) {
+                localWidth = visWidth;
             }
-            fViewControl.redraw(getContentsX() + oldW, 0, localWidth - oldW, vis_height, true);
+            fViewControl.redraw(getContentsX() + oldW, 0, localWidth - oldW, visHeight, true);
         }
 
         if (oldH > localHeight) {
@@ -1009,11 +1006,11 @@ public class ScrollView extends Composite {
             oldH = s;
         }
 
-        if (oldH < vis_height) {
-            if (localHeight > vis_height) {
-                localHeight = vis_height;
+        if (oldH < visHeight) {
+            if (localHeight > visHeight) {
+                localHeight = visHeight;
             }
-            fViewControl.redraw(0, getContentsY() + oldH, vis_width, localHeight - oldH, true);
+            fViewControl.redraw(0, getContentsY() + oldH, visWidth, localHeight - oldH, true);
         }
         if (updateScrollBarVisiblity()) {
             layout();
@@ -1109,7 +1106,7 @@ public class ScrollView extends Composite {
         int cy = getContentsY();
         int right = getContentsX() + getVisibleWidth() - vbar;
         int bottom = getContentsY() + getVisibleHeight() - hbar;
-        boolean align_h = false, align_v = false;
+        boolean alignH = false, alignV = false;
 
         if (localX < getContentsX()) {
             cx = localX;
@@ -1123,13 +1120,13 @@ public class ScrollView extends Composite {
         }
 
         if (localWidth > getVisibleWidth()) {
-            align_h = true;
+            alignH = true;
         }
         if (localHeight > getVisibleHeight()) {
-            align_v = true;
+            alignV = true;
         }
         // compute alignment on visible area horizontally
-        if (align_h || (forceAlign && localX + localWidth > right)) {
+        if (alignH || (forceAlign && localX + localWidth > right)) {
             // use align flags
             if ((align & SWT.LEFT) != 0) {
                 cx = localX;
@@ -1140,7 +1137,7 @@ public class ScrollView extends Composite {
             }
         }
         // compute alignment on visible area vertically
-        if (align_v || (forceAlign && localY + localHeight > bottom)) {
+        if (alignV || (forceAlign && localY + localHeight > bottom)) {
             // use align flags
             if ((align & SWT.TOP) != 0) {
                 cy = localY;
@@ -1594,11 +1591,11 @@ public class ScrollView extends Composite {
     @Override
     public Rectangle computeTrim(int x, int y, int w, int h) {
         Rectangle r = new Rectangle(x, y, w, h);
-        int bar_vis = computeBarVisibility(w, h, false, false);
-        if ((bar_vis & VBAR) != 0) {
+        int barVis = computeBarVisibility(w, h, false, false);
+        if ((barVis & VBAR) != 0) {
             r.width += getVerticalBarWidth();
         }
-        if ((bar_vis & HBAR) != 0) {
+        if ((barVis & HBAR) != 0) {
             r.height += getHorizontalBarHeight();
         }
         return r;
@@ -1608,18 +1605,24 @@ public class ScrollView extends Composite {
      *  Internal layout for ScrollView, handle scrollbars, drawzone and corner control
      */
     protected class SVLayout extends Layout {
+
+        private final static int DEFAULT_X = 250;
+        private final static int DEFAULT_Y = 250;
+        private final static int MAX_SEEK = 10;
+        private final static int MIN_SEEK = 0;
+
         /**
          * The seek value
          */
-        int seek = 0;
+        private int seek = 0;
         /**
          * The do-it-not flag
          */
-        boolean dontLayout = false;
+        private boolean dontLayout = false;
 
         @Override
         protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
-            Point p = new Point(250, 250);
+            Point p = new Point(DEFAULT_X, DEFAULT_Y);
             if (fContentsWidth < p.x) {
                 p.x = fContentsWidth;
             }
@@ -1635,23 +1638,23 @@ public class ScrollView extends Composite {
                 return;
             }
             seek++;
-            if (seek > 10) {
+            if (seek > MAX_SEEK) {
                 dontLayout = true;
             }
 
             Point cs = composite.getSize();
-            int bar_vis = computeBarVisibility(cs.x, cs.y, false, false);
-            boolean vb_vis = (bar_vis & VBAR) != 0;
-            boolean hb_vis = (bar_vis & HBAR) != 0;
-            fVertScrollBar.setVisible(vb_vis);
-            fHorScrollBar.setVisible(hb_vis);
+            int barVis = computeBarVisibility(cs.x, cs.y, false, false);
+            boolean vbVis = (barVis & VBAR) != 0;
+            boolean hbVis = (barVis & HBAR) != 0;
+            fVertScrollBar.setVisible(vbVis);
+            fHorScrollBar.setVisible(hbVis);
             int vbw = getVerticalBarWidth();
             int hbh = getHorizontalBarHeight();
-            int wb = vb_vis ? vbw : 0;
-            int hb = hb_vis ? hbh : 0;
+            int wb = vbVis ? vbw : 0;
+            int hb = hbVis ? hbh : 0;
             int cww = 0, cwh = 0;
 
-            if (fCornerControl != null && (vb_vis || hb_vis)) { // corner_control_.getVisible())
+            if (fCornerControl != null && (vbVis || hbVis)) { // corner_control_.getVisible())
                 fCornerControl.setVisible(true);
                 cww = vbw;
                 cwh = hbh;
@@ -1661,28 +1664,28 @@ public class ScrollView extends Composite {
                 if (hb == 0) {
                     hb = hbh;
                 }
-            } else if (vb_vis && hb_vis) {
+            } else if (vbVis && hbVis) {
                 if (fCornerControl != null) {
                     fCornerControl.setVisible(false);
                 }
                 cww = vbw;
                 cwh = hbh;
             }
-            if (vb_vis || hb_vis) {
+            if (vbVis || hbVis) {
                 updateScrollBarsValues();
             }
 
-            int vw = cs.x - (vb_vis ? vbw : 0);
-            int vh = cs.y - (hb_vis ? hbh : 0);
+            int vw = cs.x - (vbVis ? vbw : 0);
+            int vh = cs.y - (hbVis ? hbh : 0);
             int vbx = cs.x - wb;
             int hby = cs.y - hb;
 
             fViewControl.setBounds(0, 0, vw, vh);
 
-            if (vb_vis) {
+            if (vbVis) {
                 fVertScrollBar.setBounds(vbx, 0, wb, cs.y - cwh);
             }
-            if (hb_vis) {
+            if (hbVis) {
                 fHorScrollBar.setBounds(0, hby, cs.x - cww, hb);
             }
             if (fCornerControl != null && fCornerControl.getVisible()) {
@@ -1691,39 +1694,49 @@ public class ScrollView extends Composite {
             updateScrollBarsValues();
 
             seek--;
-            if (seek == 0) {
+            if (seek == MIN_SEEK) {
                 dontLayout = false;
             }
+        }
+
+        boolean isDontLayout() {
+            return dontLayout;
+        }
+
+        void setSontLayout(boolean dontLayout) {
+            this.dontLayout = dontLayout;
         }
     }
 
     // static must take place here... cursor is created once.
-    volatile static Cursor fOverviewCursor;
+    private volatile static Cursor fOverviewCursor;
 
     /** Support for click-and-see overview shell on this ScrollView */
     protected class Overview {
 
+        private final static int REFRESH_FREQ = 4;
+
         /**
          *  factor for X from real and overview sizes, for mouse move speed.
          */
-        protected float fOverviewFactorX;
+        private float fOverviewFactorX;
 
         /**
          *  factor for Y from real and overview sizes, for mouse move speed.
          */
-        protected float fOverviewFactorY;
+        private float fOverviewFactorY;
         /**
          *  shell use to show overview
          */
-        protected Shell fOverview;
+        private Shell fOverview;
         /**
          * save mouse X cursor location for disappear();
          */
-        protected int fSaveCursorX;
+        private int fSaveCursorX;
         /**
          * save mouse Y cursor location for disappear();
          */
-        protected int fSaveCursorY;
+        private int fSaveCursorY;
 
         /**
          * Apply overview support on a control. Replace existing corner_widget
@@ -1799,7 +1812,7 @@ public class ScrollView extends Composite {
                 public void mouseMove(MouseEvent event) {
                     if (overviewing()) {
                         // Slow down the refresh
-                        if (refReshCount % 4 == 0) {
+                        if (refReshCount % REFRESH_FREQ == 0) {
                             overviewMove(event);
                         }
                         refReshCount++;
@@ -1843,7 +1856,6 @@ public class ScrollView extends Composite {
                 });
             }
             // always the same..
-            // overview.setBackground( viewcontrol_.getBackground() );
             fOverview.setForeground(fViewControl.getForeground());
 
             // get location of shell (in screeen coordinates)
@@ -1851,7 +1863,8 @@ public class ScrollView extends Composite {
             int x = p.x;
             int y = p.y;
             int w, h;
-            w = h = fOverviewSize;
+            h = fOverviewSize;
+            w = h;
             Rectangle scr = getDisplay().getBounds();
             Point ccs = fCornerControl.getSize();
             try {
@@ -1880,9 +1893,6 @@ public class ScrollView extends Composite {
             }
 
             // try pop-up on button, extending to bottom right,
-            // if outside screen, extend pop-up to top left
-            // if( x+w > scr.width ) x = scr.width-w; //x += corner_control_.getSize().x-w;
-            // if( y+h > scr.height ) y = scr.height-h;//y += corner_control_.getSize().y-h;
             if (x <= 0) {
                 x = 1;
             }
@@ -2020,17 +2030,17 @@ public class ScrollView extends Composite {
             Point p = new Point(x, y);
             for (Control c = loc; c != null; c = c.getParent()) {
                 // control might have client area with 'decorations'
-                int trim_x = 0, trim_y = 0;
+                int trimX = 0, trimY = 0;
                 // other kind of widget with trimming ??
                 if (c instanceof Scrollable) {
                     Scrollable s = (Scrollable) c;
                     Rectangle rr = s.getClientArea();
                     Rectangle tr = s.computeTrim(rr.x, rr.y, rr.width, rr.height);
-                    trim_x = rr.x - tr.x;
-                    trim_y = rr.y - tr.y;
+                    trimX = rr.x - tr.x;
+                    trimY = rr.y - tr.y;
                 }
-                p.x += c.getLocation().x + trim_x;
-                p.y += c.getLocation().y + trim_y;
+                p.x += c.getLocation().x + trimX;
+                p.y += c.getLocation().y + trimY;
             }
             return p;
         }

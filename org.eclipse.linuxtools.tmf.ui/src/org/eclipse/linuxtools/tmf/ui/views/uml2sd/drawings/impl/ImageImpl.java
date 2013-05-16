@@ -36,7 +36,7 @@ public class ImageImpl implements IImage {
     /**
      * The image reference
      */
-    protected Image fImage = null;
+    private final Image fImage;
 
     // ------------------------------------------------------------------------
     // Constructors

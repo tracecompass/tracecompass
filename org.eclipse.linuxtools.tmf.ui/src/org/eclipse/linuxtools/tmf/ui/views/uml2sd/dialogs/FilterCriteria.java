@@ -48,19 +48,19 @@ public class FilterCriteria {
     /**
      * The criteria reference.
      */
-    protected Criteria fCriteria;
+    private Criteria fCriteria;
     /**
      * Flag whether this criteria is active or not
      */
-    protected boolean fIsActive;
+    private boolean fIsActive;
     /**
      * Flag whether this criteria is for positive filter or not
      */
-    protected boolean fIsPositive;
+    private boolean fIsPositive;
     /**
      * The loader class name.
      */
-    protected String fLoaderClassName;
+    private String fLoaderClassName;
 
     // ------------------------------------------------------------------------
     // Constructor

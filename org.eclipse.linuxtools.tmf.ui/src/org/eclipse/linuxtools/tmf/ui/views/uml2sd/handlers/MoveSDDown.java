@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 
@@ -23,7 +22,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
  * @author sveyrier
  *
  */
-public class MoveSDDown extends Action {
+public class MoveSDDown extends BaseSDAction {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -32,14 +31,6 @@ public class MoveSDDown extends Action {
      * The action ID.
      */
     public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDDown"; //$NON-NLS-1$
-
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-    /**
-     * The sequence diagram view reference.
-     */
-    protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -57,34 +48,23 @@ public class MoveSDDown extends Action {
      * @param view a sequence diagram view reference
      */
     public MoveSDDown(SDView view) {
-        super();
+        super(view);
         setId(ID);
         setActionDefinitionId(ID);
-        fView = view;
     }
 
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
-
     @Override
     public void run() {
-        if (fView == null) {
+        if (getView() == null) {
             return;
         }
 
-        SDWidget viewer = fView.getSDWidget();
+        SDWidget viewer = getView().getSDWidget();
         if (viewer != null) {
             viewer.scrollBy(0, +viewer.getVisibleHeight());
         }
-    }
-
-    /**
-     * Sets the active SD view.
-     *
-     * @param view The SD view.
-     */
-    public void setView(SDView view) {
-        fView = view;
     }
 }

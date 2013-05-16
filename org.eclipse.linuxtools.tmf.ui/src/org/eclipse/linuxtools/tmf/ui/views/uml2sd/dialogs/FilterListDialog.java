@@ -63,31 +63,31 @@ public class FilterListDialog extends Dialog {
     /**
      * The viewer and provided are kept here as attributes
      */
-    protected IViewPart fViewer = null;
+    private final IViewPart fViewer;
     /**
      * The filter provider implementation
      */
-    protected ISDFilterProvider fProvider = null;
+    private final ISDFilterProvider fProvider;
     /**
      * The filters are the result of editing this list
      */
-    protected List<FilterCriteria> fFilters;
+    private List<FilterCriteria> fFilters;
     /**
      * The add button.
      */
-    protected Button fAdd;
+    private Button fAdd;
     /**
      * The remove button.
      */
-    protected Button fRemove;
+    private Button fRemove;
     /**
      * The edit button.
      */
-    protected Button fEdit;
+    private Button fEdit;
     /**
      * The table with list of filters.
      */
-    protected Table fTable;
+    private Table fTable;
 
     // ------------------------------------------------------------------------
     // Constructor

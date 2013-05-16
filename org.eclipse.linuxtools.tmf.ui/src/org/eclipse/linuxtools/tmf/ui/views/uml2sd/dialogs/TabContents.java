@@ -41,55 +41,55 @@ public class TabContents extends Composite {
     /**
      * A graph node type listener implementation.
      */
-    protected GraphNodeTypeListener fGraphNodeTypeListener = null;
+    private final GraphNodeTypeListener fGraphNodeTypeListener;
     /**
      * A expression listener implementation.
      */
-    protected ExpressionListener fExpressionListener = null;
+    private final ExpressionListener fExpressionListener;
     /**
      * The button for lifelines.
      */
-    protected Button fLifelineButton = null;
+    private Button fLifelineButton;
     /**
      * The button for stops.
      */
-    protected Button fStopButton = null;
+    private Button fStopButton = null;
     /**
      * The button for synchronous messages
      */
-    protected Button fSynMessageButton = null;
+    private Button fSynMessageButton = null;
     /**
      * The button for synchronous return messages
      */
-    protected Button fSynMessageReturnButton = null;
+    private Button fSynMessageReturnButton = null;
     /**
      * The button for asynchronous messages
      */
-    protected Button fAsynMessageButton = null;
+    private Button fAsynMessageButton = null;
     /**
      * The button for asynchronous return messages
      */
-    protected Button fAsynMessageReturnButton = null;
+    private Button fAsynMessageReturnButton = null;
     /**
      * The search text combo box.
      */
-    protected Combo fSearchText = null;
+    private Combo fSearchText = null;
     /**
      * The group for selection kind.
      */
-    protected Group fKindSelection = null;
+    private Group fKindSelection = null;
     /**
      * The button for case sensitive expressions.
      */
-    protected Button fCaseSensitive = null;
+    private Button fCaseSensitive = null;
     /**
      * The label for the result string.
      */
-    protected Label fResult = null;
+    private Label fResult = null;
     /**
      * The button for notifying parent about valid data.
      */
-    protected Button fParentOkButton = null;
+    private Button fParentOkButton = null;
 
     // ------------------------------------------------------------------------
     // Constructors

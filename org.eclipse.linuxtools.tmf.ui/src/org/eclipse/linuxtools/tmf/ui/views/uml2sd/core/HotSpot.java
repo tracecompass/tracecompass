@@ -38,15 +38,15 @@ public class HotSpot extends GraphNode {
     /**
      * The execution occurrence the hot spot marker is for.
      */
-    protected BasicExecutionOccurrence fExecOcc = null;
+    private BasicExecutionOccurrence fExecOcc = null;
     /**
      * The occurrence number.
      */
-    protected int fOccurrence = 0;
+    private int fOccurrence = 0;
     /**
      * The marker image to display.
      */
-    protected IImage fImage = null;
+    private IImage fImage = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -56,7 +56,7 @@ public class HotSpot extends GraphNode {
      * Default constructor
      */
     public HotSpot() {
-        fPrefId = ISDPreferences.PREF_EXEC;
+        setColorPrefId(ISDPreferences.PREF_EXEC);
     }
 
     // ------------------------------------------------------------------------
@@ -70,6 +70,16 @@ public class HotSpot extends GraphNode {
      */
     public void setImage(IImage img) {
         fImage = img;
+    }
+
+    /**
+     * Returns the marker image.
+     *
+     * @return the image
+     * @since 2.0
+     */
+    protected IImage getImage() {
+        return fImage;
     }
 
     @Override

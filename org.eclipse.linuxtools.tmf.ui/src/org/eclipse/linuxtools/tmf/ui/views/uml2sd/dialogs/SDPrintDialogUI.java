@@ -65,184 +65,184 @@ public class SDPrintDialogUI {
     /**
      * The set horizontal pages number.
      */
-    protected Button fSetHPagesNumber;
+    private Button fSetHPagesNumber;
     /**
      * The set vertical pages number.
      */
-    protected Button fSetVPagesNumber;
+    private Button fSetVPagesNumber;
     /**
      * Flag whether to use current zoom or not.
      */
-    protected Button fUseCurrentZoom;
+    private Button fUseCurrentZoom;
     /**
      * Flag whether to print all pages or not
      */
-    protected Button fAllPages;
+    private Button fAllPages;
     /**
      * Flag whether to print current page only
      */
-    protected Button fCurrentPage;
+    private Button fCurrentPage;
     /**
      * Button to select a page list.
      */
-    protected Button fPageList;
+    private Button fPageList;
     /**
      * Button to select a page range.
      */
-    protected Button fPageRange;
+    private Button fPageRange;
     /**
      * Text field to enter from page.
      */
-    protected Text fFromPage;
+    private Text fFromPage;
     /**
      * Text field to enter to page.
      */
-    protected Text fToPage;
+    private Text fToPage;
     /**
      *  The sequence diagram widget reference.
      */
-    protected SDWidget fSdView;
+    private SDWidget fSdView;
     /**
      * Text field for number of horizontal pages
      */
-    protected Text fHorPagesNum;
+    private Text fHorPagesNum;
     /**
      * Text field for number of vertical pages
      */
-    protected Text fVertPagesNum;
+    private Text fVertPagesNum;
     /**
      * Text field for toal number of pages
      */
-    protected Text fTotalPages;
+    private Text fTotalPages;
     /**
      * A modify listener implementation to handle modifications.
      */
-    protected ModifyListener fModifyListener;
+    private ModifyListener fModifyListener;
     /**
      * A selection listener implementation to handle selections.
      */
-    protected SelectionListener fSelectionListener;
+    private SelectionListener fSelectionListener;
     /**
      * Local canvas displaying sequence diagram overview.
      */
-    protected LocalSD fOverviewCanvas;
+    private LocalSD fOverviewCanvas;
     /**
      * Number of pages
      */
-    protected int fNbPages = 0;
+    private int fNbPages = 0;
     /**
      * Number of selected pages.
      */
-    protected int fPageNum = -1;
+    private int fPageNum = -1;
     /**
      * Number of first page.
      */
-    protected int fFirstPage = -1;
+    private int fFirstPage = -1;
     /**
      * List of pages to print.
      */
-    protected int fPagesList[];
+    private int fPagesList[];
 
     /**
      * Value for dividing the sequence diagram into pages
      */
-    protected float fStepX;
+    private float fStepX;
 
     /**
      * Value for dividing the sequence diagram into pages
      */
-    protected float fStepY;
+    private float fStepY;
 
     /**
      * Value for dividing the sequence diagram into pages
      */
-    protected float sTX;
+    private float sTX;
 
     /**
      * Value for dividing the sequence diagram into pages
      */
-    protected float sTY;
+    private float sTY;
 
     /**
      * Page which to print from.
      */
-    protected int fFrom;
+    private int fFrom;
     /**
      * Page which to print to.
      */
-    protected int fTo;
+    private int fTo;
     /**
      * Flag for enabling multi-selection.
      */
-    protected boolean fMultiSelection = false;
+    private boolean fMultiSelection = false;
     /**
      * Flag for enabling area selection.
      */
-    protected boolean fAreaSelection = false;
+    private boolean fAreaSelection = false;
     /**
      * Flag for printing all.
      */
-    protected boolean fPrintAll;
+    private boolean fPrintAll;
     /**
      * Flag for printing current page only.
      */
-    protected boolean fPrintCurrent;
+    private boolean fPrintCurrent;
     /**
      * Flag for printing a selection of pages.
      */
-    protected boolean fPrintSelection;
+    private boolean fPrintSelection;
     /**
      * Flag for printing a range of pages.
      */
-    protected boolean fPrintRange;
+    private boolean fPrintRange;
     /**
      * Number of selected rows
      */
-    protected int fNbRows;
+    private int fNbRows;
     /**
      * Number of selected lines
      */
-    protected int fNbLines;
+    private int fNbLines;
     /**
      * The zoom factor.
      */
-    protected float fZoomFactor;
+    private float fZoomFactor;
     /**
      * The printer data reference.
      */
-    protected PrinterData fPrinterData;
+    private PrinterData fPrinterData;
     /**
      * The diagram tooltip to show if necessary.
      */
-    protected DiagramToolTip fToolTip = null;
+    private DiagramToolTip fToolTip = null;
     /**
      * Label for current selection.
      */
-    protected Label fCurrentSelection;
+    private Label fCurrentSelection;
     /**
      * The shell reference.
      */
-    protected Shell fShell;
+    private Shell fShell;
     /**
      * Button to open printer dialog from OS.
      */
-    protected Button fPrinterDialog;
+    private Button fPrinterDialog;
     /**
      * Flag for showing print button.
      */
-    protected boolean fShowPrintButton;
+    private boolean fShowPrintButton;
     /**
      * Test value
      */
-    protected int fTest = 3;
+    private int fTest = 3;
     /**
      * Parent wizard page if used as wizard
      */
-    protected WizardPage fParentWizardPage = null;
+    private WizardPage fParentWizardPage = null;
     /**
      * Reference to parent print dialog.
      */
-    protected SDPrintDialog fParentDialog = null;
+    private SDPrintDialog fParentDialog = null;
 
     // ------------------------------------------------------------------------
     // Helper Class
@@ -251,7 +251,7 @@ public class SDPrintDialogUI {
      * Local sequence diagram widget used to display overview of sequence diagram to print.
      * @version 1.0
      */
-    protected class LocalSD extends SDWidget {
+    private class LocalSD extends SDWidget {
 
         /**
          * Constructor
@@ -265,7 +265,7 @@ public class SDPrintDialogUI {
         @Override
         public int getContentsHeight() {
             if (fSdView.getContentsHeight() > fSdView.getContentsHeight()) {
-                return (int) (fSdView.getVisibleHeight() / (float) fTest / fSdView.fZoomValue);
+                return (int) (fSdView.getVisibleHeight() / (float) fTest / fSdView.getZoomValue());
             }
             return super.getContentsHeight();
         }
@@ -273,7 +273,7 @@ public class SDPrintDialogUI {
         @Override
         public int getContentsWidth() {
             if (fSdView.getVisibleWidth() > fSdView.getContentsWidth()) {
-                return (int) (fSdView.getVisibleWidth() / (float) fTest / fSdView.fZoomValue);
+                return (int) (fSdView.getVisibleWidth() / (float) fTest / fSdView.getZoomValue());
             }
             return super.getContentsWidth();
         }
@@ -314,11 +314,11 @@ public class SDPrintDialogUI {
 
                     Image toDel = over;
                     if (fOverviewCanvas.isFocusControl()) {
-                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.fZoomValue)), contentsToViewY((int) (line * stepY * fOverviewCanvas.fZoomValue)),
-                                ((int) (stepX * fOverviewCanvas.fZoomValue)), ((int) (stepY * fOverviewCanvas.fZoomValue))), new RGB(0, 0, 128)));
+                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
+                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), new RGB(0, 0, 128)));
                     } else {
-                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.fZoomValue)), contentsToViewY((int) (line * stepY * fOverviewCanvas.fZoomValue)),
-                                ((int) (stepX * fOverviewCanvas.fZoomValue)), ((int) (stepY * fOverviewCanvas.fZoomValue))), new RGB(221, 208, 200)));
+                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
+                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), new RGB(221, 208, 200)));
                     }
                     toDel.dispose();
                 }
@@ -339,8 +339,8 @@ public class SDPrintDialogUI {
                 row--;
 
                 Image toDel = over;
-                over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.fZoomValue)), contentsToViewY((int) (line * stepY * fOverviewCanvas.fZoomValue)),
-                        ((int) (stepX * fOverviewCanvas.fZoomValue)), ((int) (stepY * fOverviewCanvas.fZoomValue))), new RGB(221, 208, 200)));
+                over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
+                        ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), new RGB(221, 208, 200)));
                 toDel.dispose();
             }
 
@@ -367,14 +367,14 @@ public class SDPrintDialogUI {
             computeStepXY();
             Image d;
 
-            int lw = (int) (getContentsWidth() / fZoomValue);
+            int lw = (int) (getContentsWidth() / getZoomValue());
             if (getContentsWidth() < getVisibleWidth()) {
-                lw = (int) (getVisibleWidth() / fZoomValue);
+                lw = (int) (getVisibleWidth() / getZoomValue());
             }
 
-            int lh = (int) (getContentsHeight() / fZoomValue);
+            int lh = (int) (getContentsHeight() / getZoomValue());
             if (getContentsHeight() < getVisibleHeight()) {
-                lh = (int) (getVisibleHeight() / fZoomValue);
+                lh = (int) (getVisibleHeight() / getZoomValue());
             }
             d = createPagesSelectionImages(dbuffer, lw, fStepX, lh, fStepY);
 
@@ -413,8 +413,8 @@ public class SDPrintDialogUI {
                 if (row == 0) {
                     line--;
                 }
-                if ((line + 1) * fStepY > (fOverviewCanvas.getContentsY() + fOverviewCanvas.getVisibleHeight()) / fOverviewCanvas.fZoomValue) {
-                    fOverviewCanvas.scrollBy(0, (int) (fStepY * fOverviewCanvas.fZoomValue));
+                if ((line + 1) * fStepY > (fOverviewCanvas.getContentsY() + fOverviewCanvas.getVisibleHeight()) / fOverviewCanvas.getZoomValue()) {
+                    fOverviewCanvas.scrollBy(0, (int) (fStepY * fOverviewCanvas.getZoomValue()));
                 }
             }
             if (e.keyCode == SWT.ARROW_UP) {
@@ -426,8 +426,8 @@ public class SDPrintDialogUI {
                 if (row == 0) {
                     line--;
                 }
-                if ((line) * fStepY <= fOverviewCanvas.getContentsY() / fOverviewCanvas.fZoomValue) {
-                    fOverviewCanvas.scrollBy(0, -(int) (fStepY * fOverviewCanvas.fZoomValue));
+                if ((line) * fStepY <= fOverviewCanvas.getContentsY() / fOverviewCanvas.getZoomValue()) {
+                    fOverviewCanvas.scrollBy(0, -(int) (fStepY * fOverviewCanvas.getZoomValue()));
                 }
             }
             if (e.keyCode == SWT.ARROW_LEFT) {
@@ -435,8 +435,8 @@ public class SDPrintDialogUI {
                     fPageNum--;
                 }
                 int row = fPageNum % getNbRow();
-                if ((row - 1) * fStepX < (fOverviewCanvas.getContentsX()) / fOverviewCanvas.fZoomValue) {
-                    fOverviewCanvas.scrollBy(-(int) (fStepX * fOverviewCanvas.fZoomValue), 0);
+                if ((row - 1) * fStepX < (fOverviewCanvas.getContentsX()) / fOverviewCanvas.getZoomValue()) {
+                    fOverviewCanvas.scrollBy(-(int) (fStepX * fOverviewCanvas.getZoomValue()), 0);
                 }
             }
             if (e.keyCode == SWT.ARROW_RIGHT) {
@@ -447,8 +447,8 @@ public class SDPrintDialogUI {
                 if (row == 0) {
                     row = getNbRow();
                 }
-                if ((row) * fStepX > (fOverviewCanvas.getContentsX() + fOverviewCanvas.getVisibleWidth()) / fOverviewCanvas.fZoomValue) {
-                    fOverviewCanvas.scrollBy((int) (fStepX * fOverviewCanvas.fZoomValue), 0);
+                if ((row) * fStepX > (fOverviewCanvas.getContentsX() + fOverviewCanvas.getVisibleWidth()) / fOverviewCanvas.getZoomValue()) {
+                    fOverviewCanvas.scrollBy((int) (fStepX * fOverviewCanvas.getZoomValue()), 0);
                 }
             }
 
@@ -521,8 +521,8 @@ public class SDPrintDialogUI {
         protected void contentsMouseDownEvent(MouseEvent event) {
 
             computeStepXY();
-            int x1 = (int) ((event.x / fOverviewCanvas.fZoomValue) / fStepX);
-            int x2 = (int) ((event.y / fOverviewCanvas.fZoomValue) / fStepY);
+            int x1 = (int) ((event.x / fOverviewCanvas.getZoomValue()) / fStepX);
+            int x2 = (int) ((event.y / fOverviewCanvas.getZoomValue()) / fStepY);
 
             int oldPage = fPageNum;
 
@@ -824,7 +824,7 @@ public class SDPrintDialogUI {
             fTest = 10;
         }
         fOverviewCanvas.setFrame(fSdView.getFrame(), true);
-        fOverviewCanvas.fZoomValue = (float) 1 / fTest;
+        fOverviewCanvas.setZoomValue((float) 1 / fTest);
         fOverviewCanvas.setCornerControl(null);
         seqDiagLayoutData.widthHint = fOverviewCanvas.getContentsWidth() / fTest;
         seqDiagLayoutData.widthHint = fOverviewCanvas.getFrame().getWidth() / fTest + 15;
@@ -903,8 +903,8 @@ public class SDPrintDialogUI {
 
             @Override
             public void mouseHover(MouseEvent e) {
-                int x1 = (int) (fOverviewCanvas.viewToContentsX(e.x) / fOverviewCanvas.fZoomValue / fStepX);
-                int x2 = (int) (fOverviewCanvas.viewToContentsY(e.y) / fOverviewCanvas.fZoomValue / fStepY);
+                int x1 = (int) (fOverviewCanvas.viewToContentsX(e.x) / fOverviewCanvas.getZoomValue() / fStepX);
+                int x2 = (int) (fOverviewCanvas.viewToContentsY(e.y) / fOverviewCanvas.getZoomValue() / fStepY);
                 int num = x1 + x2 * getNbRow() + 1;
                 if (num > maxNumOfPages()) {
                     return;
@@ -1065,8 +1065,8 @@ public class SDPrintDialogUI {
      * Computes value for X coordinates step and Y coordinates step.
      */
     protected void computeStepXY() {
-        float cw = fOverviewCanvas.getContentsWidth() / fOverviewCanvas.fZoomValue;
-        float ch = fOverviewCanvas.getContentsHeight() / fOverviewCanvas.fZoomValue;
+        float cw = fOverviewCanvas.getContentsWidth() / fOverviewCanvas.getZoomValue();
+        float ch = fOverviewCanvas.getContentsHeight() / fOverviewCanvas.getZoomValue();
         try {
             if (fPrinterData == null) {
                 fStepX = 0;
@@ -1168,7 +1168,7 @@ public class SDPrintDialogUI {
      */
     public int getNbRow() {
         if (!fSetHPagesNumber.isDisposed()) {
-            int cw = (int) (fOverviewCanvas.getContentsWidth() / fOverviewCanvas.fZoomValue);
+            int cw = (int) (fOverviewCanvas.getContentsWidth() / fOverviewCanvas.getZoomValue());
             int row = 1;
             if (fStepX != 0) {
                 row = (int) (cw / fStepX);
@@ -1190,7 +1190,7 @@ public class SDPrintDialogUI {
      */
     public int getNbLines() {
         if (!fSetVPagesNumber.isDisposed()) {
-            int ch = (int) (fOverviewCanvas.getContentsHeight() / fOverviewCanvas.fZoomValue);
+            int ch = (int) (fOverviewCanvas.getContentsHeight() / fOverviewCanvas.getZoomValue());
             int line = 1;
             if (fStepY != 0) {
                 line = (int) (ch / fStepY);

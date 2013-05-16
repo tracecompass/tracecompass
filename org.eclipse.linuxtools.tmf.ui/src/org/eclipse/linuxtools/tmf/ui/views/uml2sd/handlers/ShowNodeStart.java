@@ -14,16 +14,14 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
 import java.util.Iterator;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
-import org.eclipse.ui.IViewPart;
 
 /**
  * Action class implementation to show end of a graph node.
@@ -31,16 +29,7 @@ import org.eclipse.ui.IViewPart;
  * @version 1.0
  * @author sveyrier
  */
-public class ShowNodeStart extends Action {
-
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    /**
-     * The sequence diagram view reference
-     */
-    protected SDView fView = null;
+public class ShowNodeStart extends BaseSDAction {
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -58,12 +47,10 @@ public class ShowNodeStart extends Action {
      *
      * @param view
      *            The sequence diagram view reference
+     * @since 2.0
      */
-    public ShowNodeStart(IViewPart view) {
-        super();
-        if (view instanceof SDView) {
-            fView = (SDView) view;
-        }
+    public ShowNodeStart(SDView view) {
+        super(view);
         setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NODE_START));
     }
 
@@ -74,11 +61,11 @@ public class ShowNodeStart extends Action {
     @Override
     @SuppressWarnings("rawtypes")
     public void run() {
-        if (fView == null) {
+        if (getView() == null) {
             return;
         }
 
-        SDWidget sdWidget = fView.getSDWidget();
+        SDWidget sdWidget = getView().getSDWidget();
 
         if (sdWidget == null) {
             return;
@@ -99,15 +86,5 @@ public class ShowNodeStart extends Action {
                 sdWidget.ensureVisible(Math.round(node.getX() * sdWidget.getZoomFactor() + sdWidget.getVisibleWidth() / (float) 2), Math.round(node.getY() * sdWidget.getZoomFactor()));
             }
         }
-    }
-
-    /**
-     * Sets the active SD view.
-     *
-     * @param view
-     *            The SD view.
-     */
-    public void setView(SDView view) {
-        fView = view;
     }
 }

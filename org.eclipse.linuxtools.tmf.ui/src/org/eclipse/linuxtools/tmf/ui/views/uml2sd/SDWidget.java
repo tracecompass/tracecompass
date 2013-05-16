@@ -93,159 +93,159 @@ public class SDWidget extends ScrollView implements SelectionListener,
     /**
      * The frame to display in the sequence diagram widget.
      */
-    protected Frame fFrame;
+    private Frame fFrame;
     /**
      * The overview image to display.
      */
-    protected Image fOverView = null;
+    private Image fOverView = null;
     /**
      * The zoom in menu item.
      */
-    protected MenuItem fZoomIn = null;
+    private MenuItem fZoomIn = null;
     /**
      * The zoom out menu item.
      */
-    protected MenuItem fZoomOut = null;
+    private MenuItem fZoomOut = null;
     /**
      * The sequence diagram selection provider.
      */
-    protected SDWidgetSelectionProvider fSelProvider = null;
+    private SDWidgetSelectionProvider fSelProvider = null;
     /**
      * The current zoom value.
      */
-    public float fZoomValue = 1;
+    private float fZoomValue = 1;
     /**
      * The current zoomInMode (true for zoom in).
      */
-    protected boolean fZoomInMode = false;
+    private boolean fZoomInMode = false;
     /**
      * The current zoomOutMode (true for zoom out).
      */
-    protected boolean fZoomOutMode = false;
+    private boolean fZoomOutMode = false;
     /**
      * The current list of selected graph nodes.
      */
-    protected List<GraphNode> fSelectedNodeList = null;
+    private List<GraphNode> fSelectedNodeList = null;
     /**
      * Flag whether ctrl button is selected or not.
      */
-    protected boolean fCtrlSelection = false;
+    private boolean fCtrlSelection = false;
     /**
      * A reference to the view site.
      */
-    protected ViewPart fSite = null;
+    private ViewPart fSite = null;
     /**
      * The current graph node (the last selected one).
      */
-    public GraphNode fCurrentGraphNode = null;
+    private GraphNode fCurrentGraphNode = null;
     /**
      * The first graph node in list (multiple selection).
      */
-    public GraphNode fListStart = null;
+    private GraphNode fListStart = null;
     /**
      * The previous graph node (multiple selection).
      */
-    public List<GraphNode> fPrevList = null;
+    private List<GraphNode> fPrevList = null;
     /**
      * The time compression bar.
      */
-    protected TimeCompressionBar fTimeBar = null;
+    private TimeCompressionBar fTimeBar = null;
     /**
      * The current diagram tool tip.
      */
-    protected DiagramToolTip fToolTip = null;
+    private DiagramToolTip fToolTip = null;
     /**
      * The accessible object reference of view control.
      */
-    protected Accessible fAccessible = null;
+    private Accessible fAccessible = null;
     /**
      * The current node for the tooltip to display.
      */
-    protected GraphNode fToolTipNode;
+    private GraphNode fToolTipNode;
     /**
      * The life line to drag and drop.
      */
-    protected Lifeline fDragAndDrop = null;
+    private Lifeline fDragAndDrop = null;
     /**
      * The number of focused widgets.
      */
-    protected int fFocusedWidget = -1;
+    private int fFocusedWidget = -1;
     /**
      * The printer zoom.
      */
-    protected float fPrinterZoom = 0;
+    private float fPrinterZoom = 0;
     /**
      * Y coordinate for printer.
      */
-    protected int fPrinterY = 0;
+    private int fPrinterY = 0;
     /**
      * X coordinate for printer.
      */
-    protected int fPrinterX = 0;
+    private int fPrinterX = 0;
     /**
      * Flag whether drag and drop is enabled or not.
      */
-    protected boolean fIsDragAndDrop = false;
+    private boolean fIsDragAndDrop = false;
     /**
      * The x coordinate for drag.
      */
-    protected int fDragX = 0;
+    private int fDragX = 0;
     /**
      * The y coordinate for drag.
      */
-    protected int fDragY = 0;
+    private int fDragY = 0;
     /**
      * The reorder mode.
      */
-    protected boolean fReorderMode = false;
+    private boolean fReorderMode = false;
     /**
      * The collapse caret image.
      */
-    protected Image fCollapaseCaretImg = null;
+    private Image fCollapaseCaretImg = null;
     /**
      * The arrow up caret image.
      */
-    protected Image fArrowUpCaretImg = null;
+    private Image fArrowUpCaretImg = null;
     /**
      * The current caret image.
      */
-    protected Image fCurrentCaretImage = null;
+    private Image fCurrentCaretImage = null;
     /**
      * A sequence diagramm collapse provider (for collapsing graph nodes)
      */
-    protected ISDCollapseProvider fCollapseProvider = null;
+    private ISDCollapseProvider fCollapseProvider = null;
     /**
      * The insertion caret.
      */
-    protected Caret fInsertionCartet = null;
+    private Caret fInsertionCartet = null;
     /**
      * The reorder list when in reorder mode.
      */
-    protected List<Lifeline[]> fReorderList = null;
+    private List<Lifeline[]> fReorderList = null;
     /**
      * Flag to specify whether in printing mode or not.
      */
-    protected boolean fIsPrinting = false;
+    private boolean fIsPrinting = false;
     /**
      * A printer reference.
      */
-    protected Printer fPrinter = null;
+    private Printer fPrinter = null;
     /**
      * Flag whether shift was selected or not.
      */
-    protected boolean fShiftSelection = false;
+    private boolean fShiftSelection = false;
     /**
      * The scroll tooltip.
      */
-    protected DiagramToolTip fScrollToolTip = null;
+    private DiagramToolTip fScrollToolTip = null;
     /**
      * Timer for auto_scroll feature
      */
-    protected AutoScroll fLocalAutoScroll = null;
+    private AutoScroll fLocalAutoScroll = null;
     /**
      * TimerTask for auto_scroll feature !=null when auto scroll is running
      */
-    protected Timer fLocalAutoScrollTimer = null;
+    private Timer fLocalAutoScrollTimer = null;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -486,7 +486,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
      * @param list of graph nodes
      */
     public void addSelection(List<GraphNode> list) {
-        // selectedNodeList.addAll(list);
         for (int i = 0; i < list.size(); i++) {
             if (!fSelectedNodeList.contains(list.get(i))) {
                 fSelectedNodeList.add(list.get(i));
@@ -577,13 +576,24 @@ public class SDWidget extends ScrollView implements SelectionListener,
      * Sets the zoom out mode.
      *
      * @param value
-     *            The mode value to set.
+     *          The mode value to set.
      */
     public void setZoomOutMode(boolean value) {
         if (value) {
             setZoomInMode(false);
         }
         fZoomOutMode = value;
+    }
+
+    /**
+     * Sets the current zoom value.
+     *
+     * @param zoomValue
+     *          The current zoom value
+     * @since 2.0
+     */
+    public void setZoomValue(float zoomValue) {
+        fZoomValue = zoomValue;
     }
 
     /**
@@ -654,6 +664,65 @@ public class SDWidget extends ScrollView implements SelectionListener,
      */
     public boolean isPrinting() {
         return fIsPrinting;
+    }
+
+    /**
+     * Returns the current graph node.
+     *
+     * @return the current graph node
+     * @since 2.0
+     */
+    public GraphNode getCurrentGraphNode() {
+        return fCurrentGraphNode;
+    }
+
+    /**
+     * Returns the current zoom value.
+     *
+     * @return the current zoom value
+     * @since 2.0
+     */
+    public float getZoomValue() {
+        return fZoomValue;
+    }
+
+    /**
+     * Gets the zoom in mode.
+     *
+     * @return the mode value to set.
+     * @since 2.0
+     */
+    public boolean getZoomInMode() {
+        return fZoomInMode;
+    }
+
+
+    /**
+     * Gets the zoom out mode.
+     *
+     * @return the mode value to set.
+     * @since 2.0
+     */
+    public boolean getZoomOutMode() {
+        return fZoomOutMode;
+    }
+
+    /**
+     * Returns if ctrl selection
+     * @return true if ctrl selection else false
+     * @since 2.0
+     */
+    public boolean isCtrlSelection() {
+        return fCtrlSelection;
+    }
+
+    /**
+     * Returns if shift selection
+     * @return true if shift Selection else false
+     * @since 2.0
+     */
+    public boolean isShiftSelection() {
+        return fCtrlSelection;
     }
 
     /**
@@ -852,7 +921,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
         if (selectedNode instanceof BaseMessage) {
             node = fFrame.getNextLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), (BaseMessage) selectedNode);
         } else if (selectedNode instanceof Lifeline) {
-            // node = frame.getNextLifelineMessage((Lifeline)selectedNode,null);
             node = fFrame.getFirstExecution((Lifeline) selectedNode);
         } else if (selectedNode instanceof BasicExecutionOccurrence) {
             node = fFrame.getNextExecOccurrence((BasicExecutionOccurrence) selectedNode);
@@ -947,7 +1015,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
         fPrinter.startJob(jobName);
 
         GC gc = new GC(fPrinter);
-//        Frame.setUserPref(SDViewPref.getInstance());
 
         float lastZoom = fZoomValue;
 
@@ -1123,8 +1190,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
         String currentPageNum = String.valueOf(pageNum);
         int ii = context.textExtent(currentPageNum);
         int jj = context.getCurrentFontHeight();
-        // context.setBackground(ColorImpl.getSystemColor(SWT.COLOR_BLACK));
-        // context.setForeground(ColorImpl.getSystemColor(SWT.COLOR_WHITE));
         fZoomValue = fPrinterZoom * lastZoom;
         context.drawText(currentPageNum, Math.round(fPrinterX + getVisibleWidth() / fPrinterZoom - ii / fPrinterZoom), Math.round(fPrinterY + getVisibleHeight() / fPrinterZoom - jj / fPrinterZoom), false);
         fIsPrinting = false;
@@ -1525,7 +1590,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
     protected void contentsMouseMoveEvent(MouseEvent e) {
         fScrollToolTip.hideToolTip();
         fToolTip.hideToolTip();
-        // super.contentsMouseMoveEvent(e);
         if (!(isFocusControl() || getViewControl().isFocusControl())) {
             Control[] child = getParent().getChildren();
             for (int i = 0; i < child.length; i++) {
@@ -1725,7 +1789,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
             }
             // redraw also resize the scrollView content
             redraw();
-        } else {// if (event.button ==1)
+        } else {
             GraphNode node = null;
             int x = Math.round(event.x / fZoomValue);
             int y = Math.round(event.y / fZoomValue);
@@ -1808,7 +1872,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
             gc.dispose();
             return;
         }
-        // Frame.setUserPref(SDViewPref.getInstance());
         SDViewPref.getInstance();
 
         Rectangle area = getClientArea();

@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -34,7 +33,7 @@ import org.eclipse.ui.IActionBars;
  * @author sveyrier
  *
  */
-public class Zoom extends Action {
+public class Zoom extends BaseSDAction {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -60,21 +59,13 @@ public class Zoom extends Action {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The sequence diagram view reference
-     */
-    protected SDView fView = null;
-    /**
      * Flag to indicate last zoom in.
      */
-    protected boolean fLastZoomIn = false;
+    private boolean fLastZoomIn = false;
     /**
      * Flag to indicate last zoom out.
      */
-    protected boolean fLastZoomOut = false;
-    /**
-     * Flag to indicate last zoom.
-     */
-    protected boolean fLastZoom = true;
+    private boolean fLastZoomOut = false;
     /**
      * The cursor used when zooming in.
      */
@@ -108,9 +99,7 @@ public class Zoom extends Action {
      * @param type The type of zoom.
      */
     public Zoom(SDView view, ZoomType type) {
-        super("", AS_RADIO_BUTTON);//$NON-NLS-1$
-
-        fView = view;
+        super(view, "", AS_RADIO_BUTTON); //$NON-NLS-1$
 
         // Pre-create zooming cursors
         fZoomInCursor = new Cursor(Display.getCurrent(),
@@ -160,11 +149,11 @@ public class Zoom extends Action {
     @Override
     public void run() {
 
-        if ((fView == null) || (fView.getSDWidget() == null)) {
+        if ((getView() == null) || (getView().getSDWidget() == null)) {
             return;
         }
 
-        SDWidget viewer = fView.getSDWidget();
+        SDWidget viewer = getView().getSDWidget();
 
         if (getId().equals(ZOOM_OUT_ID)) {
             // Eclipse 3.0 M7 workaround
@@ -174,7 +163,6 @@ public class Zoom extends Action {
 
             viewer.setZoomOutMode(isChecked());
             fLastZoomOut = isChecked();
-            fLastZoom = false;
             if (isChecked()) {
                 viewer.setCursor(fZoomOutCursor);
                 setActionChecked(NO_ZOOM_ID, false);
@@ -190,7 +178,6 @@ public class Zoom extends Action {
 
             viewer.setZoomInMode(isChecked());
             fLastZoomIn = isChecked();
-            fLastZoom = false;
             if (isChecked()) {
                 viewer.setCursor(fZoomInCursor);
                 setActionChecked(NO_ZOOM_ID, false);
@@ -204,7 +191,6 @@ public class Zoom extends Action {
             // The reset action is a radio button only to uncheck the zoom in and out button
             // when it is clicked. This avoid adding code to do it manually
             // We only have to force it to false every time
-            fLastZoom = false;
             setChecked(false);
             setActionChecked(NO_ZOOM_ID, true);
         } else if (getId().equals(NO_ZOOM_ID)) {
@@ -222,8 +208,8 @@ public class Zoom extends Action {
      * @param checked true to check the action, false to uncheck the action
      */
     protected void setActionChecked(String id, boolean checked) {
-        if (fView != null) {
-            IActionBars bar = fView.getViewSite().getActionBars();
+        if (getView() != null) {
+            IActionBars bar = getView().getViewSite().getActionBars();
             if (bar == null) {
                 return;
             }

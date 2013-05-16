@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,55 +39,55 @@ public abstract class GraphNode {
     /**
      * The start event occurrence.
      */
-    protected int fStartEventOccurrence = 0;
+    private int fStartEventOccurrence = 0;
     /**
      * The event event occurrence.
      */
-    protected int fEndEventOccurrence = 0;
+    private int fEndEventOccurrence = 0;
     /**
      * Preference ColorId to use to draw font
      */
-    public String fPrefId = ISDPreferences.PREF_SYNC_MESS;
+    private String fPrefId = ISDPreferences.PREF_SYNC_MESS;
     /**
      * The selection state of the graph node.
      */
-    protected boolean fSelected = false;
+    private boolean fSelected = false;
     /**
      * The focus state of the graph node.
      */
-    protected boolean fFocused = false;
+    private boolean fFocused = false;
     /**
      * Flag to indicate whether node has children or not.
      */
-    protected boolean fHasChilden = false;
+    private boolean fHasChilden = false;
     /**
      * The graph node name used to label the graph node in the View.
      */
-    protected String fName = ""; //$NON-NLS-1$
+    private String fName = ""; //$NON-NLS-1$
     /**
      * A map from node name to graph node.
      */
-    protected Map<String, List<GraphNode>> fNodes;
+    private Map<String, List<GraphNode>> fNodes;
     /**
      * A map from node name to graph node for forward sorting
      */
-    protected Map<String, List<GraphNode>> fForwardNodes;
+    private Map<String, List<GraphNode>> fForwardNodes;
     /**
      * A map from node name to graph node for backwards sorting.
      */
-    protected Map<String, List<GraphNode>> fBackwardNodes;
+    private Map<String, List<GraphNode>> fBackwardNodes;
     /**
      * A map from node name to index.
      */
-    protected Map<String, Integer> fIndexes;
+    private Map<String, Integer> fIndexes;
     /**
-     * A map from node name to index for forwards sorting.
+     * A map from node name to flag for forwards sorting.
      */
-    protected Map<String, Boolean> fForwardSort;
+    private Map<String, Boolean> fForwardSort;
     /**
-     * A map from node name to index for forwards sorting.
+     * A map from node name to flag for backwards sorting.
      */
-    protected Map<String, Boolean> fBackwardSort;
+    private Map<String, Boolean> fBackwardSort;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -790,5 +790,117 @@ public abstract class GraphNode {
             locHeight = -locHeight;
         }
         return (px >= locX) && (py >= locY) && ((px - locX) <= locWidth) && ((py - locY) <= locHeight);
+    }
+
+    /**
+     * Sets the start event occurrence attached to this graphNode.
+     *
+     * @param occurence
+     *          the start event occurrence attached to the graphNode
+     * @since 2.0
+     */
+    protected void setStartOccurrence(int occurence) {
+        fStartEventOccurrence = occurence;
+    }
+
+    /**
+     * Sets the end event occurrence attached to this graphNode
+     *
+     * @param occurence
+     *          the start event occurrence attached to the graphNode
+     * @since 2.0
+     */
+    protected void setEndOccurrence(int occurence) {
+        fEndEventOccurrence = occurence;
+    }
+
+    /**
+     * Sets the color preference id
+     * @param id
+     *          The color preference id
+     * @since 2.0
+     */
+    protected void setColorPrefId(String id) {
+        fPrefId = id;
+    }
+
+    /**
+     * Gets the color preference id
+     * @return the color preference id
+     * @since 2.0
+     */
+    protected String getColorPrefId() {
+        return fPrefId;
+    }
+
+    /**
+     * @return if node has children or not
+     * @since 2.0
+     */
+    protected boolean hasChildren() {
+        return fHasChilden;
+    }
+
+    /**
+     * Sets the flag indicating where the node has children or not.
+     * @param hasChildren
+     *          if node has children or not
+     * @since 2.0
+     */
+    protected void hasChildren(boolean hasChildren) {
+        fHasChilden = hasChildren;
+    }
+    /**
+     * Returns a map from node name to graph node.
+     *
+     * @return map with children graph bodes
+     * @since 2.0
+     */
+    protected Map<String, List<GraphNode>> getNodeMap() {
+        return fNodes;
+    }
+    /**
+     * Returns a map from node name to graph node for forward sorting
+     *
+     * @return forward sorting map
+     * @since 2.0
+     */
+    protected Map<String, List<GraphNode>> getForwardNodes() {
+        return fForwardNodes;
+    }
+    /**
+     * Returns a map from node name to graph node for backwards sorting.
+     *
+     * @return backwards sorting map
+     * @since 2.0
+     */
+    protected Map<String, List<GraphNode>> getBackwardNodes() {
+        return fBackwardNodes;
+    }
+    /**
+     * Returns a map from node name to index.
+     *
+     * @return map with node name to index
+     * @since 2.0
+     */
+    protected Map<String, Integer> getIndexes() {
+        return fIndexes;
+    }
+
+    /**
+     * Returns a map from node name to sort flag for forwards sorting.
+     * @return a map from node name to sort flag
+     * @since 2.0
+     */
+    protected Map<String, Boolean> getForwardSortMap() {
+        return fForwardSort;
+    }
+    /**
+     * Returns a map from node name to flag for backwards sorting.
+     * @return map from node name to flag for backwards sorting.
+     * @since 2.0
+     */
+    protected Map<String, Boolean> getBackwardSortMap() {
+        return fBackwardSort;
     }
 }

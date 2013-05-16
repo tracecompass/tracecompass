@@ -73,71 +73,67 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * The listener list
      */
-    protected List<ITimeCompressionListener> fListenerList = null;
+    private List<ITimeCompressionListener> fListenerList = null;
     /**
      * The current frame displayed.
      */
-    protected Frame fFrame = null;
+    private Frame fFrame = null;
     /**
      * List of time events.
      */
-    protected List<SDTimeEvent> fNodeList = null;
+    private List<SDTimeEvent> fNodeList = null;
     /**
      * The minimum time delta.
      */
-    protected ITmfTimestamp fMinTime = new TmfTimestamp();
+    private ITmfTimestamp fMinTime = new TmfTimestamp();
     /**
      * The maximum time delta.
      */
-    protected ITmfTimestamp fMaxTime = new TmfTimestamp();
+    private ITmfTimestamp fMaxTime = new TmfTimestamp();
     /**
      * The current zoom value.
      */
-    protected float fZoomValue = 1;
+    private float fZoomValue = 1;
     /**
      * The tooltip to display.
      */
-    protected DrawableToolTip fTooltip = null;
+    private DrawableToolTip fTooltip = null;
     /**
      *  Array of colors for displaying wight of time deltas.
      */
-    protected ColorImpl[] fColors;
+    private ColorImpl[] fColors;
     /**
      * The accessible object reference.
      */
-    protected Accessible fAccessible = null;
+    private Accessible fAccessible = null;
     /**
      * The focused widget reference.
      */
-    protected int fFocusedWidget = -1;
-    /**
-     * The sequence diagram view reference.
-     */
-    protected SDView view = null;
+    private int fFocusedWidget = -1;
     /**
      * The current lifeline.
      */
-    protected Lifeline fLifeline = null;
+    private Lifeline fLifeline = null;
     /**
      * The current start event value.
      */
-    protected int fLifelineStart = 0;
+    private int fLifelineStart = 0;
     /**
      * The current number of events.
      */
-    protected int fLifelineNumEvents = 0;
+    private int fLifelineNumEvents = 0;
     /**
      * The Current color of range to display.
      */
-    protected IColor fLifelineColor = null;
+    private IColor fLifelineColor = null;
     /**
      *  The next graph node y coordinate.
      */
-    protected int fNextNodeY = 0;
+    private int fNextNodeY = 0;
     /**
      *  The previous graph node y coordinate.
      */
-    protected int fPrevNodeY = 0;
+    private int fPrevNodeY = 0;
 
     // ------------------------------------------------------------------------
     // Constructors

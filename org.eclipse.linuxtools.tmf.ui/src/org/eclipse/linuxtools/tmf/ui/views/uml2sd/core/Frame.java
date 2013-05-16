@@ -44,27 +44,27 @@ public class Frame extends BasicFrame {
     /**
      * The lifeline that is current highlighted.
      */
-    protected Lifeline fHighlightLifeline = null;
+    private Lifeline fHighlightLifeline = null;
     /**
      * The value of the start event.
      */
-    protected int fStartEvent = 0;
+    private int fStartEvent = 0;
     /**
-     * The nubmer of events in the frame.
+     * The number of events in the frame.
      */
-    protected int fNbEvent = 0;
+    private int fNbEvent = 0;
     /**
      * The color for highlighting.
      */
-    protected IColor fHighlightColor = null;
+    private IColor fHighlightColor = null;
     /**
      * The list of time events of the corresponding execution occurrences.
      */
-    protected List<SDTimeEvent> fExecutionOccurrencesWithTime;
+    private List<SDTimeEvent> fExecutionOccurrencesWithTime;
     /**
      * The Array of lifeline categories.
      */
-    protected LifelineCategories[] fLifelineCategories = null;
+    private LifelineCategories[] fLifelineCategories = null;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -77,10 +77,10 @@ public class Frame extends BasicFrame {
      * @return the lifelines list
      */
     protected List<GraphNode> getLifelines() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return null;
         }
-        return fNodes.get(Lifeline.LIFELINE_TAG);
+        return getNodeMap().get(Lifeline.LIFELINE_TAG);
     }
 
     /**
@@ -116,10 +116,10 @@ public class Frame extends BasicFrame {
      * @return the syncMessages list
      */
     protected List<GraphNode> getSyncMessages() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return null;
         }
-        return fNodes.get(SyncMessage.SYNC_MESS_TAG);
+        return getNodeMap().get(SyncMessage.SYNC_MESS_TAG);
     }
 
     /**
@@ -154,10 +154,10 @@ public class Frame extends BasicFrame {
      * @return the asyncMessages list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessages() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return null;
         }
-        return fNodes.get(AsyncMessage.ASYNC_MESS_TAG);
+        return getNodeMap().get(AsyncMessage.ASYNC_MESS_TAG);
     }
 
     /**
@@ -192,10 +192,10 @@ public class Frame extends BasicFrame {
      * @return the syncMessages return list or <code>null</code>
      */
     protected List<GraphNode> getSyncMessagesReturn() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return null;
         }
-        return fNodes.get(SyncMessageReturn.SYNC_MESS_RET_TAG);
+        return getNodeMap().get(SyncMessageReturn.SYNC_MESS_RET_TAG);
     }
 
     /**
@@ -230,10 +230,10 @@ public class Frame extends BasicFrame {
      * @return the asyncMessageRetun list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessagesReturn() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return null;
         }
-        return fNodes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
+        return getNodeMap().get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
     }
 
     /**
@@ -268,7 +268,7 @@ public class Frame extends BasicFrame {
      * @param lifeline the lifeline to add
      */
     public void addLifeLine(Lifeline lifeline) {
-        fComputeMinMax = true;
+        setComputeMinMax(true);
         if (lifeline == null) {
             return;
         }
@@ -278,7 +278,7 @@ public class Frame extends BasicFrame {
         // and set the lifeline drawing order
         lifeline.setIndex(getNewHorizontalIndex());
         if (lifeline.hasTimeInfo()) {
-            fHasTimeInfo = true;
+            setHasTimeInfo(true);
         }
         // add the lifeline to the lifelines list
         addNode(lifeline);
@@ -290,10 +290,10 @@ public class Frame extends BasicFrame {
      * @return the first visible lifeline index
      */
     public int getFirstVisibleLifeline() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return 0;
-        } else if (fIndexes.get(Lifeline.LIFELINE_TAG) != null) {
-            return fIndexes.get(Lifeline.LIFELINE_TAG).intValue();
+        } else if (getIndexes().get(Lifeline.LIFELINE_TAG) != null) {
+            return getIndexes().get(Lifeline.LIFELINE_TAG).intValue();
         }
         return 0;
     }
@@ -304,10 +304,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleSyncMessage() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return 0;
-        } else if (fIndexes.get(SyncMessage.SYNC_MESS_TAG) != null) {
-            return fIndexes.get(SyncMessage.SYNC_MESS_TAG).intValue();
+        } else if (getIndexes().get(SyncMessage.SYNC_MESS_TAG) != null) {
+            return getIndexes().get(SyncMessage.SYNC_MESS_TAG).intValue();
         }
         return 0;
     }
@@ -318,10 +318,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleSyncMessageReturn() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return 0;
-        } else if (fIndexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null) {
-            return fIndexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG).intValue();
+        } else if (getIndexes().get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null) {
+            return getIndexes().get(SyncMessageReturn.SYNC_MESS_RET_TAG).intValue();
         }
         return 0;
     }
@@ -332,10 +332,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleAsyncMessage() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return 0;
-        } else if (fIndexes.get(AsyncMessage.ASYNC_MESS_TAG) != null) {
-            return fIndexes.get(AsyncMessage.ASYNC_MESS_TAG).intValue();
+        } else if (getIndexes().get(AsyncMessage.ASYNC_MESS_TAG) != null) {
+            return getIndexes().get(AsyncMessage.ASYNC_MESS_TAG).intValue();
         }
         return 0;
     }
@@ -346,10 +346,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleAsyncMessageReturn() {
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return 0;
-        } else if (fIndexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null) {
-            return fIndexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG).intValue();
+        } else if (getIndexes().get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null) {
+            return getIndexes().get(AsyncMessageReturn.ASYNC_MESS_RET_TAG).intValue();
         }
         return 0;
     }
@@ -529,7 +529,7 @@ public class Frame extends BasicFrame {
             if (SDViewPref.getInstance().excludeExternalTime() && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
                 BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
                 BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
-                if ((mes2.fStartLifeline == null) || (mes1.fEndLifeline == null)) {
+                if ((mes2.getStartLifeline() == null) || (mes1.getEndLifeline() == null)) {
                     continue;
                 }
             }
@@ -572,24 +572,6 @@ public class Frame extends BasicFrame {
             bounds[0] = timeArray.get(timeArray.size() - 1).getGraphNode();
         }
         return false;
-    }
-
-    /**
-     * Set whether time information is available or not
-     *
-     * @param value <code>true</code> for has time information else <code>false</code>
-     */
-    protected void setHasTimeInfo(boolean value) {
-        fHasTimeInfo = value;
-    }
-
-    /**
-     * Returns whether frame has time info or not.
-     *
-     * @return <code>true</code> whether frame has time info else <code>false</code>
-     */
-    public boolean hasTimeInfo() {
-        return fHasTimeInfo;
     }
 
     /**
@@ -644,7 +626,7 @@ public class Frame extends BasicFrame {
     @Override
     public void draw(IGC context) {
         drawFrame(context);
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return;
         }
 
@@ -660,12 +642,12 @@ public class Frame extends BasicFrame {
         if (Metrics.swimmingLaneWidth() * context.getZoom() < Metrics.LIFELINE_SIGNIFICANT_HSPACING) {
             lifelineArryStep = Math.round(Metrics.LIFELINE_SIGNIFICANT_HSPACING / (Metrics.swimmingLaneWidth() * context.getZoom()));
         }
-        if (fIndexes.size() == 0) {
+        if (getIndexes().size() == 0) {
             return;
         }
-        int lifeLineDrawIndex = fIndexes.get(Lifeline.LIFELINE_TAG).intValue();
-        for (int i = lifeLineDrawIndex; i < fNodes.get(Lifeline.LIFELINE_TAG).size(); i = i + lifelineArryStep) {
-            Lifeline toDraw = (Lifeline) fNodes.get(Lifeline.LIFELINE_TAG).get(i);
+        int lifeLineDrawIndex = getIndexes().get(Lifeline.LIFELINE_TAG).intValue();
+        for (int i = lifeLineDrawIndex; i < getNodeMap().get(Lifeline.LIFELINE_TAG).size(); i = i + lifelineArryStep) {
+            Lifeline toDraw = (Lifeline) getNodeMap().get(Lifeline.LIFELINE_TAG).get(i);
             if (toDraw.getX() - Metrics.LIFELINE_SPACING / 2 > context.getContentsX() + context.getVisibleWidth()) {
                 break;
             }
@@ -684,7 +666,7 @@ public class Frame extends BasicFrame {
                             BasicExecutionOccurrence exec = (BasicExecutionOccurrence) toDraw.getExecutions().get(index);
                             int tempEvent = fStartEvent;
                             for (int j = 0; j < fNbEvent; j++) {
-                                if (((tempEvent >= exec.fStartEventOccurrence) && (tempEvent <= exec.fEndEventOccurrence) && (tempEvent + 1 >= exec.fStartEventOccurrence) && (tempEvent + 1 <= exec.fEndEventOccurrence))) {
+                                if (((tempEvent >= exec.getStartOccurrence()) && (tempEvent <= exec.getEndOccurrence()) && (tempEvent + 1 >= exec.getStartOccurrence()) && (tempEvent + 1 <= exec.getEndOccurrence()))) {
                                     toDraw.highlightExecOccurrenceRegion(context, tempEvent, 1, SDViewPref.getInstance().getTimeCompressionSelectionColor());
                                 }
                                 tempEvent = tempEvent + 1;
@@ -704,15 +686,15 @@ public class Frame extends BasicFrame {
     @Override
     protected List<SDTimeEvent> buildTimeArray() {
 
-        if (!fHasChilden) {
+        if (!hasChildren()) {
             return new ArrayList<SDTimeEvent>();
         }
 
         List<SDTimeEvent> timeArray = super.buildTimeArray();
         fExecutionOccurrencesWithTime = null;
         if (getLifelines() != null) {
-            for (int i = 0; i < fNodes.get(Lifeline.LIFELINE_TAG).size(); i++) {
-                Lifeline lifeline = (Lifeline) fNodes.get(Lifeline.LIFELINE_TAG).get(i);
+            for (int i = 0; i < getNodeMap().get(Lifeline.LIFELINE_TAG).size(); i++) {
+                Lifeline lifeline = (Lifeline) getNodeMap().get(Lifeline.LIFELINE_TAG).get(i);
                 if (lifeline.hasTimeInfo() && lifeline.getExecutions() != null) {
                     for (Iterator<GraphNode> j = lifeline.getExecutions().iterator(); j.hasNext();) {
                         GraphNode o = j.next();
@@ -1076,10 +1058,10 @@ public class Frame extends BasicFrame {
         BasicExecutionOccurrence result = null;
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if ((e.getStartOccurrence() < exec.fStartEventOccurrence) && (result == null)) {
+            if ((e.getStartOccurrence() < exec.getStartOccurrence()) && (result == null)) {
                 result = e;
             }
-            if ((e.getStartOccurrence() < exec.fStartEventOccurrence) && (result != null) && (e.getStartOccurrence() >= result.getEndOccurrence())) {
+            if ((e.getStartOccurrence() < exec.getStartOccurrence()) && (result != null) && (e.getStartOccurrence() >= result.getEndOccurrence())) {
                 result = e;
             }
         }
@@ -1107,10 +1089,10 @@ public class Frame extends BasicFrame {
         BasicExecutionOccurrence result = null;
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if ((e.getStartOccurrence() > exec.fStartEventOccurrence) && (result == null)) {
+            if ((e.getStartOccurrence() > exec.getStartOccurrence()) && (result == null)) {
                 result = e;
             }
-            if ((e.getStartOccurrence() > exec.fStartEventOccurrence) && (result != null) && (e.getStartOccurrence() <= result.getEndOccurrence())) {
+            if ((e.getStartOccurrence() > exec.getStartOccurrence()) && (result != null) && (e.getStartOccurrence() <= result.getEndOccurrence())) {
                 result = e;
             }
         }
@@ -1142,5 +1124,92 @@ public class Frame extends BasicFrame {
             }
         }
         return result;
+    }
+
+    /**
+     * @return highlighted life line if set else null.
+     * @since 2.0
+     */
+    protected Lifeline getHighlightLifeline() {
+        return fHighlightLifeline;
+    }
+
+    /**
+     * @return the start event value.
+     * @since 2.0
+     */
+    protected int getStartEvent() {
+        return fStartEvent;
+    }
+
+    /**
+     * Returns the number of events
+     *
+     * @return the number of events
+     * @since 2.0
+     */
+    protected int getNumberOfEvents() {
+        return fNbEvent;
+    }
+
+    /**
+     * Returns the highlight color.
+     * @return the highlight color
+     * @since 2.0
+     */
+    protected IColor getHighlightColor() {
+        return fHighlightColor;
+    }
+
+    /**
+     * Set the highlighted life line.
+     * @param lifeline
+     *          The highlighted life line if set else null
+     * @since 2.0
+     */
+    protected void setHighlightLifeline(Lifeline lifeline) {
+        fHighlightLifeline = lifeline;
+    }
+
+    /**
+     * Sets the start event value
+     * @param startEvent
+     *           the start event value.
+     * @since 2.0
+     */
+    protected void setStartEvent(int startEvent) {
+        fStartEvent = startEvent;
+    }
+
+    /**
+     * Sets the number of events
+     *
+     * @param nbEvents
+     *          The number of events
+     * @since 2.0
+     */
+    protected void setNumberOfEvents(int nbEvents) {
+        fNbEvent = nbEvents;
+    }
+
+    /**
+     * Sets the highlight color.
+     * @param color
+     *          the highlight color
+     * @since 2.0
+     */
+    protected void setHighlightColor(IColor color) {
+        fHighlightColor = color;
+    }
+
+    /**
+     * sets the list of execution occurrences.
+     *
+     * @param occurences
+     *          the list of execution occurrences
+     * @since 2.0
+     */
+    protected void setExecutionOccurrencesWithTime(List<SDTimeEvent> occurences) {
+        fExecutionOccurrencesWithTime = occurences;
     }
 }

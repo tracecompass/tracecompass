@@ -33,7 +33,7 @@ public class TmfSyncMessage extends SyncMessage implements ITmfSyncSequenceDiagr
     /**
      * A synchronous sequence diagram event implementation
      */
-    protected ITmfSyncSequenceDiagramEvent fSdEvent;
+    private ITmfSyncSequenceDiagramEvent fSdEvent;
 
     // ------------------------------------------------------------------------
     // Constructors

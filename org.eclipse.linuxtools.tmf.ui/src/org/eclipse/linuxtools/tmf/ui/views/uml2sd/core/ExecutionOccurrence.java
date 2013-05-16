@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
+import java.util.Arrays;
+
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
@@ -37,31 +39,31 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     /**
      * Set the red, green and blue value of the optional color to be used for filling the execution occurrence.
      */
-    protected int[] fFillRGB;
+    private int[] fFillRGB;
     /**
      * Set the red, green and blue value of the optional color to be used for drawing the execution occurrence
      */
-    protected int[] fStrokeRGB;
+    private int[] fStrokeRGB;
     /**
      * The occurrence image.
      */
-    protected IImage fImage;
+    private IImage fImage;
     /**
      * The top ellipses image.
      */
-    protected IImage fEllipsesImage;
+    private IImage fEllipsesImage;
     /**
      *  The start time stamp.
      */
-    protected ITmfTimestamp fStartTime;
+    private ITmfTimestamp fStartTime;
     /**
      * The end time stamp;
      */
-    protected ITmfTimestamp fEndTime;
+    private ITmfTimestamp fEndTime;
     /**
      * Flag to indicate whether time information is available or not.
      */
-    protected boolean fHasTimeInfo;
+    private boolean fHasTimeInfo;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -70,10 +72,10 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     @Override
     public void setLifeline(Lifeline theLifeline) {
         super.setLifeline(theLifeline);
-        if (fLifeline != null && fHasTimeInfo) {
-            fLifeline.fHasTimeInfo = true;
-            if (fLifeline.getFrame() != null) {
-                fLifeline.getFrame().setHasTimeInfo(true);
+        if (getLifeline() != null && fHasTimeInfo) {
+            getLifeline().setTimeInfo(true);
+            if (getLifeline().getFrame() != null) {
+                getLifeline().getFrame().setHasTimeInfo(true);
             }
         }
     }
@@ -133,8 +135,8 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     public void setStartTime(ITmfTimestamp time) {
         fStartTime = time;
         fHasTimeInfo = true;
-        if (fLifeline != null) {
-            fLifeline.setTimeInfo(true);
+        if (getLifeline() != null) {
+            getLifeline().setTimeInfo(true);
         }
     }
 
@@ -147,8 +149,8 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     public void setEndTime(ITmfTimestamp time) {
         fEndTime = time;
         fHasTimeInfo = true;
-        if (fLifeline != null) {
-            fLifeline.setTimeInfo(true);
+        if (getLifeline() != null) {
+            getLifeline().setTimeInfo(true);
         }
     }
 
@@ -171,6 +173,44 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     @Override
     public boolean hasTimeInfo() {
         return fHasTimeInfo;
+    }
+
+   /**
+    * @return the RGB of the occurrence filler.
+    * @since 2.0
+    */
+    public int[] getFillRGB() {
+       if (fFillRGB == null) {
+           return null;
+       }
+       return Arrays.copyOf(fFillRGB, fFillRGB.length);
+   }
+
+    /**
+     * @return the RGB of the occurrence filler.
+     * @since 2.0
+     */
+     public int[] getStrokeRGB() {
+        if (fStrokeRGB == null) {
+            return null;
+        }
+        return Arrays.copyOf(fStrokeRGB, fStrokeRGB.length);
+    }
+
+    /**
+     * @return the image.
+     * @since 2.0
+     */
+    protected IImage getImage() {
+        return fImage;
+    }
+
+    /**
+     * @return the image.
+     * @since 2.0
+     */
+    protected IImage getEllipsesImage() {
+        return fEllipsesImage;
     }
 
     @Override
@@ -213,5 +253,15 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
             return tempStrokeColor;
         }
         return super.setUnselectedStrokeColor(context);
+    }
+
+    /**
+     * Sets the flag whether the frame has time info or not
+     * @since 2.0
+     * @param hasTimeInfo
+     *          true if frame has time info else false
+     */
+    public void setHasTimeInfo(boolean hasTimeInfo) {
+        fHasTimeInfo = hasTimeInfo;
     }
 }

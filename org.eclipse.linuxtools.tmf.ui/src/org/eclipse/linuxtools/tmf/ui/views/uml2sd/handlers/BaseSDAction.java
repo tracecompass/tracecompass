@@ -1,37 +1,33 @@
 /**********************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
+ * Copyright (c) 2013 Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM - Initial API and implementation
- *     Bernd Hufmann - Updated for TMF
+ *     Bernd Hufmann - Initial API and implementation
  **********************************************************************/
-
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 
 /**
- * Action class implementation to move right in the sequence diagram view within a page.
+ * Base class for sequence diagram actions.
  *
- * @version 1.0
- * @author sveyrier
- *
+ * @author Bernd Hufmann
+ * @since 2.0
  */
-
-public class MoveSDRight extends BaseSDAction {
+public class BaseSDAction extends Action {
 
     // ------------------------------------------------------------------------
-    // Constants
+    // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The action ID.
+     * The sequence diagram view reference.
      */
-     public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDRight"; //$NON-NLS-1$
+    private SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -39,35 +35,55 @@ public class MoveSDRight extends BaseSDAction {
     /**
      * Default constructor
      */
-    public MoveSDRight() {
+    public BaseSDAction() {
         this(null);
     }
 
     /**
      * Constructor
      *
-     * @param view a sequence diagram view reference
+     * @param view
+     *          a sequence diagram view reference
      */
-    public MoveSDRight(SDView view) {
-        super(view);
-        setId(ID);
-        setActionDefinitionId(ID);
+    public BaseSDAction(SDView view) {
+        super();
+        fView = view;
+    }
+
+    /**
+     * Constructor
+     * @param view
+     *          a sequence diagram view reference
+     * @param text
+     *          The action text
+     * @param style
+     *          The style
+     */
+    protected BaseSDAction(SDView view, String text, int style) {
+        super(text, style);
+        fView = view;
     }
 
     // ------------------------------------------------------------------------
-    // Methods
+    // Operations
     // ------------------------------------------------------------------------
 
-    @Override
-    public void run() {
+    /**
+     * Sets the active SD view.
+     *
+     * @param view The SD view.
+     */
+    public void setView(SDView view) {
+        fView = view;
+    }
 
-        if (getView() == null) {
-            return;
-        }
-
-        SDWidget viewer = getView().getSDWidget();
-        if (viewer != null) {
-            viewer.scrollBy(+viewer.getVisibleWidth(), 0);
-        }
+    /**
+     * Gets the active SD view.
+     *
+     * @return view The SD view.
+     * @since 2.0
+     */
+    public SDView getView() {
+        return fView;
     }
 }

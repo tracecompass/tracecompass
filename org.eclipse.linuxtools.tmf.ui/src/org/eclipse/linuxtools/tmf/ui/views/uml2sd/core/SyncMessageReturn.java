@@ -47,7 +47,7 @@ public class SyncMessageReturn extends SyncMessage {
     /**
      * The associated message(the message it is the return).
      */
-    protected SyncMessage fMessage = null;
+    private SyncMessage fMessage = null;
 
     // ------------------------------------------------------------------------
     // Constractors
@@ -57,7 +57,7 @@ public class SyncMessageReturn extends SyncMessage {
      * Default constructor
      */
     public SyncMessageReturn() {
-        fPrefId = ISDPreferences.PREF_SYNC_MESS_RET;
+        setColorPrefId(ISDPreferences.PREF_SYNC_MESS_RET);
     }
 
     // ------------------------------------------------------------------------
@@ -97,8 +97,8 @@ public class SyncMessageReturn extends SyncMessage {
         context.setLineStyle(context.getLineDotStyle());
         // Draw it selected?
         if (!isSelected()) {
-            context.setBackground(pref.getBackGroundColor(fPrefId));
-            context.setForeground(pref.getForeGroundColor(fPrefId));
+            context.setBackground(pref.getBackGroundColor(getColorPrefId()));
+            context.setForeground(pref.getForeGroundColor(getColorPrefId()));
         }
         super.draw(context);
         // restore the context

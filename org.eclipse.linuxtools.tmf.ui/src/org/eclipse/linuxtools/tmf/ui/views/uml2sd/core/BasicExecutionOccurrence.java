@@ -43,7 +43,7 @@ public class BasicExecutionOccurrence extends GraphNode {
     /**
      * The corresponding lifeline.
      */
-    protected Lifeline fLifeline = null;
+    private Lifeline fLifeline = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -52,7 +52,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      * Default constructore
      */
     public BasicExecutionOccurrence() {
-        fPrefId = ISDPreferences.PREF_EXEC;
+        setColorPrefId(ISDPreferences.PREF_EXEC);
     }
 
     // ------------------------------------------------------------------------
@@ -72,7 +72,7 @@ public class BasicExecutionOccurrence extends GraphNode {
         if (fLifeline == null) {
             return 0;
         }
-        return fLifeline.getY() + fLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fStartEventOccurrence;
+        return fLifeline.getY() + fLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * getStartOccurrence();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class BasicExecutionOccurrence extends GraphNode {
         if (fLifeline == null) {
             return 0;
         }
-        return ((Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing())) * (fEndEventOccurrence - fStartEventOccurrence);
+        return ((Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing())) * (getEndOccurrence() - getStartOccurrence());
     }
 
     @Override
@@ -141,7 +141,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getStartOccurrence() {
-        return fStartEventOccurrence;
+        return super.getStartOccurrence();
     }
 
     /**
@@ -151,7 +151,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getEndOccurrence() {
-        return fEndEventOccurrence;
+        return super.getEndOccurrence();
     }
 
     /**
@@ -159,8 +159,9 @@ public class BasicExecutionOccurrence extends GraphNode {
      *
      * @param occurrence the start event occurrence to set
      */
+    @Override
     public void setStartOccurrence(int occurrence) {
-        fStartEventOccurrence = occurrence;
+        super.setStartOccurrence(occurrence);
     }
 
     /**
@@ -168,8 +169,9 @@ public class BasicExecutionOccurrence extends GraphNode {
      *
      * @param occurrence the end event occurrence to set
      */
+    @Override
     public void setEndOccurrence(int occurrence) {
-        fEndEventOccurrence = occurrence;
+        super.setEndOccurrence(occurrence);
     }
 
     @Override

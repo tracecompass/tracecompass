@@ -11,9 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
 
@@ -23,7 +22,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
  * @version 1.0
  * @author Bernd Hufmann
  */
-public class LastPage extends Action {
+public class LastPage extends BaseSDAction {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -35,15 +34,6 @@ public class LastPage extends Action {
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.lastpage"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    /**
-     * The sequence diagram view reference
-     */
-    protected SDView fView = null;
-
-    // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -53,8 +43,7 @@ public class LastPage extends Action {
      * @param view the view reference
      */
     public LastPage(SDView view) {
-        super();
-        fView = view;
+        super(view);
         setText(Messages.SequenceDiagram_LastPage);
         setToolTipText(Messages.SequenceDiagram_GoToLastPage);
         setId(ID);
@@ -67,13 +56,13 @@ public class LastPage extends Action {
 
     @Override
     public void run() {
-        if ((fView == null) || (fView.getSDWidget()) == null) {
+        if ((getView() == null) || (getView().getSDWidget()) == null) {
             return;
         }
-        if (fView.getSDPagingProvider() != null) {
-            fView.getSDPagingProvider().lastPage();
+        if (getView().getSDPagingProvider() != null) {
+            getView().getSDPagingProvider().lastPage();
         }
-        fView.updateCoolBar();
-        fView.getSDWidget().redraw();
+        getView().updateCoolBar();
+        getView().getSDWidget().redraw();
     }
 }

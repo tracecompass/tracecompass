@@ -42,13 +42,13 @@ public class Stop extends GraphNode {
     /**
      * The owning lifeline on which the stop appears
      */
-    protected Lifeline fLifeline = null;
+    private Lifeline fLifeline = null;
     /**
      * This basically represents the time when the stop occurs on the owning Lifeline
      *
      * @see Lifeline Lifeline for more event occurence details
      */
-    protected int fEventOccurrence = 0;
+    private int fEventOccurrence = 0;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -93,6 +93,26 @@ public class Stop extends GraphNode {
      */
     public void setLifeline(Lifeline theLifeline) {
         fLifeline = theLifeline;
+    }
+
+    /**
+     * Get the lifeline on which the stop must be draw
+     *
+     * @return the the stop owing lifeline
+     * @since 2.0
+     */
+    public Lifeline getLifeline() {
+        return fLifeline;
+    }
+
+    /**
+     * Get the event occurrence when this stop appears
+     *
+     * @return the eventOccurence to assign to the stop
+     * @since 2.0
+     */
+    public int getEventOccurrence() {
+        return fEventOccurrence;
     }
 
     /**

@@ -75,22 +75,22 @@ public class SearchFilterDialog extends Dialog {
     /**
      * The sequence diagram view reference.
      */
-    protected SDView fSdView = null;
+    private final SDView fSdView;
 
     /**
      * The tab with the controls for a Criteria
      */
-    protected TabFolder fTabFolder = null;
+    private final TabFolder fTabFolder = null;
 
     /**
      * The Criteria updated by this dialog
      */
-    protected Criteria fCriteria = null;
+    private Criteria fCriteria = null;
 
     /**
      * The find/filter provider telling which graph nodes are supported
      */
-    protected ISDGraphNodeSupporter fProvider = null;
+    final private ISDGraphNodeSupporter fProvider;
 
     /**
      * The okText is the text for the Ok button and title is the title of the

@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
@@ -26,7 +25,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.Messages;
  * @version 1.0
  * @author Bernd Hufmann
  */
-public class OpenSDPagesDialog extends Action {
+public class OpenSDPagesDialog extends BaseSDAction {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -42,13 +41,9 @@ public class OpenSDPagesDialog extends Action {
     // ------------------------------------------------------------------------
 
     /**
-     * The sequence diagram view reference
-     */
-    protected SDView fView;
-    /**
      * The advanced paging provider reference.
      */
-    protected ISDAdvancedPagingProvider fProvider;
+    private final ISDAdvancedPagingProvider fProvider;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -63,10 +58,10 @@ public class OpenSDPagesDialog extends Action {
      *            The provider
      */
     public OpenSDPagesDialog(SDView view, ISDAdvancedPagingProvider provider) {
-        super(Messages.SequenceDiagram_Pages);
+        super(view);
+        setText(Messages.SequenceDiagram_Pages);
         setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_GOTO_PAGE));
         setId(ID);
-        fView = view;
         fProvider = provider;
     }
 
@@ -76,10 +71,10 @@ public class OpenSDPagesDialog extends Action {
 
     @Override
     public void run() {
-        if (fView == null) {
+        if (getView() == null) {
             return;
         }
-        PagesDialog dialog = new PagesDialog(fView, fProvider);
+        PagesDialog dialog = new PagesDialog(getView(), fProvider);
         dialog.open();
     }
 }
