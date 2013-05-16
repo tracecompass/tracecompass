@@ -84,11 +84,11 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     /**
      * Index of last supported streaming protocol for common URL configuration.
      */
-    private final static int COMMON_URL_LAST_INDEX = 1;
+    private static final int COMMON_URL_LAST_INDEX = 1;
     /**
      *  Index of default streaming protocol.
      */
-    private final static int DEFAULT_URL_INDEX = 0;
+    private static final int DEFAULT_URL_INDEX = 0;
 
     // ------------------------------------------------------------------------
     // Attributes

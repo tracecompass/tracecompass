@@ -1,12 +1,12 @@
 /**********************************************************************
  * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
@@ -16,13 +16,13 @@ import org.eclipse.ui.PlatformUI;
 /**
  * <p>
  * Factory for generating dialog boxes. It allows to overwrite the dialog implementation.
- * Useful also for testing purposes.  
+ * Useful also for testing purposes.
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  *
  */
-final public class TraceControlDialogFactory {
+public final class TraceControlDialogFactory {
 
     // ------------------------------------------------------------------------
     // Members
@@ -37,42 +37,42 @@ final public class TraceControlDialogFactory {
      * The new connection dialog reference.
      */
     private INewConnectionDialog fNewConnectionDialog;
-    
+
     /**
      * The enable channel dialog
      */
     private IEnableChannelDialog fEnableChannelDialog;
-    
+
     /**
      * The create session dialog.
      */
     private ICreateSessionDialog fCreateSessionDialog;
-    
+
     /**
      * The enable events dialog.
      */
     private IEnableEventsDialog fEnableEventsDialog;
-    
+
     /**
      * The get event info dialog.
      */
     private IGetEventInfoDialog fGetEventInfoDialog;
-    
+
     /**
      * The confirmation dialog implementation.
      */
     private IConfirmDialog fConfirmDialog;
-    
+
     /**
      * The add context dialog implementation.
      */
     private IAddContextDialog fAddContextDialog;
-    
+
     /**
      * The import dialog implementation.
      */
     private IImportDialog fImportDialog;
-    
+
     /**
      * The import confirmation dialog.
      */
@@ -119,7 +119,7 @@ final public class TraceControlDialogFactory {
     public void setNewConnectionDialog(INewConnectionDialog newConnectionDialog) {
         fNewConnectionDialog = newConnectionDialog;
     }
-    
+
     /**
      * @return enable channel dialog
      */
@@ -137,7 +137,7 @@ final public class TraceControlDialogFactory {
     public void setEnableChannelDialog(IEnableChannelDialog createEnableDialog) {
         fEnableChannelDialog = createEnableDialog;
     }
-    
+
     /**
      * @return create session dialog implementation
      */
@@ -191,7 +191,7 @@ final public class TraceControlDialogFactory {
     public void setGetEventInfoDialog(IGetEventInfoDialog getEventInfoDialog) {
         fGetEventInfoDialog = getEventInfoDialog;
     }
-    
+
     /**
      * @return the confirmation dialog implementation
      */
@@ -201,7 +201,7 @@ final public class TraceControlDialogFactory {
         }
         return fConfirmDialog;
     }
-    
+
     /**
      * Sets the confirmation dialog implementation
      * @param confirmDialog - a confirmation dialog implementation
@@ -209,7 +209,7 @@ final public class TraceControlDialogFactory {
     public void setConfirmDialog(IConfirmDialog confirmDialog) {
         fConfirmDialog = confirmDialog;
     }
-    
+
     /**
      * @return the add context dialog implementation
      */
@@ -219,7 +219,7 @@ final public class TraceControlDialogFactory {
         }
         return fAddContextDialog;
     }
-    
+
     /**
      * Sets the add context dialog information
      * @param addContextDialog - a add context dialog implementation
@@ -227,7 +227,7 @@ final public class TraceControlDialogFactory {
     public void setAddContextDialog(IAddContextDialog addContextDialog) {
         fAddContextDialog = addContextDialog;
     }
-    
+
     /**
      * @return the import dialog implementation
      */
@@ -237,7 +237,7 @@ final public class TraceControlDialogFactory {
         }
         return fImportDialog;
     }
-    
+
     /**
      * Sets the import dialog implementation.
      * @param importDialog - a import dialog implementation
@@ -245,7 +245,7 @@ final public class TraceControlDialogFactory {
     public void setImportDialog(IImportDialog importDialog) {
         fImportDialog = importDialog;
     }
-    
+
     /**
      * @return the import confirmation dialog implementation.
      */
@@ -255,10 +255,10 @@ final public class TraceControlDialogFactory {
         }
         return fImportConfirmationDialog;
     }
-    
+
     /**
      * Sets the import confirmation dialog implementation.
-     * @param confirmDialog - a import confirmation dialog implementation. 
+     * @param confirmDialog - a import confirmation dialog implementation.
      */
     public void setImportConfirmationDialog(IImportConfirmationDialog confirmDialog) {
         fImportConfirmationDialog = confirmDialog;

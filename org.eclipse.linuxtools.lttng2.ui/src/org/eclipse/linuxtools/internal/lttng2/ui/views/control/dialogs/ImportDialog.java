@@ -426,14 +426,6 @@ public class ImportDialog extends Dialog implements IImportDialog {
         fCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 1, 1));
         fCombo.setItems(projectNames.toArray(new String[projectNames.size()]));
 
-//        Group overrideGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
-//        layout = new GridLayout(1, true);
-//        overrideGroup.setLayout(layout);
-//        overrideGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//
-//        fOverwriteButton = new Button(overrideGroup, SWT.CHECK);
-//        fOverwriteButton.setText(Messages.TraceControl_ImportDialogOverwriteButtonText);
-
         getShell().setMinimumSize(new Point(500, 50));
     }
  }

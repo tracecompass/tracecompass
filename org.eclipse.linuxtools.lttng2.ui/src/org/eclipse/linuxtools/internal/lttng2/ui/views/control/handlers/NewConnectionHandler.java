@@ -53,7 +53,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
     /**
      * The trace control system type defined for LTTng version 2.0 and later.
      */
-    public final static String TRACE_CONTROL_SYSTEM_TYPE = "org.eclipse.linuxtools.internal.lttng2.ui.control.systemType"; //$NON-NLS-1$
+    public static final String TRACE_CONTROL_SYSTEM_TYPE = "org.eclipse.linuxtools.internal.lttng2.ui.control.systemType"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes

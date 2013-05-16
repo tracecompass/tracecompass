@@ -85,15 +85,15 @@ public class ControlPreferences {
     /**
      * Default timeout value used for executing commands, in seconds
      */
-    public final static int TRACE_CONTROL_DEFAULT_TIMEOUT_VALUE = 15;
+    public static final int TRACE_CONTROL_DEFAULT_TIMEOUT_VALUE = 15;
     /**
      * Minimum timeout value used for executing commands, in seconds
      */
-    public final static int TRACE_CONTROL_MIN_TIMEOUT_VALUE = 5;
+    public static final int TRACE_CONTROL_MIN_TIMEOUT_VALUE = 5;
     /**
      * Maximum timeout value used for executing commands, in seconds
      */
-    public final static int TRACE_CONTROL_MAX_TIMEOUT_VALUE = 600;
+    public static final int TRACE_CONTROL_MAX_TIMEOUT_VALUE = 600;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -124,7 +124,7 @@ public class ControlPreferences {
      *
      * @return the trace control preferences singleton instance
      */
-    public synchronized static ControlPreferences getInstance() {
+    public static synchronized ControlPreferences getInstance() {
         if (fInstance == null) {
             fInstance = new ControlPreferences();
         }

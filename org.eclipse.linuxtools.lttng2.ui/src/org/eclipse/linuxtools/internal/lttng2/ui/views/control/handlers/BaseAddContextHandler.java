@@ -35,7 +35,7 @@ import org.eclipse.ui.progress.UIJob;
  *
  * @author Bernd Hufmann
  */
-abstract public class BaseAddContextHandler extends BaseControlViewHandler {
+public abstract class BaseAddContextHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -62,7 +62,7 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
      * @throws ExecutionException
      *             If something goes wrong
      */
-    abstract public void addContexts(CommandParameter param, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException;
+    public abstract void addContexts(CommandParameter param, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

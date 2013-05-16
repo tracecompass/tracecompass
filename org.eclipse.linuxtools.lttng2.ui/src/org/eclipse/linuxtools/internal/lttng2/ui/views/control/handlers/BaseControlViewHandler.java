@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,7 +34,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @author Bernd Hufmann
  */
-abstract public class BaseControlViewHandler extends AbstractHandler {
+public abstract class BaseControlViewHandler extends AbstractHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -42,7 +42,7 @@ abstract public class BaseControlViewHandler extends AbstractHandler {
     /**
      * The synchronization lock.
      */
-    final protected ReentrantLock fLock = new ReentrantLock();
+    protected final ReentrantLock fLock = new ReentrantLock();
 
     // ------------------------------------------------------------------------
     // Operations

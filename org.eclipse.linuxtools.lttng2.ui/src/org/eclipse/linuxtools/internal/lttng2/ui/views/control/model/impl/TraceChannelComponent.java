@@ -116,7 +116,6 @@ public class TraceChannelComponent extends TraceControlComponent {
 
             eventComponents.add(event);
             event.setEventInfo(events[i]);
-//            addChild(event);
         }
         if (!eventComponents.isEmpty()) {
             setChildren(eventComponents);

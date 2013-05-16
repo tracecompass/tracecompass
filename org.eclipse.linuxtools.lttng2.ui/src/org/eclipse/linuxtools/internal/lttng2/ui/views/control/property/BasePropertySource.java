@@ -21,7 +21,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
  *
  * @author Bernd Hufmann
  */
-abstract public class BasePropertySource implements IPropertySource {
+public abstract class BasePropertySource implements IPropertySource {
 
     // ------------------------------------------------------------------------
     // Operations
@@ -33,10 +33,10 @@ abstract public class BasePropertySource implements IPropertySource {
     }
 
     @Override
-    abstract public IPropertyDescriptor[] getPropertyDescriptors();
+    public abstract IPropertyDescriptor[] getPropertyDescriptors();
 
     @Override
-    abstract public Object getPropertyValue(Object id);
+    public abstract Object getPropertyValue(Object id);
 
     @Override
     public boolean isPropertySet(Object id) {

@@ -199,7 +199,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
     /**
      *  Class containing parameter for the command execution.
      */
-    final static private class Parameter {
+    private static final class Parameter {
 
         /**
          * The list of event components the command is to be executed on.
@@ -214,7 +214,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         /**
          * Flag for indicating Kernel or UST.
          */
-        final private boolean fIsKernel;
+        private final boolean fIsKernel;
 
         /**
          * Constructor

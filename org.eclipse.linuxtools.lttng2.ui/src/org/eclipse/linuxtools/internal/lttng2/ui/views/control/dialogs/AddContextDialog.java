@@ -174,7 +174,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     /**
      * Content provider for the contexts tree
      */
-    final public static class ContextsContentProvider implements ITreeContentProvider {
+    public static final class ContextsContentProvider implements ITreeContentProvider {
 
         @Override
         public void dispose() {
@@ -217,7 +217,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     /**
      * Label provider for the contexts tree
      */
-    final public static class ContextsLabelProvider extends ColumnLabelProvider {
+    public static final class ContextsLabelProvider extends ColumnLabelProvider {
         @Override
         public String getText(Object element) {
 
@@ -232,7 +232,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     /**
      * Check state listener for the contexts tree.
      */
-    final public class ContextCheckListener implements ICheckStateListener {
+    public final class ContextCheckListener implements ICheckStateListener {
         @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
           if (event.getChecked()) {
