@@ -23,7 +23,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.messages"; //$NON-NLS-1$
 
-    public static String ImportTraceWizard_ImportProblem ;
+    public static String ImportTraceWizardImportProblem ;
     public static String ImportTraceWizardImportCaption;
     public static String ImportTraceWizardTraceDisplayName;
     public static String ImportTraceWizardLinkTraces;
@@ -34,15 +34,17 @@ public class Messages extends NLS {
     public static String ImportTraceWizardRemove;
     public static String ImportTraceWizardDirectoryCaption;
     public static String ImportTraceWizardDirectoryHint;
-    public static String ImportTraceWizardScanPage_renameError;
-    public static String ImportTraceWizardScanPage_SelectAtleastOne;
+    public static String ImportTraceWizardScanPageRenameError;
+    public static String ImportTraceWizardScanPageSelectAtleastOne;
     public static String ImportTraceWizardSelectAll;
-    public static String ImportTraceWizardPageScan_done;
-    public static String ImportTraceWizardPageScan_scanning;
+    public static String ImportTraceWizardPageScanDone;
+    public static String ImportTraceWizardPageScanScanning;
     public static String ImportTraceWizardPageSelectNone;
     public static String ImportTraceWizardPageSelectHint;
-    public static String BatchImportTraceWizard_remove;
-    public static String BatchImportTraceWizard_add;
+    public static String BatchImportTraceWizardRemove;
+    public static String BatchImportTraceWizardAdd;
+
+    public static String BatchImportTraceWizardErrorImportingTraceResource;
 
     static {
         // initialize resource bundle
