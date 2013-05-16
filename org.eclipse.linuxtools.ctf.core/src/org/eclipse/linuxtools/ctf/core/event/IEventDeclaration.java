@@ -33,35 +33,35 @@ public interface IEventDeclaration {
      *            The StreamInputReader for which this definition is created.
      * @return A new EventDefinition.
      */
-    public EventDefinition createDefinition(StreamInputReader streamInputReader);
+    EventDefinition createDefinition(StreamInputReader streamInputReader);
 
     /**
      * Gets the name of an event declaration
      *
      * @return the name
      */
-    public String getName();
+    String getName();
 
     /**
      * Gets the fields of an event declaration
      *
      * @return fields the fields in {@link StructDeclaration} format
      */
-    public StructDeclaration getFields();
+    StructDeclaration getFields();
 
     /**
      * Gets the context of an event declaration
      *
      * @return context the fields in {@link StructDeclaration} format
      */
-    public StructDeclaration getContext();
+    StructDeclaration getContext();
 
     /**
      * Gets the id of an event declaration
      *
      * @return The EventDeclaration ID
      */
-    public Long getId();
+    Long getId();
 
     /**
      * Gets the {@link Stream} of an event declaration
@@ -69,7 +69,7 @@ public interface IEventDeclaration {
      * @return the stream
      * @since 2.0
      */
-    public Stream getStream();
+    Stream getStream();
 
     /**
      * What is the log level of this event?
@@ -77,7 +77,7 @@ public interface IEventDeclaration {
      * @return the log level.
      * @since 2.0
      */
-    public long getLogLevel();
+    long getLogLevel();
 
     /**
      * Get the {@link Set} of names of the custom CTF attributes.
@@ -85,7 +85,7 @@ public interface IEventDeclaration {
      * @return The set of custom attributes
      * @since 2.0
      */
-    public Set<String> getCustomAttributes();
+    Set<String> getCustomAttributes();
 
     /**
      * Get the value of a given CTF attribute.
@@ -95,6 +95,6 @@ public interface IEventDeclaration {
      * @return the CTF attribute
      * @since 2.0
      */
-    public String getCustomAttribute(String key);
+    String getCustomAttribute(String key);
 
 }
