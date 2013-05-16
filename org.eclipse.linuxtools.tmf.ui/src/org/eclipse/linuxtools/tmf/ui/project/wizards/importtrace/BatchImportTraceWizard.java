@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -48,6 +50,7 @@ import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceValidationHelper;
 import org.eclipse.ui.IWorkbench;
@@ -129,6 +132,14 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         fScanPage = new ImportTraceWizardScanPage(workbench, selection);
         fSelectTypePage = new ImportTraceWizardSelectTraceTypePage(workbench, selection);
         // keep in case it's called later
+        Iterator<?> iter = selection.iterator();
+        while (iter.hasNext()) {
+            Object selected = iter.next();
+            if (selected instanceof TmfTraceFolder) {
+                fTargetFolder = ((TmfTraceFolder) selected).getResource();
+                break;
+            }
+        }
         fResults.clear();
     }
 
@@ -235,8 +246,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
             try {
                 if (fLinked) {
                     createLink(fTargetFolder, Path.fromOSString(traceToImport.getFile().getAbsolutePath()), traceToImport.getName());
-                    setTraceType(traceToImport);
-                    success = true;
+                    success = setTraceType(traceToImport).isOK();
                 }
                 else {
                     List<File> subList = new ArrayList<File>();
@@ -285,7 +295,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         }
     }
 
-    private void setTraceType(FileAndName traceToImport) {
+    private IStatus setTraceType(FileAndName traceToImport) {
         IPath path = fTargetFolder.getFullPath().append(traceToImport.getName());
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
         if (resource != null) {
@@ -335,6 +345,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                 Activator.getDefault().logError("Error importing trace resource " + resource.getName(), e); //$NON-NLS-1$
             }
         }
+        return Status.OK_STATUS;
     }
 
     @Override
@@ -367,8 +378,15 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
     public void setTraceTypesToScan(List<String> tracesToScan) {
         // intersection to know if there's a diff.
         // if there's a diff, we need to re-enque everything
+        List<String> added = new ArrayList<String>();
+        for (String traceLoc : tracesToScan) {
+            if (!fTraceTypesToScan.contains(traceLoc)) {
+                added.add(traceLoc);
+            }
+        }
         fTraceTypesToScan.clear();
         fTraceTypesToScan.addAll(tracesToScan);
+        updateTracesToScan(added);
     }
 
     /**
@@ -530,11 +548,26 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         return fResults.size();
     }
 
+    private void updateTracesToScan(final List<String> added) {
+        // Treeset is used instead of a hashset since the traces should be read
+        // in the order they were added.
+        final Set<String> filesToScan = new TreeSet<String>();
+        for (String name : fParentFiles.keySet()) {
+            filesToScan.addAll(fParentFiles.get(name));
+        }
+        IProgressMonitor pm = new NullProgressMonitor();
+        try {
+            updateScanQueue(pm, filesToScan, added);
+        } catch (InterruptedException e) {
+        }
+    }
+
     /*
      * I am a job. Make me work
      */
     private synchronized IStatus updateFiles(IProgressMonitor monitor, String traceToScan) {
         final Set<String> filesToScan = new TreeSet<String>();
+
         int workToDo = 1;
         for (String name : fParentFiles.keySet()) {
 
@@ -561,22 +594,10 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                 filesToScan.addAll(fParentFiles.get(name));
                 fParentFilesToScan.add(name);
             }
-            for (String fileToScan : filesToScan) {
-                for (String traceCat : fTraceTypesToScan) {
-                    TraceValidationHelper tv = new TraceValidationHelper(fileToScan, traceCat);
-                    // for thread safety, keep checks in this order.
-                    if (!fResults.containsKey(tv)) {
-                        if (!fTracesToScan.contains(tv)) {
-                            fTracesToScan.put(tv);
-                            monitor.subTask(tv.getTraceToScan());
-                            if (monitor.isCanceled()) {
-                                fParentFilesToScan.remove(traceToScan);
-                                fParentFiles.remove(traceToScan);
-                                return CANCEL_STATUS;
-                            }
-                        }
-                    }
-                }
+            IStatus cancelled = updateScanQueue(monitor, filesToScan, fTraceTypesToScan);
+            if (cancelled.matches(IStatus.CANCEL)) {
+                fParentFilesToScan.remove(traceToScan);
+                fParentFiles.remove(traceToScan);
             }
         } catch (InterruptedException e) {
             monitor.done();
@@ -584,6 +605,25 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         }
 
         monitor.done();
+        return Status.OK_STATUS;
+    }
+
+    private IStatus updateScanQueue(IProgressMonitor monitor, final Set<String> filesToScan, final List<String> traceTypes) throws InterruptedException {
+        for (String fileToScan : filesToScan) {
+            for (String traceCat : traceTypes) {
+                TraceValidationHelper tv = new TraceValidationHelper(fileToScan, traceCat);
+                // for thread safety, keep checks in this order.
+                if (!fResults.containsKey(tv)) {
+                    if (!fTracesToScan.contains(tv)) {
+                        fTracesToScan.put(tv);
+                        monitor.subTask(tv.getTraceToScan());
+                        if (monitor.isCanceled()) {
+                            return CANCEL_STATUS;
+                        }
+                    }
+                }
+            }
+        }
         return Status.OK_STATUS;
     }
 
@@ -599,7 +639,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                         return CANCEL_STATUS;
                     }
                     IStatus retVal = recurse(filesToScan, child, monitor);
-                    if (retVal.getSeverity() == IStatus.CANCEL) {
+                    if (retVal.matches(IStatus.CANCEL)) {
                         return retVal;
                     }
                     monitor.worked(step);
@@ -620,7 +660,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                         return CANCEL_STATUS;
                     }
                     IStatus retVal = recurse(filesToScan, child, monitor);
-                    if (retVal.getSeverity() == IStatus.CANCEL) {
+                    if (retVal.matches(IStatus.CANCEL)) {
                         return retVal;
                     }
                 }
