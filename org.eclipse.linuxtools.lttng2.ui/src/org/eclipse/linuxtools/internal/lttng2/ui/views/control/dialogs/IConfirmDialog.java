@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,6 +33,6 @@ public interface IConfirmDialog {
      *            The message in the dialog window
      * @return If the user clicked OK (true) or Cancel (false)
      */
-    public boolean openConfirm(Shell parent, String title, String message);
+    boolean openConfirm(Shell parent, String title, String message);
 
 }

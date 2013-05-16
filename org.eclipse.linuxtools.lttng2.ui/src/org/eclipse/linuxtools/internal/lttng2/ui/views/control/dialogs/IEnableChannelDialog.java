@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,24 +29,24 @@ public interface IEnableChannelDialog {
     /**
      * @return the configuration info for the new channel.
      */
-    public IChannelInfo getChannelInfo();
+    IChannelInfo getChannelInfo();
 
     /**
      * Sets the domain component
      * @param domain - the trace domain component
      */
-    public void setDomainComponent(TraceDomainComponent domain);
+    void setDomainComponent(TraceDomainComponent domain);
 
     /**
      * @return true for Kernel domain. False for UST.
      */
-    public boolean isKernel();
+    boolean isKernel();
 
     /**
      * Sets the whether dialog is for Kernel or UST
      * @param isKernel true for kernel domain else UST
      */
-    public void setHasKernel(boolean isKernel);
+    void setHasKernel(boolean isKernel);
 
     // ------------------------------------------------------------------------
     // Operations

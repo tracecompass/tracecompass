@@ -23,12 +23,12 @@ public interface IFieldInfo extends ITraceInfo {
     /**
      * @return the event field type
      */
-    public String getFieldType();
+    String getFieldType();
 
     /**
      * Sets field type string
      *
      * @param fieldType - sting of event field type
      */
-    public void setFieldType(String fieldType);
+    void setFieldType(String fieldType);
 }

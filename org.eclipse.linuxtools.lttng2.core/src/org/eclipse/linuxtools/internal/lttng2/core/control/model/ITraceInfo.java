@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,7 +22,7 @@ public interface ITraceInfo {
     /**
      * @return the name of the information element.
      */
-    public String getName();
+    String getName();
 
     /**
      * Sets the name of the information element.
@@ -30,6 +30,6 @@ public interface ITraceInfo {
      * @param name
      *            The name to assign
      */
-    public void setName(String name);
+    void setName(String name);
 
 }

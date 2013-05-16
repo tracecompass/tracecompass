@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -24,7 +24,7 @@ public interface ICommandResult {
      *
      * @return 0 if successful else >0
      */
-    public int getResult();
+    int getResult();
 
     /**
      * Sets the command result value.
@@ -32,12 +32,12 @@ public interface ICommandResult {
      * @param result
      *            The integer result to set
      */
-    public void setResult(int result);
+    void setResult(int result);
 
     /**
      * @return returns the command output.
      */
-    public String[] getOutput();
+    String[] getOutput();
 
     /**
      * Sets the command output.
@@ -45,5 +45,5 @@ public interface ICommandResult {
      * @param output
      *            The output (as an array of Strings) to assign
      */
-    public void setOutput(String[] output);
+    void setOutput(String[] output);
 }

@@ -33,51 +33,51 @@ public interface IEnableUstEvents {
     /**
      * @return a flag whether the tracepoints shall be configured.
      */
-    public boolean isTracepoints();
+    boolean isTracepoints();
 
     /**
      * @return a flag indicating whether all tracepoints shall be enabled or not.
      */
-    public boolean isAllTracePoints();
+    boolean isAllTracePoints();
 
     /**
      * @return a list of event names to be enabled.
      */
-    public List<String> getEventNames();
+    List<String> getEventNames();
 
     /**
      * @return a flag whether events using wildcards should be enabled
      */
-    public boolean isWildcard();
+    boolean isWildcard();
 
     /**
      * @return a wildcard
      */
-    public String getWildcard();
+    String getWildcard();
 
     /**
      * @return a flag whether events using log levels should be enabled
      */
-    public boolean isLogLevel();
+    boolean isLogLevel();
 
     /**
      * @return a log level type (loglevel or loglevel-only)
      */
-    public LogLevelType getLogLevelType();
+    LogLevelType getLogLevelType();
 
     /**
      * @return a log level
      */
-    public TraceLogLevel getLogLevel();
+    TraceLogLevel getLogLevel();
 
     /**
      * @return a event name for the log level enable action
      */
-    public String getLogLevelEventName();
+    String getLogLevelEventName();
 
     /**
      * @return a filter expression
      */
-    public String getFilterExpression();
+    String getFilterExpression();
 
 }

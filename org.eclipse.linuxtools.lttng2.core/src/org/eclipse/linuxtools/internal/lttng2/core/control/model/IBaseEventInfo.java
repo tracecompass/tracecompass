@@ -26,64 +26,64 @@ public interface IBaseEventInfo extends ITraceInfo {
     /**
      * @return the trace event type
      */
-    public TraceEventType getEventType();
+    TraceEventType getEventType();
 
     /**
      * Sets the trace event type to the given type
      * @param type - type to set
      */
-    public void setEventType(TraceEventType type);
+    void setEventType(TraceEventType type);
 
     /**
      * Sets the trace event type to the type specified by the given name.
      * @param typeName - event type name
      */
-    public void setEventType(String typeName);
+    void setEventType(String typeName);
 
     /**
      * @return the trace event log level
      */
-    public TraceLogLevel getLogLevel();
+    TraceLogLevel getLogLevel();
 
     /**
      * Sets the trace event log level to the given level
      * @param level - event log level to set
      */
-    public void setLogLevel(TraceLogLevel level);
+    void setLogLevel(TraceLogLevel level);
 
     /**
      * Sets the trace event log level to the level specified by the given name.
      * @param levelName - event log level name
      */
-    public void setLogLevel(String levelName);
+    void setLogLevel(String levelName);
 
     /**
      * Returns the field information (if exists)
      * @return the field information or null
      */
-    public IFieldInfo[] getFields();
+    IFieldInfo[] getFields();
 
     /**
      * @param field The field to add
      */
-    public void addField(IFieldInfo field);
+    void addField(IFieldInfo field);
 
     /**
      * Sets the fields
      * @param fields The fields
      */
-    public void setFields(List<IFieldInfo> fields);
+    void setFields(List<IFieldInfo> fields);
 
     /**
      * Returns filter expression.
      * @return filter expression
      */
-    public String getFilterExpression();
+    String getFilterExpression();
 
     /**
      * Sets the filter expression.
      * @param filter The filter expression to set
      */
-    public void setFilterExpression(String filter);
+    void setFilterExpression(String filter);
 
 }

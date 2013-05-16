@@ -1,22 +1,22 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
- * 
+ * Copyright (c) 2012, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model;
 
 /**
  * <p>
- * Listener interface a class can implement to be notified about changes 
- * of components 
+ * Listener interface a class can implement to be notified about changes
+ * of components
  * </p>
- * 
+ *
  * @author Bernd Hufmann
  */
 public interface ITraceControlComponentChangedListener {
@@ -25,18 +25,18 @@ public interface ITraceControlComponentChangedListener {
      * @param parent - the parent where the child was added.
      * @param component - the child that was added.
      */
-    public void componentAdded(ITraceControlComponent parent, ITraceControlComponent component);
+    void componentAdded(ITraceControlComponent parent, ITraceControlComponent component);
 
     /**
      * Interface for notifications about the removal of a child.
      * @param parent - the parent where the child was removed.
      * @param component - the child that was removed.
      */
-    public void componentRemoved(ITraceControlComponent parent, ITraceControlComponent component);
+    void componentRemoved(ITraceControlComponent parent, ITraceControlComponent component);
     /**
      * NInterface for notifications about the change of a component.
      * @param component - the component that was changed.
      */
-    public void componentChanged(ITraceControlComponent component);
+    void componentChanged(ITraceControlComponent component);
 }
 
