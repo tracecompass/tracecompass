@@ -11,6 +11,7 @@
  *   Francois Chouinard - Cleanup and refactoring
  *   Francois Chouinard - Moved from LTTng to TMF
  *   Francois Chouinard - Better handling of control display, support for signals
+ *   Patrick Tasse - Update for mouse wheel zoom
   *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -21,6 +22,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
@@ -169,9 +171,11 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
         // If this is the UI thread, process now
         Display display = Display.getCurrent();
         if (display != null) {
-            fValue = time;
-            fTextValue.setText(displayTime);
-            fParent.getParent().layout();
+            if (!isDisposed()) {
+                fValue = time;
+                fTextValue.setText(displayTime);
+                fParent.getParent().layout();
+            }
             return;
         }
 
@@ -199,6 +203,24 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
      */
     public long getValue() {
         return fValue;
+    }
+
+    /**
+     * Add a mouse wheel listener to the text control
+     * @param listener the mouse wheel listener
+     * @since 2.0
+     */
+    public void addMouseWheelListener(MouseWheelListener listener) {
+        fTextValue.addMouseWheelListener(listener);
+    }
+
+    /**
+     * Remove a mouse wheel listener from the text control
+     * @param listener the mouse wheel listener
+     * @since 2.0
+     */
+    public void removeMouseWheelListener(MouseWheelListener listener) {
+        fTextValue.removeMouseWheelListener(listener);
     }
 
     // ------------------------------------------------------------------------

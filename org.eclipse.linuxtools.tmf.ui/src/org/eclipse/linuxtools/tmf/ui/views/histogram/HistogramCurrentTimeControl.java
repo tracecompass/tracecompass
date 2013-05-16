@@ -10,6 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Moved from LTTng to TMF
  *   Francois Chouinard - Simplified constructor, handle interval format change
+ *   Patrick Tasse - Update value handling
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -70,7 +71,7 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
             return;
         }
         String string = fTextValue.getText();
-        long value = 0;
+        long value = getValue();
         try {
             value = TmfTimestampFormat.getDefaulTimeFormat().parseValue(string, getValue());
         } catch (ParseException e) {
@@ -92,6 +93,8 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
             // Set and propagate
             setValue(value);
             fParentView.updateCurrentEventTime(value);
+        } else {
+            setValue(value);
         }
     }
 

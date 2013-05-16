@@ -9,13 +9,13 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Moved from LTTng to TMF
+ *   Patrick Tasse - Update for mouse wheel zoom
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.widgets.Canvas;
 
 /**
  * Class to handle zooming within histogram windows..
@@ -37,7 +37,6 @@ public class HistogramZoom implements MouseWheelListener {
     // ------------------------------------------------------------------------
 
     private final Histogram fHistogram;
-    private final Canvas fCanvas;
 
     private long fAbsoluteStartTime;
     private long fAbsoluteEndTime;
@@ -55,25 +54,20 @@ public class HistogramZoom implements MouseWheelListener {
      *
      * @param histogram
      *            The parent histogram object
-     * @param canvas
-     *            The canvas
      * @param start
      *            The start time of the zoom area
      * @param end
      *            The end time of the zoom area
+     * @since 2.0
      */
-    public HistogramZoom(Histogram histogram, Canvas canvas, long start,
-            long end) {
+    public HistogramZoom(Histogram histogram, long start, long end) {
         fHistogram = histogram;
-        fCanvas = canvas;
         fAbsoluteStartTime = start;
         fAbsoluteEndTime = end;
-        fMinWindowSize = fCanvas.getBounds().x;
+        fMinWindowSize = 0;
 
         fRangeStartTime = fAbsoluteStartTime;
         fRangeDuration = fAbsoluteStartTime + fMinWindowSize;
-
-        canvas.addMouseWheelListener(this);
     }
 
     // ------------------------------------------------------------------------

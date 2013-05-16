@@ -24,11 +24,15 @@ import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -42,6 +46,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -236,12 +241,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData = new GridData(initalWidth, SWT.DEFAULT);
         gridData.horizontalAlignment = SWT.RIGHT;
         gridData.verticalAlignment = SWT.BOTTOM;
-        final Text dummyText = new Text(composite, SWT.READ_ONLY);
-        dummyText.setFont(fFont);
-        dummyText.setBackground(labelColor);
-        dummyText.setEditable(false);
-        dummyText.setText(""); //$NON-NLS-1$
-        dummyText.setLayoutData(gridData);
+        final Label dummyLabel = new Label(composite, SWT.NONE);
+        dummyLabel.setLayoutData(gridData);
 
         // Window range start time
         gridData = new GridData();
@@ -260,6 +261,17 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeRangeEndText.setFont(fFont);
         fTimeRangeEndText.setBackground(labelColor);
         fTimeRangeEndText.setLayoutData(gridData);
+
+        FocusListener listener = new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                fCanvas.setFocus();
+            }
+        };
+        fMaxNbEventsText.addFocusListener(listener);
+        fMinNbEventsText.addFocusListener(listener);
+        fTimeRangeStartText.addFocusListener(listener);
+        fTimeRangeEndText.addFocusListener(listener);
 
         return composite;
     }
@@ -478,6 +490,24 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 }
             });
         }
+    }
+
+    /**
+     * Add a mouse wheel listener to the histogram
+     * @param listener the mouse wheel listener
+     * @since 2.0
+     */
+    public void addMouseWheelListener(MouseWheelListener listener) {
+        fCanvas.addMouseWheelListener(listener);
+    }
+
+    /**
+     * Remove a mouse wheel listener from the histogram
+     * @param listener the mouse wheel listener
+     * @since 2.0
+     */
+    public void removeMouseWheelListener(MouseWheelListener listener) {
+        fCanvas.removeMouseWheelListener(listener);
     }
 
     // ------------------------------------------------------------------------

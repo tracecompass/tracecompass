@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Changed to updated histogram data model
+ *   Patrick Tasse - Update for mouse wheel zoom
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -61,7 +62,8 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
      */
     public FullTraceHistogram(HistogramView view, Composite parent) {
         super(view, parent);
-        fZoom = new HistogramZoom(this, fCanvas, getStartTime(), getTimeLimit());
+        fZoom = new HistogramZoom(this, getStartTime(), getTimeLimit());
+        addMouseWheelListener(fZoom);
         fCanvas.addMouseMoveListener(this);
     }
 
@@ -225,4 +227,12 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         imageGC.drawLine(center, (height / 2) - chHalfWidth, center, (height / 2) + chHalfWidth);
     }
 
+    /**
+     * Get the histogram zoom
+     * @return the histogram zoom
+     * @since 2.0
+     */
+    public HistogramZoom getZoom() {
+        return fZoom;
+    }
 }
