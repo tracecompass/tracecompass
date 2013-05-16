@@ -43,7 +43,7 @@ public interface ITimeGraphPresentationProvider {
      *
      * @return the name of state types
      */
-    public String getStateTypeName();
+    String getStateTypeName();
 
    /**
     * Returns the name of state type depending on the given entry.
@@ -54,7 +54,7 @@ public interface ITimeGraphPresentationProvider {
     * @return the name of state type depending on the given entry or null.
     * @since 2.0
     */
-   public String getStateTypeName(ITimeGraphEntry entry);
+   String getStateTypeName(ITimeGraphEntry entry);
 
     /**
      * Returns table of states with state name to state color relationship.
@@ -63,7 +63,7 @@ public interface ITimeGraphPresentationProvider {
      *
      * @see #getStateTableIndex
      */
-    public StateItem[] getStateTable();
+    StateItem[] getStateTable();
 
     /**
      * Returns the index in the state table corresponding to this time event.
@@ -79,7 +79,7 @@ public interface ITimeGraphPresentationProvider {
      * @see #TRANSPARENT
      * @see #INVISIBLE
      */
-    public int getStateTableIndex(ITimeEvent event);
+    int getStateTableIndex(ITimeEvent event);
 
     /**
      * Called after drawing the control
@@ -89,7 +89,7 @@ public interface ITimeGraphPresentationProvider {
      * @param gc
      *            The graphics context
      */
-    public void postDrawControl(Rectangle bounds, GC gc);
+    void postDrawControl(Rectangle bounds, GC gc);
 
     /**
      * Called after drawing an entry
@@ -101,7 +101,7 @@ public interface ITimeGraphPresentationProvider {
      * @param gc
      *            the graphics context
      */
-    public void postDrawEntry(ITimeGraphEntry entry, Rectangle bounds, GC gc);
+    void postDrawEntry(ITimeGraphEntry entry, Rectangle bounds, GC gc);
 
     /**
      * Called after drawing an event
@@ -113,7 +113,7 @@ public interface ITimeGraphPresentationProvider {
      * @param gc
      *            the graphics context
      */
-    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc);
+    void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc);
 
     /**
      * Returns the height of this item. This value is ignored if the time graph has a fixed item height.
@@ -123,7 +123,7 @@ public interface ITimeGraphPresentationProvider {
      *
      * @see TimeGraphViewer#setItemHeight
      */
-    public int getItemHeight(ITimeGraphEntry entry);
+    int getItemHeight(ITimeGraphEntry entry);
 
     /**
      * Provides the image icon for a given entry.
@@ -131,7 +131,7 @@ public interface ITimeGraphPresentationProvider {
      * @param entry the entry
      * @return the image icon
      */
-    public Image getItemImage(ITimeGraphEntry entry);
+    Image getItemImage(ITimeGraphEntry entry);
 
     /**
      * Returns the name of this event.
@@ -140,7 +140,7 @@ public interface ITimeGraphPresentationProvider {
      *            The event
      * @return The event name
      */
-    public String getEventName(ITimeEvent event);
+    String getEventName(ITimeEvent event);
 
     /**
      * Returns a map of name and value providing additional information
@@ -149,7 +149,7 @@ public interface ITimeGraphPresentationProvider {
      * @param event the time event
      * @return a map of tool tip information
      */
-    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event);
+    Map<String, String> getEventHoverToolTipInfo(ITimeEvent event);
 
     /**
      * Returns a map of name and value providing additional information
@@ -161,6 +161,6 @@ public interface ITimeGraphPresentationProvider {
      *
      * @since 2.0
      */
-    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime);
+    Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime);
 
 }

@@ -38,14 +38,14 @@ public interface ITmfStateSystem {
      *
      * @return The history's registered start time
      */
-    public long getStartTime();
+    long getStartTime();
 
     /**
      * Return the current end time of the history.
      *
      * @return The current end time of this state history
      */
-    public long getCurrentEndTime();
+    long getCurrentEndTime();
 
     /**
      * While it's possible to query a state history that is being built,
@@ -61,13 +61,13 @@ public interface ITmfStateSystem {
      *         before it could finished. In that case, no queries should be run
      *         afterwards.
      */
-    public boolean waitUntilBuilt();
+    boolean waitUntilBuilt();
 
     /**
      * Notify the state system that the trace is being closed, so it should
      * clean up, close its files, etc.
      */
-    public void dispose();
+    void dispose();
 
     /**
      * Return the current total amount of attributes in the system. This is also
@@ -76,7 +76,7 @@ public interface ITmfStateSystem {
      *
      * @return The current number of attributes in the system
      */
-    public int getNbAttributes();
+    int getNbAttributes();
 
     /**
      * @name Read-only quark-getting methods
@@ -96,7 +96,7 @@ public interface ITmfStateSystem {
      *             This exception is thrown if the requested attribute simply
      *             did not exist in the system.
      */
-    public int getQuarkAbsolute(String... attribute)
+    int getQuarkAbsolute(String... attribute)
             throws AttributeNotFoundException;
 
     /**
@@ -119,7 +119,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the quark is invalid
      */
-    public int getQuarkRelative(int startingNodeQuark, String... subPath)
+    int getQuarkRelative(int startingNodeQuark, String... subPath)
             throws AttributeNotFoundException;
 
     /**
@@ -135,7 +135,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the quark was not existing or invalid.
      */
-    public List<Integer> getSubAttributes(int quark, boolean recursive)
+    List<Integer> getSubAttributes(int quark, boolean recursive)
             throws AttributeNotFoundException;
 
     /**
@@ -162,7 +162,7 @@ public interface ITmfStateSystem {
      *         the pattern. If no attribute matched, the list will be empty (but
      *         not null).
      */
-    public List<Integer> getQuarks(String... pattern);
+    List<Integer> getQuarks(String... pattern);
 
     /**
      * Return the name assigned to this quark. This returns only the "basename",
@@ -172,7 +172,7 @@ public interface ITmfStateSystem {
      *            The quark for which we want the name
      * @return The name of the quark
      */
-    public String getAttributeName(int attributeQuark);
+    String getAttributeName(int attributeQuark);
 
     /**
      * This returns the slash-separated path of an attribute by providing its
@@ -182,7 +182,7 @@ public interface ITmfStateSystem {
      *            The quark of the attribute we want
      * @return One single string separated with '/', like a filesystem path
      */
-    public String getFullAttributePath(int attributeQuark);
+    String getFullAttributePath(int attributeQuark);
 
     /**
      * @name Query methods
@@ -202,7 +202,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the requested attribute is invalid
      */
-    public ITmfStateValue queryOngoingState(int attributeQuark)
+    ITmfStateValue queryOngoingState(int attributeQuark)
             throws AttributeNotFoundException;
 
     /**
@@ -215,7 +215,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the attribute is invalid
      */
-    public long getOngoingStartTime(int attribute)
+    long getOngoingStartTime(int attribute)
             throws AttributeNotFoundException;
 
     /**
@@ -238,7 +238,7 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
-    public List<ITmfStateInterval> queryFullState(long t)
+    List<ITmfStateInterval> queryFullState(long t)
             throws TimeRangeException, StateSystemDisposedException;
 
     /**
@@ -263,7 +263,7 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
-    public ITmfStateInterval querySingleState(long t, int attributeQuark)
+    ITmfStateInterval querySingleState(long t, int attributeQuark)
             throws AttributeNotFoundException, TimeRangeException,
             StateSystemDisposedException;
 
@@ -294,7 +294,7 @@ public interface ITmfStateSystem {
      *             If the query is sent after the state system has been disposed
      * @since 2.0
      */
-    public ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
+    ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
             throws StateValueTypeException, AttributeNotFoundException,
             TimeRangeException, StateSystemDisposedException;
 
@@ -323,7 +323,7 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
-    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
+    List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2) throws TimeRangeException,
             AttributeNotFoundException, StateSystemDisposedException;
 
@@ -357,7 +357,7 @@ public interface ITmfStateSystem {
      *             If the query is sent after the state system has been disposed
      * @since 2.0
      */
-    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
+    List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2, long resolution, IProgressMonitor monitor)
             throws TimeRangeException, AttributeNotFoundException,
             StateSystemDisposedException;

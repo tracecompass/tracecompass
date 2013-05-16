@@ -26,12 +26,12 @@ public interface ITmfEventRequest extends ITmfDataRequest {
      * @return the requested time range
      * @since 2.0
      */
-    public TmfTimeRange getRange();
+    TmfTimeRange getRange();
 
     /**
      * this method is called by the event provider to set the index corresponding to the time range start time
      * @param index the start time index
      */
-	public void setStartIndex(int index);
+    void setStartIndex(int index);
 
 }

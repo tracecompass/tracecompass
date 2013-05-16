@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,19 +28,19 @@ public interface IUml2SDLoader {
      *
      * @param viewer The sequence diagram view
      */
-    public void setViewer(SDView viewer);
+    void setViewer(SDView viewer);
 
     /**
      * Returns title string for the UML2SD View when this loader is the one
      *
      * @return the string convenient for this loader
      */
-    public String getTitleString();
+    String getTitleString();
 
     /**
      * When another loader becomes the one the previous one is replaced It's time clean-up
      * if needed (listeners to be removed for example)
      */
-    public void dispose();
+    void dispose();
 
 }

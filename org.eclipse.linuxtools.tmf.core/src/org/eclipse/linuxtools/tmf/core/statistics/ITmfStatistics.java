@@ -51,7 +51,7 @@ public interface ITmfStatistics {
      *            The end time of the query range. Has no effect if isGlobal is
      *            true.
      */
-    public void updateStats(boolean isGlobal, long start, long end);
+    void updateStats(boolean isGlobal, long start, long end);
 
     /**
      * Run a histogram query on the statistics back-end. This means, return the
@@ -74,14 +74,14 @@ public interface ITmfStatistics {
      * @return The array representing the number of events found in each
      *         sub-range.
      */
-    public List<Long> histogramQuery(long start, long end, int nb);
+    List<Long> histogramQuery(long start, long end, int nb);
 
     /**
      * Return the total number of events in the trace.
      *
      * @return The total number of events
      */
-    public long getEventsTotal();
+    long getEventsTotal();
 
     /**
      * Return a Map of the total events in the trace, per event type. The event
@@ -89,7 +89,7 @@ public interface ITmfStatistics {
      *
      * @return The map of <event_type, count>, for the whole trace
      */
-    public Map<String, Long> getEventTypesTotal();
+    Map<String, Long> getEventTypesTotal();
 
     /**
      * Retrieve the number of events in the trace in a given time interval.
@@ -100,7 +100,7 @@ public interface ITmfStatistics {
      *            End time of the time range
      * @return The number of events found
      */
-    public long getEventsInRange(long start, long end);
+    long getEventsInRange(long start, long end);
 
     /**
      * Retrieve the number of events in the trace, per event type, in a given
@@ -112,11 +112,11 @@ public interface ITmfStatistics {
      *            End time of the time range
      * @return The map of <event_type, count>, for the given time range
      */
-    public Map<String, Long> getEventTypesInRange(long start, long end);
+    Map<String, Long> getEventTypesInRange(long start, long end);
 
     /**
      * Notify the statistics back-end that the trace is being closed, so it
      * should dispose itself as appropriate (release file descriptors, etc.)
      */
-    public void dispose();
+    void dispose();
 }

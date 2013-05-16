@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Kalray.
+ * Copyright (c) 2011, 2013 Kalray, Ericsson.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,6 +25,6 @@ public interface IDoubleClickListener {
 	 * @param item the item that was double clicked in the table
 	 * @param column the column that was double clicked in the item in the table.
 	 */
-	public void handleDoubleClick(TmfVirtualTable table, TableItem item, int column);
+	void handleDoubleClick(TmfVirtualTable table, TableItem item, int column);
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,12 +25,12 @@ public interface ITimeGraphTreeListener {
      *
      * @param event event object describing details
      */
-    public void treeCollapsed(TimeGraphTreeExpansionEvent event);
+    void treeCollapsed(TimeGraphTreeExpansionEvent event);
 
     /**
      * Notifies that an entry in the timegraph has been expanded.
      *
      * @param event event object describing details
      */
-    public void treeExpanded(TimeGraphTreeExpansionEvent event);
+    void treeExpanded(TimeGraphTreeExpansionEvent event);
 }

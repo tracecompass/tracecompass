@@ -33,12 +33,12 @@ public interface ITmfDataProvider extends ITmfComponent {
      *
      * @param request The request to process
      */
-    public void sendRequest(ITmfDataRequest request);
+    void sendRequest(ITmfDataRequest request);
 
     /**
      * Queue the coalesced requests.
      */
-    public void fireRequest();
+    void fireRequest();
 
     /**
      * Increments/decrements the pending requests counters and fires the request
@@ -49,7 +49,7 @@ public interface ITmfDataProvider extends ITmfComponent {
      *            Should we increment (true) or decrement (false) the pending
      *            counter
      */
-    public void notifyPendingRequest(boolean isIncrement);
+    void notifyPendingRequest(boolean isIncrement);
 
     /**
      * Return the next event based on the context supplied. The context
@@ -58,5 +58,5 @@ public interface ITmfDataProvider extends ITmfComponent {
      * @param context the trace read context (updated)
      * @return the event referred to by context
      */
-    public ITmfEvent getNext(ITmfContext context);
+    ITmfEvent getNext(ITmfContext context);
 }

@@ -45,17 +45,17 @@ public interface ITmfContext {
     /**
      * @return the rank of the event at the context location
      */
-    public long getRank();
+    long getRank();
 
     /**
      * @return the location of the event at the context rank
      */
-    public ITmfLocation getLocation();
+    ITmfLocation getLocation();
 
     /**
      * @return indicates if the context rank is valid (!= UNKNOWN_RANK)
      */
-    public boolean hasValidRank();
+    boolean hasValidRank();
 
     // ------------------------------------------------------------------------
     // Operations
@@ -64,21 +64,21 @@ public interface ITmfContext {
     /**
      * @param location the new location
      */
-    public void setLocation(ITmfLocation location);
+    void setLocation(ITmfLocation location);
 
     /**
      * @param rank the new rank
      */
-    public void setRank(long rank);
+    void setRank(long rank);
 
     /**
      * Increment the context rank
      */
-    public void increaseRank();
+    void increaseRank();
 
     /**
      * Cleanup hook
      */
-    public void dispose();
+    void dispose();
 
 }

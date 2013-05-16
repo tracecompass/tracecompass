@@ -28,21 +28,21 @@ public interface ITmfSyncSequenceDiagramEvent {
      *
      * @return Name of message
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns name of sender of message.
      *
      * @return name of sender of message
      */
-    public String getSender();
+    String getSender();
 
     /**
      * Returns Name of receiver of message.
      *
      * @return Name of receiver of message
      */
-    public String getReceiver();
+    String getReceiver();
 
     /**
      * Returns Start time of message (i.e. send time).
@@ -50,5 +50,5 @@ public interface ITmfSyncSequenceDiagramEvent {
      * @return Start timestamp of message (i.e. send time)
      * @since 2.0
      */
-    public ITmfTimestamp getStartTime();
+    ITmfTimestamp getStartTime();
 }

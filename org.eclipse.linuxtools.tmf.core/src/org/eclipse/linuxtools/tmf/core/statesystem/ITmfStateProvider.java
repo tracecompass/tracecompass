@@ -44,14 +44,14 @@ public interface ITmfStateProvider {
      * @return The version number of the input plugin
      * @since 2.0
      */
-    public int getVersion();
+    int getVersion();
 
     /**
      * Get the trace with which this state input plugin is associated.
      *
      * @return The associated trace
      */
-    public ITmfTrace getTrace();
+    ITmfTrace getTrace();
 
     /**
      * Return the start time of this "state change input", which is normally the
@@ -60,7 +60,7 @@ public interface ITmfStateProvider {
      *
      * @return The start time
      */
-    public long getStartTime();
+    long getStartTime();
 
     /**
      * Method for the input plugin to specify which type of events it expects.
@@ -71,7 +71,7 @@ public interface ITmfStateProvider {
      *         valid subclasses) will be handled.
      * @since 2.0
      */
-    public Class<? extends ITmfEvent> getExpectedEventType();
+    Class<? extends ITmfEvent> getExpectedEventType();
 
     /**
      * Assign the target state system where this SCI will insert its state
@@ -85,7 +85,7 @@ public interface ITmfStateProvider {
      *            input plugin
      * @since 2.0
      */
-    public void assignTargetStateSystem(ITmfStateSystemBuilder ssb);
+    void assignTargetStateSystem(ITmfStateSystemBuilder ssb);
 
     /**
      * Return the currently assigned target state system.
@@ -94,7 +94,7 @@ public interface ITmfStateProvider {
      *         SS is assigned yet
      * @since 2.0
      */
-    public ITmfStateSystem getAssignedStateSystem();
+    ITmfStateSystem getAssignedStateSystem();
 
     /**
      * Send an event to this input plugin for processing. The implementation
@@ -105,7 +105,7 @@ public interface ITmfStateProvider {
      *            The event (which should be safe to cast to the
      *            expectedEventType) that has to be processed.
      */
-    public void processEvent(ITmfEvent event);
+    void processEvent(ITmfEvent event);
 
     /**
      * Provide a non-initialized copy of this state input plugin. You will need
@@ -115,11 +115,11 @@ public interface ITmfStateProvider {
      *         assigned target state system
      * @since 2.0
      */
-    public ITmfStateProvider getNewInstance();
+    ITmfStateProvider getNewInstance();
 
     /**
      * Indicate to the state history building process that we are done (for now),
      * and that it should close its current history.
      */
-    public void dispose();
+    void dispose();
 }

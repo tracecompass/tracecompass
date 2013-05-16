@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,14 +31,14 @@ public interface ISDAdvancedPagingProvider extends ISDPagingProvider {
      * @return the current page the loader is dealing with. <b>Note</b> that first page has the 0 index (indexes are from
      *         0 to pagesCount()-1).
      */
-    public int currentPage();
+    int currentPage();
 
     /**
      * Returns the number of pages.
      *
      * @return number of pages the loader is dealing with
      */
-    public int pagesCount();
+    int pagesCount();
 
     /**
      * Instructs a load of the &lt;pageNumber_&gt;<i>th</i> page.<br>
@@ -46,6 +46,6 @@ public interface ISDAdvancedPagingProvider extends ISDPagingProvider {
      *
      * @param pageNumber index of the page to load
      */
-    public void pageNumberChanged(int pageNumber);
+    void pageNumberChanged(int pageNumber);
 
 }

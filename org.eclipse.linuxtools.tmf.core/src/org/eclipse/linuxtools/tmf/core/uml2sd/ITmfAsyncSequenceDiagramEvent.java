@@ -28,5 +28,5 @@ public interface ITmfAsyncSequenceDiagramEvent extends ITmfSyncSequenceDiagramEv
      * @return end timestamp of message (i.e. receive time)
      * @since 2.0
      */
-    public ITmfTimestamp getEndTime();
+    ITmfTimestamp getEndTime();
 }

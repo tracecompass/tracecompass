@@ -76,37 +76,37 @@ public interface ITmfEvent extends IAdaptable {
     /**
      * @return the trace that 'owns' the event
      */
-    public ITmfTrace getTrace();
+    ITmfTrace getTrace();
 
     /**
      * @return the event rank within the parent trace
      */
-    public long getRank();
+    long getRank();
 
     /**
      * @return the event timestamp
      * @since 2.0
      */
-    public ITmfTimestamp getTimestamp();
+    ITmfTimestamp getTimestamp();
 
     /**
      * @return the event source
      */
-    public String getSource();
+    String getSource();
 
     /**
      * @return the event type
      */
-    public ITmfEventType getType();
+    ITmfEventType getType();
 
     /**
      * @return the event content
      */
-    public ITmfEventField getContent();
+    ITmfEventField getContent();
 
     /**
      * @return the event reference
      */
-    public String getReference();
+    String getReference();
 
 }

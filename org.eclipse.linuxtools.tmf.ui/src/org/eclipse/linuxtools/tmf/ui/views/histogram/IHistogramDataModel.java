@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
- * 
+ * Copyright (c) 2011, 2013 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Francois Chouinard - Moved from LTTng to TMF
@@ -17,18 +17,18 @@ import org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionM
 
 /**
  * Histogram data model interface.
- * 
+ *
  * @version 1.0
  * @author Bernd Hufmann
  */
 public interface IHistogramDataModel extends IBaseDistributionModel {
     /**
      * Add event to the correct bucket, compacting the if needed.
-     * 
-     * @param eventCount the event to count 
+     *
+     * @param eventCount the event to count
      * @param timestamp the timestamp of the event to count
      */
-    public void countEvent(long eventCount, long timestamp);
+    void countEvent(long eventCount, long timestamp);
     /**
      * Scale the model data to the width, height and bar width requested.
      *
@@ -38,6 +38,6 @@ public interface IHistogramDataModel extends IBaseDistributionModel {
      * @return the result array of size [width] and where the highest value doesn't exceed [height]
      *         while considering the bar width [barWidth]
      */
-    public HistogramScaledData scaleTo(int width, int height, int barWidth);
+    HistogramScaledData scaleTo(int width, int height, int barWidth);
 
 }

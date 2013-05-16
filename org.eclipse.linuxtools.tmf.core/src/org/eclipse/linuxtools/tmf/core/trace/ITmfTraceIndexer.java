@@ -68,7 +68,7 @@ public interface ITmfTraceIndexer {
      *            complete?
      * @since 2.0
      */
-    public void buildIndex(long offset, TmfTimeRange range, boolean waitForCompletion);
+    void buildIndex(long offset, TmfTimeRange range, boolean waitForCompletion);
 
     /**
      * Indicates that the indexer is busy indexing the trace.
@@ -76,7 +76,7 @@ public interface ITmfTraceIndexer {
      *
      * @return the state of the indexer (indexing or not)
      */
-    public boolean isIndexing();
+    boolean isIndexing();
 
     /**
      * Adds an entry to the trace index.
@@ -85,7 +85,7 @@ public interface ITmfTraceIndexer {
      * @param timestamp The timestamp matching this context
      * @since 2.0
      */
-    public void updateIndex(ITmfContext context, ITmfTimestamp timestamp);
+    void updateIndex(ITmfContext context, ITmfTimestamp timestamp);
 
     /**
      * Returns the context of the checkpoint immediately preceding the requested
@@ -95,7 +95,7 @@ public interface ITmfTraceIndexer {
      * @return the checkpoint context
      * @since 2.0
      */
-    public ITmfContext seekIndex(ITmfTimestamp timestamp);
+    ITmfContext seekIndex(ITmfTimestamp timestamp);
 
     /**
      * Returns the context of the checkpoint immediately preceding the requested
@@ -104,11 +104,11 @@ public interface ITmfTraceIndexer {
      * @param rank the requested event rank
      * @return the checkpoint context
      */
-    public ITmfContext seekIndex(long rank);
+    ITmfContext seekIndex(long rank);
 
     /**
      * Perform cleanup when the indexer is no longer required.
      */
-    public void dispose();
+    void dispose();
 
 }

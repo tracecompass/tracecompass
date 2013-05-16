@@ -20,59 +20,58 @@ public interface IUml2SDTestConstants {
     /**
      * Timeout for waiting of jobs to finish (in milliseconds).
      */
-    final static public int WAIT_FOR_JOBS_DELAY = 1000;
+    public static final int WAIT_FOR_JOBS_DELAY = 1000;
     /**
      * Timeout for waiting for GUI display to refresh (in milliseconds).
      */
-    final static public int GUI_REFESH_DELAY = 1000;
+    public static final int GUI_REFESH_DELAY = 1000;
     /**
      * Initial delay before indexing (in milliseconds).
      */
-    final static public int INITIAL_INDEX_DELAY = 1000;
+    public static final int INITIAL_INDEX_DELAY = 1000;
     /**
      * Delay after broadcasting a TMF signal (in milliseconds)
      */
-    final static public int BROADCAST_DELAY = 2000;
+    public static final int BROADCAST_DELAY = 2000;
     /**
      * Total number of pages of test trace.
      */
-    final static public int TOTAL_NUMBER_OF_PAGES  = 9;
+    public static final int TOTAL_NUMBER_OF_PAGES  = 9;
     /**
      * Number of messages per page (as defined for loader class)
      */
-    final static public int MAX_MESSEAGES_PER_PAGE = 10000;
+    public static final int MAX_MESSEAGES_PER_PAGE = 10000;
     /**
      * Number of messages of last page of the test trace.
      */
-    final static public int NUM_MESSAGES_OF_LAST_PAGE = 32;
+    public static final int NUM_MESSAGES_OF_LAST_PAGE = 32;
     /**
      * Default number of lifelines of test trace.
      */
-    final static public int DEFAULT_NUM_LIFELINES = 2;
+    public static final int DEFAULT_NUM_LIFELINES = 2;
     /**
      * Number of lifelines of test trace when all lifelines are visible.
      */
-    final static public int NUM_OF_ALL_LIFELINES = 3;
+    public static final int NUM_OF_ALL_LIFELINES = 3;
     /**
      * Page number of test trace where all lifelines are visible.
      */
-    final static public int PAGE_OF_ALL_LIFELINES = 4;
+    public static final int PAGE_OF_ALL_LIFELINES = 4;
     /**
      * Time scale of test trace.
      */
-    final static public byte TIME_SCALE = -9;
-
+    public static final byte TIME_SCALE = -9;
     /**
      * Master player name (property of test trace)
      */
-    final static public String MASTER_PLAYER_NAME = "Master";
+    public static final String MASTER_PLAYER_NAME = "Master";
     /**
      * First player name (property of test trace)
      */
-    final static public String FIRST_PLAYER_NAME = "player1";
+    public static final String FIRST_PLAYER_NAME = "player1";
     /**
      * Second player name (property of test trace)
      */
-    final static public String SECOND_PLAYER_NAME = "player2";
+    public static final String SECOND_PLAYER_NAME = "player2";
 
 }

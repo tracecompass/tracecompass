@@ -27,7 +27,7 @@ public interface ITimeRange {
      * @return the time when the message began
      * @since 2.0
      */
-    public ITmfTimestamp getStartTime();
+    ITmfTimestamp getStartTime();
 
     /**
      * Returns the time when the message ended.
@@ -35,12 +35,12 @@ public interface ITimeRange {
      * @return the time when the message ended
      * @since 2.0
      */
-    public ITmfTimestamp getEndTime();
+    ITmfTimestamp getEndTime();
 
     /**
      * Returns flag to indicate whether time information is available or not.
      *
      * @return flag to indicate whether time information is available or not
      */
-    public boolean hasTimeInfo();
+    boolean hasTimeInfo();
 }

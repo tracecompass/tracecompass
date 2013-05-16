@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -21,26 +21,26 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
  *
  * @version 1.0
  * @author Francois Chouinard
- * 
+ *
  * @see TmfComponent
  */
 public interface ITmfComponent {
 
-	/**
-	 * @return the component ID (display name) 
-	 */
-	public String getName();
+    /**
+     * @return the component ID (display name)
+     */
+    String getName();
 
-	/**
-	 * Dispose of the component
-	 */
-	public void dispose();
+    /**
+     * Dispose of the component
+     */
+    void dispose();
 
-	/**
-	 * Propagate a signal to all the interested listeners.
-	 * 
-	 * @param signal the signal to broadcast
-	 */
-	public void broadcast(TmfSignal signal);
+    /**
+     * Propagate a signal to all the interested listeners.
+     *
+     * @param signal the signal to broadcast
+     */
+    void broadcast(TmfSignal signal);
 
 }

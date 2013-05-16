@@ -37,6 +37,6 @@ public interface ITmfLocation {
      * @return the location information
      * @since 2.0
      */
-    public Comparable<?> getLocationInfo();
+    Comparable<?> getLocationInfo();
 
 }

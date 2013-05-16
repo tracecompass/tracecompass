@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Kalray.
+ * Copyright (c) 2011, 2013 Kalray, Ericsson.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -24,6 +24,6 @@ public interface TooltipProvider {
 	 * @param data the object being selected. (quite often a "TableItem")
 	 * @return the string of text to display in the tooltip.
 	 */
-	public String getTooltip(int column, Object data);
+	String getTooltip(int column, Object data);
 
 }

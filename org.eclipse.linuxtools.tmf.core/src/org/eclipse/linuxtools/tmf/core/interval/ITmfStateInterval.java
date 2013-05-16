@@ -31,14 +31,14 @@ public interface ITmfStateInterval {
      *
      * @return the start time of the interval
      */
-    public long getStartTime();
+    long getStartTime();
 
     /**
      * Retrieve the end time of the interval
      *
      * @return the end time of the interval
      */
-    public long getEndTime();
+    long getEndTime();
 
     /**
      * In case the "real" end time of the interval is not exactly the same as
@@ -49,21 +49,21 @@ public interface ITmfStateInterval {
      *
      * @return The end time that views should use
      */
-    public long getViewerEndTime();
+    long getViewerEndTime();
 
     /**
      * Retrieve the quark of the attribute this state interval refers to
      *
      * @return the quark of the attribute this state interval refers to
      */
-    public int getAttribute();
+    int getAttribute();
 
     /**
      * Retrieve the state value represented by this interval
      *
      * @return the state value represented by this interval
      */
-    public ITmfStateValue getStateValue();
+    ITmfStateValue getStateValue();
 
     /**
      * Test if this interval intersects another timestamp, inclusively.
@@ -72,5 +72,5 @@ public interface ITmfStateInterval {
      *            The target timestamp
      * @return True if the interval and timestamp intersect, false if they don't
      */
-    public boolean intersects(long timestamp);
+    boolean intersects(long timestamp);
 }

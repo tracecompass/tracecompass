@@ -29,7 +29,7 @@ public interface ITmfCustomAttributes {
      * @return The list of custom attribute names. Should not be null, but could
      *         be empty.
      */
-    public Set<String> listCustomAttributes();
+    Set<String> listCustomAttributes();
 
     /**
      * Get the value of a custom attribute.
@@ -39,5 +39,5 @@ public interface ITmfCustomAttributes {
      * @return Value of this attribute, or null if there is no attribute with
      *         that name
      */
-    public String getCustomAttribute(String name);
+    String getCustomAttribute(String name);
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2011, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -31,14 +31,14 @@ public interface ITmfStatisticsColumnData {
      *
      * @return the name of the column.
      */
-    public String getHeader();
+    String getHeader();
 
     /**
      * Return the width of the column at the creation.
      *
      * @return the width of the column.
      */
-    public int getWidth();
+    int getWidth();
 
     /**
      * Return the alignment of the column.
@@ -46,7 +46,7 @@ public interface ITmfStatisticsColumnData {
      * @see org.eclipse.swt.SWT
      * @return an integer representing the alignment inside the column.
      */
-    public int getAlignment();
+    int getAlignment();
 
     /**
      * Provide the text to show in the tooltip when the cursor comes over the
@@ -54,7 +54,7 @@ public interface ITmfStatisticsColumnData {
      *
      * @return text to show in the tooltip
      */
-    public String getTooltip();
+    String getTooltip();
 
     /**
      * Return the labelProvider which provides the information to put in column
@@ -62,14 +62,14 @@ public interface ITmfStatisticsColumnData {
      *
      * @return a ColumnLabelProvider.
      */
-    public ColumnLabelProvider getLabelProvider();
+    ColumnLabelProvider getLabelProvider();
 
     /**
      * Return a ViewerComparator used to sort viewer's contents.
      *
      * @return the comparator.
      */
-    public ViewerComparator getComparator();
+    ViewerComparator getComparator();
 
     /**
      * Return the provider of the percentage. Used to draw bar charts in
@@ -77,5 +77,5 @@ public interface ITmfStatisticsColumnData {
      *
      * @return the percentageProvider.
      */
-    public ITmfColumnPercentageProvider getPercentageProvider();
+    ITmfColumnPercentageProvider getPercentageProvider();
 }

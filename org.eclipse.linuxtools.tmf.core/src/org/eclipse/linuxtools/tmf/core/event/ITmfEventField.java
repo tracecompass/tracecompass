@@ -40,45 +40,45 @@ public interface ITmfEventField {
     /**
      * @return the field name
      */
-    public String getName();
+    String getName();
 
     /**
      * @return the field value
      */
-    public Object getValue();
+    Object getValue();
 
     /**
      * @return the value formatted as string
      * @since 2.0
      */
-    public String getFormattedValue();
+    String getFormattedValue();
 
     /**
      * @return the list of subfield names (empty array if none)
      */
-    public String[] getFieldNames();
+    String[] getFieldNames();
 
     /**
      * @param index The index of the field
      * @return the nth field name (null if absent or inexistent)
      */
-    public String getFieldName(int index);
+    String getFieldName(int index);
 
     /**
      * @return the list of subfields (empty array if none)
      */
-    public ITmfEventField[] getFields();
+    ITmfEventField[] getFields();
 
     /**
      * @param name The name of the field
      * @return a specific subfield by name (null if absent or inexistent)
      */
-    public ITmfEventField getField(String name);
+    ITmfEventField getField(String name);
 
     /**
      * @param index The index of the field to return
      * @return a specific subfield by index (null if absent or inexistent)
      */
-    public ITmfEventField getField(int index);
+    ITmfEventField getField(int index);
 
 }

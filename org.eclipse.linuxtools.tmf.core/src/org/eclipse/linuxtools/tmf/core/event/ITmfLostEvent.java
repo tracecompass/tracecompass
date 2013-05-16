@@ -43,11 +43,11 @@ public interface ITmfLostEvent extends ITmfEvent {
      * @return the 'problem' time range
      * @since 2.0
      */
-    public TmfTimeRange getTimeRange();
+    TmfTimeRange getTimeRange();
 
     /**
      * @return the number of lost events in the time range
      */
-    public long getNbLostEvents();
+    long getNbLostEvents();
 
 }
