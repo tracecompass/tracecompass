@@ -65,7 +65,6 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
     private static final int MAX_TRACES = 65536;
     private CheckboxTreeViewer traceTypeViewer;
 
-    // private int position = 0;
     final ScanRunnable fRunnable = new ScanRunnable("Scan job"); //$NON-NLS-1$
     final private BlockingQueue<TraceValidationHelper> fTracesToScan = new ArrayBlockingQueue<TraceValidationHelper>(MAX_TRACES);
     private volatile boolean fCanRun = true;
@@ -158,6 +157,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
         init();
         getBatchWizard().setTracesToScan(fTracesToScan);
         getBatchWizard().setTraceFolder(fTargetFolder);
+
         fRunnable.schedule();
         setErrorMessage(Messages.ImportTraceWizardScanPageSelectAtleastOne);
     }
@@ -354,11 +354,11 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
 
     private final class ScanRunnable extends Job {
 
+        private IProgressMonitor fMonitor;
+
         public ScanRunnable(String name) {
             super(name);
         }
-
-        private IProgressMonitor fMonitor;
 
         private synchronized IProgressMonitor getMonitor() {
             return fMonitor;
@@ -371,6 +371,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
             control.getDisplay().syncExec(new Runnable() {
                 @Override
                 public void run() {
+                    // monitor gets overwritten here so it's necessary to save it in a field.
                     fMonitor = SubMonitor.convert(getMonitor());
                     getMonitor().setTaskName(Messages.ImportTraceWizardPageScanScanning + ' ');
                     ((SubMonitor) getMonitor()).setWorkRemaining(IProgressMonitor.UNKNOWN);
@@ -443,6 +444,23 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
                 }
             }
             return Status.OK_STATUS;
+        }
+    }
+
+    /**
+     * Refresh the view and the corresponding model.
+     */
+    public void refresh() {
+        final Control control = traceTypeViewer.getControl();
+        if (!control.isDisposed()) {
+            control.getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (!control.isDisposed()) {
+                        traceTypeViewer.refresh();
+                    }
+                }
+            });
         }
     }
 }

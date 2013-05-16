@@ -83,13 +83,13 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
     // ------------------
 
     private IWizardPage fSelectDirectoriesPage;
-    private IWizardPage fScanPage;
+    private ImportTraceWizardScanPage fScanPage;
     private IWizardPage fSelectTypePage;
 
     private final List<String> fTraceTypesToScan = new ArrayList<String>();
     private final Set<String> fParentFilesToScan = new HashSet<String>();
 
-    private ImportTraceContentProvider fScannedTraces = new ImportTraceContentProvider();
+    private ImportTraceContentProvider fScannedTraces = new ImportTraceContentProvider(fTraceTypesToScan, fParentFilesToScan);
 
     private final Map<TraceValidationHelper, Boolean> fResults = new HashMap<TraceValidationHelper, Boolean>();
     private boolean fOverwrite = true;
@@ -561,6 +561,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
             updateScanQueue(pm, filesToScan, added);
         } catch (InterruptedException e) {
         }
+
     }
 
     /*
@@ -619,12 +620,14 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                         fTracesToScan.put(tv);
                         monitor.subTask(tv.getTraceToScan());
                         if (monitor.isCanceled()) {
+                            fScanPage.refresh();
                             return CANCEL_STATUS;
                         }
                     }
                 }
             }
         }
+        fScanPage.refresh();
         return Status.OK_STATUS;
     }
 
