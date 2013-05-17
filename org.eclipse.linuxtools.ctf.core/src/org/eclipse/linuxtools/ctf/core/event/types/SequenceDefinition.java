@@ -145,15 +145,13 @@ public class SequenceDefinition extends Definition {
             int i = 0;
 
             if (definitions != null) {
-                for (; i < definitions.length; i++) {
-                    newDefinitions[i] = definitions[i];
-                }
+                System.arraycopy(definitions, 0, newDefinitions, 0, definitions.length);
             }
 
             for (; i < currentLength; i++) {
                 newDefinitions[i] = declaration.getElementType()
-                        .createDefinition(definitionScope,
-                                fieldName + "[" + i + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                        .createDefinition(getDefinitionScope(),
+                                getFieldName() + "[" + i + "]"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             definitions = newDefinitions;

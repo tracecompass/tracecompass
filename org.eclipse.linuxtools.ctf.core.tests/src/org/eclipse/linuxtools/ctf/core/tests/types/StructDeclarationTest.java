@@ -15,8 +15,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
@@ -82,7 +82,7 @@ public class StructDeclarationTest {
      */
     @Test
     public void testGetFields() {
-        HashMap<String, IDeclaration> result = fixture.getFields();
+        Map<String, IDeclaration> result = fixture.getFields();
 
         assertNotNull(result);
         assertEquals(0, result.size());

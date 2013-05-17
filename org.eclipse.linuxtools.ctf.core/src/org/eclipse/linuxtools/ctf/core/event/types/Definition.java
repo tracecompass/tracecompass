@@ -35,19 +35,15 @@ public abstract class Definition {
     // Attributes
     // ------------------------------------------------------------------------
 
-    /** The name of the field in its container */
-    protected final String fieldName;
+    private final String fieldName;
 
     /** The complete path of this field */
-    protected final String path;
+    private final String path;
 
     /**
-     * The definition scope in which this definition is found.
      *
-     * The complete path of a definition is thus the path of the definition
-     * scope DOT the name of the definition (name of the field in its container)
      */
-    protected final IDefinitionScope definitionScope;
+    private final IDefinitionScope definitionScope;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -75,11 +71,43 @@ public abstract class Definition {
         } else {
             path = fieldName;
         }
+    }
 
-        /*
-         * System.out.println("[definition] " + this.getClass().getSimpleName()
-         * + " " + path + " created");
-         */
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
+
+    /**
+     * Get the field name in its container.
+     *
+     * @return The field name
+     * @since 2.0
+     */
+    protected String getFieldName() {
+        return fieldName;
+    }
+
+    /**
+     * Get the complete path of this field.
+     *
+     * @return The path
+     * @since 2.0
+     */
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * Get the definition scope in which this definition is found.
+     *
+     * The complete path of a definition is thus the path of the definition
+     * scope DOT the name of the definition (name of the field in its container)
+     *
+     * @return The definition scope
+     * @since 2.0
+     */
+    protected IDefinitionScope getDefinitionScope() {
+        return definitionScope;
     }
 
     // ------------------------------------------------------------------------

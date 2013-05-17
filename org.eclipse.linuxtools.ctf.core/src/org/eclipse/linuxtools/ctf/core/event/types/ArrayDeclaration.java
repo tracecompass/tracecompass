@@ -70,8 +70,7 @@ public class ArrayDeclaration implements IDeclaration {
 
     @Override
     public long getAlignment() {
-        long retVal = this.getElementType().getAlignment();
-        return retVal;
+        return getElementType().getAlignment();
     }
     // ------------------------------------------------------------------------
     // Operations

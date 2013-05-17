@@ -22,6 +22,12 @@ public class Messages extends NLS {
     public static String IOStructGen_UnknownStreamAttributeWarning;
     public static String IOStructGen_UnknownIntegerAttributeWarning;
 
+    public static String TypeAlreadyDefined;
+    public static String StructAlreadyDefined;
+    public static String EnumAlreadyDefined;
+    public static String VariantAlreadyDefined;
+    public static String TraceDoesNotContainType;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

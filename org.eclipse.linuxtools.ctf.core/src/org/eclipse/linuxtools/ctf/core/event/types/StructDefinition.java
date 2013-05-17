@@ -72,11 +72,6 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    @Override
-    public String getPath() {
-        return path;
-    }
-
     /**
      * @return The definitions of all the fields
      * @since 2.0

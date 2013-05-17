@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A CTF structure declaration.
@@ -33,7 +34,7 @@ public class StructDeclaration implements IDeclaration {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final HashMap<String, IDeclaration> fields = new HashMap<String, IDeclaration>();
+    private final Map<String, IDeclaration> fields = new HashMap<String, IDeclaration>();
     private final List<String> fieldsList = new LinkedList<String>();
     private long maxAlign;
 
@@ -77,8 +78,9 @@ public class StructDeclaration implements IDeclaration {
     /**
      * get the fields of the struct in a map. Faster access time than a list.
      * @return a HashMap of the fields (key is the name)
+     * @since 2.0
      */
-    public HashMap<String, IDeclaration> getFields() {
+    public Map<String, IDeclaration> getFields() {
         return this.fields;
     }
 

@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.internal.ctf.core.event.metadata;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
@@ -34,10 +35,10 @@ public class DeclarationScope {
 
     private DeclarationScope parentScope = null;
 
-    private final HashMap<String, StructDeclaration> structs = new HashMap<String, StructDeclaration>();
-    private final HashMap<String, EnumDeclaration> enums = new HashMap<String, EnumDeclaration>();
-    private final HashMap<String, VariantDeclaration> variants = new HashMap<String, VariantDeclaration>();
-    private final HashMap<String, IDeclaration> types = new HashMap<String, IDeclaration>();
+    private final Map<String, StructDeclaration> structs = new HashMap<String, StructDeclaration>();
+    private final Map<String, EnumDeclaration> enums = new HashMap<String, EnumDeclaration>();
+    private final Map<String, VariantDeclaration> variants = new HashMap<String, VariantDeclaration>();
+    private final Map<String, IDeclaration> types = new HashMap<String, IDeclaration>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -90,8 +91,7 @@ public class DeclarationScope {
             throws ParseException {
         /* Check if the type has been defined in the current scope */
         if (types.containsKey(name)) {
-            throw new ParseException("Type " + name //$NON-NLS-1$
-                    + " has already been defined."); //$NON-NLS-1$
+            throw new ParseException(Messages.TypeAlreadyDefined + ':' + name);
         }
 
         /* Add it to the register. */
@@ -112,16 +112,15 @@ public class DeclarationScope {
             throws ParseException {
         /* Check if the struct has been defined in the current scope. */
         if (structs.containsKey(name)) {
-            throw new ParseException("struct " + name //$NON-NLS-1$
-                    + " has already been defined."); //$NON-NLS-1$
+            throw new ParseException(Messages.StructAlreadyDefined + ':' + name);
         }
 
         /* Add it to the register. */
         structs.put(name, declaration);
 
         /* It also defined a new type, so add it to the type declarations. */
-        String struct_prefix = "struct "; //$NON-NLS-1$
-        registerType(struct_prefix + name, declaration);
+        String structPrefix = "struct "; //$NON-NLS-1$
+        registerType(structPrefix + name, declaration);
     }
 
     /**
@@ -138,16 +137,15 @@ public class DeclarationScope {
             throws ParseException {
         /* Check if the enum has been defined in the current scope. */
         if (lookupEnum(name) != null) {
-            throw new ParseException("enum " + name //$NON-NLS-1$
-                    + " has already been defined."); //$NON-NLS-1$
+            throw new ParseException(Messages.EnumAlreadyDefined + ':' + name);
         }
 
         /* Add it to the register. */
         enums.put(name, declaration);
 
         /* It also defined a new type, so add it to the type declarations. */
-        String enum_prefix = "enum "; //$NON-NLS-1$
-        registerType(enum_prefix + name, declaration);
+        String enumPrefix = "enum "; //$NON-NLS-1$
+        registerType(enumPrefix + name, declaration);
     }
 
     /**
@@ -164,16 +162,15 @@ public class DeclarationScope {
             throws ParseException {
         /* Check if the variant has been defined in the current scope. */
         if (lookupVariant(name) != null) {
-            throw new ParseException("variant " + name //$NON-NLS-1$
-                    + " has already been defined."); //$NON-NLS-1$
+            throw new ParseException(Messages.VariantAlreadyDefined + ':' + name);
         }
 
         /* Add it to the register. */
         variants.put(name, declaration);
 
         /* It also defined a new type, so add it to the type declarations. */
-        String variant_prefix = "variant "; //$NON-NLS-1$
-        registerType(variant_prefix + name, declaration);
+        String variantPrefix = "variant "; //$NON-NLS-1$
+        registerType(variantPrefix + name, declaration);
     }
 
     // ------------------------------------------------------------------------
@@ -333,7 +330,7 @@ public class DeclarationScope {
         if (types.containsKey(name)) {
             types.put(name, newType);
         } else {
-            throw new ParseException("Trace does not contain type: " + name); //$NON-NLS-1$
+            throw new ParseException(Messages.TraceDoesNotContainType + ':' + name);
         }
     }
 

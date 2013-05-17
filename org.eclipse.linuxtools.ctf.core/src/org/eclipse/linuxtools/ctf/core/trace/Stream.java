@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
@@ -53,7 +54,7 @@ public class Stream {
     /**
      * Maps event ids to events
      */
-    private HashMap<Long, IEventDeclaration> events = new HashMap<Long, IEventDeclaration>();
+    private Map<Long, IEventDeclaration> events = new HashMap<Long, IEventDeclaration>();
 
     /**
      * The inputs associated to this stream
@@ -196,7 +197,7 @@ public class Stream {
      *
      * @return all the event declarations for this stream, using the id as a key for the hashmap.
      */
-    public HashMap<Long, IEventDeclaration> getEvents() {
+    public Map<Long, IEventDeclaration> getEvents() {
         return events;
     }
 

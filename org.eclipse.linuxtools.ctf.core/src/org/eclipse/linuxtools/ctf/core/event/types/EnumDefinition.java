@@ -85,11 +85,11 @@ public class EnumDefinition extends SimpleDatatypeDefinition {
 
     /**
      * Sets the value of the enum in string format so "Enum a{DAY="0", NIGHT="1"}; will set 0
-     * @param Value The value of the enum.
+     * @param value The value of the enum.
      */
-    public void setIntegerValue(long Value) {
-        integerValue.setValue(Value);
-        value = declaration.query(Value);
+    public void setIntegerValue(long value) {
+        integerValue.setValue(value);
+        this.value = declaration.query(value);
     }
 
     @Override

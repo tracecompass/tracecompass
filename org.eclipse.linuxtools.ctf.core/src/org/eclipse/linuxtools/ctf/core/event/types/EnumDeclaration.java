@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * A CTF enum declaration.
- * 
+ *
  * The definition of a enum point basic data type. It will take the data
  * from a trace and store it (and make it fit) as an integer and a string.
  *
@@ -102,9 +102,9 @@ public class EnumDeclaration implements IDeclaration {
      * Maps integer range -> string. A simple list for now, but feel free to
      * optimize it. Babeltrace suggests an interval tree.
      */
-    static private class EnumTable {
+    private static class EnumTable {
 
-        List<Range> ranges = new LinkedList<Range>();
+        private List<Range> ranges = new LinkedList<Range>();
 
         public EnumTable() {
         }
@@ -137,10 +137,10 @@ public class EnumDeclaration implements IDeclaration {
             return null;
         }
 
-        static private class Range {
+        private static class Range {
 
-            long low, high;
-            String str;
+            private long low, high;
+            private String str;
 
             public Range(long low, long high, String str) {
                 this.low = low;

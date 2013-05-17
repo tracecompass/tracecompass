@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import java.util.Arrays;
+
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
@@ -68,7 +70,7 @@ public class ArrayDefinition extends Definition {
      * @return the definitions
      */
     public Definition[] getDefinitions() {
-        return definitions;
+        return Arrays.copyOf(definitions, definitions.length);
     }
 
     /**
@@ -76,7 +78,7 @@ public class ArrayDefinition extends Definition {
      *            the definitions to set
      */
     public void setDefinitions(Definition[] definitions) {
-        this.definitions = definitions;
+        this.definitions = Arrays.copyOf(definitions, definitions.length);
     }
 
     /**

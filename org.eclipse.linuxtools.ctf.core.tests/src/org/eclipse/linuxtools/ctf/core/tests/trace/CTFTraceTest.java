@@ -96,7 +96,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testUUIDIsSet() {
-        boolean result = fixture.UUIDIsSet();
+        boolean result = fixture.uuidIsSet();
         assertTrue(result);
     }
 

@@ -21,6 +21,34 @@ package org.eclipse.linuxtools.ctf.core.event;
  * @since 1.2
  */
 public class CTFCallsite implements Comparable<CTFCallsite> {
+
+    private static final long MASK32 = 0x00000000ffffffffL;
+
+    /**
+     * The event name
+     */
+    private final String eventName;
+
+    /**
+     * the file name of the callsite
+     */
+    private final String fileName;
+
+    /**
+     * the instruction pointer
+     */
+    private final long ip;
+
+    /**
+     * the function name
+     */
+    private final String functionName;
+
+    /**
+     * the line number of the callsite
+     */
+    private final long lineNumber;
+
     /**
      * The callsite constructor
      *
@@ -36,48 +64,25 @@ public class CTFCallsite implements Comparable<CTFCallsite> {
      *            the line number of the callsite
      */
     public CTFCallsite(String en, String func, long ip, String fn, long line) {
-        EventName = en;
-        FileName = fn;
-        FunctionName = func;
+        eventName = en;
+        fileName = fn;
+        functionName = func;
         this.ip = ip;
-        this.LineNumber = line;
+        this.lineNumber = line;
     }
 
-    static private final long MASK32 = 0x00000000ffffffffL;
-    /**
-     * The event name
-     */
-    private final String EventName;
-    /**
-     * the file name of the callsite
-     */
-    private final String FileName;
-    /**
-     * the instruction pointer
-     */
-    private final long ip;
-    /**
-     * the function name
-     */
-    private final String FunctionName;
-    /**
-     * the line number of the callsite
-     */
-    private final long LineNumber;
-
-    /* Getters */
     /**
      * @return the eventName
      */
     public String getEventName() {
-        return EventName;
+        return eventName;
     }
 
     /**
      * @return the fileName
      */
     public String getFileName() {
-        return FileName;
+        return fileName;
     }
 
     /**
@@ -91,14 +96,14 @@ public class CTFCallsite implements Comparable<CTFCallsite> {
      * @return the functionName
      */
     public String getFunctionName() {
-        return FunctionName;
+        return functionName;
     }
 
     /**
      * @return the lineNumber
      */
     public long getLineNumber() {
-        return LineNumber;
+        return lineNumber;
     }
 
     /*
@@ -145,6 +150,6 @@ public class CTFCallsite implements Comparable<CTFCallsite> {
 
     @Override
     public String toString() {
-        return FileName + "/" + FunctionName + ":" + LineNumber; //$NON-NLS-1$ //$NON-NLS-2$
+        return fileName + "/" + functionName + ":" + lineNumber; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

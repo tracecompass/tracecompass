@@ -32,13 +32,13 @@ public class IntegerDeclaration implements IDeclaration {
     // Attributes
     // ------------------------------------------------------------------------
 
-    final private int length;
-    final private boolean signed;
-    final private int base;
-    final private ByteOrder byteOrder;
-    final private Encoding encoding;
-    final private long alignment;
-    final private String clock;
+    private final int length;
+    private final boolean signed;
+    private final int base;
+    private final ByteOrder byteOrder;
+    private final Encoding encoding;
+    private final long alignment;
+    private final String clock;
 
     // ------------------------------------------------------------------------
     // Constructors

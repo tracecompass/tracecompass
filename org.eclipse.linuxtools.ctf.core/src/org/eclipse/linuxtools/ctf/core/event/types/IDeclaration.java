@@ -37,8 +37,7 @@ public interface IDeclaration {
      *            the name of the definition
      * @return a reference to the definition
      */
-    Definition createDefinition(IDefinitionScope definitionScope,
-            String fieldName);
+    Definition createDefinition(IDefinitionScope definitionScope, String fieldName);
 
     /**
      * The minimum alignment. if the field is 32 bits, the definition will pad

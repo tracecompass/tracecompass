@@ -13,10 +13,11 @@
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A CTFC variant declaration.
- * 
+ *
  * A variant is similar to a C union, only taking the minimum size of the types,
  * it is a compound data type that contains other datatypes in fields. they are
  * stored in an hashmap and indexed by names which are strings.
@@ -32,8 +33,8 @@ public class VariantDeclaration implements IDeclaration {
     // ------------------------------------------------------------------------
 
     private String tag = null;
-    final static private long alignment = 1;
-    private final HashMap<String, IDeclaration> fields = new HashMap<String, IDeclaration>();
+    private static final long alignment = 1;
+    private final Map<String, IDeclaration> fields = new HashMap<String, IDeclaration>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -85,8 +86,9 @@ public class VariantDeclaration implements IDeclaration {
     /**
      * Gets the fields of the variant
      * @return the fields of the variant
+     * @since 2.0
      */
-    public HashMap<String, IDeclaration> getFields() {
+    public Map<String, IDeclaration> getFields() {
         return this.fields;
     }
 

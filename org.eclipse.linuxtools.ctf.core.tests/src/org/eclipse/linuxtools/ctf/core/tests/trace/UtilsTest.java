@@ -29,15 +29,6 @@ import org.junit.Test;
 public class UtilsTest {
 
     /**
-     * Run the Utils() constructor test.
-     */
-    @Test
-    public void testUtils() {
-        Utils result = new Utils();
-        assertNotNull(result);
-    }
-
-    /**
      * Run the UUID makeUUID(byte[]) method test.
      */
     @Test

@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
  * A bitwise buffer capable of accessing fields with bit offsets.
  * @since 2.0
  */
-public class BitBuffer {
+public final class BitBuffer {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -96,8 +96,7 @@ public class BitBuffer {
      * @return The int value read from the buffer
      */
     public int getInt() {
-        int val = getInt(BIT_INT, true);
-        return val;
+        return getInt(BIT_INT, true);
     }
 
     /**
@@ -201,7 +200,6 @@ public class BitBuffer {
             lshift = BIT_CHAR - cshift;
             value <<= lshift;
             value |= cmask;
-            // index += lshift;
             currByte++;
         }
         for (; currByte < (endByte - 1); currByte++) {
@@ -255,7 +253,6 @@ public class BitBuffer {
             cmask = cache & mask;
             value <<= cshift;
             value |= cmask;
-            // end -= cshift;
             currByte--;
         }
         for (; currByte >= (startByte + 1); currByte--) {
@@ -372,7 +369,6 @@ public class BitBuffer {
             int b = this.buf.get(currByte) & 0xFF;
             this.buf.put(currByte, (byte) ((b & mask) | cmask));
             correctedValue >>>= cshift;
-            // end -= cshift;
             currByte--;
         }
 
@@ -437,7 +433,6 @@ public class BitBuffer {
             int b = this.buf.get(currByte) & 0xFF;
             this.buf.put(currByte, (byte) ((b & mask) | cmask));
             correctedValue >>>= BIT_CHAR - cshift;
-            // index += BIT_CHAR - cshift;
             currByte++;
         }
 

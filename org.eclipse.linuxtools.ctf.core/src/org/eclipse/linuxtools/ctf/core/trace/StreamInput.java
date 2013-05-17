@@ -56,7 +56,7 @@ public class StreamInput implements IDefinitionScope {
     /**
      * Information on the file (used for debugging)
      */
-    public final File file;
+    private final File file;
 
     /**
      * The packet index of this input
@@ -68,17 +68,17 @@ public class StreamInput implements IDefinitionScope {
     /*
      * Definition of trace packet header
      */
-    StructDefinition tracePacketHeaderDef = null;
+    private StructDefinition tracePacketHeaderDef = null;
 
     /*
      * Definition of trace stream packet context
      */
-    StructDefinition streamPacketContextDef = null;
+    private StructDefinition streamPacketContextDef = null;
 
     /*
      * Total number of lost events in this stream
      */
-    long lostSoFar = 0;
+    private long lostSoFar = 0;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -244,9 +244,9 @@ public class StreamInput implements IDefinitionScope {
             StructDefinition tracePacketHeaderDef,
             StructDefinition streamPacketContextDef, BitBuffer bitBuffer)
             throws CTFReaderException {
-        @SuppressWarnings("unused")
-        MappedByteBuffer bb = createPacketBitBuffer(fileSizeBytes,
-                packetOffsetBytes, packetIndex, bitBuffer);
+
+        /* Ignoring the return value, but this call is needed to initialize the input */
+        createPacketBitBuffer(fileSizeBytes, packetOffsetBytes, packetIndex, bitBuffer);
 
         /*
          * Read the trace packet header if it exists.
@@ -358,14 +358,13 @@ public class StreamInput implements IDefinitionScope {
         /*
          * Check the trace UUID
          */
-        ArrayDefinition uuidDef = (ArrayDefinition) tracePacketHeaderDef
-                .lookupDefinition("uuid"); //$NON-NLS-1$
+        ArrayDefinition uuidDef =
+                (ArrayDefinition) tracePacketHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
         if (uuidDef != null) {
             byte[] uuidArray = new byte[16];
 
-            for (int i = 0; i < 16; i++) {
-                IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef
-                        .getElem(i);
+            for (int i = 0; i < uuidArray.length; i++) {
+                IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getElem(i);
                 uuidArray[i] = (byte) uuidByteDef.getValue();
             }
 
@@ -426,11 +425,11 @@ public class StreamInput implements IDefinitionScope {
 
         Long contentSize = (Long) packetIndex.lookupAttribute("content_size"); //$NON-NLS-1$
         Long packetSize = (Long) packetIndex.lookupAttribute("packet_size"); //$NON-NLS-1$
-        Long timestampBegin = (Long) packetIndex.lookupAttribute("timestamp_begin"); //$NON-NLS-1$
-        Long timestampEnd = (Long) packetIndex.lookupAttribute("timestamp_end"); //$NON-NLS-1$
+        Long tsBegin = (Long) packetIndex.lookupAttribute("timestamp_begin"); //$NON-NLS-1$
+        Long tsEnd = (Long) packetIndex.lookupAttribute("timestamp_end"); //$NON-NLS-1$
         String device = (String) packetIndex.lookupAttribute("device"); //$NON-NLS-1$
         // LTTng Specific
-        Long CPU_ID = (Long) packetIndex.lookupAttribute("cpu_id"); //$NON-NLS-1$
+        Long cpuId = (Long) packetIndex.lookupAttribute("cpu_id"); //$NON-NLS-1$
         Long lostEvents = (Long) packetIndex.lookupAttribute("events_discarded");  //$NON-NLS-1$
 
         /* Read the content size in bits */
@@ -452,16 +451,16 @@ public class StreamInput implements IDefinitionScope {
         }
 
         /* Read the begin timestamp */
-        if (timestampBegin != null) {
-            packetIndex.setTimestampBegin(timestampBegin.longValue());
+        if (tsBegin != null) {
+            packetIndex.setTimestampBegin(tsBegin.longValue());
         }
 
         /* Read the end timestamp */
-        if (timestampEnd != null) {
-            if( timestampEnd == -1 ) {
-                timestampEnd = Long.MAX_VALUE;
+        if (tsEnd != null) {
+            if( tsEnd == -1 ) {
+                tsEnd = Long.MAX_VALUE;
             }
-            packetIndex.setTimestampEnd(timestampEnd.longValue());
+            packetIndex.setTimestampEnd(tsEnd.longValue());
             setTimestampEnd(packetIndex.getTimestampEnd());
         }
 
@@ -469,8 +468,8 @@ public class StreamInput implements IDefinitionScope {
             packetIndex.setTarget(device);
         }
 
-        if (CPU_ID != null) {
-            packetIndex.setTarget("CPU" + CPU_ID.toString()); //$NON-NLS-1$
+        if (cpuId != null) {
+            packetIndex.setTarget("CPU" + cpuId.toString()); //$NON-NLS-1$
         }
 
         if (lostEvents != null) {
