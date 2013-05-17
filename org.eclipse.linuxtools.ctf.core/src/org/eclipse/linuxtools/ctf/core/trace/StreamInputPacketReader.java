@@ -286,7 +286,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
      */
     public EventDefinition readNextEvent() throws CTFReaderException {
         /* Default values for those fields */
-        long eventID = 0;
+        long eventID = EventDeclaration.UNSET_EVENT_ID;
         long timestamp = 0;
 
         if (lostEventsInThisPacket > lostSoFar) {
