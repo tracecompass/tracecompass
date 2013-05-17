@@ -8,13 +8,13 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Made immutable
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.event;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -30,57 +30,45 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private TmfTimeRange fTimeRange;
-    private long fNbLostEvents;
+    private final TmfTimeRange fTimeRange;
+    private final long fNbLostEvents;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     /**
-     * Default constructor which boils down to the default TmfEvent with no
-     * lost event over the empty time range.
-     */
-    public TmfLostEvent() {
-        this(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, TmfTimeRange.NULL_RANGE, 0);
-    }
-
-    /**
      * Full constructor
      *
-     * @param trace the parent trace
-     * @param rank the event rank (in the trace)
-     * @param timestamp the event timestamp
-     * @param source the event source
-     * @param type the event type
-     * @param reference the event reference
-     * @param timeRange the 'problematic' time range
-     * @param nbLostEvents the number of lost events in the time range
+     * @param trace
+     *            the parent trace
+     * @param rank
+     *            the event rank (in the trace)
+     * @param timestamp
+     *            the event timestamp
+     * @param source
+     *            the event source
+     * @param type
+     *            the event type
+     * @param reference
+     *            the event reference
+     * @param timeRange
+     *            the 'problematic' time range
+     * @param nbLostEvents
+     *            the number of lost events in the time range
      * @since 2.0
      */
-    public TmfLostEvent(final ITmfTrace trace, final long rank, final ITmfTimestamp timestamp,
-            final String source, final ITmfEventType type, final String reference, final TmfTimeRange timeRange, final long nbLostEvents)
-    {
+    public TmfLostEvent(final ITmfTrace trace,
+            final long rank,
+            final ITmfTimestamp timestamp,
+            final String source,
+            final ITmfEventType type,
+            final String reference,
+            final TmfTimeRange timeRange,
+            final long nbLostEvents) {
         super(trace, rank, timestamp, source, type, null, reference);
         fTimeRange = timeRange;
         fNbLostEvents = nbLostEvents;
-    }
-
-    /**
-     * Copy constructor
-     *
-     * @param event the original event
-     */
-    public TmfLostEvent(final ITmfLostEvent event) {
-        super(  event.getTrace(),
-                event.getRank(),
-                event.getTimestamp(),
-                event.getSource(),
-                event.getType(),
-                event.getContent(),
-                event.getReference());
-        fTimeRange = event.getTimeRange();
-        fNbLostEvents = event.getNbLostEvents();
     }
 
     // ------------------------------------------------------------------------
@@ -98,25 +86,6 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
     @Override
     public long getNbLostEvents() {
         return fNbLostEvents;
-    }
-
-    // ------------------------------------------------------------------------
-    // Convenience setters
-    // ------------------------------------------------------------------------
-
-    /**
-     * @param timeRange the 'problematic' time range
-     * @since 2.0
-     */
-    protected void setTimeRange(final TmfTimeRange timeRange) {
-        fTimeRange = timeRange;
-    }
-
-    /**
-     * @param nbLostEvents the number of lost events
-     */
-    protected void setNbLostEvents(final long nbLostEvents) {
-        fNbLostEvents = nbLostEvents;
     }
 
     // ------------------------------------------------------------------------
@@ -160,7 +129,8 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfLostEvent [Event=" + super.toString() + ", fTimeRange=" + fTimeRange + ", fNbLostEvents=" + fNbLostEvents + "]";
+        return getClass().getSimpleName() + " [Event=" + super.toString() +
+                ", fTimeRange=" + fTimeRange + ", fNbLostEvents=" + fNbLostEvents + "]";
     }
 
 }
