@@ -149,7 +149,7 @@ public interface ITmfTrace extends ITmfDataProvider {
      * @param project the eclipse project
      * @param path the trace path
      *
-     * @return true if trace is valid
+     * @return an IStatus object with validation result. Use severity OK to indicate success.
      * @since 2.0
      */
     IStatus validate(IProject project, String path);

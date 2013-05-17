@@ -47,7 +47,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
  * <li> public double getLocationRatio(ITmfLocation<?> location)
  * <li> public ITmfContext seekEvent(ITmfLocation<?> location)
  * <li> public ITmfContext seekEvent(double ratio)
- * <li> public boolean validate(IProject project, String path)
+ * <li> public IStatus validate(IProject project, String path)
  * </ul>
  * A concrete trace must provide its corresponding parser. A common way to
  * accomplish this is by making the concrete class extend TmfTrace and
