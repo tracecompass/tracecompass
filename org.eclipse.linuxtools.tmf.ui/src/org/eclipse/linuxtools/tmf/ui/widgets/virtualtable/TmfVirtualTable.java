@@ -122,6 +122,8 @@ public class TmfVirtualTable extends Composite {
      */
     private IDoubleClickListener doubleClickListener = null;
 
+    private boolean fResetTopIndex = false;
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -356,15 +358,20 @@ public class TmfVirtualTable extends Composite {
                 );
 
         /*
-         * When a partially visible table item is selected, sometimes the top index
-         * or the origin is changed to ensure the selected item is fully visible.
-         * This leaves a blank space at the bottom of the virtual table and hides
-         * the first row. The solution is to ensure that the top index is set to 0.
+         * Feature in Windows. When a partially visible table item is selected,
+         * after ~500 ms the top index is changed to ensure the selected item is
+         * fully visible. This leaves a blank space at the bottom of the virtual
+         * table. The workaround is to reset the top index to 0 if it is not 0.
+         * Also reset the top index to 0 if indicated by the flag that was set
+         * at table selection of a partially visible table item.
          */
         fTable.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
-                fTable.setTopIndex(0);
+                if (fTable.getTopIndex() != 0 || fResetTopIndex) {
+                    fTable.setTopIndex(0);
+                }
+                fResetTopIndex = false;
             }
         });
     }
@@ -378,6 +385,17 @@ public class TmfVirtualTable extends Composite {
             fSelectedEventRank = selectedRow;
         } else {
             fSelectedEventRank = fTableTopEventRank + selectedRow;
+        }
+
+        /*
+         * Feature in Linux. When a partially visible table item is selected,
+         * the origin is changed to ensure the selected item is fully visible.
+         * This makes the first row partially visible. The solution is to force
+         * reset the origin by setting the top index to 0. This should happen
+         * only once at the next redraw by the paint listener.
+         */
+        if (selectedRow >= fFullyVisibleRows) {
+            fResetTopIndex = true;
         }
     }
 
