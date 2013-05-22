@@ -135,6 +135,7 @@ public class SelectTracesWizardPage extends WizardPage {
     public boolean performFinish() {
 
         IFolder experiment = fExperiment.getResource();
+        boolean changed = false;
 
         // Add the selected traces to the experiment
         Set<String> keys = fPreviousTraces.keySet();
@@ -145,6 +146,7 @@ public class SelectTracesWizardPage extends WizardPage {
                 fPreviousTraces.remove(name);
             } else {
                 fExperiment.addTrace(trace);
+                changed = true;
             }
         }
 
@@ -156,8 +158,12 @@ public class SelectTracesWizardPage extends WizardPage {
             } catch (CoreException e) {
                 Activator.getDefault().logError("Error selecting traces for experiment " + experiment.getName(), e); //$NON-NLS-1$
             }
+            changed = true;
         }
         fProject.refresh();
+        if (changed) {
+            fExperiment.closeEditors();
+        }
 
         return true;
     }
