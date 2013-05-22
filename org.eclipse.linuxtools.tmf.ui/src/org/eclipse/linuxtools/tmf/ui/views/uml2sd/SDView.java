@@ -1054,7 +1054,7 @@ public class SDView extends ViewPart {
      * @return the value of the initialization flag.
      * @since 2.0
      */
-    private boolean isNeedInit() {
+    protected boolean isNeedInit() {
         return fNeedInit;
     }
 
