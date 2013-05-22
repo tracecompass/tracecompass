@@ -74,6 +74,8 @@ public class ImportTraceWizardSelectTraceTypePage extends AbstractImportTraceWiz
 
         final ICheckStateListener listener = new TraceTypeCheckListener();
 
+        setTitle(Messages.ImportTraceWizardSelectTraceTypePageTitle);
+
         fTreeView = new CheckboxTreeViewer(control, SWT.BORDER);
         fTreeView.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         fTreeView.setContentProvider(fProvider);

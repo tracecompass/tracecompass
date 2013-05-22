@@ -112,6 +112,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
     public void createControl(Composite parent) {
         super.createControl(parent);
         final Composite control = (Composite) this.getControl();
+        setTitle(Messages.ImportTraceWizardScanPageTitle);
         traceTypeViewer = new CheckboxTreeViewer(control, SWT.CHECK);
         traceTypeViewer.setContentProvider(getBatchWizard().getScannedTraces());
         traceTypeViewer.getTree().setHeaderVisible(true);
@@ -354,6 +355,8 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
 
     private final class ScanRunnable extends Job {
 
+        // monitor is stored here, starts as the main monitor but becomes a
+        // submonitor
         private IProgressMonitor fMonitor;
 
         public ScanRunnable(String name) {
@@ -366,18 +369,26 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
 
         @Override
         public IStatus run(IProgressMonitor monitor) {
+            /*
+             * Set up phase, it is synchronous
+             */
             fMonitor = monitor;
             final Control control = traceTypeViewer.getControl();
+            // please note the sync exec here is to allow us to set
             control.getDisplay().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    // monitor gets overwritten here so it's necessary to save it in a field.
+                    // monitor gets overwritten here so it's necessary to save
+                    // it in a field.
                     fMonitor = SubMonitor.convert(getMonitor());
                     getMonitor().setTaskName(Messages.ImportTraceWizardPageScanScanning + ' ');
                     ((SubMonitor) getMonitor()).setWorkRemaining(IProgressMonitor.UNKNOWN);
                 }
             });
-
+            /*
+             * At this point we start calling async execs and updating the view.
+             * This is a good candidate to parallelise.
+             */
             while (fCanRun == true) {
                 boolean updated = false;
                 boolean validCombo;
@@ -389,6 +400,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
                             if (!control.isDisposed()) {
                                 getMonitor().setTaskName(Messages.ImportTraceWizardPageScanScanning + ' ');
                                 getMonitor().subTask(Messages.ImportTraceWizardPageScanDone);
+                                ImportTraceWizardScanPage.this.setMessage(Messages.ImportTraceWizardPageScanScanning + ' ' + Messages.ImportTraceWizardPageScanDone);
                             }
                         }
                     });

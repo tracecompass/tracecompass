@@ -32,18 +32,20 @@ public class Messages extends NLS {
     public static String ImportTraceWizardAddFile;
     public static String ImportTraceWizardAddDirectory;
     public static String ImportTraceWizardRemove;
-    public static String ImportTraceWizardDirectoryCaption;
+    public static String ImportTraceWizardDirectoryTitle;
     public static String ImportTraceWizardDirectoryHint;
     public static String ImportTraceWizardScanPageRenameError;
     public static String ImportTraceWizardScanPageSelectAtleastOne;
     public static String ImportTraceWizardSelectAll;
+    public static String ImportTraceWizardScanPageTitle;
+    public static String ImportTraceWizardSelectTraceTypePageTitle;
+    public static String ImportTraceWizardPageOptionsTitle;
     public static String ImportTraceWizardPageScanDone;
     public static String ImportTraceWizardPageScanScanning;
     public static String ImportTraceWizardPageSelectNone;
     public static String ImportTraceWizardPageSelectHint;
     public static String BatchImportTraceWizardRemove;
     public static String BatchImportTraceWizardAdd;
-
     public static String BatchImportTraceWizardErrorImportingTraceResource;
 
     public static String SharedSelectProject;
