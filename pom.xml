@@ -46,13 +46,6 @@
   
 <profiles>
   <profile>
-    <id>lttngTests</id>
-      <modules>
-        <module>org.eclipse.linuxtools.lttng2.core.tests</module>
-      </modules>
-  </profile>
-  
-  <profile>
     <id>lttngPackage</id>
       <properties>
           <lttngPackageDestination>/var/www/technology/linuxtools/lttng/update-nightly/</lttngPackageDestination>
