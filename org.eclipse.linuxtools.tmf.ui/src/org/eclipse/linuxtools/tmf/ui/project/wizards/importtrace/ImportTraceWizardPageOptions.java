@@ -112,5 +112,4 @@ public class ImportTraceWizardPageOptions extends AbstractImportTraceWizardPage 
         }
         this.setTitle(Messages.ImportTraceWizardPageOptionsTitle);
     }
-
 }

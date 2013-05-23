@@ -159,11 +159,11 @@ public class ImportTraceWizardSelectTraceTypePage extends AbstractImportTraceWiz
             ITreeContentProvider tcp = (ITreeContentProvider) fTreeView.getContentProvider();
             String parentElement = (String) tcp.getParent(element);
             if (parentElement != null) {
-                String[] siblings = (String[]) tcp.getChildren(parentElement);
-                final String first = siblings[0];
+                TraceTypeHelper[] siblings = (TraceTypeHelper[]) tcp.getChildren(parentElement);
+                final TraceTypeHelper first = siblings[0];
                 final boolean isFirstChecked = fTreeView.getChecked(first);
                 boolean allSame = true;
-                for (String peer : siblings) {
+                for (TraceTypeHelper peer : siblings) {
                     final boolean peerChecked = fTreeView.getChecked(peer);
                     if (peerChecked != isFirstChecked) {
                         allSame = false;
