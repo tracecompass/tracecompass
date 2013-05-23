@@ -336,6 +336,16 @@ To import the trace as a link, use the platform-specific key modifier while drag
 
 It is also possible to drop a trace, resource, file or folder into an existing experiment. If the item does not already exist as a trace in the project's trace folder, it will first be copied or imported, then the trace will be added to the experiment.
 
+=== Link with Editor ===
+
+The tracing projects support the feature '''Link With Editor''' of the Project Explorer view. With this feature it is now possible to<br/>
+* select a trace element in the Project Explorer view and the corresponding [[#Events_Editor | Events Editor]] will get focus if the relevant trace is open.
+* select an [[#Events_Editor | Events Editor]] and the corresponding trace element will be highlighted in the Project Explorer view.
+
+To enable or disable this feature toggle the '''Link With Editor''' button of the Project Explorer view as shown below.
+
+[[Image:images/TMF_LinkWithEditor.png]]
+
 == Events Editor ==
 
 The Events editor shows the basic trace data elements (events) in a tabular format. The editors can be dragged in the editor area so that several traces may be shown side by side. These traces are synchronized by timestamp.
