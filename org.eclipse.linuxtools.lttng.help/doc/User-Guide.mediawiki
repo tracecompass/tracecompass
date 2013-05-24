@@ -5,7 +5,7 @@ LTTng (Linux Trace Toolkit, next generation) is a highly efficient tracing tool 
 
 For more information about LTTng, refer to the project [http://lttng.org site]
 
-'''Note''': This User Guide covers the integration of the latest LTTng (v2.0) in Eclipse. The legacy version (v0.x) of both the tracer and the LTTng integration are no longer being maintained but are still available for download. The User Guide for the legacy LTTng integration is available [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng/User_Guide here].
+'''Note''': This User Guide covers the integration of the latest LTTng (v2.0) in Eclipse. The legacy version (v0.x) of both the tracer and the LTTng integration are no longer being maintained.
 
 == About Tracing ==
 
@@ -1274,7 +1274,7 @@ The TID column shows the process node's '''thread ID''' and the PTID column show
 
 This part of the Control Flow View is probably the most interesting one. Using the mouse, you can navigate through the trace (go left, right) and zoom on a specific region to inspect its details.
 
-The colored bars you see represent '''states''' for the associated process node. When a process state changes in time, so does the color. States colors legend is available through a [[#Toolbar|toolbar button]]:
+The colored bars you see represent '''states''' for the associated process node. When a process state changes in time, so does the color. For state '''SYSCALL''' the name of the system call is displayed in the state bar. States colors legend is available through a [[#Toolbar|toolbar button]]:
 
 [[Image:images/Cfv_legend.png]]
 
@@ -1340,12 +1340,17 @@ The '''Previous event''' and '''Next event''' buttons update the current time in
 
 The '''Previous process''' and '''Next process''' buttons select the previous and next process node within the process tree.
 
+The '''Process filter''' buttons opens a new dialog box for configuring the processes to show.
+
+[[Image:images/LTTng2_CFV_Filter.png]]
+
 == Resources View ==
 This view is specific to kernel trace. To open it, go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''LTTng/Resources''' in the list.
 
-[[Image:images/Rv example.png| Example of resources view with all trace points and syscalls enabled]]
+[[Image:images/Rv_example.png| Example of resources view with all trace points and syscalls enabled]]
 
-This view shows the state of system resources i.e. if changes occured during the trace either on '''CPUs''', '''IRQs''' or '''soft IRQs''', it will appear in this view. The left side of the view present a list of resources that are affected by at least one event of the trace. The right side illustrate the state in which each resource is at some point in time.
+This view shows the state of system resources i.e. if changes occured during the trace either on '''CPUs''', '''IRQs''' or '''soft IRQs''', it will appear in this view. The left side of the view present a list of resources that are affected by at least one event of the trace. The right side illustrate the state in which each resource is at some point in time. For state '''USERMODE''' it also prints the process name in the state bar. For state '''SYSCALL''' the name of the system call is
+displayed in the state region.
 
 Just like other views, according to which trace points and system calls are activated, the content of this view may change from one trace to another.
 
@@ -1361,7 +1366,7 @@ Then, by selecting '''Next Event''', it will show the next state transition and 
 
 [[Image:images/RV_infobox2.png|Shows the next state of the IRQ]]
 
-This view is also synchronized with the others : [[#Histogram_View | histogram]], [[#LTTng_Kernel_Events_Editor | Events editor]], [[#Control_Flow_View | control flow view]], etc.
+This view is also synchronized with the others : [[#Histogram_View | Histogram View]], [[#LTTng_Kernel_Events_Editor | Events Editor]], [[#Control_Flow_View | Control Flow View]], etc.
 
 === Navigation ===
 
@@ -1373,7 +1378,13 @@ See Control Flow View's '''[[#Incomplete_regions|Incomplete regions]]'''.
 
 === Toolbar ===
 
-See Control Flow View's '''[[#Toolbar|Toolbar]]'''.
+The Resources View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+[[Image:images/Rv_toolbar.png]]
+
+The '''Previous event''' and '''Next event''' buttons update the current time indicator so that it's on the previous or next event.
+
+The '''Previous resource''' and '''Next resource''' buttons select the previous and next resource node within the resource tree.
 
 == LTTng Kernel Events Editor ==
 
