@@ -189,8 +189,87 @@ A new project will appear in the '''Project Explorer''' view.
 Tracing projects have two sub-folders: '''Traces''' which holds the individual traces, and '''Experiments''' which holds sets of traces that we want to correlate.
 
 === Importing Traces in a Project ===
+==== Batch Importing ====
+The '''Batch Import Trace Wizard''' allows users to search their media for traces and import multiple traces of varying trace types simultaneously. It also handles name clashes and renaming of traces.
 
-The '''Traces''' folder holds the set of traces available for experiments. To import a trace to the traces folder, select the Traces folder and click the right mouse button. Then select '''Import...''' menu item in the context-sensitive menu.
+The '''Traces''' folder holds the set of traces available for a tracing project. To import a set of traces to the '''Traces''' folder, one can open the '''Import...''' menu from the '''File''' main menu.
+
+[[Image:images/importImages/importImportMenu.png]]
+
+Then select '''Batch Trace Import'''
+
+[[Image:images/importImages/importMenuSelect.png]]
+
+Or one can select the '''Traces''' folder by double clicking on the project name.
+
+[[Image:images/importImages/importSelectTracingProject.png]]
+
+Then click the right mouse button on the '''Traces''' folder. Then select '''Batch Import...''' menu item in the context-sensitive menu.
+
+[[Image:images/importImages/importBatchImport.png]]
+
+At this point, the '''Batch import wizard''' is opened.
+
+The '''Available trace types''' page is visible. Select a trace type to scan for by clicking an item in trace types tree. If one selects a parent element, the new state will be propagated to the children.
+
+[[Image:images/importImages/importSelectTraceTypeToImport.png]]
+
+When that is done, the warning message will go away and the user can click '''Next >'''.
+
+[[Image:images/importImages/importSelectTraceTypeComplete.png]]
+
+Then select one or more files or directories to scan for traces. The directories added will be recursively scanned, all children files and directories will be scanned. This can be slow depending on the size of the directory to scan.
+
+[[Image:images/importImages/importSelectFilesToScan.png]]
+
+One can add a directory by clicking on '''Add Directory...''' then selecting a directory to import.
+
+[[Image:images/importImages/importSelectedDirectory.png]]
+
+One can also add a file by clicking on '''Add File...''' then selecting a file to import.
+
+[[Image:images/importImages/importAddFile.png]]
+
+Once the files and directories are selected, a background scanner will already start scanning them for potential matches. to select the candidates, click '''Next >'''.
+
+Here the user will see the results of the scan. The list will grow as more files are scanned.
+To select a trace to import, first open a trace type.
+
+[[Image:images/importImages/importScan1.png]]
+
+Then select the trace to import.
+
+[[Image:images/importImages/importScan2.png]]
+
+When that is done, typically one can press '''Finish''', and the trace will be imported. They can set the trace to be '''linked''' or '''copied'''. A '''linked''' trace is not copied to the user's workspace, rather, the original file is used. This is useful for traces that are very large and that the user does not want to copy several times. '''Copied''' traces are as their name indicates, copied to the local workspace. This is useful if there is a trace on a network or on some removable media. The user can also specify if the trace should '''overwrite''' the resources in the workspace or not.
+
+[[Image:images/importImages/importScan3.png]]
+
+One can select several traces also and import them simultaneously. In this case there is a problem, the name of both traces are the same, this is a conflicting name and needs to be resolved.
+
+[[Image:images/importImages/importScan4.png]]
+
+To do so, select one of the conflicting traces, then '''click on its name'''. Then type in a new name.
+
+[[Image:images/importImages/importScan5.png]]
+
+Here the traces shall be copied instead of linked.
+
+[[Image:images/importImages/importScan6.png]]
+
+At this point, press '''Finish''' to import the traces.
+
+If the '''Finish''' button is grayed, or if the user wishes to import to a different project, they need to press '''Next >'''. The user then needs to select a project to import to on the '''options''' page.
+
+[[Image:images/importImages/importOptions.png]]
+
+You will then see the traces in the '''Traces''' folder as shown below and can '''open''' them by '''double-clicking''' on them. For more details on how to open a trace see section [[#Opening_a_Trace_or_Experiment|Opening a Trace or Experiment]].
+
+[[Image:images/importImages/importFinish.png]]
+
+==== Importing ====
+
+The previous way of importing a trace is still available. To access it, simply  select '''Import...''' menu item in the context-sensitive menu.
 
 [[Image:images/ProjectImportTraceAction.png]]
 
@@ -621,7 +700,7 @@ The first line of a matching entry is highlighted with darker colors.
 
 By default only the first matching entry will be highlighted. To highlight all matching entries in the preview input data, click the '''Highlight All''' button. This might take a few seconds to process, depending on the input size.
 
-Click the '''Next''' button to go to the second page of the wizard.
+Click the '''Next >''' button to go to the second page of the wizard.
 
 [[Image:images/CustomTextParserOutput.png]]
 
@@ -693,7 +772,7 @@ The '''Preview input''' text box can be used to enter any XML log data that will
 
 The '''Preview:''' text field of each capturing element and attribute and of the Time Stamp will be filled from the parsed data of the first matching log entry. Also, when creating a new child element or attribute, its element or attribute name will be suggested if possible from the preview input data.
 
-Click the '''Next''' button to go to the second page of the wizard.
+Click the '''Next >''' button to go to the second page of the wizard.
 
 [[Image:images/CustomXMLParserOutput.png]]
 
