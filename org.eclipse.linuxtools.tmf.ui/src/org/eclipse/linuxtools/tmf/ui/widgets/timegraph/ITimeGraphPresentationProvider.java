@@ -31,12 +31,12 @@ public interface ITimeGraphPresentationProvider {
     /** State table index for an invisible event
      * @since 2.0
      */
-    public final int INVISIBLE = -1;
+    final int INVISIBLE = -1;
 
     /** State table index for a transparent event (only borders drawn)
      * @since 2.0
      */
-    public final int TRANSPARENT = -2;
+    final int TRANSPARENT = -2;
 
     /**
      * Returns the name of state types.

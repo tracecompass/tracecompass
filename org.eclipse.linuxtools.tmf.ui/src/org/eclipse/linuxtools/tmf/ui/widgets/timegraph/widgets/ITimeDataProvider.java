@@ -98,7 +98,7 @@ public interface ITimeDataProvider {
      *            Ensure visibility of new time (will adjust time range if
      *            necessary)
      */
-    public void setSelectedTimeNotify(long time, boolean ensureVisible);
+    void setSelectedTimeNotify(long time, boolean ensureVisible);
 
     /**
      * Updates the selected time and adjusts the time range if necessary without
@@ -110,7 +110,7 @@ public interface ITimeDataProvider {
      *            Ensure visibility of new time (will adjust time range if
      *            necessary)
      */
-    public void setSelectedTime(long time, boolean ensureVisible);
+    void setSelectedTime(long time, boolean ensureVisible);
 
     /**
      * Reset the start and end times

@@ -27,125 +27,125 @@ import org.eclipse.swt.graphics.Color;
 public class TimeGraphColorScheme {
 
     // elements color indices
-    static public final int BLACK_STATE = 0;
-    static public final int GREEN_STATE = 1;
-    static public final int DARK_BLUE_STATE = 2;
-    static public final int ORANGE_STATE = 3;
-    static public final int GOLD_STATE = 4;
-    static public final int RED_STATE = 5;
-    static public final int GRAY_STATE = 6;
-    static public final int DARK_GREEN_STATE = 7;
-    static public final int DARK_YELLOW_STATE = 8;
-    static public final int MAGENTA3_STATE = 9;
-    static public final int PURPLE1_STATE = 10;
-    static public final int PINK1_STATE = 11;
-    static public final int AQUAMARINE_STATE = 12;
-    static public final int LIGHT_BLUE_STATE = 13;
-    static public final int CADET_BLUE_STATE = 14;
-    static public final int OLIVE_STATE = 15;
+    public static final int BLACK_STATE = 0;
+    public static final int GREEN_STATE = 1;
+    public static final int DARK_BLUE_STATE = 2;
+    public static final int ORANGE_STATE = 3;
+    public static final int GOLD_STATE = 4;
+    public static final int RED_STATE = 5;
+    public static final int GRAY_STATE = 6;
+    public static final int DARK_GREEN_STATE = 7;
+    public static final int DARK_YELLOW_STATE = 8;
+    public static final int MAGENTA3_STATE = 9;
+    public static final int PURPLE1_STATE = 10;
+    public static final int PINK1_STATE = 11;
+    public static final int AQUAMARINE_STATE = 12;
+    public static final int LIGHT_BLUE_STATE = 13;
+    public static final int CADET_BLUE_STATE = 14;
+    public static final int OLIVE_STATE = 15;
 
-    static public final int STATES0 = 0;
-    static public final int STATES1 = 15;
+    public static final int STATES0 = 0;
+    public static final int STATES1 = 15;
 
     // selected state elements color indices
-    static public final int BLACK_STATE_SEL = 16;
-    static public final int GREEN_STATE_SEL = 17;
-    static public final int DARK_BLUE_STATE_SEL = 18;
-    static public final int ORANGE_STATE_SEL = 19;
-    static public final int GOLD_STATE_SEL = 20;
-    static public final int RED_STATE_SEL = 21;
-    static public final int GRAY_STATE_SEL = 22;
-    static public final int DARK_GREEN_STATE_SEL = 23;
-    static public final int DARK_YELLOW_STATE_SEL = 24;
-    static public final int MAGENTA3_STATE_SEL = 25;
-    static public final int PURPLE1_STATE_SEL = 26;
-    static public final int PINK1_STATE_SEL = 27;
-    static public final int AQUAMARINE_STATE_SEL = 28;
-    static public final int LIGHT_BLUE_STATE_SEL = 29;
-    static public final int CADET_BLUE_STATE_SEL = 30;
-    static public final int OLIVE_STATE_SEL = 31;
+    public static final int BLACK_STATE_SEL = 16;
+    public static final int GREEN_STATE_SEL = 17;
+    public static final int DARK_BLUE_STATE_SEL = 18;
+    public static final int ORANGE_STATE_SEL = 19;
+    public static final int GOLD_STATE_SEL = 20;
+    public static final int RED_STATE_SEL = 21;
+    public static final int GRAY_STATE_SEL = 22;
+    public static final int DARK_GREEN_STATE_SEL = 23;
+    public static final int DARK_YELLOW_STATE_SEL = 24;
+    public static final int MAGENTA3_STATE_SEL = 25;
+    public static final int PURPLE1_STATE_SEL = 26;
+    public static final int PINK1_STATE_SEL = 27;
+    public static final int AQUAMARINE_STATE_SEL = 28;
+    public static final int LIGHT_BLUE_STATE_SEL = 29;
+    public static final int CADET_BLUE_STATE_SEL = 30;
+    public static final int OLIVE_STATE_SEL = 31;
 
-    static public final int STATES_SEL0 = 16;
-    static public final int STATES_SEL1 = 31;
+    public static final int STATES_SEL0 = 16;
+    public static final int STATES_SEL1 = 31;
 
     // colors indices for viewer controls
-    static public final int BACKGROUND = 32;
-    static public final int FOREGROUND = 33;
-    static public final int BACKGROUND_SEL = 34;
-    static public final int FOREGROUND_SEL = 35;
-    static public final int BACKGROUND_SEL_NOFOCUS = 36;
-    static public final int FOREGROUND_SEL_NOFOCUS = 37;
-    static public final int TOOL_BACKGROUND = 38;
-    static public final int TOOL_FOREGROUND = 39;
+    public static final int BACKGROUND = 32;
+    public static final int FOREGROUND = 33;
+    public static final int BACKGROUND_SEL = 34;
+    public static final int FOREGROUND_SEL = 35;
+    public static final int BACKGROUND_SEL_NOFOCUS = 36;
+    public static final int FOREGROUND_SEL_NOFOCUS = 37;
+    public static final int TOOL_BACKGROUND = 38;
+    public static final int TOOL_FOREGROUND = 39;
 
     // misc colors
-    static public final int FIX_COLOR = 40;
-    static public final int WHITE = 41;
-    static public final int GRAY = 42;
-    static public final int BLACK = 43;
-    static public final int DARK_GRAY = 44;
+    public static final int FIX_COLOR = 40;
+    public static final int WHITE = 41;
+    public static final int GRAY = 42;
+    public static final int BLACK = 43;
+    public static final int DARK_GRAY = 44;
 
     // selected border color indices
-    static public final int BLACK_BORDER = 45;
-    static public final int GREEN_BORDER = 46;
-    static public final int DARK_BLUE_BORDER = 47;
-    static public final int ORANGE_BORDER = 48;
-    static public final int GOLD_BORDER = 49;
-    static public final int RED_BORDER = 50;
-    static public final int GRAY_BORDER = 51;
-    static public final int DARK_GREEN_BORDER1 = 52;
-    static public final int DARK_YELLOW_BORDER1 = 53;
-    static public final int MAGENTA3_BORDER1 = 54;
-    static public final int PURPLE1_BORDER1 = 55;
-    static public final int PINK1_BORDER1 = 56;
-    static public final int AQUAMARINE_BORDER1 = 57;
-    static public final int LIGHT_BLUE_BORDER1 = 58;
-    static public final int CADET_BLUE_STATE_BORDER = 59;
-    static public final int OLIVE_BORDER2 = 60;
+    public static final int BLACK_BORDER = 45;
+    public static final int GREEN_BORDER = 46;
+    public static final int DARK_BLUE_BORDER = 47;
+    public static final int ORANGE_BORDER = 48;
+    public static final int GOLD_BORDER = 49;
+    public static final int RED_BORDER = 50;
+    public static final int GRAY_BORDER = 51;
+    public static final int DARK_GREEN_BORDER1 = 52;
+    public static final int DARK_YELLOW_BORDER1 = 53;
+    public static final int MAGENTA3_BORDER1 = 54;
+    public static final int PURPLE1_BORDER1 = 55;
+    public static final int PINK1_BORDER1 = 56;
+    public static final int AQUAMARINE_BORDER1 = 57;
+    public static final int LIGHT_BLUE_BORDER1 = 58;
+    public static final int CADET_BLUE_STATE_BORDER = 59;
+    public static final int OLIVE_BORDER2 = 60;
 
-    static public final int STATES_BORDER0 = 45;
-    static public final int STATES_BORDER1 = 60;
+    public static final int STATES_BORDER0 = 45;
+    public static final int STATES_BORDER1 = 60;
 
-    static public final int MID_LINE = 61;
-    static public final int RED = 62;
-    static public final int GREEN = 63;
-    static public final int BLUE = 64;
-    static public final int YELLOW = 65;
-    static public final int CYAN = 66;
-    static public final int MAGENTA = 67;
+    public static final int MID_LINE = 61;
+    public static final int RED = 62;
+    public static final int GREEN = 63;
+    public static final int BLUE = 64;
+    public static final int YELLOW = 65;
+    public static final int CYAN = 66;
+    public static final int MAGENTA = 67;
 
-    static public final int SELECTED_TIME = 68;
-    static public final int LEGEND_BACKGROUND = 69;
-    static public final int LEGEND_FOREGROUND = 70;
+    public static final int SELECTED_TIME = 68;
+    public static final int LEGEND_BACKGROUND = 69;
+    public static final int LEGEND_FOREGROUND = 70;
 
     // group items' colors
-    static public final int GR_BACKGROUND = 71;
-    static public final int GR_FOREGROUND = 72;
-    static public final int GR_BACKGROUND_SEL = 73;
-    static public final int GR_FOREGROUND_SEL = 74;
-    static public final int GR_BACKGROUND_SEL_NOFOCUS = 75;
-    static public final int GR_FOREGROUND_SEL_NOFOCUS = 76;
+    public static final int GR_BACKGROUND = 71;
+    public static final int GR_FOREGROUND = 72;
+    public static final int GR_BACKGROUND_SEL = 73;
+    public static final int GR_FOREGROUND_SEL = 74;
+    public static final int GR_BACKGROUND_SEL_NOFOCUS = 75;
+    public static final int GR_FOREGROUND_SEL_NOFOCUS = 76;
 
-    static public final int LIGHT_LINE = 77;
-    static public final int BACKGROUND_NAME = 78;
-    static public final int BACKGROUND_NAME_SEL = 79;
-    static public final int BACKGROUND_NAME_SEL_NOFOCUS = 80;
+    public static final int LIGHT_LINE = 77;
+    public static final int BACKGROUND_NAME = 78;
+    public static final int BACKGROUND_NAME_SEL = 79;
+    public static final int BACKGROUND_NAME_SEL_NOFOCUS = 80;
 
     // Interraction's colors
-    static public final int TI_START_THREAD = BLACK;
-    static public final int TI_HANDOFF_LOCK = BLUE;
-    static public final int TI_NOTIFY_ALL = GREEN;
-    static public final int TI_NOTIFY = GREEN;
-    static public final int TI_NOTIFY_JOINED = DARK_GRAY;
-    static public final int TI_INTERRUPT = RED;
-    static public final int TI_WAIT_EXCEEDED = BLUE;
+    public static final int TI_START_THREAD = BLACK;
+    public static final int TI_HANDOFF_LOCK = BLUE;
+    public static final int TI_NOTIFY_ALL = GREEN;
+    public static final int TI_NOTIFY = GREEN;
+    public static final int TI_NOTIFY_JOINED = DARK_GRAY;
+    public static final int TI_INTERRUPT = RED;
+    public static final int TI_WAIT_EXCEEDED = BLUE;
 
-    static interface IColorProvider {
-        public Color get();
+    interface IColorProvider {
+        Color get();
     }
 
     static class SysCol implements IColorProvider {
-        int syscol;
+        private int syscol;
 
         SysCol(int syscol) {
             this.syscol = syscol;
@@ -158,9 +158,9 @@ public class TimeGraphColorScheme {
     }
 
     static class RGB implements IColorProvider {
-        int r;
-        int g;
-        int b;
+        private int r;
+        private int g;
+        private int b;
 
         RGB(int r, int g, int b) {
             this.r = r;
@@ -175,10 +175,10 @@ public class TimeGraphColorScheme {
     }
 
     static class Mix implements IColorProvider {
-        IColorProvider cp1;
-        IColorProvider cp2;
-        int w1;
-        int w2;
+        private IColorProvider cp1;
+        private IColorProvider cp2;
+        private int w1;
+        private int w2;
 
         Mix(IColorProvider cp1, IColorProvider cp2, int w1, int w2) {
             this.cp1 = cp1;
@@ -198,12 +198,11 @@ public class TimeGraphColorScheme {
         public Color get() {
             Color col1 = cp1.get();
             Color col2 = cp2.get();
-            Color col = Utils.mixColors(col1, col2, w1, w2);
-            return col;
+            return Utils.mixColors(col1, col2, w1, w2);
         }
     }
 
-    static private final IColorProvider _providersMap[] = {
+    private static final IColorProvider PROVIDERS_MAP[] = {
         //
         new RGB(100, 100, 100), // UNKNOWN
         new RGB(174, 200, 124), // RUNNING
@@ -301,22 +300,22 @@ public class TimeGraphColorScheme {
         new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_WIDGET_BACKGROUND), 1, 6), // BACKGROUND_NAME_SEL_NOFOCUS
     };
 
-    private final Color _colors[];
+    private final Color fColors[];
 
     /**
      * Default constructor
      */
     public TimeGraphColorScheme() {
-        _colors = new Color[_providersMap.length];
+        fColors = new Color[PROVIDERS_MAP.length];
     }
 
     /**
      * Dispose this color scheme
      */
     public void dispose() {
-        for (int i = 0; i < _colors.length; i++) {
-            Utils.dispose(_colors[i]);
-            _colors[i] = null;
+        for (int i = 0; i < fColors.length; i++) {
+            Utils.dispose(fColors[i]);
+            fColors[i] = null;
         }
     }
 
@@ -328,16 +327,16 @@ public class TimeGraphColorScheme {
      * @return The matching color
      */
     public Color getColor(int idx) {
-        if (null == _colors[idx]) {
+        if (null == fColors[idx]) {
             if (idx >= STATES_SEL0 && idx <= STATES_SEL1) {
                 Color col1 = getColor(idx - STATES_SEL0);
                 Color col2 = getColor(BACKGROUND_SEL);
-                _colors[idx] = Utils.mixColors(col1, col2, 3, 1);
+                fColors[idx] = Utils.mixColors(col1, col2, 3, 1);
             } else {
-                _colors[idx] = _providersMap[idx].get();
+                fColors[idx] = PROVIDERS_MAP[idx].get();
             }
         }
-        return _colors[idx];
+        return fColors[idx];
     }
 
     /**

@@ -43,20 +43,8 @@ import org.eclipse.swt.widgets.Composite;
 public class TimeGraphScale extends TimeGraphBaseControl implements
         MouseListener, MouseMoveListener {
 
-    /**
-     * Standard constructor
-     *
-     * @param parent
-     *            The parent composite object
-     * @param colors
-     *            The color scheme to use
-     */
-    public TimeGraphScale(Composite parent, TimeGraphColorScheme colors) {
-        super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED);
-        addMouseListener(this);
-        addMouseMoveListener(this);
-    }
-
+    private static final long MICROSEC_IN_NS = 1000;
+    private static final long MILLISEC_IN_NS = 1000000;
     private static final long SEC_IN_NS = 1000000000;
     private static final long MIN_IN_NS = 60 * SEC_IN_NS;
     private static final long HOUR_IN_NS = 60 * MIN_IN_NS;
@@ -71,15 +59,47 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
     private static final Calendar GREGORIAN_CALENDAR = Calendar.getInstance();
 
-    private ITimeDataProvider _timeProvider;
-    private int _dragState = 0;
-    private int _dragX0 = 0;
-    private int _dragX = 0;
-    private long _time0bak;
-    private long _time1bak;
-    private boolean _isInUpdate;
-    private final Rectangle _rect0 = new Rectangle(0, 0, 0, 0);
-    private int _height;
+    private static final TimeDraw TIMEDRAW_NANOSEC = new TimeDrawNanosec();
+    private static final TimeDraw TIMEDRAW_MICROSEC = new TimeDrawMicrosec();
+    private static final TimeDraw TIMEDRAW_MILLISEC = new TimeDrawMillisec();
+    private static final TimeDraw TIMEDRAW_SEC = new TimeDrawSec();
+    private static final TimeDraw TIMEDRAW_ABS_NANOSEC = new TimeDrawAbsNanoSec();
+    private static final TimeDraw TIMEDRAW_ABS_MICROSEC = new TimeDrawAbsMicroSec();
+    private static final TimeDraw TIMEDRAW_ABS_MILLISEC = new TimeDrawAbsMillisec();
+    private static final TimeDraw TIMEDRAW_ABS_SEC = new TimeDrawAbsSec();
+    private static final TimeDraw TIMEDRAW_ABS_MIN = new TimeDrawAbsMin();
+    private static final TimeDraw TIMEDRAW_ABS_HRS = new TimeDrawAbsHrs();
+    private static final TimeDraw TIMEDRAW_ABS_DAY = new TimeDrawAbsDay();
+    private static final TimeDraw TIMEDRAW_ABS_MONTH = new TimeDrawAbsMonth();
+    private static final TimeDraw TIMEDRAW_ABS_YEAR = new TimeDrawAbsYear();
+    private static final TimeDraw TIMEDRAW_NUMBER = new TimeDrawNumber();
+
+    private static final int NO_BUTTON = 0;
+    private static final int LEFT_BUTTON = 1;
+    private static final int RIGHT_BUTTON = 3;
+
+    private ITimeDataProvider fTimeProvider;
+    private int fDragState = NO_BUTTON;
+    private int fDragX0 = 0;
+    private int fDragX = 0;
+    private long fTime0bak;
+    private long fTime1bak;
+    private boolean fIsInUpdate;
+    private int fHeight;
+
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent composite object
+     * @param colors
+     *            The color scheme to use
+     */
+    public TimeGraphScale(Composite parent, TimeGraphColorScheme colors) {
+        super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED);
+        addMouseListener(this);
+        addMouseMoveListener(this);
+    }
 
     /**
      * Assign the time provider for this scale
@@ -88,14 +108,12 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      *            The provider to use
      */
     public void setTimeProvider(ITimeDataProvider timeProvider) {
-        _timeProvider = timeProvider;
+        fTimeProvider = timeProvider;
     }
-
-    private long _timeDelta;
 
     @Override
     public Point computeSize(int wHint, int hHint, boolean changed) {
-        return super.computeSize(wHint, _height, changed);
+        return super.computeSize(wHint, fHeight, changed);
     }
 
     /**
@@ -105,13 +123,14 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      *            The height to use
      */
     public void setHeight(int height) {
-        this._height = height;
+        this.fHeight = height;
     }
 
-    private void calcTimeDelta(int width, double pixelsPerNanoSec) {
+    private long calcTimeDelta(int width, double pixelsPerNanoSec) {
+        long timeDelta;
         double minDelta = (pixelsPerNanoSec == 0) ? YEAR_IN_NS : width / pixelsPerNanoSec;
         long unit = 1;
-        if (_timeProvider != null && _timeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
+        if (fTimeProvider != null && fTimeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
             if (minDelta > 6 * MONTH_IN_NS) {
                 unit = YEAR_IN_NS;
             } else if (minDelta > 3 * MONTH_IN_NS) {
@@ -131,49 +150,35 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             } else if (minDelta > 20 * SEC_IN_NS) {
                 unit = 30 * SEC_IN_NS;
             } else if (minDelta <= 1) {
-                _timeDelta = 1;
-                return;
+                timeDelta = 1;
+                return timeDelta;
             }
         }
         double log = Math.log10(minDelta / unit);
         long pow10 = (long) log;
         double remainder = log - pow10;
         if (remainder < LOG10_1) {
-            _timeDelta = (long) Math.pow(10, pow10) * unit;
+            timeDelta = (long) Math.pow(10, pow10) * unit;
         } else if (remainder < LOG10_2) {
-            _timeDelta = 2 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 2 * (long) Math.pow(10, pow10) * unit;
         } else if (remainder < LOG10_3 && unit >= HOUR_IN_NS && unit < YEAR_IN_NS) {
-            _timeDelta = 3 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 3 * (long) Math.pow(10, pow10) * unit;
         } else if (remainder < LOG10_5) {
-            _timeDelta = 5 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 5 * (long) Math.pow(10, pow10) * unit;
         } else {
-            _timeDelta = 10 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 10 * (long) Math.pow(10, pow10) * unit;
         }
-        if (_timeDelta<=0) {
-            _timeDelta=1;
+        if (timeDelta <= 0) {
+            timeDelta = 1;
         }
+        return timeDelta;
     }
-
-    private static TimeDraw TIMEDRAW_NANOSEC = new TimeDrawNanosec();
-    private static TimeDraw TIMEDRAW_MICROSEC = new TimeDrawMicrosec();
-    private static TimeDraw TIMEDRAW_MILLISEC = new TimeDrawMillisec();
-    private static TimeDraw TIMEDRAW_SEC = new TimeDrawSec();
-    private static TimeDraw TIMEDRAW_ABS_NANOSEC = new TimeDrawAbsNanoSec();
-    private static TimeDraw TIMEDRAW_ABS_MICROSEC = new TimeDrawAbsMicroSec();
-    private static TimeDraw TIMEDRAW_ABS_MILLISEC = new TimeDrawAbsMillisec();
-    private static TimeDraw TIMEDRAW_ABS_SEC = new TimeDrawAbsSec();
-    private static TimeDraw TIMEDRAW_ABS_MIN = new TimeDrawAbsMin();
-    private static TimeDraw TIMEDRAW_ABS_HRS = new TimeDrawAbsHrs();
-    private static TimeDraw TIMEDRAW_ABS_DAY = new TimeDrawAbsDay();
-    private static TimeDraw TIMEDRAW_ABS_MONTH = new TimeDrawAbsMonth();
-    private static TimeDraw TIMEDRAW_ABS_YEAR = new TimeDrawAbsYear();
-    private static TimeDraw TIMEDRAW_NUMBER = new TimeDrawNumber();
 
     TimeDraw getTimeDraw(long timeDelta) {
         TimeDraw timeDraw;
-        if (_timeProvider != null) {
+        if (fTimeProvider != null) {
 
-            if (_timeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
+            if (fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
                 if (timeDelta >= YEAR_IN_NS) {
                     timeDraw = TIMEDRAW_ABS_YEAR;
                 } else if (timeDelta >= MONTH_IN_NS) {
@@ -186,25 +191,25 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                     timeDraw = TIMEDRAW_ABS_MIN;
                 } else if (timeDelta >= SEC_IN_NS) {
                     timeDraw = TIMEDRAW_ABS_SEC;
-                } else if (timeDelta >= 1000000) {
+                } else if (timeDelta >= MILLISEC_IN_NS) {
                     timeDraw = TIMEDRAW_ABS_MILLISEC;
-                } else if (timeDelta >= 1000) {
+                } else if (timeDelta >= MICROSEC_IN_NS) {
                     timeDraw = TIMEDRAW_ABS_MICROSEC;
                 } else {
                     timeDraw = TIMEDRAW_ABS_NANOSEC;
                 }
                 return timeDraw;
-            } else if (_timeProvider.getTimeFormat() == TimeFormat.NUMBER) {
+            } else if (fTimeProvider.getTimeFormat() == TimeFormat.NUMBER) {
                 timeDraw = TIMEDRAW_NUMBER;
                 return timeDraw;
             }
 
         }
-        if (timeDelta >= 1000000000) {
+        if (timeDelta >= SEC_IN_NS) {
             timeDraw = TIMEDRAW_SEC;
-        } else if (timeDelta >= 1000000) {
+        } else if (timeDelta >= MILLISEC_IN_NS) {
             timeDraw = TIMEDRAW_MILLISEC;
-        } else if (timeDelta >= 1000) {
+        } else if (timeDelta >= MICROSEC_IN_NS) {
             timeDraw = TIMEDRAW_MICROSEC;
         } else {
             timeDraw = TIMEDRAW_NANOSEC;
@@ -215,48 +220,49 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     @Override
     void paint(Rectangle rect, PaintEvent e) {
 
-        if (_isInUpdate || null == _timeProvider) {
+        if (fIsInUpdate || null == fTimeProvider) {
             return;
         }
 
         GC gc = e.gc;
         gc.fillRectangle(rect);
 
-        long time0 = _timeProvider.getTime0();
-        long time1 = _timeProvider.getTime1();
-        long selectedTime = _timeProvider.getSelectedTime();
-        int leftSpace = _timeProvider.getNameSpace();
-        int timeSpace = _timeProvider.getTimeSpace();
+        long time0 = fTimeProvider.getTime0();
+        long time1 = fTimeProvider.getTime1();
+        long selectedTime = fTimeProvider.getSelectedTime();
+        int leftSpace = fTimeProvider.getNameSpace();
+        int timeSpace = fTimeProvider.getTimeSpace();
 
-        gc.setBackground(_colors.getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
-        gc.setForeground(_colors.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
-        Utils.init(_rect0, rect);
+        gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
+        gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
+        Rectangle rect0 = new Rectangle(0, 0, 0, 0);
+        Utils.init(rect0, rect);
 
         // draw top left area
-        _rect0.width = leftSpace;
-        _rect0.x += 4;
-        _rect0.width -= 4;
-        Rectangle absHeaderRect = new Rectangle(_rect0.x, _rect0.y, _rect0.width, _rect0.height);
-        _rect0.x -= 4;
-        _rect0.width += 4;
+        rect0.width = leftSpace;
+        rect0.x += 4;
+        rect0.width -= 4;
+        Rectangle absHeaderRect = new Rectangle(rect0.x, rect0.y, rect0.width, rect0.height);
+        rect0.x -= 4;
+        rect0.width += 4;
 
         // prepare and draw right rect of the timescale
-        _rect0.x += leftSpace;
-        _rect0.width = rect.width - leftSpace;
+        rect0.x += leftSpace;
+        rect0.width = rect.width - leftSpace;
 
         // draw bottom border and erase all other area
         gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1,
                 rect.y + rect.height - 1);
-        _rect0.height--;
-        gc.fillRectangle(_rect0);
+        rect0.height--;
+        gc.fillRectangle(rect0);
 
-        if (3 == _dragState && null != _timeProvider) {
+        if (RIGHT_BUTTON == fDragState && null != fTimeProvider) {
             // draw selected zoom region background
-            gc.setBackground(_colors.getBkColor(true, false, true));
-            if (_dragX0 < _dragX) {
-                gc.fillRectangle(new Rectangle(leftSpace + _dragX0, _rect0.y, _dragX - _dragX0, _rect0.height));
-            } else if (_dragX0 > _dragX) {
-                gc.fillRectangle(new Rectangle(leftSpace + _dragX, _rect0.y, _dragX0 - _dragX, _rect0.height));
+            gc.setBackground(getColorScheme().getBkColor(true, false, true));
+            if (fDragX0 < fDragX) {
+                gc.fillRectangle(new Rectangle(leftSpace + fDragX0, rect0.y, fDragX - fDragX0, rect0.height));
+            } else if (fDragX0 > fDragX) {
+                gc.fillRectangle(new Rectangle(leftSpace + fDragX, rect0.y, fDragX0 - fDragX, rect0.height));
             }
         }
 
@@ -269,98 +275,98 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         int labelWidth = gc.getCharWidth('0') * numDigits;
         double pixelsPerNanoSec = (timeSpace <= RIGHT_MARGIN) ? 0 :
             (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
-        calcTimeDelta(labelWidth, pixelsPerNanoSec);
+        long timeDelta = calcTimeDelta(labelWidth, pixelsPerNanoSec);
 
-        TimeDraw timeDraw = getTimeDraw(_timeDelta);
+        TimeDraw timeDraw = getTimeDraw(timeDelta);
 
         // draw selected zoom region lines
-        if (3 == _dragState && null != _timeProvider) {
-            gc.drawLine(leftSpace + _dragX0, rect.y, leftSpace + _dragX0, rect.y + rect.height);
-            gc.drawLine(leftSpace + _dragX, rect.y, leftSpace + _dragX, rect.y + rect.height);
+        if (RIGHT_BUTTON == fDragState && null != fTimeProvider) {
+            gc.drawLine(leftSpace + fDragX0, rect.y, leftSpace + fDragX0, rect.y + rect.height);
+            gc.drawLine(leftSpace + fDragX, rect.y, leftSpace + fDragX, rect.y + rect.height);
         }
 
-        if (_rect0.isEmpty()) {
+        if (rect0.isEmpty()) {
             return;
         }
 
         // draw selected time
-        int x = _rect0.x + (int) ((selectedTime - time0) * pixelsPerNanoSec);
-        if (x >= _rect0.x && x < _rect0.x + _rect0.width) {
-            gc.setForeground(_colors.getColor(TimeGraphColorScheme.SELECTED_TIME));
-            gc.drawLine(x, _rect0.y + _rect0.height - 6, x, _rect0.y
-                    + _rect0.height);
-            gc.setForeground(_colors.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
+        int x = rect0.x + (int) ((selectedTime - time0) * pixelsPerNanoSec);
+        if (x >= rect0.x && x < rect0.x + rect0.width) {
+            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.SELECTED_TIME));
+            gc.drawLine(x, rect0.y + rect0.height - 6, x, rect0.y
+                    + rect0.height);
+            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
         }
 
         // draw time scale ticks
-        _rect0.y = rect.y;
-        _rect0.height = rect.height - 4;
-        _rect0.width = labelWidth;
+        rect0.y = rect.y;
+        rect0.height = rect.height - 4;
+        rect0.width = labelWidth;
 
         long time;
-        if (_timeProvider != null && _timeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
-            time = floorToCalendar(time0, _timeDelta);
+        if (fTimeProvider != null && fTimeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
+            time = floorToCalendar(time0, timeDelta);
         } else {
-            time = (time0 / _timeDelta) * _timeDelta;
+            time = (time0 / timeDelta) * timeDelta;
             if (time != time0) {
-                time += _timeDelta;
+                time += timeDelta;
             }
         }
 
-        int y = _rect0.y + _rect0.height;
+        int y = rect0.y + rect0.height;
 
-        if (_timeProvider != null && _timeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
+        if (fTimeProvider != null && fTimeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
             timeDraw.drawAbsHeader(gc, time, absHeaderRect);
         }
 
         while (true) {
             x = rect.x + leftSpace + (int) (Math.floor((time - time0) * pixelsPerNanoSec));
-            if (x >= rect.x + leftSpace + rect.width - _rect0.width) {
+            if (x >= rect.x + leftSpace + rect.width - rect0.width) {
                 break;
             }
             if (x >= rect.x + leftSpace) {
                 gc.drawLine(x, y, x, y + 4);
-                _rect0.x = x;
-                if (x + _rect0.width <= rect.x + rect.width) {
-                    timeDraw.draw(gc, time, _rect0);
+                rect0.x = x;
+                if (x + rect0.width <= rect.x + rect.width) {
+                    timeDraw.draw(gc, time, rect0);
                 }
             }
-            if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - _timeDelta || _timeDelta == 0) {
+            if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - timeDelta || timeDelta == 0) {
                 break;
             }
-            if (_timeProvider != null && _timeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
-                if (_timeDelta >= YEAR_IN_NS) {
-                    long millis = time / 1000000L;
+            if (fTimeProvider != null && fTimeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
+                if (timeDelta >= YEAR_IN_NS) {
+                    long millis = time / MILLISEC_IN_NS;
                     GREGORIAN_CALENDAR.setTime(new Date(millis));
-                    GREGORIAN_CALENDAR.add(Calendar.YEAR, (int) (_timeDelta / YEAR_IN_NS));
+                    GREGORIAN_CALENDAR.add(Calendar.YEAR, (int) (timeDelta / YEAR_IN_NS));
                     millis = GREGORIAN_CALENDAR.getTimeInMillis();
-                    time = millis * 1000000L;
-                } else if (_timeDelta >= MONTH_IN_NS) {
-                    long millis = time / 1000000L;
+                    time = millis * MILLISEC_IN_NS;
+                } else if (timeDelta >= MONTH_IN_NS) {
+                    long millis = time / MILLISEC_IN_NS;
                     GREGORIAN_CALENDAR.setTime(new Date(millis));
-                    GREGORIAN_CALENDAR.add(Calendar.MONTH, (int) (_timeDelta / MONTH_IN_NS));
+                    GREGORIAN_CALENDAR.add(Calendar.MONTH, (int) (timeDelta / MONTH_IN_NS));
                     millis = GREGORIAN_CALENDAR.getTimeInMillis();
-                    time = millis * 1000000L;
-                } else if (_timeDelta >= DAY_IN_NS) {
-                    long millis = time / 1000000L;
+                    time = millis * MILLISEC_IN_NS;
+                } else if (timeDelta >= DAY_IN_NS) {
+                    long millis = time / MILLISEC_IN_NS;
                     GREGORIAN_CALENDAR.setTime(new Date(millis));
-                    GREGORIAN_CALENDAR.add(Calendar.DAY_OF_MONTH, (int) (_timeDelta / DAY_IN_NS));
+                    GREGORIAN_CALENDAR.add(Calendar.DAY_OF_MONTH, (int) (timeDelta / DAY_IN_NS));
                     millis = GREGORIAN_CALENDAR.getTimeInMillis();
-                    time = millis * 1000000L;
+                    time = millis * MILLISEC_IN_NS;
                 } else {
-                    time += _timeDelta;
+                    time += timeDelta;
                 }
             } else {
-                time += _timeDelta;
+                time += timeDelta;
             }
         }
     }
 
-    private long floorToCalendar(long time, long timeDelta) {
+    private static long floorToCalendar(long time, long timeDelta) {
         long ret = time;
 
-        if (_timeDelta >= YEAR_IN_NS) {
-            GREGORIAN_CALENDAR.setTime(new Date(ret / 1000000));
+        if (timeDelta >= YEAR_IN_NS) {
+            GREGORIAN_CALENDAR.setTime(new Date(ret / MILLISEC_IN_NS));
             int year = GREGORIAN_CALENDAR.get(Calendar.YEAR);
             int yearDelta = (int) (timeDelta / YEAR_IN_NS);
             year = (year / yearDelta) * yearDelta;
@@ -371,9 +377,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             GREGORIAN_CALENDAR.set(Calendar.MINUTE, 0);
             GREGORIAN_CALENDAR.set(Calendar.SECOND, 0);
             GREGORIAN_CALENDAR.set(Calendar.MILLISECOND, 0);
-            ret = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
-        } else if (_timeDelta >= MONTH_IN_NS) {
-            GREGORIAN_CALENDAR.setTime(new Date(ret / 1000000));
+            ret = GREGORIAN_CALENDAR.getTimeInMillis() * MILLISEC_IN_NS;
+        } else if (timeDelta >= MONTH_IN_NS) {
+            GREGORIAN_CALENDAR.setTime(new Date(ret / MILLISEC_IN_NS));
             int month = GREGORIAN_CALENDAR.get(Calendar.MONTH);
             int monthDelta = (int) (timeDelta / MONTH_IN_NS);
             month = (month / monthDelta) * monthDelta;
@@ -383,9 +389,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             GREGORIAN_CALENDAR.set(Calendar.MINUTE, 0);
             GREGORIAN_CALENDAR.set(Calendar.SECOND, 0);
             GREGORIAN_CALENDAR.set(Calendar.MILLISECOND, 0);
-            ret = GREGORIAN_CALENDAR.getTimeInMillis() * 1000000;
+            ret = GREGORIAN_CALENDAR.getTimeInMillis() * MILLISEC_IN_NS;
         } else {
-            long offset = GREGORIAN_CALENDAR.getTimeZone().getOffset(ret / 1000000L) * 1000000L;
+            long offset = GREGORIAN_CALENDAR.getTimeZone().getOffset(ret / MILLISEC_IN_NS) * MILLISEC_IN_NS;
             ret += offset;
             ret = (ret / timeDelta) * timeDelta;
             ret -= offset;
@@ -397,7 +403,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         int numDigits = 5;
         long timeRange = time1 - time0;
 
-        if (_timeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
+        if (fTimeProvider.getTimeFormat().equals(TimeFormat.CALENDAR)) {
             // Calculate the number of digits to represent the minutes provided
             // 11:222
             // HH:mm:ss
@@ -410,7 +416,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 numDigits += 6;
             }
         } else {
-            long sec = time1 / 1000000000;
+            long sec = time1 / SEC_IN_NS;
             numDigits = Long.toString(sec).length();
             int thousandGroups = (numDigits - 1) / 3;
             numDigits += thousandGroups;
@@ -423,90 +429,91 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     @Override
     public void mouseDown(MouseEvent e) {
         getParent().setFocus();
-        if (_dragState == 0 && null != _timeProvider) {
-            int x = e.x - _timeProvider.getNameSpace();
-            if (1 == e.button && x > 0) {
+        if (fDragState == NO_BUTTON && null != fTimeProvider) {
+            int x = e.x - fTimeProvider.getNameSpace();
+            if (LEFT_BUTTON == e.button && x > 0) {
                 setCapture(true);
-                _dragState = 1;
-            } else if (3 == e.button) {
-                _dragState = 3;
+                fDragState = LEFT_BUTTON;
+            } else if (RIGHT_BUTTON == e.button) {
+                fDragState = RIGHT_BUTTON;
             }
             if (x < 0) {
                 x = 0;
-            } else if (x > getSize().x - _timeProvider.getNameSpace()) {
-                x = getSize().x - _timeProvider.getNameSpace();
+            } else if (x > getSize().x - fTimeProvider.getNameSpace()) {
+                x = getSize().x - fTimeProvider.getNameSpace();
             }
-            _dragX = _dragX0 = x;
-            _time0bak = _timeProvider.getTime0();
-            _time1bak = _timeProvider.getTime1();
+            fDragX = x;
+            fDragX0 = x;
+            fTime0bak = fTimeProvider.getTime0();
+            fTime1bak = fTimeProvider.getTime1();
         }
     }
 
     @Override
     public void mouseUp(MouseEvent e) {
-        if (e.button == 1 && _dragState == 1) {
+        if (e.button == LEFT_BUTTON && fDragState == LEFT_BUTTON) {
             setCapture(false);
-            _dragState = 0;
+            fDragState = NO_BUTTON;
 
             // Notify time provider to check the need for listener notification
-            if (_dragX != _dragX0 && _timeProvider.getTime0() != _timeProvider.getTime1()) {
-                _timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
+            if (fDragX != fDragX0 && fTimeProvider.getTime0() != fTimeProvider.getTime1()) {
+                fTimeProvider.setStartFinishTimeNotify(fTimeProvider.getTime0(), fTimeProvider.getTime1());
             }
-        } else if (e.button == 3 && _dragState == 3 && null != _timeProvider) {
-            _dragState = 0;
-            if (_dragX0 == _dragX || _timeProvider.getTime0() == _timeProvider.getTime1()) {
+        } else if (e.button == RIGHT_BUTTON && fDragState == RIGHT_BUTTON && null != fTimeProvider) {
+            fDragState = NO_BUTTON;
+            if (fDragX0 == fDragX || fTimeProvider.getTime0() == fTimeProvider.getTime1()) {
                 redraw();
                 return;
             }
-            int timeSpace = _timeProvider.getTimeSpace();
-            int leftSpace = _timeProvider.getNameSpace();
+            int timeSpace = fTimeProvider.getTimeSpace();
+            int leftSpace = fTimeProvider.getNameSpace();
             int x = Math.max(0, e.x - leftSpace);
             if (timeSpace > 0) {
-                _dragX = x;
-                if (_dragX0 > _dragX) { // drag right to left
-                    _dragX = _dragX0;
-                    _dragX0 = x;
+                fDragX = x;
+                if (fDragX0 > fDragX) { // drag right to left
+                    fDragX = fDragX0;
+                    fDragX0 = x;
                 }
-                long time0 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX0 / timeSpace));
-                long time1 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX / timeSpace));
+                long time0 = fTime0bak + (long) ((fTime1bak - fTime0bak) * ((double) fDragX0 / timeSpace));
+                long time1 = fTime0bak + (long) ((fTime1bak - fTime0bak) * ((double) fDragX / timeSpace));
 
-                _timeProvider.setStartFinishTimeNotify(time0, time1);
-                _time0bak = _timeProvider.getTime0();
-                _time1bak = _timeProvider.getTime1();
+                fTimeProvider.setStartFinishTimeNotify(time0, time1);
+                fTime0bak = fTimeProvider.getTime0();
+                fTime1bak = fTimeProvider.getTime1();
             }
         }
     }
 
     @Override
     public void mouseMove(MouseEvent e) {
-        if (_dragX0 < 0 || _dragState == 0 || _timeProvider == null) {
+        if (fDragX0 < 0 || fDragState == NO_BUTTON || fTimeProvider == null) {
             return;
         }
         Point size = getSize();
-        int leftSpace = _timeProvider.getNameSpace();
-        int timeSpace = _timeProvider.getTimeSpace();
+        int leftSpace = fTimeProvider.getNameSpace();
+        int timeSpace = fTimeProvider.getTimeSpace();
         int x = e.x - leftSpace;
-        if (1 == _dragState) {
-            if (x > 0 && size.x > leftSpace && _dragX != x) {
-                _dragX = x;
-                if (_timeProvider.getTime0() == _timeProvider.getTime1()) {
+        if (LEFT_BUTTON == fDragState) {
+            if (x > 0 && size.x > leftSpace && fDragX != x) {
+                fDragX = x;
+                if (fTimeProvider.getTime0() == fTimeProvider.getTime1()) {
                     return;
                 }
-                long interval = (long) ((_time1bak - _time0bak) * ((double) _dragX0 / _dragX));
+                long interval = (long) ((fTime1bak - fTime0bak) * ((double) fDragX0 / fDragX));
                 if (interval == Long.MAX_VALUE) {
-                    _timeProvider.setStartFinishTime(_time0bak, Long.MAX_VALUE);
+                    fTimeProvider.setStartFinishTime(fTime0bak, Long.MAX_VALUE);
                 } else {
-                    long time1 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX0 / _dragX));
-                    _timeProvider.setStartFinishTime(_time0bak, time1);
+                    long time1 = fTime0bak + (long) ((fTime1bak - fTime0bak) * ((double) fDragX0 / fDragX));
+                    fTimeProvider.setStartFinishTime(fTime0bak, time1);
                 }
             }
-        } else if (3 == _dragState) {
+        } else if (RIGHT_BUTTON == fDragState) {
             if (x < 0) {
-                _dragX = 0;
+                fDragX = 0;
             } else if (x > timeSpace) {
-                _dragX = timeSpace;
+                fDragX = timeSpace;
             } else {
-                _dragX = x;
+                fDragX = x;
             }
             redraw();
         }
@@ -514,29 +521,35 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
     @Override
     public void mouseDoubleClick(MouseEvent e) {
-        if (e.button == 1 && null != _timeProvider && _timeProvider.getTime0() != _timeProvider.getTime1() && (e.stateMask & SWT.BUTTON_MASK) == 0) {
-            _timeProvider.resetStartFinishTime();
-            _timeProvider.notifyStartFinishTime();
-            _time0bak = _timeProvider.getTime0();
-            _time1bak = _timeProvider.getTime1();
+        if (e.button == 1 && null != fTimeProvider && fTimeProvider.getTime0() != fTimeProvider.getTime1() && (e.stateMask & SWT.BUTTON_MASK) == 0) {
+            fTimeProvider.resetStartFinishTime();
+            fTimeProvider.notifyStartFinishTime();
+            fTime0bak = fTimeProvider.getTime0();
+            fTime1bak = fTimeProvider.getTime1();
         }
     }
 }
 
 abstract class TimeDraw {
-    static String S   = ""  ; //$NON-NLS-1$
-    static String S0  = "0" ; //$NON-NLS-1$
-    static String S00 = "00"; //$NON-NLS-1$
-    protected static final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss");          //$NON-NLS-1$
-    protected static final SimpleDateFormat stimeformatheader = new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
-    protected static final SimpleDateFormat sminformat = new SimpleDateFormat("HH:mm");              //$NON-NLS-1$
-    protected static final SimpleDateFormat sminformatheader = new SimpleDateFormat("yyyy MMM dd");  //$NON-NLS-1$
-    protected static final SimpleDateFormat shrsformat = new SimpleDateFormat("MMM dd HH:mm");       //$NON-NLS-1$
-    protected static final SimpleDateFormat shrsformatheader = new SimpleDateFormat("yyyy");         //$NON-NLS-1$
-    protected static final SimpleDateFormat sdayformat = new SimpleDateFormat("MMM dd");             //$NON-NLS-1$
-    protected static final SimpleDateFormat sdayformatheader = new SimpleDateFormat("yyyy");         //$NON-NLS-1$
-    protected static final SimpleDateFormat smonthformat = new SimpleDateFormat("yyyy MMM");         //$NON-NLS-1$
-    protected static final SimpleDateFormat syearformat = new SimpleDateFormat("yyyy");              //$NON-NLS-1$
+    protected static final long MICROSEC_IN_NS = 1000;
+    protected static final long MILLISEC_IN_NS = 1000000;
+    protected static final long MILLISEC_IN_US = 1000;
+    protected static final long SEC_IN_NS = 1000000000;
+    protected static final long SEC_IN_MS = 1000;
+    private static final String S   = ""  ; //$NON-NLS-1$
+    private static final String S0  = "0" ; //$NON-NLS-1$
+    private static final String S00 = "00"; //$NON-NLS-1$
+    protected static final long PAD_1000 = 1000;
+    protected static final SimpleDateFormat SEC_FORMAT_HEADER = new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
+    protected static final SimpleDateFormat SEC_FORMAT = new SimpleDateFormat("HH:mm:ss");           //$NON-NLS-1$
+    protected static final SimpleDateFormat MIN_FORMAT_HEADER = new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
+    protected static final SimpleDateFormat MIN_FORMAT = new SimpleDateFormat("HH:mm");              //$NON-NLS-1$
+    protected static final SimpleDateFormat HOURS_FORMAT_HEADER = new SimpleDateFormat("yyyy");      //$NON-NLS-1$
+    protected static final SimpleDateFormat HOURS_FORMAT = new SimpleDateFormat("MMM dd HH:mm");     //$NON-NLS-1$
+    protected static final SimpleDateFormat DAY_FORMAT_HEADER = new SimpleDateFormat("yyyy");        //$NON-NLS-1$
+    protected static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("MMM dd");             //$NON-NLS-1$
+    protected static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("yyyy MMM");         //$NON-NLS-1$
+    protected static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");              //$NON-NLS-1$
 
     static String sep(long n) {
         StringBuilder retVal = new StringBuilder();
@@ -566,324 +579,213 @@ abstract class TimeDraw {
     public abstract void draw(GC gc, long time, Rectangle rect);
 
     /**
-     * Override to draw absolute time header This is for the time information
+     * Override to draw absolute time header. This is for the time information
      * not shown in the draw of each tick
      *
      * @param gc
      *            Graphics context
-     * @param time
-     *            Timestamp
+     * @param nanosec
+     *            time in nanosec
      * @param absHeaderRect
      *            Header rectangle
      */
-    public void drawAbsHeader(GC gc, long time, Rectangle absHeaderRect) {
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle absHeaderRect) {
     }
-
-    public abstract String hint();
 }
 
 class TimeDrawSec extends TimeDraw {
-    static String _hint = "sec"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        long correctTime = time / 1000000000;
-        Utils.drawText(gc, sep(correctTime), rect, true);
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        long sec = nanosec / SEC_IN_NS;
+        Utils.drawText(gc, sep(sec), rect, true);
     }
 }
 
 class TimeDrawMillisec extends TimeDraw {
-    static String _hint = "0.000"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        long correctTime = time / 1000000;
-        long ms = correctTime % 1000;
-        correctTime /= 1000;
-        Utils.drawText(gc, sep(correctTime) + "." + pad(ms), rect, true); //$NON-NLS-1$
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        long millisec = nanosec / MILLISEC_IN_NS;
+        long ms = millisec % PAD_1000;
+        long sec = millisec / SEC_IN_MS;
+        Utils.drawText(gc, sep(sec) + "." + pad(ms), rect, true); //$NON-NLS-1$
     }
 }
 
 class TimeDrawMicrosec extends TimeDraw {
-    static String _hint = "0.000 000"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        long correctTime = time / 1000;
-        long mcs = correctTime % 1000;
-        correctTime /= 1000;
-        long ms = correctTime % 1000;
-        correctTime /= 1000;
-        Utils.drawText(gc, sep(correctTime) + "." + pad(ms) + " " + pad(mcs), rect, true); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        long microsec = nanosec / MICROSEC_IN_NS;
+        long us = microsec % PAD_1000;
+        long millisec = microsec / MILLISEC_IN_US;
+        long ms = millisec % PAD_1000;
+        long sec = millisec / SEC_IN_MS;
+        Utils.drawText(gc, sep(sec) + "." + pad(ms) + " " + pad(us), rect, true); //$NON-NLS-1$ //$NON-NLS-2$
     }
 }
 
 class TimeDrawNanosec extends TimeDraw {
-    static String _hint = "0.000 000 000"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        long ns = time % 1000;
-        long correctTime = time / 1000;
-        long mcs = correctTime % 1000;
-        correctTime /= 1000;
-        long ms = correctTime % 1000;
-        correctTime /= 1000;
-        Utils.drawText(gc, sep(correctTime) + "." + pad(ms) + " " + pad(mcs) + " " + pad(ns), rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        long ns = nanosec % PAD_1000;
+        long microsec = nanosec / MICROSEC_IN_NS;
+        long us = microsec % PAD_1000;
+        long millisec = microsec / MILLISEC_IN_US;
+        long ms = millisec % PAD_1000;
+        long sec = millisec / SEC_IN_MS;
+        Utils.drawText(gc, sep(sec) + "." + pad(ms) + " " + pad(us) + " " + pad(ns), rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }
 
 class TimeDrawAbsYear extends TimeDraw {
-    static String _hint = "YYYY"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = syearformat.format(new Date(time / 1000000));
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = YEAR_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         Utils.drawText(gc, stime, rect, true);
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsMonth extends TimeDraw {
-    static String _hint = "YYYY Mmm"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = smonthformat.format(new Date(time / 1000000));
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = MONTH_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         Utils.drawText(gc, stime, rect, true);
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsDay extends TimeDraw {
-    static String _hint = "Mmm dd"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = sdayformat.format(new Date(time / 1000000));
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = DAY_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = sdayformatheader.format(new Date(time / 1000000));
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
+        String header = DAY_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
             Utils.drawText(gc, header, rect, true);
         }
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsHrs extends TimeDraw {
-    static String _hint = "Mmm dd HH:mm"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = shrsformat.format(new Date(time / 1000000));
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = HOURS_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = shrsformatheader.format(new Date(time / 1000000));
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
+        String header = HOURS_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
             Utils.drawText(gc, header, rect, true);
         }
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsMin extends TimeDraw {
-    static String _hint = "HH:mm"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = sminformat.format(new Date(time / 1000000));
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = MIN_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = sminformatheader.format(new Date(time / 1000000));
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
+        String header = MIN_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
             Utils.drawText(gc, header, rect, true);
         }
-    }
-
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsSec extends TimeDraw {
-    static String _hint = "HH:mm:ss"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date(time / 1000000));
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = SEC_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         Utils.drawText(gc, stime, rect, true);
     }
 
     @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date(time / 1000000));
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
+        String header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
             Utils.drawText(gc, header, rect, true);
         }
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsMillisec extends TimeDraw {
-    static String _hint = "HH:ss:ms"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date(time / 1000000));
-        String ns = Utils.formatNs(time, Resolution.MILLISEC);
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = SEC_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
+        String ns = Utils.formatNs(nanosec, Resolution.MILLISEC);
 
         Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
     }
 
     @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date(time / 1000000));
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
+        String header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
             Utils.drawText(gc, header, rect, true);
         }
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsMicroSec extends TimeDraw {
-    static String _hint = "HH:ss:ms:mcs"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date(time / 1000000));
-        String micr = Utils.formatNs(time, Resolution.MICROSEC);
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = SEC_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
+        String micr = Utils.formatNs(nanosec, Resolution.MICROSEC);
         Utils.drawText(gc, stime + "." + micr, rect, true); //$NON-NLS-1$
     }
 
     @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date(time / 1000000));
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
+        String header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
             Utils.drawText(gc, header, rect, true);
         }
-    }
-
-    @Override
-    public String hint() {
-        return _hint;
     }
 }
 
 class TimeDrawAbsNanoSec extends TimeDraw {
-    static String _hint = "HH:ss:ms:mcs:ns"; //$NON-NLS-1$
-
     @Override
-    public void draw(GC gc, long time, Rectangle rect) {
-        String stime = stimeformat.format(new Date(time / 1000000));
-        String ns = Utils.formatNs(time, Resolution.NANOSEC);
+    public void draw(GC gc, long nanosec, Rectangle rect) {
+        String stime = SEC_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
+        String ns = Utils.formatNs(nanosec, Resolution.NANOSEC);
         Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
     }
 
     @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = stimeformatheader.format(new Date(time / 1000000));
+    public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
+        String header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
         int headerwidth = gc.stringExtent(header).x + 4;
         if (headerwidth <= rect.width) {
             rect.x += (rect.width - headerwidth);
             Utils.drawText(gc, header, rect, true);
         }
     }
-
-    @Override
-    public String hint() {
-        return _hint;
-    }
 }
 
-
 class TimeDrawNumber extends TimeDraw {
-
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
         String stime = NumberFormat.getInstance().format(time);
         Utils.drawText(gc, stime, rect, true);
-    }
-
-    @Override
-    public void drawAbsHeader(GC gc, long time, Rectangle rect) {
-        String header = NumberFormat.getInstance().format(time);
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
-    }
-
-    @Override
-    public String hint() {
-        return "cycle"; //$NON-NLS-1$
     }
 }
