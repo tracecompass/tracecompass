@@ -44,6 +44,8 @@ import org.eclipse.ui.dialogs.FileSystemElement;
  */
 public final class TmfTraceType {
 
+    private static final char SEPARATOR = ':';
+
     /**
      * Extension point ID
      */
@@ -222,9 +224,9 @@ public final class TmfTraceType {
     // ------------------------------------------------------------------
 
     /**
-     * Returns a list of "category : tracetype , ..."
+     * Returns a list of "category:tracetype , ..."
      *
-     * @return returns a list of "category : tracetype , ..."
+     * @return returns a list of "category:tracetype , ..."
      * @since 2.0
      */
     public String[] getAvailableTraceTypes() {
@@ -235,7 +237,7 @@ public final class TmfTraceType {
         List<String> customTypes = getCustomTraceTypes();
         for (String key : this.fTraceTypes.keySet()) {
             TraceTypeHelper tt = this.fTraceTypes.get(key);
-            traceTypes.add(tt.getCategoryName() + " : " + tt.getName()); //$NON-NLS-1$
+            traceTypes.add(tt.getCategoryName() + SEPARATOR + tt.getName());
         }
         traceTypes.addAll(customTypes);
 
@@ -286,13 +288,13 @@ public final class TmfTraceType {
 
         // add the custom trace types
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-            String traceTypeName = CUSTOM_TXT_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
+            String traceTypeName = CUSTOM_TXT_CATEGORY + SEPARATOR + def.definitionName;
             TraceTypeHelper tt = new TraceTypeHelper(traceTypeName, CUSTOM_TXT_CATEGORY, def.definitionName, null);
             fTraceTypes.put(traceTypeName, tt);
             traceTypes.add(traceTypeName);
         }
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-            String traceTypeName = CUSTOM_XML_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
+            String traceTypeName = CUSTOM_XML_CATEGORY + SEPARATOR + def.definitionName;
             TraceTypeHelper tt = new TraceTypeHelper(traceTypeName, CUSTOM_TXT_CATEGORY, def.definitionName, null);
             fTraceTypes.put(traceTypeName, tt);
             traceTypes.add(traceTypeName);

@@ -132,7 +132,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
         // --------------------
         TreeViewerColumn column = new TreeViewerColumn(traceTypeViewer, SWT.NONE);
         column.getColumn().setWidth(COL_WIDTH);
-        column.getColumn().setText(Messages.ImportTraceWizardImportCaption);
+        column.getColumn().setText(Messages.ImportTraceWizardTraceDisplayName);
         column.setLabelProvider(new FirstColumnLabelProvider());
         column.setEditingSupport(new ColumnEditorSupport(traceTypeViewer, textCellEditor));
 
@@ -142,7 +142,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
 
         column = new TreeViewerColumn(traceTypeViewer, SWT.NONE);
         column.getColumn().setWidth(COL_WIDTH);
-        column.getColumn().setText(Messages.ImportTraceWizardTraceDisplayName);
+        column.getColumn().setText(Messages.ImportTraceWizardImportCaption);
         column.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {

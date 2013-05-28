@@ -46,6 +46,8 @@ public class Messages extends NLS {
 
     public static String BatchImportTraceWizardErrorImportingTraceResource;
 
+    public static String SharedSelectProject;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

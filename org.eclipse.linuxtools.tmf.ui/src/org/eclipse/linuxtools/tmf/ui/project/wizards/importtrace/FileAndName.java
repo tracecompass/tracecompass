@@ -118,6 +118,15 @@ class FileAndName implements Comparable<FileAndName> {
         return fConflict;
     }
 
+    /**
+     * Is the fileAndName renamed
+     *
+     * @return true if the name does not match the filename
+     */
+    public boolean isRenamed() {
+        return !fName.equals(fFile.getName());
+    }
+
     // ------------------------------------------------------------------------
     // Comparator & Equals
     // ------------------------------------------------------------------------
