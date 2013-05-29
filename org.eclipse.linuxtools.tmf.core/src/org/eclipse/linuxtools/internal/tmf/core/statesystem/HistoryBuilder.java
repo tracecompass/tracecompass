@@ -74,7 +74,7 @@ public class HistoryBuilder extends TmfComponent {
         }
         if (stateProvider.getAssignedStateSystem() != ss) {
             /* Logic check to make sure the provider is setup properly */
-            throw new RuntimeException();
+            throw new IllegalArgumentException();
         }
 
         sp = stateProvider;
@@ -227,7 +227,7 @@ public class HistoryBuilder extends TmfComponent {
 class StateSystemBuildRequest extends TmfEventRequest {
 
     /** The amount of events queried at a time through the requests */
-    private final static int chunkSize = 50000;
+    private static final int CHUNK_SIZE = 50000;
 
     private final HistoryBuilder builder;
     private final ITmfStateProvider sci;
@@ -237,7 +237,7 @@ class StateSystemBuildRequest extends TmfEventRequest {
         super(builder.getStateProvider().getExpectedEventType(),
                 TmfTimeRange.ETERNITY,
                 TmfDataRequest.ALL_DATA,
-                chunkSize,
+                CHUNK_SIZE,
                 ITmfDataRequest.ExecutionType.BACKGROUND);
         this.builder = builder;
         this.sci = builder.getStateProvider();
@@ -247,10 +247,8 @@ class StateSystemBuildRequest extends TmfEventRequest {
     @Override
     public void handleData(final ITmfEvent event) {
         super.handleData(event);
-        if (event != null) {
-            if (event.getTrace() == trace) {
-                sci.processEvent(event);
-            }
+        if (event != null && event.getTrace() == trace) {
+            sci.processEvent(event);
         }
     }
 

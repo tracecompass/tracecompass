@@ -50,15 +50,15 @@ class HT_IO {
      */
     HT_IO(HistoryTree tree, boolean newFile) throws IOException {
         this.tree = tree;
-        historyTreeFile = tree.config.stateFile;
-        boolean success1 = true, success2;
+        historyTreeFile = tree.getConfig().getStateFile();
+        boolean success1 = true;
 
         if (newFile) {
             /* Create a new empty History Tree file */
             if (historyTreeFile.exists()) {
                 success1 = historyTreeFile.delete();
             }
-            success2 = historyTreeFile.createNewFile();
+            boolean success2 = historyTreeFile.createNewFile();
             if (!(success1 && success2)) {
                 /* It seems we do not have permission to create the new file */
                 throw new IOException("Cannot create new file at " + //$NON-NLS-1$
@@ -97,7 +97,7 @@ class HT_IO {
     }
 
     private HTNode readNodeFromMemory(int seqNumber) {
-        for (HTNode node : tree.latestBranch) {
+        for (HTNode node : tree.getLatestBranch()) {
             if (node.getSequenceNumber() == seqNumber) {
                 return node;
             }
@@ -159,12 +159,12 @@ class HT_IO {
     }
 
     File supplyATWriterFile() {
-        return tree.config.stateFile;
+        return tree.getConfig().getStateFile();
     }
 
     long supplyATWriterFilePos() {
-        return HistoryTree.getTreeHeaderSize()
-                + ((long) tree.getNodeCount() * tree.config.blockSize);
+        return HistoryTree.TREE_HEADER_SIZE
+                + ((long) tree.getNodeCount() * tree.getConfig().getBlockSize());
     }
 
     synchronized void closeFile() {
@@ -194,8 +194,8 @@ class HT_IO {
      */
     private void seekFCToNodePos(FileChannel fc, int seqNumber)
             throws IOException {
-        fc.position(HistoryTree.getTreeHeaderSize() + (long) seqNumber
-                * tree.config.blockSize);
+        fc.position(HistoryTree.TREE_HEADER_SIZE + (long) seqNumber
+                * tree.getConfig().getBlockSize());
         /*
          * cast to (long) is needed to make sure the result is a long too and
          * doesn't get truncated

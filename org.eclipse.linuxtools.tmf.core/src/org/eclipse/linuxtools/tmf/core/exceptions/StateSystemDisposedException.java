@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,5 +22,22 @@ package org.eclipse.linuxtools.tmf.core.exceptions;
 public class StateSystemDisposedException extends Exception {
 
     private static final long serialVersionUID = 7896041701818620084L;
+
+    /**
+     * Create a new simple StateSystemDisposedException.
+     */
+    public StateSystemDisposedException() {
+        super();
+    }
+
+    /**
+     * Create a new StateSystemDisposedException based on a previous one.
+     *
+     * @param e
+     *            The previous exception
+     */
+    public StateSystemDisposedException(Throwable e) {
+        super(e);
+    }
 
 }

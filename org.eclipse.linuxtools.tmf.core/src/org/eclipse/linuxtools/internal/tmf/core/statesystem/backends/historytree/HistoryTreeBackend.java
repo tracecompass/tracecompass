@@ -185,7 +185,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         /* We start by reading the information in the root node */
         // FIXME using CoreNode for now, we'll have to redo this part to handle
         // different node types
-        CoreNode currentNode = sht.latestBranch.firstElement();
+        CoreNode currentNode = sht.getLatestBranch().get(0);
         currentNode.writeInfoFromNode(stateInfo, t);
 
         /* Then we follow the branch down in the relevant children */
@@ -195,7 +195,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                 currentNode.writeInfoFromNode(stateInfo, t);
             }
         } catch (ClosedChannelException e) {
-            throw new StateSystemDisposedException();
+            throw new StateSystemDisposedException(e);
         }
 
         /*
@@ -232,7 +232,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
         // FIXME using CoreNode for now, we'll have to redo this part to handle
         // different node types
-        CoreNode currentNode = sht.latestBranch.firstElement();
+        CoreNode currentNode = sht.getLatestBranch().get(0);
         HTInterval interval = currentNode.getRelevantInterval(key, t);
 
         try {
@@ -241,7 +241,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                 interval = currentNode.getRelevantInterval(key, t);
             }
         } catch (ClosedChannelException e) {
-            throw new StateSystemDisposedException();
+            throw new StateSystemDisposedException(e);
         }
         /*
          * Since we should now have intervals at every attribute/timestamp
@@ -266,7 +266,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @return The tree depth
      */
     public int getTreeDepth() {
-        return sht.latestBranch.size();
+        return sht.getLatestBranch().size();
     }
 
     /**

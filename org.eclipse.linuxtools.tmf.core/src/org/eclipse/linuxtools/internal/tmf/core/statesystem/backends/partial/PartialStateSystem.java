@@ -34,7 +34,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
  */
 public class PartialStateSystem extends StateSystem {
 
-    private static final String errMsg = "Partial state system should not modify the attribute tree!"; //$NON-NLS-1$
+    private static final String ERR_MSG = "Partial state system should not modify the attribute tree!"; //$NON-NLS-1$
 
     private final CountDownLatch ssAssignedLatch = new CountDownLatch(1);
     private final Lock queryLock = new ReentrantLock();
@@ -119,7 +119,7 @@ public class PartialStateSystem extends StateSystem {
 
     @Override
     protected void addEmptyAttribute() {
-        throw new RuntimeException(errMsg);
+        throw new RuntimeException(ERR_MSG);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class PartialStateSystem extends StateSystem {
         try {
             return realStateSystem.getQuarkAbsolute(attribute);
         } catch (AttributeNotFoundException e) {
-            throw new RuntimeException(errMsg);
+            throw new RuntimeException(ERR_MSG);
         }
     }
 
@@ -138,7 +138,7 @@ public class PartialStateSystem extends StateSystem {
         try {
             return realStateSystem.getQuarkRelative(startingNodeQuark, subPath);
         } catch (AttributeNotFoundException e) {
-            throw new RuntimeException(errMsg);
+            throw new RuntimeException(ERR_MSG);
         }
     }
 

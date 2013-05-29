@@ -41,7 +41,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
  */
 public class InMemoryBackend implements IStateHistoryBackend {
 
-    private final static Comparator<ITmfStateInterval> endComparator =
+    private static final Comparator<ITmfStateInterval> END_COMPARATOR =
             new TmfIntervalEndComparator();
 
     private final List<ITmfStateInterval> intervals;
@@ -181,7 +181,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
 
     private static int binarySearchEndTime(List<ITmfStateInterval> list, long time) {
         ITmfStateInterval dummyInterval = new TmfStateInterval(-1, time, -1, null);
-        int mid = Collections.binarySearch(list, dummyInterval, endComparator);
+        int mid = Collections.binarySearch(list, dummyInterval, END_COMPARATOR);
 
         /* The returned value is < 0 if the exact key was not found. */
         if (mid < 0) {

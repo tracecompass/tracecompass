@@ -17,15 +17,14 @@ import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 
 /**
  * An implement of a state history back-end to simply discards *all* the
  * intervals it receives. Obviously, no queries can be done on it. It is useful
- * for using with a {@link StateSystem} on which you will only want to do
- * "ongoing" requests.
+ * for using with a StateSystem on which you will only want to do "ongoing"
+ * requests.
  *
  * @author Alexandre Montplaisir
  */

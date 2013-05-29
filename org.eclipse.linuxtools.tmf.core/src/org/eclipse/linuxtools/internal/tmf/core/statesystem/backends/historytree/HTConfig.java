@@ -18,15 +18,17 @@ import java.io.File;
  * Configuration object for a StateHistoryTree.
  *
  * @author alexmont
- *
  */
 final class HTConfig {
 
-    public final File stateFile;
-    public final int blockSize;
-    public final int maxChildren;
-    public final int providerVersion;
-    public final long treeStart;
+    private static final int DEFAULT_BLOCKSIZE = 64 * 1024;
+    private static final int DEFAULT_MAXCHILDREN = 50;
+
+    private final File stateFile;
+    private final int blockSize;
+    private final int maxChildren;
+    private final int providerVersion;
+    private final long treeStart;
 
     HTConfig(File newStateFile, int blockSize, int maxChildren,
             int providerVersion, long startTime) {
@@ -44,6 +46,30 @@ final class HTConfig {
      * @param startTime
      */
     HTConfig(File newStateFile, int providerVersion, long startTime) {
-        this(newStateFile, 64 * 1024, 50, providerVersion, startTime);
+        this(newStateFile, DEFAULT_BLOCKSIZE, DEFAULT_MAXCHILDREN, providerVersion, startTime);
+    }
+
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
+
+    public File getStateFile() {
+        return stateFile;
+    }
+
+    public int getBlockSize() {
+        return blockSize;
+    }
+
+    public int getMaxChildren() {
+        return maxChildren;
+    }
+
+    public int getProviderVersion() {
+        return providerVersion;
+    }
+
+    public long getTreeStart() {
+        return treeStart;
     }
 }

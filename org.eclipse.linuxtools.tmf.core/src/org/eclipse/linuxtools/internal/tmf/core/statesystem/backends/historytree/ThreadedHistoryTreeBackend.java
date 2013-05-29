@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
@@ -31,12 +32,6 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
  */
 public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         implements Runnable {
-
-    /*
-     * From superclass:
-     *
-     * protected final StateHistoryTree sht;
-     */
 
     private BlockingQueue<HTInterval> intervalQueue;
     private final Thread shtThread;
@@ -125,9 +120,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         try {
             intervalQueue.put(interval);
         } catch (InterruptedException e) {
-            /* We should not get interrupted here */
-            System.out.println("State system got interrupted!"); //$NON-NLS-1$
-            e.printStackTrace();
+            Activator.logError("State system interrupted", e); //$NON-NLS-1$
         }
     }
 
@@ -171,16 +164,16 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
             intervalQueue.put(pill);
             shtThread.join();
         } catch (TimeRangeException e) {
-            e.printStackTrace();
+            Activator.logError("Error closing state system", e); //$NON-NLS-1$
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Activator.logError("State system interrupted", e); //$NON-NLS-1$
         }
     }
 
     @Override
     public void run() {
         if (intervalQueue == null) {
-            System.err.println("Cannot start the storage backend without its interval queue."); //$NON-NLS-1$
+            Activator.logError("Cannot start the storage backend without its interval queue."); //$NON-NLS-1$
             return;
         }
         HTInterval currentInterval;
@@ -200,11 +193,10 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
             return;
         } catch (InterruptedException e) {
             /* We've been interrupted abnormally */
-            System.out.println("State History Tree interrupted!"); //$NON-NLS-1$
-            e.printStackTrace();
+            Activator.logError("State History Tree interrupted!", e); //$NON-NLS-1$
         } catch (TimeRangeException e) {
             /* This also should not happen */
-            e.printStackTrace();
+            Activator.logError("Error starting the state system", e); //$NON-NLS-1$
         }
     }
 
