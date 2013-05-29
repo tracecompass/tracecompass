@@ -50,10 +50,6 @@ public class ImportConfirmationDialog extends Dialog implements IImportConfirmat
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The dialog composite.
-     */
-    private Composite fDialogComposite = null;
-    /**
      * The radio button for selecting the overwrite action
      */
     private Button fOverwriteButton = null;
@@ -124,15 +120,15 @@ public class ImportConfirmationDialog extends Dialog implements IImportConfirmat
     protected Control createDialogArea(Composite parent) {
 
         // Main dialog panel
-        fDialogComposite = new Composite(parent, SWT.NONE);
+       Composite dialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
-        fDialogComposite.setLayout(layout);
-        fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+        dialogComposite.setLayout(layout);
+        dialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Label sessionNameLabel = new Label(fDialogComposite, SWT.RIGHT);
+        Label sessionNameLabel = new Label(dialogComposite, SWT.RIGHT);
         sessionNameLabel.setText(Messages.TraceControl_ImportDialogTraceAlreadyExistError + ": " + fTraceName); //$NON-NLS-1$
 
-        fOverwriteButton = new Button(fDialogComposite, SWT.RADIO);
+        fOverwriteButton = new Button(dialogComposite, SWT.RADIO);
         fOverwriteButton.setText(Messages.TraceControl_ImportDialogConfirmationOverwriteLabel);
 
         fOverwriteButton.addSelectionListener(new SelectionAdapter() {
@@ -143,7 +139,7 @@ public class ImportConfirmationDialog extends Dialog implements IImportConfirmat
             }
         });
 
-        fRenameButton = new Button(fDialogComposite, SWT.RADIO);
+        fRenameButton = new Button(dialogComposite, SWT.RADIO);
         fRenameButton.setText(Messages.TraceControl_ImportDialogConfirmationRenameLabel);
 
         fRenameButton.addSelectionListener(new SelectionAdapter() {
@@ -153,7 +149,7 @@ public class ImportConfirmationDialog extends Dialog implements IImportConfirmat
             }
         });
 
-        fNewTraceNameText = new Text(fDialogComposite, SWT.NONE);
+        fNewTraceNameText = new Text(dialogComposite, SWT.NONE);
         fNewTraceNameText.setToolTipText(Messages.TraceControl_ImportDialogConfirmationNewNameLabel);
         fNewTraceNameText.setText(fTraceName);
 
@@ -169,7 +165,7 @@ public class ImportConfirmationDialog extends Dialog implements IImportConfirmat
 
         getShell().setMinimumSize(new Point(300, 150));
 
-        return fDialogComposite;
+        return dialogComposite;
     }
 
     @Override

@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
  *
  * @author Bernd Hufmann
  */
-public class ControlCommandLogger {
+final public class ControlCommandLogger {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -38,7 +38,6 @@ public class ControlCommandLogger {
     // Constructor
     // ------------------------------------------------------------------------
     private ControlCommandLogger() {
-
     }
 
     // ------------------------------------------------------------------------

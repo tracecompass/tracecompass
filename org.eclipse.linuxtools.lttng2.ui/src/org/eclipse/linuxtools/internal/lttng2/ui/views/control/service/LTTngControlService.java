@@ -926,7 +926,7 @@ public class LTTngControlService implements ILttngControlService {
         ret.append(result.getResult());
         ret.append("\n"); //$NON-NLS-1$
         for (int i = 0; i < output.length; i++) {
-            ret.append(output[i] + "\n"); //$NON-NLS-1$
+            ret.append(output[i]).append("\n"); //$NON-NLS-1$
         }
         return ret.toString();
     }

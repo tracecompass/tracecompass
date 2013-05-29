@@ -53,10 +53,6 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The dialog composite.
-     */
-    private Composite fDialogComposite = null;
-    /**
      * The text widget for the channel name
      */
     private Text fChannelNameText = null;
@@ -84,10 +80,6 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
      * The read timer interval of the channel.
      */
     private Text fReadTimerText = null;
-    /**
-     * Group composite for domain selection.
-     */
-    private Group fDomainGroup = null;
     /**
      * Radio button for selecting kernel domain.
      */
@@ -191,40 +183,40 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
     protected Control createDialogArea(Composite parent) {
 
         // Main dialog panel
-        fDialogComposite = new Composite(parent, SWT.NONE);
+        Composite dialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, true);
-        fDialogComposite.setLayout(layout);
+        dialogComposite.setLayout(layout);
 
-        Label channelNameLabel = new Label(fDialogComposite, SWT.RIGHT);
+        Label channelNameLabel = new Label(dialogComposite, SWT.RIGHT);
         channelNameLabel.setText(Messages.TraceControl_EnableChannelNameLabel);
-        fChannelNameText = new Text(fDialogComposite, SWT.NONE);
+        fChannelNameText = new Text(dialogComposite, SWT.NONE);
         fChannelNameText.setToolTipText(Messages.TraceControl_EnableChannelNameTooltip);
 
-        Label subBufferSizeLabel = new Label(fDialogComposite, SWT.RIGHT);
+        Label subBufferSizeLabel = new Label(dialogComposite, SWT.RIGHT);
         subBufferSizeLabel.setText(Messages.TraceControl_SubBufferSizePropertyName);
-        fSubBufferSizeText = new Text(fDialogComposite, SWT.NONE);
+        fSubBufferSizeText = new Text(dialogComposite, SWT.NONE);
         fSubBufferSizeText.setToolTipText(Messages.TraceControl_EnableChannelSubBufferSizeTooltip);
         fSubBufferSizeText.addVerifyListener(fVerifyListener);
 
-        Label numSubBufferLabel = new Label(fDialogComposite, SWT.RIGHT);
+        Label numSubBufferLabel = new Label(dialogComposite, SWT.RIGHT);
         numSubBufferLabel.setText(Messages.TraceControl_NbSubBuffersPropertyName);
-        fNumberOfSubBuffersText = new Text(fDialogComposite, SWT.NONE);
+        fNumberOfSubBuffersText = new Text(dialogComposite, SWT.NONE);
         fNumberOfSubBuffersText.setToolTipText(Messages.TraceControl_EnableChannelNbSubBuffersTooltip);
         fNumberOfSubBuffersText.addVerifyListener(fVerifyListener);
 
-        Label switchTimerLabel = new Label(fDialogComposite, SWT.RIGHT);
+        Label switchTimerLabel = new Label(dialogComposite, SWT.RIGHT);
         switchTimerLabel.setText(Messages.TraceControl_SwitchTimerPropertyName);
-        fSwitchTimerText = new Text(fDialogComposite, SWT.NONE);
+        fSwitchTimerText = new Text(dialogComposite, SWT.NONE);
         fSwitchTimerText.setToolTipText(Messages.TraceControl_EnableChannelSwitchTimerTooltip);
         fSwitchTimerText.addVerifyListener(fVerifyListener);
 
-        Label readTimerLabel = new Label(fDialogComposite, SWT.RIGHT);
+        Label readTimerLabel = new Label(dialogComposite, SWT.RIGHT);
         readTimerLabel.setText(Messages.TraceControl_ReadTimerPropertyName);
-        fReadTimerText = new Text(fDialogComposite, SWT.NONE);
+        fReadTimerText = new Text(dialogComposite, SWT.NONE);
         fReadTimerText.setToolTipText(Messages.TraceControl_EnableChannelReadTimerTooltip);
         fReadTimerText.addVerifyListener(fVerifyListener);
 
-        Group discardModeGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
+        Group discardModeGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
         discardModeGroup.setText(Messages.TraceControl_EnableChannelDiscardModeGroupName);
         layout = new GridLayout(2, true);
         discardModeGroup.setLayout(layout);
@@ -239,15 +231,15 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         fOverwriteModeButton.setToolTipText(Messages.TraceControl_EnableChannelOverwriteModeTooltip);
         fOverwriteModeButton.setSelection(false);
 
-        fDomainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
-        fDomainGroup.setText(Messages.TraceControl_DomainDisplayName);
+        Group domainGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
+        domainGroup.setText(Messages.TraceControl_DomainDisplayName);
         layout = new GridLayout(2, true);
-        fDomainGroup.setLayout(layout);
+        domainGroup.setLayout(layout);
 
-        fKernelButton = new Button(fDomainGroup, SWT.RADIO);
+        fKernelButton = new Button(domainGroup, SWT.RADIO);
         fKernelButton.setText(Messages.TraceControl_KernelDomainDisplayName);
         fKernelButton.setSelection(fIsKernel);
-        fUstButton = new Button(fDomainGroup, SWT.RADIO);
+        fUstButton = new Button(domainGroup, SWT.RADIO);
         fUstButton.setText(Messages.TraceControl_UstDisplayName);
         fUstButton.setSelection(!fIsKernel);
 
@@ -265,7 +257,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         fOverwriteModeButton.setLayoutData(data);
 
         data = new GridData(GridData.FILL, GridData.CENTER, false, false, 3, 1);
-        fDomainGroup.setLayoutData(data);
+        domainGroup.setLayoutData(data);
 
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
         fKernelButton.setLayoutData(data);
@@ -283,7 +275,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
 
         setDefaults();
 
-        return fDialogComposite;
+        return dialogComposite;
     }
 
     @Override

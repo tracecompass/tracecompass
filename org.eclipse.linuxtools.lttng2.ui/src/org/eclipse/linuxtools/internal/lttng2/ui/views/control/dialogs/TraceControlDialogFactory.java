@@ -95,7 +95,7 @@ public final class TraceControlDialogFactory {
     /**
      * @return TraceControlDialogFactory instance
      */
-    public synchronized static TraceControlDialogFactory getInstance() {
+    public static synchronized TraceControlDialogFactory getInstance() {
         if (fInstance == null) {
             fInstance = new TraceControlDialogFactory();
         }

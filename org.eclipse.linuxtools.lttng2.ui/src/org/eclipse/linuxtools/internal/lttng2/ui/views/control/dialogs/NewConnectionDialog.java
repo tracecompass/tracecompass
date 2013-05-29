@@ -59,18 +59,6 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The dialog composite.
-     */
-    private Composite fDialogComposite = null;
-    /**
-     * The Group for the host combo box.
-     */
-    private Group fComboGroup = null;
-    /**
-     * The Group for the text input.
-     */
-    private Group fTextGroup = null;
-    /**
      * The host combo box.
      */
     private CCombo fExistingHostsCombo = null;
@@ -176,20 +164,20 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     protected Control createDialogArea(Composite parent) {
 
         // Main dialog panel
-        fDialogComposite = new Composite(parent, SWT.NONE);
+        Composite dialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
-        fDialogComposite.setLayout(layout);
-        fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+        dialogComposite.setLayout(layout);
+        dialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         // Existing connections group
-        fComboGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
-        fComboGroup.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
+        Group comboGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
+        comboGroup.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
         layout = new GridLayout(2, true);
-        fComboGroup.setLayout(layout);
+        comboGroup.setLayout(layout);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        fComboGroup.setLayoutData(data);
+        comboGroup.setLayoutData(data);
 
-        fExistingHostsCombo = new CCombo(fComboGroup, SWT.READ_ONLY);
+        fExistingHostsCombo = new CCombo(comboGroup, SWT.READ_ONLY);
         fExistingHostsCombo.setToolTipText(Messages.TraceControl_NewNodeComboToolTip);
         fExistingHostsCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 2, 1));
 
@@ -202,32 +190,32 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fExistingHostsCombo.setEnabled(fExistingHosts.length > 0);
 
         // Node information grop
-        fTextGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
+        Group textGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
         layout = new GridLayout(3, true);
-        fTextGroup.setLayout(layout);
+        textGroup.setLayout(layout);
         data = new GridData(GridData.FILL_HORIZONTAL);
-        fTextGroup.setLayoutData(data);
+        textGroup.setLayoutData(data);
 
-        fButton = new Button(fTextGroup, SWT.CHECK);
+        fButton = new Button(textGroup, SWT.CHECK);
         fButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 3, 1));
         fButton.setText(Messages.TraceControl_NewNodeEditButtonName);
         fButton.setEnabled(fExistingHosts.length > 0);
 
-        Label connectionNameLabel = new Label(fTextGroup, SWT.RIGHT);
+        Label connectionNameLabel = new Label(textGroup, SWT.RIGHT);
         connectionNameLabel.setText(Messages.TraceControl_NewNodeConnectionNameLabel);
-        fConnectionNameText = new Text(fTextGroup, SWT.NONE);
+        fConnectionNameText = new Text(textGroup, SWT.NONE);
         fConnectionNameText.setToolTipText(Messages.TraceControl_NewNodeConnectionNameTooltip);
         fConnectionNameText.setEnabled(fExistingHosts.length == 0);
 
-        Label hostNameLabel = new Label(fTextGroup, SWT.RIGHT);
+        Label hostNameLabel = new Label(textGroup, SWT.RIGHT);
         hostNameLabel.setText(Messages.TraceControl_NewNodeHostNameLabel);
-        fHostNameText = new Text(fTextGroup, SWT.NONE);
+        fHostNameText = new Text(textGroup, SWT.NONE);
         fHostNameText.setToolTipText(Messages.TraceControl_NewNodeHostNameTooltip);
         fHostNameText.setEnabled(fExistingHosts.length == 0);
 
-        Label portLabel = new Label(fTextGroup, SWT.RIGHT);
+        Label portLabel = new Label(textGroup, SWT.RIGHT);
         portLabel.setText(Messages.TraceControl_NewNodePortLabel);
-        fPortText = new Text(fTextGroup, SWT.NONE);
+        fPortText = new Text(textGroup, SWT.NONE);
         fPortText.setToolTipText(Messages.TraceControl_NewNodePortTooltip);
         fPortText.setEnabled(fExistingHosts.length == 0);
         fPortText.addVerifyListener(new VerifyListener() {
@@ -295,7 +283,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
         fHostNameText.setText(""); //$NON-NLS-1$
 
-        return fDialogComposite;
+        return dialogComposite;
     }
 
     @Override

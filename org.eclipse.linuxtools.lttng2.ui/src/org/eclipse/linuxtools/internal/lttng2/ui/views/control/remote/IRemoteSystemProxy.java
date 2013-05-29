@@ -34,7 +34,7 @@ public interface IRemoteSystemProxy {
     /**
      * Invalid port number for IP based connections.
      */
-    public final static int INVALID_PORT_NUMBER = -1;
+    static final int INVALID_PORT_NUMBER = -1;
 
     // ------------------------------------------------------------------------
     // Operations
