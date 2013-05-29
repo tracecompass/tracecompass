@@ -378,7 +378,7 @@ public class HistogramView extends TmfView {
     /**
      * Handles trace opened signal. Loads histogram if new trace time range is not
      * equal <code>TmfTimeRange.NULL_RANGE</code>
-     * @param signal the trace selected signal
+     * @param signal the trace opened signal
      * @since 2.0
      */
     @TmfSignalHandler

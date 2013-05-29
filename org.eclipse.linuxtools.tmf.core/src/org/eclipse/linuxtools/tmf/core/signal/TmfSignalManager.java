@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Update register methods
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.signal;
@@ -60,6 +61,7 @@ public class TmfSignalManager {
      *            The object that will be notified of new signals
      */
     public static synchronized void register(Object listener) {
+        deregister(listener); // make sure that listener is only registered once
         Method[] methods = getSignalHandlerMethods(listener);
         if (methods.length > 0) {
             fListeners.put(listener, methods);
@@ -75,6 +77,7 @@ public class TmfSignalManager {
      *            The object that will be notified of new signals
      */
     public static synchronized void registerVIP(Object listener) {
+        deregister(listener); // make sure that listener is only registered once
         Method[] methods = getSignalHandlerMethods(listener);
         if (methods.length > 0) {
             fVIPListeners.put(listener, methods);

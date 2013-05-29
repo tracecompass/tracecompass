@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -110,6 +111,19 @@ public class TmfEnvironmentView extends TmfView {
     public void setFocus() {
         fTree.setFocus();
     }
+
+    /**
+     * Handler for the trace opened signal.
+     * @param signal
+     *            The incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        fTrace = signal.getTrace();
+        updateTable();
+    }
+
 
     /**
      * Handler for the trace selected signal.

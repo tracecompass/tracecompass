@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
@@ -219,6 +220,8 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             }
         }
         super.init(traceName, type);
+        // register as VIP after super.init() because TmfComponent registers to signal manager there
+        TmfSignalManager.registerVIP(this);
     }
 
     /**
