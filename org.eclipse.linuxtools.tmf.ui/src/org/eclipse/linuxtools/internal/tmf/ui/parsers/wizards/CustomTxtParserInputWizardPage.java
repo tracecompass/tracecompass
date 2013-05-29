@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Patrick Tassé - Initial API and implementation
+ *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
@@ -82,7 +82,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * Input wizard page for custom text parsers.
  *
- * @author Patrick Tassé
+ * @author Patrick Tasse
  */
 public class CustomTxtParserInputWizardPage extends WizardPage {
 
@@ -90,24 +90,24 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
     private static final String SIMPLE_DATE_FORMAT_URL = "http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
     private static final String PATTERN_URL = "http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html#sum"; //$NON-NLS-1$
-    private static final Image lineImage = Activator.getDefault().getImageFromPath("/icons/elcl16/line_icon.gif"); //$NON-NLS-1$
-    private static final Image addImage = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
-    private static final Image addNextImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
-    private static final Image addChildImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addchild_button.gif"); //$NON-NLS-1$
-    private static final Image deleteImage = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
-    private static final Image moveUpImage = Activator.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
-    private static final Image moveDownImage = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
-    private static final Image helpImage = Activator.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
-    private static final Color COLOR_BLACK = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+    private static final Image LINE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/line_icon.gif"); //$NON-NLS-1$
+    private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
+    private static final Image ADD_NEXT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
+    private static final Image ADD_CHILD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addchild_button.gif"); //$NON-NLS-1$
+    private static final Image DELETE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
+    private static final Image MOVE_UP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
+    private static final Image MOVE_DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
+    private static final Image HELP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
+    private static final Color COLOR_BLACK = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
     private static final Color COLOR_LIGHT_GREEN = new Color(Display.getDefault(), 192, 255, 192);
-    private static final Color COLOR_GREEN = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
+    private static final Color COLOR_GREEN = Display.getDefault().getSystemColor(SWT.COLOR_GREEN);
     private static final Color COLOR_LIGHT_YELLOW = new Color(Display.getDefault(), 255, 255, 192);
-    private static final Color COLOR_YELLOW = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
+    private static final Color COLOR_YELLOW = Display.getDefault().getSystemColor(SWT.COLOR_YELLOW);
     private static final Color COLOR_LIGHT_MAGENTA = new Color(Display.getDefault(), 255, 192, 255);
-    private static final Color COLOR_MAGENTA = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
+    private static final Color COLOR_MAGENTA = Display.getDefault().getSystemColor(SWT.COLOR_MAGENTA);
     private static final Color COLOR_LIGHT_RED = new Color(Display.getDefault(), 255, 192, 192);
-    private static final Color COLOR_TEXT_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-    private static final Color COLOR_WIDGET_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+    private static final Color COLOR_TEXT_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
+    private static final Color COLOR_WIDGET_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
     private final ISelection selection;
     private CustomTxtTraceDefinition definition;
@@ -118,10 +118,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private Text logtypeText;
     private Text timestampOutputFormatText;
     private Text timestampPreviewText;
-    private ScrolledComposite treeScrolledComposite;
     private ScrolledComposite lineScrolledComposite;
     private TreeViewer treeViewer;
-    private Composite treeContainer;
     private Composite lineContainer;
     private StyledText inputText;
     private Font fixedFont;
@@ -186,7 +184,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         timestampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
 
         Button dateFormatHelpButton = new Button(headerComposite, SWT.PUSH);
-        dateFormatHelpButton.setImage(helpImage);
+        dateFormatHelpButton.setImage(HELP_IMAGE);
         dateFormatHelpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_dateFormatHelp);
         dateFormatHelpButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -210,7 +208,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         buttonBar.setLayout(buttonBarLayout);
 
         Button removeButton = new Button(buttonBar, SWT.PUSH);
-        removeButton.setImage(deleteImage);
+        removeButton.setImage(DELETE_IMAGE);
         removeButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_removeLine);
         removeButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -231,7 +229,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         });
         Button addNextButton = new Button(buttonBar, SWT.PUSH);
-        addNextButton.setImage(addNextImage);
+        addNextButton.setImage(ADD_NEXT_IMAGE);
         addNextButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_addNextLine);
         addNextButton.addSelectionListener(new SelectionAdapter() {
         	@Override
@@ -258,7 +256,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         });
         Button addChildButton = new Button(buttonBar, SWT.PUSH);
-        addChildButton.setImage(addChildImage);
+        addChildButton.setImage(ADD_CHILD_IMAGE);
         addChildButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_addChildLine);
         addChildButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -277,7 +275,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         });
         Button moveUpButton = new Button(buttonBar, SWT.PUSH);
-        moveUpButton.setImage(moveUpImage);
+        moveUpButton.setImage(MOVE_UP_IMAGE);
         moveUpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_moveUp);
         moveUpButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -302,7 +300,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         });
         Button moveDownButton = new Button(buttonBar, SWT.PUSH);
-        moveDownButton.setImage(moveDownImage);
+        moveDownButton.setImage(MOVE_DOWN_IMAGE);
         moveDownButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_moveDown);
         moveDownButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -334,12 +332,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         SashForm hSash = new SashForm(vSash, SWT.HORIZONTAL);
         hSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        treeScrolledComposite = new ScrolledComposite(hSash, SWT.V_SCROLL | SWT.H_SCROLL);
+        ScrolledComposite treeScrolledComposite = new ScrolledComposite(hSash, SWT.V_SCROLL | SWT.H_SCROLL);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.heightHint = 200;
         gd.widthHint = 200;
         treeScrolledComposite.setLayoutData(gd);
-        treeContainer = new Composite(treeScrolledComposite, SWT.NONE);
+        Composite treeContainer = new Composite(treeScrolledComposite, SWT.NONE);
         treeContainer.setLayout(new FillLayout());
         treeScrolledComposite.setContent(treeContainer);
         treeScrolledComposite.setExpandHorizontal(true);
@@ -401,7 +399,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         });
 
         Button legendButton = new Button(sashBottom, SWT.PUSH);
-        legendButton.setImage(helpImage);
+        legendButton.setImage(HELP_IMAGE);
         legendButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_previewLegend);
         legendButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         legendButton.addSelectionListener(new SelectionAdapter() {
@@ -476,7 +474,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
         @Override
         public Image getImage(Object element) {
-            return lineImage;
+            return LINE_IMAGE;
         }
 
         @Override
@@ -633,8 +631,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         Scanner scanner = new Scanner(inputText.getText());
         scanner.useDelimiter("\n"); //$NON-NLS-1$
         int rawPos = 0;
-        String skip; // skip starting delimiters
-        if ((skip = scanner.findWithinHorizon("\\A\n+", 0)) != null) { //$NON-NLS-1$
+        // skip starting delimiters
+        String skip = scanner.findWithinHorizon("\\A\n+", 0); //$NON-NLS-1$
+        if (skip != null) {
             rawPos += skip.length();
         }
 
@@ -836,10 +835,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                             COLOR_BLACK, COLOR_LIGHT_GREEN, SWT.BOLD));
                 }
                 String value = matcher.group(i+1).trim();
-                if (selectedLine != null && selectedLine.inputLine.equals(line) && rootLineMatches == 1) {
-                    if (selectedLine.inputs.get(i).previewText.getText().equals(Messages.CustomTxtParserInputWizardPage_noMatchingLine)) {
-                        selectedLine.inputs.get(i).previewText.setText(value);
-                    }
+                if (selectedLine != null && selectedLine.inputLine.equals(line) && rootLineMatches == 1 &&
+                        selectedLine.inputs.get(i).previewText.getText().equals(Messages.CustomTxtParserInputWizardPage_noMatchingLine)) {
+                    selectedLine.inputs.get(i).previewText.setText(value);
                 }
                 if (value.length() == 0) {
                     continue;
@@ -924,21 +922,21 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     }
 
     private void openLegend() {
-        final String CG = Messages.CustomTxtParserInputWizardPage_capturedGroup;
-        final String UCG = Messages.CustomTxtParserInputWizardPage_unidentifiedCaptureGroup;
-        final String UT = Messages.CustomTxtParserInputWizardPage_uncapturedText;
+        final String cg = Messages.CustomTxtParserInputWizardPage_capturedGroup;
+        final String ucg = Messages.CustomTxtParserInputWizardPage_unidentifiedCaptureGroup;
+        final String ut = Messages.CustomTxtParserInputWizardPage_uncapturedText;
         int line1start = 0;
         String line1 = Messages.CustomTxtParserInputWizardPage_nonMatchingLine;
         int line2start = line1start + line1.length();
-        String line2 = Messages.CustomTxtParserInputWizardPage_matchingLineRoot + CG + " " + UCG + " " + UT + " \n";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String line2 = Messages.CustomTxtParserInputWizardPage_matchingLineRoot + cg + ' ' + ucg + ' ' + ut + " \n";  //$NON-NLS-1$
         int line3start = line2start + line2.length();
-        String line3 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + CG + " " + UCG + " " + UT + " \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String line3 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
         int line4start = line3start + line3.length();
-        String line4 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + CG + " " + UCG + " " + UT + " \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String line4 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
         int line5start = line4start + line4.length();
         String line5 = Messages.CustomTxtParserInputWizardPage_nonMatchingLine;
         int line6start = line5start + line5.length();
-        String line6 = Messages.CustomTxtParserInputWizardPage_matchingRootLine + CG + " " + UCG + " " + UT + " \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String line6 = Messages.CustomTxtParserInputWizardPage_matchingRootLine + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
 
         final Shell legendShell = new Shell(getShell(), SWT.DIALOG_TRIM);
         legendShell.setLayout(new FillLayout());
@@ -949,14 +947,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         legendText.setStyleRange(new StyleRange(line3start, line3.length(), COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
         legendText.setStyleRange(new StyleRange(line4start, line4.length(), COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
         legendText.setStyleRange(new StyleRange(line6start, line6.length(), COLOR_BLACK, COLOR_YELLOW, SWT.ITALIC));
-        legendText.setStyleRange(new StyleRange(line2start + line2.indexOf(CG), CG.length(), COLOR_BLACK, COLOR_GREEN, SWT.BOLD));
-        legendText.setStyleRange(new StyleRange(line2start + line2.indexOf(UCG), UCG.length(), COLOR_BLACK, COLOR_MAGENTA));
-        legendText.setStyleRange(new StyleRange(line3start + line3.indexOf(CG), CG.length(), COLOR_BLACK, COLOR_LIGHT_GREEN, SWT.BOLD));
-        legendText.setStyleRange(new StyleRange(line3start + line3.indexOf(UCG), UCG.length(), COLOR_BLACK, COLOR_LIGHT_MAGENTA));
-        legendText.setStyleRange(new StyleRange(line4start + line4.indexOf(CG), CG.length(), COLOR_BLACK, COLOR_LIGHT_GREEN, SWT.BOLD));
-        legendText.setStyleRange(new StyleRange(line4start + line4.indexOf(UCG), UCG.length(), COLOR_BLACK, COLOR_LIGHT_MAGENTA));
-        legendText.setStyleRange(new StyleRange(line6start + line6.indexOf(CG), CG.length(), COLOR_BLACK, COLOR_GREEN, SWT.BOLD));
-        legendText.setStyleRange(new StyleRange(line6start + line6.indexOf(UCG), UCG.length(), COLOR_BLACK, COLOR_MAGENTA));
+        legendText.setStyleRange(new StyleRange(line2start + line2.indexOf(cg), cg.length(), COLOR_BLACK, COLOR_GREEN, SWT.BOLD));
+        legendText.setStyleRange(new StyleRange(line2start + line2.indexOf(ucg), ucg.length(), COLOR_BLACK, COLOR_MAGENTA));
+        legendText.setStyleRange(new StyleRange(line3start + line3.indexOf(cg), cg.length(), COLOR_BLACK, COLOR_LIGHT_GREEN, SWT.BOLD));
+        legendText.setStyleRange(new StyleRange(line3start + line3.indexOf(ucg), ucg.length(), COLOR_BLACK, COLOR_LIGHT_MAGENTA));
+        legendText.setStyleRange(new StyleRange(line4start + line4.indexOf(cg), cg.length(), COLOR_BLACK, COLOR_LIGHT_GREEN, SWT.BOLD));
+        legendText.setStyleRange(new StyleRange(line4start + line4.indexOf(ucg), ucg.length(), COLOR_BLACK, COLOR_LIGHT_MAGENTA));
+        legendText.setStyleRange(new StyleRange(line6start + line6.indexOf(cg), cg.length(), COLOR_BLACK, COLOR_GREEN, SWT.BOLD));
+        legendText.setStyleRange(new StyleRange(line6start + line6.indexOf(ucg), ucg.length(), COLOR_BLACK, COLOR_MAGENTA));
         legendShell.setText(Messages.CustomTxtParserInputWizardPage_previewLegend);
         legendShell.pack();
         legendShell.open();
@@ -986,20 +984,20 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private class Line {
         private static final String INFINITY_STRING = "\u221E"; //$NON-NLS-1$
-        InputLine inputLine;
-        Group group;
-        Composite labelComposite;
-        Text regexText;
-        Composite cardinalityContainer;
-        Combo cardinalityCombo;
-        Label cardinalityMinLabel;
-        Text cardinalityMinText;
-        Label cardinalityMaxLabel;
-        Text cardinalityMaxText;
-        Button infiniteButton;
-        List<InputGroup> inputs = new ArrayList<InputGroup>();
-        Button addGroupButton;
-        Label addGroupLabel;
+        private InputLine inputLine;
+        private Group group;
+        private Composite labelComposite;
+        private Text regexText;
+        private Composite cardinalityContainer;
+        private Combo cardinalityCombo;
+        private Label cardinalityMinLabel;
+        private Text cardinalityMinText;
+        private Label cardinalityMaxLabel;
+        private Text cardinalityMaxText;
+        private Button infiniteButton;
+        private List<InputGroup> inputs = new ArrayList<InputGroup>();
+        private Button addGroupButton;
+        private Label addGroupLabel;
 
         public Line(Composite parent, String name, InputLine inputLine) {
             this.inputLine = inputLine;
@@ -1034,7 +1032,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             regexText.addModifyListener(updateListener);
 
             Button regexHelpButton = new Button(regexContainer, SWT.PUSH);
-            regexHelpButton.setImage(helpImage);
+            regexHelpButton.setImage(HELP_IMAGE);
             regexHelpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_regularExpressionHelp);
             regexHelpButton.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -1199,7 +1197,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         private void createAddGroupButton() {
             addGroupButton = new Button(group, SWT.PUSH);
             addGroupButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-            addGroupButton.setImage(addImage);
+            addGroupButton.setImage(ADD_IMAGE);
             addGroupButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_addGroup);
             addGroupButton.addSelectionListener(new SelectionAdapter() {
             	@Override
@@ -1236,11 +1234,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 group.getParent().layout();
             }
         }
-
-//        private void setName(String name) {
-//            this.name = name;
-//            group.setText("Line " + name);
-//        }
 
         private void dispose() {
             group.dispose();
@@ -1302,23 +1295,23 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     }
 
     private class InputGroup {
-        Line line;
-        int inputNumber;
+        private Line line;
+        private int inputNumber;
 
         // children of parent (must be disposed)
-        Composite labelComposite;
-        Composite tagComposite;
-        Label previewLabel;
-        Text previewText;
+        private Composite labelComposite;
+        private Composite tagComposite;
+        private Label previewLabel;
+        private Text previewText;
 
         // children of labelComposite
-        Label inputLabel;
+        private Label inputLabel;
 
         // children of tagComposite
-        Combo tagCombo;
-        Label tagLabel;
-        Text tagText;
-        Combo actionCombo;
+        private Combo tagCombo;
+        private Label tagLabel;
+        private Text tagText;
+        private Combo actionCombo;
 
         public InputGroup(Composite parent, Line line, int inputNumber) {
             this.line = line;
@@ -1333,7 +1326,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
             Button deleteButton = new Button(labelComposite, SWT.PUSH);
             deleteButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-            deleteButton.setImage(deleteImage);
+            deleteButton.setImage(DELETE_IMAGE);
             deleteButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_removeGroup);
             deleteButton.addSelectionListener(new SelectionAdapter() {
             	@Override
@@ -1454,12 +1447,11 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         } else {
             logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
             for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                if (definition.definitionName.equals(def.definitionName)) {
-                    if (editDefinitionName == null || ! editDefinitionName.equals(definition.definitionName)) {
-                        errors.append("The log type name already exists. "); //$NON-NLS-1$
-                        logtypeText.setBackground(COLOR_LIGHT_RED);
-                        break;
-                    }
+                if (definition.definitionName.equals(def.definitionName) &&
+                        (editDefinitionName == null || !editDefinitionName.equals(definition.definitionName))) {
+                    errors.append("The log type name already exists. "); //$NON-NLS-1$
+                    logtypeText.setBackground(COLOR_LIGHT_RED);
+                    break;
                 }
             }
         }
@@ -1487,10 +1479,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
         } else {
             timestampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
-//            timestampPreviewText.setBackground(COLOR_WIDGET_BACKGROUND);
-//            errors.append("Identify a Time Stamp group (Line "+name+"). ");
-//            timestampPreviewText.setText("*no timestamp group*");
-//            timestampPreviewText.setBackground(COLOR_LIGHT_RED);
         }
 
         if (errors.length() == 0) {

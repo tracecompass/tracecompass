@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Patrick Tassé - Initial API and implementation
+ *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbench;
 /**
  * Wizard for custom XML trace parsers.
  *
- * @author Patrick Tassé
+ * @author Patrick Tasse
  */
 public class CustomXmlParserWizard extends Wizard implements INewWizard {
 

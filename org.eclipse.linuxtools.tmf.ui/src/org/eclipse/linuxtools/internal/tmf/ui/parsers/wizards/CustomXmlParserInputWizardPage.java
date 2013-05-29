@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Patrick Tassé - Initial API and implementation
+ *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
@@ -89,24 +89,24 @@ import org.xml.sax.SAXParseException;
 /**
  * Input wizard page for custom XML trace parsers.
  *
- * @author Patrick Tassé
+ * @author Patrick Tasse
  */
 public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
     private static final String SIMPLE_DATE_FORMAT_URL = "http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
-    private static final Image elementImage = Activator.getDefault().getImageFromPath("/icons/elcl16/element_icon.gif"); //$NON-NLS-1$
-    private static final Image addImage = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
-    private static final Image addNextImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
-    private static final Image addChildImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addchild_button.gif"); //$NON-NLS-1$
-    private static final Image addManyImage = Activator.getDefault().getImageFromPath("/icons/elcl16/addmany_button.gif"); //$NON-NLS-1$
-    private static final Image deleteImage = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
-    private static final Image moveUpImage = Activator.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
-    private static final Image moveDownImage = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
-    private static final Image helpImage = Activator.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
+    private static final Image ELEMENT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/element_icon.gif"); //$NON-NLS-1$
+    private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
+    private static final Image ADD_NEXT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
+    private static final Image ADD_CHILD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addchild_button.gif"); //$NON-NLS-1$
+    private static final Image ADD_MANY_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addmany_button.gif"); //$NON-NLS-1$
+    private static final Image DELETE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
+    private static final Image MOVE_UP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
+    private static final Image MOVE_DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
+    private static final Image HELP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
     private static final Color COLOR_LIGHT_RED = new Color(Display.getDefault(), 255, 192, 192);
-    private static final Color COLOR_TEXT_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-    private static final Color COLOR_WIDGET_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+    private static final Color COLOR_TEXT_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
+    private static final Color COLOR_WIDGET_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
     private final ISelection selection;
     private CustomXmlTraceDefinition definition;
@@ -122,11 +122,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private Button addNextButton;
     private Button moveUpButton;
     private Button moveDownButton;
-    private Button feelingLuckyButton;
-    private ScrolledComposite treeScrolledComposite;
     private ScrolledComposite elementScrolledComposite;
     private TreeViewer treeViewer;
-    private Composite treeContainer;
     private Composite elementContainer;
     private Text errorText;
     private StyledText inputText;
@@ -195,7 +192,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         timeStampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
 
         Button dateFormatHelpButton = new Button(headerComposite, SWT.PUSH);
-        dateFormatHelpButton.setImage(helpImage);
+        dateFormatHelpButton.setImage(HELP_IMAGE);
         dateFormatHelpButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_dateFormatHelp);
         dateFormatHelpButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -221,9 +218,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         SashForm hSash = new SashForm(vSash, SWT.HORIZONTAL);
         hSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        treeScrolledComposite = new ScrolledComposite(hSash, SWT.V_SCROLL | SWT.H_SCROLL);
+        ScrolledComposite treeScrolledComposite = new ScrolledComposite(hSash, SWT.V_SCROLL | SWT.H_SCROLL);
         treeScrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        treeContainer = new Composite(treeScrolledComposite, SWT.NONE);
+        Composite treeContainer = new Composite(treeScrolledComposite, SWT.NONE);
         treeContainer.setLayout(new FillLayout());
         treeScrolledComposite.setContent(treeContainer);
         treeScrolledComposite.setExpandHorizontal(true);
@@ -323,7 +320,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         buttonBar.setLayout(buttonBarLayout);
 
         removeButton = new Button(buttonBar, SWT.PUSH);
-        removeButton.setImage(deleteImage);
+        removeButton.setImage(DELETE_IMAGE);
         removeButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_removeElement);
         removeButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -355,7 +352,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         });
 
         addChildButton = new Button(buttonBar, SWT.PUSH);
-        addChildButton.setImage(addChildImage);
+        addChildButton.setImage(ADD_CHILD_IMAGE);
         addChildButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addChildElement);
         addChildButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -377,7 +374,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         });
 
         addNextButton = new Button(buttonBar, SWT.PUSH);
-        addNextButton.setImage(addNextImage);
+        addNextButton.setImage(ADD_NEXT_IMAGE);
         addNextButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addNextElement);
         addNextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -401,8 +398,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             }
         });
 
-        feelingLuckyButton = new Button(buttonBar, SWT.PUSH);
-        feelingLuckyButton.setImage(addManyImage);
+        Button feelingLuckyButton = new Button(buttonBar, SWT.PUSH);
+        feelingLuckyButton.setImage(ADD_MANY_IMAGE);
         feelingLuckyButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_feelingLucky);
         feelingLuckyButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -429,7 +426,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         });
 
         moveUpButton = new Button(buttonBar, SWT.PUSH);
-        moveUpButton.setImage(moveUpImage);
+        moveUpButton.setImage(MOVE_UP_IMAGE);
         moveUpButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_moveUp);
         moveUpButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -449,7 +446,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         });
 
         moveDownButton = new Button(buttonBar, SWT.PUSH);
-        moveDownButton.setImage(moveDownImage);
+        moveDownButton.setImage(MOVE_DOWN_IMAGE);
         moveDownButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_moveDown);
         moveDownButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -534,7 +531,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         @Override
         public Image getImage(Object element) {
-            return elementImage;
+            return ELEMENT_IMAGE;
         }
 
         @Override
@@ -846,23 +843,23 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     }
 
     private class ElementNode {
-        final InputElement inputElement;
-        final Group group;
-        List<Attribute> attributes = new ArrayList<Attribute>();
-        List<ElementNode> childElements = new ArrayList<ElementNode>();
-        Text elementNameText;
-        Composite tagComposite;
-        Combo tagCombo;
-        Label tagLabel;
-        Text tagText;
-        Combo actionCombo;
-        Label previewLabel;
-        Text previewText;
-        Button logEntryButton;
-        Label fillerLabel;
-        Composite addAttributeComposite;
-        Button addAttributeButton;
-        Label addAttributeLabel;
+        private final InputElement inputElement;
+        private final Group group;
+        private List<Attribute> attributes = new ArrayList<Attribute>();
+        private List<ElementNode> childElements = new ArrayList<ElementNode>();
+        private Text elementNameText;
+        private Composite tagComposite;
+        private Combo tagCombo;
+        private Label tagLabel;
+        private Text tagText;
+        private Combo actionCombo;
+        private Label previewLabel;
+        private Text previewText;
+        private Button logEntryButton;
+        private Label fillerLabel;
+        private Composite addAttributeComposite;
+        private Button addAttributeButton;
+        private Label addAttributeLabel;
 
         public ElementNode(Composite parent, InputElement inputElement) {
             this.inputElement = inputElement;
@@ -1121,7 +1118,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             addAttributeComposite.setLayout(addAttributeLayout);
 
             addAttributeButton = new Button(addAttributeComposite, SWT.PUSH);
-            addAttributeButton.setImage(addImage);
+            addAttributeButton.setImage(ADD_IMAGE);
             addAttributeButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addAttribute);
             addAttributeButton.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -1202,27 +1199,27 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     }
 
     private class Attribute {
-        ElementNode element;
-        int attributeNumber;
+        private ElementNode element;
+        private int attributeNumber;
 
         // children of parent (must be disposed)
-        Composite labelComposite;
-        Composite attributeComposite;
-        Label filler;
-        Composite tagComposite;
+        private Composite labelComposite;
+        private Composite attributeComposite;
+        private Label filler;
+        private Composite tagComposite;
 
         // children of labelComposite
-        Label attributeLabel;
+        private Label attributeLabel;
 
         // children of attributeComposite
-        Text attributeNameText;
-        Text previewText;
+        private Text attributeNameText;
+        private Text previewText;
 
         // children of tagComposite
-        Combo tagCombo;
-        Label tagLabel;
-        Text tagText;
-        Combo actionCombo;
+        private Combo tagCombo;
+        private Label tagLabel;
+        private Text tagText;
+        private Combo actionCombo;
 
         public Attribute(Composite parent, ElementNode element, InputAttribute inputAttribute, int attributeNumber) {
             this.element = element;
@@ -1237,7 +1234,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
             Button deleteButton = new Button(labelComposite, SWT.PUSH);
             deleteButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-            deleteButton.setImage(deleteImage);
+            deleteButton.setImage(DELETE_IMAGE);
             deleteButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_removeAttribute);
             deleteButton.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -1476,12 +1473,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         } else {
             logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
             for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                if (definition.definitionName.equals(def.definitionName)) {
-                    if (editDefinitionName == null || !editDefinitionName.equals(definition.definitionName)) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_duplicatelogTypeError);
-                        logtypeText.setBackground(COLOR_LIGHT_RED);
-                        break;
-                    }
+                if (definition.definitionName.equals(def.definitionName) &&
+                        (editDefinitionName == null || !editDefinitionName.equals(definition.definitionName))) {
+                    errors.append(Messages.CustomXmlParserInputWizardPage_duplicatelogTypeError);
+                    logtypeText.setBackground(COLOR_LIGHT_RED);
+                    break;
                 }
             }
         }

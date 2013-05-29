@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2010, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Patrick Tassé - Initial API and implementation
+ *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
@@ -44,26 +44,22 @@ import org.eclipse.swt.widgets.Text;
 /**
  * Output wizard page for custom XML trace parsers.
  *
- * @author Patrick Tassé
+ * @author Patrick Tasse
  */
 public class CustomXmlParserOutputWizardPage extends WizardPage {
 
-    private static final Image upImage = Activator.getDefault().getImageFromPath("/icons/elcl16/up_button.gif"); //$NON-NLS-1$
-    private static final Image downImage = Activator.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
+    private static final Image UP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/up_button.gif"); //$NON-NLS-1$
+    private static final Image DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
     private final CustomXmlParserWizard wizard;
     private CustomXmlTraceDefinition definition;
-    List<Output> outputs = new ArrayList<Output>();
-    //    Output messageOutput;
-    Composite container;
-    SashForm sash;
-    //    Text timestampFormatText;
-    //    Text timestampPreviewText;
-    ScrolledComposite outputsScrolledComposite;
-    Composite outputsContainer;
-    //    ScrolledComposite inputScrolledComposite;
-    Composite tableContainer;
-    CustomEventsTable previewTable;
-    File tmpFile;
+    private List<Output> outputs = new ArrayList<Output>();
+    private Composite container;
+    private SashForm sash;
+    private ScrolledComposite outputsScrolledComposite;
+    private Composite outputsContainer;
+    private Composite tableContainer;
+    private CustomEventsTable previewTable;
+    private File tmpFile;
 
     /**
      * Constructor
@@ -295,7 +291,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             nameLabel.moveBelow(enabledButton);
 
             upButton = new Button(parent, SWT.PUSH);
-            upButton.setImage(upImage);
+            upButton.setImage(UP_IMAGE);
             upButton.setToolTipText(Messages.CustomXmlParserOutputWizardPage_moveBefore);
             upButton.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -306,7 +302,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             upButton.moveBelow(nameLabel);
 
             downButton = new Button(parent, SWT.PUSH);
-            downButton.setImage(downImage);
+            downButton.setImage(DOWN_IMAGE);
             downButton.setToolTipText(Messages.CustomXmlParserOutputWizardPage_moveAfter);
             downButton.addSelectionListener(new SelectionAdapter() {
                 @Override
