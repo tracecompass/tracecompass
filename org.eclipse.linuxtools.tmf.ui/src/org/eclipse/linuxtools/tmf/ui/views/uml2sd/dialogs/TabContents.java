@@ -39,14 +39,6 @@ public class TabContents extends Composite {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * A graph node type listener implementation.
-     */
-    private final GraphNodeTypeListener fGraphNodeTypeListener;
-    /**
-     * A expression listener implementation.
-     */
-    private final ExpressionListener fExpressionListener;
-    /**
      * The button for lifelines.
      */
     private Button fLifelineButton;
@@ -74,10 +66,6 @@ public class TabContents extends Composite {
      * The search text combo box.
      */
     private Combo fSearchText = null;
-    /**
-     * The group for selection kind.
-     */
-    private Group fKindSelection = null;
     /**
      * The button for case sensitive expressions.
      */
@@ -108,8 +96,8 @@ public class TabContents extends Composite {
         fParentOkButton = okButton;
         setLayout(new GridLayout());
 
-        fGraphNodeTypeListener = new GraphNodeTypeListener();
-        fExpressionListener = new ExpressionListener();
+        GraphNodeTypeListener graphNodeTypeListener = new GraphNodeTypeListener();
+        ExpressionListener expressionListener = new ExpressionListener();
 
         // Inform the user how to fill the string to search
         Label searchTitle = new Label(this, SWT.LEFT);
@@ -133,25 +121,25 @@ public class TabContents extends Composite {
                 fSearchText.add(expressionList[i]);
             }
         }
-        fSearchText.addModifyListener(fExpressionListener);
+        fSearchText.addModifyListener(expressionListener);
 
         // Create the case sensitive check button
         fCaseSensitive = new Button(searchPart, SWT.CHECK);
         fCaseSensitive.setText(Messages.SequenceDiagram_CaseSensitive);
 
         // Create the group for searched graph node kind selection
-        fKindSelection = new Group(this, SWT.SHADOW_NONE);
-        fKindSelection.setText(Messages.SequenceDiagram_SearchFor);
+        Group kindSelection = new Group(this, SWT.SHADOW_NONE);
+        kindSelection.setText(Messages.SequenceDiagram_SearchFor);
         // kindSelection.setLayoutData(tabLayoutData2);
         GridLayout kindSelectionLayout = new GridLayout();
         kindSelectionLayout.numColumns = 1;
-        fKindSelection.setLayout(kindSelectionLayout);
+        kindSelection.setLayout(kindSelectionLayout);
         GridData kindSelectionData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_FILL);
-        fKindSelection.setLayoutData(kindSelectionData);
+        kindSelection.setLayoutData(kindSelectionData);
 
         // Create the lifeline check button
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.LIFELINE)) {
-            fLifelineButton = new Button(fKindSelection, SWT.CHECK);
+            fLifelineButton = new Button(kindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.LIFELINE, null);
             if (nodeName != null) {
                 fLifelineButton.setText(nodeName);
@@ -159,12 +147,12 @@ public class TabContents extends Composite {
                 fLifelineButton.setText(Messages.SequenceDiagram_Lifeline);
             }
             fLifelineButton.setEnabled(true);
-            fLifelineButton.addSelectionListener(fGraphNodeTypeListener);
+            fLifelineButton.addSelectionListener(graphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.STOP)) {
             // Create the stop check button
-            fStopButton = new Button(fKindSelection, SWT.CHECK);
+            fStopButton = new Button(kindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.STOP, null);
             if (nodeName != null) {
                 fStopButton.setText(nodeName);
@@ -173,12 +161,12 @@ public class TabContents extends Composite {
             }
 
             fStopButton.setEnabled(true);
-            fStopButton.addSelectionListener(fGraphNodeTypeListener);
+            fStopButton.addSelectionListener(graphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGE)) {
             // Create the synchronous message check button
-            fSynMessageButton = new Button(fKindSelection, SWT.CHECK);
+            fSynMessageButton = new Button(kindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.SYNCMESSAGE, null);
             if (nodeName != null) {
                 fSynMessageButton.setText(nodeName);
@@ -186,12 +174,12 @@ public class TabContents extends Composite {
                 fSynMessageButton.setText(Messages.SequenceDiagram_SynchronousMessage);
             }
             fSynMessageButton.setEnabled(true);
-            fSynMessageButton.addSelectionListener(fGraphNodeTypeListener);
+            fSynMessageButton.addSelectionListener(graphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGERETURN)) {
             // Create the synchronous message return check button
-            fSynMessageReturnButton = new Button(fKindSelection, SWT.CHECK);
+            fSynMessageReturnButton = new Button(kindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.SYNCMESSAGERETURN, null);
             if (nodeName != null) {
                 fSynMessageReturnButton.setText(nodeName);
@@ -199,12 +187,12 @@ public class TabContents extends Composite {
                 fSynMessageReturnButton.setText(Messages.SequenceDiagram_SynchronousMessageReturn);
             }
             fSynMessageReturnButton.setEnabled(true);
-            fSynMessageReturnButton.addSelectionListener(fGraphNodeTypeListener);
+            fSynMessageReturnButton.addSelectionListener(graphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGE)) {
             // Create the asynchronous message check button
-            fAsynMessageButton = new Button(fKindSelection, SWT.CHECK);
+            fAsynMessageButton = new Button(kindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.ASYNCMESSAGE, null);
             if (nodeName != null) {
                 fAsynMessageButton.setText(nodeName);
@@ -212,12 +200,12 @@ public class TabContents extends Composite {
                 fAsynMessageButton.setText(Messages.SequenceDiagram_AsynchronousMessage);
             }
             fAsynMessageButton.setEnabled(true);
-            fAsynMessageButton.addSelectionListener(fGraphNodeTypeListener);
+            fAsynMessageButton.addSelectionListener(graphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGERETURN)) {
             // Create the asynchronous message return check button
-            fAsynMessageReturnButton = new Button(fKindSelection, SWT.CHECK);
+            fAsynMessageReturnButton = new Button(kindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.ASYNCMESSAGERETURN, null);
             if (nodeName != null) {
                 fAsynMessageReturnButton.setText(nodeName);
@@ -225,7 +213,7 @@ public class TabContents extends Composite {
                 fAsynMessageReturnButton.setText(Messages.SequenceDiagram_AsynchronousMessageReturn);
             }
             fAsynMessageReturnButton.setEnabled(true);
-            fAsynMessageReturnButton.addSelectionListener(fGraphNodeTypeListener);
+            fAsynMessageReturnButton.addSelectionListener(graphNodeTypeListener);
         }
 
         fResult = new Label(this, SWT.LEFT);

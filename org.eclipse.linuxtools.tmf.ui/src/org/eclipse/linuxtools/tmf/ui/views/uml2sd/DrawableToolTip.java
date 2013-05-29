@@ -39,13 +39,27 @@ import org.eclipse.swt.widgets.Shell;
 public class DrawableToolTip implements PaintListener {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    private static final int HORIZONTAL_MARGIN = 10;
+    private static final int VERTICAL_MARGIN = 10;
+    private static final int TEXT_SCALE_MARGIN = 20;
+    private static final int SCALE_LENGTH = 100;
+    private static final int SHELL_WIDTH = 200;
+    private static final int SHELL_HEIGHT = 50;
+    private static final int NUMBER_STEPS = 10;
+    private static final int BASE_RED_VALUE = 255;
+    private static final int BASE_GREEN_BLUE_VALUE = 225;
+    private static final int COLOR_STEP = 25;
+    private static final int BOUNDS_Y_OFFSET = 26;
+    private static final int RECTANGLE_HEIGHT = 11;
+    private static final int DEFAULT_LINE_WIDTH = 10;
+    private static final int BORDER_LINE_WIDTH = 14;
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    /**
-     * The parent control where the tooltip must be drawn
-     */
-    private Composite fParent = null;
     /**
      * The tooltip shell
      */
@@ -61,19 +75,19 @@ public class DrawableToolTip implements PaintListener {
     /**
      * The horizontal margin used for drawing.
      */
-    private static int fHorMargin = 10;
+    private static int fHorMargin = HORIZONTAL_MARGIN;
     /**
      * The vertical margin used for drawing.
      */
-    private static int fVertMargin = 10;
+    private static int fVertMargin = VERTICAL_MARGIN;
     /**
      * The minimum text scale margin.
      */
-    private static int fTextScaleMargin = 20;
+    private static int fTextScaleMargin = TEXT_SCALE_MARGIN;
     /**
      * The length of the text scale.
      */
-    private static int fScaleLength = 100;
+    private static int fScaleLength = SCALE_LENGTH;
     /**
      * The text to display
      */
@@ -93,24 +107,19 @@ public class DrawableToolTip implements PaintListener {
      * @param parent The parent composite.
      */
     public DrawableToolTip(Composite parent) {
-        fParent = parent;
-        fToolTipShell = new Shell(fParent.getShell(), SWT.ON_TOP);
+        fToolTipShell = new Shell(parent.getShell(), SWT.ON_TOP);
         fToolTipShell.setLayout(new RowLayout());
         fToolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
         fToolTipShell.addPaintListener(this);
-        fToolTipShell.setSize(200, 50);
+        fToolTipShell.setSize(SHELL_WIDTH, SHELL_HEIGHT);
 
-        fColors = new Color[10];
-        fColors[0] = new Color(Display.getDefault(), 255, 229, 229);
-        fColors[1] = new Color(Display.getDefault(), 255, 204, 204);
-        fColors[2] = new Color(Display.getDefault(), 255, 178, 178);
-        fColors[3] = new Color(Display.getDefault(), 255, 153, 153);
-        fColors[4] = new Color(Display.getDefault(), 255, 127, 127);
-        fColors[5] = new Color(Display.getDefault(), 255, 102, 102);
-        fColors[6] = new Color(Display.getDefault(), 255, 76, 76);
-        fColors[7] = new Color(Display.getDefault(), 255, 51, 51);
-        fColors[8] = new Color(Display.getDefault(), 255, 25, 25);
-        fColors[9] = new Color(Display.getDefault(), 255, 0, 0);
+        fColors = new Color[NUMBER_STEPS];
+        int greenBlue = BASE_GREEN_BLUE_VALUE;
+        final int step = COLOR_STEP;
+        for (int i = 0; i < fColors.length; i++) {
+            fColors[i] = new Color(Display.getDefault(), BASE_RED_VALUE, greenBlue, greenBlue);
+            greenBlue -= step;
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -221,7 +230,7 @@ public class DrawableToolTip implements PaintListener {
         int w = fToolTipShell.getBounds().width;
         int h = fToolTipShell.getBounds().height;
         Point hr = Display.getDefault().getCursorLocation();
-        fToolTipShell.setBounds(hr.x, hr.y + 26, w, h);
+        fToolTipShell.setBounds(hr.x, hr.y + BOUNDS_Y_OFFSET, w, h);
         fToolTipShell.setVisible(true);
     }
 
@@ -251,19 +260,16 @@ public class DrawableToolTip implements PaintListener {
         event.gc.drawText(fMessage, fHorMargin, fVertMargin, true);
         event.gc.drawLine(fHorMargin, fVertMargin + fTextScaleMargin + size.y, fHorMargin + fScaleLength, fVertMargin + fTextScaleMargin + size.y);
 
-        int step = fScaleLength / 10;
+        int step = fScaleLength / NUMBER_STEPS;
 
-        // double gr = (max - min) / 10;
         ITmfTimestamp minMaxdelta = fMinMaxRange.getEndTime().getDelta(fMinMaxRange.getStartTime());
-        double gr = (minMaxdelta.getValue()) / (double) 10;
+        double gr = (minMaxdelta.getValue()) / (double) NUMBER_STEPS;
 
-        // double delta = currentValue-min;
         ITmfTimestamp delta = fCurrentValue.getDelta(fMinMaxRange.getStartTime());
         long absDelta = Math.abs(delta.getValue());
 
         int colIndex = 0;
         if (gr != 0) {
-            // colIndex = Math.round((float)(Math.log(1+delta)/gr));
             colIndex = Math.round((float) (absDelta / gr));
             if (colIndex > fColors.length) {
                 colIndex = fColors.length;
@@ -274,12 +280,12 @@ public class DrawableToolTip implements PaintListener {
             colIndex = 1;
         }
 
-        for (int i = 0; i <= 10; i++) {
-            if (i < 10) {
+        for (int i = 0; i <= NUMBER_STEPS; i++) {
+            if (i < NUMBER_STEPS) {
                 event.gc.setBackground(fColors[i]);
             }
-            if ((i < colIndex) && (i < 10)) {
-                event.gc.fillRectangle(fHorMargin + i * step, fVertMargin + fTextScaleMargin + size.y - 5, step, 11);
+            if ((i < colIndex) && (i < NUMBER_STEPS)) {
+                event.gc.fillRectangle(fHorMargin + i * step, fVertMargin + fTextScaleMargin + size.y - 5, step, RECTANGLE_HEIGHT);
             }
             if (i == 0) {
                 event.gc.drawText(Messages.SequenceDiagram_Min, fHorMargin, size.y + 2 * fVertMargin + fTextScaleMargin, true);
@@ -288,9 +294,9 @@ public class DrawableToolTip implements PaintListener {
                 int len = event.gc.textExtent(Messages.SequenceDiagram_Max).x;
                 event.gc.drawText(Messages.SequenceDiagram_Max, fHorMargin + fScaleLength - len + 1, size.y + 2 * fVertMargin + fTextScaleMargin, true);
             }
-            int lineWidth = 10;
-            if ((i == 0) || (i == 10)) {
-                lineWidth = 14;
+            int lineWidth = DEFAULT_LINE_WIDTH;
+            if ((i == 0) || (i == NUMBER_STEPS)) {
+                lineWidth = BORDER_LINE_WIDTH;
             }
             event.gc.drawLine(fHorMargin + i * step, fVertMargin + fTextScaleMargin + size.y - lineWidth / 2, fHorMargin + i * step, fVertMargin + fTextScaleMargin + size.y + lineWidth / 2);
         }

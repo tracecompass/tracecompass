@@ -104,7 +104,6 @@ public class FilterListDialog extends Dialog {
         fViewer = view;
         fProvider = loader;
         fFilters = null;
-        // filters = provider.getCurrentFilters();
         setShellStyle(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
     }
 

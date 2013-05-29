@@ -33,6 +33,12 @@ import org.eclipse.swt.widgets.Text;
 public class DiagramToolTip {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    private static final int CHARACTERS_PER_COLUMN = 100;
+    private static final int DEFAULT_CURSOR_HEIGHT = 32;
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
@@ -82,7 +88,7 @@ public class DiagramToolTip {
 
         int w = fToolTipShell.getBounds().width;
         Point hr = Display.getDefault().getCursorLocation();
-        int cursorH = 32;
+        int cursorH = DEFAULT_CURSOR_HEIGHT;
         for (int i = 0; i < Display.getDefault().getCursorSizes().length; i++) {
             if (Display.getDefault().getCursorSizes()[i].y < cursorH) {
                 cursorH = Display.getDefault().getCursorSizes()[i].y;
@@ -96,11 +102,10 @@ public class DiagramToolTip {
             hr.x = hr.x - tempX;
         }
         fTextBox.setText(value);
-        int charactersPerColumn = 100;
         GC gc = new GC(fTextBox);
         FontMetrics fm = gc.getFontMetrics();
         gc.dispose();
-        int width = charactersPerColumn * fm.getAverageCharWidth();
+        int width = CHARACTERS_PER_COLUMN * fm.getAverageCharWidth();
         fTextBox.setSize(fTextBox.computeSize(width, fTextBox.getLineCount() * fTextBox.getLineHeight()));
         fToolTipShell.setLocation(hr.x, hr.y + cursorH);
         fToolTipShell.setSize(fTextBox.getSize());

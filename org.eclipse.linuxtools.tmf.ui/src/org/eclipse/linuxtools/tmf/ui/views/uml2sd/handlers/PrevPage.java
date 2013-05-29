@@ -33,7 +33,7 @@ public class PrevPage extends BaseSDAction {
     /**
      * The action ID.
      */
-    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.prevpage"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.prevpage"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructors

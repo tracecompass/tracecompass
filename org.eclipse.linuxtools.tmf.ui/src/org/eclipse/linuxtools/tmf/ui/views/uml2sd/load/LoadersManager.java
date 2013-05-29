@@ -87,7 +87,7 @@ public class LoadersManager {
      *
      * @return the manager instance
      */
-    public synchronized static LoadersManager getInstance() {
+    public static synchronized LoadersManager getInstance() {
         if (fLoadersManager == null) {
             fLoadersManager = new LoadersManager();
         }

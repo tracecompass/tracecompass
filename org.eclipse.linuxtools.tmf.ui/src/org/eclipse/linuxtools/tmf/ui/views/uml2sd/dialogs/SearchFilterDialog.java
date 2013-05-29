@@ -90,7 +90,7 @@ public class SearchFilterDialog extends Dialog {
     /**
      * The find/filter provider telling which graph nodes are supported
      */
-    final private ISDGraphNodeSupporter fProvider;
+    private final ISDGraphNodeSupporter fProvider;
 
     /**
      * The okText is the text for the Ok button and title is the title of the
@@ -98,25 +98,25 @@ public class SearchFilterDialog extends Dialog {
      * Both depend (okText and title (below)) on the usage that is done of this
      * dialog (find or filter).
      */
-    protected String fOkText;
+    private String fOkText;
 
     /**
      * The title is the title of the dialog.<br>
      * Both depend (okText and title) on the usage that is done of this dialog
      * (find or filter).
      */
-    protected String fTitle;
+    private String fTitle;
 
     /**
      * List of string expressions that have been searched already
      */
-    protected String[] fExpressionList;
+    private String[] fExpressionList;
 
     /**
      * find is true if the dialog is for the find feature and false for filter
      * feature
      */
-    protected boolean fIsFind;
+    private boolean fIsFind;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -406,4 +406,47 @@ public class SearchFilterDialog extends Dialog {
     public void setTitle(String title) {
         fTitle = title;
     }
+
+    /**
+     * Gets the text to be used for the ok button
+     *
+     * @return the text to be used for the ok button
+     * @since 2.0
+     */
+    public String getOkText() {
+        return fOkText;
+    }
+
+    /**
+     * Sets the IsFind flag (true for find, else for filter)
+     *
+     * @param flag value to set
+     * @since 2.0
+     */
+    protected void setIsFind(boolean flag) {
+        fIsFind = flag;
+    }
+
+    /**
+     * Gets the title to be used for the dialog box.
+     *
+     * @return the title to be used for the dialog box.
+     * @since 2.0
+     */
+    public String getTitle() {
+        return fTitle;
+    }
+
+    /**
+     * Gets the IsFind flag (true for find, else for filter)
+     *
+     * @return true for find, else for filter
+     * @since 2.0
+     */
+    protected boolean isFind() {
+        return fIsFind;
+    }
+
+
+
 }

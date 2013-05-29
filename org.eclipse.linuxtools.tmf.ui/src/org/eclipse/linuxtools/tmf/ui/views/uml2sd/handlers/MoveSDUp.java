@@ -30,7 +30,7 @@ public class MoveSDUp extends BaseSDAction {
     /**
      * The action ID.
      */
-    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDUp"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDUp"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructors

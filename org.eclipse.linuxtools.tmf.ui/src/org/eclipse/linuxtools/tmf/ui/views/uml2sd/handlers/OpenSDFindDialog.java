@@ -34,12 +34,12 @@ public class OpenSDFindDialog extends BaseSDAction {
     /**
      * The action ID.
      */
-    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.sdFind"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.sdFind"; //$NON-NLS-1$
 
     /**
      * The action definition ID.
      */
-    public final static String ACTION_DEFINITION_ID = "org.eclipse.ui.edit.findReplace"; //$NON-NLS-1$
+    public static final String ACTION_DEFINITION_ID = "org.eclipse.ui.edit.findReplace"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructors

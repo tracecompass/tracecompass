@@ -108,15 +108,17 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Default title name.
      */
-    protected final static String TITLE = Messages.TmfUml2SDSyncLoader_ViewName;
+    protected static final String TITLE = Messages.TmfUml2SDSyncLoader_ViewName;
     /**
      * Default block size for background request.
      */
-    protected final static int DEFAULT_BLOCK_SIZE = 50000;
+    protected static final int DEFAULT_BLOCK_SIZE = 50000;
     /**
      * Maximum number of messages per page.
      */
-    protected final static int MAX_NUM_OF_MSG = 10000;
+    protected static final int MAX_NUM_OF_MSG = 10000;
+
+    private static final int INDEXING_THREAD_SLEEP_VALUE = 100;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -139,7 +141,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Flag whether the time range signal was sent by this loader class or not
      */
-    volatile protected boolean fIsSignalSent = false;
+    protected volatile boolean fIsSignalSent = false;
 
     // The view and event attributes
     /**
@@ -163,7 +165,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * The current page displayed.
      */
-    volatile protected int fCurrentPage = 0;
+    protected volatile int fCurrentPage = 0;
     /**
      * The current time selected.
      */
@@ -171,7 +173,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Flag to specify that selection of message is done by selection or by signal.
      */
-    volatile protected boolean fIsSelect = false;
+    protected volatile boolean fIsSelect = false;
 
     // Search attributes
     /**
@@ -189,7 +191,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * The current find index within the list of found nodes (<code>fFindeResults</code> within a page.
      */
-    volatile protected int fCurrentFindIndex = 0;
+    protected volatile int fCurrentFindIndex = 0;
 
     // Filter attributes
     /**
@@ -1210,7 +1212,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         /**
          * The search event request.
          */
-        final protected SearchEventRequest fSearchRequest;
+        protected final SearchEventRequest fSearchRequest;
 
         /**
          * Constructor
@@ -1296,7 +1298,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         /**
          * The find criteria.
          */
-        final private Criteria fCriteria;
+        private final Criteria fCriteria;
         /**
          * A progress monitor
          */
@@ -1421,7 +1423,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         protected IStatus run(IProgressMonitor monitor) {
             while (!monitor.isCanceled()) {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(INDEXING_THREAD_SLEEP_VALUE);
                 } catch (InterruptedException e) {
                     return Status.OK_STATUS;
                 }

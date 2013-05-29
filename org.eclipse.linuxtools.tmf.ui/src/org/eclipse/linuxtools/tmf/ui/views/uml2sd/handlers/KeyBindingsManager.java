@@ -105,7 +105,7 @@ public class KeyBindingsManager {
      *
      * @return the KeyBindingsManager singleton instance
      */
-    public synchronized static KeyBindingsManager getInstance() {
+    public static synchronized KeyBindingsManager getInstance() {
         if (fInstance == null) {
             fInstance = new KeyBindingsManager();
         }

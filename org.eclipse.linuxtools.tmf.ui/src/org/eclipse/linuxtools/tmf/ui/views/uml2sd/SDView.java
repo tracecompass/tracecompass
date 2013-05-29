@@ -92,42 +92,42 @@ public class SDView extends ViewPart {
      * Name of menu separator for view modes
      * @since 2.0
      */
-    public final static String UML2SD_VIEW_MODES_SEPARATOR = "UML2SD_VIEW_MODES"; //$NON-NLS-1$
+    public static final String UML2SD_VIEW_MODES_SEPARATOR = "UML2SD_VIEW_MODES"; //$NON-NLS-1$
     /**
      * Name of menu separator for working set
      * @since 2.0
      */
-    public final static String UML2SD_WORKING_SET_SEPARATOR = "UML2SD_WORKING_SET"; //$NON-NLS-1$
+    public static final String UML2SD_WORKING_SET_SEPARATOR = "UML2SD_WORKING_SET"; //$NON-NLS-1$
     /**
      * Name of menu separator for sorting
      * @since 2.0
      */
-    public final static String UML2SD_SORTING_SEPARATOR = "UML2SD_SORTING"; //$NON-NLS-1$
+    public static final String UML2SD_SORTING_SEPARATOR = "UML2SD_SORTING"; //$NON-NLS-1$
     /**
      * Name of menu separator for filtering
      * @since 2.0
      */
-    public final static String UML2SD_FILTERING_SEPARATOR = "UML2SD_FILTERING"; //$NON-NLS-1$
+    public static final String UML2SD_FILTERING_SEPARATOR = "UML2SD_FILTERING"; //$NON-NLS-1$
     /**
      * Name of menu separator for view layout
      * @since 2.0
      */
-    public final static String UML2SD_VIEW_LAYOUT_SEPARATOR = "UML2SD_VIEW_LAYOUT"; //$NON-NLS-1$
+    public static final String UML2SD_VIEW_LAYOUT_SEPARATOR = "UML2SD_VIEW_LAYOUT"; //$NON-NLS-1$
     /**
      * Name of menu separator for link editor
      * @since 2.0
      */
-    public final static String UML2SD_LINK_EDITOR_SEPARATOR = "UML2SD_LINK_EDITOR"; //$NON-NLS-1$
+    public static final String UML2SD_LINK_EDITOR_SEPARATOR = "UML2SD_LINK_EDITOR"; //$NON-NLS-1$
     /**
      * Name of menu separator for other commands
      * @since 2.0
      */
-    public final static String UML2SD_OTHER_COMMANDS_SEPARATOR = "UML2SD_OTHER_COMMANDS"; //$NON-NLS-1$
+    public static final String UML2SD_OTHER_COMMANDS_SEPARATOR = "UML2SD_OTHER_COMMANDS"; //$NON-NLS-1$
     /**
      * Name of menu separator for other plug-in commands
      * @since 2.0
      */
-    public final static String UML2SD_OTHER_PLUGINS_COMMANDS_SEPARATOR = "UML2SD_OTHER_PLUGINS_COMMANDS"; //$NON-NLS-1$
+    public static final String UML2SD_OTHER_PLUGINS_COMMANDS_SEPARATOR = "UML2SD_OTHER_PLUGINS_COMMANDS"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes

@@ -352,20 +352,20 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
      * @param toTemp Switch to the temporary preferences
      */
     protected void swapPref(boolean toTemp) {
-        String TAG1 = "";//$NON-NLS-1$
-        String TAG2 = TEMP_TAG;
+        String tag1 = "";//$NON-NLS-1$
+        String tag2 = TEMP_TAG;
         if (!toTemp) {
-            TAG1 = TEMP_TAG;
-            TAG2 = "";//$NON-NLS-1$
+            tag1 = TEMP_TAG;
+            tag2 = "";//$NON-NLS-1$
         }
         Set<String> keySet = SDViewPref.getInstance().getFontPref().keySet();
         Iterator<String> it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                fFont.setPreferenceName((String) prefName + TAG1);
+                fFont.setPreferenceName((String) prefName + tag1);
                 fFont.load();
-                fFont.setPreferenceName((String) prefName + TAG2);
+                fFont.setPreferenceName((String) prefName + tag2);
                 fFont.store();
             }
         }
@@ -375,9 +375,9 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                fBackGroundColor.setPreferenceName((String) prefName + TAG1);
+                fBackGroundColor.setPreferenceName((String) prefName + tag1);
                 fBackGroundColor.load();
-                fBackGroundColor.setPreferenceName((String) prefName + TAG2);
+                fBackGroundColor.setPreferenceName((String) prefName + tag2);
                 fBackGroundColor.store();
             }
         }
@@ -387,9 +387,9 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                fLineColor.setPreferenceName((String) prefName + TAG1);
+                fLineColor.setPreferenceName((String) prefName + tag1);
                 fLineColor.load();
-                fLineColor.setPreferenceName((String) prefName + TAG2);
+                fLineColor.setPreferenceName((String) prefName + tag2);
                 fLineColor.store();
             }
         }
@@ -399,9 +399,9 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                fTextColor.setPreferenceName((String) prefName + TAG1);
+                fTextColor.setPreferenceName((String) prefName + tag1);
                 fTextColor.load();
-                fTextColor.setPreferenceName((String) prefName + TAG2);
+                fTextColor.setPreferenceName((String) prefName + tag2);
                 fTextColor.store();
             }
         }
