@@ -1850,7 +1850,11 @@ public class SDWidget extends ScrollView implements SelectionListener,
 
         @Override
         public void run() {
-            Display.getDefault().asyncExec(new Runnable() {
+            Display display = Display.getDefault();
+            if ((display == null) || (display.isDisposed())) {
+                return;
+            }
+            display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     if (fSdWidget.isDisposed()) {
