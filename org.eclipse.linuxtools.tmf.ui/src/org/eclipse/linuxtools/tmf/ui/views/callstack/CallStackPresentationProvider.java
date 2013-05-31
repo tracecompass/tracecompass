@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.callstack;
 
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
@@ -46,7 +47,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
         MULTIPLE (new RGB(100, 100, 100)),
         EXEC     (new RGB(0, 200, 0));
 
-        public final RGB rgb;
+        private final RGB rgb;
 
         private State (RGB rgb) {
             this.rgb = rgb;
@@ -66,10 +67,12 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public StateItem[] getStateTable() {
+        final float saturation = 0.6f;
+        final float brightness = 0.6f;
         StateItem[] stateTable = new StateItem[NUM_COLORS + 1];
         stateTable[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
         for (int i = 0; i < NUM_COLORS; i++) {
-            RGB rgb = new RGB((i), (float) 0.6, (float) 0.6);
+            RGB rgb = new RGB(i, saturation, brightness);
             stateTable[i + 1] = new StateItem(rgb, State.EXEC.toString());
         }
         return stateTable;
@@ -98,9 +101,9 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
                     return state.toString();
                 }
             } catch (AttributeNotFoundException e) {
-                e.printStackTrace();
+                Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
             } catch (TimeRangeException e) {
-                e.printStackTrace();
+                Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
             } catch (StateSystemDisposedException e) {
                 /* Ignored */
             }
@@ -127,9 +130,9 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
                 Utils.drawText(gc, state.toString(), bounds.x, bounds.y - 2, bounds.width, true, true);
             }
         } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
         } catch (TimeRangeException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {
             /* Ignored */
         }
