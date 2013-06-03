@@ -751,29 +751,32 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     }
                 }
             } else {
-                String temp[] = traceType.split(":", 2); //$NON-NLS-1$
-                if (temp.length < 2) {
-                    Activator.getDefault().logError("Error with trace type " + traceType); //$NON-NLS-1$
-                    return false;
-                }
-                final String traceId = TmfTraceType.getInstance().getTraceTypeId(temp[0], temp[1]);
-                if (traceId != null) {
-                    if (!TmfTraceType.getInstance().validateTrace(traceId, getSelectedResources())) {
+                if (!traceType.equals("")) { //$NON-NLS-1$
+                    // Trace type was selected
+                    String temp[] = traceType.split(":", 2); //$NON-NLS-1$
+                    if (temp.length < 2) {
+                        Activator.getDefault().logError("Error with trace type " + traceType); //$NON-NLS-1$
+                        return false;
+                    }
+                    final String traceId = TmfTraceType.getInstance().getTraceTypeId(temp[0], temp[1]);
+                    if (traceId != null) {
+                        if (!TmfTraceType.getInstance().validateTrace(traceId, getSelectedResources())) {
+                            setMessage(null);
+                            setErrorMessage(Messages.ImportTraceWizard_TraceValidationFailed);
+                            return false;
+                        }
+                    } else {
                         setMessage(null);
                         setErrorMessage(Messages.ImportTraceWizard_TraceValidationFailed);
                         return false;
                     }
-                } else {
-                    setMessage(null);
-                    setErrorMessage(Messages.ImportTraceWizard_TraceValidationFailed);
-                    return false;
-                }
-                IConfigurationElement ce = TmfTraceType.getInstance().getTraceAttributes(traceId);
-                if (ce != null) {
-                    traceTypeOK = true;
-                    traceBundle = ce.getContributor().getName();
-                    traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
-                    traceIcon = ce.getAttribute(TmfTraceType.ICON_ATTR);
+                    IConfigurationElement ce = TmfTraceType.getInstance().getTraceAttributes(traceId);
+                    if (ce != null) {
+                        traceTypeOK = true;
+                        traceBundle = ce.getContributor().getName();
+                        traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
+                        traceIcon = ce.getAttribute(TmfTraceType.ICON_ATTR);
+                    }
                 }
             }
             if (ok && traceTypeOK && !traceType.equals("")) { //$NON-NLS-1$
