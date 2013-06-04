@@ -128,12 +128,12 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
                 /* Put the process' status back to user mode */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_USERMODE);
+                value = StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE;
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Put the CPU's status back to user mode */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_USERMODE);
+                value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -151,12 +151,12 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
                 /* Change the status of the running process to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_INTERRUPTED);
+                value = StateValues.PROCESS_STATUS_INTERRUPTED_VALUE;
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Change the status of the CPU to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IRQ);
+                value = StateValues.CPU_STATUS_IRQ_VALUE;
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -192,12 +192,12 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
                 /* Change the status of the running process to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_INTERRUPTED);
+                value = StateValues.PROCESS_STATUS_INTERRUPTED_VALUE;
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Change the status of the CPU to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_SOFTIRQ);
+                value = StateValues.CPU_STATUS_SOFTIRQ_VALUE;
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -228,7 +228,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                 /* Mark this SoftIRQ as *raised* in the resource tree.
                  * State value = -2 */
                 quark = ss.getQuarkRelativeAndAdd(getNodeSoftIRQs(), softIrqId.toString());
-                value = TmfStateValue.newValueInt(StateValues.SOFT_IRQ_RAISED);
+                value = StateValues.SOFT_IRQ_RAISED_VALUE;
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -250,9 +250,9 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                 /* Set the status of the process that got scheduled out. */
                 quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
                 if (prevState != 0) {
-                    value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT_BLOCKED);
+                    value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
                 } else {
-                    value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT_FOR_CPU);
+                    value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
                 }
                 ss.modifyAttribute(ts, value, quark);
 
@@ -278,12 +278,12 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                     /* Check if the entering process is in kernel or user mode */
                     quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
                     if (ss.queryOngoingState(quark).isNull()) {
-                        value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_USERMODE);
+                        value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
                     } else {
-                        value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_SYSCALL);
+                        value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
                     }
                 } else {
-                    value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IDLE);
+                    value = StateValues.CPU_STATUS_IDLE_VALUE;
                 }
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
                 ss.modifyAttribute(ts, value, quark);
@@ -316,7 +316,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
                 /* Set the new process' status */
                 quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT_FOR_CPU);
+                value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the process' syscall name, to be the same as the parent's */
@@ -392,11 +392,11 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                 if (ss.queryOngoingState(quark).isNull()) {
                      /* "2" here means "WAIT_FOR_CPU", and "5" "WAIT_BLOCKED" in the LTTng kernel. */
                     if (status == 2) {
-                        value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT_FOR_CPU);
+                        value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
                     } else if (status == 5) {
-                        value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT_BLOCKED);
+                        value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
                     } else {
-                        value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_UNKNOWN);
+                        value = StateValues.PROCESS_STATUS_UNKNOWN_VALUE;
                     }
                     ss.modifyAttribute(ts, value, quark);
                 }
@@ -417,7 +417,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                  * run. Assign it to the "wait for cpu" state.
                  */
                 quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_WAIT_FOR_CPU);
+                value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -439,12 +439,12 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
                     /* Put the process in system call mode */
                     quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                    value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_SYSCALL);
+                    value = StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE;
                     ss.modifyAttribute(ts, value, quark);
 
                     /* Put the CPU in system call (kernel) mode */
                     quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                    value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_SYSCALL);
+                    value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
                     ss.modifyAttribute(ts, value, quark);
                 }
             }
@@ -548,10 +548,10 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
         quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
         if (ss.queryOngoingState(quark).isNull()) {
             /* We were in user mode before the interruption */
-            value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_USERMODE);
+            value = StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE;
         } else {
             /* We were previously in kernel mode */
-            value = TmfStateValue.newValueInt(StateValues.PROCESS_STATUS_RUN_SYSCALL);
+            value = StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE;
         }
         quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
         ss.modifyAttribute(ts, value, quark);
@@ -573,14 +573,14 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             quark = ss.getQuarkRelative(currentThreadNode, Attributes.SYSTEM_CALL);
             if (ss.queryOngoingState(quark).isNull()) {
                 /* That process was in user mode */
-                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_USERMODE);
+                value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
             } else {
                 /* That process was in a system call */
-                value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_RUN_SYSCALL);
+                value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
             }
         } else {
             /* There was no real process scheduled, CPU was idle */
-            value = TmfStateValue.newValueInt(StateValues.CPU_STATUS_IDLE);
+            value = StateValues.CPU_STATUS_IDLE_VALUE;
         }
         quark = ss.getQuarkRelativeAndAdd(currentCpuNode, Attributes.STATUS);
         ss.modifyAttribute(ts, value, quark);
