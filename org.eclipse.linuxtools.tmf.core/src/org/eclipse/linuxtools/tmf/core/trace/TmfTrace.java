@@ -677,8 +677,15 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         }
 
         if (signal.getTrace() == this) {
-            /* Additionally, the signal is directly for this trace or experiment. */
+            /* Additionally, the signal is directly for this trace. */
             if (getNbEvents() == 0) {
+                return;
+            }
+
+            /* For a streaming trace, the range updated signal should be sent
+             * by the subclass when a new safe time is determined.
+             */
+            if (getStreamingInterval() > 0) {
                 return;
             }
 
