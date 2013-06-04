@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.signal.TmfClearExperimentSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
@@ -159,15 +158,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
             fTraces = null;
         }
         super.dispose();
-    }
-
-    /**
-     * @param signal the clear view signal
-     * @since 2.0
-     */
-    @TmfSignalHandler
-    public void handleClearExperimentSignal(TmfClearExperimentSignal signal) {
-        dispose();
     }
 
     // ------------------------------------------------------------------------
