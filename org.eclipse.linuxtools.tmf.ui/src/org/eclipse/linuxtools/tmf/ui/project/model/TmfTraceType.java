@@ -295,7 +295,7 @@ public final class TmfTraceType {
         }
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
             String traceTypeName = CUSTOM_XML_CATEGORY + SEPARATOR + def.definitionName;
-            TraceTypeHelper tt = new TraceTypeHelper(traceTypeName, CUSTOM_TXT_CATEGORY, def.definitionName, null);
+            TraceTypeHelper tt = new TraceTypeHelper(traceTypeName, CUSTOM_XML_CATEGORY, def.definitionName, null);
             fTraceTypes.put(traceTypeName, tt);
             traceTypes.add(traceTypeName);
         }
