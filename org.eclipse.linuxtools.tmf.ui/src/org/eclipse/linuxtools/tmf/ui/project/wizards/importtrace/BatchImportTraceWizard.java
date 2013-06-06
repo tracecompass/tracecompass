@@ -275,7 +275,9 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                             success = true;
                         }
                     } else {
-                        path = fTargetFolder.getFullPath().append(traceToImport.getName());
+                        // Add trace directory
+                        subList.add(traceToImport.getFile());
+                        // Add all files in trace directory
                         File[] fileList = traceToImport.getFile().listFiles();
                         for (File child : fileList) {
                             subList.add(child);
@@ -287,10 +289,9 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                                 return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
                             }
                         });
-
                         ImportOperation operation = new ImportOperation(
                                 path,
-                                parentFile,
+                                parentFile.getParentFile(),
                                 fileSystemStructureProvider,
                                 overwriteQuery,
                                 subList);
