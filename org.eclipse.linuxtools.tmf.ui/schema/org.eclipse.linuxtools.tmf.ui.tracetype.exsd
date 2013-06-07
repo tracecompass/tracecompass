@@ -143,7 +143,7 @@ If omitted, the default events editor will be used.
             <annotation>
                <documentation>
                   The id of the editor to use for this trace type.
-If empty, the trace will open in the Events view.
+If empty, the default events editor will be used.
                </documentation>
             </annotation>
          </attribute>
