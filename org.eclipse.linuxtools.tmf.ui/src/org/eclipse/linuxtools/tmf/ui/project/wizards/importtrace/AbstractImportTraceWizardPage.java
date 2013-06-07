@@ -77,8 +77,8 @@ abstract class AbstractImportTraceWizardPage extends WizardResourceImportPage {
      */
     public AbstractImportTraceWizardPage(IWorkbench workbench, IStructuredSelection selection) {
         this(BATCH_IMPORT_WIZARD_PAGE, selection);
-        setTitle(Messages.ImportTraceWizard_FileSystemTitle);
-        setDescription(Messages.ImportTraceWizard_DialogTitle);
+        setTitle(null);
+        setDescription(null);
 
         // Locate the target trace folder
         IFolder traceFolder = null;
