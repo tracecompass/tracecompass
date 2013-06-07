@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="org.eclipse.linuxtools.tmf.help" default="build" basedir=".">
     <description>
-        Generate Eclipse help content for the Linux Tools TMF Designer Guide
+        Generate Eclipse help content for the Linux Tools TMF Developer Guide
     </description>
 
-   <property name="ug.title" value="TMF Designer Guide" />
+   <property name="ug.title" value="TMF Developer Guide" />
 
     <path id="wikitext.tasks.classpath">
         <!-- Search in the local Eclipse installation directory for the Wikitext plugin -->
@@ -24,7 +24,7 @@
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties" />
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
 
-    <target name="build" description="Generate Eclipse help content for the Linux Tools TMF Designer Guide">
+    <target name="build" description="Generate Eclipse help content for the Linux Tools TMF Developer Guide">
         <wikitext-to-eclipse-help markupLanguage="MediaWiki"
             validate="true"
             failonvalidationerror="true"
@@ -35,7 +35,7 @@
             formatoutput="true"
             helpPrefix="doc">
             <fileset dir="doc">
-                <include name="User-Guide.mediawiki" />
+                <include name="Developer-Guide.mediawiki" />
             </fileset>
             <stylesheet url="book.css" />
         </wikitext-to-eclipse-help>

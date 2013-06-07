@@ -1,0 +1,2870 @@
+
+= Introduction =
+
+The purpose of the '''Tracing Monitoring Framework (TMF)''' is to facilitate the integration of tracing and monitoring tools into Eclipse, to provide out-of-the-box generic functionalities/views and provide extension mechanisms of the base functionalities for application specific purposes.
+
+= Implementing a New Trace Type =
+
+The framework can easily be extended to support more trace types. To make a new trace type, one must define the following items:
+
+* The event type
+* The trace reader
+* The trace context
+* The trace location
+* (Optional but recommended) The ''org.eclipse.linuxtools.tmf.ui.tracetype'' plug-in extension point
+
+The '''event type''' must implement an ''ITmfEvent'' or extend a class that implements an ''ITmfEvent''. Typically it will extend ''TmfEvent''. The event type must contain all the data of an event. The '''trace reader''' must be of an ''ITmfTrace'' type. The ''TmfTrace'' class will supply many background operations so that the reader only needs to implement certain functions. The '''trace context''' can be seen as the internals of an iterator. It is required by the trace reader to parse events as it iterates the trace and to keep track of its rank and location. It can have a timestamp, a rank, a file position, or any other element, it should be considered to be ephemeral. The '''trace location''' is an element that is cloned often to store checkpoints, it is generally persistent. It is used to rebuild a context, therefore, it needs to contain enough information to unambiguously point to one and only one event. Finally the ''tracetype'' plug-in extension associates a given trace, non-programmatically to a trace type for use in the UI.
+
+== An Example: Nexus-lite parser ==
+
+=== Description of the file ===
+
+This is a very small subset of the nexus trace format, with some changes to make it easier to read. There is one file. This file starts with 64 Strings containing the event names, then an arbitrarily large number of events. The events are each 64 bits long. the first 32 are the timestamp in microseconds, the second 32 are split into 6 bits for the event type, and 26 for the data payload.
+
+The trace type will be made of two parts, part 1 is the event description, it is just 64 strings, comma seperated and then a line feed.
+
+<pre>
+Startup,Stop,Load,Add, ... ,reserved\n
+</pre>
+
+Then there will be the events in this format
+
+{| width= "85%"
+|style="width: 50%; background-color: #ffffcc;"|timestamp (32 bits)
+|style="width: 10%; background-color: #ffccff;"|type (6 bits)
+|style="width: 40%; background-color: #ccffcc;"|payload (26 bits)
+|-
+|style="background-color: #ffcccc;" colspan="3"|64 bits total
+|}
+
+all events will be the same size (64 bits).
+
+=== NexusLite Plug-in ===
+
+Create a '''New''', '''Project...''', '''Plug-in Project''', set the title to '''com.example.nexuslite''', click '''Next >''' then click on '''Finish'''.
+
+Now the structure for the Nexus trace Plug-in is set up.
+
+Add a dependency to TMF core and UI by opening the '''MANIFEST.MF''' in '''META-INF''', selecting the '''Dependencies''' tab and '''Add ...''' '''org.eclipse.linuxtools.tmf.core''' and '''org.eclipse.linuxtools.tmf.ui'''.
+
+[[Image:images/NTTAddDepend.png]]<br>
+[[Image:images/NTTSelectProjects.png]]<br>
+
+Now the project can access TMF classes.
+
+=== Trace Event ===
+
+The '''TmfEvent''' class will work for this example. No code required.
+
+=== Trace Reader ===
+
+The trace reader will extend a '''TmfTrace''' class.
+
+It will need to implement:
+
+* validate (is the trace format valid?)
+
+* initTrace (called as the trace is opened
+
+* seekEvent (go to a position in the trace and create a context)
+
+* getNext (implemented in the base class)
+
+* parseEvent (read the next element in the trace)
+
+Here is an example implementation of the Nexus Trace file
+
+<pre>/*******************************************************************************
+ * Copyright (c) 2013 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Matthew Khouzam - Initial API and implementation
+ *******************************************************************************/
+
+package com.example.nexuslite;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+
+/**
+ * Nexus trace type
+ *
+ * @author Matthew Khouzam
+ */
+public class NexusTrace extends TmfTrace implements ITmfEventParser {
+
+    private static final int CHUNK_SIZE = 65536; // seems fast on MY system
+    private static final int EVENT_SIZE = 8; // according to spec
+
+    private TmfLongLocation fCurrentLocation;
+    private static final TmfLongLocation NULLLOCATION = new TmfLongLocation(
+            (Long) null);
+    private static final TmfContext NULLCONTEXT = new TmfContext(NULLLOCATION,
+            -1L);
+
+    private long fSize;
+    private long fOffset;
+    private File fFile;
+    private String[] fEventTypes;
+    private FileChannel fFileChannel;
+    private MappedByteBuffer fMappedByteBuffer;
+
+    @Override
+    public IStatus validate(@SuppressWarnings("unused") IProject project,
+            String path) {
+        File f = new File(path);
+        if (!f.exists()) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    "File does not exist"); //$NON-NLS-1$
+        }
+        if (!f.isFile()) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, path
+                    + " is not a file"); //$NON-NLS-1$
+        }
+        String header = readHeader(f);
+        if (header.split(",", 64).length == 64) { //$NON-NLS-1$
+            return Status.OK_STATUS;
+        }
+        return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                "File does not start as a CSV"); //$NON-NLS-1$
+    }
+
+    @Override
+    public ITmfLocation getCurrentLocation() {
+        return fCurrentLocation;
+    }
+
+    @Override
+    public void initTrace(IResource resource, String path,
+            Class<? extends ITmfEvent> type) throws TmfTraceException {
+        super.initTrace(resource, path, type);
+        fFile = new File(path);
+        fSize = fFile.length();
+        if (fSize == 0) {
+            throw new TmfTraceException("file is empty"); //$NON-NLS-1$
+        }
+        String header = readHeader(fFile);
+        if (header == null) {
+            throw new TmfTraceException("File does not start as a CSV"); //$NON-NLS-1$
+        }
+        fEventTypes = header.split(",", 64); // 64 values of types according to //$NON-NLS-1$
+                                             // the 'spec'
+        if (fEventTypes.length != 64) {
+            throw new TmfTraceException(
+                    "Trace header does not contain 64 event names"); //$NON-NLS-1$
+        }
+        if (getNbEvents() < 1) {
+            throw new TmfTraceException("Trace does not have any events"); //$NON-NLS-1$
+        }
+        try {
+            fFileChannel = new FileInputStream(fFile).getChannel();
+            seek(0);
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        } catch (IOException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
+    }
+
+    /**
+     * @return
+     */
+    private String readHeader(File file) {
+        String header = new String();
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new FileReader(file));
+            header = br.readLine();
+            br.close();
+        } catch (IOException e) {
+            return null;
+        }
+        fOffset = header.length() + 1;
+        setNbEvents((fSize - fOffset) / EVENT_SIZE);
+        return header;
+    }
+
+    @Override
+    public double getLocationRatio(ITmfLocation location) {
+        return ((TmfLongLocation) location).getLocationInfo().doubleValue()
+                / getNbEvents();
+    }
+
+    @Override
+    public ITmfContext seekEvent(ITmfLocation location) {
+        TmfLongLocation nl = (TmfLongLocation) location;
+        if (location == null) {
+            nl = new TmfLongLocation(0L);
+        }
+        try {
+            seek(nl.getLocationInfo());
+        } catch (IOException e) {
+            return NULLCONTEXT;
+        }
+        return new TmfContext(nl, nl.getLocationInfo());
+    }
+
+    @Override
+    public ITmfContext seekEvent(double ratio) {
+        long rank = (long) (ratio * getNbEvents());
+        try {
+            seek(rank);
+        } catch (IOException e) {
+            return NULLCONTEXT;
+        }
+        return new TmfContext(new TmfLongLocation(rank), rank);
+    }
+
+    private void seek(long rank) throws IOException {
+        final long position = fOffset + (rank * EVENT_SIZE);
+        int size = Math.min((int) (fFileChannel.size() - position), CHUNK_SIZE);
+        fMappedByteBuffer = fFileChannel.map(MapMode.READ_ONLY, position, size);
+    }
+
+    @Override
+    public ITmfEvent parseEvent(ITmfContext context) {
+        if ((context == null) || (context.getRank() == -1)) {
+            return null;
+        }
+        TmfEvent event = null;
+        long ts = -1;
+        int type = -1;
+        int payload = -1;
+        long pos = context.getRank();
+        if (pos < getNbEvents()) {
+            try {
+                // if we are approaching the limit size, move to a new window
+                if ((fMappedByteBuffer.position() + EVENT_SIZE) > fMappedByteBuffer
+                        .limit()) {
+                    seek(context.getRank());
+                }
+                /*
+                 * the trace format, is:
+                 *
+                 * - 32 bits for the time,
+                 * - 6 for the event type,
+                 * - 26 for the data.
+                 *
+                 * all the 0x00 stuff are masks.
+                 */
+
+                /*
+                 * it may be interesting to assume if the ts goes back in time,
+                 * it actually is rolling over we would need to keep the
+                 * previous timestamp for that, keep the high bits and increment
+                 * them if the next int ts read is lesser than the previous one
+                 */
+
+                ts = 0x00000000ffffffffL & fMappedByteBuffer.getInt();
+
+                long data = 0x00000000ffffffffL & fMappedByteBuffer.getInt();
+                type = (int) (data >> 26) & (0x03f); // first 6 bits
+                payload = (int) (data & 0x003FFFFFFL); // last 26 bits
+                // the time is in microseconds.
+                TmfTimestamp timestamp = new TmfTimestamp(ts, ITmfTimestamp.MICROSECOND_SCALE);
+                final String title = fEventTypes[type];
+                // put the value in a field
+                final TmfEventField tmfEventField = new TmfEventField(
+                        "value", payload, null); //$NON-NLS-1$
+                // the field must be in an array
+                final TmfEventField[] fields = new TmfEventField[1];
+                fields[0] = tmfEventField;
+                final TmfEventField content = new TmfEventField(
+                        ITmfEventField.ROOT_FIELD_ID, null, fields);
+                // set the current location
+
+                fCurrentLocation = new TmfLongLocation(pos);
+                // create the event
+                event = new TmfEvent(this, pos, timestamp, null,
+                        new TmfEventType(title, title, null), content, null);
+            } catch (IOException e) {
+                fCurrentLocation = new TmfLongLocation(-1L);
+            }
+        }
+        return event;
+    }
+}
+</pre>
+
+In this example the '''validate''' function checks if the file exists and is not a directory.
+
+The '''initTrace''' function will read the event names, and find where the data starts. After this, the number of events is known, and since each event is 8 bytes long according to the specs, the seek is then trivial.
+
+The '''seek''' here will just reset the reader to the right location.
+
+The '''parseEvent''' method needs to parse and return the current event and store the current location.
+
+The '''getNext''' method (in base class) will read the next event and update the context. It calls the '''parseEvent''' method to read the event and update the location. It does not need to be overridden and in this example it is not. The sequence of actions necessary are parse the next event from the trace, create an '''ITmfEvent''' with that data, update the current location, call '''updateAttributes''', update the context then return the event.
+
+=== Trace Context ===
+
+The trace context will be a '''TmfContext'''
+
+=== Trace Location ===
+
+The trace location will be a long, representing the rank in the file. The '''TmfLongLocation''' will be the used, once again, no code is required.
+
+=== (Optional but recommended) The ''org.eclipse.linuxtools.tmf.ui.tracetype'' plug-in extension point ===
+
+One can implement the ''tracetype'' extension in their own plug-in. In this example, the ''com.example.nexuslite'' plug-in will be modified.
+
+The '''plugin.xml''' file in the ui plug-in needs to be updated if one wants users to access the given event type. It can be updated in the Eclipse plug-in editor.
+
+# In Extensions tab, add the '''org.eclipse.linuxtools.tmf.ui.tracetype''' extension point.
+[[Image:images/NTTExtension.png]]<br>
+[[Image:images/NTTTraceType.png]]<br>
+[[Image:images/NTTExtensionPoint.png]]<br>
+
+# Add in the '''org.eclipse.linuxtools.tmf.ui.tracetype''' extension a new type. To do that, '''right click''' on the extension then in the context menu, go to '''New >''', '''type'''.
+
+[[Image:images/NTTAddType.png]]<br>
+
+The '''id''' is the unique identifier used to refer to the trace.
+
+The '''name''' is the field that shall be displayed when a trace type is selected.
+
+The '''trace type''' is the canonical path refering to the class of the trace.
+
+The '''event type''' is the canonical path refering to the class of the events of a given trace.
+
+The  '''category''' (optional) is the container in which this trace type will be stored.
+
+The '''icon''' (optional) is the image to associate with that trace type.
+
+In the end, the extension menu should look like this.
+
+[[Image:images/NTTPluginxmlComplete.png]]<br>
+
+== Best Practices ==
+
+* Do not load the whole trace in RAM, it will limit the size of the trace that can be read.
+* Reuse as much code as possible, it makes the trace format much easier to maintain.
+* Use Eclipse's editor instead of editing the xml directly.
+* Do not forget Java supports only signed data types, there may be special care needed to handle unsigned data.
+* Keep all the code in the same plug-in as the ''tracetype'' if it makes sense from a design point of view. It will make integration easier.
+
+== Download the Code ==
+
+The plug-in is available [http://wiki.eclipse.org/images/3/34/Com.example.nexuslite.zip here] with a trace generator and a quick test case.
+
+= View Tutorial  =
+
+This tutorial describes how to create a simple view using the TMF framework and the SWTChart library. SWTChart is a library based on SWT that can draw several types of charts including a line chart which we will use in this tutorial. We will create a view containing a line chart that displays time stamps on the X axis and the corresponding event values on the Y axis.
+
+This tutorial will cover concepts like:
+
+* Extending TmfView
+* Signal handling (@TmfSignalHandler)
+* Data requests (TmfEventRequest)
+* SWTChart integration
+
+=== Prerequisites ===
+
+The tutorial is based on Eclipse 4.3 (Eclipse Kepler), TMF 2.0.0 and SWTChart 0.7.0. You can install SWTChart by using the Orbit update site. http://download.eclipse.org/tools/orbit/downloads/
+
+=== Creating an Eclipse UI Plug-in ===
+
+To create a new project with name org.eclipse.linuxtools.tmf.sample.ui select '''File -> New -> Project -> Plug-in Development -> Plug-in Project'''. <br>
+[[Image:images/Screenshot-NewPlug-inProject1.png]]<br>
+
+[[Image:images/Screenshot-NewPlug-inProject2.png]]<br>
+
+[[Image:images/Screenshot-NewPlug-inProject3.png]]<br>
+
+=== Creating a View ===
+
+To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
+[[Image:images/SelectManifest.png]]<br>
+
+Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.linuxtools.tmf.core'' and press '''OK'''<br>
+Following the same steps, add ''org.eclipse.linuxtools.tmf.ui'' and ''org.swtchart''.<br>
+[[Image:images/AddDependencyTmfUi.png]]<br>
+
+Change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the view extension ''org.eclipse.ui.views'' and press '''Finish'''.<br>
+[[Image:images/AddViewExtension1.png]]<br>
+
+To create a view, click the right mouse button. Then select '''New -> view'''<br>
+[[Image:images/AddViewExtension2.png]]<br>
+
+A new view entry has been created. Fill in the fields ''id'' and ''name''. For ''class'' click on the '''class hyperlink''' and it will show the New Java Class dialog. Enter the name ''SampleView'', change the superclass to ''TmfView'' and click Finish. This will create the source file and fill the ''class'' field in the process. We use TmfView as the superclass because it provides extra functionality like getting the active trace, pinning and it has support for signal handling between components.<br>
+[[Image:images/FillSampleViewExtension.png]]<br>
+
+This will generate an empty class. Once the quick fixes are applied, the following code is obtained:
+
+<pre>
+package org.eclipse.linuxtools.tmf.sample.ui;
+
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.part.ViewPart;
+
+public class SampleView extends TmfView {
+
+    public SampleView(String viewName) {
+        super(viewName);
+        // TODO Auto-generated constructor stub
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void setFocus() {
+        // TODO Auto-generated method stub
+
+    }
+
+}
+</pre>
+
+This creates an empty view, however the basic structure is now is place.
+
+=== Implementing a view ===
+
+We will start by adding a empty chart then it will need to be populated with the trace data. Finally, we will make the chart more visually pleasing by adjusting the range and formating the time stamps.
+
+==== Adding an Empty Chart ====
+
+First, we can add an empty chart to the view and initialize some of its components.
+
+<pre>
+    private static final String SERIES_NAME = "Series";
+    private static final String Y_AXIS_TITLE = "Signal";
+    private static final String X_AXIS_TITLE = "Time";
+    private static final String FIELD = "value"; // The name of the field that we want to display on the Y axis
+    private static final String VIEW_ID = "org.eclipse.linuxtools.tmf.sample.ui.view";
+    private Chart chart;
+    private ITmfTrace currentTrace;
+
+    public SampleView() {
+        super(VIEW_ID);
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        chart = new Chart(parent, SWT.BORDER);
+        chart.getTitle().setVisible(false);
+        chart.getAxisSet().getXAxis(0).getTitle().setText(X_AXIS_TITLE);
+        chart.getAxisSet().getYAxis(0).getTitle().setText(Y_AXIS_TITLE);
+        chart.getSeriesSet().createSeries(SeriesType.LINE, SERIES_NAME);
+        chart.getLegend().setVisible(false);
+    }
+
+    @Override
+    public void setFocus() {
+        chart.setFocus();
+    }
+</pre>
+
+The view is prepared. Run the Example. To launch the an Eclipse Application select the ''Overview'' tab and click on '''Launch an Eclipse Application'''<br>
+[[Image:images/RunEclipseApplication.png]]<br>
+
+A new Eclipse application window will show. In the new window go to '''Windows -> Show View -> Other... -> Other -> Sample View'''.<br>
+[[Image:images/ShowViewOther.png]]<br>
+
+You should now see a view containing an empty chart<br>
+[[Image:images/EmptySampleView.png]]<br>
+
+==== Signal Handling ====
+
+We would like to populate the view when a trace is selected. To achieve this, we can use a signal hander which is specified with the '''@TmfSignalHandler''' annotation.
+
+<pre>
+    @TmfSignalHandler
+    public void traceSelected(final TmfTraceSelectedSignal signal) {
+
+    }
+</pre>
+
+==== Requesting Data ====
+
+Then we need to actually gather data from the trace. This is done asynchronously using a ''TmfEventRequest''
+
+<pre>
+    @TmfSignalHandler
+    public void traceSelected(final TmfTraceSelectedSignal signal) {
+        // Don't populate the view again if we're already showing this trace
+        if (currentTrace == signal.getTrace()) {
+            return;
+        }
+        currentTrace = signal.getTrace();
+
+        // Create the request to get data from the trace
+
+        TmfEventRequest req = new TmfEventRequest(TmfEvent.class,
+                TmfTimeRange.ETERNITY, TmfEventRequest.ALL_DATA,
+                ExecutionType.BACKGROUND) {
+
+            @Override
+            public void handleData(ITmfEvent data) {
+                // Called for each event
+                super.handleData(data);
+            }
+
+            @Override
+            public void handleSuccess() {
+                // Request successful, not more data available
+                super.handleSuccess();
+            }
+
+            @Override
+            public void handleFailure() {
+                // Request failed, not more data available
+                super.handleFailure();
+            }
+        };
+        ITmfTrace trace = signal.getTrace();
+        trace.sendRequest(req);
+    }
+</pre>
+
+==== Transferring Data to the Chart ====
+
+The chart expects an array of doubles for both the X and Y axis values. To provide that, we can accumulate each event's time and value in their respective list then convert the list to arrays when all events are processed.
+
+<pre>
+        TmfEventRequest req = new TmfEventRequest(TmfEvent.class,
+                TmfTimeRange.ETERNITY, TmfEventRequest.ALL_DATA,
+                ExecutionType.BACKGROUND) {
+
+            ArrayList<Double> xValues = new ArrayList<Double>();
+            ArrayList<Double> yValues = new ArrayList<Double>();
+
+            @Override
+            public void handleData(ITmfEvent data) {
+                // Called for each event
+                super.handleData(data);
+                ITmfEventField field = data.getContent().getField(FIELD);
+                if (field != null) {
+                    yValues.add((Double) field.getValue());
+                    xValues.add((double) data.getTimestamp().getValue());
+                }
+            }
+
+            @Override
+            public void handleSuccess() {
+                // Request successful, not more data available
+                super.handleSuccess();
+
+                final double x[] = toArray(xValues);
+                final double y[] = toArray(yValues);
+
+                // This part needs to run on the UI thread since it updates the chart SWT control
+                Display.getDefault().asyncExec(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        chart.getSeriesSet().getSeries()[0].setXSeries(x);
+                        chart.getSeriesSet().getSeries()[0].setYSeries(y);
+
+                        chart.redraw();
+                    }
+
+                });
+            }
+
+            /**
+             * Convert List<Double> to double[]
+             */
+            private double[] toArray(List<Double> list) {
+                double[] d = new double[list.size()];
+                for (int i = 0; i < list.size(); ++i) {
+                    d[i] = list.get(i);
+                }
+
+                return d;
+            }
+        };
+</pre>
+
+==== Adjusting the Range ====
+
+The chart now contains values but they might be out of range and not visible. We can adjust the range of each axis by computing the minimum and maximum values as we add events.
+
+<pre>
+
+            ArrayList<Double> xValues = new ArrayList<Double>();
+            ArrayList<Double> yValues = new ArrayList<Double>();
+            private double maxY = -Double.MAX_VALUE;
+            private double minY = Double.MAX_VALUE;
+            private double maxX = -Double.MAX_VALUE;
+            private double minX = Double.MAX_VALUE;
+
+            @Override
+            public void handleData(ITmfEvent data) {
+                super.handleData(data);
+                ITmfEventField field = data.getContent().getField(FIELD);
+                if (field != null) {
+                    Double yValue = (Double) field.getValue();
+                    minY = Math.min(minY, yValue);
+                    maxY = Math.max(maxY, yValue);
+                    yValues.add(yValue);
+
+                    double xValue = (double) data.getTimestamp().getValue();
+                    xValues.add(xValue);
+                    minX = Math.min(minX, xValue);
+                    maxX = Math.max(maxX, xValue);
+                }
+            }
+
+            @Override
+            public void handleSuccess() {
+                super.handleSuccess();
+                final double x[] = toArray(xValues);
+                final double y[] = toArray(yValues);
+
+                // This part needs to run on the UI thread since it updates the chart SWT control
+                Display.getDefault().asyncExec(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        chart.getSeriesSet().getSeries()[0].setXSeries(x);
+                        chart.getSeriesSet().getSeries()[0].setYSeries(y);
+
+                        // Set the new range
+                        if (!xValues.isEmpty() && !yValues.isEmpty()) {
+                            chart.getAxisSet().getXAxis(0).setRange(new Range(0, x[x.length - 1]));
+                            chart.getAxisSet().getYAxis(0).setRange(new Range(minY, maxY));
+                        } else {
+                            chart.getAxisSet().getXAxis(0).setRange(new Range(0, 1));
+                            chart.getAxisSet().getYAxis(0).setRange(new Range(0, 1));
+                        }
+                        chart.getAxisSet().adjustRange();
+
+                        chart.redraw();
+                    }
+                });
+            }
+</pre>
+
+==== Formatting the Time Stamps ====
+
+To display the time stamps on the X axis nicely, we need to specify a format or else the time stamps will be displayed as ''long''. We use TmfTimestampFormat to make it consistent with the other TMF views. We also need to handle the '''TmfTimestampFormatUpdateSignal''' to make sure that the time stamps update when the preferences change.
+
+<pre>
+    @Override
+    public void createPartControl(Composite parent) {
+        ...
+
+        chart.getAxisSet().getXAxis(0).getTick().setFormat(new TmfChartTimeStampFormat());
+    }
+
+    public class TmfChartTimeStampFormat extends SimpleDateFormat {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
+            long time = date.getTime();
+            toAppendTo.append(TmfTimestampFormat.getDefaulTimeFormat().format(time));
+            return toAppendTo;
+        }
+    }
+
+    @TmfSignalHandler
+    public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
+        // Called when the time stamp preference is changed
+        chart.getAxisSet().getXAxis(0).getTick().setFormat(new TmfChartTimeStampFormat());
+        chart.redraw();
+    }
+</pre>
+
+We also need to populate the view when a trace is already selected and the view is opened. We can reuse the same code by having the view send the '''TmfTraceSelectedSignal''' to itself.
+
+<pre>
+    @Override
+    public void createPartControl(Composite parent) {
+        ...
+
+        ITmfTrace trace = getActiveTrace();
+        if (trace != null) {
+            traceSelected(new TmfTraceSelectedSignal(this, trace));
+        }
+    }
+</pre>
+
+The view is now ready but we need a proper trace to test it. For this example, a trace was generated using LTTng-UST so that it would produce a sine function.<br>
+
+[[Image:images/SampleView.png]]<br>
+
+In summary, we have implemented a simple TMF view using the SWTChart library. We made use of signals and requests to populate the view at the appropriate time and we formated the time stamps nicely. We also made sure that the time stamp format is updated when the preferences change.
+
+= Component Interaction =
+
+TMF provides a mechanism for different components to interact with each other using signals. The signals can carry information that is specific to each signal.
+
+The TMF Signal Manager handles registration of components and the broadcasting of signals to their intended receivers.
+
+Components can register as VIP receivers which will ensure they will receive the signal before non-VIP receivers.
+
+== Sending Signals ==
+
+In order to send a signal, an instance of the signal must be created and passed as argument to the signal manager to be dispatched. Every component that can handle the signal will receive it. The receivers do not need to be known by the sender.
+
+<pre>
+TmfExampleSignal signal = new TmfExampleSignal(this, ...);
+TmfSignalManager.dispatchSignal(signal);
+</pre>
+
+If the sender is an instance of the class TmfComponent, the broadcast method can be used:
+
+<pre>
+TmfExampleSignal signal = new TmfExampleSignal(this, ...);
+broadcast(signal);
+</pre>
+
+== Receiving Signals ==
+
+In order to receive any signal, the receiver must first be registered with the signal manager. The receiver can register as a normal or VIP receiver.
+
+<pre>
+TmfSignalManager.register(this);
+TmfSignalManager.registerVIP(this);
+</pre>
+
+If the receiver is an instance of the class TmfComponent, it is automatically registered as a normal receiver in the constructor.
+
+When the receiver is destroyed or disposed, it should deregister itself from the signal manager.
+
+<pre>
+TmfSignalManager.deregister(this);
+</pre>
+
+To actually receive and handle any specific signal, the receiver must use the @TmfSignalHandler annotation and implement a method that will be called when the signal is broadcast. The name of the method is irrelevant.
+
+<pre>
+@TmfSignalHandler
+public void example(TmfExampleSignal signal) {
+    ...
+}
+</pre>
+
+The source of the signal can be used, if necessary, by a component to filter out and ignore a signal that was broadcast by itself when the component is also a receiver of the signal but only needs to handle it when it was sent by another component or another instance of the component.
+
+== Signal Throttling ==
+
+It is possible for a TmfComponent instance to buffer the dispatching of signals so that only the last signal queued after a specified delay without any other signal queued is sent to the receivers. All signals that are preempted by a newer signal within the delay are discarded.
+
+The signal throttler must first be initialized:
+
+<pre>
+final int delay = 100; // in ms
+TmfSignalThrottler throttler = new TmfSignalThrottler(this, delay);
+</pre>
+
+Then the sending of signals should be queued through the throttler:
+
+<pre>
+TmfExampleSignal signal = new TmfExampleSignal(this, ...);
+throttler.queue(signal);
+</pre>
+
+When the throttler is no longer needed, it should be disposed:
+
+<pre>
+throttler.dispose();
+</pre>
+
+== Signal Reference ==
+
+The following is a list of built-in signals defined in the framework.
+
+=== TmfStartSynchSignal ===
+
+''Purpose''
+
+This signal is used to indicate the start of broadcasting of a signal. Internally, the data provider will not fire event requests until the corresponding TmfEndSynchSignal signal is received. This allows coalescing of requests triggered by multiple receivers of the broadcast signal.
+
+''Senders''
+
+Sent by TmfSignalManager before dispatching a signal to all receivers.
+
+''Receivers''
+
+Received by TmfDataProvider.
+
+=== TmfEndSynchSignal ===
+
+''Purpose''
+
+This signal is used to indicate the end of broadcasting of a signal. Internally, the data provider fire all pending event requests that were received and buffered since the corresponding TmfStartSynchSignal signal was received. This allows coalescing of requests triggered by multiple receivers of the broadcast signal.
+
+''Senders''
+
+Sent by TmfSignalManager after dispatching a signal to all receivers.
+
+''Receivers''
+
+Received by TmfDataProvider.
+
+=== TmfTraceOpenedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a trace has been opened in an editor.
+
+''Senders''
+
+Sent by a TmfEventsEditor instance when it is created.
+
+''Receivers''
+
+Received by TmfTrace, TmfExperiment, TmfTraceManager and every view that shows trace data. Components that show trace data should handle this signal.
+
+=== TmfTraceSelectedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a trace has become the currently selected trace.
+
+''Senders''
+
+Sent by a TmfEventsEditor instance when it receives focus. Components can send this signal to make a trace editor be brought to front.
+
+''Receivers''
+
+Received by TmfTraceManager and every view that shows trace data. Components that show trace data should handle this signal.
+
+=== TmfTraceClosedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a trace editor has been closed.
+
+''Senders''
+
+Sent by a TmfEventsEditor instance when it is disposed.
+
+''Receivers''
+
+Received by TmfTraceManager and every view that shows trace data. Components that show trace data should handle this signal.
+
+=== TmfTraceRangeUpdatedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that the valid time range of a trace has been updated. This triggers indexing of the trace up to the end of the range. In the context of streaming, this end time is considered a safe time up to which all events are guaranteed to have been completely received. For non-streaming traces, the end time is set to infinity indicating that all events can be read immediately. Any processing of trace events that wants to take advantage of request coalescing should be triggered by this signal.
+
+''Senders''
+
+Sent by TmfExperiment and non-streaming TmfTrace. Streaming traces should send this signal in the TmfTrace subclass when a new safe time is determined by a specific implementation.
+
+''Receivers''
+
+Received by TmfTrace, TmfExperiment and components that process trace events. Components that need to process trace events should handle this signal.
+
+=== TmfTraceUpdatedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that new events have been indexed for a trace.
+
+''Senders''
+
+Sent by TmfCheckpointIndexer when new events have been indexed and the number of events has changed.
+
+''Receivers''
+
+Received by components that need to be notified of a new trace event count.
+
+=== TmfTimeSynchSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a new time has been selected.
+
+''Senders''
+
+Sent by any component that allows the user to select a time.
+
+''Receivers''
+
+Received by any component that needs to be notified of the currently selected time.
+
+=== TmfRangeSynchSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a new time range window has been set.
+
+''Senders''
+
+Sent by any component that allows the user to set a time range window.
+
+''Receivers''
+
+Received by any component that needs to be notified of the current visible time range window.
+
+=== TmfEventFilterAppliedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a filter has been applied to a trace.
+
+''Senders''
+
+Sent by TmfEventsTable when a filter is applied.
+
+''Receivers''
+
+Received by any component that shows trace data and needs to be notified of applied filters.
+
+=== TmfEventSearchAppliedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a search has been applied to a trace.
+
+''Senders''
+
+Sent by TmfEventsTable when a search is applied.
+
+''Receivers''
+
+Received by any component that shows trace data and needs to be notified of applied searches.
+
+=== TmfTimestampFormatUpdateSignal ===
+
+''Purpose''
+
+This signal is used to indicate that the timestamp format preference has been updated.
+
+''Senders''
+
+Sent by TmfTimestampFormat when the default timestamp format preference is changed.
+
+''Receivers''
+
+Received by any component that needs to refresh its display for the new timestamp format.
+
+=== TmfStatsUpdatedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that the statistics data model has been updated.
+
+''Senders''
+
+Sent by statistic providers when new statistics data has been processed.
+
+''Receivers''
+
+Received by statistics viewers and any component that needs to be notified of a statistics update.
+
+== Debugging ==
+
+TMF has built-in Eclipse tracing support for the debugging of signal interaction between components. To enable it, open the '''Run/Debug Configuration...''' dialog, select a configuration, click the '''Tracing''' tab, select the plug-in '''org.eclipse.linuxtools.tmf.core''', and check the '''signal''' item.
+
+All signals sent and received will be logged to the file TmfTrace.log located in the Eclipse home directory.
+
+= Generic State System =
+
+== Introduction ==
+
+The Generic State System is a utility available in TMF to track different states
+over the duration of a trace. It works by first sending some or all events of
+the trace into a state provider, which defines the state changes for a given
+trace type. Once built, views and analysis modules can then query the resulting
+database of states (called "state history") to get information.
+
+For example, let's suppose we have the following sequence of events in a kernel
+trace:
+
+ 10 s, sys_open, fd = 5, file = /home/user/myfile
+ ...
+ 15 s, sys_read, fd = 5, size=32
+ ...
+ 20 s, sys_close, fd = 5
+
+Now let's say we want to implement an analysis module which will track the
+amount of bytes read and written to eachfile. Here, of course the sys_read is
+interesting. However, by just looking at that event, we have no information on
+which file is being read, only its fd (5) is known. To get the match
+fd5 = /home/user/myfile, we have to go back to the sys_open event which happens
+5 seconds earlier.
+
+But since we don't know exactly where this sys_open event is, we will have to go
+back to the very start of the trace, and look through events one by one! This is
+obviously not efficient, and will not scale well if we want to analyze many
+similar patterns, or for very large traces.
+
+A solution in this case would be to use the state system to keep track of the
+amount of bytes read/written to every *filename* (instead of every file
+descriptor, like we get from the events). Then the module could ask the state
+system "what is the amount of bytes read for file "/home/user/myfile" at time
+16 s", and it would return the answer "32" (assuming there is no other read
+than the one shown).
+
+== High-level components ==
+
+The State System infrastructure is composed of 3 parts:
+* The state provider
+* The central state system
+* The storage backend
+
+The state provider is the customizable part. This is where the mapping from
+trace events to state changes is done. This is what you want to implement for
+your specific trace type and analysis type. It's represented by the
+ITmfStateProvider interface (with a threaded implementation in
+AbstractTmfStateProvider, which you can extend).
+
+The core of the state system is exposed through the ITmfStateSystem and
+ITmfStateSystemBuilder interfaces. The former allows only read-only access and
+is typically used for views doing queries. The latter also allows writing to the
+state history, and is typically used by the state provider.
+
+Finally, each state system has its own separate backend. This determines how the
+intervals, or the "state history", are saved (in RAM, on disk, etc.) You can
+select the type of backend at construction time in the TmfStateSystemFactory.
+
+== Definitions ==
+
+Before we dig into how to use the state system, we should go over some useful
+definitions:
+
+=== Attribute ===
+
+An attribute is the smallest element of the model that can be in any particular
+state. When we refer to the "full state", in fact it means we are interested in
+the state of every single attribute of the model.
+
+=== Attribute Tree ===
+
+Attributes in the model can be placed in a tree-like structure, a bit like files
+and directories in a file system. However, note that an attribute can always
+have both a value and sub-attributes, so they are like files and directories at
+the same time. We are then able to refer to every single attribute with its
+path in the tree.
+
+For example, in the attribute tree for LTTng kernel traces, we use the following
+attributes, among others:
+
+<pre>
+|- Processes
+|    |- 1000
+|    |   |- PPID
+|    |   |- Exec_name
+|    |- 1001
+|    |   |- PPID
+|    |   |- Exec_name
+|   ...
+|- CPUs
+     |- 0
+     |  |- Status
+     |  |- Current_pid
+    ...
+</pre>
+
+In this model, the attribute "Processes/1000/PPID" refers to the PPID of process
+with PID 1000. The attribute "CPUs/0/Status" represents the status (running,
+idle, etc.) of CPU 0. "Processes/1000/PPID" and "Processes/1001/PPID" are two
+different attribute, even though their base name is the same: the whole path is
+the unique identifier.
+
+The value of each attribute can change over the duration of the trace,
+independently of the other ones, and independently of its position in the tree.
+
+The tree-like organization is optional, all attributes could be at the same
+level. But it's possible to put them in a tree, and it helps make things
+clearer.
+
+=== Quark ===
+
+In addition to a given path, each attribute also has a unique integer
+identifier, called the "quark". To continue with the file system analogy, this
+is like the inode number. When a new attribute is created, a new unique quark
+will be assigned automatically. They are assigned incrementally, so they will
+normally be equal to their order of creation, starting at 0.
+
+Methods are offered to get the quark of an attribute from its path. The API
+methods for inserting state changes and doing queries normally use quarks
+instead of paths. This is to encourage users to cache the quarks and re-use
+them, which avoids re-walking the attribute tree over and over, which avoids
+unneeded hashing of strings.
+
+=== State value ===
+
+The path and quark of an attribute will remain constant for the whole duration
+of the trace. However, the value carried by the attribute will change. The value
+of a specific attribute at a specific time is called the state value.
+
+In the TMF implementation, state values can be integers, longs, or strings.
+There is also a "null value" type, which is used to indicate that no particular
+value is active for this attribute at this time, but without resorting to a
+'null' reference.
+
+Any other type of value could be used, as long as the backend knows how to store
+it.
+
+Note that the TMF implementation also forces every attribute to always carry the
+same type of state value. This is to make it simpler for views, so they can
+expect that an attribute will always use a given type, without having to check
+every single time. Null values are an exception, they are always allowed for all
+attributes, since they can safely be "unboxed" into all types.
+
+=== State change ===
+
+A state change is the element that is inserted in the state system. It consists
+of:
+* a timestamp (the time at which the state change occurs)
+* an attribute (the attribute whose value will change)
+* a state value (the new value that the attribute will carry)
+
+It's not an object per se in the TMF implementation (it's represented by a
+function call in the state provider). Typically, the state provider will insert
+zero, one or more state changes for every trace event, depending on its event
+type, payload, etc.
+
+Note, we use "timestamp" here, but it's in fact a generic term that could be
+referred to as "index". For example, if a given trace type has no notion of
+timestamp, the event rank could be used.
+
+In the TMF implementation, the timestamp is a long (64-bit integer).
+
+=== State interval ===
+
+State changes are inserted into the state system, but state intervals are the
+objects that come out on the other side. Those are stocked in the storage
+backend. A state interval represents a "state" of an attribute we want to track.
+When doing queries on the state system, intervals are what is returned. The
+components of a state interval are:
+* Start time
+* End time
+* State value
+* Quark
+
+The start and end times represent the time range of the state. The state value
+is the same as the state value in the state change that started this interval.
+The interval also keeps a reference to its quark, although you normally know
+your quark in advance when you do queries.
+
+=== State history ===
+
+The state history is the name of the container for all the intervals created by
+the state system. The exact implementation (how the intervals are stored) is
+determined by the storage backend that is used.
+
+Some backends will use a state history that is peristent on disk, others do not.
+When loading a trace, if a history file is available and the backend supports
+it, it will be loaded right away, skipping the need to go through another
+construction phase.
+
+=== Construction phase ===
+
+Before we can query a state system, we need to build the state history first. To
+do so, trace events are sent one-by-one through the state provider, which in
+turn sends state changes to the central component, which then creates intervals
+and stores them in the backend. This is called the construction phase.
+
+Note that the state system needs to receive its events into chronological order.
+This phase will end once the end of the trace is reached.
+
+Also note that it is possible to query the state system while it is being build.
+Any timestamp between the start of the trace and the current end time of the
+state system (available with ITmfStateSystem#getCurrentEndTime()) is a valid
+timestamp that can be queried.
+
+=== Queries ===
+
+As mentioned previously, when doing queries on the state system, the returned
+objects will be state intervals. In most cases it's the state *value* we are
+interested in, but since the backend has to instantiate the interval object
+anyway, there is no additional cost to return the interval instead. This way we
+also get the start and end times of the state "for free".
+
+There are two types of queries that can be done on the state system:
+
+==== Full queries ====
+
+A full query means that we want to retrieve the whole state of the model for one
+given timestamp. As we remember, this means "the state of every single attribute
+in the model". As parameter we only need to pass the timestamp (see the API
+methods below). The return value will be an array of intervals, where the offset
+in the array represents the quark of each attribute.
+
+==== Single queries ====
+
+In other cases, we might only be interested in the state of one particular
+attribute at one given timestamp. For these cases it's better to use a
+single query. For a single query. we need to pass both a timestamp and a
+quark in parameter. The return value will be a single interval, representing
+the state that this particular attribute was at that time.
+
+Single queries are typically faster than full queries (but once again, this
+depends on the backend that is used), but not by much. Even if you only want the
+state of say 10 attributes out of 200, it could be faster to use a full query
+and only read the ones you need. Single queries should be used for cases where
+you only want one attribute per timestamp (for example, if you follow the state
+of the same attribute over a time range).
+
+
+== Relevant interfaces/classes ==
+
+This section will describe the public interface and classes that can be used if
+you want to use the state system.
+
+=== Main classes in org.eclipse.linuxtools.tmf.core.statesystem ===
+
+==== ITmfStateProvider / AbstractTmfStateProvider ====
+
+ITmfStateProvider is the interface you have to implement to define your state
+provider. This is where most of the work has to be done to use a state system
+for a custom trace type or analysis type.
+
+For first-time users, it's recommended to extend AbstractTmfStateProvider
+instead. This class takes care of all the initialization mumbo-jumbo, and also
+runs the event handler in a separate thread. You will only need to implement
+eventHandle, which is the call-back that will be called for every event in the
+trace.
+
+For an example, you can look at StatsStateProvider in the TMF tree, or at the
+small example below.
+
+==== TmfStateSystemFactory ====
+
+Once you have defined your state provider, you need to tell your trace type to
+build a state system with this provider during its initialization. This consists
+of overriding TmfTrace#buildStateSystems() and in there of calling the method in
+TmfStateSystemFactory that corresponds to the storage backend you want to use
+(see the section [[#Comparison of state system backends]]).
+
+You will have to pass in parameter the state provider you want to use, which you
+should have defined already. Each backend can also ask for more configuration
+information.
+
+You must then call registerStateSystem(id, statesystem) to make your state
+system visible to the trace objects and the views. The ID can be any string of
+your choosing. To access this particular state system, the views or modules will
+need to use this ID.
+
+Also, don't forget to call super.buildStateSystems() in your implementation,
+unless you know for sure you want to skip the state providers built by the
+super-classes.
+
+You can look at how LttngKernelTrace does it for an example. It could also be
+possible to build a state system only under certain conditions (like only if the
+trace contains certain event types).
+
+
+==== ITmfStateSystem ====
+
+ITmfStateSystem is the main interface through which views or analysis modules
+will access the state system. It offers a read-only view of the state system,
+which means that no states can be inserted, and no attributes can be created.
+Calling TmfTrace#getStateSystems().get(id) will return you a ITmfStateSystem
+view of the requested state system. The main methods of interest are:
+
+===== getQuarkAbsolute()/getQuarkRelative() =====
+
+Those are the basic quark-getting methods. The goal of the state system is to
+return the state values of given attributes at given timestamps. As we've seen
+earlier, attributes can be described with a file-system-like path. The goal of
+these methods is to convert from the path representation of the attribute to its
+quark.
+
+Since quarks are created on-the-fly, there is no guarantee that the same
+attributes will have the same quark for two traces of the same type. The views
+should always query their quarks when dealing with a new trace or a new state
+provider. Beyond that however, quarks should be cached and reused as much as
+possible, to avoid potentially costly string re-hashing.
+
+getQuarkAbsolute() takes a variable amount of Strings in parameter, which
+represent the full path to the attribute. Some of them can be constants, some
+can come programatically, often from the event's fields.
+
+getQuarkRelative() is to be used when you already know the quark of a certain
+attribute, and want to access on of its sub-attributes. Its first parameter is
+the origin quark, followed by a String varagrs which represent the relative path
+to the final attribute.
+
+These two methods will throw an AttributeNotFoundException if trying to access
+an attribute that does not exist in the model.
+
+These methods also imply that the view has the knowledge of how the attribute
+tree is organized. This should be a reasonable hypothesis, since the same
+analysis plugin will normally ship both the state provider and the view, and
+they will have been written by the same person. In other cases, it's possible to
+use getSubAttributes() to explore the organization of the attribute tree first.
+
+===== waitUntilBuilt() =====
+
+This is a simple method used to block the caller until the construction phase of
+this state system is done. If the view prefers to wait until all information is
+available before starting to do queries (to get all known attributes right away,
+for example), this is the guy to call.
+
+===== queryFullState() =====
+
+This is the method to do full queries. As mentioned earlier, you only need to
+pass a target timestamp in parameter. It will return a List of state intervals,
+in which the offset corresponds to the attribute quark. This will represent the
+complete state of the model at the requested time.
+
+===== querySingleState() =====
+
+The method to do single queries. You pass in parameter both a timestamp and an
+attribute quark. This will return the single state matching this
+timestamp/attribute pair.
+
+Other methods are available, you are encouraged to read their Javadoc and see if
+they can be potentially useful.
+
+==== ITmfStateSystemBuilder ====
+
+ITmfStateSystemBuilder is the read-write interface to the state system. It
+extends ITmfStateSystem itself, so all its methods are available. It then adds
+methods that can be used to write to the state system, either by creating new
+attributes of inserting state changes.
+
+It is normally reserved for the state provider and should not be visible to
+external components. However it will be available in AbstractTmfStateProvider,
+in the field 'ss'. That way you can call ss.modifyAttribute() etc. in your state
+provider to write to the state.
+
+The main methods of interest are:
+
+===== getQuark*AndAdd() =====
+
+getQuarkAbsoluteAndAdd() and getQuarkRelativeAndAdd() work exactly like their
+non-AndAdd counterparts in ITmfStateSystem. The difference is that the -AndAdd
+versions will not throw any exception: if the requested attribute path does not
+exist in the system, it will be created, and its newly-assigned quark will be
+returned.
+
+When in a state provider, the -AndAdd version should normally be used (unless
+you know for sure the attribute already exist and don't want to create it
+otherwise). This means that there is no need to define the whole attribute tree
+in advance, the attributes will be created on-demand.
+
+===== modifyAttribute() =====
+
+This is the main state-change-insertion method. As was explained before, a state
+change is defined by a timestamp, an attribute and a state value. Those three
+elements need to be passed to modifyAttribute as parameters.
+
+Other state change insertion methods are available (increment-, push-, pop- and
+removeAttribute()), but those are simply convenience wrappers around
+modifyAttribute(). Check their Javadoc for more information.
+
+===== closeHistory() =====
+
+When the construction phase is done, do not forget to call closeHistory() to
+tell the backend that no more intervals will be received. Depending on the
+backend type, it might have to save files, close descriptors, etc. This ensures
+that a persitent file can then be re-used when the trace is opened again.
+
+If you use the AbstractTmfStateProvider, it will call closeHistory()
+automatically when it reaches the end of the trace.
+
+=== Other relevant interfaces ===
+
+==== o.e.l.tmf.core.statevalue.ITmfStateValue ====
+
+This is the interface used to represent state values. Those are used when
+inserting state changes in the provider, and is also part of the state intervals
+obtained when doing queries.
+
+The abstract TmfStateValue class contains the factory methods to create new
+state values of either int, long or string types. To retrieve the real object
+inside the state value, one can use the .unbox* methods.
+
+Note: Do not instantiate null values manually, use TmfStateValue.nullValue()
+
+==== o.e.l.tmf.core.interval.ITmfStateInterval ====
+
+This is the interface to represent the state intervals, which are stored in the
+state history backend, and are returned when doing state system queries. A very
+simple implementation is available in TmfStateInterval. Its methods should be
+self-descriptive.
+
+=== Exceptions ===
+
+The following exceptions, found in o.e.l.tmf.core.exceptions, are related to
+state system activities.
+
+==== AttributeNotFoundException ====
+
+This is thrown by getQuarkRelative() and getQuarkAbsolute() (but not byt the
+-AndAdd versions!) when passing an attribute path that is not present in the
+state system. This is to ensure that no new attribute is created when using
+these versions of the methods.
+
+Views can expect some attributes to be present, but they should handle these
+exceptions for when the attributes end up not being in the state system (perhaps
+this particular trace didn't have a certain type of events, etc.)
+
+==== StateValueTypeException ====
+
+This exception will be thrown when trying to unbox a state value into a type
+different than its own. You should always check with ITmfStateValue#getType()
+beforehand if you are not sure about the type of a given state value.
+
+==== TimeRangeException ====
+
+This exception is thrown when trying to do a query on the state system for a
+timestamp that is outside of its range. To be safe, you should check with
+ITmfStateSystem#getStartTime() and #getCurrentEndTime() for the current valid
+range of the state system. This is especially important when doing queries on
+a state system that is currently being built.
+
+==== StateSystemDisposedException ====
+
+This exception is thrown when trying to access a state system that has been
+disposed, with its dispose() method. This can potentially happen at shutdown,
+since Eclipse is not always consistent with the order in which the components
+are closed.
+
+
+== Comparison of state system backends ==
+
+As we have seen in section [[#High-level components]], the state system needs
+a storage backend to save the intervals. Different implementations are
+available when building your state system from TmfStateSystemFactory.
+
+Do not confuse full/single queries with full/partial history! All backend types
+should be able to handle any type of queries defined in the ITmfStateSystem API,
+unless noted otherwise.
+
+=== Full history ===
+
+Available with TmfStateSystemFactory#newFullHistory(). The full history uses a
+History Tree data structure, which is an optimized structure store state
+intervals on disk. Once built, it can respond to queries in a ''log(n)'' manner.
+
+You need to specify a file at creation time, which will be the container for
+the history tree. Once it's completely built, it will remain on disk (until you
+delete the trace from the project). This way it can be reused from one session
+to another, which makes subsequent loading time much faster.
+
+This the backend used by the LTTng kernel plugin. It offers good scalability and
+performance, even at extreme sizes (it's been tested with traces of sizes up to
+500 GB). Its main downside is the amount of disk space required: since every
+single interval is written to disk, the size of the history file can quite
+easily reach and even surpass the size of the trace itself.
+
+=== Null history ===
+
+Available with TmfStateSystemFactory#newNullHistory(). As its name implies the
+null history is in fact an absence of state history. All its query methods will
+return null (see the Javadoc in NullBackend).
+
+Obviously, no file is required, and almost no memory space is used.
+
+It's meant to be used in cases where you are not interested in past states, but
+only in the "ongoing" one. It can also be useful for debugging and benchmarking.
+
+=== In-memory history ===
+
+Available with TmfStateSystemFactory#newInMemHistory(). This is a simple wrapper
+using an ArrayList to store all state intervals in memory. The implementation
+at the moment is quite simple, it will iterate through all entries when doing
+queries to find the ones that match.
+
+The advantage of this method is that it's very quick to build and query, since
+all the information resides in memory. However, you are limited to 2^31 entries
+(roughly 2 billions), and depending on your state provider and trace type, that
+can happen really fast!
+
+There are no safeguards, so if you bust the limit you will end up with
+ArrayOutOfBoundsException's everywhere. If your trace or state history can be
+arbitrarily big, it's probably safer to use a Full History instead.
+
+=== Partial history ===
+
+Available with TmfStateSystemFactory#newPartialHistory(). The partial history is
+a more advanced form of the full history. Instead of writing all state intervals
+to disk like with the full history, we only write a small fraction of them, and
+go back to read the trace to recreate the states in-between.
+
+It has a big advantage over a full history in terms of disk space usage. It's
+very possible to reduce the history tree file size by a factor of 1000, while
+keeping query times within a factor of two. Its main downside comes from the
+fact that you cannot do efficient single queries with it (they are implemented
+by doing full queries underneath).
+
+This makes it a poor choice for views like the Control Flow view, where you do
+a lot of range queries and single queries. However, it is a perfect fit for
+cases like statistics, where you usually do full queries already, and you store
+lots of small states which are very easy to "compress".
+
+However, it can't really be used until bug 409630 is fixed.
+
+== Code example ==
+
+Here is a small example of code that will use the state system. For this
+example, let's assume we want to track the state of all the CPUs in a LTTng
+kernel trace. To do so, we will watch for the "sched_switch" event in the state
+provider, and will update an attribute indicating if the associated CPU should
+be set to "running" or "idle".
+
+We will use an attribute tree that looks like this:
+<pre>
+CPUs
+ |--0
+ |  |--Status
+ |
+ |--1
+ |  |--Status
+ |
+ |  2
+ |  |--Status
+...
+</pre>
+
+The second-level attributes will be named from the information available in the
+trace events. Only the "Status" attributes will carry a state value (this means
+we could have just used "1", "2", "3",... directly, but we'll do it in a tree
+for the example's sake).
+
+Also, we will use integer state values to represent "running" or "idle", instead
+of saving the strings that would get repeated every time. This will help in
+reducing the size of the history file.
+
+First we will define a state provider in MyStateProvider. Then, assuming we
+have already implemented a custom trace type extending CtfTmfTrace, we will add
+a section to it to make it build a state system using the provider we defined
+earlier. Finally, we will show some example code that can query the state
+system, which would normally go in a view or analysis module.
+
+=== State Provider ===
+
+<pre>
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
+import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
+import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+
+/**
+ * Example state system provider.
+ *
+ * @author Alexandre Montplaisir
+ */
+public class MyStateProvider extends AbstractTmfStateProvider {
+
+    /** State value representing the idle state */
+    public static ITmfStateValue IDLE = TmfStateValue.newValueInt(0);
+
+    /** State value representing the running state */
+    public static ITmfStateValue RUNNING = TmfStateValue.newValueInt(1);
+
+    /**
+     * Constructor
+     *
+     * @param trace
+     *            The trace to which this state provider is associated
+     */
+    public MyStateProvider(ITmfTrace trace) {
+        super(trace, CtfTmfEvent.class, "Example"); //$NON-NLS-1$
+        /*
+         * The third parameter here is not important, it's only used to name a
+         * thread internally.
+         */
+    }
+
+    @Override
+    public int getVersion() {
+        /*
+         * If the version of an existing file doesn't match the version supplied
+         * in the provider, a rebuild of the history will be forced.
+         */
+        return 1;
+    }
+
+    @Override
+    public MyStateProvider getNewInstance() {
+        return new MyStateProvider(getTrace());
+    }
+
+    @Override
+    protected void eventHandle(ITmfEvent ev) {
+        /*
+         * AbstractStateChangeInput should have already checked for the correct
+         * class type.
+         */
+        CtfTmfEvent event = (CtfTmfEvent) ev;
+
+        final long ts = event.getTimestamp().getValue();
+        Integer nextTid = ((Long) event.getContent().getField("next_tid").getValue()).intValue();
+
+        try {
+
+            if (event.getEventName().equals("sched_switch")) {
+                int quark = ss.getQuarkAbsoluteAndAdd("CPUs", String.valueOf(event.getCPU()), "Status");
+                ITmfStateValue value;
+                if (nextTid > 0) {
+                    value = RUNNING;
+                } else {
+                    value = IDLE;
+                }
+                ss.modifyAttribute(ts, value, quark);
+            }
+
+        } catch (TimeRangeException e) {
+            /*
+             * This should not happen, since the timestamp comes from a trace
+             * event.
+             */
+            throw new IllegalStateException(e);
+        } catch (AttributeNotFoundException e) {
+            /*
+             * This should not happen either, since we're only accessing a quark
+             * we just created.
+             */
+            throw new IllegalStateException(e);
+        } catch (StateValueTypeException e) {
+            /*
+             * This wouldn't happen here, but could potentially happen if we try
+             * to insert mismatching state value types in the same attribute.
+             */
+            e.printStackTrace();
+        }
+
+    }
+
+}
+</pre>
+
+=== Trace type definition ===
+
+<pre>
+import java.io.File;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
+
+/**
+ * Example of a custom trace type using a custom state provider.
+ *
+ * @author Alexandre Montplaisir
+ */
+public class MyTraceType extends CtfTmfTrace {
+
+    /** The file name of the history file  */
+    public final static String HISTORY_FILE_NAME = "mystatefile.ht";
+
+    /** ID of the state system we will build */
+    public static final String STATE_ID = "org.eclipse.linuxtools.lttng2.example";
+
+    /**
+     * Default constructor
+     */
+    public MyTraceType() {
+        super();
+    }
+
+    @Override
+    public IStatus validate(final IProject project, final String path)  {
+        /*
+         * Add additional validation code here, and return a IStatus.ERROR if
+         * validation fails.
+         */
+        return Status.OK_STATUS;
+    }
+
+    @Override
+    protected void buildStateSystem() throws TmfTraceException {
+        super.buildStateSystem();
+
+        /* Build the custom state system for this trace */
+        String directory = TmfTraceManager.getSupplementaryFileDir(this);
+        final File htFile = new File(directory + HISTORY_FILE_NAME);
+        final ITmfStateProvider htInput = new MyStateProvider(this);
+
+        ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(htFile, htInput, false);
+        fStateSystems.put(STATE_ID, ss);
+    }
+
+}
+</pre>
+
+=== Query code ===
+
+<pre>
+import java.util.List;
+
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
+import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+
+/**
+ * Class showing examples of state system queries.
+ *
+ * @author Alexandre Montplaisir
+ */
+public class QueryExample {
+
+    private final ITmfStateSystem ss;
+
+    /**
+     * Constructor
+     *
+     * @param trace
+     *            Trace that this "view" will display.
+     */
+    public QueryExample(ITmfTrace trace) {
+        ss = trace.getStateSystems().get(MyTraceType.STATE_ID);
+    }
+
+    /**
+     * Example method of querying one attribute in the state system.
+     *
+     * We pass it a cpu and a timestamp, and it returns us if that cpu was
+     * executing a process (true/false) at that time.
+     *
+     * @param cpu
+     *            The CPU to check
+     * @param timestamp
+     *            The timestamp of the query
+     * @return True if the CPU was running, false otherwise
+     */
+    public boolean cpuIsRunning(int cpu, long timestamp) {
+        try {
+            int quark = ss.getQuarkAbsolute("CPUs", String.valueOf(cpu), "Status");
+            ITmfStateValue value = ss.querySingleState(timestamp, quark).getStateValue();
+
+            if (value.equals(MyStateProvider.RUNNING)) {
+                return true;
+            }
+
+        /*
+         * Since at this level we have no guarantee on the contents of the state
+         * system, it's important to handle these cases correctly.
+         */
+        } catch (AttributeNotFoundException e) {
+            /*
+             * Handle the case where the attribute does not exist in the state
+             * system (no CPU with this number, etc.)
+             */
+             ...
+        } catch (TimeRangeException e) {
+            /*
+             * Handle the case where 'timestamp' is outside of the range of the
+             * history.
+             */
+             ...
+        } catch (StateSystemDisposedException e) {
+            /*
+             * Handle the case where the state system is being disposed. If this
+             * happens, it's normally when shutting down, so the view can just
+             * return immediately and wait it out.
+             */
+        }
+        return false;
+    }
+
+
+    /**
+     * Example method of using a full query.
+     *
+     * We pass it a timestamp, and it returns us how many CPUs were executing a
+     * process at that moment.
+     *
+     * @param timestamp
+     *            The target timestamp
+     * @return The amount of CPUs that were running at that time
+     */
+    public int getNbRunningCpus(long timestamp) {
+        int count = 0;
+
+        try {
+            /* Get the list of the quarks we are interested in. */
+            List<Integer> quarks = ss.getQuarks("CPUs", "*", "Status");
+
+            /*
+             * Get the full state at our target timestamp (it's better than
+             * doing an arbitrary number of single queries).
+             */
+            List<ITmfStateInterval> state = ss.queryFullState(timestamp);
+
+            /* Look at the value of the state for each quark */
+            for (Integer quark : quarks) {
+                ITmfStateValue value = state.get(quark).getStateValue();
+                if (value.equals(MyStateProvider.RUNNING)) {
+                    count++;
+                }
+            }
+
+        } catch (TimeRangeException e) {
+            /*
+             * Handle the case where 'timestamp' is outside of the range of the
+             * history.
+             */
+             ...
+        } catch (StateSystemDisposedException e) {
+            /* Handle the case where the state system is being disposed. */
+            ...
+        }
+        return count;
+    }
+}
+</pre>
+
+= UML2 Sequence Diagram Framework =
+
+The purpose of the UML2 Sequence Diagram Framework of TMF is to provide a framework for generation of UML2 sequence diagrams. It provides 
+*UML2 Sequence diagram drawing capabilities (i.e. lifelines, messages, activations, object creation and deletion)
+*a generic, re-usable Sequence Diagram View 
+*Eclipse Extension Point for the creation of sequence diagrams 
+*callback hooks for searching and filtering within the Sequence Diagram View
+*scalability<br>
+The following chapters describe the Sequence Diagram Framework as well as a reference implementation and its usage.
+
+== TMF UML2 Sequence Diagram Extensions ==
+
+In the UML2 Sequence Diagram Framework an Eclipse extension point is defined so that other plug-ins can contribute code to create sequence diagram. 
+
+'''Identifier''': org.eclipse.linuxtools.tmf.ui.uml2SDLoader<br>
+'''Since''': Since 0.3.2 (based on UML2SD of org.eclipse.tptp.common.ui)<br>
+'''Description''': This extension point aims to list and connect any UML2 Sequence Diagram loader.<br>
+'''Configuration Markup''':<br>
+
+<pre>
+<!ELEMENT extension (uml2SDLoader)+>
+<!ATTLIST extension
+point CDATA #REQUIRED
+id    CDATA #IMPLIED
+name  CDATA #IMPLIED
+>
+</pre>
+
+*point - A fully qualified identifier of the target extension point.
+*id - An optional identifier of the extension instance.
+*name - An optional name of the extension instance.
+
+<pre>
+<!ELEMENT uml2SDLoader EMPTY>
+<!ATTLIST uml2SDLoader
+id      CDATA #REQUIRED
+name    CDATA #REQUIRED
+class   CDATA #REQUIRED
+view    CDATA #REQUIRED
+default (true | false)
+</pre>
+
+*id - A unique identifier for this uml2SDLoader. This is not mandatory as long as the id attribute cannot be retrieved by the provider plug-in. The class attribute is the one on which the underlying algorithm relies.
+*name - An name of the extension instance.
+*class - The implementation of this UML2 SD viewer loader. The class must implement org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader.
+*view - The view ID of the view that this loader aims to populate. Either org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView itself or a extension of org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView.
+*default - Set to true to make this loader the default one for the view; in case of several default loaders, first one coming from extensions list is taken.
+
+
+== Management of the Extension Point  ==
+
+The TMF UI plug-in is responsible for evaluating each contribution to the extension point. 
+<br>
+<br>
+With this extension point, a loader class is associated with a Sequence Diagram View. Multiple loaders can be associated to a single Sequence Diagram View. However, additional means have to be implemented to specify which loader should be used when opening the view. For example, an eclipse action or command could be used for that. This additional code is not necessary if there is only one loader for a given Sequence Diagram View associated and this loader has the attribute "default" set to "true". (see also [[#Using one Sequence Diagram View with Multiple Loaders | Using one Sequence Diagram View with Multiple Loaders]])
+
+== Sequence Diagram View  ==
+
+For this extension point a Sequence Diagram View has to be defined as well. The Sequence Diagram View class implementation is provided by the plug-in ''org.eclipse.linuxtools.tmf.ui'' (''org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView'') and can be used as is or can also be sub-classed. For that, a view extension has to be added to the ''plugin.xml''. 
+
+=== Supported Widgets  ===
+
+The loader class provides a frame containing all the UML2 widgets to be displayed. The following widgets exist:
+
+*Lifeline
+*Activation
+*Synchronous Message 
+*Asynchronous Message 
+*Synchronous Message Return 
+*Asynchronous Message Return
+*Stop
+
+For a lifeline, a category can be defined. The lifeline category defines icons, which are displayed in the lifeline header.
+
+=== Zooming  ===
+
+The Sequence Diagram View allows the user to zoom in, zoom out and reset the zoom factor.
+
+=== Printing  ===
+
+It is possible to print the whole sequence diagram as well as part of it.  
+
+=== Key Bindings ===
+
+*SHIFT+ALT+ARROW-DOWN - to scroll down within sequence diagram one view page at a time
+*SHIFT+ALT+ARROW-UP - to scroll up within sequence diagram one view page at a time
+*SHIFT+ALT+ARROW-RIGHT - to scroll right within sequence diagram one view page at a time
+*SHIFT+ALT+ARROW-LEFT - to scroll left within sequence diagram one view page at a time
+*SHIFT+ALT+ARROW-HOME - to jump to the beginning of the selected message if not already visible in page
+*SHIFT+ALT+ARROW-END - to jump to the end of the selected message if not already visible in page
+*CTRL+F - to open find dialog if either the basic or extended find provider is defined (see [[#Using the Find Provider Interface | Using the Find Provider Interface]])
+*CTRL+P - to open print dialog 
+
+=== Preferences ===
+
+The UML2 Sequence Diagram Framework provides preferences to customize the appearance of the Sequence Diagram View. The color of all widgets and text as well as the fonts of the text of all widget can be adjust. Amongst others the default lifeline width can be alternated. To change preferences select '''Windows->Preferences->Tracing->UML2 Sequence Diagrams'''. The following preference page will show:<br>
+[[Image:images/SeqDiagramPref.png]]  <br>
+After changing the preferences select '''OK'''.
+
+=== Callback hooks ===
+
+The Sequence Diagram View provides several callback hooks so that extension can provide application specific functionality. The following interfaces can be provided:
+* Basic find provider or extended find Provider<br> For finding within the sequence diagram
+* Basic filter provider and extended Filter Provider<br> For filtering within the sequnce diagram.
+* Basic paging provider or advanced paging provider<br> For scalability reasons, used to limit number of displayed messages
+* Properies provider<br> To provide properties of selected elements
+* Collapse provider <br> To collapse areas of the sequence diagram
+
+== Tutorial  ==
+
+This tutorial describes how to create a UML2 Sequence Diagram Loader extension and use this loader in the in Eclipse. 
+
+=== Prerequisites ===
+
+The tutorial is based on Eclipse 3.7 (Eclipse Indigo) and TMF 0.3.2.   
+
+=== Creating an Eclipse UI Plug-in ===
+
+To create a new project with name org.eclipse.linuxtools.tmf.sample.ui select '''File -> New -> Project -> Plug-in Development -> Plug-in Project'''. <br>
+[[Image:images/Screenshot-NewPlug-inProject1.png]]<br>
+
+[[Image:images/Screenshot-NewPlug-inProject2.png]]<br>
+
+[[Image:images/Screenshot-NewPlug-inProject3.png]]<br>
+
+=== Creating a Sequence Diagram View ===
+
+To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
+[[Image:images/SelectManifest.png]]<br>
+
+Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.linuxtools.tmf.ui'' and press '''OK'''<br>
+[[Image:images/AddDependencyTmfUi.png]]<br>
+
+Change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the view extension ''org.eclipse.ui.views'' and press '''Finish'''.<br> 
+[[Image:images/AddViewExtension1.png]]<br>
+ 
+To create a Sequence Diagram View, click the right mouse button. Then select '''New -> view'''<br>
+[[Image:images/AddViewExtension2.png]]<br>
+
+A new view entry has been created. Fill in the  fields ''id'', ''name'' and ''class''. Note that for ''class'' the SD view implementation (''org.eclipse.linuxtools.tmf.ui.views.SDView'') of the TMF UI plug-in is used.<br>
+[[Image:images/FillSampleSeqDiagram.png]]<br>
+
+The view is prepared. Run the Example. To launch the an Eclipse Application select the ''Overview'' tab and click on '''Launch an Eclipse Application'''<br>
+[[Image:images/RunEclipseApplication.png]]<br>
+
+A new Eclipse application window will show. In the new window go to '''Windows -> Show View -> Other... -> Other -> Sample Sequence Diagram'''.<br> 
+[[Image:images/ShowViewOther.png]]<br>
+
+The Sequence Diagram View will open with an blank page.<br>
+[[Image:images/BlankSampleSeqDiagram.png]]<br>
+
+Close the Example Application.
+
+=== Defining the uml2SDLoader Extension ===
+
+After defining the Sequence Diagram View it's time to create the ''uml2SDLoader'' Extension. <br>
+
+Before doing that add a dependency to TMF. For that select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.linuxtools.tmf'' and press '''OK'''<br>
+[[Image:images/AddDependencyTmf.png]]<br>
+
+To create the loader extension, change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the extension ''org.eclipse.linuxtools.tmf.ui.uml2SDLoader'' and press '''Finish'''.<br>
+[[Image:images/AddTmfUml2SDLoader.png]]<br>
+
+A new 'uml2SDLoader'' extension has been created. Fill in fields ''id'', ''name'', ''class'', ''view'' and ''default''. Use ''default'' equal true for this example. For the view add the id of the Sequence Diagram View of chapter [[#Creating a Sequence Diagram View | Creating a Sequence Diagram View]]. <br>
+[[Image:images/FillSampleLoader.png]]<br>
+
+Then click on ''class'' (see above) to open the new class dialog box. Fill in the relevant fields and select '''Finish'''. <br>
+[[Image:images/NewSampleLoaderClass.png]]<br>
+
+A new Java class will be created which implements the interface ''org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader''.<br>
+
+<pre>
+package org.eclipse.linuxtools.tmf.sample.ui;
+
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
+
+public class SampleLoader implements IUml2SDLoader {
+
+    public SampleLoader() {
+        // TODO Auto-generated constructor stub
+    }
+
+    @Override
+    public void dispose() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public String getTitleString() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setViewer(SDView arg0) {
+        // TODO Auto-generated method stub
+
+    }
+</pre>
+
+=== Implementing the Loader Class  ===
+
+Next is to implement the methods of the IUml2SDLoader interface method. The following code snippet shows how to create the major sequence diagram elements. Please note that no time information is stored.<br>
+
+<pre>
+package org.eclipse.linuxtools.tmf.sample.ui;
+
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessageReturn;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ExecutionOccurrence;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Frame;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Stop;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessageReturn;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
+
+public class SampleLoader implements IUml2SDLoader {
+
+    private SDView fSdView;
+    
+    public SampleLoader() {
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    @Override
+    public String getTitleString() {
+        return "Sample Diagram";
+    }
+
+    @Override
+    public void setViewer(SDView arg0) {
+        fSdView = arg0;
+        createFrame();
+    }
+    
+    private void createFrame() {
+
+        Frame testFrame = new Frame();
+        testFrame.setName("Sample Frame");
+
+        /*
+         *  Create lifelines
+         */
+        
+        Lifeline lifeLine1 = new Lifeline();
+        lifeLine1.setName("Object1");
+        testFrame.addLifeLine(lifeLine1);
+        
+        Lifeline lifeLine2 = new Lifeline();
+        lifeLine2.setName("Object2");
+        testFrame.addLifeLine(lifeLine2);
+        
+
+        /*
+         * Create Sync Message
+         */
+        // Get new occurrence on lifelines
+        lifeLine1.getNewEventOccurrence();
+        
+        // Get Sync message instances
+        SyncMessage start = new SyncMessage();
+        start.setName("Start");
+        start.setEndLifeline(lifeLine1);
+        testFrame.addMessage(start);
+
+        /*
+         * Create Sync Message
+         */
+        // Get new occurrence on lifelines
+        lifeLine1.getNewEventOccurrence();
+        lifeLine2.getNewEventOccurrence();
+        
+        // Get Sync message instances
+        SyncMessage syn1 = new SyncMessage();
+        syn1.setName("Sync Message 1");
+        syn1.setStartLifeline(lifeLine1);
+        syn1.setEndLifeline(lifeLine2);
+        testFrame.addMessage(syn1);
+
+        /*
+         * Create corresponding Sync Message Return
+         */
+        
+        // Get new occurrence on lifelines
+        lifeLine1.getNewEventOccurrence();
+        lifeLine2.getNewEventOccurrence();
+
+        SyncMessageReturn synReturn1 = new SyncMessageReturn();
+        synReturn1.setName("Sync Message Return 1");
+        synReturn1.setStartLifeline(lifeLine2);
+        synReturn1.setEndLifeline(lifeLine1);
+        synReturn1.setMessage(syn1);
+        testFrame.addMessage(synReturn1);
+        
+        /*
+         * Create Activations (Execution Occurrence)
+         */
+        ExecutionOccurrence occ1 = new ExecutionOccurrence();
+        occ1.setStartOccurrence(start.getEventOccurrence());
+        occ1.setEndOccurrence(synReturn1.getEventOccurrence());
+        lifeLine1.addExecution(occ1);
+        occ1.setName("Activation 1");
+        
+        ExecutionOccurrence occ2 = new ExecutionOccurrence();
+        occ2.setStartOccurrence(syn1.getEventOccurrence());
+        occ2.setEndOccurrence(synReturn1.getEventOccurrence());
+        lifeLine2.addExecution(occ2);
+        occ2.setName("Activation 2");
+        
+        /*
+         * Create Sync Message
+         */
+        // Get new occurrence on lifelines
+        lifeLine1.getNewEventOccurrence();
+        lifeLine2.getNewEventOccurrence();
+        
+        // Get Sync message instances
+        AsyncMessage asyn1 = new AsyncMessage();
+        asyn1.setName("Async Message 1");
+        asyn1.setStartLifeline(lifeLine1);
+        asyn1.setEndLifeline(lifeLine2);
+        testFrame.addMessage(asyn1);
+
+        /*
+         * Create corresponding Sync Message Return
+         */
+        
+        // Get new occurrence on lifelines
+        lifeLine1.getNewEventOccurrence();
+        lifeLine2.getNewEventOccurrence();
+
+        AsyncMessageReturn asynReturn1 = new AsyncMessageReturn();
+        asynReturn1.setName("Async Message Return 1");
+        asynReturn1.setStartLifeline(lifeLine2);
+        asynReturn1.setEndLifeline(lifeLine1);
+        asynReturn1.setMessage(asyn1);
+        testFrame.addMessage(asynReturn1);
+        
+        /*
+         * Create a note 
+         */
+        
+        // Get new occurrence on lifelines
+        lifeLine1.getNewEventOccurrence();
+        
+        EllipsisisMessage info = new EllipsisisMessage();
+        info.setName("Object deletion");
+        info.setStartLifeline(lifeLine2);
+        testFrame.addNode(info);
+        
+        /*
+         * Create a Stop
+         */
+        Stop stop = new Stop();
+        stop.setLifeline(lifeLine2);
+        stop.setEventOccurrence(lifeLine2.getNewEventOccurrence());
+        lifeLine2.addNode(stop);
+        
+        fSdView.setFrame(testFrame);
+    }
+}
+</pre>
+
+Now it's time to run the example application. To launch the Example Application select the ''Overview'' tab and click on '''Launch an Eclipse Application'''<br>
+[[Image:images/SampleDiagram1.png]] <br>
+
+=== Adding time information ===
+
+To add time information in sequence diagram the timestamp has to be set for each message. The sequence diagram framework uses the ''TmfTimestamp'' class of plug-in ''org.eclipse.linuxtools.tmf''. Use ''setTime()'' on each message ''SyncMessage'' since start and end time are the same. For each ''AsyncMessage'' set start and end time separately by using methods ''setStartTime'' and ''setEndTime''. For example: <br>
+
+<pre>
+    private void createFrame() {
+        //...
+        start.setTime(new TmfTimestamp(1000, -3));
+        syn1.setTime(new TmfTimestamp(1005, -3));
+        synReturn1.setTime(new TmfTimestamp(1050, -3));
+        asyn1.setStartTime(new TmfTimestamp(1060, -3));
+        asyn1.setEndTime(new TmfTimestamp(1070, -3));
+        asynReturn1.setStartTime(new TmfTimestamp(1060, -3));
+        asynReturn1.setEndTime(new TmfTimestamp(1070, -3));
+        //...
+    }
+</pre>
+
+When running the example application, a time compression bar on the left appears which indicates the time elapsed between consecutive events. The time compression scale shows where the time falls between the minimum and maximum delta times. The intensity of the color is used to indicate the length of time, namely, the deeper the intensity, the higher the delta time. The minimum and maximum delta times are configurable through the collbar menu ''Configure Min Max''. The time compression bar and scale may provide an indication about which events consumes the most time. By hovering over the time compression bar a tooltip appears containing more information. <br>
+
+[[Image:images/SampleDiagramTimeComp.png]] <br>
+
+By hovering over a message it will show the time information in the appearing tooltip. For each ''SyncMessage'' it shows its time occurrence and for each ''AsyncMessage'' it shows the start and end time.
+
+[[Image:images/SampleDiagramSyncMessage.png]] <br>
+[[Image:images/SampleDiagramAsyncMessage.png]] <br>
+
+To see the time elapsed between 2 messages, select one message and hover over a second message. A tooltip will show with the delta in time. Note if the second message is before the first then a negative delta is displayed. Note that for ''AsynMessage'' the end time is used for the delta calculation.<br>
+[[Image:images/SampleDiagramMessageDelta.png]] <br>
+
+=== Default Coolbar and Menu Items ===
+
+The Sequence Diagram View comes with default coolbar and menu items. By default, each sequence diagram shows the following actions:
+* Zoom in
+* Zoom out
+* Reset Zoom Factor 
+* Selection
+* Configure Min Max (drop-down menu only)
+* Navigation -> Show the node end (drop-down menu only)
+* Navigation -> Show the node start (drop-down menu only)
+
+[[Image:images/DefaultCoolbarMenu.png]]<br>
+
+=== Implementing Optional Callbacks ===
+
+The following chapters describe how to use all supported provider interfaces.
+
+==== Using the Paging Provider Interface ==== 
+
+For scalability reasons, the paging provider interfaces exists to limit the number of messages displayed in the Sequence Diagram View at a time. For that, two interfaces exist, the basic paging provider and the advanced paging provider. When using the basic paging interface, actions for traversing page by page through the sequence diagram of a trace will be provided. 
+<br>
+To use the basic paging provider, first the interface methods of the ''ISDPagingProvider'' have to be implemented by a class. (i.e. ''hasNextPage()'', ''hasPrevPage()'', ''nextPage()'', ''prevPage()'', ''firstPage()'' and ''endPage()''. Typically, this is implemented in the loader class. Secondly, the provider has to be set in the Sequence Diagram View. This will be done in the ''setViewer()'' method of the loader class. Lastly, the paging provider has to be removed from the view, when the ''dispose()'' method of the loader class is called.      
+
+<pre>
+public class SampleLoader implements IUml2SDLoader, ISDPagingProvider {
+    //...
+    private page = 0;
+    
+    @Override
+    public void dispose() {
+        if (fSdView != null) {
+            fSdView.resetProviders();
+        }
+    }
+    
+    @Override
+    public void setViewer(SDView arg0) {
+        fSdView = arg0;
+        fSdView.setSDPagingProvider(this);
+        createFrame();
+    }
+    
+    private void createSecondFrame() {
+        Frame testFrame = new Frame();
+        testFrame.setName("SecondFrame");
+        Lifeline lifeline = new Lifeline();
+        lifeline.setName("LifeLine 0");
+        testFrame.addLifeLine(lifeline);
+        lifeline = new Lifeline();
+        lifeline.setName("LifeLine 1");
+        testFrame.addLifeLine(lifeline);
+        for (int i = 1; i < 5; i++) {
+            SyncMessage message = new SyncMessage();
+            message.autoSetStartLifeline(testFrame.getLifeline(0));
+            message.autoSetEndLifeline(testFrame.getLifeline(0));
+            message.setName((new StringBuilder("Message ")).append(i).toString());
+            testFrame.addMessage(message);
+            
+            SyncMessageReturn messageReturn = new SyncMessageReturn();
+            messageReturn.autoSetStartLifeline(testFrame.getLifeline(0));
+            messageReturn.autoSetEndLifeline(testFrame.getLifeline(0));
+            
+            testFrame.addMessage(messageReturn);
+            messageReturn.setName((new StringBuilder("Message return ")).append(i).toString());
+            ExecutionOccurrence occ = new ExecutionOccurrence();
+            occ.setStartOccurrence(testFrame.getSyncMessage(i - 1).getEventOccurrence());
+            occ.setEndOccurrence(testFrame.getSyncMessageReturn(i - 1).getEventOccurrence());
+            testFrame.getLifeline(0).addExecution(occ);
+        }
+        fSdView.setFrame(testFrame);
+    }
+
+    @Override
+    public boolean hasNextPage() {
+        return page == 0;
+    }
+
+    @Override
+    public boolean hasPrevPage() {
+        return page == 1;
+    }
+
+    @Override
+    public void nextPage() {
+        page = 1;
+        createSecondFrame();
+    }
+
+    @Override
+    public void prevPage() {
+        page = 0;
+        createFrame();
+    }
+
+    @Override
+    public void firstPage() {
+        page = 0;
+        createFrame();
+    }
+
+    @Override
+    public void lastPage() {
+        page = 1;
+        createSecondFrame();
+    }
+    //...
+}
+
+</pre>
+
+When running the example application, new actions will be shown in the coolbar and the coolbar menu. <br>
+
+[[Image:images/PageProviderAdded.png]]
+
+<br><br>
+To use the advanced paging provider, the interface ''ISDAdvancePagingProvider'' has to be implemented. It extends the basic paging provider. The methods ''currentPage()'', ''pagesCount()'' and ''pageNumberChanged()'' have to be added. 
+<br>  
+ 
+==== Using the Find Provider Interface ====
+
+For finding nodes in a sequence diagram two interfaces exists. One for basic finding and one for extended finding. The basic find comes with a dialog box for entering find criteria as regular expressions. This find criteria can be used to execute the find. Find criteria a persisted in the Eclipse workspace.
+<br>
+For the extended find provider interface a ''org.eclipse.jface.action.Action'' class has to be provided. The actual find handling has to be implemented and triggered by the action.
+<br>
+Only on at a time can be active. If the extended find provder is defined it obsoletes the basic find provider.
+<br>
+To use the basic find provider, first the interface methods of the ''ISDFindProvider'' have to be implemented by a class. Typically, this is implemented in the loader class. Add the ISDFindProvider to the list of implemented interfaces, implement the methods ''find()'' and ''cancel()'' and set the provider in the ''setViewer()'' method as well as remove the provider in the ''dispose()'' method of the loader class. Please note that the ''ISDFindProvider'' extends the interface ''ISDGraphNodeSupporter'' which methods (''isNodeSupported()'' and ''getNodeName()'') have to be implemented, too. The following shows an example implementation. Please note that only search for lifelines and SynchMessage are supported. The find itself will always find only the first occurrence the pattern to match.  
+
+<pre>
+public class SampleLoader implements IUml2SDLoader, ISDPagingProvider, ISDFindProvider {
+
+    //...
+    @Override
+    public void dispose() {
+        if (fSdView != null) {
+            fSdView.resetProviders();
+        }
+    }
+
+    @Override
+    public void setViewer(SDView arg0) {
+        fSdView = arg0;
+        fSdView.setSDPagingProvider(this);
+        fSdView.setSDFindProvider(this);
+        createFrame();
+    }
+
+    @Override
+    public boolean isNodeSupported(int nodeType) {
+        switch (nodeType) {
+        case ISDGraphNodeSupporter.LIFELINE:
+        case ISDGraphNodeSupporter.SYNCMESSAGE:
+            return true;
+
+        default:
+            break;
+        }
+        return false;
+    }
+
+    @Override
+    public String getNodeName(int nodeType, String loaderClassName) {
+        switch (nodeType) {
+        case ISDGraphNodeSupporter.LIFELINE:
+            return "Lifeline";
+        case ISDGraphNodeSupporter.SYNCMESSAGE:
+            return "Sync Message";
+        }
+        return "";
+    }
+
+    @Override
+    public boolean find(Criteria criteria) {
+        Frame frame = fSdView.getFrame();
+        if (criteria.isLifeLineSelected()) {
+            for (int i = 0; i < frame.lifeLinesCount(); i++) {
+                if (criteria.matches(frame.getLifeline(i).getName())) {
+                    fSdView.getSDWidget().moveTo(frame.getLifeline(i));
+                    return true;
+                }
+            }
+        }
+        if (criteria.isSyncMessageSelected()) {
+            for (int i = 0; i < frame.syncMessageCount(); i++) {
+                if (criteria.matches(frame.getSyncMessage(i).getName())) {
+                    fSdView.getSDWidget().moveTo(frame.getSyncMessage(i));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void cancel() {
+        // reset find parameters
+    }
+    //...
+}
+</pre>
+
+When running the example application, the find action will be shown in the coolbar and the coolbar menu. <br>
+[[Image:images/FindProviderAdded.png]]
+
+To find a sequence diagram node press on the find button of the coolbar (see above). A new dialog box will open. Enter a regular expression in the ''Matching String'' text box, select the node types (e.g. Sync Message) and press '''Find'''. If found the corresponding node will be selected. If not found the dialog box will indicate not found. <br> 
+[[Image:images/FindDialog.png]]<br>
+
+Note that the find dialog will be opened by typing the key shortcut CRTL+F.
+
+==== Using the Filter Provider Interface ====
+
+For filtering of sequence diagram elements two interfaces exists. One basic for filtering and one for extended filtering. The basic filtering comes with two dialog for entering filter criteria as regular expressions and one for selecting the filter to be used. Multiple filters can be active at a time. Filter criteria are persisted in the Eclipse workspace.
+<br>
+To use the basic filter provider, first the interface method of the ''ISDFilterProvider'' has to be implemented by a class. Typically, this is implemented in the loader class. Add the ''ISDFilterProvider'' to the list of implemented interfaces, implement the method ''filter()''and set the provider in the ''setViewer()'' method as well as remove the provider in the ''dispose()'' method of the loader class. Please note that the ''ISDFindProvider'' extends the interface ''ISDGraphNodeSupporter'' which methods (''isNodeSupported()'' and ''getNodeName()'') have to be implemented, too. <br>
+Note that no example implementation of ''filter()'' is provided. 
+<br>
+
+<pre>
+public class SampleLoader implements IUml2SDLoader, ISDPagingProvider, ISDFindProvider, ISDFilterProvider {
+
+    //...
+    @Override
+    public void dispose() {
+        if (fSdView != null) {
+            fSdView.resetProviders();
+        }
+    }
+
+    @Override
+    public void setViewer(SDView arg0) {
+        fSdView = arg0;
+        fSdView.setSDPagingProvider(this);
+        fSdView.setSDFindProvider(this);
+        fSdView.setSDFilterProvider(this);
+        createFrame();
+    }
+
+    @Override
+    public boolean filter(List<?> list) {
+        return false;
+    }
+    //...
+}
+</pre>
+
+When running the example application, the filter action will be shown in the coolbar menu. <br>
+[[Image:images/HidePatternsMenuItem.png]]
+
+To filter select the '''Hide Patterns...''' of the coolbar menu. A new dialog box will open. <br>
+[[Image:images/DialogHidePatterns.png]] 
+
+To Add a new filter press '''Add...'''. A new dialog box will open. Enter a regular expression in the ''Matching String'' text box, select the node types (e.g. Sync Message) and press '''Create''''. <br> 
+[[Image:images/DialogHidePatterns.png]] <br>
+
+Now back at the Hide Pattern dialog. Select one or more filter and select '''OK'''.
+
+To use the extended filter provider, the interface ''ISDExtendedFilterProvider'' has to be implemented. It will provide a ''org.eclipse.jface.action.Action'' class containing the actual filter handling and filter algorithm.
+
+==== Using the Extended Action Bar Provider Interface ====
+
+The extended action bar provider can be used to add customized actions to the Sequence Diagram View. 
+To use the extended action bar provider, first the interface method of the interface ''ISDExtendedActionBarProvider'' has to be implemented by a class. Typically, this is implemented in the loader class. Add the ''ISDExtendedActionBarProvider'' to the list of implemented interfaces, implement the method ''supplementCoolbarContent()'' and set the provider in the ''setViewer()'' method as well as remove the provider in the ''dispose()'' method of the loader class. <br>
+
+<pre>
+public class SampleLoader implements IUml2SDLoader, ISDPagingProvider, ISDFindProvider, ISDFilterProvider, ISDExtendedActionBarProvider {
+    //...
+    
+    @Override
+    public void dispose() {
+        if (fSdView != null) {
+            fSdView.resetProviders();
+        }
+    }
+
+    @Override
+    public void setViewer(SDView arg0) {
+        fSdView = arg0;
+        fSdView.setSDPagingProvider(this);
+        fSdView.setSDFindProvider(this);
+        fSdView.setSDFilterProvider(this);
+        fSdView.setSDExtendedActionBarProvider(this);
+        createFrame();
+    }
+
+    @Override
+    public void supplementCoolbarContent(IActionBars iactionbars) {
+        Action action = new Action("Refresh") {
+            @Override
+            public void run() {
+                System.out.println("Refreshing...");
+            }
+        };
+        iactionbars.getMenuManager().add(action);
+        iactionbars.getToolBarManager().add(action);
+    }
+    //...
+}
+</pre>
+
+When running the example application, all new actions will be added to the coolbar and coolbar menu according to the implementation of ''supplementCoolbarContent()''<br>.
+For the example above the coolbar and coolbar menu will look as follows.
+
+[[Image:images/SupplCoolbar.png]]
+
+==== Using the Properties Provider Interface====
+
+This interface can be used to provide property information. A property provider which returns an ''IPropertyPageSheet'' (see ''org.eclipse.ui.views'') has to be implemented and set in the Sequence Diagram View. <br>
+
+To use the property provider, first the interface method of the ''ISDPropertiesProvider'' has to be implemented by a class. Typically, this is implemented in the loader class. Add the ''ISDPropertiesProvider'' to the list of implemented interfaces, implement the method ''getPropertySheetEntry()'' and set the provider in the ''setViewer()'' method as well as remove the provider in the ''dispose()'' method of the loader class. Please note that no example is provided here.
+
+Please refer to the following Eclipse articles for more information about properties and tabed properties.
+*[http://www.eclipse.org/articles/Article-Properties-View/properties-view.html | Take control of your properties]
+*[http://www.eclipse.org/articles/Article-Tabbed-Properties/tabbed_properties_view.html | The Eclipse Tabbed Properties View]
+
+==== Using the Collapse Provider Interface ====
+
+This interface can be used to define a provider which responsibility is to collapse two selected lifelines. This can be used to hide a pair of lifelines.
+
+To use the collapse provider, first the interface method of the ''ISDCollapseProvider'' has to be implemented by a class. Typically, this is implemented in the loader class. Add the ISDCollapseProvider to the list of implemented interfaces, implement the method ''collapseTwoLifelines()'' and set the provider in the ''setViewer()'' method as well as remove the provider in the ''dispose()'' method of the loader class. Please note that no example is provided here.
+
+==== Using the Selection Provider Service ====
+
+The Sequence Diagram View comes with a build in selection provider service. To this service listeners can be added. To use the selection provider service, the interface ''ISelectionListener'' of plug-in  ''org.eclipse.ui'' has to implemented. Typically this is implemented in loader class. Firstly, add the ''ISelectionListener'' interface to the list of implemented interfaces, implement the method ''selectionChanged()'' and set the listener in method ''setViewer()'' as well as remove the listener in the ''dispose()'' method of the loader class.
+
+<pre>
+public class SampleLoader implements IUml2SDLoader, ISDPagingProvider, ISDFindProvider, ISDFilterProvider, ISDExtendedActionBarProvider, ISelectionListener {
+
+    //...
+    @Override
+    public void dispose() {
+        if (fSdView != null) {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().removePostSelectionListener(this);
+            fSdView.resetProviders();
+        }
+    }
+
+    @Override
+    public String getTitleString() {
+        return "Sample Diagram";
+    }
+
+    @Override
+    public void setViewer(SDView arg0) {
+        fSdView = arg0;
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().addPostSelectionListener(this);
+        fSdView.setSDPagingProvider(this);
+        fSdView.setSDFindProvider(this);
+        fSdView.setSDFilterProvider(this);
+        fSdView.setSDExtendedActionBarProvider(this);
+
+        createFrame();
+    }
+
+    @Override
+    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+        ISelection sel = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
+        if (sel != null && (sel instanceof StructuredSelection)) {
+            StructuredSelection stSel = (StructuredSelection) sel;
+            if (stSel.getFirstElement() instanceof BaseMessage) {
+                BaseMessage syncMsg = ((BaseMessage) stSel.getFirstElement());
+                System.out.println("Message '" + syncMsg.getName() + "' selected.");
+            }
+        }
+    }
+    
+    //...
+}
+</pre>
+
+=== Printing a Sequence Diagram ===
+
+To print a the whole sequence diagram or only parts of it, select the Sequence Diagram View and select '''File -> Print...''' or type the key combination ''CTRL+P''. A new print dialog will open. <br>
+
+[[Image:images/PrintDialog.png]] <br>
+
+Fill in all the relevant information, select '''Printer...''' to choose the printer and the press '''OK'''.
+
+=== Using one Sequence Diagram View with Multiple Loaders ===
+
+A Sequence Diagram View definition can be used with multiple sequence diagram loaders. However, the active loader to be used when opening the view has to be set. For this define an Eclipse action or command and assign the current loader to the view. Here is a code snippet for that:
+
+<pre>
+public class OpenSDView extends AbstractHandler {
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        try {
+            IWorkbenchPage persp = TmfUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            SDView view = (SDView) persp.showView("org.eclipse.linuxtools.ust.examples.ui.componentinteraction");
+            LoadersManager.getLoadersManager().createLoader("org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader", view);
+        } catch (PartInitException e) {
+            throw new ExecutionException("PartInitException caught: ", e);
+        }
+        return null;
+ }
+}
+</pre>
+
+=== Downloading the Tutorial ===
+
+Use the following link to download the source code of the tutorial [http://wiki.eclipse.org/images/e/e6/SamplePlugin.zip Plug-in of Tutorial].
+
+== Integration of Tracing and Monitoring Framework with Sequence Diagram Framework ==
+
+In the previous sections the Sequence Diagram Framework has been described and a tutorial was provided. In the following sections the integration of the Sequence Diagram Framework with other features of TMF will be described. Together it is a powerful framework to analyze and visualize content of traces. The integration is explained using the reference implementation of a UML2 sequence diagram loader which part of the TMF UI delivery. The reference implementation can be used as is, can be sub-classed or simply be an example for other sequence diagram loaders to be implemented. 
+
+=== Reference Implementation ===
+
+A Sequence Diagram View Extension is defined in the plug-in TMF UI as well as a uml2SDLoader Extension with the reference loader. 
+
+[[Image:images/ReferenceExtensions.png]]
+
+=== Used Sequence Diagram Features ===
+
+Besides the default features of the Sequence Diagram Framework, the reference implementation uses the following additional features:
+*Advanced paging
+*Basic finding
+*Basic filtering
+*Selection Service
+
+==== Advanced paging ====
+
+The reference loader implements the interface ''ISDAdvancedPagingProvider'' interface. Please refer to section [[#Using the Paging Provider Interface | Using the Paging Provider Interface]] for more details about the advanced paging feature.
+
+==== Basic finding ====
+
+The reference loader implements the interface ''ISDFindProvider'' interface. The user can search for ''Lifelines'' and ''Interactions''. The find is done across pages. If the expression to match is not on the current page a new thread is started to search on other pages. If expression is found the corresponding page is shown as well as the searched item is displayed. If not found then a message is displayed in the ''Progress View'' of Eclipse. Please refer to section [[#Using the Find Provider Interface | Using the Find Provider Interface]] for more details about the basic find feature.
+
+==== Basic filtering ====
+
+The reference loader implements the interface ''ISDFilterProvider'' interface. The user can filter on ''Lifelines'' and ''Interactions''. Please refer to section [[#Using the Filter Provider Interface | Using the Filter Provider Interface]] for more details about the basic filter feature.
+
+==== Selection Service ====
+
+The reference loader implements the interface ''ISelectionListener'' interface. When an interaction is selected a ''TmfTimeSynchSignal'' is broadcast (see [[#TMF Signal Framework | TMF Signal Framework]]). Please also refer to section [[#Using the Selection Provider Service | Using the Selection Provider Service]] for more details about the selection service and . 
+
+=== Used TMF Features ===
+
+The reference implementation uses the following features of TMF:
+*TMF Experiment and Trace for accessing traces
+*Event Request Framework to request TMF events from the experiment and respective traces
+*Signal Framework for broadcasting and receiving TMF signals for synchronization purposes
+
+==== TMF Experiment and Trace for accessing traces ====
+
+The reference loader uses TMF Experiments to access traces and to request data from the traces.   
+
+==== TMF Event Request Framework ====
+
+The reference loader use the TMF Event Request Framework to request events from the experiment and its traces.
+
+When opening a traces (which is triggered by signal ''TmfExperimentSelected'') or when opening the Sequence Diagram View after a trace had been opened previously, a TMF background request is initiated to index the trace and to fill in the first page of the sequence diagram. The purpose of the indexing is to store time ranges for pages with 10000 messages per page. This allows quickly to move to certain pages in a trace without having to re-parse from the beginning. The request is called indexing request.
+
+When switching pages, the a TMF foreground event request is initiated to retrieve the corresponding events from the experiment. It uses the time range stored in the index for the respective page.
+
+A third type of event request is issued for finding specific data across pages. 
+
+==== TMF Signal Framework ====
+
+The reference loader extends the class ''TmfComponent''. By doing that the loader is register as TMF signal handler for sending and receiving TMF signals. The loader implements signal handlers for the following TMF signals:
+*''TmfTraceSelectedSignal''
+This signal indicates that a trace or experiment was selected. When receiving this signal the indexing request is initiated and the first page is displayed after receiving the relevant information.
+*''traceClosed''
+This signal indicates that a trace or experiment was closed. When receiving this signal the loader resets its data and a blank page is loaded in the Sequence Diagram View.
+*''TmfTimeSynchSignal''
+This signal indicates that a event with a certain timestamp is selected. When receiving this signal the corresponding message is selected in the Sequence Diagram View. If necessary, the page is changed.
+*''TmfRangeSynchSignal''
+This signal indicates that a new time range is in focus. When receiving this signal the loader loads the page which corresponds to the start time of the time range signal. The message with the start time will be in focus.
+
+Besides acting on receiving signals, the reference loader is also sending signals. A ''TmfTimeSynchSignal'' is broadcasted with the timestamp of the message which was selected in the Sequence Diagram View. ''TmfRangeSynchSignal'' is sent when a page is changed in the Sequence Diagram View. The start timestamp of the time range sent is the timestamp of the first message. The end timestamp sent is the timestamp of the first message plus the current time range window. The current time range window is the time window that was indicated in the last received ''TmfRangeSynchSignal''.
+
+=== Supported Traces ===
+
+The reference implementation is able to analyze traces from a single component that traces the interaction with other components. For example, a server node could have trace information about its interaction with client nodes. The server node could be traced and then analyzed using TMF and the Sequence Diagram Framework of TMF could used to visualize the interactions with the client nodes.<br>
+
+Note that combined traces of multiple components, that contain the trace information about the same interactions are not supported in the reference implementation!
+
+=== Trace Format ===
+
+The reference implementation in class ''TmfUml2SDSyncLoader'' in package ''org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl'' analyzes events from type ''ITmfEvent'' and creates events type ''ITmfSyncSequenceDiagramEvent'' if the ''ITmfEvent'' contains all relevant information information. The parsing algorithm looks like as follows:
+
+<pre>
+    /**
+     * @param tmfEvent Event to parse for sequence diagram event details
+     * @return sequence diagram event if details are available else null
+     */
+    protected ITmfSyncSequenceDiagramEvent getSequenceDiagramEvent(ITmfEvent tmfEvent){
+        //type = .*RECEIVE.* or .*SEND.*
+        //content = sender:<sender name>:receiver:<receiver name>,signal:<signal name>
+        String eventType = tmfEvent.getType().toString();
+        if (eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeSend) || eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeReceive)) {
+            Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSender);
+            Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldReceiver);
+            Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSignal);
+            if ((sender instanceof ITmfEventField) && (receiver instanceof ITmfEventField) && (name instanceof ITmfEventField)) {
+                ITmfSyncSequenceDiagramEvent sdEvent = new TmfSyncSequenceDiagramEvent(tmfEvent,
+                                ((ITmfEventField) sender).getValue().toString(),
+                                ((ITmfEventField) receiver).getValue().toString(),
+                                ((ITmfEventField) name).getValue().toString());
+
+                return sdEvent;
+            }
+        }
+        return null;
+    }
+</pre>
+
+The analysis looks for event type Strings containing ''SEND'' and ''RECEIVE''. If event type matches these key words, the analyzer will look for strings ''sender'', ''receiver'' and ''signal'' in the event fields of type ''ITmfEventField''. If all the data is found a sequence diagram event from can be created. Note that Sync Messages are assumed, which means start and end time are the same.
+
+=== How to use the Reference Implementation ===
+
+An example trace visualizer is provided that uses a trace in binary format. It contains trace events with sequence diagram information. To parse the data using TMF a class is provided that implements ''ITmfTrace''. Additionally, a parser is provided that reads from the file and converts a trace event to ''TmfEvent''. This parser implements the interface ''ITmfEventParser''. To get the source code see [[#Downloading the Reference Plug-in | Download the Reference Plug-in]]
+<br>
+The plug-in structure will look like this:<br>
+[[Image:images/ReferencePlugin.png]]<br>
+
+To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
+[[Image:images/SelectManifestRef.png]]<br>
+
+Run the Reference Application. To launch the Eclipse Application select the ''Overview'' tab and click on '''Launch an Eclipse Application'''<br>
+[[Image:images/RunApplicationRef.png]]<br>
+
+To open the Reference Sequence Diagram View, select '''Windows -> Show View -> Other... -> TMF -> Sequence Diagram''' <br> 
+[[Image:images/ShowTmfSDView.png]]<br>
+
+An blank Sequence Diagram View will open. 
+
+Select the '''Select Experiment''' button of the toolbar to load the sequence diagram from the data provided in the trace file. What this does is open the file ''tracesets/sdEvents'', parse this file through TMF and analyze all events of type ''TmfEvent'' and generates the Sequence Diagram out of it.  <br>
+[[Image:images/ReferenceSeqDiagram.png]]<br>
+
+Now the reference application can be explored. To demonstrate the view features try the following things:
+*Select a message in the Sequence diagram. As result the corresponding event will be selected in the Events View.
+*Select an event in the Events View. As result the corresponding message in the Sequence Diagram View will be selected. If necessary, the page will be changed.
+*In the Events View, press key ''End''. As result, the Sequence Diagram view will jump to the last page.  
+*In the Events View, press key ''Home''. As result, the Sequence Diagram view will jump to the first page.
+*In the Sequence Diagram View select the find button. Enter the expression '''REGISTER.*''', select '''Search for Interaction''' and press '''Find'''. As result the corresponding message will be selected in the Sequence Diagram and the corresponding event in the Events View will be selected. Select again '''Find''' the next occurrence of will be selected. Since the second occurrence is on a different page than the first, the corresponding page will be loaded.
+* In the Sequence Diagram View, select menu item '''Hide Patterns...'''. Add the filter '''BALL.*''' for '''Interaction''' only and select '''OK'''. As result all messages with name ''BALL_REQUEST'' and ''BALL_REPLY'' will be hidden. To remove the filter, select menu item '''Hide Patterns...''', deselect the corresponding filter and press '''OK'''. All the messages will be shown again.<br> 
+ 
+To dispose the diagram, select the '''Dispose Experiment''' button of the toolbar. The current sequence diagram will be disposed and an empty diagram will be loaded. 
+
+=== Extending the Reference Loader ===
+
+In some case it might be necessary to change the implementation of the analysis of each ''TmfEvent'' for the generation of ''Sequence Diagram Events''. For that just extend the class ''TmfUml2SDSyncLoader'' and overwrite the method ''protected ITmfSyncSequenceDiagramEvent getSequnceDiagramEvent(TmfEvent tmfEvent)'' with your own implementation.
+
+=== Downloading the Reference Plug-in ===
+To download the reference plug-in that demonstrates the reference loader, use the following link: [http://wiki.eclipse.org/images/d/d3/ReferencePlugin.zip Reference Plug-in]. Just extract the zip file and import the extracted Eclipse plug-in (plug-in name: ''org.eclipse.linuxtools.tmf.reference.ui'') to your Eclipse workspace. <br>
+
+= CTF Parser =
+
+== CTF Format ==
+CTF is a format used to store traces. It is self defining, binary and made to be easy to write to.
+Before going further, the full specification of the CTF file format can be found at http://www.efficios.com/ .
+
+For the purpose of the reader some basic description will be given. A CTF trace typically is made of several files all in the same folder.
+
+These files can be split into two types :
+* Metadata
+* Event streams
+
+=== Metadata ===
+The metadata is either raw text or packetized text. It is tsdl encoded. it contains a description of the type of data in the event streams. It can grow over time if new events are added to a trace but it will never overwrite what is already there.
+
+=== Event Streams ===
+The event streams are a file per stream per cpu. These streams are binary and packet based. The streams store events and event information (ie lost events) The event data is stored in headers and field payloads.
+
+So if you have two streams (channels) "channel1" and "channel2" and 4 cores, you will have the following files in your trace directory: "channel1_0" , "channel1_1" , "channel1_2" , "channel1_3" , "channel2_0" , "channel2_1" , "channel2_2" & "channel2_3"
+
+== Reading a trace ==
+In order to read a CTF trace, two steps must be done.
+* The metadata must be read to know how to read the events.
+* the events must be read.
+
+The metadata is a written in a subset of the C language called TSDL. To read it, first it is depacketized (if it is not in plain text) then the raw text is parsed by an antlr grammer. The parsing is done in two phases. There is a lexer (CTFLexer.g) which separated the metatdata text into tokens. The tokens are then pattern matched using the parser (CTFParser.g) to form an AST. This AST is walked through using "IOStructGen.java" to populate streams and traces in trace parent object.
+
+When the metadata is loaded and read, the trace object will be populated with 3 items:
+* the event definitions available per stream: a definition is a description of the datatype.
+* the event declarations available per stream: this will save declaration creation on a per event basis. They will all be created in advance, just not populated.
+* the beginning of a packet index.
+
+Now all the trace readers for the event streams have everything they need to read a trace. They will each point to one file, and read the file from packet to packet. Everytime the trace reader changes packet, the index is updated with the new packet's information. The readers are in a priority queue and sorted by timestamp. This ensures that the events are read in a sequential order. They are also sorted by file name so that in the eventuality that two events occur at the same time, they stay in the same order.
+
+== Seeking in a trace ==
+The reason for maintaining an index is to speed up seeks. In the case that a user wishes to seek to a certain timestamp, they just have to find the index entry that contains the timestamp, and go there to iterate in that packet until the proper event is found. this will reduce the searches time by an order of 8000 for a 256k paket size (kernel default).
+
+== Interfacing to TMF == 
+The trace can be read easily now but the data is still awkward to extract.
+
+=== CtfLocation ===
+A location in a given trace, it is currently the timestamp of a trace and the index of the event. The index shows for a given timestamp if it is the first second or nth element.
+
+=== CtfTmfTrace ===
+The CtfTmfTrace is a wrapper for the standard CTF trace that allows it to perform the following actions: 
+* '''initTrace()''' create a trace
+* '''validateTrace()''' is the trace a CTF trace?
+* '''getLocationRatio()''' how far in the trace is my location?
+* '''seekEvent()''' sets the cursor to a certain point in a trace.
+* '''readNextEvent()''' reads the next event and then advances the cursor
+* '''getTraceProperties()''' gets the 'env' structures of the metadata
+
+=== CtfIterator ===
+The CtfIterator is a wrapper to the CTF file reader. It behaves like an iterator on a trace. However, it contains a file pointer and thus cannot be duplicated too often or the system will run out of file handles. To alleviate the situation, a pool of iterators is created at the very beginning and stored in the CtfTmfTrace. They can be retried by calling the GetIterator() method.
+
+=== CtfIteratorManager ===
+Since each CtfIterator will have a file reader, the OS will run out of handles if too many iterators are spawned. The solution is to use the iterator manager. This will allow the user to get an iterator. If there is a context at the requested position, the manager will return that one, if not, a context will be selected at random and set to the correct location. Using random replacement minimizes contention as it will settle quickly at a new balance point.
+
+=== CtfTmfContext ===
+The CtfTmfContext implements the ITmfContext type. It is the CTF equivalent of TmfContext. It has a CtfLocation and points to an iterator in the CtfTmfTrace iterator pool as well as the parent trace. it is made to be cloned easily and not affect system resources much. Contexts behave much like C file pointers (FILE*) but they can be copied until one runs out of RAM.
+
+=== CtfTmfTimestamp ===
+The CtfTmfTimestamp take a CTF time (normally a long int) and outputs the time formats it as a TmfTimestamp, allowing it to be compared to other timestamps. The time is stored with the UTC offset already applied. It also features a simple toString() function that allows it to output the time in more Human readable ways: "yyyy/mm/dd/hh:mm:ss.nnnnnnnnn ns" for example. An additional feature is the getDelta() function that allows two timestamps to be substracted, showing the time difference between A and B.
+ 
+=== CtfTmfEvent ===
+The CtfTmfEvent is an ITmfEvent that is used to wrap event declarations and event definitions from the CTF side into easier to read and parse chunks of information. It is a final class with final fields made to be newed very often without incurring performance costs. Most of the information is already available. It should be noted that one type of event can appear called "lost event" these are synthetic events that do not exist in the trace. They will not appear in other trace readers such as babeltrace.
+
+=== Other ===
+There are other helper files that format given events for views, they are simpler and the architecture does not depend on them.
+
+=== Limitations ===
+For the moment live trace reading is not supported, there are no sources of traces to test on.
+
