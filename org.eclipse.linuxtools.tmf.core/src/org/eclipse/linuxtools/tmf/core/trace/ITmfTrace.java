@@ -339,4 +339,18 @@ public interface ITmfTrace extends ITmfDataProvider {
      * @since 2.0
      */
     ITmfTimestamp getInitialRangeOffset();
+
+    /**
+     * Returns the ID of the host this trace is from. The host ID is not
+     * necessarily the hostname, but should be a unique identifier for the
+     * machine on which the trace was taken. It can be used to determine if two
+     * traces were taken on the exact same machine (timestamp are already
+     * synchronized, resources with same id are the same if taken at the same
+     * time, etc).
+     *
+     * @return The host id of this trace
+     * @since 3.0
+     */
+   String getHostId();
+
 }

@@ -410,6 +410,14 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         return new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public String getHostId() {
+        return this.getName();
+    }
+
     // ------------------------------------------------------------------------
     // Convenience setters
     // ------------------------------------------------------------------------

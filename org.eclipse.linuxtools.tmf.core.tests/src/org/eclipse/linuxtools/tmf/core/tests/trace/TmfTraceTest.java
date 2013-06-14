@@ -1465,4 +1465,13 @@ public class TmfTraceTest {
         TmfTimestamp initRange = new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE);
         assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
     }
+
+    /**
+     * Run the String getHostId() method test
+     */
+    @Test
+    public void testTraceHostId() {
+        String a = fTrace.getHostId();
+        assertEquals("A-Test-10K", a);
+    }
 }
