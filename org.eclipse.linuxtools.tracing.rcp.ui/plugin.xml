@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>org.eclipse.linuxtools.tracing.rcp.product
+         <run
+               class="org.eclipse.linuxtools.internal.tracing.rcp.ui.Application">
+         </run>
+      </application>
+   </extension>
+   
+      <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.linuxtools.tracing.rcp.ui.application"
+            name="Linux Tools Trace Viewer">
+            <property
+               name="appName"
+               value="Linux Tools Trace Viewer">
+            </property>
+            <property
+               name="cssTheme"
+               value="org.eclipse.e4.ui.css.theme.e4_default">
+            </property>
+            
+            <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+            </property>
+            <property
+                  name="aboutImage"
+                  value="icons/alt_about.gif">
+            </property>
+            <property
+                  name="aboutText"
+                  value="Linux Tools Trace Viewer&#x0A;&#x0A;Version: 0.0.1&#x0A;&#x0A;Copyright (c) 2013 Ericsson&#x0A;&#x0A;All rights reserved. This program and the accompanying materials are&#x0A;made available under the terms of the Eclipse Public License v1.0 which&#x0A;accompanies this distribution, and is available at&#x0A;http://www.eclipse.org/legal/epl-v10.html">
+            </property>
+            <property
+                  name="windowImages"
+                  value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+            </property>
+      </product>
+   </extension>
+   
+   -->
+   <extension point="org.eclipse.ui.activities">
+      <activity name="Tracine RCP"                    id="org.eclipse.linuxtools.internal.tracing.rcp.ui"      description="Tracing RCP" />
+      <activity name="Unwanted Java Perspective"      id="org.eclipse.unwantedJavaPerspective"     description="" />
+      <activity name="Unwanted Team Perspective"      id="org.eclipse.unwantedTeamPerspective"     description="" />
+      <activity name="Unwanted Debug Perspective"     id="org.eclipse.unwantedDebugPerspective"    description="" />
+      <activity name="Unwanted PluginDev Perspective" id="org.eclipse.unwantedPluginDevPerspective" description="" />      
+      <activity name="Unwanted Resource Perspective"  id="org.eclipse.unwantedResourcePerspective"  description="" />
+      <activity name="Unwanted Search Perspective"  id="org.eclipse.unwantedSearch"  description="" />
+      <activityPatternBinding activityId="org.eclipse.linuxtools.internal.tracing.rcp.ui"      pattern="org\.eclipse\.linuxtools.*" />
+      <activityPatternBinding activityId="org.eclipse.unwantedJavaPerspective"     pattern="org\.eclipse\.jdt.*" />
+      <activityPatternBinding activityId="org.eclipse.unwantedTeamPerspective"     pattern="org\.eclipse\.team.*" />
+      <activityPatternBinding activityId="org.eclipse.unwantedDebugPerspective"    pattern="org\.eclipse\.debug.*" />
+      <activityPatternBinding activityId="org.eclipse.unwantedSearch" pattern="org\.eclipse\.search.*" />
+      <activityPatternBinding activityId="org.eclipse.unwantedResourcePerspective"  pattern="org\.eclipse\.ui\.[r]*" />
+      <defaultEnablement id="org.eclipse.linuxtools.internal.tracing.rcp.ui" />
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="org.eclipse.linuxtools.tracing.rcp.ui.menuFile"
+               label="%menu.main.file"
+               mnemonic="F">
+            <command
+                  commandId="org.eclipse.ui.file.restartWorkbench"
+                  style="push">
+            </command>
+            <separator
+                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator4"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.file.exit"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="org.eclipse.linuxtools.tracing.rcp.ui.menuWindow"
+               label="%menu.main.window">
+            <command
+                  commandId="org.eclipse.ui.perspectives.showPerspective"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.views.showView"
+                  style="push">
+            </command>
+            <separator
+                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.window.savePerspective"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.resetPerspective"
+                  style="push">
+            </command>
+            <separator
+                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.window.preferences"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="org.eclipse.linuxtools.tracing.rcp.ui.menuhelp"
+               label="%menu.main.help"
+               mnemonic="H">
+            <command
+                  commandId="org.eclipse.ui.help.helpContents"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.install"
+                  style="push">
+            </command>
+            <separator
+                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator3"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.help.aboutAction"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+
+</plugin>
