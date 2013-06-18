@@ -16,6 +16,13 @@ needed, a default tracing project called ''Tracing''.
 Now the application can be used as described in the User Guide for Linux Tools
 LTTng integration (see section [[#References | References]]).
 
+= Opening a Trace =
+To open a trace, click on the '''File''' menu, '''Open''' and select a '''Open file...''' (logs and such) or '''Open directory...''' (Ctf trace). Select the file or directory, and the RCP will open it. It will attempt to autodetect the trace type. If many trace types can read this trace, a window will prompt the user to select a trace type. Once a trace type is selected, the trace loads.
+
+If the user prefers, they can launch the RCP with the argument '''--open <trace-path>'''. The trace will then automatically open. Conflicting trace types will be resolved the same way as opening from a menu, if there are conflicting types, the user will be prompted to select a trace type.
+
+In both of the above cases, the trace will be linked to the default project.
+
 = References =
 
 * [http://www.eclipse.org/linuxtools/projectPages/lttng/ Linux Tools - LTTng integration]

@@ -15,31 +15,15 @@ package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
-import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IReusableEditor;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * <b><u>OpenTraceHandler</u></b>
@@ -113,74 +97,7 @@ public class OpenTraceHandler extends AbstractHandler {
         }
 
         // If trace is under an experiment, use the original trace from the traces folder
-        final TmfTraceElement traceElement = fTrace.getElementUnderTraceFolder();
-
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-
-                final ITmfTrace trace = traceElement.instantiateTrace();
-                final ITmfEvent traceEvent = traceElement.instantiateEvent();
-                if ((trace == null) || (traceEvent == null)) {
-                    TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_NoTraceType);
-                    if (trace != null) {
-                        trace.dispose();
-                    }
-                    return;
-                }
-
-                // Get the editor_id from the extension point
-                String traceEditorId = traceElement.getEditorId();
-                final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
-
-                try {
-                    trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                } catch (final TmfTraceException e) {
-                    TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_InitError + "\n\n" + e); //$NON-NLS-1$
-                    trace.dispose();
-                    return;
-                }
-
-                final IFile file;
-                try {
-                    file = traceElement.createBookmarksFile();
-                } catch (final CoreException e) {
-                    Activator.getDefault().logError("Error opening trace " + traceElement.getName(), e); //$NON-NLS-1$
-                    TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$
-                    trace.dispose();
-                    return;
-                }
-
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            final IEditorInput editorInput = new TmfEditorInput(file, trace);
-                            final IWorkbench wb = PlatformUI.getWorkbench();
-                            final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-
-                            final IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
-                            if ((editor != null) && (editor instanceof IReusableEditor)) {
-                                activePage.reuseEditor((IReusableEditor) editor, editorInput);
-                                activePage.activate(editor);
-                            } else {
-                                activePage.openEditor(editorInput, editorId);
-                                IDE.setDefaultEditor(file, editorId);
-                                // editor should dispose the trace on close
-                            }
-                        } catch (final PartInitException e) {
-                            TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$
-                            Activator.getDefault().logError("Error opening trace " + traceElement.getName(), e); //$NON-NLS-1$
-                            trace.dispose();
-                        }
-                    }
-                });
-
-            }
-        };
-
-        thread.start();
-        return null;
+        return TmfOpenTraceHelper.openTraceFromElement(fTrace.getElementUnderTraceFolder());
     }
 
 }

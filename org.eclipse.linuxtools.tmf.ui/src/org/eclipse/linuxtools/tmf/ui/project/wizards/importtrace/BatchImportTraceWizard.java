@@ -30,7 +30,6 @@ import java.util.concurrent.BlockingQueue;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -50,6 +49,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -252,8 +252,12 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         for (FileAndName traceToImport : fTraces) {
             try {
                 if (fLinked) {
-                    createLink(fTargetFolder, Path.fromOSString(traceToImport.getFile().getAbsolutePath()), traceToImport.getName());
-                    success = setTraceType(traceToImport).isOK();
+                    if (TmfImportHelper.createLink(fTargetFolder, Path.fromOSString(traceToImport.getFile().getAbsolutePath()), traceToImport.getName()) != null) {
+                        success = false;
+                    }
+                    else {
+                        success = setTraceType(traceToImport).isOK();
+                    }
                 }
                 else {
                     List<File> subList = new ArrayList<File>();
@@ -266,7 +270,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                             subList.add(parentFile);
                             parentFile = parentFile.getParentFile();
                             final FileInputStream source = new FileInputStream(traceToImport.getFile());
-                            if( resource.exists()) {
+                            if (resource.exists()) {
                                 resource.delete(IResource.FORCE, new NullProgressMonitor());
                             }
                             resource.create(source, true, new NullProgressMonitor());
@@ -308,33 +312,6 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
             }
         }
         return success;
-    }
-
-    private static void createLink(IFolder parentFolder, IPath location, String targetName) {
-        File source = new File(location.toString());
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        try {
-
-            if (source.isDirectory()) {
-                IFolder folder = parentFolder.getFolder(targetName);
-                IStatus result = workspace.validateLinkLocation(folder, location);
-                if (result.isOK()) {
-                    folder.createLink(location, IResource.REPLACE, null);
-                } else {
-                    Activator.getDefault().logError(result.getMessage());
-                }
-            } else {
-                IFile file = parentFolder.getFile(targetName);
-                IStatus result = workspace.validateLinkLocation(file, location);
-                if (result.isOK()) {
-                    file.createLink(location, IResource.REPLACE, null);
-                } else {
-                    Activator.getDefault().logError(result.getMessage());
-                }
-            }
-        } catch (CoreException e) {
-
-        }
     }
 
     private IStatus setTraceType(FileAndName traceToImport) {

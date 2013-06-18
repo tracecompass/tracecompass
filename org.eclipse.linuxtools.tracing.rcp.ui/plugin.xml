@@ -45,16 +45,34 @@
             </property>
       </product>
    </extension>
-   
-   -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.file"
+            defaultHandler="org.eclipse.linuxtools.internal.tracing.rcp.ui.commands.OpenFileHandler"
+            description="%command.OpenFile.description"
+            id="org.eclipse.linuxtools.lttng2.rcp.ui.openFile"
+            name="%command.OpenFile.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.file"
+            defaultHandler="org.eclipse.linuxtools.internal.tracing.rcp.ui.commands.OpenDirHandler"
+            description="%command.OpenDirectory.description"
+            id="org.eclipse.linuxtools.lttng2.rcp.ui.openDir"
+            name="%command.OpenDirectory.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+   </extension>
    <extension point="org.eclipse.ui.activities">
-      <activity name="Tracine RCP"                    id="org.eclipse.linuxtools.internal.tracing.rcp.ui"      description="Tracing RCP" />
-      <activity name="Unwanted Java Perspective"      id="org.eclipse.unwantedJavaPerspective"     description="" />
-      <activity name="Unwanted Team Perspective"      id="org.eclipse.unwantedTeamPerspective"     description="" />
-      <activity name="Unwanted Debug Perspective"     id="org.eclipse.unwantedDebugPerspective"    description="" />
-      <activity name="Unwanted PluginDev Perspective" id="org.eclipse.unwantedPluginDevPerspective" description="" />      
-      <activity name="Unwanted Resource Perspective"  id="org.eclipse.unwantedResourcePerspective"  description="" />
-      <activity name="Unwanted Search Perspective"  id="org.eclipse.unwantedSearch"  description="" />
+      <activity name="%activity.name"                    id="org.eclipse.linuxtools.internal.tracing.rcp.ui"      description="%activity.description" />
+      <activity name="%activity.name.javaPerspective"      id="org.eclipse.unwantedJavaPerspective"     description="%activity.description.javaPerspective" />
+      <activity name="%activity.name.teamPerspective"      id="org.eclipse.unwantedTeamPerspective"     description="%activity.description.teamPerspective" />
+      <activity name="%activity.name.debugPerspective"     id="org.eclipse.unwantedDebugPerspective"    description="%activity.description.debugPerspective" />
+      <activity name="%activity.name.pluginDevPerspective" id="org.eclipse.unwantedPluginDevPerspective" description="%activity.description.pluginDevPerspective" />
+      <activity name="%activity.name.resourcePerspective"  id="org.eclipse.unwantedResourcePerspective"  description="%activity.description.resourcePerspective" />
+      <activity name="%activity.name.search"  id="org.eclipse.unwantedSearch"  description="%activity.description.search" />
       <activityPatternBinding activityId="org.eclipse.linuxtools.internal.tracing.rcp.ui"      pattern="org\.eclipse\.linuxtools.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedJavaPerspective"     pattern="org\.eclipse\.jdt.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedTeamPerspective"     pattern="org\.eclipse\.team.*" />
@@ -71,13 +89,27 @@
          <menu
                id="org.eclipse.linuxtools.tracing.rcp.ui.menuFile"
                label="%menu.main.file"
-               mnemonic="F">
+               mnemonic="%menu.mnemonic">
+            <command
+                  commandId="org.eclipse.linuxtools.lttng2.rcp.ui.openFile"
+                  label="%command.OpenFile.label"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.linuxtools.lttng2.rcp.ui.openDir"
+                  label="%command.OpenDirectory.label"
+                  style="push">
+            </command>
+            <separator
+                  name="OpenSeparator"
+                  visible="true">
+            </separator>
             <command
                   commandId="org.eclipse.ui.file.restartWorkbench"
                   style="push">
             </command>
             <separator
-                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator4"
+                  name="ExitSeparator"
                   visible="true">
             </separator>
             <command
@@ -128,7 +160,7 @@
          <menu
                id="org.eclipse.linuxtools.tracing.rcp.ui.menuhelp"
                label="%menu.main.help"
-               mnemonic="H">
+               mnemonic="%menu.mnemonic.0">
             <command
                   commandId="org.eclipse.ui.help.helpContents"
                   style="push">

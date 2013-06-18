@@ -96,6 +96,15 @@ public class TraceTypeHelper {
         return valid;
     }
 
+    /**
+     * Get an object of the trace type
+     * @return an object of the trace type
+     * @since 2.1
+     */
+    public ITmfTrace getTrace(){
+        return fTrace;
+    }
+
     private boolean standardValidate(String path) {
         final boolean valid = fTrace.validate(null, path).equals(Status.OK_STATUS);
         return valid;
