@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Collection;
-import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
@@ -61,9 +60,6 @@ public class StreamInputPacketReader implements IDefinitionScope {
     /** Stream event context definition.*/
     private final StructDefinition streamEventContextDef;
 
-    /** Maps event ID to event definitions. */
-    private final Map<Long, EventDefinition> events;
-
     /** Reference to the index entry of the current packet. */
     private StreamInputPacketIndexEntry currentPacket = null;
 
@@ -100,7 +96,6 @@ public class StreamInputPacketReader implements IDefinitionScope {
         bitBuffer = new BitBuffer();
         bitBuffer.setByteOrder(streamInputReader.getByteOrder());
 
-        events = streamInputReader.getStreamInput().getStream().getTrace().getEventDefs(streamInputReader.getStreamInput());
         lostSoFar = 0;
 
         /* Create trace packet header definition. */
@@ -140,9 +135,9 @@ public class StreamInputPacketReader implements IDefinitionScope {
         Collection<IEventDeclaration> eventDecls = streamInputReader.getStreamInput().getStream().getEvents().values();
 
         for (IEventDeclaration event : eventDecls) {
-            if (!events.containsKey(event.getId())) {
+            if (!streamInputReader.getEventDefinitions().containsKey(event.getId())) {
                 EventDefinition eventDef = event.createDefinition(streamInputReader);
-                events.put(event.getId(), eventDef);
+                streamInputReader.addEventDefinition(event.getId(), eventDef);
             }
         }
     }
@@ -350,7 +345,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
         }
 
         /* Get the right event definition using the event id. */
-        EventDefinition eventDef = events.get(eventID);
+        EventDefinition eventDef = streamInputReader.getEventDefinitions().get(eventID);
         if (eventDef == null) {
             throw new CTFReaderException("Incorrect event id : " + eventID); //$NON-NLS-1$
         }
