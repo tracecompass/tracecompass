@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.internal.ctf.core.event.metadata;
  * @author Matthew Khouzam and All
  */
 @SuppressWarnings("nls")
-public interface CTFStrings {
+public interface MetadataStrings {
 
     /** None */
 
