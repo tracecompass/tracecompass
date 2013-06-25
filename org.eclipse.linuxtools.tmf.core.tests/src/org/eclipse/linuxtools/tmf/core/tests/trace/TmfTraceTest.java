@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
@@ -1242,7 +1243,8 @@ public class TmfTraceTest {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                range, 0, NB_EVENTS, blockSize, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -1271,7 +1273,8 @@ public class TmfTraceTest {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                range, 0, nbEvents, blockSize, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -1301,7 +1304,8 @@ public class TmfTraceTest {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                range, 0, nbEvents, blockSize, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -1332,7 +1336,8 @@ public class TmfTraceTest {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, startIndex, nbEvents, blockSize) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                range, startIndex, nbEvents, blockSize, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -1395,7 +1400,8 @@ public class TmfTraceTest {
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                range, 0, NB_EVENTS, BLOCK_SIZE, ExecutionType.FOREGROUND) {
             int nbRead = 0;
             @Override
             public void handleData(final ITmfEvent event) {

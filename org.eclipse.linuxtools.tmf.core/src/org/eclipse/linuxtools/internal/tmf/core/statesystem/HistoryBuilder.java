@@ -236,6 +236,7 @@ class StateSystemBuildRequest extends TmfEventRequest {
     StateSystemBuildRequest(HistoryBuilder builder) {
         super(builder.getStateProvider().getExpectedEventType(),
                 TmfTimeRange.ETERNITY,
+                0,
                 TmfDataRequest.ALL_DATA,
                 CHUNK_SIZE,
                 ITmfDataRequest.ExecutionType.BACKGROUND);

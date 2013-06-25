@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -57,7 +58,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider {
         final TmfEventRequest eventRequest = (TmfEventRequest) request;
         final TmfTimeRange range = eventRequest.getRange();
         final TmfEventRequest subRequest =
-                new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+                new TmfEventRequest(ITmfEvent.class, range, 0, NB_EVENTS, BLOCK_SIZE, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);

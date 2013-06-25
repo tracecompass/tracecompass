@@ -382,7 +382,9 @@ public class TmfSchedulerTest {
         private String backgroundName;
 
         BackgroundRequest(TmfTimeRange timeRange) {
-            super(fixture.getEventType(), timeRange,
+            super(fixture.getEventType(),
+                    timeRange,
+                    0,
                     TmfDataRequest.ALL_DATA,
                     CHUNK_SIZE,
                     ExecutionType.BACKGROUND);
@@ -409,7 +411,9 @@ public class TmfSchedulerTest {
         private String foregroundName;
 
         ForegroundRequest(TmfTimeRange timeRange) {
-            super(fixture.getEventType(), timeRange,
+            super(fixture.getEventType(),
+                    timeRange,
+                    0,
                     TmfDataRequest.ALL_DATA,
                     CHUNK_SIZE,
                     ExecutionType.FOREGROUND);

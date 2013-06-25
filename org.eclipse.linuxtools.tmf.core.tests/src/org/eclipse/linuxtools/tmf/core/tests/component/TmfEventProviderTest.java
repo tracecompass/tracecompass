@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
@@ -108,7 +109,8 @@ public class TmfEventProviderTest {
         ITmfDataProvider provider = eventProviders[0];
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                range, 0, NB_EVENTS, BLOCK_SIZE, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(ITmfEvent event) {
                 super.handleData(event);
@@ -155,7 +157,8 @@ public class TmfEventProviderTest {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
 
         // Create first request
-        final TmfEventRequest request1 = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request1 = new TmfEventRequest(ITmfEvent.class,
+                range, 0, NB_EVENTS, BLOCK_SIZE, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(ITmfEvent event) {
                 super.handleData(event);
@@ -182,7 +185,8 @@ public class TmfEventProviderTest {
         assertFalse("isRunning", request1.isRunning());
 
         // Create second request
-        final TmfEventRequest request2 = new TmfEventRequest(ITmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+        final TmfEventRequest request2 = new TmfEventRequest(ITmfEvent.class,
+                range, 0, NB_EVENTS, BLOCK_SIZE, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(ITmfEvent event) {
                 super.handleData(event);
@@ -256,7 +260,7 @@ public class TmfEventProviderTest {
         ITmfDataProvider provider = eventProviders[0];
 
         final TmfEventRequest request = new TmfEventRequest(TmfSyntheticEventStub.class, range,
-                nbEvents, blockSize) {
+                0, nbEvents, blockSize, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(ITmfEvent event) {
                 super.handleData(event);
