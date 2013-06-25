@@ -1360,7 +1360,11 @@ public class TmfTraceTest {
         final int nbEvents  = 1000;
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
-        final TmfDataRequest request = new TmfDataRequest(ITmfEvent.class, startIndex, nbEvents) {
+        final TmfDataRequest request = new TmfDataRequest(ITmfEvent.class,
+                startIndex,
+                nbEvents,
+                TmfDataRequest.DEFAULT_BLOCK_SIZE,
+                TmfDataRequest.ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
