@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Simon Delisle - Updated for support of LTTng Tools 2.2
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.service;
 
@@ -575,21 +576,47 @@ public class LTTngControlService implements ILttngControlService {
             }
 //            --subbuf-size SIZE   Subbuffer size in bytes
 //                                     (default: 4096, kernel default: 262144)
-            command.append(LTTngControlServiceConstants.OPTION_SUB_BUFFER_SIZE);
-            command.append(String.valueOf(info.getSubBufferSize()));
+            if (info.getSubBufferSize() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                command.append(LTTngControlServiceConstants.OPTION_SUB_BUFFER_SIZE);
+                command.append(String.valueOf(info.getSubBufferSize()));
+            }
 
 //            --num-subbuf NUM     Number of subbufers
-//                                     (default: 8, kernel default: 4)
-            command.append(LTTngControlServiceConstants.OPTION_NUM_SUB_BUFFERS);
-            command.append(String.valueOf(info.getNumberOfSubBuffers()));
+            if (info.getNumberOfSubBuffers() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                command.append(LTTngControlServiceConstants.OPTION_NUM_SUB_BUFFERS);
+                command.append(String.valueOf(info.getNumberOfSubBuffers()));
+            }
 
-//            --switch-timer USEC  Switch timer interval in usec (default: 0)
-            command.append(LTTngControlServiceConstants.OPTION_SWITCH_TIMER);
-            command.append(String.valueOf(info.getSwitchTimer()));
+//            --switch-timer USEC  Switch timer interval in usec
+            if (info.getSwitchTimer() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                command.append(LTTngControlServiceConstants.OPTION_SWITCH_TIMER);
+                command.append(String.valueOf(info.getSwitchTimer()));
+            }
 
-//            --read-timer USEC    Read timer interval in usec (default: 200)
-            command.append(LTTngControlServiceConstants.OPTION_READ_TIMER);
-            command.append(String.valueOf(info.getReadTimer()));
+//            --read-timer USEC    Read timer interval in usec
+            if (info.getReadTimer() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                command.append(LTTngControlServiceConstants.OPTION_READ_TIMER);
+                command.append(String.valueOf(info.getReadTimer()));
+            }
+
+            if (isVersionSupported("2.2.0")) { //$NON-NLS-1$
+//                --buffer-uid  Every application sharing the same UID use the same buffers
+                if (!isKernel && info.isBuffersUID()) {
+                    command.append(LTTngControlServiceConstants.OPTION_PER_UID_BUFFERS);
+                }
+
+//                -C SIZE   Maximum size of trace files in bytes
+                if (info.getMaxSizeTraceFiles() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                    command.append(LTTngControlServiceConstants.OPTION_MAX_SIZE_TRACE_FILES);
+                    command.append(String.valueOf(info.getMaxSizeTraceFiles()));
+                }
+
+//                -W NUM   Maximum number of trace files
+                if (info.getMaxNumberTraceFiles() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                    command.append(LTTngControlServiceConstants.OPTION_MAX_TRACE_FILES);
+                    command.append(String.valueOf(info.getMaxNumberTraceFiles()));
+                }
+            }
         }
 
         executeCommand(command.toString(), monitor);

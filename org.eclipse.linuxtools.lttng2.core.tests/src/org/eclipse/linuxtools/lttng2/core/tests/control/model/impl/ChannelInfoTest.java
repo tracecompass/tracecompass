@@ -77,6 +77,9 @@ public class ChannelInfoTest {
         assertEquals("disabled", result.getState().getInName());
         assertEquals(0, result.getSubBufferSize());
         assertEquals(0, result.getSwitchTimer());
+        assertEquals(0, result.getMaxSizeTraceFiles());
+        assertEquals(0, result.getMaxNumberTraceFiles());
+        assertEquals(false, result.isBuffersUID());
     }
 
     /**
@@ -94,6 +97,9 @@ public class ChannelInfoTest {
         assertEquals(fChannelInfo1.getState(), channelInfo.getState());
         assertEquals(fChannelInfo1.getSwitchTimer(), channelInfo.getSwitchTimer());
         assertEquals(fChannelInfo1.getEvents().length, channelInfo.getEvents().length);
+        assertEquals(fChannelInfo1.getMaxSizeTraceFiles(), channelInfo.getMaxSizeTraceFiles());
+        assertEquals(fChannelInfo1.getMaxNumberTraceFiles(), channelInfo.getMaxNumberTraceFiles());
+        assertEquals(fChannelInfo1.isBuffersUID(), channelInfo.isBuffersUID());
 
         IEventInfo[] orignalEvents = fChannelInfo1.getEvents();
         IEventInfo[] resultEvents = channelInfo.getEvents();
@@ -157,6 +163,9 @@ public class ChannelInfoTest {
         fixture.setNumberOfSubBuffers(4);
         fixture.setOutputType("splice()");
         fixture.setSubBufferSize(1L);
+        fixture.setMaxSizeTraceFiles(1024);
+        fixture.setMaxNumberTraceFiles(20);
+        fixture.setBuffersUID(true);
         fixture.addEvent(new EventInfo("event"));
 
         long switchTimer = fixture.getSwitchTimer();
@@ -180,6 +189,15 @@ public class ChannelInfoTest {
         long subBufferSize = fixture.getSubBufferSize();
         assertEquals(1L, subBufferSize);
 
+        int maxSizeTraceFiles = fixture.getMaxSizeTraceFiles();
+        assertEquals(1024, maxSizeTraceFiles);
+
+        int maxNumberTraceFiles = fixture.getMaxNumberTraceFiles();
+        assertEquals(20, maxNumberTraceFiles);
+
+        boolean buffersUID = fixture.isBuffersUID();
+        assertTrue(buffersUID);
+
         fixture.setSwitchTimer(5L);
         fixture.setOverwriteMode(false);
         fixture.setReadTimer(6L);
@@ -187,6 +205,9 @@ public class ChannelInfoTest {
         fixture.setNumberOfSubBuffers(7);
         fixture.setOutputType("mmap()");
         fixture.setSubBufferSize(8L);
+        fixture.setMaxSizeTraceFiles(4096);
+        fixture.setMaxNumberTraceFiles(10);
+        fixture.setBuffersUID(false);
 
         switchTimer = fixture.getSwitchTimer();
         assertEquals(5L, switchTimer);
@@ -208,6 +229,15 @@ public class ChannelInfoTest {
 
         subBufferSize = fixture.getSubBufferSize();
         assertEquals(8L, subBufferSize);
+
+        maxSizeTraceFiles = fixture.getMaxSizeTraceFiles();
+        assertEquals(4096, maxSizeTraceFiles);
+
+        maxNumberTraceFiles = fixture.getMaxNumberTraceFiles();
+        assertEquals(10, maxNumberTraceFiles);
+
+        buffersUID = fixture.isBuffersUID();
+        assertFalse(buffersUID);
     }
 
     /**

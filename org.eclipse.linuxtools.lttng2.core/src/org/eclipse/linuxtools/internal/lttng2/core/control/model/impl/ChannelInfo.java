@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Simon Delisle - Updated for support of LTTng Tools 2.2
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;
 
@@ -64,6 +65,18 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
      * The events information of the channel.
      */
     private final List<IEventInfo> fEvents = new ArrayList<IEventInfo>();
+    /**
+     * The maximum size of trace files
+     */
+    private int fMaxSizeTraceFiles;
+    /**
+     * The maximum number of trace files
+     */
+    private int fMaxNumberTraceFiles;
+    /**
+     * The value of the checkbox per UID buffers
+     */
+    private boolean fIsBuffersUID;
 
 
     // ------------------------------------------------------------------------
@@ -88,6 +101,9 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         fNumberOfSubBuffers = other.fNumberOfSubBuffers;
         fSwitchTimer = other.fSwitchTimer;
         fReadTimer = other.fReadTimer;
+        fMaxSizeTraceFiles = other.fMaxSizeTraceFiles;
+        fMaxNumberTraceFiles = other.fMaxNumberTraceFiles;
+        fIsBuffersUID = other.fIsBuffersUID;
         fOutputType = (other.fOutputType == null ? null : String.valueOf(other.fOutputType));
         fState = other.fState;
         for (Iterator<IEventInfo> iterator = other.fEvents.iterator(); iterator.hasNext();) {
@@ -292,5 +308,35 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
             }
             output.append(")]");
             return output.toString();
+    }
+
+    @Override
+    public void setMaxSizeTraceFiles(int maxSizeTraceFiles) {
+        fMaxSizeTraceFiles = maxSizeTraceFiles;
+    }
+
+    @Override
+    public void setMaxNumberTraceFiles(int maxNumberTraceFiles) {
+        fMaxNumberTraceFiles = maxNumberTraceFiles;
+    }
+
+    @Override
+    public int getMaxSizeTraceFiles() {
+        return fMaxSizeTraceFiles;
+    }
+
+    @Override
+    public int getMaxNumberTraceFiles() {
+        return fMaxNumberTraceFiles;
+    }
+
+    @Override
+    public void setBuffersUID(boolean buffersUID) {
+        fIsBuffersUID = buffersUID;
+    }
+
+    @Override
+    public boolean isBuffersUID() {
+        return fIsBuffersUID;
     }
 }

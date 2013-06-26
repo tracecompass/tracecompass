@@ -952,7 +952,7 @@ A dialog box will open for entering information about the channel to be created.
 
 [[Image:images/LTTng2CreateChannelDialog.png]]
 
-By default the domain '''Kernel''' is selected and the corresponding default values are shown. To create a UST channel, select '''UST''' under the domain section. To get the default values of UST, then press button '''Default'''.
+By default the domain '''Kernel''' is selected. To create a UST channel, select '''UST''' under the domain section. The label <Default> in any text box indicates that the default value of the tracer will be configured. To initialize the dialog box press button '''Default'''.
 
 If required update the following channel information and then press '''Ok'''.
 
@@ -964,6 +964,29 @@ If required update the following channel information and then press '''Ok'''.
 * '''Switch Timer Interval''': The switch timer interval.
 
 Upon successful operation, the requested domain will be created under the session tree node as well as the requested channel will be added under the domain. The channel will be '''ENABLED'''.
+
+==== Trace file rotation ====
+
+Since LTTng Tools v2.2.0 it is possible to set the maximum size of trace files and the maximum number of them. These options are located in the same dialog box that is used to enabling channels.
+
+[[Image:images/LTTng2CreateChannelDialogFileRotation.png]]
+
+* '''Maximum size of trace files''': The maximum size of trace files
+* '''Maximum number of trace files''': The maximum number of trace files
+
+==== Per UID buffers ====
+
+Since LTTng Tools v2.2.0 it is possible to have one buffer per UID for UST traces. It can be activated in the dialog box when enabling channels.
+
+[[Image:images/LTTng2CreateChannelDialogPerUIDBuffers.png]]
+
+* '''Per UID buffers''': To activate the per UID buffers option for UST channel only
+
+==== Periodical flush for metadata ====
+
+Since LTTng Tools v2.2.0 it is possible to configure periodical flush for the metadata channel. To set this, use the checkbox '''Configure metadata channel''' then use the switcher timer interval for the interval.
+
+[[Image:images/LTTng2CreateChannelDialogMetadataFlush.png]]
 
 ==== Enabling Channels On Domain Level ====
 

@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Simon Delisle - Updated for support of LTTng Tools 2.2
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
@@ -29,30 +30,6 @@ public interface IChannelInfo extends ITraceInfo {
      * Default value for overwrite mode.
      */
     public final static boolean DEFAULT_OVERWRITE_MODE = false;
-    /**
-     * Default value for sub-buffer size for a UST channel.
-     */
-    public final static long DEFAULT_SUB_BUFFER_SIZE_UST = 4096L;
-    /**
-     * Default value for sub-buffer size for a Kernel channel.
-     */
-    public final static long DEFAULT_SUB_BUFFER_SIZE_KERNEL = 262144L;
-    /**
-     * Default value for number of sub-buffer a UST channel.
-     */
-    public final static int DEFAULT_NUMBER_OF_SUB_BUFFERS_UST = 8;
-    /**
-     * Default value for number of sub-buffer a Kernel channel.
-     */
-    public final static int DEFAULT_NUMBER_OF_SUB_BUFFERS_KERNEL = 4;
-    /**
-     * Default value for number of the switch timer interval.
-     */
-    public final static long DEFAULT_SWITCH_TIMER = 0;
-    /**
-     * Default value for number of the read timer interval.
-     */
-    public final static long DEFAULT_READ_TIMER = 200;
 
     /**
      * @return the overwrite mode value.
@@ -143,4 +120,31 @@ public interface IChannelInfo extends ITraceInfo {
      * @param event - event information to add.
      */
     void addEvent(IEventInfo event);
+    /**
+     * Sets the maximum size of trace files
+     * @param maxSizeTraceFiles - maximum size
+     */
+    void setMaxSizeTraceFiles(int maxSizeTraceFiles);
+    /**
+     * Sets the maximum number of trace files
+     * @param maxNumberTraceFiles - maximum number
+     */
+    void setMaxNumberTraceFiles(int maxNumberTraceFiles);
+    /**
+     * @return maximum size of trace files
+     */
+    int getMaxSizeTraceFiles();
+    /**
+     * @return maximum number of trace files
+     */
+    int getMaxNumberTraceFiles();
+    /**
+     * Sets per UID buffers
+     * @param buffersUID - enable or not
+     */
+    void setBuffersUID(boolean buffersUID);
+    /**
+     * @return the value of buffersUID (enable or not)
+     */
+    boolean isBuffersUID();
 }

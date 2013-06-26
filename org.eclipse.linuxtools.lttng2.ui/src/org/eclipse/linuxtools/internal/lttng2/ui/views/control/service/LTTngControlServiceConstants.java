@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Simon Delisle - Updated for support of LTTng Tools 2.2
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.service;
 
@@ -30,6 +31,14 @@ public interface LTTngControlServiceConstants {
      * Pattern to match the LTTng toolchain version 2.x.y.
      */
     static final Pattern VERSION_2_PATTERN = Pattern.compile("(2\\.\\d+\\.\\d+).*"); //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * Unused value
+     */
+    static final int UNUSED_VALUE = -1;
 
     // ------------------------------------------------------------------------
     // Command constants
@@ -214,6 +223,18 @@ public interface LTTngControlServiceConstants {
      * Command line option for configuring the streaming data URL.
      */
     static final String OPTION_DATA_URL = " -D "; //$NON-NLS-1$
+    /**
+     * Command line option for per UID buffers
+     */
+    static final String OPTION_PER_UID_BUFFERS = " --buffers-uid "; //$NON-NLS-1$
+    /**
+     * Command line option for maximum size of trace files
+     */
+    static final String OPTION_MAX_SIZE_TRACE_FILES = " -C "; //$NON-NLS-1$
+    /**
+     * Command line option for maximum trace files
+     */
+    static final String OPTION_MAX_TRACE_FILES = " -W "; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Parsing constants

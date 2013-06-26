@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TargetNodeComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
@@ -36,6 +37,12 @@ public interface IEnableChannelDialog {
      * @param domain - the trace domain component
      */
     void setDomainComponent(TraceDomainComponent domain);
+
+    /**
+     * Set the targent node component
+     * @param node - the node component
+     */
+    void setTargetNodeComponent(TargetNodeComponent node);
 
     /**
      * @return true for Kernel domain. False for UST.
