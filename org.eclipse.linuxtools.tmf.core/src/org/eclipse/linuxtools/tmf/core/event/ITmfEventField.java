@@ -81,4 +81,15 @@ public interface ITmfEventField {
      */
     ITmfEventField getField(int index);
 
+    /**
+     * Gets the a sub-field of this field, which may be multiple levels down.
+     *
+     * @param path
+     *            Array of field names to recursively go through
+     * @return The field at the end, or null if a field in the path cannot be
+     *         found
+     * @since 3.0
+     */
+    ITmfEventField getSubField(String[] path);
+
 }

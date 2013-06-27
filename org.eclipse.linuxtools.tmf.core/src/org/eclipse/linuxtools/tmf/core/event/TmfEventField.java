@@ -135,6 +135,21 @@ public class TmfEventField implements ITmfEventField {
         return null;
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public ITmfEventField getSubField(final String[] names) {
+        ITmfEventField field = this;
+        for (String name : names) {
+            field = field.getField(name);
+            if (field == null) {
+                return null;
+            }
+        }
+        return field;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

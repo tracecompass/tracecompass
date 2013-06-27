@@ -126,6 +126,26 @@ public class CtfTmfEventTest {
     }
 
     /**
+     * Run the ITmfEventField getSubFieldValue(String[]) method test.
+     */
+    @Test
+    public void testGetSubFieldValue() {
+        /* Field exists */
+        String[] names = { "pid" };
+        assertNotNull(fixture.getContent().getSubField(names));
+
+        /* First field exists, not the second */
+        String[] names2 = { "pid", "abcd" };
+        assertNull(fixture.getContent().getSubField(names2));
+
+        /* Both field do not exist */
+        String[] names3 = { "pfid", "abcd" };
+        assertNull(fixture.getContent().getSubField(names3));
+
+        /* TODO Missing case of embedded field, need event for it */
+    }
+
+    /**
      * Run the long getID() method test.
      */
     @Test
