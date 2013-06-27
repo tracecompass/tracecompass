@@ -59,7 +59,6 @@ public class ShowNodeStart extends BaseSDAction {
     // ------------------------------------------------------------------------
 
     @Override
-    @SuppressWarnings("rawtypes")
     public void run() {
         if (getView() == null) {
             return;
@@ -74,7 +73,7 @@ public class ShowNodeStart extends BaseSDAction {
         ISelectionProvider selProvider = sdWidget.getSelectionProvider();
         ISelection sel = selProvider.getSelection();
         Object selectedNode = null;
-        Iterator it = ((StructuredSelection) sel).iterator();
+        Iterator<Object> it = ((StructuredSelection) sel).iterator();
         while (it.hasNext()) {
             selectedNode = it.next();
         }

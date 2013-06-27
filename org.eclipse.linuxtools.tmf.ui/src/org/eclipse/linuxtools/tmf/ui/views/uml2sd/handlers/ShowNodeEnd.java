@@ -57,7 +57,6 @@ public class ShowNodeEnd extends BaseSDAction {
     // ------------------------------------------------------------------------
 
     @Override
-    @SuppressWarnings("rawtypes")
     public void run() {
         if (getView() == null) {
             return;
@@ -73,7 +72,7 @@ public class ShowNodeEnd extends BaseSDAction {
         ISelection sel = selProvider.getSelection();
         Object selectedNode = null;
 
-        Iterator it = ((StructuredSelection) sel).iterator();
+        Iterator<Object> it = ((StructuredSelection) sel).iterator();
         while (it.hasNext()) {
             selectedNode = it.next();
         }

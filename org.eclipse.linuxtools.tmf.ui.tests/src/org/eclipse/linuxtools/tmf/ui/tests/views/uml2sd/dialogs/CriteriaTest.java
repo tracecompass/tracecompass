@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.Criteria;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.FilterCriteria;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDGraphNodeSupporter;
 import org.junit.Test;
@@ -242,7 +243,7 @@ public class CriteriaTest {
             }
 
             @Override
-            public boolean filter(List<?> filters) {
+            public boolean filter(List<FilterCriteria> filters) {
                 return false;
             }
         };
