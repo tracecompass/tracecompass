@@ -112,185 +112,170 @@ public class TmfTraceTest {
     // ------------------------------------------------------------------------
 
     @Test
-    @SuppressWarnings("null")
     public void testStandardConstructor() throws TmfTraceException {
-        TmfTraceStub trace = null;
-        File testfile = null;
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
-            testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath());
+            File testfile = new File(FileLocator.toFileURL(location).toURI());
+            TmfTraceStub trace = new TmfTraceStub(testfile.toURI().getPath());
             trace.indexTrace(true);
+
+            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertNull("getResource", trace.getResource());
+            assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
+            assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+            assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
+            assertEquals("getName", TEST_STREAM, trace.getName());
+
+            assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+            assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
+            assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
+            assertEquals("getStartTime", 1, trace.getStartTime().getValue());
+            assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
+
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
             fail("IOException");
         }
-
-        assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  ITmfEvent.class, trace.getType());
-        assertNull  ("getResource", trace.getResource());
-        assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
-        assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
-        assertEquals("getName", TEST_STREAM, trace.getName());
-
-        assertEquals("getNbEvents",    NB_EVENTS, trace.getNbEvents());
-        assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
-        assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
     }
 
     @Test
-    @SuppressWarnings("null")
     public void testStandardConstructorCacheSize() throws TmfTraceException {
-        TmfTraceStub trace = null;
-        File testfile = null;
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
-            testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath(), 0);
+            File testfile = new File(FileLocator.toFileURL(location).toURI());
+            TmfTraceStub trace = new TmfTraceStub(testfile.toURI().getPath(), 0);
             trace.indexTrace(true);
+
+            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertNull("getResource", trace.getResource());
+            assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
+            assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
+            assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
+            assertEquals("getName", TEST_STREAM, trace.getName());
+
+            assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+            assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
+            assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
+            assertEquals("getStartTime", 1, trace.getStartTime().getValue());
+            assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
+
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
             fail("IOException");
         }
 
-        assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  ITmfEvent.class, trace.getType());
-        assertNull  ("getResource", trace.getResource());
-        assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
-        assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
-        assertEquals("getName", TEST_STREAM, trace.getName());
-
-        assertEquals("getNbEvents",    NB_EVENTS, trace.getNbEvents());
-        assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
-        assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
-
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
-            testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE);
+            File testfile = new File(FileLocator.toFileURL(location).toURI());
+            TmfTraceStub trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE);
             trace.indexTrace(true);
+
+            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertNull("getResource", trace.getResource());
+            assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
+            assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
+            assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
+            assertEquals("getName", TEST_STREAM, trace.getName());
+
+            assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+            assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
+            assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
+            assertEquals("getStartTime", 1, trace.getStartTime().getValue());
+            assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
+
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
             fail("IOException");
         }
-
-        assertEquals("getType",  ITmfEvent.class, trace.getType());
-        assertNull  ("getResource", trace.getResource());
-        assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
-        assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
-        assertEquals("getName", TEST_STREAM, trace.getName());
-
-        assertEquals("getNbEvents",    NB_EVENTS, trace.getNbEvents());
-        assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
-        assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
     }
 
     @Test
-    @SuppressWarnings("null")
     public void testFullConstructor() throws TmfTraceException {
-        TmfTraceStub trace = null;
-        File testfile = null;
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
-            testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, null);
+            File testfile = new File(FileLocator.toFileURL(location).toURI());
+            TmfTraceStub trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, null);
             trace.indexTrace(true);
+
+            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertNull("getResource", trace.getResource());
+            assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
+            assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
+            assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
+            assertEquals("getName", TEST_STREAM, trace.getName());
+
+            assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+            assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
+            assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
+            assertEquals("getStartTime", 1, trace.getStartTime().getValue());
+            assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
+
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
             fail("IOException");
         }
-
-        assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  ITmfEvent.class, trace.getType());
-        assertNull  ("getResource", trace.getResource());
-        assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
-        assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
-        assertEquals("getName", TEST_STREAM, trace.getName());
-
-        assertEquals("getNbEvents",    NB_EVENTS, trace.getNbEvents());
-        assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
-        assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
     }
 
     @Test
-    @SuppressWarnings("null")
     public void testLiveTraceConstructor() throws TmfTraceException {
-        TmfTraceStub trace = null;
-        File testfile = null;
         final long interval = 100;
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
-            testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, interval);
+            File testfile = new File(FileLocator.toFileURL(location).toURI());
+            TmfTraceStub trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, interval);
             trace.indexTrace(true);
+
+            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertNull("getResource", trace.getResource());
+            assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
+            assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
+            assertEquals("getStreamingInterval", interval, trace.getStreamingInterval());
+            assertEquals("getName", TEST_STREAM, trace.getName());
+
+            assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+            assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
+            assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
+            assertEquals("getStartTime", 1, trace.getStartTime().getValue());
+            assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
+
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
             fail("IOException");
         }
-
-        assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  ITmfEvent.class, trace.getType());
-        assertNull  ("getResource", trace.getResource());
-        assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
-        assertEquals("getStreamingInterval", interval, trace.getStreamingInterval());
-        assertEquals("getName", TEST_STREAM, trace.getName());
-
-        assertEquals("getNbEvents",    NB_EVENTS, trace.getNbEvents());
-        assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
-        assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
     }
 
     @Test
-    @SuppressWarnings("null")
     public void testCopyConstructor() throws TmfTraceException {
-        TmfTraceStub original = null;
-        TmfTraceStub trace = null;
-        File testfile = null;
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
-            testfile = new File(FileLocator.toFileURL(location).toURI());
-            original = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, new TmfCheckpointIndexer(null));
-            trace = new TmfTraceStub(original);
+            File testfile = new File(FileLocator.toFileURL(location).toURI());
+            TmfTraceStub original = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, new TmfCheckpointIndexer(null));
+            TmfTraceStub trace = new TmfTraceStub(original);
             trace.indexTrace(true);
+
+            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertNull("getResource", trace.getResource());
+            assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
+            assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
+            assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
+            assertEquals("getName", TEST_STREAM, trace.getName());
+
+            assertEquals("getNbEvents", NB_EVENTS, trace.getNbEvents());
+            assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
+            assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
+            assertEquals("getStartTime", 1, trace.getStartTime().getValue());
+            assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
+
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
             fail("IOException");
         }
-
-        assertFalse ("Open trace", trace == null);
-        assertEquals("getType",  ITmfEvent.class, trace.getType());
-        assertNull  ("getResource", trace.getResource());
-        assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
-        assertEquals("getCacheSize", BLOCK_SIZE, trace.getCacheSize());
-        assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
-        assertEquals("getName", TEST_STREAM, trace.getName());
-
-        assertEquals("getNbEvents",    NB_EVENTS, trace.getNbEvents());
-        assertEquals("getRange-start", 1,         trace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
-        assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
-        assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
 
         // Test the copy of a null trace
         try {
