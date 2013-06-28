@@ -145,4 +145,12 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         return getEventHoverToolTipInfo(event);
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public boolean displayTimesInTooltip() {
+        return true;
+    }
+
 }

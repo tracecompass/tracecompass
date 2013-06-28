@@ -192,49 +192,50 @@ public class TimeGraphTooltipHandler {
                             addItem(message, eventAddOns.get(message));
                         }
                     }
+                    if (fTimeGraphProvider.displayTimesInTooltip()) {
+                        long eventStartTime = -1;
+                        long eventDuration = -1;
+                        long eventEndTime = -1;
 
-                    long eventStartTime = -1;
-                    long eventDuration = -1;
-                    long eventEndTime = -1;
-
-                    eventStartTime = currEvent.getTime();
-                    eventDuration = currEvent.getDuration();
-                    if (eventDuration < 0 && nextEvent != null) {
-                        eventEndTime = nextEvent.getTime();
-                        eventDuration = eventEndTime - eventStartTime;
-                    } else {
-                        eventEndTime = eventStartTime + eventDuration;
-                    }
-
-                    Resolution res = Resolution.NANOSEC;
-                    TimeFormat tf = fTimeDataProvider.getTimeFormat();
-                    if (tf == TimeFormat.CALENDAR) {
-                        addItem(Messages.TmfTimeTipHandler_TRACE_DATE, eventStartTime > -1 ?
-                                Utils.formatDate(eventStartTime)
-                                : "?"); //$NON-NLS-1$
-                    }
-                    if (eventDuration > 0) {
-                        addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, eventStartTime > -1 ?
-                                Utils.formatTime(eventStartTime, tf, res)
-                                : "?"); //$NON-NLS-1$
-
-                        addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, eventEndTime > -1 ?
-                                Utils.formatTime(eventEndTime, tf, res)
-                                : "?"); //$NON-NLS-1$
-                    } else {
-                        addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, eventStartTime > -1 ?
-                                Utils.formatTime(eventStartTime, tf, res)
-                                : "?"); //$NON-NLS-1$
-                    }
-
-                    if (eventDuration > 0) {
-                        // Duration in relative format in any case
-                        if (tf == TimeFormat.CALENDAR) {
-                            tf = TimeFormat.RELATIVE;
+                        eventStartTime = currEvent.getTime();
+                        eventDuration = currEvent.getDuration();
+                        if (eventDuration < 0 && nextEvent != null) {
+                            eventEndTime = nextEvent.getTime();
+                            eventDuration = eventEndTime - eventStartTime;
+                        } else {
+                            eventEndTime = eventStartTime + eventDuration;
                         }
-                        addItem(Messages.TmfTimeTipHandler_DURATION, eventDuration > -1 ?
-                                Utils.formatTime(eventDuration, tf, res)
-                                : "?"); //$NON-NLS-1$
+
+                        Resolution res = Resolution.NANOSEC;
+                        TimeFormat tf = fTimeDataProvider.getTimeFormat();
+                        if (tf == TimeFormat.CALENDAR) {
+                            addItem(Messages.TmfTimeTipHandler_TRACE_DATE, eventStartTime > -1 ?
+                                    Utils.formatDate(eventStartTime)
+                                    : "?"); //$NON-NLS-1$
+                        }
+                        if (eventDuration > 0) {
+                            addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, eventStartTime > -1 ?
+                                    Utils.formatTime(eventStartTime, tf, res)
+                                    : "?"); //$NON-NLS-1$
+
+                            addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, eventEndTime > -1 ?
+                                    Utils.formatTime(eventEndTime, tf, res)
+                                    : "?"); //$NON-NLS-1$
+                        } else {
+                            addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, eventStartTime > -1 ?
+                                    Utils.formatTime(eventStartTime, tf, res)
+                                    : "?"); //$NON-NLS-1$
+                        }
+
+                        if (eventDuration > 0) {
+                            // Duration in relative format in any case
+                            if (tf == TimeFormat.CALENDAR) {
+                                tf = TimeFormat.RELATIVE;
+                            }
+                            addItem(Messages.TmfTimeTipHandler_DURATION, eventDuration > -1 ?
+                                    Utils.formatTime(eventDuration, tf, res)
+                                    : "?"); //$NON-NLS-1$
+                        }
                     }
                 }
             }
