@@ -185,7 +185,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
 
         /* The returned value is < 0 if the exact key was not found. */
         if (mid < 0) {
-            mid = -mid;
+            mid = -mid - 1;
         }
 
         /*
