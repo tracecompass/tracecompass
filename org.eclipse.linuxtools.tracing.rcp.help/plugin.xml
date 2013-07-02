@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+<!-- This part should be in a documentation plugin -->
+<!-- Configure the help contribution for this plugin -->
+   <extension point="org.eclipse.help.toc">
+      <toc
+            file="doc/User-Guide-toc.xml"
+            primary="true" />
+   </extension>
+</plugin>

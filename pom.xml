@@ -49,6 +49,7 @@
     <id>tracingRcp</id>
       <modules>
         <module>org.eclipse.linuxtools.tracing.rcp</module>
+        <module>org.eclipse.linuxtools.tracing.rcp.help</module>
         <module>org.eclipse.linuxtools.tracing.rcp.ui</module>
         <module>org.eclipse.linuxtools.tracing.rcp.product</module>
       </modules>
