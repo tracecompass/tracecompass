@@ -10,5 +10,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.core.runtime
 Export-Package: org.eclipse.linuxtools.internal.lttng2.core;x-friends:="org.eclipse.linuxtools.lttng2.core.tests",
- org.eclipse.linuxtools.internal.lttng2.core.control.model;x-friends:="org.eclipse.linuxtools.lttng2.ui",
- org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;x-friends:="org.eclipse.linuxtools.lttng2.ui"
+ org.eclipse.linuxtools.internal.lttng2.core.control.model;x-friends:="org.eclipse.linuxtools.lttng2.ui,org.eclipse.linuxtools.lttng2.ui.tests,org.eclipse.linuxtools.lttng2.core.tests",
+ org.eclipse.linuxtools.internal.lttng2.core.control.model.impl;x-friends:="org.eclipse.linuxtools.lttng2.ui,org.eclipse.linuxtools.lttng2.ui.tests,org.eclipse.linuxtools.lttng2.core.tests"
