@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.core.statevalue;
 
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * A state value containing a simple integer.
  *
@@ -22,10 +20,10 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 final class IntegerStateValue extends TmfStateValue {
 
-    private final Integer valueInt;
+    private final int valueInt;
 
     public IntegerStateValue(int valueAsInt) {
-        this.valueInt = new Integer(valueAsInt);
+        this.valueInt = valueAsInt;
     }
 
     @Override
@@ -44,7 +42,7 @@ final class IntegerStateValue extends TmfStateValue {
     }
 
     @Override
-    public @Nullable String toString() {
+    public String toString() {
         return String.format("%3d", valueInt); //$NON-NLS-1$
     }
 }

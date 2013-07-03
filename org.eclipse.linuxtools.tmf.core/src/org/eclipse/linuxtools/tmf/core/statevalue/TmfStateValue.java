@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.core.statevalue;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 
 
@@ -45,7 +44,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
     protected abstract Object getValue();
 
     @Override
-    public boolean equals(@Nullable Object other) {
+    public boolean equals(Object other) {
         if (this == other) {
             return true;
         }
@@ -112,7 +111,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @param strValue The string value to contain
      * @return The newly-create TmfStateValue object
      */
-    public static TmfStateValue newValueString(@Nullable String strValue) {
+    public static TmfStateValue newValueString(String strValue) {
         if (strValue == null) {
             return nullValue();
         }
