@@ -2149,7 +2149,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             // the method fTrace.getRank() from interfering and delaying ongoing requests.
             final TmfDataRequest subRequest = new TmfDataRequest(ITmfEvent.class, 0, 1, ExecutionType.FOREGROUND) {
 
-                TmfTimestamp ts = new TmfTimestamp(signal.getCurrentTime());
+                TmfTimestamp ts = new TmfTimestamp(signal.getBeginTime());
 
                 @Override
                 public void handleData(final ITmfEvent event) {

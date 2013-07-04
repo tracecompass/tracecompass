@@ -80,9 +80,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private static final TimeDraw TIMEDRAW_ABS_YEAR = new TimeDrawAbsYear();
     private static final TimeDraw TIMEDRAW_NUMBER = new TimeDrawNumber();
 
+    private static final int DRAG_EXTERNAL = -1;
     private static final int NO_BUTTON = 0;
     private static final int LEFT_BUTTON = 1;
-    private static final int RIGHT_BUTTON = 3;
 
     private ITimeDataProvider fTimeProvider;
     private int fDragState = NO_BUTTON;
@@ -138,6 +138,28 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      */
     public void setHeight(int height) {
         this.fHeight = height;
+    }
+
+    /**
+     * Set the drag range to paint decorators
+     *
+     * @param begin
+     *            The begin x-coordinate
+     * @param end
+     *            The end x-coordinate
+     * @since 2.1
+     */
+    public void setDragRange(int begin, int end) {
+        if (NO_BUTTON == fDragState || DRAG_EXTERNAL == fDragState) {
+            fDragX0 = begin - fTimeProvider.getNameSpace();
+            fDragX = end - fTimeProvider.getNameSpace();
+            if (begin >= 0 || end >= 0) {
+                fDragState = DRAG_EXTERNAL;
+            } else {
+                fDragState = NO_BUTTON;
+            }
+        }
+        redraw();
     }
 
     private long calcTimeDelta(int width, double pixelsPerNanoSec) {
@@ -243,7 +265,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         long time0 = fTimeProvider.getTime0();
         long time1 = fTimeProvider.getTime1();
-        long selectedTime = fTimeProvider.getSelectedTime();
         int leftSpace = fTimeProvider.getNameSpace();
         int timeSpace = fTimeProvider.getTimeSpace();
 
@@ -270,16 +291,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         rect0.height--;
         gc.fillRectangle(rect0);
 
-        if (RIGHT_BUTTON == fDragState && null != fTimeProvider) {
-            // draw selected zoom region background
-            gc.setBackground(getColorScheme().getBkColor(true, false, true));
-            if (fDragX0 < fDragX) {
-                gc.fillRectangle(new Rectangle(leftSpace + fDragX0, rect0.y, fDragX - fDragX0, rect0.height));
-            } else if (fDragX0 > fDragX) {
-                gc.fillRectangle(new Rectangle(leftSpace + fDragX, rect0.y, fDragX0 - fDragX, rect0.height));
-            }
-        }
-
         if (time1 <= time0 || timeSpace < 2) {
             return;
         }
@@ -293,23 +304,30 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         TimeDraw timeDraw = getTimeDraw(timeDelta);
 
-        // draw selected zoom region lines
-        if (RIGHT_BUTTON == fDragState && null != fTimeProvider) {
-            gc.drawLine(leftSpace + fDragX0, rect.y, leftSpace + fDragX0, rect.y + rect.height);
-            gc.drawLine(leftSpace + fDragX, rect.y, leftSpace + fDragX, rect.y + rect.height);
+        // draw range decorators
+        if (DRAG_EXTERNAL == fDragState) {
+            int x1 = leftSpace + Math.min(fDragX0, fDragX);
+            int x2 = leftSpace + Math.max(fDragX0, fDragX);
+            drawRangeDecorators(rect0, gc, x1, x2);
+        } else {
+            int x1;
+            int x2;
+            if (fTimeProvider instanceof ITimeDataProvider2) {
+                long selectionBegin = ((ITimeDataProvider2) fTimeProvider).getSelectionBegin();
+                long selectionEnd = ((ITimeDataProvider2) fTimeProvider).getSelectionEnd();
+                x1 = leftSpace + (int) ((selectionBegin - time0) * pixelsPerNanoSec);
+                x2 = leftSpace + (int) ((selectionEnd - time0) * pixelsPerNanoSec);
+            } else {
+                @SuppressWarnings("deprecation")
+                long selectedTime = fTimeProvider.getSelectedTime();
+                x1 = leftSpace + (int) ((selectedTime - time0) * pixelsPerNanoSec);
+                x2 = x1;
+            }
+            drawRangeDecorators(rect0, gc, x1, x2);
         }
 
         if (rect0.isEmpty()) {
             return;
-        }
-
-        // draw selected time
-        int x = rect0.x + (int) ((selectedTime - time0) * pixelsPerNanoSec);
-        if (x >= rect0.x && x < rect0.x + rect0.width) {
-            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.SELECTED_TIME));
-            gc.drawLine(x, rect0.y + rect0.height - 6, x, rect0.y
-                    + rect0.height);
-            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
         }
 
         // draw time scale ticks
@@ -334,7 +352,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         }
 
         while (true) {
-            x = rect.x + leftSpace + (int) (Math.floor((time - time0) * pixelsPerNanoSec));
+            int x = rect.x + leftSpace + (int) (Math.floor((time - time0) * pixelsPerNanoSec));
             if (x >= rect.x + leftSpace + rect.width - rect0.width) {
                 break;
             }
@@ -373,6 +391,30 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             } else {
                 time += timeDelta;
             }
+        }
+    }
+
+    private static void drawRangeDecorators(Rectangle rect, GC gc, int x1, int x2) {
+        int y1 = rect.y + rect.height - 9;
+        int y2 = rect.y + rect.height - 5;
+        int ym = (y1 + y2) / 2;
+        if (x1 >= rect.x) {
+            // T1
+            gc.drawLine(x1 - 3, y1, x1 - 3, y2);
+            gc.drawLine(x1 - 4, y1, x1 - 2, y1);
+            gc.drawLine(x1, y1, x1, y2);
+        }
+        if (x2 >= rect.x && x2 - x1 > 3) {
+            // T2
+            gc.drawLine(x2 - 2, y1, x2 - 2, y2);
+            gc.drawLine(x2 - 3, y1, x2 - 1, y1);
+        }
+        if (x2 >= rect.x && x2 - x1 > 0) {
+            gc.drawLine(x2 + 1, y1, x2 + 3, y1);
+            gc.drawLine(x2 + 3, y1, x2 + 3, ym);
+            gc.drawLine(x2 + 1, ym, x2 + 3, ym);
+            gc.drawLine(x2 + 1, ym, x2 + 1, y2);
+            gc.drawLine(x2 + 1, y2, x2 + 3, y2);
         }
     }
 
@@ -448,8 +490,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             if (LEFT_BUTTON == e.button && x > 0) {
                 setCapture(true);
                 fDragState = LEFT_BUTTON;
-            } else if (RIGHT_BUTTON == e.button) {
-                fDragState = RIGHT_BUTTON;
             }
             if (x < 0) {
                 x = 0;
@@ -473,28 +513,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             if (fDragX != fDragX0 && fTimeProvider.getTime0() != fTimeProvider.getTime1()) {
                 fTimeProvider.setStartFinishTimeNotify(fTimeProvider.getTime0(), fTimeProvider.getTime1());
             }
-        } else if (e.button == RIGHT_BUTTON && fDragState == RIGHT_BUTTON && null != fTimeProvider) {
-            fDragState = NO_BUTTON;
-            if (fDragX0 == fDragX || fTimeProvider.getTime0() == fTimeProvider.getTime1()) {
-                redraw();
-                return;
-            }
-            int timeSpace = fTimeProvider.getTimeSpace();
-            int leftSpace = fTimeProvider.getNameSpace();
-            int x = Math.max(0, e.x - leftSpace);
-            if (timeSpace > 0) {
-                fDragX = x;
-                if (fDragX0 > fDragX) { // drag right to left
-                    fDragX = fDragX0;
-                    fDragX0 = x;
-                }
-                long time0 = fTime0bak + (long) ((fTime1bak - fTime0bak) * ((double) fDragX0 / timeSpace));
-                long time1 = fTime0bak + (long) ((fTime1bak - fTime0bak) * ((double) fDragX / timeSpace));
-
-                fTimeProvider.setStartFinishTimeNotify(time0, time1);
-                fTime0bak = fTimeProvider.getTime0();
-                fTime1bak = fTimeProvider.getTime1();
-            }
         }
     }
 
@@ -505,7 +523,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         }
         Point size = getSize();
         int leftSpace = fTimeProvider.getNameSpace();
-        int timeSpace = fTimeProvider.getTimeSpace();
         int x = e.x - leftSpace;
         if (LEFT_BUTTON == fDragState) {
             if (x > 0 && size.x > leftSpace && fDragX != x) {
@@ -521,15 +538,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                     fTimeProvider.setStartFinishTime(fTime0bak, time1);
                 }
             }
-        } else if (RIGHT_BUTTON == fDragState) {
-            if (x < 0) {
-                fDragX = 0;
-            } else if (x > timeSpace) {
-                fDragX = timeSpace;
-            } else {
-                fDragX = x;
-            }
-            redraw();
         }
     }
 

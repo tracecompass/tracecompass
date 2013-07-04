@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Support selection range
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace;
@@ -18,7 +19,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 
 /**
  * Context of a trace, which is the representation of the "view" the user
- * currently has on this trace (selected time range, selected time stamp).
+ * currently has on this trace (window time range, selected time or time range).
  *
  * TODO could be extended to support the notion of current location too.
  *
@@ -28,32 +29,42 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 final class TmfTraceContext {
 
     static final TmfTraceContext NULL_CONTEXT =
-            new TmfTraceContext(TmfTimestamp.BIG_CRUNCH, TmfTimeRange.NULL_RANGE);
+            new TmfTraceContext(TmfTimestamp.BIG_CRUNCH, TmfTimestamp.BIG_CRUNCH, TmfTimeRange.NULL_RANGE);
 
-    private final ITmfTimestamp fTimestamp;
-    private final TmfTimeRange fTimerange;
+    private final TmfTimeRange fSelection;
+    private final TmfTimeRange fWindowRange;
 
-    public TmfTraceContext(ITmfTimestamp ts, TmfTimeRange tr) {
-        fTimestamp = ts;
-        fTimerange = tr;
+    public TmfTraceContext(ITmfTimestamp beginTs, ITmfTimestamp endTs, TmfTimeRange tr) {
+        fSelection = new TmfTimeRange(beginTs, endTs);
+        fWindowRange = tr;
     }
 
-    public TmfTraceContext(TmfTraceContext prevCtx, ITmfTimestamp ts) {
-        fTimestamp = ts;
-        fTimerange = prevCtx.fTimerange;
+    public TmfTraceContext(TmfTraceContext prevCtx, ITmfTimestamp beginTs, ITmfTimestamp endTs) {
+        fSelection = new TmfTimeRange(beginTs, endTs);
+        fWindowRange = prevCtx.fWindowRange;
     }
 
-    public ITmfTimestamp getTimestamp() {
-        return fTimestamp;
+    public TmfTraceContext(TmfTraceContext prevCtx, TmfTimeRange tr) {
+        fSelection = prevCtx.fSelection;
+        fWindowRange = tr;
     }
 
-    public TmfTimeRange getTimerange() {
-        return fTimerange;
+    public ITmfTimestamp getSelectionBegin() {
+        return fSelection.getStartTime();
+    }
+
+    public ITmfTimestamp getSelectionEnd() {
+        return fSelection.getEndTime();
+    }
+
+    public TmfTimeRange getWindowRange() {
+        return fWindowRange;
     }
 
     public boolean isValid() {
-        if (fTimestamp.compareTo(TmfTimestamp.ZERO) <= 0 ||
-                fTimerange.getEndTime().compareTo(fTimerange.getStartTime()) <= 0) {
+        if (fSelection.getStartTime().compareTo(TmfTimestamp.ZERO) <= 0 ||
+                fSelection.getEndTime().compareTo(TmfTimestamp.ZERO) <= 0 ||
+                fWindowRange.getEndTime().compareTo(fWindowRange.getStartTime()) <= 0) {
             return false;
         }
         return true;
@@ -61,7 +72,7 @@ final class TmfTraceContext {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[fTimestamp=" + fTimestamp.toString() + //$NON-NLS-1$
-                ", fTimerange=" + fTimerange + ']'; //$NON-NLS-1$
+        return getClass().getSimpleName() + "[fSelection=" + fSelection + //$NON-NLS-1$
+                ", fWindowRange=" + fWindowRange + ']'; //$NON-NLS-1$
     }
 }

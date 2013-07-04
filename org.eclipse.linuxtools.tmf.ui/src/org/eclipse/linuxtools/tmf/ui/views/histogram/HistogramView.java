@@ -18,7 +18,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
@@ -83,7 +82,8 @@ public class HistogramView extends TmfView {
     private long fWindowStartTime;
     private long fWindowEndTime;
     private long fWindowSpan;
-    private long fCurrentTimestamp;
+    private long fSelectionBeginTime;
+    private long fSelectionEndTime;
 
     // Time controls
     private HistogramTextControl fCurrentEventTimeControl;
@@ -297,29 +297,20 @@ public class HistogramView extends TmfView {
     // ------------------------------------------------------------------------
 
     /**
-     * Broadcast TmfSignal about new current time value.
-     * @param newTime the new current time.
+     * Broadcast TmfSignal about new current selection time range.
+     * @param beginTime the begin time of current selection.
+     * @param endTime the end time of current selection.
      */
-    void updateCurrentEventTime(long newTime) {
-        if (fTrace != null) {
-            TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, ITmfTimestamp.NANOSECOND_SCALE), TmfTimestamp.BIG_CRUNCH);
-            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, 1, 0, ExecutionType.FOREGROUND) {
-                @Override
-                public void handleData(ITmfEvent event) {
-                    if (event != null) {
-                        ITmfTimestamp ts = event.getTimestamp();
-                        updateDisplayedCurrentTime(ts.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
-                        TmfTimeSynchSignal signal = new TmfTimeSynchSignal(this, ts);
-                        fTimeSyncThrottle.queue(signal);
-                    }
-                }
-            };
-            fTrace.sendRequest(request);
-        }
+    void updateSelectionTime(long beginTime, long endTime) {
+        updateDisplayedSelectionTime(beginTime, endTime);
+        TmfTimestamp beginTs = new TmfTimestamp(beginTime, ITmfTimestamp.NANOSECOND_SCALE);
+        TmfTimestamp endTs = new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE);
+        TmfTimeSynchSignal signal = new TmfTimeSynchSignal(this, beginTs, endTs);
+        fTimeSyncThrottle.queue(signal);
     }
 
     /**
-     * Broadcast TmfSignal about new selected time range.
+     * Broadcast TmfSignal about new selection time range.
      * @param startTime the new start time
      * @param endTime the new end time
      */
@@ -329,13 +320,12 @@ public class HistogramView extends TmfView {
             TmfTimeRange timeRange = new TmfTimeRange(
                     new TmfTimestamp(startTime, ITmfTimestamp.NANOSECOND_SCALE),
                     new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE));
-            ITmfTimestamp currentTime = new TmfTimestamp(fCurrentTimestamp, ITmfTimestamp.NANOSECOND_SCALE);
             fTimeSpanControl.setValue(endTime - startTime);
 
             updateDisplayedTimeRange(startTime, endTime);
 
             // Send the FW signal
-            TmfRangeSynchSignal signal = new TmfRangeSynchSignal(this, timeRange, currentTime);
+            TmfRangeSynchSignal signal = new TmfRangeSynchSignal(this, timeRange);
             fTimeRangeSyncThrottle.queue(signal);
         }
     }
@@ -435,7 +425,8 @@ public class HistogramView extends TmfView {
         fWindowStartTime = 0L;
         fWindowEndTime = 0L;
         fWindowSpan = 0L;
-        fCurrentTimestamp = 0L;
+        fSelectionBeginTime = 0L;
+        fSelectionEndTime = 0L;
 
         // Clear the UI widgets
         fFullTraceHistogram.clear();
@@ -507,9 +498,10 @@ public class HistogramView extends TmfView {
         // Because this can't happen :-)
         assert (signal != null);
 
-        // Update the selected event time
-        ITmfTimestamp currentTime = signal.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
-        updateDisplayedCurrentTime(currentTime.getValue());
+        // Update the selected time range
+        ITmfTimestamp beginTime = signal.getBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
+        ITmfTimestamp endTime = signal.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
+        updateDisplayedSelectionTime(beginTime.getValue(), endTime.getValue());
     }
 
     /**
@@ -545,7 +537,8 @@ public class HistogramView extends TmfView {
 
     private void initializeHistograms() {
         TmfTimeRange fullRange = updateTraceTimeRange();
-        long timestamp = fTraceManager.getCurrentTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        long selectionBeginTime = fTraceManager.getSelectionBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        long selectionEndTime = fTraceManager.getSelectionEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         long startTime = fTraceManager.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         long duration = fTraceManager.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue() - startTime;
 
@@ -555,7 +548,7 @@ public class HistogramView extends TmfView {
         fTimeRangeHistogram.clear();
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setTimeRange(startTime, duration);
-        fTimeRangeHistogram.setCurrentEvent(timestamp);
+        fTimeRangeHistogram.setSelection(selectionBeginTime, selectionEndTime);
 
         if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
@@ -563,14 +556,15 @@ public class HistogramView extends TmfView {
         fFullTraceHistogram.clear();
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fFullTraceHistogram.setTimeRange(startTime, duration);
-        fFullTraceHistogram.setCurrentEvent(timestamp);
+        fFullTraceHistogram.setSelection(selectionBeginTime, selectionEndTime);
 
         fWindowStartTime = startTime;
         fWindowSpan = duration;
         fWindowEndTime = startTime + duration;
 
-        fCurrentTimestamp = timestamp;
-        fCurrentEventTimeControl.setValue(fCurrentTimestamp);
+        fSelectionBeginTime = selectionBeginTime;
+        fSelectionEndTime = selectionEndTime;
+        fCurrentEventTimeControl.setValue(fSelectionBeginTime);
 
         fTimeSpanControl.setValue(duration);
 
@@ -580,12 +574,13 @@ public class HistogramView extends TmfView {
         }
     }
 
-    private void updateDisplayedCurrentTime(long time) {
-        fCurrentTimestamp = time;
+    private void updateDisplayedSelectionTime(long beginTime, long endTime) {
+        fSelectionBeginTime = beginTime;
+        fSelectionEndTime = endTime;
 
-        fFullTraceHistogram.setCurrentEvent(fCurrentTimestamp);
-        fTimeRangeHistogram.setCurrentEvent(fCurrentTimestamp);
-        fCurrentEventTimeControl.setValue(fCurrentTimestamp);
+        fFullTraceHistogram.setSelection(fSelectionBeginTime, fSelectionEndTime);
+        fTimeRangeHistogram.setSelection(fSelectionBeginTime, fSelectionEndTime);
+        fCurrentEventTimeControl.setValue(fSelectionBeginTime);
     }
 
     private void updateDisplayedTimeRange(long start, long end) {
