@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -122,58 +121,56 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
         Map<String, String> retMap = new LinkedHashMap<String, String>();
+        if (!(event instanceof TimeEvent) || !((TimeEvent) event).hasValue() ||
+                !(event.getEntry() instanceof ControlFlowEntry)) {
+            return retMap;
+        }
+        ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
+        ITmfStateSystem ssq = entry.getTrace().getStateSystems().get(LttngKernelTrace.STATE_ID);
+        int tid = entry.getThreadId();
 
-        if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
-            TimeGraphEntry entry = (TimeGraphEntry) event.getEntry();
-            ITmfStateSystem ssq = entry.getTrace().getStateSystems().get(LttngKernelTrace.STATE_ID);
-            if (entry instanceof ControlFlowEntry) {
-                ControlFlowEntry entry2 = (ControlFlowEntry) entry;
-                int tid = entry2.getThreadId();
-
-                try {
-                    // Find every CPU first, then get the current thread
-                    int cpusQuark = ssq.getQuarkAbsolute(Attributes.CPUS);
-                    List<Integer> cpuQuarks = ssq.getSubAttributes(cpusQuark, false);
-                    for (Integer cpuQuark : cpuQuarks) {
-                        int currentThreadQuark = ssq.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
-                        ITmfStateInterval interval = ssq.querySingleState(event.getTime(), currentThreadQuark);
-                        if (!interval.getStateValue().isNull()) {
-                            ITmfStateValue state = interval.getStateValue();
-                            int currentThreadId = state.unboxInt();
-                            if (tid == currentThreadId) {
-                                retMap.put(Messages.ControlFlowView_attributeCpuName, ssq.getAttributeName(cpuQuark));
-                                break;
-                            }
-                        }
-                    }
-
-                } catch (AttributeNotFoundException e) {
-                    e.printStackTrace();
-                } catch (TimeRangeException e) {
-                    e.printStackTrace();
-                } catch (StateValueTypeException e) {
-                    e.printStackTrace();
-                } catch (StateSystemDisposedException e) {
-                    /* Ignored */
-                }
-                int status = ((TimeEvent) event).getValue();
-                if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
-                    try {
-                        int syscallQuark = ssq.getQuarkRelative(entry2.getThreadQuark(), Attributes.SYSTEM_CALL);
-                        ITmfStateInterval value = ssq.querySingleState(event.getTime(), syscallQuark);
-                        if (!value.getStateValue().isNull()) {
-                            ITmfStateValue state = value.getStateValue();
-                            retMap.put(Messages.ControlFlowView_attributeSyscallName, state.toString());
-                        }
-
-                    } catch (AttributeNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (TimeRangeException e) {
-                        e.printStackTrace();
-                    } catch (StateSystemDisposedException e) {
-                        /* Ignored */
+        try {
+            // Find every CPU first, then get the current thread
+            int cpusQuark = ssq.getQuarkAbsolute(Attributes.CPUS);
+            List<Integer> cpuQuarks = ssq.getSubAttributes(cpusQuark, false);
+            for (Integer cpuQuark : cpuQuarks) {
+                int currentThreadQuark = ssq.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
+                ITmfStateInterval interval = ssq.querySingleState(event.getTime(), currentThreadQuark);
+                if (!interval.getStateValue().isNull()) {
+                    ITmfStateValue state = interval.getStateValue();
+                    int currentThreadId = state.unboxInt();
+                    if (tid == currentThreadId) {
+                        retMap.put(Messages.ControlFlowView_attributeCpuName, ssq.getAttributeName(cpuQuark));
+                        break;
                     }
                 }
+            }
+
+        } catch (AttributeNotFoundException e) {
+            e.printStackTrace();
+        } catch (TimeRangeException e) {
+            e.printStackTrace();
+        } catch (StateValueTypeException e) {
+            e.printStackTrace();
+        } catch (StateSystemDisposedException e) {
+            /* Ignored */
+        }
+        int status = ((TimeEvent) event).getValue();
+        if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
+            try {
+                int syscallQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
+                ITmfStateInterval value = ssq.querySingleState(event.getTime(), syscallQuark);
+                if (!value.getStateValue().isNull()) {
+                    ITmfStateValue state = value.getStateValue();
+                    retMap.put(Messages.ControlFlowView_attributeSyscallName, state.toString());
+                }
+
+            } catch (AttributeNotFoundException e) {
+                e.printStackTrace();
+            } catch (TimeRangeException e) {
+                e.printStackTrace();
+            } catch (StateSystemDisposedException e) {
+                /* Ignored */
             }
         }
 

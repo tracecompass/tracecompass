@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDrawingHelper;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils;
@@ -55,12 +56,12 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     private enum State {
         IDLE             (new RGB(200, 200, 200)),
-        USERMODE         (new RGB(0,   200, 0)),
-        SYSCALL          (new RGB(0,     0, 200)),
+        USERMODE         (new RGB(  0, 200,   0)),
+        SYSCALL          (new RGB(  0,   0, 200)),
         IRQ              (new RGB(200,   0, 100)),
         SOFT_IRQ         (new RGB(200, 150, 100)),
         IRQ_ACTIVE       (new RGB(200,   0, 100)),
-        SOFT_IRQ_RAISED  (new RGB(200, 200, 0)),
+        SOFT_IRQ_RAISED  (new RGB(200, 200,   0)),
         SOFT_IRQ_ACTIVE  (new RGB(200, 150, 100));
 
         public final RGB rgb;
@@ -81,12 +82,10 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         return State.values();
     }
 
-    private static State getEventState(ITimeEvent event) {
-        if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
-            TimeEvent tcEvent = (TimeEvent) event;
-
+    private static State getEventState(TimeEvent event) {
+        if (event.hasValue()) {
             ResourcesEntry entry = (ResourcesEntry) event.getEntry();
-            int value = tcEvent.getValue();
+            int value = event.getValue();
 
             if (entry.getType() == Type.CPU) {
                 if (value == StateValues.CPU_STATUS_IDLE) {
@@ -100,9 +99,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 } else if (value == StateValues.CPU_STATUS_SOFTIRQ) {
                     return State.SOFT_IRQ;
                 }
-            } else if ((entry.getType() == Type.IRQ) && (tcEvent.hasValue()) && (value != ResourcesView.NO_VALUE_EVENT)) {
+            } else if (entry.getType() == Type.IRQ) {
                 return State.IRQ_ACTIVE;
-            } else if ((entry.getType() == Type.SOFT_IRQ) && (tcEvent.hasValue()) && (value != ResourcesView.NO_VALUE_EVENT)) {
+            } else if (entry.getType() == Type.SOFT_IRQ) {
                 if (value == StateValues.SOFT_IRQ_RAISED) {
                     return State.SOFT_IRQ_RAISED;
                 }
@@ -114,15 +113,12 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
-        State state = getEventState(event);
+        State state = getEventState((TimeEvent) event);
         if (state != null) {
             return state.ordinal();
         }
-        if (event instanceof TimeEvent) {
-            TimeEvent tcEvent = (TimeEvent) event;
-            if (tcEvent.hasValue()) {
-                return INVISIBLE;
-            }
+        if (event instanceof NullTimeEvent) {
+            return INVISIBLE;
         }
         return TRANSPARENT;
     }
@@ -140,15 +136,12 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public String getEventName(ITimeEvent event) {
-        State state = getEventState(event);
+        State state = getEventState((TimeEvent) event);
         if (state != null) {
             return state.toString();
         }
-        if (event instanceof TimeEvent) {
-            TimeEvent tcEvent = (TimeEvent) event;
-            if (tcEvent.hasValue()) {
-                return null;
-            }
+        if (event instanceof NullTimeEvent) {
+            return null;
         }
         return Messages.ResourcesView_multipleStates;
     }
