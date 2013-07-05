@@ -20,7 +20,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
  * vice-versa functions without having to expose their full functionnalities.
  *
  * @author gbastien
- * @since 2.1
+ * @since 3.0
  */
 public interface ITmfTimeGraphDrawingHelper {
 

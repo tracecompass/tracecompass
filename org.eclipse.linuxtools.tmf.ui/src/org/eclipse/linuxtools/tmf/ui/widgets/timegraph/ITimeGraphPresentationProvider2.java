@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDraw
  * Extension of the ITimeGraphPresentationProvider interface to avoid API breakage
  *
  * @author Geneviève Bastien
- * @since 2.1
+ * @since 3.0
  * TODO: Add me to ITimeGraphPresentationProvider before the 3.0 release
  */
 public interface ITimeGraphPresentationProvider2 extends ITimeGraphPresentationProvider {

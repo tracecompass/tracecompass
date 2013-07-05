@@ -346,7 +346,7 @@ public class TimeGraphCombo extends Composite {
      *            the style of widget to construct
      * @param weights
      *            The relative weights of each side of the sash form
-     * @since 2.1
+     * @since 3.0
      */
     public TimeGraphCombo(Composite parent, int style, int[] weights) {
         super(parent, style);

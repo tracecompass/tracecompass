@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
  * Message strings for TMF model handling.
  *
  * @author Jean-Christian Kouamé
- * @since 2.1
+ * @since 3.0
  */
 public class Messages extends NLS {
 

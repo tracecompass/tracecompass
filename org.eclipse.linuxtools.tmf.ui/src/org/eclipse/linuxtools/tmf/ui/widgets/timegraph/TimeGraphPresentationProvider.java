@@ -48,7 +48,7 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     /**
      * Constructor
      * @param stateTypeName  The state type name
-     * @since 2.1
+     * @since 3.0
      */
     public TimeGraphPresentationProvider(String stateTypeName) {
         fStateTypeName = stateTypeName;
@@ -87,7 +87,7 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     }
 
     /**
-     * @since 2.1
+     * @since 3.0
      */
     @Override
     public ITmfTimeGraphDrawingHelper getDrawingHelper() {
@@ -95,7 +95,7 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     }
 
     /**
-     * @since 2.1
+     * @since 3.0
      */
     @Override
     public void setDrawingHelper(ITmfTimeGraphDrawingHelper helper) {
