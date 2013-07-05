@@ -122,7 +122,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      * @return boolean
      * @since 2.0
      */
-    public boolean seek(final CtfLocationInfo ctfLocationData) {
+    public synchronized boolean seek(final CtfLocationInfo ctfLocationData) {
         boolean ret = false;
 
         /* Adjust the timestamp depending on the trace's offset */
@@ -139,11 +139,12 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
          * assign the location index correctly
          */
         long index = 0;
-        if (this.getCurrentEvent() != null) {
-            currTimestamp = this.getCurrentEvent().getTimestamp().getValue();
+        final CtfTmfEvent currentEvent = this.getCurrentEvent();
+        if (currentEvent != null) {
+            currTimestamp = currentEvent.getTimestamp().getValue();
 
             for (long i = 0; i < ctfLocationData.getIndex(); i++) {
-                if (currTimestamp == this.getCurrentEvent().getTimestamp().getValue()) {
+                if (currTimestamp == currentEvent.getTimestamp().getValue()) {
                     index++;
                 } else {
                     index = 0;
@@ -246,7 +247,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      * @return boolean successful or not
      */
     @Override
-    public boolean advance() {
+    public synchronized boolean advance() {
         long index = curLocation.getLocationInfo().getIndex();
         long timestamp = curLocation.getLocationInfo().getTimestamp();
         boolean ret = super.advance();

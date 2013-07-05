@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.eclipse.linuxtools.internal.gdbtrace.core;x-internal:=true,
+Export-Package: org.eclipse.linuxtools.internal.gdbtrace.core;x-friends:="org.eclipse.linuxtools.gdbtrace.core.tests",
  org.eclipse.linuxtools.internal.gdbtrace.core.event;x-friends:="org.eclipse.linuxtools.gdbtrace.ui",
  org.eclipse.linuxtools.internal.gdbtrace.core.trace;x-friends:="org.eclipse.linuxtools.gdbtrace.ui"
 Import-Package: org.eclipse.cdt.dsf.concurrent,

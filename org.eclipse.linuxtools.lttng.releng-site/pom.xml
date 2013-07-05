@@ -39,7 +39,7 @@
                 <goal>run</goal>
               </goals>
               <configuration>
-              <tasks>
+              <target>
                 <delete includeemptydirs="false">
                   <fileset
                     dir="${lttngPackageDestination}">
@@ -52,7 +52,7 @@
                     <include name="**" />
                   </fileset>
                 </copy>
-              </tasks>
+              </target>
             </configuration>
           </execution>
         </executions>

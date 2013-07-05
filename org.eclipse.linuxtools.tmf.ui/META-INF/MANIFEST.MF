@@ -45,6 +45,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.views.statesystem,
  org.eclipse.linuxtools.tmf.ui.views.statistics,
  org.eclipse.linuxtools.tmf.ui.views.timechart,
+ org.eclipse.linuxtools.tmf.ui.views.timegraph,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.core,
  org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs,

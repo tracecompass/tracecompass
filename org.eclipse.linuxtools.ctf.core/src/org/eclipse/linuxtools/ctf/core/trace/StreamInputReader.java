@@ -13,6 +13,9 @@
 package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.nio.ByteOrder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
@@ -56,6 +59,8 @@ public class StreamInputReader {
 
     private CTFTraceReader parent;
 
+    /** Map of all the event types */
+    private final Map<Long, EventDefinition> eventDefs = new HashMap<Long,EventDefinition>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -163,6 +168,30 @@ public class StreamInputReader {
      */
     StreamInput getStreamInput() {
         return streamInput;
+    }
+
+    /**
+     * Gets the event definition hashmap for this StreamInput
+     *
+     * @return Unmodifiable map with the event definitions
+     * @since 2.1
+     */
+    public Map<Long, EventDefinition> getEventDefinitions() {
+        return Collections.unmodifiableMap(eventDefs);
+    }
+
+    /**
+     * Add an event definition to this stream input reader.
+     *
+     * @param id
+     *            The id of the event definition. This will overwrite any
+     *            existing definition with the same id.
+     * @param def
+     *            The matching event definition
+     * @since 2.1
+     */
+    public void addEventDefinition(Long id, EventDefinition def) {
+        eventDefs.put(id, def);
     }
 
     // ------------------------------------------------------------------------
