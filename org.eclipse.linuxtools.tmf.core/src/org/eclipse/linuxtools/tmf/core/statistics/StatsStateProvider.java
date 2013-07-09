@@ -14,10 +14,12 @@
 package org.eclipse.linuxtools.tmf.core.statistics;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfLostEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
+import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics.Attributes;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -48,7 +50,7 @@ class StatsStateProvider extends AbstractTmfStateProvider {
      * Version number of this input handler. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 0;
+    private static final int VERSION = 1;
 
     /**
      * Constructor
@@ -81,6 +83,18 @@ class StatsStateProvider extends AbstractTmfStateProvider {
         final String eventName = event.getType().getName();
 
         try {
+            /* Special handling for lost events */
+            if (event instanceof ITmfLostEvent) {
+                ITmfLostEvent le = (ITmfLostEvent) event;
+                quark = ss.getQuarkAbsoluteAndAdd(Attributes.EVENT_TYPES, Messages.LostEventsName);
+
+                int curVal = ss.queryOngoingState(quark).unboxInt();
+                if (curVal == -1) { curVal = 0; }
+
+                TmfStateValue value = TmfStateValue.newValueInt((int) (curVal + le.getNbLostEvents()));
+                ss.modifyAttribute(ts, value, quark);
+                return;
+            }
 
             /* Total number of events */
             quark = ss.getQuarkAbsoluteAndAdd(Attributes.TOTAL);
