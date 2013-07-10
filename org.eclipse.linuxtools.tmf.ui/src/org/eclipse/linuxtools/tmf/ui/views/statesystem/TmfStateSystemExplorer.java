@@ -374,10 +374,8 @@ public class TmfStateSystemExplorer extends TmfView {
 
             item.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND)) ;
 
-            if (!filterStatus) {
-                if (!value.equals(item.getText(VALUE_COL)) || fCurrentTimestamp == startTime.getValue()) {
+            if (!filterStatus && (!value.equals(item.getText(VALUE_COL)) || fCurrentTimestamp == startTime.getValue())) {
                     item.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_YELLOW));
-                }
             }
 
             item.setText(VALUE_COL, value) ;
