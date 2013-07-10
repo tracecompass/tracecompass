@@ -421,11 +421,13 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
      *         respectively as keys and values
      */
     private Map<String, String> getTraceProperties() {
-        for (ITmfTrace trace : TmfTraceManager.getInstance().getOpenedTraces()) {
-            if (trace.getResource().equals(this.getResource())) {
-                if (trace instanceof ITmfTraceProperties) {
-                    ITmfTraceProperties traceProperties = (ITmfTraceProperties) trace;
-                    return traceProperties.getTraceProperties();
+        for (ITmfTrace openedTrace : TmfTraceManager.getInstance().getOpenedTraces()) {
+            for (ITmfTrace singleTrace : TmfTraceManager.getTraceSet(openedTrace)) {
+                if (this.getLocation().toString().endsWith(singleTrace.getPath())) {
+                    if (singleTrace instanceof ITmfTraceProperties) {
+                        ITmfTraceProperties traceProperties = (ITmfTraceProperties) singleTrace;
+                        return traceProperties.getTraceProperties();
+                    }
                 }
             }
         }
