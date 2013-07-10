@@ -13,6 +13,7 @@
  *   Patrick Tasse, Ericsson - Refactoring
  *   Geneviève Bastien, École Polytechnique de Montréal - Move code to
  *                            provide base classes for time graph view
+ *                            Add display of links between items
  *****************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
@@ -37,6 +38,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationPro
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTreeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTreeExpansionEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.swt.SWT;
@@ -372,6 +374,16 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         fItemData.refreshData(traces);
         adjustScrolls();
         redraw();
+    }
+
+    /**
+     * Refresh the links (arrows) of this widget
+     *
+     * @param events The link events to refresh
+     * @since 2.1
+     */
+    public void refreshArrows(List<ILinkEvent> events) {
+        fItemData.refreshArrows(events);
     }
 
     /**
@@ -1174,6 +1186,8 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
         // draw items
         drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
+        drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);
+        fTimeGraphProvider.postDrawControl(bounds, gc);
 
         int alpha = gc.getAlpha();
         gc.setAlpha(100);
@@ -1276,7 +1290,6 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             Item item = items[i];
             drawItem(item, bounds, timeProvider, i, nameSpace, gc);
         }
-        fTimeGraphProvider.postDrawControl(bounds, gc);
     }
 
     /**
@@ -1368,6 +1381,131 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             }
         }
         fTimeGraphProvider.postDrawEntry(entry, rect, gc);
+    }
+
+    /**
+     * Draw the links
+     *
+     * @param bounds
+     *            The rectangle of the area
+     * @param timeProvider
+     *            The time provider
+     * @param links
+     *            The array items to draw
+     * @param nameSpace
+     *            The width reserved for the names
+     * @param gc
+     *            Reference to the SWT GC object
+     * @since 2.1
+     */
+    public void drawLinks(Rectangle bounds, ITimeDataProvider timeProvider,
+            List<ILinkEvent> links, int nameSpace, GC gc) {
+        for (ILinkEvent event : links) {
+            drawLink(event, bounds, timeProvider, nameSpace, gc);
+        }
+    }
+
+    /**
+     * Draws the link type events of this item
+     *
+     * @param event
+     *            the item to draw
+     * @param bounds
+     *            the container rectangle
+     * @param timeProvider
+     *            Time provider
+     * @param nameSpace
+     *            the name space
+     * @param gc
+     *            Graphics context
+     * @since 2.1
+     */
+    protected void drawLink(ILinkEvent event, Rectangle bounds, ITimeDataProvider timeProvider, int nameSpace, GC gc) {
+        int srcIndex = fItemData.findItemIndex(event.getEntry());
+        int destIndex = fItemData.findItemIndex(event.getDestinationEntry());
+
+        if ((srcIndex == -1) || (destIndex == -1)) {
+            return;
+        }
+
+        Rectangle src = getStatesRect(bounds, srcIndex, nameSpace);
+        Rectangle dst = getStatesRect(bounds, destIndex, nameSpace);
+
+        int x0 = getXForTime(event.getTime());
+        int x1 = getXForTime(event.getTime() + event.getDuration());
+        int y0 = src.y + src.height / 2;
+        int y1 = dst.y + dst.height / 2;
+        drawArrow(getColorScheme(), event, new Rectangle(x0, y0, x1 - x0, y1 - y0), gc);
+    }
+
+    /**
+     * Draw the state (color fill)
+     *
+     * @param colors
+     *            Color scheme
+     * @param event
+     *            Time event for which we're drawing the state
+     * @param rect
+     *            Where to draw
+     * @param gc
+     *            Graphics context
+     * @return true if the state was drawn
+     * @since 2.1
+     */
+    protected boolean drawArrow(TimeGraphColorScheme colors, ITimeEvent event,
+            Rectangle rect, GC gc) {
+
+        int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
+        if (colorIdx < 0) {
+            return false;
+        }
+        boolean visible = ((rect.height == 0) && (rect.width == 0)) ? false : true;
+
+        if (visible) {
+            Color stateColor = null;
+            if (colorIdx < fEventColorMap.length) {
+                stateColor = fEventColorMap[colorIdx];
+            } else {
+                stateColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+            }
+
+            gc.setForeground(stateColor);
+            gc.setBackground(stateColor);
+
+            /* Draw the arrow */
+            gc.drawLine(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
+            drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, gc);
+
+        }
+        fTimeGraphProvider.postDrawEvent(event, rect, gc);
+        return visible;
+    }
+
+    /*
+     * @author Francis Giraldeau
+     *
+     * Inspiration:
+     * http://stackoverflow.com/questions/3010803/draw-arrow-on-line-algorithm
+     *
+     * The algorithm was taken from this site, not the code itself
+     */
+    private static void drawArrowHead(int x0, int y0, int x1, int y1, GC gc)
+    {
+        int factor = 10;
+        double cos = 0.9510;
+        double sin = 0.3090;
+        int lenx = x1 - x0;
+        int leny = y1 - y0;
+        double len = Math.sqrt(lenx * lenx + leny * leny);
+
+        double dx = factor * lenx / len;
+        double dy = factor * leny / len;
+        int end1X = (int) Math.round((x1 - (dx * cos + dy * -sin)));
+        int end1Y = (int) Math.round((y1 - (dx * sin + dy * cos)));
+        int end2X = (int) Math.round((x1 - (dx * cos + dy * sin)));
+        int end2Y = (int) Math.round((y1 - (dx * -sin + dy * cos)));
+        int[] arrow = new int[] { x1, y1, end1X, end1Y, end2X, end2Y, x1, y1 };
+        gc.fillPolygon(arrow);
     }
 
     /**
@@ -2211,6 +2349,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         private Item[] fExpandedItems = new Item[0];
         private Item[] fItems = new Item[0];
         private ITimeGraphEntry fTraces[] = new ITimeGraphEntry[0];
+        private List<ILinkEvent> fLinks = new ArrayList<ILinkEvent>();
         private boolean fTraceFilter[] = new boolean[0];
         private final ArrayList<ITimeGraphEntry> fFilteredOut = new ArrayList<ITimeGraphEntry>();
 
@@ -2327,6 +2466,15 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             }
 
             refreshData();
+        }
+
+        public void refreshArrows(List<ILinkEvent> events) {
+            /* If links are null, reset the list */
+            if (events != null) {
+                fLinks = events;
+            } else {
+                fLinks = new ArrayList<ILinkEvent>();
+            }
         }
 
         public ITimeGraphEntry[] getTraces() {

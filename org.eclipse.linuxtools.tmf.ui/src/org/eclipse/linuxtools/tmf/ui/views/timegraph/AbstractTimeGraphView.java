@@ -11,6 +11,7 @@
  *   Bernd Hufmann - Updated signal handling
  *   Geneviève Bastien - Move code to provide base classes for time graph view
  *   Marc-Andre Laperle - Add time zone preference
+ *   Geneviève Bastien - Add event links between entries
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.timegraph;
@@ -53,6 +54,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProv
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -273,6 +275,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            the trace to add
      * @param list
      *            The list of time graph entries
+     * @since 2.1
      */
     protected void putEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
         synchronized(fEntryListMap) {
@@ -446,6 +449,10 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 }
                 zoom(entry, fMonitor);
             }
+            /* Refresh the arrows when zooming */
+            List<ILinkEvent> events = getLinkList(fZoomStartTime, fZoomEndTime, fResolution, fMonitor);
+            fTimeGraphCombo.setLinks(events);
+            redraw();
         }
 
         private void zoom(TimeGraphEntry entry, IProgressMonitor monitor) {
@@ -694,6 +701,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     /**
      * @param signal the format of the timestamps was updated.
+     * @since 2.1
      */
     @TmfSignalHandler
     public void updateTimeFormat( final TmfTimestampFormatUpdateSignal signal){
@@ -762,6 +770,27 @@ public abstract class AbstractTimeGraphView extends TmfView {
     protected abstract List<ITimeEvent> getEventList(TimeGraphEntry entry,
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor);
+
+    /**
+     * Gets the list of links (displayed as arrows) for a trace in a given
+     * timerange.  Default implementation returns an empty list.
+     *
+     * @param startTime
+     *            Start of the time range
+     * @param endTime
+     *            End of the time range
+     * @param resolution
+     *            The resolution
+     * @param monitor
+     *            The progress monitor object
+     * @return The list of link events
+     * @since 2.1
+     */
+    protected List<ILinkEvent> getLinkList(long startTime, long endTime,
+            long resolution, IProgressMonitor monitor) {
+        return new ArrayList<ILinkEvent>();
+    }
+
 
     /**
      * Refresh the display
