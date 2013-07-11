@@ -69,7 +69,7 @@ import org.eclipse.ui.IActionBars;
  * left, showing entries and a canvas on the right to draw something for these
  * entries.
  *
- * @since 2.1
+ * @since 3.0
  */
 public abstract class AbstractTimeGraphView extends TmfView {
 
