@@ -10,20 +10,28 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.tests.project.model;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+package org.eclipse.linuxtools.tmf.core.analysis;
 
 /**
- * Test suite for org.eclipse.linuxtools.tmf.ui.project.model
+ * Interface for all output types of analysis
+ *
+ * @author Geneviève Bastien
+ * @since 3.0
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ProjectModelAnalysisTest.class,
-        ProjectModelOutputTest.class,
-        ProjectModelTraceTest.class
-})
-public class AllTests {
+public interface IAnalysisOutput {
+
+    /**
+     * Gets the name of the output
+     *
+     * @return Name of the output
+     */
+    String getName();
+
+    /**
+     * Requests the output for an analysis module. This function does not
+     * necessarily output the analysis, it just specifies that the user wants
+     * this output.
+     */
+    void requestOutput();
 
 }

@@ -45,6 +45,8 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
     private static final String fTraceIconFile = "icons/elcl16/trace.gif"; //$NON-NLS-1$
     private static final String fUnknownIconFile = "icons/elcl16/unknown_parser.gif"; //$NON-NLS-1$
     private static final String fExperimentIconFile = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
+    private static final String fAnalysisIconFile = "icons/ovr16/experiment_folder_ovr.png"; //$NON-NLS-1$
+    private static final String fViewIconFile = "icons/obj16/node_obj.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -56,6 +58,8 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
     private final Image fDefaultTraceIcon;
     private final Image fUnknownTraceIcon;
     private final Image fExperimentIcon;
+    private final Image fDefaultAnalysisIcon;
+    private final Image fDefaultViewIcon;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -71,6 +75,8 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
         fDefaultTraceIcon = loadIcon(bundle, fTraceIconFile);
         fUnknownTraceIcon = loadIcon(bundle, fUnknownIconFile);
         fExperimentIcon = loadIcon(bundle, fExperimentIconFile);
+        fDefaultAnalysisIcon = loadIcon(bundle, fAnalysisIconFile);
+        fDefaultViewIcon = loadIcon(bundle, fViewIconFile);
     }
 
     private static Image loadIcon(Bundle bundle, String url) {
@@ -128,6 +134,28 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
 
         if (element instanceof TmfTraceFolder) {
             return fTraceFolderIcon;
+        }
+
+        if (element instanceof TmfAnalysisOutputElement) {
+            TmfAnalysisOutputElement output = (TmfAnalysisOutputElement) element;
+            Image icon = output.getIcon();
+            if (icon == null) {
+                return fDefaultViewIcon;
+            }
+            return icon;
+        }
+
+        if (element instanceof TmfAnalysisElement) {
+            TmfAnalysisElement analysis = (TmfAnalysisElement) element;
+            String iconFile = analysis.getIconFile();
+            if (iconFile != null) {
+                Bundle bundle = analysis.getBundle();
+                if (bundle != null) {
+                    Image icon = loadIcon(bundle, iconFile);
+                    return icon;
+                }
+            }
+            return fDefaultAnalysisIcon;
         }
 
         return null;

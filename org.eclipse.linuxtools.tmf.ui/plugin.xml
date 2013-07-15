@@ -405,6 +405,9 @@
                         <instanceof
                               value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                         </instanceof>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisOutputElement">
+                        </instanceof>
                      </or>
                   </iterate>
                </with>
@@ -736,6 +739,30 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.analysis_help"
+               icon="icons/dlcl16/open.gif"
+               label="%command.analysis_help"
+               mnemonic="%command.analysis_help.mnemonic"
+               style="push"
+               tooltip="%command.analysis_help.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisElement">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -750,6 +777,12 @@
             description="%command.new_experiment.description"
             id="org.eclipse.linuxtools.tmf.ui.command.new_experiment"
             name="%command.new_experiment">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.analysis_help.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.analysis_help"
+            name="%command.analysis_help">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
@@ -928,6 +961,40 @@
                      operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenAnalysisHelpHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.analysis_help">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisElement">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenAnalysisOutputHandler"
+            commandId="org.eclipse.ui.navigate.openResource">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisOutputElement">
                   </instanceof>
                </iterate>
             </and>

@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.linuxtools.tmf.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.linuxtools.tmf.core" id="org.eclipse.linuxtools.tmf.core.analysis" name="Trace Analysis Module"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to contribute new analysis modules to the TMF framework.  Analysis modules provide new independent functionalities that can be run on traces.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="module"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="module">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="parameter"/>
+            <element ref="tracetype"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique ID that identifies this analysis module.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The trace analysis module&apos;s name as it is displayed to the end user
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="analysis_module" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The fully qualified name of a class that implements the &lt;samp&gt;IAnalysisModule&lt;/samp&gt; interface.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  The icon associated to this analysis module.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="automatic" type="boolean">
+            <annotation>
+               <documentation>
+                  Whether to execute this analysis automatically when trace is opened, or wait for the user to ask for it
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parameter">
+      <annotation>
+         <documentation>
+            Parameter for this module
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The parameter name
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="default_value" type="string">
+            <annotation>
+               <documentation>
+                  A default value for this parameter
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="tracetype">
+      <annotation>
+         <documentation>
+            Allow to define the tracetypes this analysis applies to.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The base trace class this analysis applies to or not (it also applies to traces extending this class).
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.trace.ITmfTrace"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="applies" type="boolean">
+            <annotation>
+               <documentation>
+                  Does this tracetype element mean the class applies or not (default true)
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         3.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+For an example implementation of an analysis module see:
+&lt;pre&gt;
+plug-in: org.eclipse.linuxtools.tmf.core.tests
+package: org.eclipse.linuxtools.tmf.core.tests.stubs.analysis
+class: TestCtfAnalysis
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+The following is an example of the extension point:
+&lt;pre&gt;
+&lt;extension
+         point=&quot;org.eclipse.linuxtools.tmf.core.analysis&quot;&gt;
+      &lt;module
+         id=&quot;org.eclipse.linuxtools.tmf.core.tests.analysis.testctf&quot;
+         name=&quot;Test analysis ctf&quot;
+         analysis_module=&quot;org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestCtfAnalysis&quot;
+         automatic=&quot;true&quot;&gt;
+      &lt;/module&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+For this extension point, a class implementing IAnalysisModule must be defined (org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule).  Most analysis can just extend the org.eclipse.linuxtools.tmf.core.analysis.TmfAbstractAnalysisModule class, since it already contains everything to manage the trace&apos;s, the analysis&apos; execution, cancellation, completion, the help texts, etc.
+&lt;/p&gt;
+&lt;p&gt;
+The key method to implement if extending TmfAbstractAnalysisModule is executeAnalysis(final IProgressMonitor monitor).  It contains the code of the analysis itself and is executed inside an Eclipse job.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2013 École Polytechnique de Montréal
+
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

@@ -16,11 +16,13 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -234,6 +236,35 @@ public interface ITmfTrace extends ITmfDataProvider {
      * @since 2.0
      */
     void indexTrace(boolean waitForCompletion);
+
+    /**
+     * Returns an analysis module with the given id
+     *
+     * @param analysisId
+     *            The analysis module id
+     * @return The {@link IAnalysisModule} object
+     */
+    IAnalysisModule getAnalysisModule(String analysisId);
+
+    /**
+     * Return a list of analysis modules that are of a given class
+     *
+     * @param moduleclass
+     *            Class returned module must extend
+     * @return List of {@link IAnalysisModule} of class moduleclass
+     */
+    List<IAnalysisModule> getAnalysisModules(Class<? extends IAnalysisModule> moduleclass);
+
+    /**
+     * Returns a map of analysis modules applicable to this trace. The key is
+     * the analysis id.
+     *
+     * This view should be read-only (implementations should use
+     * {@link Collections#unmodifiableMap}).
+     *
+     * @return The map of analysis modules
+     */
+    Map<String, IAnalysisModule> getAnalysisModules();
 
     // ------------------------------------------------------------------------
     // Trace characteristics getters

@@ -50,6 +50,8 @@ public class Messages extends NLS {
     public static String SynchronizeTracesHandler_ErrorSynchingExperiment;
     public static String SynchronizeTracesHandler_ErrorSynchingForTrace;
 
+    public static String AnalysisModule_Help;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

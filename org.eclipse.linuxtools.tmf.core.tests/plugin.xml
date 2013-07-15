@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+         id="org.eclipse.linuxtools.tmf.core.tests.analysis.test"
+         name="Test analysis"
+         analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis">
+         <parameter
+               name="test">
+         </parameter>
+         <tracetype
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
+         </tracetype>
+      </module>
+      <module
+         id="org.eclipse.linuxtools.tmf.core.tests.analysis.test2"
+         name="Test analysis 2"
+         analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis"
+         automatic="true">
+         <parameter
+               default_value="3"
+               name="test">
+         </parameter>
+         <tracetype
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
+         </tracetype>
+      </module>
+      <module
+         id="org.eclipse.linuxtools.tmf.core.tests.analysis.testctf"
+         name="Test analysis ctf"
+         analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestCtfAnalysis"
+         automatic="true">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub">
+         </tracetype>
+      </module>
+   </extension>
+
+</plugin>

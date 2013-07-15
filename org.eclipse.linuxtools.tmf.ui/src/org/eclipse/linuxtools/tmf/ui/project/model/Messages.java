@@ -24,6 +24,12 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.project.model.messages"; //$NON-NLS-1$
 
+    /** Instantiate analysis message box title */
+    public static String TmfAnalysisElement_InstantiateAnalysis;
+
+    /** The message when analysis view is not available */
+    public static String TmfAnalysisViewOutput_ViewUnavailable;
+
     /** The category of the resource properties */
     public static String TmfTraceElement_ResourceProperties;
 
@@ -67,6 +73,9 @@ public class Messages extends NLS {
     public static String TmfOpenTraceHelper_ErrorExperiment;
     /** Init error */
     public static String TmfOpenTraceHelper_InitError;
+
+    /** Analysis view title */
+    public static String TmfAnalysisViewOutput_Title;
 
     static {
         // initialize resource bundle

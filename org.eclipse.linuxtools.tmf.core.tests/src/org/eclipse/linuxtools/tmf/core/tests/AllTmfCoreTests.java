@@ -22,6 +22,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TmfCorePluginTest.class,
+    org.eclipse.linuxtools.tmf.core.tests.analysis.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.component.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.event.AllTests.class,

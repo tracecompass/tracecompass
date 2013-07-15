@@ -86,17 +86,9 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
             IProject project = (IProject) element;
             return project.isAccessible();
         }
-        if (element instanceof TmfTraceFolder) {
-            TmfTraceFolder folder = (TmfTraceFolder) element;
-            return folder.hasChildren();
-        }
-        if (element instanceof TmfExperimentFolder) {
-            TmfExperimentFolder folder = (TmfExperimentFolder) element;
-            return folder.hasChildren();
-        }
-        if (element instanceof TmfExperimentElement) {
-            TmfExperimentElement folder = (TmfExperimentElement) element;
-            return folder.hasChildren();
+        if (element instanceof TmfProjectModelElement) {
+            TmfProjectModelElement modelElement = (TmfProjectModelElement) element;
+            return modelElement.hasChildren();
         }
         return false;
     }
@@ -146,6 +138,16 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
         // Experiment
         if (parentElement instanceof TmfExperimentElement) {
             return getExperimentChildren((TmfExperimentElement) parentElement);
+        }
+
+        // Traces
+        if (parentElement instanceof TmfTraceElement) {
+            return getTraceChildren((TmfTraceElement) parentElement);
+        }
+
+        // Analysis
+        if (parentElement instanceof TmfAnalysisElement) {
+            return getAnalysisChildren((TmfAnalysisElement) parentElement);
         }
 
         return new Object[0];
@@ -232,6 +234,7 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
                 }
                 children.add(trace);
                 childrenMap.remove(name);
+                getTraceChildren((TmfTraceElement) trace);
             }
         } catch (CoreException e) {
         }
@@ -314,6 +317,32 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
         // Remove the leftovers (what was in the model but removed from the
         // project)
         cleanupModel(tmfExperiment, childrenMap);
+
+        for (TmfAnalysisElement analysis : tmfExperiment.getAvailableAnalysis()) {
+            children.add(analysis);
+        }
+
+        return children.toArray();
+    }
+
+    private static Object[] getTraceChildren(TmfTraceElement parentElement) {
+        // The children structure
+        List<Object> children = new ArrayList<Object>();
+
+        for (TmfAnalysisElement analysis : parentElement.getAvailableAnalysis()) {
+            children.add(analysis);
+        }
+
+        return children.toArray();
+    }
+
+    private static Object[] getAnalysisChildren(TmfAnalysisElement parentElement) {
+        // The children structure
+        List<Object> children = new ArrayList<Object>();
+
+        for (TmfAnalysisOutputElement output : parentElement.getAvailableOutputs()) {
+            children.add(output);
+        }
 
         return children.toArray();
     }
