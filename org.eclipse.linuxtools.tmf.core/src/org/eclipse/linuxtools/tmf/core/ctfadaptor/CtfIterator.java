@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * The CTF trace reader iterator.
@@ -202,6 +202,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     /**
      * Method setLocation.
      * @param location ITmfLocation<?>
+     * @since 3.0
      */
     @Override
     public void setLocation(final ITmfLocation location) {

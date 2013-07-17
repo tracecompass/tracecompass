@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +30,10 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * A simple indexer that manages the trace index as an array of trace
@@ -43,12 +47,12 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
  * <p>
  * Locating a specific checkpoint is trivial for both rank (rank % interval) and
  * timestamp (bsearch in the array).
- *
- * @version 1.0
- * @author Francois Chouinard
- *
+ * *
  * @see ITmfTrace
  * @see ITmfEvent
+ *
+ * @author Francois Chouinard
+ * @since 3.0
  */
 public class TmfCheckpointIndexer implements ITmfTraceIndexer {
 

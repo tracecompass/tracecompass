@@ -11,19 +11,20 @@
  *   Patrick Tasse - Updated for location in checkpoint
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * The basic trace checkpoint structure in TMF. The purpose of the checkpoint is
  * to associate a trace location to an event timestamp.
- *
- * @version 1.0
- * @author Francois Chouinard
- *
+ * *
  * @see ITmfTimestamp
  * @see ITmfLocation
+ *
+ * @author Francois Chouinard
+ * @since 3.0
  */
 public interface ITmfCheckpoint extends Comparable<ITmfCheckpoint> {
 

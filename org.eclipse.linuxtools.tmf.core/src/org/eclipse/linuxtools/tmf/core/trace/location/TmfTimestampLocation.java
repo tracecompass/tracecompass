@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.location;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
  * A concrete implementation of TmfLocation based on ITmfTimestamp:s
  *
  * @author Francois Chouinard
- * @since 2.0
+ * @since 3.0
  */
 public final class TmfTimestampLocation extends TmfLocation {
 

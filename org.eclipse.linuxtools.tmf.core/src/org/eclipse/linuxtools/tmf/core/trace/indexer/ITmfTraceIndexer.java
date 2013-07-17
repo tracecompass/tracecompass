@@ -10,20 +10,22 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.indexer;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * The generic trace indexer in TMF with support for incremental indexing.
  *
- * @version 1.0
- * @author Francois Chouinard
- *
  * @see ITmfTrace
  * @see ITmfEvent
+ *
+ * @author Francois Chouinard
+ * @since 3.0
  */
 public interface ITmfTraceIndexer {
 

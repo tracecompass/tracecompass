@@ -10,9 +10,9 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.tests.trace;
+package org.eclipse.linuxtools.tmf.core.tests.trace.location;
 
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.TmfLocation;
 
 /**
  * <b><u>TmfStringLocation</u></b>

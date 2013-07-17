@@ -13,7 +13,7 @@
  *   Patrick Tasse - Updated for location in checkpoint
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.tests.trace;
+package org.eclipse.linuxtools.tmf.core.tests.trace.indexer.checkpoint;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,9 +22,9 @@ import static org.junit.Assert.fail;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.TmfCheckpoint;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
 import org.junit.Test;
 
 /**

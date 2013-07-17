@@ -15,8 +15,8 @@ package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
 import java.util.regex.Matcher;
 
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * Trace context for custom text traces.

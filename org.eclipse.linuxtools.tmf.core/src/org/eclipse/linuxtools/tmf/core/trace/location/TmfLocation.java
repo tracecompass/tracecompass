@@ -11,15 +11,15 @@
  *   Francois Chouinard - Updated as per TMF Trace Model 1.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.location;
 
 
 /**
  * A abstract implementation of ITmfLocation. The concrete classes must provide
  * comparable location information.
  *
- * @version 2.0
  * @author Francois Chouinard
+ * @since 3.0
  */
 public abstract class TmfLocation implements ITmfLocation {
 

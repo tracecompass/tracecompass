@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
 
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * Trace context for custom XML traces.

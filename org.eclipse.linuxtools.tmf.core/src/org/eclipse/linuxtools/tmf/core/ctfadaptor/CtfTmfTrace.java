@@ -33,9 +33,9 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * The CTf trace handler
@@ -173,12 +173,16 @@ public class CtfTmfTrace extends TmfTrace
      *
      * @return null, since the trace has no knowledge of the current location
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getCurrentLocation()
+     * @since 3.0
      */
     @Override
     public ITmfLocation getCurrentLocation() {
         return null;
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
     public double getLocationRatio(ITmfLocation location) {
         final CtfLocation curLocation = (CtfLocation) location;
@@ -198,6 +202,7 @@ public class CtfTmfTrace extends TmfTrace
      * @param location
      *            ITmfLocation<?>
      * @return ITmfContext
+     * @since 3.0
      */
     @Override
     public synchronized ITmfContext seekEvent(final ITmfLocation location) {

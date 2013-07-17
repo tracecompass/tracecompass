@@ -33,6 +33,8 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * TmfExperiment presents a time-ordered, unified view of a set of ITmfTrace:s
@@ -254,6 +256,9 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
     // ITmfTrace trace positioning
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 3.0
+     */
     @Override
     public synchronized ITmfContext seekEvent(final ITmfLocation location) {
         // Validate the location
@@ -306,6 +311,9 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
         return context;
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
     public double getLocationRatio(final ITmfLocation location) {
         if (location instanceof TmfExperimentLocation) {
@@ -319,6 +327,9 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser {
         return 0.0;
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
     public ITmfLocation getCurrentLocation() {
         // never used

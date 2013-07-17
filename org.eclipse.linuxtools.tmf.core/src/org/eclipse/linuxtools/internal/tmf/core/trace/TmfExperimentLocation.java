@@ -14,7 +14,7 @@
 
 package org.eclipse.linuxtools.internal.tmf.core.trace;
 
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 
 /**

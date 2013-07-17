@@ -11,7 +11,7 @@
  *   Francois Chouinard - Updated as per TMF Trace Model 1.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.location;
 
 /**
  * The generic trace location in TMF.
@@ -22,8 +22,8 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * <p>
  * This location is trace-specific, must be comparable and immutable.
  *
- * @version 2.0
  * @author Francois Chouinard
+ * @since 3.0
  */
 public interface ITmfLocation {
 

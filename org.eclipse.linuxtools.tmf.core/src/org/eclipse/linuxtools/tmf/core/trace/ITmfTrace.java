@@ -26,6 +26,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * The event stream structure in TMF. In its basic form, a trace has:
@@ -259,6 +261,7 @@ public interface ITmfTrace extends ITmfDataProvider {
 
     /**
      * @return the current trace location
+     * @since 3.0
      */
     ITmfLocation getCurrentLocation();
 
@@ -267,6 +270,7 @@ public interface ITmfTrace extends ITmfDataProvider {
      *
      * @param location a trace specific location
      * @return a floating-point number between 0.0 (beginning) and 1.0 (end)
+     * @since 3.0
      */
     double getLocationRatio(ITmfLocation location);
 
@@ -285,6 +289,7 @@ public interface ITmfTrace extends ITmfDataProvider {
      * <p>
      * @param location the trace specific location
      * @return a context which can later be used to read the corresponding event
+     * @since 3.0
      */
     ITmfContext seekEvent(ITmfLocation location);
 

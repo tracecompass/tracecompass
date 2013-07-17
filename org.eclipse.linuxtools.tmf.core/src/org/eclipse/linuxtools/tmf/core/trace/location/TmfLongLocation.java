@@ -10,13 +10,14 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.location;
+
 
 /**
  * A concrete implementation of TmfLocation based on Long:s
  *
  * @author Francois Chouinard
- * @since 2.0
+ * @since 3.0
  */
 public final class TmfLongLocation extends TmfLocation {
 

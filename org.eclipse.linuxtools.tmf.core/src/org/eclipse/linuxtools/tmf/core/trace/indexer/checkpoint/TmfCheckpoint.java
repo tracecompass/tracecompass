@@ -12,19 +12,20 @@
  *   Patrick Tasse - Updated for location in checkpoint
  ******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.trace;
+package org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
  * A basic implementation of ITmfCheckpoint. It simply maps an event timestamp
  * to a generic location.
  *
- * @version 1.0
- * @author Francois Chouinard
- *
  * @see ITmfLocation
  * @see ITmfTimestamp
+ *
+ * @author Francois Chouinard
+ * @since 3.0
  */
 public class TmfCheckpoint implements ITmfCheckpoint {
 
@@ -47,7 +48,7 @@ public class TmfCheckpoint implements ITmfCheckpoint {
      *
      * @param timestamp the checkpoint timestamp
      * @param location the corresponding trace location
-     * @since 2.0
+     * @since 3.0
      */
     public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfLocation location) {
         fTimestamp = timestamp;

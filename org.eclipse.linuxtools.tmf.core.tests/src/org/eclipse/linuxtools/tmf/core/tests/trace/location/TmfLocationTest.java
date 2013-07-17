@@ -12,7 +12,7 @@
  *   Patrick Tasse - Add tests for TmfExperimentLocation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.tests.trace;
+package org.eclipse.linuxtools.tmf.core.tests.trace.location;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,9 +22,9 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentLocation;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfLocationArray;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLongLocation;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTimestampLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.TmfTimestampLocation;
 import org.junit.Before;
 import org.junit.Test;
 

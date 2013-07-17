@@ -14,6 +14,8 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
+import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
+
 /**
  * The basic trace context structure in TMF. The purpose of the context is to
  * associate a trace location to an event at a specific rank (order).
@@ -49,6 +51,7 @@ public interface ITmfContext {
 
     /**
      * @return the location of the event at the context rank
+     * @since 3.0
      */
     ITmfLocation getLocation();
 
@@ -63,6 +66,7 @@ public interface ITmfContext {
 
     /**
      * @param location the new location
+     * @since 3.0
      */
     void setLocation(ITmfLocation location);
 

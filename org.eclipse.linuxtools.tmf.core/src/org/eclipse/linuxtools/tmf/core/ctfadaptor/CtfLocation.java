@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.location.TmfLocation;
 
 /**
  * The nugget of information that is unique to a location in a CTF trace.
