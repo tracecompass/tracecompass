@@ -82,4 +82,8 @@ public class ControlFlowEntry extends TimeGraphEntry {
         return fThreadQuark;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + '(' + getName() + '[' + fThreadId + "])"; //$NON-NLS-1$
+    }
 }

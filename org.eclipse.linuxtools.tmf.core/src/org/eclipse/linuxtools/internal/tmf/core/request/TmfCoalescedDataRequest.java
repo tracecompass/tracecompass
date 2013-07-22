@@ -344,7 +344,8 @@ public class TmfCoalescedDataRequest extends TmfDataRequest {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName()
-			+ "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
+        return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName()
+                + "," + getExecType() + "," + getIndex() + "," + getNbRequested() + ","
+                + getBlockSize() + ", " + fRequests.toString() + ")]";
     }
 }

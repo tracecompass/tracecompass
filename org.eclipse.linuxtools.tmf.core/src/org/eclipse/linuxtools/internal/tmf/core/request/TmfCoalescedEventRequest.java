@@ -280,8 +280,9 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-		return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName()
-			+ "," + getRange() + "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
+        return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName()
+                + "," + getExecType() + "," + getRange() + "," + getIndex() + "," + getNbRequested()
+                + "," + getBlockSize() + ", " + fRequests.toString() + ")]";
     }
 
 }

@@ -235,10 +235,10 @@ public class TmfEventRequestTest {
 
     @Test
     public void testToString() {
-        String expected1 = "[TmfEventRequest(0,ITmfEvent," + range1 + ",0,100,200)]";
-        String expected2 = "[TmfEventRequest(1,ITmfEvent," + range2 + ",0,100,200)]";
-        String expected3 = "[TmfEventRequest(2,ITmfEvent," + range2 + ",0,200,200)]";
-        String expected4 = "[TmfEventRequest(3,ITmfEvent," + range2 + ",0,200,300)]";
+        String expected1 = "[TmfEventRequestStub(0,ITmfEvent,FOREGROUND," + range1 + ",0,100,200)]";
+        String expected2 = "[TmfEventRequestStub(1,ITmfEvent,FOREGROUND," + range2 + ",0,100,200)]";
+        String expected3 = "[TmfEventRequestStub(2,ITmfEvent,FOREGROUND," + range2 + ",0,200,200)]";
+        String expected4 = "[TmfEventRequestStub(3,ITmfEvent,FOREGROUND," + range2 + ",0,200,300)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

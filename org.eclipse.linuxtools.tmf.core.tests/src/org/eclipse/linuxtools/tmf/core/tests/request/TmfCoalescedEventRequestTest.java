@@ -256,10 +256,10 @@ public class TmfCoalescedEventRequestTest {
 
     @Test
     public void testToString() {
-        String expected1 = "[TmfCoalescedEventRequest(0,ITmfEvent," + range1 + ",0,100,200)]";
-        String expected2 = "[TmfCoalescedEventRequest(1,ITmfEvent," + range2 + ",0,100,200)]";
-        String expected3 = "[TmfCoalescedEventRequest(2,ITmfEvent," + range2 + ",0,200,200)]";
-        String expected4 = "[TmfCoalescedEventRequest(3,ITmfEvent," + range2 + ",0,200,300)]";
+        String expected1 = "[TmfCoalescedEventRequest(0,ITmfEvent,FOREGROUND," + range1 + ",0,100,200, [])]";
+        String expected2 = "[TmfCoalescedEventRequest(1,ITmfEvent,FOREGROUND," + range2 + ",0,100,200, [])]";
+        String expected3 = "[TmfCoalescedEventRequest(2,ITmfEvent,FOREGROUND," + range2 + ",0,200,200, [])]";
+        String expected4 = "[TmfCoalescedEventRequest(3,ITmfEvent,FOREGROUND," + range2 + ",0,200,300, [])]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

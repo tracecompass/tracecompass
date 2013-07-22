@@ -224,4 +224,9 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         fChildren.add(child);
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + '(' + fName + ')';
+    }
+
 }

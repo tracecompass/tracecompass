@@ -214,10 +214,10 @@ public class TmfDataRequestTest {
 
     @Test
     public void testToString() {
-        String expected1 = "[TmfDataRequest(0,ITmfEvent,10,100,200)]";
-        String expected2 = "[TmfDataRequest(1,ITmfEvent,20,100,200)]";
-        String expected3 = "[TmfDataRequest(2,ITmfEvent,20,200,200)]";
-        String expected4 = "[TmfDataRequest(3,ITmfEvent,20,200,300)]";
+        String expected1 = "[TmfDataRequestStub(0,ITmfEvent,FOREGROUND,10,100,200)]";
+        String expected2 = "[TmfDataRequestStub(1,ITmfEvent,FOREGROUND,20,100,200)]";
+        String expected3 = "[TmfDataRequestStub(2,ITmfEvent,FOREGROUND,20,200,200)]";
+        String expected4 = "[TmfDataRequestStub(3,ITmfEvent,FOREGROUND,20,200,300)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());
