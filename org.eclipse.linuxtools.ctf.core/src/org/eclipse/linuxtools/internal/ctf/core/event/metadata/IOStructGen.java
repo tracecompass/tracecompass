@@ -379,19 +379,19 @@ public class IOStructGen {
 
         String left = concatenateUnaryStrings(leftStrings);
 
-        if (left.equals(CTFStrings.MAJOR)) {
+        if (left.equals(MetadataStrings.MAJOR)) {
             if (trace.majortIsSet()) {
                 throw new ParseException("major is already set"); //$NON-NLS-1$
             }
 
             trace.setMajor(getMajorOrMinor(rightNode));
-        } else if (left.equals(CTFStrings.MINOR)) {
+        } else if (left.equals(MetadataStrings.MINOR)) {
             if (trace.minorIsSet()) {
                 throw new ParseException("minor is already set"); //$NON-NLS-1$
             }
 
             trace.setMinor(getMajorOrMinor(rightNode));
-        } else if (left.equals(CTFStrings.UUID_STRING)) {
+        } else if (left.equals(MetadataStrings.UUID_STRING)) {
             UUID uuid = getUUID(rightNode);
 
             /*
@@ -407,7 +407,7 @@ public class IOStructGen {
                 trace.setUUID(uuid);
             }
 
-        } else if (left.equals(CTFStrings.BYTE_ORDER)) {
+        } else if (left.equals(MetadataStrings.BYTE_ORDER)) {
             ByteOrder byteOrder = getByteOrder(rightNode);
 
             /*
@@ -435,7 +435,7 @@ public class IOStructGen {
                     }
                 }
             }
-        } else if (left.equals(CTFStrings.PACKET_HEADER)) {
+        } else if (left.equals(MetadataStrings.PACKET_HEADER)) {
             if (trace.packetHeaderIsSet()) {
                 throw new ParseException("packet.header already defined"); //$NON-NLS-1$
             }
@@ -551,7 +551,7 @@ public class IOStructGen {
 
         if (stream.isIdSet()) {
             if (!trace.packetHeaderIsSet()
-                    || !trace.getPacketHeader().hasField(CTFStrings.STREAM_ID)) {
+                    || !trace.getPacketHeader().hasField(MetadataStrings.STREAM_ID)) {
                 throw new ParseException(
                         "Stream has an ID, but there is no stream_id field in packet header."); //$NON-NLS-1$
             }
@@ -579,7 +579,7 @@ public class IOStructGen {
 
         String left = concatenateUnaryStrings(leftStrings);
 
-        if (left.equals(CTFStrings.ID)) {
+        if (left.equals(MetadataStrings.ID)) {
             if (stream.isIdSet()) {
                 throw new ParseException("stream id already defined"); //$NON-NLS-1$
             }
@@ -587,7 +587,7 @@ public class IOStructGen {
             long streamID = getStreamID(rightNode);
 
             stream.setId(streamID);
-        } else if (left.equals(CTFStrings.EVENT_HEADER)) {
+        } else if (left.equals(MetadataStrings.EVENT_HEADER)) {
             if (stream.isEventHeaderSet()) {
                 throw new ParseException("event.header already defined"); //$NON-NLS-1$
             }
@@ -607,7 +607,7 @@ public class IOStructGen {
             }
 
             stream.setEventHeader((StructDeclaration) eventHeaderDecl);
-        } else if (left.equals(CTFStrings.EVENT_CONTEXT)) {
+        } else if (left.equals(MetadataStrings.EVENT_CONTEXT)) {
             if (stream.isEventContextSet()) {
                 throw new ParseException("event.context already defined"); //$NON-NLS-1$
             }
@@ -627,7 +627,7 @@ public class IOStructGen {
             }
 
             stream.setEventContext((StructDeclaration) eventContextDecl);
-        } else if (left.equals(CTFStrings.PACKET_CONTEXT)) {
+        } else if (left.equals(MetadataStrings.PACKET_CONTEXT)) {
             if (stream.isPacketContextSet()) {
                 throw new ParseException("packet.context already defined"); //$NON-NLS-1$
             }
@@ -736,7 +736,7 @@ public class IOStructGen {
 
         String left = concatenateUnaryStrings(leftStrings);
 
-        if (left.equals(CTFStrings.NAME2)) {
+        if (left.equals(MetadataStrings.NAME2)) {
             if (event.nameIsSet()) {
                 throw new ParseException("name already defined"); //$NON-NLS-1$
             }
@@ -744,7 +744,7 @@ public class IOStructGen {
             String name = getEventName(rightNode);
 
             event.setName(name);
-        } else if (left.equals(CTFStrings.ID)) {
+        } else if (left.equals(MetadataStrings.ID)) {
             if (event.idIsSet()) {
                 throw new ParseException("id already defined"); //$NON-NLS-1$
             }
@@ -752,7 +752,7 @@ public class IOStructGen {
             long id = getEventID(rightNode);
 
             event.setId(id);
-        } else if (left.equals(CTFStrings.STREAM_ID)) {
+        } else if (left.equals(MetadataStrings.STREAM_ID)) {
             if (event.streamIsSet()) {
                 throw new ParseException("stream id already defined"); //$NON-NLS-1$
             }
@@ -766,7 +766,7 @@ public class IOStructGen {
             }
 
             event.setStream(stream);
-        } else if (left.equals(CTFStrings.CONTEXT)) {
+        } else if (left.equals(MetadataStrings.CONTEXT)) {
             if (event.contextIsSet()) {
                 throw new ParseException("context already defined"); //$NON-NLS-1$
             }
@@ -785,7 +785,7 @@ public class IOStructGen {
             }
 
             event.setContext((StructDeclaration) contextDecl);
-        } else if (left.equals(CTFStrings.FIELDS_STRING)) {
+        } else if (left.equals(MetadataStrings.FIELDS_STRING)) {
             if (event.fieldsIsSet()) {
                 throw new ParseException("fields already defined"); //$NON-NLS-1$
             }
@@ -808,7 +808,7 @@ public class IOStructGen {
              */
             final StructDeclaration fields = (StructDeclaration) fieldsDecl;
             event.setFields(fields);
-        } else if (left.equals(CTFStrings.LOGLEVEL2)) {
+        } else if (left.equals(MetadataStrings.LOGLEVEL2)) {
             long logLevel = parseUnaryInteger((CommonTree) rightNode.getChild(0));
             event.setLogLevel(logLevel);
         } else {
@@ -1263,13 +1263,13 @@ public class IOStructGen {
                 }
                 String left = concatenateUnaryStrings(leftStrings);
 
-                if (left.equals(CTFStrings.EXP_DIG)) {
+                if (left.equals(MetadataStrings.EXP_DIG)) {
                     exponent = (int) parseUnaryInteger((CommonTree) rightNode.getChild(0));
-                } else if (left.equals(CTFStrings.BYTE_ORDER)) {
+                } else if (left.equals(MetadataStrings.BYTE_ORDER)) {
                     byteOrder = getByteOrder(rightNode);
-                } else if (left.equals(CTFStrings.MANT_DIG)) {
+                } else if (left.equals(MetadataStrings.MANT_DIG)) {
                     mantissa = (int) parseUnaryInteger((CommonTree) rightNode.getChild(0));
-                } else if (left.equals(CTFStrings.ALIGN)) {
+                } else if (left.equals(MetadataStrings.ALIGN)) {
                     alignment = getAlignment(rightNode);
                 } else {
                     throw new ParseException("Float: unknown attribute " + left); //$NON-NLS-1$
@@ -1383,11 +1383,11 @@ public class IOStructGen {
 
                 if (left.equals("signed")) { //$NON-NLS-1$
                     signed = getSigned(rightNode);
-                } else if (left.equals(CTFStrings.BYTE_ORDER)) {
+                } else if (left.equals(MetadataStrings.BYTE_ORDER)) {
                     byteOrder = getByteOrder(rightNode);
                 } else if (left.equals("size")) { //$NON-NLS-1$
                     size = getSize(rightNode);
-                } else if (left.equals(CTFStrings.ALIGN)) {
+                } else if (left.equals(MetadataStrings.ALIGN)) {
                     alignment = getAlignment(rightNode);
                 } else if (left.equals("base")) { //$NON-NLS-1$
                     base = getBase(rightNode);
@@ -2399,11 +2399,11 @@ public class IOStructGen {
         if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals(CTFStrings.TRUE)
-                    || strval.equals(CTFStrings.TRUE2)) {
+            if (strval.equals(MetadataStrings.TRUE)
+                    || strval.equals(MetadataStrings.TRUE2)) {
                 ret = true;
-            } else if (strval.equals(CTFStrings.FALSE)
-                    || strval.equals(CTFStrings.FALSE2)) {
+            } else if (strval.equals(MetadataStrings.FALSE)
+                    || strval.equals(MetadataStrings.FALSE2)) {
                 ret = false;
             } else {
                 throw new ParseException("Invalid boolean value " //$NON-NLS-1$
@@ -2447,12 +2447,12 @@ public class IOStructGen {
         if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals(CTFStrings.LE)) {
+            if (strval.equals(MetadataStrings.LE)) {
                 return ByteOrder.LITTLE_ENDIAN;
-            } else if (strval.equals(CTFStrings.BE)
-                    || strval.equals(CTFStrings.NETWORK)) {
+            } else if (strval.equals(MetadataStrings.BE)
+                    || strval.equals(MetadataStrings.NETWORK)) {
                 return ByteOrder.BIG_ENDIAN;
-            } else if (strval.equals(CTFStrings.NATIVE)) {
+            } else if (strval.equals(MetadataStrings.NATIVE)) {
                 return trace.getByteOrder();
             } else {
                 throw new ParseException("Invalid value for byte order"); //$NON-NLS-1$
@@ -2559,24 +2559,24 @@ public class IOStructGen {
         } else if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals(CTFStrings.DECIMAL)
-                    || strval.equals(CTFStrings.DEC)
-                    || strval.equals(CTFStrings.DEC_CTE)
-                    || strval.equals(CTFStrings.INT_MOD)
-                    || strval.equals(CTFStrings.UNSIGNED_CTE)) {
+            if (strval.equals(MetadataStrings.DECIMAL)
+                    || strval.equals(MetadataStrings.DEC)
+                    || strval.equals(MetadataStrings.DEC_CTE)
+                    || strval.equals(MetadataStrings.INT_MOD)
+                    || strval.equals(MetadataStrings.UNSIGNED_CTE)) {
                 return 10;
-            } else if (strval.equals(CTFStrings.HEXADECIMAL)
-                    || strval.equals(CTFStrings.HEX)
-                    || strval.equals(CTFStrings.X)
-                    || strval.equals(CTFStrings.X2)
-                    || strval.equals(CTFStrings.POINTER)) {
+            } else if (strval.equals(MetadataStrings.HEXADECIMAL)
+                    || strval.equals(MetadataStrings.HEX)
+                    || strval.equals(MetadataStrings.X)
+                    || strval.equals(MetadataStrings.X2)
+                    || strval.equals(MetadataStrings.POINTER)) {
                 return 16;
-            } else if (strval.equals(CTFStrings.OCTAL)
-                    || strval.equals(CTFStrings.OCT)
-                    || strval.equals(CTFStrings.OCTAL_CTE)) {
+            } else if (strval.equals(MetadataStrings.OCTAL)
+                    || strval.equals(MetadataStrings.OCT)
+                    || strval.equals(MetadataStrings.OCTAL_CTE)) {
                 return 8;
-            } else if (strval.equals(CTFStrings.BINARY)
-                    || strval.equals(CTFStrings.BIN)) {
+            } else if (strval.equals(MetadataStrings.BINARY)
+                    || strval.equals(MetadataStrings.BIN)) {
                 return 2;
             } else {
                 throw new ParseException("Invalid value for base"); //$NON-NLS-1$
@@ -2602,11 +2602,11 @@ public class IOStructGen {
         if (isUnaryString(firstChild)) {
             String strval = concatenateUnaryStrings(rightNode.getChildren());
 
-            if (strval.equals(CTFStrings.UTF8)) {
+            if (strval.equals(MetadataStrings.UTF8)) {
                 return Encoding.UTF8;
-            } else if (strval.equals(CTFStrings.ASCII)) {
+            } else if (strval.equals(MetadataStrings.ASCII)) {
                 return Encoding.ASCII;
-            } else if (strval.equals(CTFStrings.NONE)) {
+            } else if (strval.equals(MetadataStrings.NONE)) {
                 return Encoding.NONE;
             } else {
                 throw new ParseException("Invalid value for encoding"); //$NON-NLS-1$

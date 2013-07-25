@@ -11,8 +11,16 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.tracing.rcp.ui;
 
+import java.io.File;
+import java.net.URL;
+import java.text.MessageFormat;
+
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.linuxtools.internal.tracing.rcp.ui.messages.Messages;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -27,6 +35,35 @@ public class Application implements IApplication {
     public Object start(IApplicationContext context) throws Exception {
         Display display = PlatformUI.createDisplay();
         try {
+            // fetch the Location that we will be modifying
+            Location instanceLoc = Platform.getInstanceLocation();
+
+            // -data @noDefault in <applName>.ini allows us to set the workspace here.
+            // If the user wants to change the location then he has to change
+            // @noDefault to a specific location or remove -data @noDefault for
+            // default location
+            if (!instanceLoc.allowsDefault() && !instanceLoc.isSet()) {
+                File workspaceRoot = new File(TracingRcpPlugin.getWorkspaceRoot());
+
+                if (!workspaceRoot.exists()) {
+                    MessageDialog.openError(display.getActiveShell(),
+                            Messages.Application_WorkspaceCreationError,
+                            MessageFormat.format(Messages.Application_WorkspaceRootNotExistError, new Object[] { TracingRcpPlugin.getWorkspaceRoot() }));
+                    return IApplication.EXIT_OK;
+                }
+
+                if (!workspaceRoot.canWrite()) {
+                    MessageDialog.openError(display.getActiveShell(),
+                            Messages.Application_WorkspaceCreationError,
+                            MessageFormat.format(Messages.Application_WorkspaceRootPermissionError, new Object[] { TracingRcpPlugin.getWorkspaceRoot() }));
+                    return IApplication.EXIT_OK;
+                }
+
+                String workspace = TracingRcpPlugin.getWorkspaceRoot() + File.separator + TracingRcpPlugin.WORKSPACE_NAME;
+                // set location to workspace
+                instanceLoc.set(new URL("file", null, workspace), false); //$NON-NLS-1$
+            }
+
             int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {
                 return IApplication.EXIT_RESTART;

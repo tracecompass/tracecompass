@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-Vendor: %Bundle-Vendor
+Bundle-Version: 2.1.0.qualifier
+Bundle-Localization: plugin
+Bundle-SymbolicName: org.eclipse.linuxtools.lttng2.ust.core.tests;singleton:=true
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit;bundle-version="4.0.0"
+Export-Package: org.eclipse.linuxtools.lttng2.ust.core.tests

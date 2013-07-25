@@ -689,7 +689,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
-        fEventsTable.refresh();
+        if (fEventsTable != null) {
+            fEventsTable.refresh();
+        }
     }
 
 }

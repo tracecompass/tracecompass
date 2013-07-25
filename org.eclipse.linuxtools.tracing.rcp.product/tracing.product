@@ -23,7 +23,7 @@ http://www.eclipse.org/legal/epl-v10.html
    </configIni>
 
    <launcherArgs>
-      <programArgs>--launcher.XXMaxPermSize 256m</programArgs>
+      <programArgs>--launcher.XXMaxPermSize 256m -data @noDefault</programArgs>
       <vmArgsLin>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.6</vmArgsLin>
       <vmArgsMac>-Xms512m -Xmx1024m -XstartOnFirstThread -Dosgi.requiredJavaVersion=1.6 -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
       <vmArgsSol>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.6</vmArgsSol>
@@ -39,7 +39,6 @@ http://www.eclipse.org/legal/epl-v10.html
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</linux>

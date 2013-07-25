@@ -44,7 +44,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 2;
+    private static final int VERSION = 3;
 
     /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
     private final HashMap<String, Integer> knownEventNames;
@@ -414,11 +414,17 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
                 /*
                  * The process indicated in the event's payload is now ready to
-                 * run. Assign it to the "wait for cpu" state.
+                 * run. Assign it to the "wait for cpu" state, but only if it
+                 * was not already running.
                  */
                 quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.STATUS);
-                value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
-                ss.modifyAttribute(ts, value, quark);
+                int status = ss.queryOngoingState(quark).unboxInt();
+
+                if (status != StateValues.PROCESS_STATUS_RUN_SYSCALL &&
+                    status != StateValues.PROCESS_STATUS_RUN_USERMODE) {
+                    value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
+                    ss.modifyAttribute(ts, value, quark);
+                }
             }
                 break;
 

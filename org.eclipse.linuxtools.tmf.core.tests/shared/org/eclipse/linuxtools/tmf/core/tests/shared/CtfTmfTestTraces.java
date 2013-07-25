@@ -34,7 +34,7 @@ public final class CtfTmfTestTraces {
     private static final File emptyFile = new File("");
     private static CtfTmfTrace emptyTrace = new CtfTmfTrace();
 
-    private static CtfTmfTrace[] testTraces = new CtfTmfTrace[2];
+    private static CtfTmfTrace[] testTraces = new CtfTmfTrace[3];
 
     /**
      * Get an empty File (new File("");)

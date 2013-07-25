@@ -38,6 +38,11 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
     private static final byte TYPE_STRING = 1;
     private static final byte TYPE_LONG = 2;
 
+    /* String entry sizes of different state values */
+    private static final int NO_ENTRY_SIZE = 0;
+    private static final int LONG_ENTRY_SIZE = 8;
+    // sizes of string values depend on the string itself
+
     private final long start;
     private final long end;
     private final int attribute;
@@ -71,6 +76,32 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
     }
 
     /**
+     * "Faster" constructor for inner use only. When we build an interval when
+     * reading it from disk (with {@link #readFrom}), we already know the size
+     * of the strings entry, so there is no need to call
+     * {@link #computeStringsEntrySize()} and do an extra copy.
+     *
+     * @param intervalStart
+     * @param intervalEnd
+     * @param attribute
+     * @param value
+     * @param size
+     * @throws TimeRangeException
+     */
+    private HTInterval(long intervalStart, long intervalEnd, int attribute,
+            TmfStateValue value, int size) throws TimeRangeException {
+        if (intervalStart > intervalEnd) {
+            throw new TimeRangeException();
+        }
+
+        this.start = intervalStart;
+        this.end = intervalEnd;
+        this.attribute = attribute;
+        this.sv = value;
+        this.stringsEntrySize = size;
+    }
+
+    /**
      * Reader constructor. Builds the interval using an already-allocated
      * ByteBuffer, which normally comes from a NIO FileChannel.
      *
@@ -99,11 +130,13 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
 
         case TYPE_NULL:
             value = TmfStateValue.nullValue();
+            valueSize = NO_ENTRY_SIZE;
             break;
 
         case TYPE_INTEGER:
             /* "ValueOrOffset" is the straight value */
             value = TmfStateValue.newValueInt(valueOrOffset);
+            valueSize = NO_ENTRY_SIZE;
             break;
 
         case TYPE_STRING:
@@ -142,6 +175,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
             buffer.mark();
             buffer.position(valueOrOffset);
             value = TmfStateValue.newValueLong(buffer.getLong());
+            valueSize = LONG_ENTRY_SIZE;
 
             /*
              * Restore the file pointer's position (so we can read the next
@@ -155,7 +189,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
         }
 
         try {
-            interval = new HTInterval(intervalStart, intervalEnd, attribute, value);
+            interval = new HTInterval(intervalStart, intervalEnd, attribute, value, valueSize);
         } catch (TimeRangeException e) {
             throw new IOException(errMsg);
         }
@@ -304,10 +338,10 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
         case NULL:
         case INTEGER:
             /* Those don't use the strings section at all */
-            return 0;
+            return NO_ENTRY_SIZE;
         case LONG:
             /* The value's bytes are written directly into the strings section */
-            return 8;
+            return LONG_ENTRY_SIZE;
         case STRING:
             try {
                 /* String's length + 2 (1 byte for size, 1 byte for \0 at the end */

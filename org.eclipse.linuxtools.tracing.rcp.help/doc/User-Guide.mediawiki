@@ -1,0 +1,24 @@
+= Overview =
+The Linux Tools Trace Viewer is a stand-alone application based on Eclipse's
+Rich Client Platform (RCP). The purpose of this is to provide a lightweight
+application to view and analyze traces. It includes all TMF (Tracing and
+Monitoring Framework) features, as well as all features from the LTTng (Linux
+Tracing Toolkit next generation) Eclipse integration, which are provided by the
+Linux Tools Project.
+
+= Getting Started =
+To start the Linux Tools Trace Viewer, go to the directory where the Trace
+Viewer is installed and then run the application named '''traceViewer'''.
+During startup, the Trace Viewer will create, if necessary, an Eclipse workspace
+in the user's home directory with the name ''.traceviewer''. It also creates, if
+needed, a default tracing project called ''Tracing''.
+
+Now the application can be used as described in the User Guide for Linux Tools
+LTTng integration (see section [[#References | References]]).
+
+= References =
+
+* [http://www.eclipse.org/linuxtools/projectPages/lttng/ Linux Tools - LTTng integration]
+* [http://www.lttng.org/ LTTng project]
+* [http://wiki.eclipse.org/Linux_Tools_Project/TMF/User_Guide TMF User Guide]
+

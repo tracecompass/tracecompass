@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="org.eclipse.linuxtools.tracing.rcp.help" default="build">
+    <description>
+            Generate Eclipse help content for the Linux Tools Trace Viewer user guide
+    </description>
+
+    <!-- Set correct values -->
+    <property name="help.doc.url.base" value="http://wiki.eclipse.org" />
+    <property name="ug.path"  value="Linux_Tools_Project/Trace_Viewer/User_Guide" />
+    <property name="ug.title" value="Trace Viewer User Guide" />
+
+    <path id="wikitext.tasks.classpath">
+        <!-- Search in the local Eclipse installation directory for the Wikitext plugin -->
+        <fileset dir="${eclipse.home}/plugins" erroronmissingdir="false">
+            <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
+        </fileset>
+
+        <!-- Search in the system-wide installation directory (Debian) -->
+        <fileset dir="/usr/share/eclipse/dropins/mylyn-wikitext/eclipse/plugins" erroronmissingdir="false">
+            <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
+        </fileset>
+        
+        <!-- For Maven builds: use the compile_classpath -->
+        <pathelement path="${compile_classpath}" />
+    </path>
+
+    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties" />
+    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
+
+    <target name="build" description="Generate Eclipse help content for the Linux Tools Trace Viewer User Guide">
+        <wikitext-to-eclipse-help markupLanguage="MediaWiki"
+                validate="true"
+                failonvalidationerror="true"
+                overwrite="true"
+                multipleOutputFiles="true"
+                navigationimages="true"
+                title="${ug.title}"
+                formatoutput="true"
+                helpPrefix="doc">
+                <fileset dir="./doc">
+                   <include name="User-Guide.mediawiki" />
+                </fileset>
+                <stylesheet url="book.css" />
+            </wikitext-to-eclipse-help>
+          <antcall target="test" />
+    </target>
+
+    <target name="test" description="Verify that all of the HTML files are well-formed XML">
+        <!-- 
+        Don't bother with DTD validation: we only care if the files are well-formed.
+        We therefore provide an empty DTD 
+        -->
+        <xmlvalidate lenient="true">
+            <fileset dir="doc">
+                <include name="**/*.html" />
+            </fileset>
+            <dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location=".empty.dtd" />
+        </xmlvalidate>
+    </target>
+
+
+    <!-- If you need a proxy for the "download" target, set it here -->
+    <!--
+    <setproxy proxyhost="host" proxyport="port"/>
+    -->
+
+    <target name="download" description="Download the current contents of the LTTng User Guide from the Eclipse wiki">
+        <mediawiki-to-eclipse-help wikiBaseUrl="${help.doc.url.base}" title="${ug.title}" formatoutput="true" dest="." templateExcludes="*eclipseproject*">
+            <path name="${ug.path}" title="${ug.title}" generateToc="false" />
+            <stylesheet url="book.css" />
+            <pageAppendum>
+= Updating This Document =
+
+This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit 
+http://wiki.eclipse.org/Linux_Tools_Project/LTTng2/User_Guide.
+            </pageAppendum>
+        </mediawiki-to-eclipse-help>
+    </target>
+
+    <target name ="clean" description="Delete all generated files">
+      <delete failonerror="false" includeemptydirs="true">
+        <!-- Files under doc/ (generated locally) -->
+        <fileset dir="doc" includes="**/*.html" />
+        <fileset dir="doc" includes="**/*.xml" />
+
+        <!-- Files downloaded from the Eclipse wiki -->
+        <fileset dir="Linux_Tools_Project" />
+        <fileset file="toc.xml" />
+      </delete>
+    </target>
+
+</project>

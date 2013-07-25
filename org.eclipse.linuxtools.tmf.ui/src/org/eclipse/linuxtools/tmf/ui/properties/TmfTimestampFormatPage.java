@@ -7,16 +7,26 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *     Francois Chouinard - Initial API and implementation
+ *     Marc-Andre Laperle - Add time zone preference
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.properties;
 
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimePreferencesConstants;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,9 +41,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * The TMF timestamp format configuration page. This page is used to select
- * the global timestamp and interval time formats (for display and parsing).
- * The user can either pick a pre-defined format or enter his/her own.
+ * The TMF timestamp format configuration page. This page is used to select the
+ * global timestamp and interval time formats (for display and parsing). The
+ * user can either pick a pre-defined format or enter his/her own.
  *
  * @version 1.0
  * @author Francois Chouinard
@@ -47,50 +57,90 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
 
     // Date and Time formats
     private static final String[][] fDateTimeFormats = new String[][] {
-        { TmfTimePreferences.DATE_YEAR_FMT,     TmfTimePreferences.DATE_YEAR_FMT    },
-        { TmfTimePreferences.DATE_YEAR2_FMT,    TmfTimePreferences.DATE_YEAR2_FMT   },
-        { TmfTimePreferences.DATE_MONTH_FMT,    TmfTimePreferences.DATE_MONTH_FMT   },
-        { TmfTimePreferences.DATE_DAY_FMT,      TmfTimePreferences.DATE_DAY_FMT     },
-        { TmfTimePreferences.DATE_JDAY_FMT,     TmfTimePreferences.DATE_JDAY_FMT    },
-        { TmfTimePreferences.TIME_HOUR_FMT,     TmfTimePreferences.TIME_HOUR_FMT    },
-        { TmfTimePreferences.TIME_MINUTE_FMT,   TmfTimePreferences.TIME_MINUTE_FMT  },
-        { TmfTimePreferences.TIME_SECOND_FMT,   TmfTimePreferences.TIME_SECOND_FMT  },
-        { TmfTimePreferences.TIME_ELAPSED_FMT + " (secs in epoch)",  TmfTimePreferences.TIME_ELAPSED_FMT }, //$NON-NLS-1$
-        { "(none)",          TmfTimePreferences.TIME_NO_FMT      }, //$NON-NLS-1$
+            { ITmfTimePreferencesConstants.DATE_YEAR_FMT, ITmfTimePreferencesConstants.DATE_YEAR_FMT },
+            { ITmfTimePreferencesConstants.DATE_YEAR2_FMT, ITmfTimePreferencesConstants.DATE_YEAR2_FMT },
+            { ITmfTimePreferencesConstants.DATE_MONTH_FMT, ITmfTimePreferencesConstants.DATE_MONTH_FMT },
+            { ITmfTimePreferencesConstants.DATE_DAY_FMT, ITmfTimePreferencesConstants.DATE_DAY_FMT },
+            { ITmfTimePreferencesConstants.DATE_JDAY_FMT, ITmfTimePreferencesConstants.DATE_JDAY_FMT },
+            { ITmfTimePreferencesConstants.TIME_HOUR_FMT, ITmfTimePreferencesConstants.TIME_HOUR_FMT },
+            { ITmfTimePreferencesConstants.TIME_MINUTE_FMT, ITmfTimePreferencesConstants.TIME_MINUTE_FMT },
+            { ITmfTimePreferencesConstants.TIME_SECOND_FMT, ITmfTimePreferencesConstants.TIME_SECOND_FMT },
+            { ITmfTimePreferencesConstants.TIME_ELAPSED_FMT + " (secs in epoch)", ITmfTimePreferencesConstants.TIME_ELAPSED_FMT }, //$NON-NLS-1$
+            { "(none)", ITmfTimePreferencesConstants.TIME_NO_FMT }, //$NON-NLS-1$
     };
 
     // Sub-second formats
     private static final String[][] fSubSecondFormats = new String[][] {
-        { TmfTimePreferences.SUBSEC_MILLI_FMT + " (ms)", TmfTimePreferences.SUBSEC_MILLI_FMT }, //$NON-NLS-1$
-        { TmfTimePreferences.SUBSEC_MICRO_FMT + " (µs)", TmfTimePreferences.SUBSEC_MICRO_FMT }, //$NON-NLS-1$
-        { TmfTimePreferences.SUBSEC_NANO_FMT  + " (ns)", TmfTimePreferences.SUBSEC_NANO_FMT  }, //$NON-NLS-1$
+            { ITmfTimePreferencesConstants.SUBSEC_MILLI_FMT + " (ms)", ITmfTimePreferencesConstants.SUBSEC_MILLI_FMT }, //$NON-NLS-1$
+            { ITmfTimePreferencesConstants.SUBSEC_MICRO_FMT + " (µs)", ITmfTimePreferencesConstants.SUBSEC_MICRO_FMT }, //$NON-NLS-1$
+            { ITmfTimePreferencesConstants.SUBSEC_NANO_FMT + " (ns)", ITmfTimePreferencesConstants.SUBSEC_NANO_FMT }, //$NON-NLS-1$
     };
 
     // Date and Time delimiters
     private static final String[][] fDateTimeDelimiters = new String[][] {
-        { "(none)",          TmfTimePreferences.DELIMITER_NONE      }, //$NON-NLS-1$
-        { "  (space)",       TmfTimePreferences.DELIMITER_SPACE     }, //$NON-NLS-1$
-        { ", (comma)",       TmfTimePreferences.DELIMITER_COMMA     }, //$NON-NLS-1$
-        { "- (dash)",        TmfTimePreferences.DELIMITER_DASH      }, //$NON-NLS-1$
-        { "_ (underline)",   TmfTimePreferences.DELIMITER_UNDERLINE }, //$NON-NLS-1$
-        { ": (colon)",       TmfTimePreferences.DELIMITER_COLON     }, //$NON-NLS-1$
-        { "; (semicolon)",   TmfTimePreferences.DELIMITER_SEMICOLON }, //$NON-NLS-1$
-        { "/ (slash)",       TmfTimePreferences.DELIMITER_SLASH     }, //$NON-NLS-1$
-        { "\" (dbl-quote)",  TmfTimePreferences.DELIMITER_DQUOT     }, //$NON-NLS-1$
+            { "(none)", ITmfTimePreferencesConstants.DELIMITER_NONE }, //$NON-NLS-1$
+            { "  (space)", ITmfTimePreferencesConstants.DELIMITER_SPACE }, //$NON-NLS-1$
+            { ", (comma)", ITmfTimePreferencesConstants.DELIMITER_COMMA }, //$NON-NLS-1$
+            { "- (dash)", ITmfTimePreferencesConstants.DELIMITER_DASH }, //$NON-NLS-1$
+            { "_ (underline)", ITmfTimePreferencesConstants.DELIMITER_UNDERLINE }, //$NON-NLS-1$
+            { ": (colon)", ITmfTimePreferencesConstants.DELIMITER_COLON }, //$NON-NLS-1$
+            { "; (semicolon)", ITmfTimePreferencesConstants.DELIMITER_SEMICOLON }, //$NON-NLS-1$
+            { "/ (slash)", ITmfTimePreferencesConstants.DELIMITER_SLASH }, //$NON-NLS-1$
+            { "\" (dbl-quote)", ITmfTimePreferencesConstants.DELIMITER_DQUOT }, //$NON-NLS-1$
     };
 
     // Sub-Second delimiters
     private static final String[][] fSubSecondDelimiters = new String[][] {
-        { "(none)",          TmfTimePreferences.DELIMITER_NONE      }, //$NON-NLS-1$
-        { "  (space)",       TmfTimePreferences.DELIMITER_SPACE     }, //$NON-NLS-1$
-        { ", (comma)",       TmfTimePreferences.DELIMITER_COMMA     }, //$NON-NLS-1$
-        { "- (dash)",        TmfTimePreferences.DELIMITER_DASH      }, //$NON-NLS-1$
-        { "_ (underline)",   TmfTimePreferences.DELIMITER_UNDERLINE }, //$NON-NLS-1$
-        { ": (colon)",       TmfTimePreferences.DELIMITER_COLON     }, //$NON-NLS-1$
-        { "; (semicolon)",   TmfTimePreferences.DELIMITER_SEMICOLON }, //$NON-NLS-1$
-        { "/ (slash)",       TmfTimePreferences.DELIMITER_SLASH     }, //$NON-NLS-1$
-        { "\" (dbl-quote)",  TmfTimePreferences.DELIMITER_DQUOT     }, //$NON-NLS-1$
-        { ". (period)",      TmfTimePreferences.DELIMITER_PERIOD    }, //$NON-NLS-1$
+            { "(none)", ITmfTimePreferencesConstants.DELIMITER_NONE }, //$NON-NLS-1$
+            { "  (space)", ITmfTimePreferencesConstants.DELIMITER_SPACE }, //$NON-NLS-1$
+            { ", (comma)", ITmfTimePreferencesConstants.DELIMITER_COMMA }, //$NON-NLS-1$
+            { "- (dash)", ITmfTimePreferencesConstants.DELIMITER_DASH }, //$NON-NLS-1$
+            { "_ (underline)", ITmfTimePreferencesConstants.DELIMITER_UNDERLINE }, //$NON-NLS-1$
+            { ": (colon)", ITmfTimePreferencesConstants.DELIMITER_COLON }, //$NON-NLS-1$
+            { "; (semicolon)", ITmfTimePreferencesConstants.DELIMITER_SEMICOLON }, //$NON-NLS-1$
+            { "/ (slash)", ITmfTimePreferencesConstants.DELIMITER_SLASH }, //$NON-NLS-1$
+            { "\" (dbl-quote)", ITmfTimePreferencesConstants.DELIMITER_DQUOT }, //$NON-NLS-1$
+            { ". (period)", ITmfTimePreferencesConstants.DELIMITER_PERIOD }, //$NON-NLS-1$
+    };
+
+    // Time zones
+    @SuppressWarnings("nls")
+    private static final String[] timeZones = new String[] {
+            Messages.TmfTimestampFormatPage_LocalTime,
+            "GMT-12",
+            "GMT-11",
+            "GMT-10",
+            "GMT-9:30",
+            "GMT-9",
+            "GMT-7",
+            "GMT-6",
+            "GMT-5",
+            "GMT-4",
+            "GMT-3:30",
+            "GMT-3",
+            "GMT-2",
+            "GMT-1",
+            "GMT",
+            "GMT+1",
+            "GMT+2",
+            "GMT+3",
+            "GMT+3:30",
+            "GMT+4",
+            "GMT+4:30",
+            "GMT+5",
+            "GMT+5:30",
+            "GMT+6",
+            "GMT+7",
+            "GMT+8",
+            "GMT+9",
+            "GMT+9:30",
+            "GMT+10",
+            "GMT+10:30",
+            "GMT+11",
+            "GMT+11:30",
+            "GMT+12",
+            "GMT+13:00",
+            "GMT+14:00"
     };
 
     // ------------------------------------------------------------------------
@@ -106,7 +156,9 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
     private Composite fExampleSection;
     private Text fPatternDisplay;
     private Text fExampleDisplay;
-    private String fTimePattern;
+
+    // Timezone section
+    private ComboFieldEditor fCombo;
 
     // Date/Time format section
     private RadioGroupFieldEditor fDateTimeFields;
@@ -121,6 +173,8 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
     private String fProperty;
     private String fChangedProperty;
 
+    private Map<String, String> fPreferenceMap;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -129,13 +183,19 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
      * The default constructor
      */
     public TmfTimestampFormatPage() {
-        fPreferenceStore = TmfTimePreferences.getPreferenceStore();
+        fPreferenceStore = getPreferenceStore();
         fTimePreference = TmfTimePreferences.getInstance();
+        fPreferenceMap = fTimePreference.getPreferenceMap();
     }
 
     // ------------------------------------------------------------------------
     // IWorkbenchPreferencePage
     // ------------------------------------------------------------------------
+
+    @Override
+    protected IPreferenceStore doGetPreferenceStore() {
+        return Activator.getDefault().getCorePreferenceStore();
+    }
 
     @Override
     public void init(IWorkbench workbench) {
@@ -174,40 +234,59 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
         separator.setLayoutData(
                 new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_FILL));
 
+        // Time Zones
+        String[][] timeZoneIntervals = new String[timeZones.length][2];
+        timeZoneIntervals[0][0] = timeZones[0];
+        timeZoneIntervals[0][1] = fPreferenceStore.getDefaultString(ITmfTimePreferencesConstants.TIME_ZONE);
+        for (int i = 1; i < timeZones.length; i++) {
+            TimeZone tz = null;
+            try {
+                tz = TimeZone.getTimeZone(timeZones[i]);
+                timeZoneIntervals[i][0] = tz.getDisplayName();
+                timeZoneIntervals[i][1] = tz.getID();
+            } catch (NullPointerException e) {
+                System.out.println("TimeZone " + timeZones[i] + " does not exist."); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+        }
+
+        fCombo = new ComboFieldEditor(ITmfTimePreferencesConstants.TIME_ZONE, "Time Zone", timeZoneIntervals, fPage); //$NON-NLS-1$
+        fCombo.setPreferenceStore(fPreferenceStore);
+        fCombo.load();
+        fCombo.setPropertyChangeListener(this);
+
         // Date and Time section
         fDateTimeFields = new RadioGroupFieldEditor(
-                TmfTimePreferences.DATIME, "Date and Time format", 3, fDateTimeFormats, fPage, true); //$NON-NLS-1$
+                ITmfTimePreferencesConstants.DATIME, "Date and Time format", 3, fDateTimeFormats, fPage, true); //$NON-NLS-1$
         fDateTimeFields.setPreferenceStore(fPreferenceStore);
         fDateTimeFields.load();
         fDateTimeFields.setPropertyChangeListener(this);
 
         // Sub-second section
         fSSecFields = new RadioGroupFieldEditor(
-                TmfTimePreferences.SUBSEC, "Sub-second format", 3, fSubSecondFormats, fPage, true); //$NON-NLS-1$
+                ITmfTimePreferencesConstants.SUBSEC, "Sub-second format", 3, fSubSecondFormats, fPage, true); //$NON-NLS-1$
         fSSecFields.setPreferenceStore(fPreferenceStore);
         fSSecFields.load();
         fSSecFields.setPropertyChangeListener(this);
 
         // Separators section
         fDateFieldDelim = new RadioGroupFieldEditor(
-                TmfTimePreferences.DATE_DELIMITER, "Date delimiter", 5, fDateTimeDelimiters, fPage, true); //$NON-NLS-1$
+                ITmfTimePreferencesConstants.DATE_DELIMITER, "Date delimiter", 5, fDateTimeDelimiters, fPage, true); //$NON-NLS-1$
         fDateFieldDelim.setPreferenceStore(fPreferenceStore);
         fDateFieldDelim.load();
         fDateFieldDelim.setPropertyChangeListener(this);
 
         fTimeFieldDelim = new RadioGroupFieldEditor(
-                TmfTimePreferences.TIME_DELIMITER, "Time delimiter", 5, fDateTimeDelimiters, fPage, true); //$NON-NLS-1$
+                ITmfTimePreferencesConstants.TIME_DELIMITER, "Time delimiter", 5, fDateTimeDelimiters, fPage, true); //$NON-NLS-1$
         fTimeFieldDelim.setPreferenceStore(fPreferenceStore);
         fTimeFieldDelim.load();
         fTimeFieldDelim.setPropertyChangeListener(this);
 
         fSSecFieldDelim = new RadioGroupFieldEditor(
-                TmfTimePreferences.SSEC_DELIMITER, "Sub-Second Delimiter", 5, fSubSecondDelimiters, fPage, true); //$NON-NLS-1$
+                ITmfTimePreferencesConstants.SSEC_DELIMITER, "Sub-Second Delimiter", 5, fSubSecondDelimiters, fPage, true); //$NON-NLS-1$
         fSSecFieldDelim.setPreferenceStore(fPreferenceStore);
         fSSecFieldDelim.load();
         fSSecFieldDelim.setPropertyChangeListener(this);
 
-        fTimePreference.initPatterns();
         refresh();
         return fPage;
     }
@@ -219,9 +298,9 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
         fDateFieldDelim.loadDefault();
         fTimeFieldDelim.loadDefault();
         fSSecFieldDelim.loadDefault();
+        fCombo.loadDefault();
 
-        fTimePreference.setDefaults();
-        fTimePattern = TmfTimePreferences.getTimePattern();
+        fPreferenceMap = TmfTimePreferences.getInstance().getDefaultPreferenceMap();
         displayExample();
     }
 
@@ -232,8 +311,10 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
         fDateFieldDelim.store();
         fTimeFieldDelim.store();
         fSSecFieldDelim.store();
+        fCombo.store();
 
-        TmfTimePreferences.setTimePattern(fTimePattern);
+        TmfTimestampFormat.updateDefaultFormats();
+        TmfSignalManager.dispatchSignal(new TmfTimestampFormatUpdateSignal(null));
         displayExample();
     }
 
@@ -282,27 +363,22 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
     }
 
     void updatePatterns() {
-        if (TmfTimePreferences.DATIME.equals(fProperty)) {
-            fTimePreference.setDateTimeFormat(fChangedProperty);
-        } else if (TmfTimePreferences.SUBSEC.equals(fProperty)) {
-            fTimePreference.setSSecFormat(fChangedProperty);
-        } else if (TmfTimePreferences.DATE_DELIMITER.equals(fProperty)) {
-            fTimePreference.setDateFieldSep(fChangedProperty);
-        } else if (TmfTimePreferences.TIME_DELIMITER.equals(fProperty)) {
-            fTimePreference.setTimeFieldSep(fChangedProperty);
-        } else if (TmfTimePreferences.SSEC_DELIMITER.equals(fProperty)) {
-            fTimePreference.setSSecFieldSep(fChangedProperty);
+        if (ITmfTimePreferencesConstants.DATIME.equals(fProperty) ||
+                ITmfTimePreferencesConstants.SUBSEC.equals(fProperty) ||
+                ITmfTimePreferencesConstants.DATE_DELIMITER.equals(fProperty) ||
+                ITmfTimePreferencesConstants.TIME_DELIMITER.equals(fProperty) ||
+                ITmfTimePreferencesConstants.SSEC_DELIMITER.equals(fProperty)) {
+            fPreferenceMap.put(fProperty, fChangedProperty);
         }
-        fTimePreference.updatePatterns();
-        fTimePattern = TmfTimePreferences.getTimePattern();
     }
 
     private void displayExample() {
         long ts = 1332170682500677380L;
-        fPatternDisplay.setText(fTimePattern);
+        String timePattern = fTimePreference.computeTimePattern(fPreferenceMap);
+        fPatternDisplay.setText(timePattern);
         fPatternDisplay.redraw();
 
-        fExampleDisplay.setText(new TmfTimestampFormat(fTimePattern).format(ts));
+        fExampleDisplay.setText(new TmfTimestampFormat(timePattern).format(ts));
         fExampleDisplay.redraw();
     }
 
