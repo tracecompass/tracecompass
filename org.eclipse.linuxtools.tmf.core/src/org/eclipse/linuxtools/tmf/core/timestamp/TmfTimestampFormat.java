@@ -267,7 +267,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      *
      * @param pattern the format pattern
      * @param timeZone the time zone
-     * @since 2.1
+     * @since 3.0
      */
     public TmfTimestampFormat(String pattern, TimeZone timeZone) {
         setTimeZone(timeZone);
@@ -288,7 +288,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     // ------------------------------------------------------------------------
 
     /**
-     * @since 2.1
+     * @since 3.0
      */
     public static void updateDefaultFormats() {
         fDefaultTimeFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getTimePattern(), TmfTimePreferences.getInstance().getTimeZone());

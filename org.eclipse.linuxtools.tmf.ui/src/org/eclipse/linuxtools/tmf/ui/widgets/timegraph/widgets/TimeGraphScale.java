@@ -547,7 +547,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      * Update the display to use the updated timestamp format
      *
      * @param signal the incoming signal
-     * @since 2.1
+     * @since 3.0
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {

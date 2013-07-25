@@ -86,7 +86,7 @@ public class Utils {
     /**
      * Update the time and date formats to use the current time zone
      *
-     * @since 2.1
+     * @since 3.0
      */
     public static void updateTimeZone() {
         TimeZone timeZone = TmfTimePreferences.getInstance().getTimeZone();
