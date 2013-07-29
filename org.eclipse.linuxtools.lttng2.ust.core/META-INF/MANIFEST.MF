@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng2.ust.core;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.lttng2.ust.core.Activator
@@ -12,5 +12,5 @@ Export-Package: org.eclipse.linuxtools.internal.lttng2.ust.core;x-internal:=true
  org.eclipse.linuxtools.lttng2.ust.core.trace
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.linuxtools.ctf.core;bundle-version="2.1.0",
- org.eclipse.linuxtools.tmf.core;bundle-version="2.1.0"
+ org.eclipse.linuxtools.ctf.core;bundle-version="3.0.0",
+ org.eclipse.linuxtools.tmf.core;bundle-version="3.0.0"
