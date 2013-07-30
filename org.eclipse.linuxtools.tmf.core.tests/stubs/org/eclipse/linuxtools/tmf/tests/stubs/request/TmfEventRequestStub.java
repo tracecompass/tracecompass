@@ -25,7 +25,7 @@ public class TmfEventRequestStub extends TmfEventRequest {
      * @param dataType the event type
      */
     public TmfEventRequestStub(final Class<? extends ITmfEvent> dataType) {
-        super(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        super(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, ExecutionType.FOREGROUND);
     }
 
     /**
@@ -33,7 +33,7 @@ public class TmfEventRequestStub extends TmfEventRequest {
      * @param range the requested time range
      */
     public TmfEventRequestStub(final Class<? extends ITmfEvent> dataType, final TmfTimeRange range) {
-        super(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        super(dataType, range, 0, ALL_DATA, ExecutionType.FOREGROUND);
     }
 
     /**
@@ -42,7 +42,7 @@ public class TmfEventRequestStub extends TmfEventRequest {
      * @param nbRequested the number of events requested
      */
     public TmfEventRequestStub(final Class<? extends ITmfEvent> dataType, final TmfTimeRange range, final int nbRequested) {
-        super(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        super(dataType, range, 0, nbRequested, ExecutionType.FOREGROUND);
     }
 
     /**
@@ -52,7 +52,7 @@ public class TmfEventRequestStub extends TmfEventRequest {
      * @param blockSize the event block size
      */
     public TmfEventRequestStub(final Class<? extends ITmfEvent> dataType, final TmfTimeRange range, final int nbRequested, final int blockSize) {
-        super(dataType, range, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
+        super(dataType, range, 0, nbRequested, ExecutionType.FOREGROUND);
     }
 
     /**
@@ -63,7 +63,7 @@ public class TmfEventRequestStub extends TmfEventRequest {
      * @param blockSize the event block size
      */
     public TmfEventRequestStub(final Class<? extends ITmfEvent> dataType, final TmfTimeRange range, final long index, final int nbRequested, final int blockSize) {
-        super(dataType, range, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
+        super(dataType, range, index, nbRequested, ExecutionType.FOREGROUND);
     }
 
     @Override

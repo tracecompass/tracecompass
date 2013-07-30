@@ -227,7 +227,7 @@ public class EventContextTest {
         public EventContextTestRequest(long timestamp) {
             super(CtfTmfEvent.class,
                     new TmfTimeRange(new CtfTmfTimestamp(timestamp), TmfTimestamp.BIG_CRUNCH),
-                    0, 1, 1, ExecutionType.FOREGROUND);
+                    0, 1, ExecutionType.FOREGROUND);
         }
 
         @Override

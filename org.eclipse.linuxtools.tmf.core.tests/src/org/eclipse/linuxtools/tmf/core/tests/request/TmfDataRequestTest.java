@@ -49,18 +49,18 @@ public class TmfDataRequestTest {
     @Before
     public void setUp() {
         TmfDataRequest.reset();
-        fRequest1 = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
-        fRequest2 = new TmfDataRequestStub(ITmfEvent.class, 20, 100, 200);
-        fRequest3 = new TmfDataRequestStub(ITmfEvent.class, 20, 200, 200);
-        fRequest4 = new TmfDataRequestStub(ITmfEvent.class, 20, 200, 300);
-        fRequest1b = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
-        fRequest1c = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
+        fRequest1 = new TmfDataRequestStub(ITmfEvent.class, 10, 100);
+        fRequest2 = new TmfDataRequestStub(ITmfEvent.class, 20, 100);
+        fRequest3 = new TmfDataRequestStub(ITmfEvent.class, 20, 200);
+        fRequest4 = new TmfDataRequestStub(ITmfEvent.class, 20, 200);
+        fRequest1b = new TmfDataRequestStub(ITmfEvent.class, 10, 100);
+        fRequest1c = new TmfDataRequestStub(ITmfEvent.class, 10, 100);
         fRequestCount = fRequest1c.getRequestId() + 1;
     }
 
     private static TmfDataRequest setupTestRequest(final boolean[] flags) {
 
-        TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200) {
+        TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100) {
             @Override
             public void handleCompleted() {
                 super.handleCompleted();
@@ -145,7 +145,7 @@ public class TmfDataRequestTest {
 
     @Test
     public void testTmfDataRequestIndexNbEventsBlocksize() {
-        TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100, 200);
+        TmfDataRequest request = new TmfDataRequestStub(ITmfEvent.class, 10, 100);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType", ITmfEvent.class, request.getDataType());
@@ -214,10 +214,10 @@ public class TmfDataRequestTest {
 
     @Test
     public void testToString() {
-        String expected1 = "[TmfDataRequest(0,ITmfEvent,10,100,200)]";
-        String expected2 = "[TmfDataRequest(1,ITmfEvent,20,100,200)]";
-        String expected3 = "[TmfDataRequest(2,ITmfEvent,20,200,200)]";
-        String expected4 = "[TmfDataRequest(3,ITmfEvent,20,200,300)]";
+        String expected1 = "[TmfDataRequest(0,ITmfEvent,10,100)]";
+        String expected2 = "[TmfDataRequest(1,ITmfEvent,20,100)]";
+        String expected3 = "[TmfDataRequest(2,ITmfEvent,20,200)]";
+        String expected4 = "[TmfDataRequest(3,ITmfEvent,20,200)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

@@ -80,9 +80,6 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
     // Constants
     // ------------------------------------------------------------------------
 
-    /** The default maximum number of events per chunk */
-    public static final int DEFAULT_BLOCK_SIZE = 1000;
-
     /** The request count for all the events */
     public static final int ALL_DATA = Integer.MAX_VALUE;
 
@@ -103,9 +100,6 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
 
     /** The number of requested events (ALL_DATA for all) */
     protected int fNbRequested;
-
-    /** The block size (for BG requests) */
-    private final int fBlockSize;
 
     /** The number of reads so far */
     private int fNbRead;
@@ -141,22 +135,17 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
      *            The number of events requested. You can use
      *            {@link TmfDataRequest#ALL_DATA} to specify you want all events
      *            in the trace.
-     * @param blockSize
-     *            The number of events per block. You can use
-     *            {@link TmfDataRequest#DEFAULT_BLOCK_SIZE}.
      * @param priority
      *            The requested execution priority.
      */
     public TmfDataRequest(Class<? extends ITmfEvent> dataType,
             long index,
             int nbRequested,
-            int blockSize,
             ExecutionType priority) {
         fRequestId = fRequestNumber++;
         fDataType = dataType;
         fIndex = index;
         fNbRequested = nbRequested;
-        fBlockSize = blockSize;
         fExecType = priority;
         fNbRead = 0;
 
@@ -211,14 +200,6 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
     @Override
     public int getNbRequested() {
         return fNbRequested;
-    }
-
-    /**
-     * @return the block size (for BG requests)
-     */
-    @Override
-    public int getBlockSize() {
-        return fBlockSize;
     }
 
     /**
@@ -471,7 +452,7 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName() + "," + fIndex + "," + fNbRequested
-                + "," + getBlockSize() + ")]";
+        return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName()
+                + "," + fIndex + "," + fNbRequested + ")]";
     }
 }

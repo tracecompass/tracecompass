@@ -1394,7 +1394,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 return;
             }
             request = new TmfDataRequest(ITmfEvent.class, (int) fFilterCheckCount,
-                    nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
+                    nbRequested, ExecutionType.BACKGROUND) {
                 @Override
                 public void handleData(final ITmfEvent event) {
                     super.handleData(event);
@@ -1632,7 +1632,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (direction == Direction.BACKWARD) {
                     rank = Math.max(0, rank - fTrace.getCacheSize() + 1);
                 }
-                request = new TmfDataRequest(ITmfEvent.class, (int) rank, nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
+                request = new TmfDataRequest(ITmfEvent.class, (int) rank, nbRequested, ExecutionType.BACKGROUND) {
                     long currentRank = rank;
 
                     @Override
@@ -2148,7 +2148,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             // do the work to select the actual event with the timestamp specified in the signal. This procedure prevents
             // the method fTrace.getRank() from interfering and delaying ongoing requests.
             final TmfDataRequest subRequest = new TmfDataRequest(ITmfEvent.class,
-                    0, 1, TmfDataRequest.DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND) {
+                    0, 1, ExecutionType.FOREGROUND) {
 
                 TmfTimestamp ts = new TmfTimestamp(signal.getCurrentTime());
 

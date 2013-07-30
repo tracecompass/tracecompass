@@ -224,7 +224,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
 
         public StatsTotalRequest(ITmfTrace trace, TmfTimeRange range) {
             super(trace.getEventType(), range, 0, TmfDataRequest.ALL_DATA,
-                    trace.getCacheSize(), ITmfDataRequest.ExecutionType.BACKGROUND);
+                    ITmfDataRequest.ExecutionType.BACKGROUND);
             total = 0;
         }
 
@@ -254,7 +254,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
 
         public StatsPerTypeRequest(ITmfTrace trace, TmfTimeRange range) {
             super(trace.getEventType(), range, 0, TmfDataRequest.ALL_DATA,
-                    trace.getCacheSize(), ITmfDataRequest.ExecutionType.BACKGROUND);
+                    ITmfDataRequest.ExecutionType.BACKGROUND);
             this.stats = new HashMap<String, Long>();
         }
 
@@ -310,7 +310,6 @@ public class TmfEventsStatistics implements ITmfStatistics {
                             new TmfTimestamp(endTime, SCALE)),
                     0,
                     TmfDataRequest.ALL_DATA,
-                    trace.getCacheSize(),
                     ITmfDataRequest.ExecutionType.BACKGROUND);
 
             /* Prepare the results map, with all counts at 0 */

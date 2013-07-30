@@ -20,7 +20,6 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * Class to request events for given time range from a trace to fill a HistogramDataModel and HistogramView.
@@ -65,9 +64,7 @@ public class HistogramRequest extends TmfEventRequest {
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range,
             int rank, int nbEvents, int blockSize,
             ITmfDataRequest.ExecutionType execType) {
-        super(ITmfEvent.class, range, rank, nbEvents,
-                (blockSize > 0) ? blockSize : ITmfTrace.DEFAULT_TRACE_CACHE_SIZE,
-                execType);
+        super(ITmfEvent.class, range, rank, nbEvents, execType);
         fHistogram = histogram;
     }
 

@@ -35,7 +35,6 @@ import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
 @SuppressWarnings("javadoc")
 public class TmfSyntheticEventProviderStub extends TmfEventProvider {
 
-    public static final int BLOCK_SIZE = 100;
     public static final int NB_EVENTS  = 1000;
 
     public TmfSyntheticEventProviderStub() {
@@ -58,7 +57,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider {
         final TmfEventRequest eventRequest = (TmfEventRequest) request;
         final TmfTimeRange range = eventRequest.getRange();
         final TmfEventRequest subRequest =
-                new TmfEventRequest(ITmfEvent.class, range, 0, NB_EVENTS, BLOCK_SIZE, ExecutionType.FOREGROUND) {
+                new TmfEventRequest(ITmfEvent.class, range, 0, NB_EVENTS, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);

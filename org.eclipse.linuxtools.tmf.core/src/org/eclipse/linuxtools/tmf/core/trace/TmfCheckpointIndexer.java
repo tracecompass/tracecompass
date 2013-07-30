@@ -165,8 +165,8 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         // Build a background request for all the trace data. The index is
         // updated as we go by readNextEvent().
         fIndexingRequest = new TmfEventRequest(ITmfEvent.class,
-                range, offset, TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
-        {
+                range, offset, TmfDataRequest.ALL_DATA,
+                ITmfDataRequest.ExecutionType.BACKGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);

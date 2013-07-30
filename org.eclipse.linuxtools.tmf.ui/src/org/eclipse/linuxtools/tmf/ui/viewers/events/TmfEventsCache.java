@@ -242,7 +242,6 @@ public class TmfEventsCache {
 
             DataRequest(Class<? extends ITmfEvent> dataType, ITmfFilter reqFilter, int start, int nbRequested) {
                 super(dataType, start, nbRequested,
-                        TmfDataRequest.DEFAULT_BLOCK_SIZE,
                         TmfDataRequest.ExecutionType.FOREGROUND);
                 requestFilter = reqFilter;
                 requestRank = start;
@@ -336,7 +335,6 @@ public class TmfEventsCache {
                 TmfDataRequest request = new TmfDataRequest(ITmfEvent.class,
                         startIndex,
                         nbRequested,
-                        TmfDataRequest.DEFAULT_BLOCK_SIZE,
                         TmfDataRequest.ExecutionType.FOREGROUND) {
                     private int count = 0;
                     private long rank = startIndex;

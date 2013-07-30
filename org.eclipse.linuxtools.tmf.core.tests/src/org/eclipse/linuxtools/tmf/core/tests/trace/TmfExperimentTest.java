@@ -825,42 +825,12 @@ public class TmfExperimentTest {
 
     @Test
     public void testProcessRequestForNbEvents() throws InterruptedException {
-        final int blockSize = 100;
         final int nbEvents  = 1000;
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
-                range, 0, nbEvents, blockSize, ExecutionType.FOREGROUND) {
-            @Override
-            public void handleData(final ITmfEvent event) {
-                super.handleData(event);
-                requestedEvents.add(event);
-            }
-        };
-        fExperiment.sendRequest(request);
-        request.waitForCompletion();
-
-        assertEquals("nbEvents", nbEvents, requestedEvents.size());
-        assertTrue("isCompleted",  request.isCompleted());
-        assertFalse("isCancelled", request.isCancelled());
-
-        // Ensure that we have distinct events.
-        // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < nbEvents; i++) {
-            assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
-        }
-    }
-
-    @Test
-    public void testProcessRequestForNbEvents2() throws InterruptedException {
-        final int blockSize = 2 * NB_EVENTS;
-        final int nbEvents = 1000;
-        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
-
-        final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
-                range, 0, nbEvents, blockSize, ExecutionType.FOREGROUND) {
+                range, 0, nbEvents, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -884,13 +854,12 @@ public class TmfExperimentTest {
     @Test
     public void testProcessRequestForAllEvents() throws InterruptedException {
         final int nbEvents  = TmfDataRequest.ALL_DATA;
-        final int blockSize =  1;
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
         final long nbExpectedEvents = NB_EVENTS;
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
-                range, 0, nbEvents, blockSize, ExecutionType.FOREGROUND) {
+                range, 0, nbEvents, ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
@@ -917,25 +886,27 @@ public class TmfExperimentTest {
 
     @Test
     public void testCancel() throws InterruptedException {
-        final int nbEvents  = NB_EVENTS;
-        final int blockSize = BLOCK_SIZE;
+        final int nbEvents = NB_EVENTS;
+        final int limit = BLOCK_SIZE;
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
-                range, 0, nbEvents, blockSize, ExecutionType.FOREGROUND) {
+                range, 0, nbEvents, ExecutionType.FOREGROUND) {
             int nbRead = 0;
+
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
-                if (++nbRead == blockSize) {
+                if (++nbRead == limit) {
                     cancel();
                 }
             }
+
             @Override
             public void handleCancel() {
-                if (requestedEvents.size() < blockSize) {
+                if (requestedEvents.size() < limit) {
                     System.out.println("aie");
                 }
             }
@@ -943,7 +914,7 @@ public class TmfExperimentTest {
         fExperiment.sendRequest(request);
         request.waitForCompletion();
 
-        assertEquals("nbEvents",  blockSize, requestedEvents.size());
+        assertEquals("nbEvents",  limit, requestedEvents.size());
         assertTrue("isCompleted", request.isCompleted());
         assertTrue("isCancelled", request.isCancelled());
     }

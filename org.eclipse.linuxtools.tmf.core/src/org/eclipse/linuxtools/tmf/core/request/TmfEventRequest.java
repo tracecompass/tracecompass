@@ -52,20 +52,16 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
      *            The number of events requested. You can use
      *            {@link TmfEventRequest#ALL_DATA} to indicate you want all
      *            events in the time range.
-     * @param blockSize
-     *            The number of events per block. You can use
-     *            {@link TmfDataRequest#DEFAULT_BLOCK_SIZE}.
      * @param priority
      *            The requested execution priority.
-     * @since 2.0
+     * @since 3.0
      */
     public TmfEventRequest(Class<? extends ITmfEvent> dataType,
             TmfTimeRange range,
             long index,
             int nbRequested,
-            int blockSize,
             ExecutionType priority) {
-        super(dataType, index, nbRequested, blockSize, priority);
+        super(dataType, index, nbRequested, priority);
         fRange = range;
 
         if (TmfCoreTracer.isRequestTraced()) {
@@ -133,7 +129,7 @@ public abstract class TmfEventRequest extends TmfDataRequest implements ITmfEven
     @SuppressWarnings("nls")
     public String toString() {
         return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName()
-                + "," + getRange() + "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
+                + "," + getRange() + "," + getIndex() + "," + getNbRequested() + ")]";
     }
 
 }

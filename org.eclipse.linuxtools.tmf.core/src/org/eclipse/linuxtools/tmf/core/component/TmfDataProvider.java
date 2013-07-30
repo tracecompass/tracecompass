@@ -264,7 +264,7 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
     protected void newCoalescedDataRequest(ITmfDataRequest request) {
         synchronized (fLock) {
             TmfCoalescedDataRequest coalescedRequest = new TmfCoalescedDataRequest(request.getDataType(), request.getIndex(),
-                    request.getNbRequested(), request.getBlockSize(), request.getExecType());
+                    request.getNbRequested(), request.getExecType());
             coalescedRequest.addRequest(request);
             if (TmfCoreTracer.isRequestTraced()) {
                 TmfCoreTracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
@@ -304,7 +304,7 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
         if (request.getExecType() == ExecutionType.FOREGROUND) {
             queueRequest(request);
         } else {
-            queueBackgroundRequest(request, request.getBlockSize(), true);
+            queueBackgroundRequest(request, true);
         }
     }
 
@@ -335,12 +335,11 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
      *
      * @param request
      *            The request
-     * @param blockSize
-     *            The request should be split in chunks of this size
      * @param indexing
      *            Should we index the chunks
+     * @since 3.0
      */
-    protected void queueBackgroundRequest(final ITmfDataRequest request, final int blockSize, final boolean indexing) {
+    protected void queueBackgroundRequest(final ITmfDataRequest request, final boolean indexing) {
         queueRequest(request);
     }
 
