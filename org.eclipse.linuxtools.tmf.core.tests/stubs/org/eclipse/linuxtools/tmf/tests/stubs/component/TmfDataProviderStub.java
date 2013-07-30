@@ -46,7 +46,7 @@ public class TmfDataProviderStub extends TmfDataProvider {
         final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
         try {
             final File test = new File(FileLocator.toFileURL(location).toURI());
-            fTrace = new TmfTraceStub(test.getPath(), 0, true);
+            fTrace = new TmfTraceStub(test.getPath(), 0, true, null, null);
         } catch (final TmfTraceException e) {
             e.printStackTrace();
         } catch (final URISyntaxException e) {

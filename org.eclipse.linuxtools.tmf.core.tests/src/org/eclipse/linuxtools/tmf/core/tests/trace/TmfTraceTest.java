@@ -95,7 +95,7 @@ public class TmfTraceTest {
             try {
                 final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
                 final File test = new File(FileLocator.toFileURL(location).toURI());
-                fTrace = new TmfTraceStub(test.toURI().getPath());
+                fTrace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null, null);
                 fTrace.indexTrace(true);
             } catch (final TmfTraceException e) {
                 e.printStackTrace();
@@ -120,7 +120,7 @@ public class TmfTraceTest {
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath());
+            trace = new TmfTraceStub(testfile.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null, null);
             trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
@@ -151,7 +151,7 @@ public class TmfTraceTest {
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath(), 0);
+            trace = new TmfTraceStub(testfile.toURI().getPath(), 0, false, null, null);
             trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
@@ -176,7 +176,7 @@ public class TmfTraceTest {
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath());
+            trace = new TmfTraceStub(testfile.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null, null);
             trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
@@ -205,7 +205,7 @@ public class TmfTraceTest {
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, null);
+            trace = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, false, null, null);
             trace.indexTrace(true);
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
@@ -267,7 +267,7 @@ public class TmfTraceTest {
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
-            original = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, new TmfCheckpointIndexer(null));
+            original = new TmfTraceStub(testfile.toURI().getPath(), BLOCK_SIZE, false, new TmfCheckpointIndexer(null), null);
             trace = new TmfTraceStub(original);
             trace.indexTrace(true);
         } catch (final URISyntaxException e) {
@@ -1451,7 +1451,7 @@ public class TmfTraceTest {
         try {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
             testfile = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub(testfile.toURI().getPath());
+            trace = new TmfTraceStub(testfile.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null, null);
             // verify initial values
             TmfTimestamp defaultInitRange = new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
             assertEquals("getInitialRangeOffset", defaultInitRange, trace.getInitialRangeOffset());
