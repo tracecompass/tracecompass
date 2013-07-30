@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferTypeConstants;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.DomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.EventInfo;
@@ -192,7 +193,7 @@ public class LTTngControlService implements ILttngControlService {
 
                 // in domain kernel
                 ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
-                index = parseDomain(result.getOutput(), index, channels);
+                index = parseDomain(result.getOutput(), index, channels, domainInfo);
 
                 if (channels.size() > 0) {
                     // add domain
@@ -213,7 +214,7 @@ public class LTTngControlService implements ILttngControlService {
 
                 // in domain UST
                 ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
-                index = parseDomain(result.getOutput(), index, channels);
+                index = parseDomain(result.getOutput(), index, channels, domainInfo);
 
                 if (channels.size() > 0) {
                     // add domain
@@ -967,9 +968,11 @@ public class LTTngControlService implements ILttngControlService {
      *            - current index in command output array
      * @param channels
      *            - list for returning channel information
+     * @param domainInfo
+     *            - The domain information
      * @return the new current index in command output array
      */
-    protected int parseDomain(String[] output, int currentIndex, List<IChannelInfo> channels) {
+    protected int parseDomain(String[] output, int currentIndex, List<IChannelInfo> channels, IDomainInfo domainInfo) {
         int index = currentIndex;
 
         // Channels:
@@ -987,6 +990,14 @@ public class LTTngControlService implements ILttngControlService {
         while (index < output.length) {
             String line = output[index];
 
+            if (isVersionSupported("2.2.0")) { //$NON-NLS-1$
+                Matcher bufferTypeMatcher = LTTngControlServiceConstants.BUFFER_TYPE_PATTERN.matcher(line);
+                if (bufferTypeMatcher.matches()) {
+                    domainInfo.setBufferType(getAttributeValue(line));
+                }
+            } else {
+                domainInfo.setBufferType(BufferTypeConstants.BUFFER_TYPE_UNKNOWN);
+            }
             Matcher outerMatcher = LTTngControlServiceConstants.CHANNELS_SECTION_PATTERN.matcher(line);
             Matcher noKernelChannelMatcher = LTTngControlServiceConstants.DOMAIN_NO_KERNEL_CHANNEL_PATTERN.matcher(line);
             Matcher noUstChannelMatcher = LTTngControlServiceConstants.DOMAIN_NO_UST_CHANNEL_PATTERN.matcher(line);

@@ -36,6 +36,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
      */
     private final List<IChannelInfo> fChannels = new ArrayList<IChannelInfo>();
     private boolean fIsKernel = false;
+    private String fBufferType = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -127,6 +128,19 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         return true;
     }
 
+    @Override
+    public String getBufferType() {
+        if (fIsKernel) {
+            return BufferTypeConstants.BUFFER_SHARED;
+        }
+        return fBufferType;
+    }
+
+    @Override
+    public void setBufferType(String bufferType) {
+        fBufferType = bufferType;
+    }
+
     @SuppressWarnings("nls")
     @Override
     public String toString() {
@@ -147,5 +161,4 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
             output.append(")]");
             return output.toString();
     }
-
 }

@@ -241,6 +241,7 @@ final public class Messages extends NLS {
     public static String TraceControl_StatePropertyName;
     public static String TraceControl_VersionPropertyName;
     public static String TraceControl_DomainNamePropertyName;
+    public static String TraceControl_BufferTypePropertyName;
     public static String TraceControl_ChannelNamePropertyName;
     public static String TraceControl_OverwriteModePropertyName;
     public static String TraceControl_SubBufferSizePropertyName;

@@ -285,6 +285,10 @@ public interface LTTngControlServiceConstants {
      */
     static final Pattern DOMAIN_NO_UST_CHANNEL_PATTERN = Pattern.compile("\\s*Error\\:\\s+UST\\s+channel\\s+not\\s+found.*"); //$NON-NLS-1$
     /**
+     * Pattern to match for buffer type (lttng list <session>)
+     */
+    static final Pattern BUFFER_TYPE_PATTERN = Pattern.compile("\\s*Buffer\\s+type\\:.*"); //$NON-NLS-1$
+    /**
      * Pattern to match for channels section (lttng list <session>)
      */
     static final Pattern CHANNELS_SECTION_PATTERN = Pattern.compile("\\s*Channels\\:"); //$NON-NLS-1$

@@ -1293,6 +1293,7 @@ The Control View provides property information of selected tree component. Depen
 ** '''State''': The state of the session ('''ACTIVE''' or '''INACTIVE''')
 * '''Domain''' Properties
 ** '''Domain Name''': The name of the domain.
+** '''Buffer Type''': The buffer type of the domain.
 * '''Channel''' Properties
 ** '''Channel Name''': The name of the channel.
 ** '''Number of Sub Buffers''': The number of sub-buffers of the channel.
