@@ -32,120 +32,40 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
     // Attributes
     // ------------------------------------------------------------------------
 
-	private TmfTimeRange fRange;	// The requested events time range
+    private TmfTimeRange fRange; // The requested events time range
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
     /**
-     * Request all the events of a given type (high priority)
-     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * Request 'n' events of a given type for the given time range (given
+     * priority). Events are returned in blocks of the given size.
      *
-     * @param dataType the requested data type
+     * @param dataType
+     *            The requested data type
+     * @param range
+     *            The range of the request. You can use
+     *            {@link TmfTimeRange#ETERNITY} to request all events.
+     * @param index
+     *            The index of the first event to retrieve. Use '0' to start at
+     *            the beginning.
+     * @param nbRequested
+     *            The number of events requested. You can use
+     *            {@link TmfDataRequest#ALL_DATA} to request all events.
+     * @param blockSize
+     *            The number of events per block. You can use
+     *            {@link TmfDataRequest#DEFAULT_BLOCK_SIZE} to use a default
+     *            value.
+     * @param priority
+     *            The requested execution priority
      */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType) {
-        this(dataType, TmfTimeRange.ETERNITY, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
-    }
-
-    /**
-     * Request all the events of a given type (given priority)
-     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     *
-     * @param dataType the requested data type
-     * @param priority the requested execution priority
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, ExecutionType priority) {
-        this(dataType, TmfTimeRange.ETERNITY, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
-    }
-
-    /**
-     * Request all the events of a given type for the given time range (high priority)
-     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     *
-     * @param dataType the requested data type
-     * @param range the time range of the requested events
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
-    }
-
-    /**
-     * Request all the events of a given type for the given time range (given priority)
-     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     *
-     * @param dataType the requested data type
-     * @param range the time range of the requested events
-     * @param priority the requested execution priority
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, ExecutionType priority) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
-    }
-
-    /**
-     * Request 'n' events of a given type from the given time range (high priority)
-     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     *
-     * @param dataType the requested data type
-     * @param range the time range of the requested events
-     * @param nbRequested the number of events requested
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
-    }
-
-    /**
-     * Request 'n' events of a given type for the given time range (given priority)
-     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
-     *
-     * @param dataType the requested data type
-     * @param range the time range of the requested events
-     * @param nbRequested the number of events requested
-     * @param priority the requested execution priority
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested, ExecutionType priority) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, priority);
-    }
-
-    /**
-     * Request 'n' events of a given type for the given time range (high priority).
-     * Events are returned in blocks of the given size.
-     *
-     * @param dataType the requested data type
-     * @param range the time range of the requested events
-     * @param nbRequested the number of events requested
-     * @param blockSize the number of events per block
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-        this(dataType, range, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
-    }
-
-    /**
-     * Request 'n' events of a given type for the given time range (given priority).
-     * Events are returned in blocks of the given size.
-     *
-     * @param dataType the requested data type
-     * @param range the time range of the requested events
-     * @param nbRequested the number of events requested
-     * @param blockSize the number of events per block
-     * @param priority the requested execution priority
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType priority) {
-        this(dataType, range, 0, nbRequested, blockSize, priority);
-    }
-
-    /**
-     * Request 'n' events of a given type for the given time range (given priority).
-     * Events are returned in blocks of the given size.
-     *
-     * @param dataType the requested data type
-     * @param range the time range of the requested events
-     * @param index the index of the first event to retrieve
-     * @param nbRequested the number of events requested
-     * @param blockSize the number of events per block
-     * @param priority the requested execution priority
-     */
-    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType, TmfTimeRange range, long index, int nbRequested, int blockSize, ExecutionType priority) {
+    public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType,
+            TmfTimeRange range,
+            long index,
+            int nbRequested,
+            int blockSize,
+            ExecutionType priority) {
         super(ITmfEvent.class, index, nbRequested, blockSize, priority);
         fRange = range;
 
@@ -174,25 +94,25 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
         }
     }
 
-	@Override
-	public boolean isCompatible(ITmfDataRequest request) {
-	    if (request instanceof ITmfEventRequest) {
-	        if (super.isCompatible(request)) {
-	            return overlaps((ITmfEventRequest) request);
-	        }
-	    }
-	    return false;
-	}
+    @Override
+    public boolean isCompatible(ITmfDataRequest request) {
+        if (request instanceof ITmfEventRequest) {
+            if (super.isCompatible(request)) {
+                return overlaps((ITmfEventRequest) request);
+            }
+        }
+        return false;
+    }
 
     private boolean overlaps(ITmfEventRequest request) {
         ITmfTimestamp startTime = request.getRange().getStartTime();
-        ITmfTimestamp endTime   = request.getRange().getEndTime();
+        ITmfTimestamp endTime = request.getRange().getEndTime();
         return (startTime.compareTo(endTime) <= 0) && (fRange.getStartTime().compareTo(fRange.getEndTime()) <= 0);
     }
 
     private void merge(ITmfEventRequest request) {
         ITmfTimestamp startTime = request.getRange().getStartTime();
-        ITmfTimestamp endTime   = request.getRange().getEndTime();
+        ITmfTimestamp endTime = request.getRange().getEndTime();
         if (!fRange.contains(startTime) && fRange.getStartTime().compareTo(startTime) > 0) {
             fRange = new TmfTimeRange(startTime, fRange.getEndTime());
         }
@@ -242,15 +162,15 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
     // ITmfEventRequest
     // ------------------------------------------------------------------------
 
-	@Override
-	public TmfTimeRange getRange() {
-		return fRange;
-	}
+    @Override
+    public TmfTimeRange getRange() {
+        return fRange;
+    }
 
-	@Override
-	public void setStartIndex(int index) {
-		setIndex(index);
-	}
+    @Override
+    public void setStartIndex(int index) {
+        setIndex(index);
+    }
 
     // ------------------------------------------------------------------------
     // Object
@@ -259,29 +179,29 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
     @Override
     // All requests have a unique id
     public int hashCode() {
-    	return super.hashCode();
+        return super.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
-    	if (other instanceof TmfCoalescedEventRequest) {
-    		TmfCoalescedEventRequest request = (TmfCoalescedEventRequest) other;
-       		return 	(request.getDataType()    == getDataType()) &&
-       				(request.getIndex()       == getIndex())    &&
-       				(request.getNbRequested() == getNbRequested()) &&
-       	    		(request.getRange().equals(getRange()));
-       	}
-    	if (other instanceof TmfCoalescedDataRequest) {
-       		return super.equals(other);
-    	}
-  		return false;
+        if (other instanceof TmfCoalescedEventRequest) {
+            TmfCoalescedEventRequest request = (TmfCoalescedEventRequest) other;
+            return (request.getDataType() == getDataType()) &&
+                    (request.getIndex() == getIndex()) &&
+                    (request.getNbRequested() == getNbRequested()) &&
+                    (request.getRange().equals(getRange()));
+        }
+        if (other instanceof TmfCoalescedDataRequest) {
+            return super.equals(other);
+        }
+        return false;
     }
 
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-		return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName()
-			+ "," + getRange() + "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
+        return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName()
+                + "," + getRange() + "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
     }
 
 }
