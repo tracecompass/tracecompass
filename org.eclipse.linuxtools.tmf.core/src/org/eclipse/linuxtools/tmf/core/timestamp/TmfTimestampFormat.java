@@ -9,6 +9,7 @@
  * Contributors:
  *     Francois Chouinard - Initial API and implementation
  *     Marc-Andre Laperle - Add time zone preference
+ *     Patrick Tasse - Updated for negative value formatting
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.timestamp;
@@ -361,13 +362,23 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     public synchronized String format(long value) {
 
         // Split the timestamp value into its sub-components
-        long sec = value / 1000000000;            // seconds
-        long ms  = value % 1000000000 / 1000000;  // milliseconds
-        long cs  = value % 1000000    / 1000;     // microseconds
-        long ns  = value % 1000;                  // nanoseconds
+        long date = value / 1000000; // milliseconds since January 1, 1970, 00:00:00 GMT
+        long sec = value / 1000000000;    // seconds since January 1, 1970, 00:00:00 GMT
+        long ms  = Math.abs(value) % 1000000000 / 1000000;  // milliseconds
+        long cs  = Math.abs(value) % 1000000    / 1000;     // microseconds
+        long ns  = Math.abs(value) % 1000;                  // nanoseconds
+
+        // Adjust for negative value when formatted as a date
+        if (value < 0 && ms + cs + ns > 0 && !fPattern.contains("T")) { //$NON-NLS-1$
+            date -= 1;
+            long nanosec = 1000000000 - (1000000 * ms + 1000 * cs + ns);
+            ms = nanosec / 1000000;
+            cs = nanosec % 1000000 / 1000;
+            ns = nanosec % 1000;
+        }
 
         // Let the base class fill the stuff it knows about
-        StringBuffer result = new StringBuffer(super.format(sec * 1000 + ms));
+        StringBuffer result = new StringBuffer(super.format(date));
 
         // In the case where there is no separation between 2 supplementary
         // fields, the pattern will have the form "..'[pat-1]''[pat-2]'.." and
@@ -395,6 +406,9 @@ public class TmfTimestampFormat extends SimpleDateFormat {
             // Format the proper value as per the pattern
             switch (pattern.charAt(0)) {
                 case 'T':
+                    if (value < 0 && sec == 0) {
+                        result.insert(0, '-');
+                    }
                     fmtVal = dfmt.format(sec);
                     break;
                 case 'S':
