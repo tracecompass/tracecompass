@@ -87,8 +87,10 @@ public class ControlFlowView extends AbstractTimeGraphView {
      * Constructor
      */
     public ControlFlowView() {
-        super(ID, COLUMN_NAMES, FILTER_COLUMN_NAMES, new ControlFlowPresentationProvider());
+        super(ID, new ControlFlowPresentationProvider());
+        setTreeColumns(COLUMN_NAMES);
         setTreeLabelProvider(new ControlFlowTreeLabelProvider());
+        setFilterColumns(FILTER_COLUMN_NAMES);
         setEntryComparator(new ControlFlowEntryComparator());
     }
 
@@ -430,7 +432,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
     protected void synchingToTime(long time) {
         int selected = getSelectionValue(time);
         if (selected > 0) {
-            for (Object element : getTimeGraphCombo().getTimeGraphViewer().getExpandedElements()) {
+            for (Object element : getTimeGraphViewer().getExpandedElements()) {
                 if (element instanceof ControlFlowEntry) {
                     ControlFlowEntry entry = (ControlFlowEntry) element;
                     if (entry.getThreadId() == selected) {

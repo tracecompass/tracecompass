@@ -49,17 +49,9 @@ public class ResourcesView extends AbstractTimeGraphView {
      */
     public static final int NO_VALUE_EVENT = -999;
 
-    private static final String PROCESS_COLUMN = Messages.ControlFlowView_processColumn;
-
-    private static final String[] COLUMN_NAMES = new String[] {
-            PROCESS_COLUMN
-    };
-
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
-            PROCESS_COLUMN
+            Messages.ResourcesView_stateTypeName
     };
-
-    private static final int[] WEIGHTS = { 15, 85 };
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -69,8 +61,8 @@ public class ResourcesView extends AbstractTimeGraphView {
      * Default constructor
      */
     public ResourcesView() {
-        super(ID, COLUMN_NAMES, FILTER_COLUMN_NAMES, new ResourcesPresentationProvider());
-        setWeight(WEIGHTS);
+        super(ID, new ResourcesPresentationProvider());
+        setFilterColumns(FILTER_COLUMN_NAMES);
     }
 
     @Override
