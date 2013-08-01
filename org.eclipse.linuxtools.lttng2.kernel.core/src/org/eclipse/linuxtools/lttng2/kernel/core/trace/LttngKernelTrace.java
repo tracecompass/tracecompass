@@ -103,7 +103,7 @@ public class LttngKernelTrace extends CtfTmfTrace {
             ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(htFile, htInput, false);
             fStateSystems.put(STATE_ID, ss);
         } catch (TmfTraceException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
         }
         return Status.OK_STATUS;
     }
