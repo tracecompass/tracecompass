@@ -19,7 +19,7 @@
 
   <artifactId>org.eclipse.linuxtools.gdbtrace.core.tests</artifactId>
   <groupId>org.eclipse.linuxtools.gdbtrace</groupId>
-  <version>2.1.0-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools GDB Tracepoint Analysis Core Tests Plug-in</name>

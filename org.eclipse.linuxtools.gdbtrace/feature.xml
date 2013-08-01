@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.linuxtools.gdbtrace"
       label="%featureName"
-      version="2.1.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="%featureProvider"
       license-feature="org.eclipse.linuxtools.license.feature"
       license-feature-version="1.0.0.qualifier">
@@ -39,7 +39,7 @@
       <import plugin="org.eclipse.cdt.dsf.gdb.ui"/>
       <import plugin="org.eclipse.linuxtools.tmf.core" version="2.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.linuxtools.tmf.ui" version="2.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.gdbtrace.core" version="2.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.gdbtrace.core" version="1.1.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
