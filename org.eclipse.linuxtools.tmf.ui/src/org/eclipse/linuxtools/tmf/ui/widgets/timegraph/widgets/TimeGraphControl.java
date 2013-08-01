@@ -30,8 +30,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
@@ -1880,32 +1880,32 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
             long time = getTimeAtX(x);
             if (time >= 0) {
                 message.append("T: "); //$NON-NLS-1$
-                message.append(new CtfTmfTimestamp(time).toString());
+                message.append(new TmfNanoTimestamp(time).toString());
                 message.append("     T1: "); //$NON-NLS-1$
                 if (fTimeProvider instanceof ITimeDataProvider2) {
                     long selectionBegin = ((ITimeDataProvider2) fTimeProvider).getSelectionBegin();
                     long selectionEnd = ((ITimeDataProvider2) fTimeProvider).getSelectionEnd();
-                    message.append(new CtfTmfTimestamp(Math.min(selectionBegin, selectionEnd)).toString());
+                    message.append(new TmfNanoTimestamp(Math.min(selectionBegin, selectionEnd)).toString());
                     if (selectionBegin != selectionEnd) {
                         message.append("     T2: "); //$NON-NLS-1$
-                        message.append(new CtfTmfTimestamp(Math.max(selectionBegin, selectionEnd)).toString());
+                        message.append(new TmfNanoTimestamp(Math.max(selectionBegin, selectionEnd)).toString());
                         message.append("     \u0394: "); //$NON-NLS-1$
                         message.append(new TmfTimestampDelta(Math.abs(selectionBegin - selectionEnd), ITmfTimestamp.NANOSECOND_SCALE));
                     }
                 } else {
                     @SuppressWarnings("deprecation")
                     long selectedTime = fTimeProvider.getSelectedTime();
-                    message.append(new CtfTmfTimestamp(selectedTime));
+                    message.append(new TmfNanoTimestamp(selectedTime));
                 }
             }
         } else if (fDragState == DRAG_SELECTION || fDragState == DRAG_ZOOM) {
             long time0 = fDragTime0;
             long time = getTimeAtX(fDragX);
             message.append("T1: "); //$NON-NLS-1$
-            message.append(new CtfTmfTimestamp(Math.min(time, time0)).toString());
+            message.append(new TmfNanoTimestamp(Math.min(time, time0)).toString());
             if (time != time0) {
                 message.append("     T2: "); //$NON-NLS-1$
-                message.append(new CtfTmfTimestamp(Math.max(time, time0)).toString());
+                message.append(new TmfNanoTimestamp(Math.max(time, time0)).toString());
                 message.append("     \u0394: "); //$NON-NLS-1$
                 message.append(new TmfTimestampDelta(Math.abs(time - time0), ITmfTimestamp.NANOSECOND_SCALE));
             }
