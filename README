@@ -35,3 +35,7 @@ $ mvn clean install -Dmaven.test.skip=true
 The RCP is not built by default, to build it you need to add "-PtracingRcp" to
 the 'mvn' command:
 $ mvn clean install -PtracingRcp -Dmaven.test.skip=true
+
+This will build the RCP for all supported architectures. The resulting archives
+will be placed in lttng/org.eclipse.linuxtools.tracing.rcp.product/target/products
+
