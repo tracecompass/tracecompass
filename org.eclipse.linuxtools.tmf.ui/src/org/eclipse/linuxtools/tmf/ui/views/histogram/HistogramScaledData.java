@@ -68,12 +68,12 @@ public class HistogramScaledData {
     public int fCurrentBucket;
     /**
      * The index of the selection begin bucket.
-     * @since 2.1
+     * @since 3.0
      */
     public int fSelectionBeginBucket;
     /**
      * The index of the selection end bucket.
-     * @since 2.1
+     * @since 3.0
      */
     public int fSelectionEndBucket;
     /**

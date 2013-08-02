@@ -1022,7 +1022,7 @@ public class TmfVirtualTable extends Composite {
      * recently selected. The array is empty if no items are selected.
      * <p>
      * @return the array of indices of the selected items
-     * @since 2.1
+     * @since 3.0
      */
     public int[] getSelectionIndices() {
         if (fSelectedEventRank < 0 || fSelectedBeginRank < 0) {

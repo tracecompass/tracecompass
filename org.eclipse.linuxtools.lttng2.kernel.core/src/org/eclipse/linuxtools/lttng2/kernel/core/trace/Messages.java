@@ -29,12 +29,12 @@ public class Messages extends NLS {
     public static String LttngKernelTrace_DomainError;
     /**
      * Malformed trace (buffer overflow maybe?)
-     * @since 2.1
+     * @since 3.0
      */
     public static String LttngKernelTrace_MalformedTrace;
     /**
      * Trace read error
-     * @since 2.1
+     * @since 3.0
      */
     public static String LttngKernelTrace_TraceReadError;
 

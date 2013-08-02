@@ -63,7 +63,7 @@ public class TimeGraphTimeEvent extends EventObject {
      *            The selection begin time
      * @param endTime
      *            The selection end time
-     * @since 2.1
+     * @since 3.0
      */
     public TimeGraphTimeEvent(Object source, long beginTime, long endTime) {
         super(source);
@@ -82,7 +82,7 @@ public class TimeGraphTimeEvent extends EventObject {
 
     /**
      * @return the selection begin time
-     * @since 2.1
+     * @since 3.0
      */
     public long getBeginTime() {
         return fBeginTime;
@@ -90,7 +90,7 @@ public class TimeGraphTimeEvent extends EventObject {
 
     /**
      * @return the selection end time
-     * @since 2.1
+     * @since 3.0
      */
     public long getEndTime() {
         return fEndTime;
