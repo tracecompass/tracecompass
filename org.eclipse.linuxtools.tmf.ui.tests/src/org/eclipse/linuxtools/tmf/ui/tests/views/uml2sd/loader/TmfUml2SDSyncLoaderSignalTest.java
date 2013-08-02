@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2013 Ericsson
+ * Copyright (c) 2011, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Alexandre Montplaisir - Port to JUnit4
+ *   Patrick Tasse - Support selection range
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader;
@@ -18,6 +19,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
@@ -52,7 +54,8 @@ public class TmfUml2SDSyncLoaderSignalTest {
         rangeWindow = (TmfTimestamp) range.getEndTime().getDelta(range.getStartTime());
         currentTime = new Uml2SDTestTimestamp(9789773782043L);
 
-        fFacility.getTrace().broadcast(new TmfRangeSynchSignal(fFacility, range, currentTime));
+        fFacility.getTrace().broadcast(new TmfRangeSynchSignal(fFacility, range));
+        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(fFacility, currentTime));
         fFacility.delay(IUml2SDTestConstants.BROADCAST_DELAY);
 
         fTmfComponent = new Uml2SDSignalValidator();

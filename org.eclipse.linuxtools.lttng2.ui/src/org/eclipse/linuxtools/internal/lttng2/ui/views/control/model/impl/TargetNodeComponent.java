@@ -233,6 +233,30 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         return getControlService().isVersionSupported("2.1.0"); //$NON-NLS-1$
     }
 
+    /**
+     * Returns if node supports per UID buffers or not
+     * @return <code>true</code> if node supports per UID buffers else <code>false</code>
+     */
+    public boolean isPerUIDBuffersSupported() {
+        return getControlService().isVersionSupported("2.2.0"); //$NON-NLS-1$
+    }
+
+    /**
+     * Returns if node supports trace file rotation or not
+     * @return <code>true</code> if node supports trace file rotation else <code>false</code>
+     */
+    public boolean isTraceFileRotationSupported() {
+        return getControlService().isVersionSupported("2.2.0"); //$NON-NLS-1$
+    }
+
+    /**
+     * Returns if node supports periodical flush for metadata or not
+     * @return <code>true</code> if node supports periodical flush for metadata else <code>false</code>
+     */
+    public boolean isPeriodicalMetadataFlushSupported() {
+        return getControlService().isVersionSupported("2.2.0"); //$NON-NLS-1$
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

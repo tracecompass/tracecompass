@@ -830,6 +830,8 @@ public class LTTngControlServiceTest {
             chanInfo.setReadTimer(100);
             chanInfo.setSwitchTimer(200);
             chanInfo.setNumberOfSubBuffers(2);
+            chanInfo.setMaxNumberTraceFiles(10);
+            chanInfo.setMaxSizeTraceFiles(0);
             fService.enableChannels(sessionName, list, true, chanInfo, new NullProgressMonitor());
 
             // Create/enable/configure 1 UST channel
@@ -842,6 +844,33 @@ public class LTTngControlServiceTest {
             chanInfo.setReadTimer(200);
             chanInfo.setSwitchTimer(100);
             chanInfo.setNumberOfSubBuffers(1);
+            chanInfo.setMaxNumberTraceFiles(20);
+            chanInfo.setMaxSizeTraceFiles(0);
+            fService.enableChannels(sessionName, list, false, chanInfo, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    @Test
+    public void testCreateChannelUIDBuffer() {
+        try {
+            String sessionName = "mysession2";
+            List<String> list = new ArrayList<String>();
+            String USTChannel = "ustChannel";
+            list.add(USTChannel);
+            fShell.setScenario(SCEN_CHANNEL_HANDLING);
+
+            ChannelInfo chanInfo = new ChannelInfo("");
+            chanInfo.setOverwriteMode(true);
+            chanInfo.setSubBufferSize(32768);
+            chanInfo.setReadTimer(200);
+            chanInfo.setSwitchTimer(100);
+            chanInfo.setNumberOfSubBuffers(1);
+            chanInfo.setMaxNumberTraceFiles(20);
+            chanInfo.setMaxSizeTraceFiles(0);
+            chanInfo.setBuffersUID(true);
             fService.enableChannels(sessionName, list, false, chanInfo, new NullProgressMonitor());
 
         } catch (ExecutionException e) {

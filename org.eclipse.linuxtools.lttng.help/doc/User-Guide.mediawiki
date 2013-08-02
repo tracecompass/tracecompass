@@ -45,7 +45,7 @@ The LTTng Eclipse plug-in has a number of features to allow efficient handling o
 * Support for arbitrarily large traces (larger than available memory)
 * Support for correlating multiple time-ordered traces
 * Support for zooming down to the nanosecond on any part of a trace or set of traces
-* Views synchronization of currently selected event
+* Views synchronization of currently selected time or time range, and window time range
 * Efficient searching and filtering of events
 * Support for trace bookmarks
 
@@ -445,6 +445,8 @@ The first row of the table is the header row a.k.a. the Search and Filter row.
 
 The highlighted event is the ''current event'' and is synchronized with the other views. If you select another event, the other views will be updated accordingly. The properties view will display a more detailed view of the selected event.
 
+An event range can be selected by holding the '''Shift''' key while clicking another event or using any of the cursor keys ('''Up'''', '''Down''', '''PageUp''', '''PageDown''', '''Home''', '''End'''). The first and last events in the selection will be used to determine the current selected time range for synchronization with the other views.
+
 [[Image:images/LTTng2EventProperties.png]]
 
 The Events editor can be closed, disposing a trace. When this is done, all the views displaying the information will be updated with the trace data of the next event editor tab. If all the editor tabs are closed, then the views will display their empty states.
@@ -525,11 +527,10 @@ The Histogram View displays the trace events distribution with respect to time. 
 
 On the top left, there are two data controls:
 
-* '''Current Event (sec)''': Displays the timestamp of the currently selected event
+* '''Current Event (sec)''': Displays the current time or selected time range begin time
 * '''Window Span (sec)''': Displays the current time range window size
 
 Both control can be used to modify their respective value. After validation, the other controls and views will be synchronized and updated accordingly.
-
 
 The large histogram, at the bottom, shows the event distribution over the whole trace or set of traces. It also has a smaller semi-transparent window, with a cross-hair, that shows the currently selected time range window. The time range window can be zoomed in/out by using the mouse wheel. It can also be selected by the mouse and dragged to another region of the trace.
 
@@ -537,7 +538,7 @@ The smaller histogram, on top right, corresponds to the currently selected time 
 
 The x-axis of each histogram corresponds to the events timestamps. The timestamp of the first and the last event of the respective ranges is displayed. The y-axis of each histogram shows the minimum/maximum number of events in the corresponding histogram bars.
 
-The dashed vertical magenta bar, on the right, shows the position of the last event. The dashed vertical red bar shows the relative position of the currently selected event. The current event can be changed by clicking on the histogram.
+The dashed vertical magenta bar, on the right, shows the position of the last event. The vertical blue bar shows the currently selected time. The current time can be changed by clicking on the histogram. Shift-clicking the histogram will select a time range, in which case there will be vertical blue bars at the begin and end time and the region in between will be shaded.
 
 Hovering the mouse over an histogram bar pops up an information window that displays the start/end time of the corresponding bar as well as the number of events it represents.
 
@@ -545,8 +546,8 @@ In each histogram, the following keys are handled:
 
 * '''Left''': Moves the current event to the previous non-empty bar
 * '''Right''': Moves the current event to the next non-empty bar
-* '''Home''': Displays the current event to the first histogram bar
-* '''End''': Displays the current event to the last non-empty histogram bar
+* '''Home''': Sets the current time to the first histogram bar
+* '''End''': Sets the current time to the last non-empty histogram bar
 
 == Statistics View ==
 
@@ -578,7 +579,7 @@ The Filters view allows the user to define preset filters that can be applied to
 
 The filters can be more complex than what can be achieved with the filter header row in the events table. The filter is defined in a tree node structure, where the node types can be any of '''EVENTTYPE''', '''AND''', '''OR''', '''CONTAINS''', '''EQUALS''', '''MATCHES''' or '''COMPARE'''. Some nodes types have restrictions on their possible children in the tree.
 
-The '''EVENTTYPE''' node filters against the event type of the trace as defined in a plugin extension or in a custom parsers. When used, any child node will have its field combo box restricted to the possible fields of that event type.
+The '''EVENTTYPE''' node filters against the event type of the trace as defined in a plug-in extension or in a custom parsers. When used, any child node will have its field combo box restricted to the possible fields of that event type.
 
 The '''AND''' node applies the logical ''and'' condition on all of its children. All children conditions must be true for the filter to match. A ''not'' operator can be applied to invert the condition.
 
@@ -612,7 +613,7 @@ When a bookmark is applied in the events table, the ticks corresponding to the b
 
 When a filter is applied in the events table, the non-matching ticks are removed from the Time Chart view.
 
-The Time Chart only supports traces that are opened in an editor. The use of an editor is specified in the plugin extension for that trace type, or is enabled by default for custom traces.
+The Time Chart only supports traces that are opened in an editor. The use of an editor is specified in the plug-in extension for that trace type, or is enabled by default for custom traces.
 
 == Environment Variables View ==
 A new feature of CTF traces is their ability to store user defined data that is not to be placed in an event. It is generally data that is per-trace specific, such as the tracer version and the trace domain. It will be populated when a trace is loaded if the trace has environment variables. <br>
@@ -625,7 +626,7 @@ The State System Explorer view allows the user to inspect the state interval val
 
 The view shows a tree of currently selected traces and their registered state system IDs. For each state system the tree structure of attributes is displayed. The attribute name, quark, value, start and end time, and full attribute path are shown for each attribute.
 
-To modify the time of attributes shown in the view, select a different current time in other views that support time synchronization (e.g. event table, histogram view).
+To modify the time of attributes shown in the view, select a different current time in other views that support time synchronization (e.g. event table, histogram view). When a time range is selected, this view uses the begin time.
 
 == Call Stack View ==
 
@@ -640,6 +641,8 @@ Double-clicking on a function entry in the table will zoom the time graph to the
 The time graph on the right-hand side of the view shows the call stack state graphically over time. The function name is visible on each call stack event if size permits. The color of each call stack event is randomly assigned based on the function name, allowing for easy identification of repeated calls to the same function.
 
 Clicking on the time graph will set the current time and consequently update the table with the current call stack information.
+
+Shift-clicking on the time graph will select a time range. When the selection is a time range, the begin time is used to update the stack information.
 
 Double-clicking on a call stack event will zoom the time graph to the selected function's range of execution.
 
@@ -949,7 +952,7 @@ A dialog box will open for entering information about the channel to be created.
 
 [[Image:images/LTTng2CreateChannelDialog.png]]
 
-By default the domain '''Kernel''' is selected and the corresponding default values are shown. To create a UST channel, select '''UST''' under the domain section. To get the default values of UST, then press button '''Default'''.
+By default the domain '''Kernel''' is selected. To create a UST channel, select '''UST''' under the domain section. The label <Default> in any text box indicates that the default value of the tracer will be configured. To initialize the dialog box press button '''Default'''.
 
 If required update the following channel information and then press '''Ok'''.
 
@@ -961,6 +964,29 @@ If required update the following channel information and then press '''Ok'''.
 * '''Switch Timer Interval''': The switch timer interval.
 
 Upon successful operation, the requested domain will be created under the session tree node as well as the requested channel will be added under the domain. The channel will be '''ENABLED'''.
+
+==== Trace file rotation ====
+
+Since LTTng Tools v2.2.0 it is possible to set the maximum size of trace files and the maximum number of them. These options are located in the same dialog box that is used to enabling channels.
+
+[[Image:images/LTTng2CreateChannelDialogFileRotation.png]]
+
+* '''Maximum size of trace files''': The maximum size of trace files
+* '''Maximum number of trace files''': The maximum number of trace files
+
+==== Per UID buffers ====
+
+Since LTTng Tools v2.2.0 it is possible to have one buffer per UID for UST traces. It can be activated in the dialog box when enabling channels.
+
+[[Image:images/LTTng2CreateChannelDialogPerUIDBuffers.png]]
+
+* '''Per UID buffers''': To activate the per UID buffers option for UST channel only
+
+==== Periodical flush for metadata ====
+
+Since LTTng Tools v2.2.0 it is possible to configure periodical flush for the metadata channel. To set this, use the checkbox '''Configure metadata channel''' then use the switcher timer interval for the interval.
+
+[[Image:images/LTTng2CreateChannelDialogMetadataFlush.png]]
 
 ==== Enabling Channels On Domain Level ====
 
@@ -1267,6 +1293,7 @@ The Control View provides property information of selected tree component. Depen
 ** '''State''': The state of the session ('''ACTIVE''' or '''INACTIVE''')
 * '''Domain''' Properties
 ** '''Domain Name''': The name of the domain.
+** '''Buffer Type''': The buffer type of the domain.
 * '''Channel''' Properties
 ** '''Channel Name''': The name of the channel.
 ** '''Number of Sub Buffers''': The number of sub-buffers of the channel.
@@ -1359,18 +1386,21 @@ The colored bars you see represent '''states''' for the associated process node.
 
 This dark yellow is what you'll see most of the time since scheduling puts processes on hold while others run.
 
-The vertical blue line is the '''current time indicator'''.
+The vertical blue line is the '''current selection indicator'''. When a time range is selected, the region between the begin and end time of the selection will be shaded.
 
 ==== Using the mouse ====
 
 The states flow is usable with the mouse. The following actions are set:
 
-* '''drag horizontally''': pan left or right
+* '''left-click''': select a time or time range begin time
+* '''Shift-left-click''': select a time range end time
+* '''left-drag horizontally''': select a time range or change the time range begin or end time
+* '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
+* '''right-drag horizontally''': [[#Zoom region|zoom region]]
 * '''click on a colored bar''': the associated process node is selected and the current time indicator is moved where the click happened
 * '''mouse wheel up/down''': zoom in or out
-* '''drag the time ruler horizontally''': zoom in or out
-* '''drag the time ruler horizontally with the right button''': [[#Zoom region|zoom region]]
-* '''double-click the time ruler''': reset zoom
+* '''drag the time ruler horizontally''': zoom in or out with fixed start time
+* '''double-click the time ruler''': reset zoom to full range
 
 When the current time indicator is changed (when clicking in the states flow), all the other views are '''synchronized'''. For example, the [[#LTTng_Kernel_Events_Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
 
@@ -1390,7 +1420,7 @@ When no dots are left, you are viewing '''all the events and states''' within th
 
 ==== Zoom region ====
 
-To zoom in on a specific region, '''right-click and drag the time ruler''' in order to draw a time range:
+To zoom in on a specific region, '''right-click and drag''' in order to draw a time range:
 
 [[Image:images/Cfv_zoom_region.png]]
 

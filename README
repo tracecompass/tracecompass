@@ -1,0 +1,37 @@
+This directory contains the source code for the LTTng integration plugins for
+Eclipse, which includes the generic Tracing and Monitoring Framework (TMF).
+
+The plugins are categorized as follows:
+org.eclipse.linuxtools.ctf.*          Common Trace Format (CTF) reader library
+org.eclipse.linuxtools.gdbtrace.*     Support for reading and viewing GDB traces
+org.eclipse.linuxtools.lttng*         LTTng 2.x integration
+org.eclipse.linuxtools.tmf.*          Tracing and Monitoring Framework
+org.eclipse.linuxtools.tracing.rcp.*  Code specific to the RCP version
+
+
+To set up the environment to build TMF from within Eclipse, see this wiki page:
+http://wiki.eclipse.org/Linux_Tools_Project/LTTng_Eclipse_Plug-in_Development_Environment_Setup
+
+
+
+
+To build it using Maven, you first need to build the Linux Tools licensing
+feature (starting from the root of the source tree):
+$ cd releng/org.eclipse.linuxtools.license-feature
+$ mvn clean install
+Then you can build the LTTng plugins:
+$ cd ../../lttng
+$ mvn clean install
+
+As long as you don't clear the Maven reactor cache (in ~/.m2), you should not
+need to rebuild the licensing feature.
+
+
+The default command will compile and run the unit tests. Running the tests can
+take some time, to skip them you can append "-Dmaven.test.skip=true" to the
+'mvn' command:
+$ mvn clean install -Dmaven.test.skip=true
+
+The RCP is not built by default, to build it you need to add "-PtracingRcp" to
+the 'mvn' command:
+$ mvn clean install -PtracingRcp -Dmaven.test.skip=true

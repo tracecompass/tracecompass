@@ -452,7 +452,12 @@ public abstract class TmfDataRequest implements ITmfDataRequest {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName()
+        String name = getClass().getName();
+        int dot = name.lastIndexOf('.');
+        if (dot >= 0) {
+            name = name.substring(dot + 1);
+        }
+        return "[" + name + "(" + fRequestId + "," + fDataType.getSimpleName()+ "," + getExecType()
                 + "," + fIndex + "," + fNbRequested + ")]";
     }
 }

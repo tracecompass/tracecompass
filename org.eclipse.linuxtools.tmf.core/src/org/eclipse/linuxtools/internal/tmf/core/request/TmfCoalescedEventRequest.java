@@ -196,7 +196,8 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
     @SuppressWarnings("nls")
     public String toString() {
         return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName()
-                + "," + getRange() + "," + getIndex() + "," + getNbRequested() + ")]";
+                + "," + getExecType() + "," + getRange() + "," + getIndex() + "," + getNbRequested()
+                + ", " + fRequests.toString() + ")]";
     }
 
 }

@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Patrick Tasse - Support selection range
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader;
 
@@ -62,7 +63,7 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
         // Set results so that it can be validated in the test case
         setSignalReceived(true);
         setSourceError(getSource() != signal.getSource());
-        setCurrentTimeError(!getCurrentTime().equals(signal.getCurrentTime()));
+        setCurrentTimeError(!getCurrentTime().equals(signal.getBeginTime()));
     }
 
     /**
@@ -75,9 +76,6 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
         setSignalReceived(true);
         if (getSource() != null) {
             setSourceError(getSource() != signal.getSource());
-        }
-        if (getCurrentTime() != null) {
-            setCurrentTimeError(!getCurrentTime().equals(signal.getCurrentTime()));
         }
         if (getCurrentRange() != null) {
             setRangeError(!getCurrentRange().equals(signal.getCurrentRange()));

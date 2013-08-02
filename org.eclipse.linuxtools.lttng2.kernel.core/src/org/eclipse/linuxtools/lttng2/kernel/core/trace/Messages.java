@@ -27,6 +27,16 @@ public class Messages extends NLS {
      * The domain is not "kernel"
      */
     public static String LttngKernelTrace_DomainError;
+    /**
+     * Malformed trace (buffer overflow maybe?)
+     * @since 2.1
+     */
+    public static String LttngKernelTrace_MalformedTrace;
+    /**
+     * Trace read error
+     * @since 2.1
+     */
+    public static String LttngKernelTrace_TraceReadError;
 
     static {
         // initialize resource bundle

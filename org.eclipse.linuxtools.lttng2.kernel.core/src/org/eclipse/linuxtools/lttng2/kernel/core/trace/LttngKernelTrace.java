@@ -14,6 +14,7 @@
 package org.eclipse.linuxtools.lttng2.kernel.core.trace;
 
 import java.io.File;
+import java.nio.BufferOverflowException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
@@ -74,6 +75,9 @@ public class LttngKernelTrace extends CtfTmfTrace {
             return validStatus;
         } catch (NullPointerException e){
             validStatus = new Status(IStatus.ERROR,  Activator.PLUGIN_ID, e.toString(), e);
+            return validStatus;
+        } catch (final BufferOverflowException e) {
+            validStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_TraceReadError + ": " + Messages.LttngKernelTrace_MalformedTrace); //$NON-NLS-1$
             return validStatus;
         }
 

@@ -12,6 +12,7 @@
  *                   time stamp in any order
  *   Francois Chouinard - Moved from LTTng to TMF
  *   Francois Chouinard - Added support for empty initial buckets
+ *   Patrick Tasse - Support selection range
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -93,7 +94,8 @@ public class HistogramDataModel implements IHistogramDataModel {
     private long fFirstBucketTime; // could be negative when analyzing events with descending order!!!
     private long fFirstEventTime;
     private long fLastEventTime;
-    private long fCurrentEventTime;
+    private long fSelectionBegin;
+    private long fSelectionEnd;
     private long fTimeLimit;
 
     // Private listener lists
@@ -154,7 +156,8 @@ public class HistogramDataModel implements IHistogramDataModel {
         fFirstBucketTime = other.fFirstBucketTime;
         fFirstEventTime = other.fFirstEventTime;
         fLastEventTime = other.fLastEventTime;
-        fCurrentEventTime = other.fCurrentEventTime;
+        fSelectionBegin = other.fSelectionBegin;
+        fSelectionEnd = other.fSelectionEnd;
         fTimeLimit = other.fTimeLimit;
         fModelListeners = new ListenerList();
         Object[] listeners = other.fModelListeners.getListeners();
@@ -233,9 +236,29 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Returns the time of the current event in the model.
      * @return the time of the current event.
+     * @deprecated As of 2.1, use {@link #getSelectionBegin()} and {@link #getSelectionEnd()}
      */
+    @Deprecated
     public long getCurrentEventTime() {
-        return fCurrentEventTime;
+        return fSelectionBegin;
+    }
+
+    /**
+     * Returns the begin time of the current selection in the model.
+     * @return the begin time of the current selection.
+     * @since 2.1
+     */
+    public long getSelectionBegin() {
+        return fSelectionBegin;
+    }
+
+    /**
+     * Returns the end time of the current selection in the model.
+     * @return the end time of the current selection.
+     * @since 2.1
+     */
+    public long getSelectionEnd() {
+        return fSelectionEnd;
     }
 
     /**
@@ -301,7 +324,8 @@ public class HistogramDataModel implements IHistogramDataModel {
         fNbEvents = 0;
         fFirstBucketTime = 0;
         fLastEventTime = 0;
-        fCurrentEventTime = 0;
+        fSelectionBegin = 0;
+        fSelectionEnd = 0;
         fLastBucket = 0;
         fBucketDuration = 1;
         updateEndTime();
@@ -312,18 +336,49 @@ public class HistogramDataModel implements IHistogramDataModel {
      * Sets the current event time (no notification of listeners)
      *
      * @param timestamp A time stamp to set.
+     * @deprecated As of 2.1, use {@link #setSelection(long, long)}
      */
+    @Deprecated
     public void setCurrentEvent(long timestamp) {
-        fCurrentEventTime = timestamp;
+        fSelectionBegin = timestamp;
+        fSelectionEnd = timestamp;
     }
 
     /**
      * Sets the current event time with notification of listeners
      *
      * @param timestamp A time stamp to set.
+     * @deprecated As of 2.1, use {@link #setSelectionNotifyListeners(long, long)}
      */
+    @Deprecated
     public void setCurrentEventNotifyListeners(long timestamp) {
-        fCurrentEventTime = timestamp;
+        fSelectionBegin = timestamp;
+        fSelectionEnd = timestamp;
+        fireModelUpdateNotification();
+    }
+
+    /**
+     * Sets the current selection time range (no notification of listeners)
+     *
+     * @param beginTime The selection begin time.
+     * @param endTime The selection end time.
+     * @since 2.1
+     */
+    public void setSelection(long beginTime, long endTime) {
+        fSelectionBegin = beginTime;
+        fSelectionEnd = endTime;
+    }
+
+    /**
+     * Sets the current selection time range with notification of listeners
+     *
+     * @param beginTime The selection begin time.
+     * @param endTime The selection end time.
+     * @since 2.1
+     */
+    public void setSelectionNotifyListeners(long beginTime, long endTime) {
+        fSelectionBegin = beginTime;
+        fSelectionEnd = endTime;
         fireModelUpdateNotification();
     }
 
@@ -442,11 +497,20 @@ public class HistogramDataModel implements IHistogramDataModel {
         }
 
         fBucketDuration = Math.max(fBucketDuration, 1);
-        // Set the current event index in the scaled histogram
-        if ((fCurrentEventTime >= fFirstBucketTime) && (fCurrentEventTime <= fLastEventTime)) {
-            result.fCurrentBucket = (int) ((fCurrentEventTime - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
+        // Set selection begin and end index in the scaled histogram
+        if (fSelectionBegin < fFirstBucketTime) {
+            result.fSelectionBeginBucket = -1;
+        } else if (fSelectionBegin > fLastEventTime) {
+            result.fSelectionBeginBucket = fLastBucket;
         } else {
-            result.fCurrentBucket = HistogramScaledData.OUT_OF_RANGE_BUCKET;
+            result.fSelectionBeginBucket = (int) ((fSelectionBegin - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
+        }
+        if (fSelectionEnd < fFirstBucketTime) {
+            result.fSelectionEndBucket = -1;
+        } else if (fSelectionEnd > fLastEventTime) {
+            result.fSelectionEndBucket = fLastBucket;
+        } else {
+            result.fSelectionEndBucket = (int) ((fSelectionEnd - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
         }
 
         result.fFirstBucketTime = fFirstBucketTime;

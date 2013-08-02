@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -295,6 +296,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             fEventsTable = new TmfEventsTable(parent, 0);
             fEventsTable.addSelectionChangedListener(this);
         }
+        IStatusLineManager statusLineManager = getEditorSite().getActionBars().getStatusLineManager();
+        fEventsTable.setStatusLineManager(statusLineManager);
         addPropertyListener(this);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
         // we need to wrap the ISelectionProvider interface in the editor because

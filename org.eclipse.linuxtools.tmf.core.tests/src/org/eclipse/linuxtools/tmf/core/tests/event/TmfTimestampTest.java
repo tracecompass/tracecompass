@@ -10,6 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adjusted for new Event Model
  *   Alexandre Montplaisir - Port to JUnit4
+ *   Patrick Tasse - Updated for negative value formatting
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
@@ -42,6 +43,12 @@ public class TmfTimestampTest {
     private final ITmfTimestamp ts1 = new TmfTimestamp(12345,  0);
     private final ITmfTimestamp ts2 = new TmfTimestamp(12345, -1);
     private final ITmfTimestamp ts3 = new TmfTimestamp(12345,  2, 5);
+    private final ITmfTimestamp ts4 = new TmfTimestamp(12345, -3, 0);
+    private final ITmfTimestamp ts5 = new TmfTimestamp(12345, -6, 0);
+    private final ITmfTimestamp ts6 = new TmfTimestamp(12345, -9, 0);
+    private final ITmfTimestamp ts7 = new TmfTimestamp(-12345, -3, 0);
+    private final ITmfTimestamp ts8 = new TmfTimestamp(-12345, -6, 0);
+    private final ITmfTimestamp ts9 = new TmfTimestamp(-12345, -9, 0);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -206,14 +213,26 @@ public class TmfTimestampTest {
     @Test
     public void testToStringDefault() {
         DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
-        Date d0 = new Date(ts0.getValue() * (long) Math.pow(10, ts0.getScale() + 3));
-        Date d1 = new Date(ts1.getValue() * (long) Math.pow(10, ts1.getScale() + 3));
-        Date d2 = new Date(ts2.getValue() * (long) Math.pow(10, ts2.getScale() + 3));
-        Date d3 = new Date(ts3.getValue() * (long) Math.pow(10, ts3.getScale() + 3));
+        Date d0 = new Date((long) (ts0.getValue() * Math.pow(10, ts0.getScale() + 3)));
+        Date d1 = new Date((long) (ts1.getValue() * Math.pow(10, ts1.getScale() + 3)));
+        Date d2 = new Date((long) (ts2.getValue() * Math.pow(10, ts2.getScale() + 3)));
+        Date d3 = new Date((long) (ts3.getValue() * Math.pow(10, ts3.getScale() + 3)));
+        Date d4 = new Date((long) (ts4.getValue() * Math.pow(10, ts4.getScale() + 3)));
+        Date d5 = new Date((long) (ts5.getValue() * Math.pow(10, ts5.getScale() + 3)));
+        Date d6 = new Date((long) (ts6.getValue() * Math.pow(10, ts6.getScale() + 3)));
+        Date d7 = new Date((long) (ts7.getValue() * Math.pow(10, ts7.getScale() + 3)));
+        Date d8 = new Date((long) (ts8.getValue() * Math.pow(10, ts8.getScale() + 3)) - 1);
+        Date d9 = new Date((long) (ts9.getValue() * Math.pow(10, ts9.getScale() + 3)) - 1);
         assertEquals("toString", df.format(d0) + " 000 000", ts0.toString());
         assertEquals("toString", df.format(d1) + " 000 000", ts1.toString());
         assertEquals("toString", df.format(d2) + " 000 000", ts2.toString());
         assertEquals("toString", df.format(d3) + " 000 000", ts3.toString());
+        assertEquals("toString", df.format(d4) + " 000 000", ts4.toString());
+        assertEquals("toString", df.format(d5) + " 345 000", ts5.toString());
+        assertEquals("toString", df.format(d6) + " 012 345", ts6.toString());
+        assertEquals("toString", df.format(d7) + " 000 000", ts7.toString());
+        assertEquals("toString", df.format(d8) + " 655 000", ts8.toString());
+        assertEquals("toString", df.format(d9) + " 987 655", ts9.toString());
     }
 
     @Test
@@ -222,6 +241,12 @@ public class TmfTimestampTest {
         assertEquals("toString", "12345.000 000 000", ts1.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
         assertEquals("toString", "1234.500 000 000", ts2.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
         assertEquals("toString", "1234500.000 000 000", ts3.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        assertEquals("toString", "012.345 000 000", ts4.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        assertEquals("toString", "000.012 345 000", ts5.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        assertEquals("toString", "000.000 012 345", ts6.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        assertEquals("toString", "-012.345 000 000", ts7.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        assertEquals("toString", "-000.012 345 000", ts8.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
+        assertEquals("toString", "-000.000 012 345", ts9.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
     }
 
     // ------------------------------------------------------------------------

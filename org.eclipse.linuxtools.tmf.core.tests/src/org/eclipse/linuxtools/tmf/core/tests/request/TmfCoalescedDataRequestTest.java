@@ -169,10 +169,10 @@ public class TmfCoalescedDataRequestTest {
 
     @Test
     public void testToString() {
-        String expected1 = "[TmfCoalescedDataRequest(0,ITmfEvent,10,100)]";
-        String expected2 = "[TmfCoalescedDataRequest(1,ITmfEvent,20,100)]";
-        String expected3 = "[TmfCoalescedDataRequest(2,ITmfEvent,20,200)]";
-        String expected4 = "[TmfCoalescedDataRequest(3,ITmfEvent,20,200)]";
+        String expected1 = "[TmfCoalescedDataRequest(0,ITmfEvent,FOREGROUND,10,100, [])]";
+        String expected2 = "[TmfCoalescedDataRequest(1,ITmfEvent,FOREGROUND,20,100, [])]";
+        String expected3 = "[TmfCoalescedDataRequest(2,ITmfEvent,FOREGROUND,20,200, [])]";
+        String expected4 = "[TmfCoalescedDataRequest(3,ITmfEvent,FOREGROUND,20,200, [])]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

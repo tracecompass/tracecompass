@@ -10,6 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Added setter and getter and bar width support
  *   Francois Chouinard - Moved from LTTng to TMF
+ *   Patrick Tasse - Support selection range
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -63,7 +64,18 @@ public class HistogramScaledData {
     /**
      * The index of the current bucket.
      */
+    @Deprecated
     public int fCurrentBucket;
+    /**
+     * The index of the selection begin bucket.
+     * @since 2.1
+     */
+    public int fSelectionBeginBucket;
+    /**
+     * The index of the selection end bucket.
+     * @since 2.1
+     */
+    public int fSelectionEndBucket;
     /**
      * The index of the last bucket.
      */
@@ -99,7 +111,8 @@ public class HistogramScaledData {
         Arrays.fill(fData, 0);
         fBucketDuration = 1;
         fMaxValue = 0;
-        fCurrentBucket = 0;
+        fSelectionBeginBucket = 0;
+        fSelectionEndBucket = 0;
         fLastBucket = 0;
         fScalingFactor = 1;
         fFirstBucketTime = 0;
@@ -116,7 +129,8 @@ public class HistogramScaledData {
         fData = Arrays.copyOf(other.fData, fWidth);
         fBucketDuration = other.fBucketDuration;
         fMaxValue = other.fMaxValue;
-        fCurrentBucket = other.fCurrentBucket;
+        fSelectionBeginBucket = other.fSelectionBeginBucket;
+        fSelectionEndBucket = other.fSelectionEndBucket;
         fLastBucket = other.fLastBucket;
         fScalingFactor = other.fScalingFactor;
         fFirstBucketTime = other.fFirstBucketTime;

@@ -50,5 +50,18 @@ public interface IDomainInfo extends ITraceInfo {
      */
     void setIsKernel(boolean isKernel);
 
+    /**
+     * @return Information about the buffer type
+     */
+    String getBufferType();
+
+    /**
+     * Sets the buffer type
+     *
+     * @param bufferType
+     *            The buffer type
+     */
+    void setBufferType(String bufferType);
+
 
 }
