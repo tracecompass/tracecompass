@@ -445,14 +445,16 @@ public abstract class AbstractTimeGraphView extends TmfView {
             }
             for (TimeGraphEntry entry : fZoomEntryList) {
                 if (fMonitor.isCanceled()) {
-                    break;
+                    return;
                 }
                 zoom(entry, fMonitor);
             }
             /* Refresh the arrows when zooming */
             List<ILinkEvent> events = getLinkList(fZoomStartTime, fZoomEndTime, fResolution, fMonitor);
-            fTimeGraphCombo.setLinks(events);
-            redraw();
+            if (events != null) {
+                fTimeGraphCombo.setLinks(events);
+                redraw();
+            }
         }
 
         private void zoom(TimeGraphEntry entry, IProgressMonitor monitor) {
@@ -888,7 +890,12 @@ public abstract class AbstractTimeGraphView extends TmfView {
         fillLocalToolBar(bars.getToolBarManager());
     }
 
-    private void fillLocalToolBar(IToolBarManager manager) {
+    /**
+     * Add actions to local tool bar manager
+     *
+     * @param manager the tool bar manager
+     */
+    protected void fillLocalToolBar(IToolBarManager manager) {
         if (fFilterColumns.length > 0) {
             manager.add(fTimeGraphCombo.getShowFilterAction());
         }

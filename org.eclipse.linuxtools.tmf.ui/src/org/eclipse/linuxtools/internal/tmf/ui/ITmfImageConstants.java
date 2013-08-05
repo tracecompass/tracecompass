@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Bernd Hufmann - initial API and implementation
+ *     Patrick Tasse - added icons
  *******************************************************************************/
 package org.eclipse.linuxtools.internal.tmf.ui;
 
@@ -41,6 +42,7 @@ public interface ITmfImageConstants {
     public static final String IMG_UI_NEXT_ITEM = IMG_UI_NEXT_PAGE;
     public static final String IMG_UI_PREV_ITEM = IMG_UI_PREV_PAGE;
     public static final String IMG_UI_PIN_VIEW = ICONS_PATH + "elcl16/pin_view.gif";
+    public static final String IMG_UI_HIDE_ARROWS = ICONS_PATH + "elcl16/hide_arrows.gif";
 
     /* eview16 */
     public static final String IMG_UI_SEQ_DIAGRAM_OBJ = ICONS_PATH + "eview16/sequencediagram_view.gif";

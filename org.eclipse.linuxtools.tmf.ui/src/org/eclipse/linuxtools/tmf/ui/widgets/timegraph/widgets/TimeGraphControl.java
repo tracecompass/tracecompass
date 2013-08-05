@@ -138,6 +138,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     private final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
     private final List<ViewerFilter> fFilters = new ArrayList<ViewerFilter>();
     private MenuDetectEvent fPendingMenuDetectEvent = null;
+    private boolean fHideArrows = false;
 
     private int fBorderWidth = 0;
     private int fHeaderHeight = 0;
@@ -903,6 +904,17 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     /**
+     * Hide arrows
+     *
+     * @param hideArrows true to hide arrows
+     *
+     * @since 2.1
+     */
+    public void hideArrows(boolean hideArrows) {
+        fHideArrows = hideArrows;
+    }
+
+    /**
      * Return the currently selected trace
      *
      * @return The entry matching the trace
@@ -1379,6 +1391,9 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      */
     public void drawLinks(Rectangle bounds, ITimeDataProvider timeProvider,
             List<ILinkEvent> links, int nameSpace, GC gc) {
+        if (fHideArrows) {
+            return;
+        }
         for (ILinkEvent event : links) {
             drawLink(event, bounds, timeProvider, nameSpace, gc);
         }
