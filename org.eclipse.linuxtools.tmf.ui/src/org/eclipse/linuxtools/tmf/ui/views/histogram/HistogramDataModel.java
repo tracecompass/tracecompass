@@ -246,7 +246,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Returns the begin time of the current selection in the model.
      * @return the begin time of the current selection.
-     * @since 2.1
+     * @since 3.0
      */
     public long getSelectionBegin() {
         return fSelectionBegin;
@@ -255,7 +255,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Returns the end time of the current selection in the model.
      * @return the end time of the current selection.
-     * @since 2.1
+     * @since 3.0
      */
     public long getSelectionEnd() {
         return fSelectionEnd;
@@ -362,7 +362,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      *
      * @param beginTime The selection begin time.
      * @param endTime The selection end time.
-     * @since 2.1
+     * @since 3.0
      */
     public void setSelection(long beginTime, long endTime) {
         fSelectionBegin = beginTime;
@@ -374,7 +374,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      *
      * @param beginTime The selection begin time.
      * @param endTime The selection end time.
-     * @since 2.1
+     * @since 3.0
      */
     public void setSelectionNotifyListeners(long beginTime, long endTime) {
         fSelectionBegin = beginTime;

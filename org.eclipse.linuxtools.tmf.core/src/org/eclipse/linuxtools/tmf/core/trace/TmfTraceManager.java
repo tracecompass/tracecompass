@@ -96,7 +96,7 @@ public final class TmfTraceManager {
 
     /**
      * @return The begin timestamp of selection
-     * @since 2.1
+     * @since 3.0
      */
     public ITmfTimestamp getSelectionBeginTime() {
         return getCurrentTraceContext().getSelectionBegin();
@@ -104,7 +104,7 @@ public final class TmfTraceManager {
 
     /**
      * @return The end timestamp of selection
-     * @since 2.1
+     * @since 3.0
      */
     public ITmfTimestamp getSelectionEndTime() {
         return getCurrentTraceContext().getSelectionEnd();

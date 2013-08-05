@@ -385,7 +385,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      *            The begin time of the current selection
      * @param endTime
      *            The end time of the current selection
-     * @since 2.1
+     * @since 3.0
      */
     public void setSelection(final long beginTime, final long endTime) {
         fSelectionBegin = (beginTime > 0) ? beginTime : 0;

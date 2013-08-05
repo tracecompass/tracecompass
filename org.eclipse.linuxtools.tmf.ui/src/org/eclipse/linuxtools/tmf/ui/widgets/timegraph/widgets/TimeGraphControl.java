@@ -261,7 +261,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *
      * @param statusLineManager
      *            The status line manager, or null to disable status line messages
-     * @since 2.1
+     * @since 3.0
      */
     public void setStatusLineManager(IStatusLineManager statusLineManager) {
         if (fStatusLineManager != null && statusLineManager == null) {
@@ -275,7 +275,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *
      * @param timeGraphScale
      *            The time graph scale
-     * @since 2.1
+     * @since 3.0
      */
     public void setTimeGraphScale(TimeGraphScale timeGraphScale) {
         fTimeGraphScale = timeGraphScale;

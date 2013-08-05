@@ -555,7 +555,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 2.1
+     * @since 3.0
      */
     @Override
     public long getSelectionBegin() {
@@ -563,7 +563,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 2.1
+     * @since 3.0
      */
     @Override
     public long getSelectionEnd() {
@@ -639,7 +639,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 2.1
+     * @since 3.0
      */
     @Override
     public void setSelectionRangeNotify(long beginTime, long endTime) {
@@ -654,7 +654,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 2.1
+     * @since 3.0
      */
     @Override
     public void setSelectionRange(long beginTime, long endTime) {

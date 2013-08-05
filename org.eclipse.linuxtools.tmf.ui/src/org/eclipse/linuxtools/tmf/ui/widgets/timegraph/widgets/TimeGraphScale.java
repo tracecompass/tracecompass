@@ -147,7 +147,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      *            The begin x-coordinate
      * @param end
      *            The end x-coordinate
-     * @since 2.1
+     * @since 3.0
      */
     public void setDragRange(int begin, int end) {
         if (NO_BUTTON == fDragState || DRAG_EXTERNAL == fDragState) {
