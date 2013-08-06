@@ -51,7 +51,7 @@
                         <product>
                             <archiveFileName>linuxtools-trace-viewer-${project.version}</archiveFileName>
                             <id>${productId}</id>
-                            <rootFolder>eclipse</rootFolder>
+                            <rootFolder>traceviewer</rootFolder>
                         </product>
                     </products>
                 </configuration>
