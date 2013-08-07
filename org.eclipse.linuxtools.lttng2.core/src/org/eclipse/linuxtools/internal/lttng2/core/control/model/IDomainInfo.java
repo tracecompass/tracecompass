@@ -13,6 +13,8 @@ package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferType;
+
 /**
  * <p>
  * Interface for retrieval of trace domain information.
@@ -53,7 +55,7 @@ public interface IDomainInfo extends ITraceInfo {
     /**
      * @return Information about the buffer type
      */
-    String getBufferType();
+    BufferType getBufferType();
 
     /**
      * Sets the buffer type
@@ -61,7 +63,7 @@ public interface IDomainInfo extends ITraceInfo {
      * @param bufferType
      *            The buffer type
      */
-    void setBufferType(String bufferType);
+    void setBufferType(BufferType bufferType);
 
 
 }

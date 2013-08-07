@@ -11,7 +11,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
 
-import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferTypeConstants;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferType;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
@@ -74,7 +74,7 @@ public class TraceDomainPropertySource extends BasePropertySource {
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        if (fDomain.getBufferType().equals(BufferTypeConstants.BUFFER_TYPE_UNKNOWN)) {
+        if (fDomain.getBufferType() == BufferType.BUFFER_TYPE_UNKNOWN) {
             return new IPropertyDescriptor[] {
                     new ReadOnlyTextPropertyDescriptor(TRACE_DOMAIN_NAME_PROPERTY_ID, TRACE_DOMAIN_NAME_PROPERTY_NAME) };
         }
@@ -87,7 +87,7 @@ public class TraceDomainPropertySource extends BasePropertySource {
     @Override
     public Object getPropertyValue(Object id) {
         if(BUFFER_TYPE_PROPERTY_ID.equals(id)){
-            return fDomain.getBufferType();
+            return fDomain.getBufferType().getInName();
         }
 
         if(TRACE_DOMAIN_NAME_PROPERTY_ID.equals(id)) {

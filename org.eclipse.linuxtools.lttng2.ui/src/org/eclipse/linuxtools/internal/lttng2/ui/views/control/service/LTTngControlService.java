@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BaseEventInfo;
-import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferTypeConstants;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.DomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.EventInfo;
@@ -191,6 +191,9 @@ public class LTTngControlService implements ILttngControlService {
                 // Create Domain
                 IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_KernelDomainDisplayName);
 
+                // set kernel flag
+                domainInfo.setIsKernel(true);
+
                 // in domain kernel
                 ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
                 index = parseDomain(result.getOutput(), index, channels, domainInfo);
@@ -201,9 +204,6 @@ public class LTTngControlService implements ILttngControlService {
 
                     // set channels
                     domainInfo.setChannels(channels);
-
-                    // set kernel flag
-                    domainInfo.setIsKernel(true);
                 }
                 continue;
             }
@@ -211,6 +211,9 @@ public class LTTngControlService implements ILttngControlService {
             matcher = LTTngControlServiceConstants.DOMAIN_UST_GLOBAL_PATTERN.matcher(line);
             if (matcher.matches()) {
                 IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_UstGlobalDomainDisplayName);
+
+                // set kernel flag
+                domainInfo.setIsKernel(false);
 
                 // in domain UST
                 ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
@@ -222,9 +225,6 @@ public class LTTngControlService implements ILttngControlService {
 
                     // set channels
                     domainInfo.setChannels(channels);
-
-                    // set kernel flag
-                    domainInfo.setIsKernel(false);
                 }
                 continue;
             }
@@ -601,9 +601,15 @@ public class LTTngControlService implements ILttngControlService {
             }
 
             if (isVersionSupported("2.2.0")) { //$NON-NLS-1$
-//                --buffer-uid  Every application sharing the same UID use the same buffers
-                if (!isKernel && info.isBuffersUID()) {
-                    command.append(LTTngControlServiceConstants.OPTION_PER_UID_BUFFERS);
+//                --buffers-uid  Every application sharing the same UID use the same buffers
+//                --buffers-pid Buffers are allocated per PID
+                if (!isKernel) {
+                    if (info.getBufferType() == BufferType.BUFFER_PER_PID) {
+                        command.append(LTTngControlServiceConstants.OPTION_PER_PID_BUFFERS);
+
+                    } else if (info.getBufferType() == BufferType.BUFFER_PER_UID) {
+                        command.append(LTTngControlServiceConstants.OPTION_PER_UID_BUFFERS);
+                    }
                 }
 
 //                -C SIZE   Maximum size of trace files in bytes
@@ -975,6 +981,11 @@ public class LTTngControlService implements ILttngControlService {
     protected int parseDomain(String[] output, int currentIndex, List<IChannelInfo> channels, IDomainInfo domainInfo) {
         int index = currentIndex;
 
+        // if kernel set the buffer type to shared
+        if (domainInfo.isKernel()) {
+            domainInfo.setBufferType(BufferType.BUFFER_SHARED);
+        }
+
         // Channels:
         // -------------
         // - channnel1: [enabled]
@@ -993,10 +1004,17 @@ public class LTTngControlService implements ILttngControlService {
             if (isVersionSupported("2.2.0")) { //$NON-NLS-1$
                 Matcher bufferTypeMatcher = LTTngControlServiceConstants.BUFFER_TYPE_PATTERN.matcher(line);
                 if (bufferTypeMatcher.matches()) {
-                    domainInfo.setBufferType(getAttributeValue(line));
+                    String bufferTypeString = getAttributeValue(line);
+                    if (BufferType.BUFFER_PER_PID.getInName().equals(bufferTypeString)) {
+                        domainInfo.setBufferType(BufferType.BUFFER_PER_PID);
+                    } else if (BufferType.BUFFER_PER_UID.getInName().equals(bufferTypeString)) {
+                        domainInfo.setBufferType(BufferType.BUFFER_PER_UID);
+                    } else {
+                        domainInfo.setBufferType(BufferType.BUFFER_TYPE_UNKNOWN);
+                    }
                 }
             } else {
-                domainInfo.setBufferType(BufferTypeConstants.BUFFER_TYPE_UNKNOWN);
+                domainInfo.setBufferType(BufferType.BUFFER_TYPE_UNKNOWN);
             }
             Matcher outerMatcher = LTTngControlServiceConstants.CHANNELS_SECTION_PATTERN.matcher(line);
             Matcher noKernelChannelMatcher = LTTngControlServiceConstants.DOMAIN_NO_KERNEL_CHANNEL_PATTERN.matcher(line);
@@ -1014,6 +1032,9 @@ public class LTTngControlService implements ILttngControlService {
 
                         // get channel enablement
                         channelInfo.setState(innerMatcher.group(2));
+
+                        // set BufferType
+                        channelInfo.setBufferType(domainInfo.getBufferType());
 
                         // add channel
                         channels.add(channelInfo);

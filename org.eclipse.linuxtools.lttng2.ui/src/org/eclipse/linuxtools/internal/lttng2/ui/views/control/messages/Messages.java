@@ -225,11 +225,16 @@ final public class Messages extends NLS {
     public static String TraceControl_AllSessionsDisplayName;
     public static String TraceControl_SessionDisplayName;
     public static String TraceControl_DomainDisplayName;
+    public static String TraceControl_BufferTypeDisplayName;
     public static String TraceControl_ChannelDisplayName;
     public static String TraceControl_EventDisplayName;
     public static String TraceControl_ProviderDisplayName;
     public static String TraceControl_KernelProviderDisplayName;
+    public static String TraceControl_SharedBuffersDisplayName;
+    public static String TraceControl_PerPidBuffersDisplayName;
+    public static String TraceControl_PerPidBuffersTooltip;
     public static String TraceControl_PerUidBuffersDisplayName;
+    public static String TraceControl_PerUidBuffersTooltip;
 
     // Property names
     public static String TraceControl_SessionNamePropertyName;
