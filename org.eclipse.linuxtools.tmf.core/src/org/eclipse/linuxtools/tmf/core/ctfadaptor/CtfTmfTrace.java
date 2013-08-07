@@ -92,9 +92,6 @@ public class CtfTmfTrace extends TmfTrace
 
         super.initTrace(resource, path, eventType);
 
-        @SuppressWarnings("unused")
-        CtfTmfEventType type;
-
         try {
             this.fTrace = new CTFTrace(path);
             CtfIteratorManager.addTrace(this);

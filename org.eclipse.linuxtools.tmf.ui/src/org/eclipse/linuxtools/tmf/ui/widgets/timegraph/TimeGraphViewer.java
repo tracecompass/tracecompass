@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2013 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2013 Intel Corporation, Ericsson, others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *   Alexander N. Alexeev, Intel - Add monitors statistics support
  *   Alvaro Sanchez-Leon - Adapted for TMF
  *   Patrick Tasse - Refactoring
+ *   Geneviève Bastien - Add event links between entries
  *****************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
@@ -25,6 +26,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider2;
@@ -154,6 +156,19 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
             fSelectionEnd = 0;
             fSelectedEntry = null;
             refreshAllData(realInput);
+        }
+    }
+
+    /**
+     * Sets (or clears if null) the list of links to display on this combo
+     *
+     * @param links
+     *            the links to display in this time graph combo
+     * @since 2.1
+     */
+    public void setLinks(List<ILinkEvent> links) {
+        if (fTimeGraphCtrl != null) {
+            fTimeGraphCtrl.refreshArrows(links);
         }
     }
 

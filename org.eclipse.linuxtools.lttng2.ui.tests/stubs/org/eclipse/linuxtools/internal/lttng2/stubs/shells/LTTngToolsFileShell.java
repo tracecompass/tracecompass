@@ -40,8 +40,6 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private final static String INPUT_KEY = "<COMMAND_INPUT>";
     private final static String INPUT_END_KEY = "</COMMAND_INPUT>";
     private final static String RESULT_KEY = "<COMMAND_RESULT>";
-    @SuppressWarnings("unused")
-    private final static String RESULT_END_KEY = "</COMMAND_RESULT>";
     private final static String OUTPUT_KEY = "<COMMAND_OUTPUT>";
     private final static String OUTPUT_END_KEY = "</COMMAND_OUTPUT>";
     private final static String COMMENT_KEY = "#.*";

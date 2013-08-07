@@ -27,8 +27,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IReusableEditor;
@@ -122,7 +122,7 @@ public class OpenTraceHandler extends AbstractHandler {
                 final ITmfTrace trace = traceElement.instantiateTrace();
                 final ITmfEvent traceEvent = traceElement.instantiateEvent();
                 if ((trace == null) || (traceEvent == null)) {
-                    displayErrorMsg(Messages.OpenTraceHandler_NoTraceType);
+                    TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_NoTraceType);
                     if (trace != null) {
                         trace.dispose();
                     }
@@ -136,7 +136,7 @@ public class OpenTraceHandler extends AbstractHandler {
                 try {
                     trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                 } catch (final TmfTraceException e) {
-                    displayErrorMsg(Messages.OpenTraceHandler_InitError + "\n\n" + e); //$NON-NLS-1$
+                    TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_InitError + "\n\n" + e); //$NON-NLS-1$
                     trace.dispose();
                     return;
                 }
@@ -146,7 +146,7 @@ public class OpenTraceHandler extends AbstractHandler {
                     file = traceElement.createBookmarksFile();
                 } catch (final CoreException e) {
                     Activator.getDefault().logError("Error opening trace " + traceElement.getName(), e); //$NON-NLS-1$
-                    displayErrorMsg(Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$
+                    TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$
                     trace.dispose();
                     return;
                 }
@@ -169,7 +169,7 @@ public class OpenTraceHandler extends AbstractHandler {
                                 // editor should dispose the trace on close
                             }
                         } catch (final PartInitException e) {
-                            displayErrorMsg(Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$
+                            TraceUtils.displayErrorMsg(Messages.OpenTraceHandler_Title, Messages.OpenTraceHandler_Error + "\n\n" + e.getMessage()); //$NON-NLS-1$
                             Activator.getDefault().logError("Error opening trace " + traceElement.getName(), e); //$NON-NLS-1$
                             trace.dispose();
                         }
@@ -181,18 +181,6 @@ public class OpenTraceHandler extends AbstractHandler {
 
         thread.start();
         return null;
-    }
-
-    private static void displayErrorMsg(final String errorMsg) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-                mb.setText(Messages.OpenTraceHandler_Title);
-                mb.setMessage(errorMsg);
-                mb.open();
-            }
-        });
     }
 
 }

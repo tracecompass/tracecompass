@@ -77,10 +77,6 @@ public class TmfProviderManagerTest {
     }
 
     private class TmfEvent3 extends TmfEvent {
-        @SuppressWarnings("unused")
-        public TmfEvent3(TmfEvent3 other) {
-            super(other);
-        }
     }
 
     private class TestProvider3 extends TmfDataProvider {

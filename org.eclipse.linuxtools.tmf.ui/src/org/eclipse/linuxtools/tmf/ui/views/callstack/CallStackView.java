@@ -40,7 +40,6 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.callstack.CallStackStateProvider;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -56,6 +55,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampDelta;
@@ -496,7 +496,7 @@ public class CallStackView extends TmfView {
             public void timeRangeUpdated(TimeGraphRangeUpdateEvent event) {
                 long startTime = event.getStartTime();
                 long endTime = event.getEndTime();
-                TmfTimeRange range = new TmfTimeRange(new CtfTmfTimestamp(startTime), new CtfTmfTimestamp(endTime));
+                TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
                 broadcast(new TmfRangeSynchSignal(CallStackView.this, range));
                 startZoomThread(startTime, endTime);
             }
@@ -508,7 +508,7 @@ public class CallStackView extends TmfView {
                 long beginTime = event.getBeginTime();
                 long endTime = event.getEndTime();
                 selectTime(beginTime);
-                broadcast(new TmfTimeSynchSignal(CallStackView.this, new CtfTmfTimestamp(beginTime), new CtfTmfTimestamp(endTime)));
+                broadcast(new TmfTimeSynchSignal(CallStackView.this, new TmfNanoTimestamp(beginTime), new TmfNanoTimestamp(endTime)));
             }
         });
 
@@ -534,7 +534,7 @@ public class CallStackView extends TmfView {
                         long spacingTime = (long) ((endTime - startTime) * SPACING_RATIO);
                         startTime -= spacingTime;
                         endTime += spacingTime;
-                        TmfTimeRange range = new TmfTimeRange(new CtfTmfTimestamp(startTime), new CtfTmfTimestamp(endTime));
+                        TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
                         broadcast(new TmfRangeSynchSignal(CallStackView.this, range));
                         fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
                         startZoomThread(startTime, endTime);
@@ -557,7 +557,7 @@ public class CallStackView extends TmfView {
                         long spacingTime = (long) ((endTime - startTime) * SPACING_RATIO);
                         startTime -= spacingTime;
                         endTime += spacingTime;
-                        TmfTimeRange range = new TmfTimeRange(new CtfTmfTimestamp(startTime), new CtfTmfTimestamp(endTime));
+                        TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
                         broadcast(new TmfRangeSynchSignal(CallStackView.this, range));
                         fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
                         startZoomThread(startTime, endTime);

@@ -329,8 +329,6 @@ public class StreamInputReader {
          */
         final int len = this.streamInput.getIndex().getEntries().size();
 
-        @SuppressWarnings("unused")
-        StreamInputPacketIndexEntry entry = null;
         /*
          * Go to beginning of trace.
          */
