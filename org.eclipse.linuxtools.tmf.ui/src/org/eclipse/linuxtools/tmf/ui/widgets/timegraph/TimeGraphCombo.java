@@ -836,7 +836,7 @@ public class TimeGraphCombo extends Composite {
      * Sets or clears the list of links to display on this combo
      *
      * @param links the links to display in this time graph combo
-     * @since 2.1
+     * @since 3.0
      */
     public void setLinks(List<ILinkEvent> links) {
         fTimeGraphViewer.setLinks(links);

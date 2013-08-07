@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model;
  * Interface for time event that allows to specify the destination entry of the
  * event
  *
- * @since 2.1
+ * @since 3.0
  */
 public interface ILinkEvent extends ITimeEvent {
 

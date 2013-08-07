@@ -380,7 +380,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      * Refresh the links (arrows) of this widget
      *
      * @param events The link events to refresh
-     * @since 2.1
+     * @since 3.0
      */
     public void refreshArrows(List<ILinkEvent> events) {
         fItemData.refreshArrows(events);
@@ -1396,7 +1396,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *            The width reserved for the names
      * @param gc
      *            Reference to the SWT GC object
-     * @since 2.1
+     * @since 3.0
      */
     public void drawLinks(Rectangle bounds, ITimeDataProvider timeProvider,
             List<ILinkEvent> links, int nameSpace, GC gc) {
@@ -1418,7 +1418,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *            the name space
      * @param gc
      *            Graphics context
-     * @since 2.1
+     * @since 3.0
      */
     protected void drawLink(ILinkEvent event, Rectangle bounds, ITimeDataProvider timeProvider, int nameSpace, GC gc) {
         int srcIndex = fItemData.findItemIndex(event.getEntry());
@@ -1450,7 +1450,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      * @param gc
      *            Graphics context
      * @return true if the state was drawn
-     * @since 2.1
+     * @since 3.0
      */
     protected boolean drawArrow(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc) {

@@ -164,7 +164,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
      *
      * @param links
      *            the links to display in this time graph combo
-     * @since 2.1
+     * @since 3.0
      */
     public void setLinks(List<ILinkEvent> links) {
         if (fTimeGraphCtrl != null) {
