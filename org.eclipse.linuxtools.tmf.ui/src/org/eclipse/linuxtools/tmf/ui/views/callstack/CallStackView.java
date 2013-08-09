@@ -867,10 +867,19 @@ public class CallStackView extends TmfView {
                     eventList.add(new CallStackEvent(entry, time, duration, value));
                     lastIsNull = false;
                 } else {
-                    if (lastEndTime != time && lastEndTime != -1 && lastIsNull) {
-                        eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
+                    if (lastEndTime == -1) {
+                        // add null event if it intersects the start time
+                        eventList.add(new NullTimeEvent(entry, time, duration));
+                    } else {
+                        if (lastEndTime != time && lastIsNull) {
+                            // add unknown event if between two null states
+                            eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
+                        }
+                        if (time + duration >= endTime) {
+                            // add null event if it intersects the end time
+                            eventList.add(new NullTimeEvent(entry, time, duration));
+                        }
                     }
-                    eventList.add(new NullTimeEvent(entry, time, duration));
                     lastIsNull = true;
                 }
                 lastEndTime = time + duration;

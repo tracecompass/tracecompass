@@ -22,8 +22,6 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
  */
 public class CallStackEvent extends TimeEvent {
 
-    private int fValue = -1;
-
     /**
      * Standard constructor
      *
@@ -37,22 +35,6 @@ public class CallStackEvent extends TimeEvent {
      *            The event value (1-256)
      */
     public CallStackEvent(CallStackEntry entry, long time, long duration, int value) {
-        super(entry, time, duration);
-        fValue = value;
-    }
-
-    /**
-     * Retrieve the value associated with this event
-     *
-     * @return The integer value
-     */
-    @Override
-    public int getValue() {
-        return fValue;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " start=" + getTime() + " end=" + (getTime() + getDuration()) + " duration=" + getDuration() + " value=" + fValue; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        super(entry, time, duration, value);
     }
 }
