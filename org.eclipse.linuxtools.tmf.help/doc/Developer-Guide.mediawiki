@@ -2882,3 +2882,259 @@ There are other helper files that format given events for views, they are simple
 === Limitations ===
 For the moment live trace reading is not supported, there are no sources of traces to test on.
 
+= Event matching and trace synchronization =
+
+Event matching consists in taking an event from a trace and linking it to another event in a possibly different trace. The example that comes to mind is matching network packets sent from one traced machine to another traced machine. These matches can be used to synchronize traces.
+
+Trace synchronization consists in taking traces, taken on different machines, with a different time reference, and finding the formula to transform the timestamps of some of the traces, so that they all have the same time reference.
+
+== Event matching interfaces ==
+
+Here's a description of the major parts involved in event matching.  These classes are all in the ''org.eclipse.linuxtools.tmf.core.event.matching'' package:
+
+* '''ITmfEventMatching''': Controls the event matching process
+* '''ITmfMatchEventDefinition''': Describes how events are matched
+* '''IMatchProcessingUnit''': Processes the matched events
+
+== Implementation details and how to extend it ==
+
+=== ITmfEventMatching interface and derived classes ===
+
+This interface and its default abstract implementation '''TmfEventMatching''' control the event matching itself. Their only public method is ''matchEvents''. The class needs to manage how to setup the traces, and any initialization or finalization procedures.
+
+The abstract class generates an event request for each trace from which events are matched and waits for the request to complete before calling the one from another trace. The ''handleData'' method from the request calls the ''matchEvent'' method that needs to be implemented in children classes.
+
+Class '''TmfNetworkEventMatching''' is a concrete implementation of this interface. It applies to all use cases where a ''in'' event can be matched with a ''out' event (''in'' and ''out'' can be the same event, with different data). It creates a '''TmfEventDependency''' between the source and destination events. The dependency is added to the processing unit.
+
+To match events requiring other mechanisms (for instance, a series of events can be matched with another series of events), one would need to implement another class either extending '''TmfEventMatching''' or implementing '''ITmfEventMatching'''. It would most probably also require a new '''ITmfMatchEventDefinition''' implementation.
+
+=== ITmfMatchEventDefinition interface and its derived classes ===
+
+These are the classes that describe how to actually match specific events together.
+
+The '''canMatchTrace''' method will tell if a definition is compatible with a given trace.
+
+The '''getUniqueField''' method will return a list of field values that uniquely identify this event and can be used to find a previous event to match with.
+
+Typically, there would be a match definition abstract class/interface per event matching type.
+
+The interface '''ITmfNetworkMatchDefinition''' adds the ''getDirection'' method to indicate whether this event is a ''in'' or ''out'' event to be matched with one from the opposite direction.
+
+As examples, two concrete network match definitions have been implemented in the ''org.eclipse.linuxtools.lttng2.kernel.core.event.matching'' package for two compatible methods of matching TCP packets (See the LTTng User Guide on ''trace synchronization'' for information on those matching methods). Each one tells which events need to be present in the metadata of a CTF trace for this matching method to be applicable. It also returns the field values from each event that will uniquely match 2 events together.
+
+=== IMatchProcessingUnit interface and derived classes ===
+
+While matching events is an exercice in itself, it's what to do with the match that really makes this functionality interesting. This is the job of the '''IMatchProcessingUnit''' interface.
+
+'''TmfEventMatches''' provides a default implementation that only stores the matches to count them. When a new match is obtained, the ''addMatch'' is called with the match and the processing unit can do whatever needs to be done with it.
+
+A match processing unit can be an analysis in itself. For example, trace synchronization is done through such a processing unit. One just needs to set the processing unit in the TmfEventMatching constructor.
+
+== Code examples ==
+
+=== Using network packets matching in an analysis ===
+
+This example shows how one can create a processing unit inline to create a link between two events. In this example, the code already uses an event request, so there is no need here to call the ''matchEvents'' method, that will only create another request.
+
+<pre>
+class MyAnalysis extends TmfAbstractAnalysisModule {
+
+    private TmfNetworkEventMatching tcpMatching;
+
+    ...
+
+    protected void executeAnalysis() {
+
+        IMatchProcessingUnit matchProcessing = new IMatchProcessingUnit() {
+            @Override
+            public void matchingEnded() {
+            }
+
+            @Override
+            public void init(ITmfTrace[] fTraces) {
+            }
+
+            @Override
+            public int countMatches() {
+                return 0;
+            }
+
+            @Override
+            public void addMatch(TmfEventDependency match) {
+                log.debug("we got a tcp match! " + match.getSourceEvent().getContent() + " " + match.getDestinationEvent().getContent());
+                TmfEvent source = match.getSourceEvent();
+                TmfEvent destination = match.getDestinationEvent();
+                /* Create a link between the two events */
+            }
+        };
+
+        ITmfTrace[] traces = { getTrace() };
+        tcpMatching = new TmfNetworkEventMatching(traces, matchProcessing);
+        tcpMatching.initMatching();
+
+        MyEventRequest request = new MyEventRequest(this, i);
+        getTrace().sendRequest(request);
+    }
+
+    public void analyzeEvent(TmfEvent event) {
+        ...
+        tcpMatching.matchEvent(event, 0);
+        ...
+    }
+
+    ...
+
+}
+
+class MyEventRequest extends TmfEventRequest {
+
+    private final MyAnalysis analysis;
+
+    MyEventRequest(MyAnalysis analysis, int traceno) {
+        super(CtfTmfEvent.class,
+            TmfTimeRange.ETERNITY,
+            0,
+            TmfDataRequest.ALL_DATA,
+            ITmfDataRequest.ExecutionType.FOREGROUND);
+        this.analysis = analysis;
+    }
+
+    @Override
+    public void handleData(final ITmfEvent event) {
+        super.handleData(event);
+        if (event != null) {
+            analysis.analyzeEvent(event);
+        }
+    }
+}
+</pre>
+
+=== Match network events from UST traces ===
+
+Suppose a client-server application is instrumented using LTTng-UST. Traces are collected on the server and some clients on different machines. The traces can be synchronized using network event matching.
+
+The following metadata describes the events:
+
+<pre>
+    event {
+        name = "myapp:send";
+        id = 0;
+        stream_id = 0;
+        loglevel = 13;
+        fields := struct {
+            integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _sendto;
+            integer { size = 64; align = 8; signed = 1; encoding = none; base = 10; } _messageid;
+            integer { size = 64; align = 8; signed = 1; encoding = none; base = 10; } _data;
+        };
+    };
+
+    event {
+        name = "myapp:receive";
+        id = 1;
+        stream_id = 0;
+        loglevel = 13;
+        fields := struct {
+            integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _from;
+            integer { size = 64; align = 8; signed = 1; encoding = none; base = 10; } _messageid;
+            integer { size = 64; align = 8; signed = 1; encoding = none; base = 10; } _data;
+        };
+    };
+</pre>
+
+One would need to write an event match definition for those 2 events as follows:
+
+<pre>
+public class MyAppUstEventMatching implements ITmfNetworkMatchDefinition {
+
+    @Override
+    public Direction getDirection(ITmfEvent event) {
+        String evname = event.getType().getName();
+        if (evname.equals("myapp:receive")) {
+            return Direction.IN;
+        } else if (evname.equals("myapp:send")) {
+            return Direction.OUT;
+        }
+        return null;
+    }
+
+    @Override
+    public List<Object> getUniqueField(ITmfEvent event) {
+        List<Object> keys = new ArrayList<Object>();
+
+        if (evname.equals("myapp:receive")) {
+            keys.add(event.getContent().getField("from").getValue());
+            keys.add(event.getContent().getField("messageid").getValue());
+        } else {
+            keys.add(event.getContent().getField("sendto").getValue());
+            keys.add(event.getContent().getField("messageid").getValue());
+        }
+
+        return keys;
+    }
+
+    @Override
+    public boolean canMatchTrace(ITmfTrace trace) {
+        if (!(trace instanceof CtfTmfTrace)) {
+            return false;
+        }
+        CtfTmfTrace ktrace = (CtfTmfTrace) trace;
+        String[] events = { "myapp:receive", "myapp:send" };
+        return ktrace.hasAtLeastOneOfEvents(events);
+    }
+
+    @Override
+    public MatchingType[] getApplicableMatchingTypes() {
+        MatchingType[] types = { MatchingType.NETWORK };
+        return types;
+    }
+
+}
+</pre>
+
+Somewhere in code that will be executed at the start of the plugin (like in the Activator), the following code will have to be run:
+
+<pre>
+TmfEventMatching.registerMatchObject(new MyAppUstEventMatching());
+</pre>
+
+Now, only adding the traces in an experiment and clicking the '''Synchronize traces''' menu element would synchronize the traces using the new definition for event matching.
+
+== Trace synchronization ==
+
+Trace synchronization classes and interfaces are located in the ''org.eclipse.linuxtools.tmf.core.synchronization'' package.
+
+=== Synchronization algorithm ===
+
+Synchronization algorithms are used to synchronize traces from events matched between traces. After synchronization, traces taken on different machines with different time references see their timestamps modified such that they all use the same time reference (typically, the time of at least one of the traces). With traces from different machines, it is impossible to have perfect synchronization, so the result is a best approximation that takes network latency into account.
+
+The abstract class '''SynchronizationAlgorithm''' is a processing unit for matches. New synchronization algorithms must extend this one, it already contains the functions to get the timestamp transforms for different traces.
+
+The ''fully incremental convex hull'' synchronization algorithm is the default synchronization algorithm.
+
+While the synchronization system provisions for more synchronization algorithms, there is not yet a way to select one, the experiment's trace synchronization uses the default algorithm. To test a new synchronization algorithm, the synchronization should be called directly like this:
+
+<pre>
+SynchronizationAlgorithm syncAlgo = new MyNewSynchronizationAlgorithm();
+syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, traces, syncAlgo, true);
+</pre>
+
+=== Timestamp transforms ===
+
+Timestamp transforms are the formulae used to transform the timestamps from a trace into the reference time. The '''ITmfTimestampTransform''' is the interface to implement to add a new transform.
+
+The following classes implement this interface:
+
+* '''TmfTimestampTransform''': default transform. It cannot be instantiated, it has a single static object TmfTimestampTransform.IDENTITY, which returns the original timestamp.
+* '''TmfTimestampTransformLinear''': transforms the timestamp using a linear formula: ''f(t) = at + b'', where ''a'' and ''b'' are computed by the synchronization algorithm.
+
+One could extend the interface for other timestamp transforms, for instance to have a transform where the formula would change over the course of the trace.
+
+== Todo ==
+
+Here's a list of features not yet implemented that would enhance trace synchronization and event matching:
+
+* Ability to select a synchronization algorithm
+* Implement a better way to select the reference trace instead of arbitrarily taking the first in alphabetical order (for instance, the minimum spanning tree algorithm by Masoume Jabbarifar (article on the subject not published yet))
+* Ability to join traces from the same host so that even if one of the traces is not synchronized with the reference trace, it will take the same timestamp transform as the one on the same machine.
+* Instead of having the timestamp transforms per trace, have the timestamp transform as part of an experiment context, so that the trace's specific analysis, like the state system, are in the original trace, but are transformed only when needed for an experiment analysis.
+* Add more views to display the synchronization information (only textual statistics are available for now)
