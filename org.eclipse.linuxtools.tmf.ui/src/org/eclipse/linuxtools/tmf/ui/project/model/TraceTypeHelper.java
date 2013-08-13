@@ -101,7 +101,7 @@ public class TraceTypeHelper {
      * @return an object of the trace type
      * @since 2.1
      */
-    public ITmfTrace getTrace(){
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 
