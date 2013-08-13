@@ -2500,6 +2500,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 refreshExpanded(expandedItemList, item);
             }
             fExpandedItems = expandedItemList.toArray(new Item[0]);
+            fTopIndex = Math.min(fTopIndex, Math.max(0, fExpandedItems.length - 1));
         }
 
         private void refreshExpanded(List<Item> expandedItemList, Item item) {
