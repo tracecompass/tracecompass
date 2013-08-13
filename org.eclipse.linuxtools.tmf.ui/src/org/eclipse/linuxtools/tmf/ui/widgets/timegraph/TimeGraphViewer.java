@@ -1466,7 +1466,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
      *
      * @return The Action object
      *
-     * @since 2.1
+     * @since 3.0
      */
     public Action getHideArrowsAction(final IDialogSettings dialogSettings) {
         if (fHideArrowsAction == null) {

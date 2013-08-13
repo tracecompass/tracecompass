@@ -908,7 +908,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *
      * @param hideArrows true to hide arrows
      *
-     * @since 2.1
+     * @since 3.0
      */
     public void hideArrows(boolean hideArrows) {
         fHideArrows = hideArrows;
@@ -2278,7 +2278,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
      *            The height
      * @return true if the height is successfully stored, false otherwise
      *
-     * @since 2.1
+     * @since 3.0
      */
     public boolean setItemHeight(ITimeGraphEntry entry, int rowHeight) {
         Item item = fItemData.findItem(entry);
