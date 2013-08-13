@@ -363,7 +363,9 @@ public class TmfVirtualTable extends Composite {
             return;
         }
         int selectedRow = indexOf(item);
-        if (event.button != 2) {
+        if (event.button == 1 || (event.button == 3 &&
+                (selectedRow < Math.min(fSelectedBeginRank, fSelectedEventRank) ||
+                        selectedRow > Math.max(fSelectedBeginRank, fSelectedEventRank)))) {
             if (selectedRow >= 0) {
                 fSelectedEventRank = selectedRow;
             } else {

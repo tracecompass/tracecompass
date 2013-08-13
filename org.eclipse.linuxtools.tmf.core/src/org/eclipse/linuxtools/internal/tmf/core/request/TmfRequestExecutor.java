@@ -62,7 +62,7 @@ public class TmfRequestExecutor implements Executor {
     // The tasks
     private TmfEventThread fActiveTask;
 
-    private final Timer fTimer = new Timer();
+    private final Timer fTimer = new Timer(true);
     private TimerTask fTimerTask;
 
     private int fForegroundCycle = 0;
@@ -209,6 +209,9 @@ public class TmfRequestExecutor implements Executor {
      * Stops the executor
      */
     public synchronized void stop() {
+        fTimerTask.cancel();
+        fTimer.cancel();
+
         if (fActiveTask != null) {
             fActiveTask.cancel();
         }

@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
@@ -390,9 +391,10 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
 
     @Override
     public IStatus validate(IProject project, String path) {
-        if( fileExists(path)) {
+        File file = new File(path);
+        if (file.exists() && file.isFile() && file.canRead() && file.length() > 0) {
             return Status.OK_STATUS;
         }
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID ,Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
+        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
     }
 }

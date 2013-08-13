@@ -45,6 +45,23 @@ public class Messages extends NLS {
     /** The description for the linked property */
     public static String TmfTraceElement_IsLinked;
 
+    /** Error opening a trace */
+    public static String TmfOpenTraceHelper_ErrorOpeningTrace;
+    /** Could not link trace */
+    public static String TmfOpenTraceHelper_LinkFailed;
+    /** No trace type match */
+    public static String TmfOpenTraceHelper_NoTraceTypeMatch;
+    /** Open Trace*/
+    public static String TmfOpenTraceHelper_OpenTrace;
+    /** Reduce was too efficient, no candidates found! */
+    public static String TmfOpenTraceHelper_ReduceError;
+    /** No trace type */
+    public static String TmfOpenTraceHelper_NoTraceType;
+    /** Init error */
+    public static String TmfOpenTraceHelper_InitError;
+    /** Error */
+    public static String TmfOpenTraceHelper_Error;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
