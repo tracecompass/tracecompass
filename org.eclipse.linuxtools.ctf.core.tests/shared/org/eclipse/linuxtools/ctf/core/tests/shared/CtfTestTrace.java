@@ -30,7 +30,9 @@ public enum CtfTestTrace {
     /** Another kernel trace */
     TRACE2("../org.eclipse.linuxtools.ctf.core.tests/traces/trace2"),
     /** Kernel trace with event contexts */
-    KERNEL_VM("../org.eclipse.linuxtools.ctf.core.tests/traces/kernel_vm");
+    KERNEL_VM("../org.eclipse.linuxtools.ctf.core.tests/traces/kernel_vm"),
+    /** UST trace with lots of lost events */
+    HELLO_LOST("../org.eclipse.linuxtools.ctf.core.tests/traces/hello-lost");
 
 
     private final String fPath;

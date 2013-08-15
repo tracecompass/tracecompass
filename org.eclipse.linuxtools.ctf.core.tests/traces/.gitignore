@@ -1,6 +1,7 @@
 *.bz2
 *.tar
 /ctf-testsuite
+/hello-lost
 /kernel
 /kernel_vm
 /trace2
