@@ -38,19 +38,29 @@ public class ImportFileInfo {
      */
     private boolean fIsOverwrite;
 
+    private boolean fIsKernel;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
      * Standard constructor
-     * @param file A remote file reference
-     * @param traceName A trace name
-     * @param isOverwrite global overwrite flag
+     *
+     * @param file
+     *            A remote file reference
+     * @param traceName
+     *            A trace name
+     * @param isOverwrite
+     *            global overwrite flag
+     * @param isKernel
+     *            <code>true</code> if it is a kernel trace else
+     *            <code>false</code>
      */
-    public ImportFileInfo(IRemoteFile file, String traceName, boolean isOverwrite) {
+    public ImportFileInfo(IRemoteFile file, String traceName, boolean isOverwrite, boolean isKernel) {
         fRemoteFile = file;
         fLocalTraceName = traceName;
         fIsOverwrite = isOverwrite;
+        fIsKernel = isKernel;
     }
 
     // ------------------------------------------------------------------------
@@ -62,9 +72,12 @@ public class ImportFileInfo {
     public String getLocalTraceName() {
         return fLocalTraceName;
     }
+
     /**
      * Sets the local trace name
-     * @param importTraceName - local name of trace to set (name after importing)
+     *
+     * @param importTraceName
+     *            - local name of trace to set (name after importing)
      */
     public void setLocalTraceName(String importTraceName) {
         this.fLocalTraceName = importTraceName;
@@ -82,18 +95,41 @@ public class ImportFileInfo {
     public void setOverwrite(boolean isOverwrite) {
         this.fIsOverwrite = isOverwrite;
     }
+
     /**
      * @return the remote file implementation.
      */
     public IRemoteFile getImportFile() {
         return fRemoteFile;
     }
+
     /**
      * Sets the remote file implementation
-     * @param remoteFile The remote file implementation.
+     *
+     * @param remoteFile
+     *            The remote file implementation.
      */
     public void setRemoteFile(IRemoteFile remoteFile) {
         fRemoteFile = remoteFile;
+    }
+
+    /**
+     * Returns whether it is a kernel trace or not
+     *
+     * @return <code>true</code> if it is a kernel trace else <code>false</code>
+     */
+    public boolean isKernel() {
+        return fIsKernel;
+    }
+
+    /**
+     * Sets whether it is a kernel trace or not
+     *
+     * @param isKernel
+     *            <code>true</code> for kernel trace else <code>false</code>
+     */
+    public void setKernel(boolean isKernel) {
+        fIsKernel = isKernel;
     }
 }
 

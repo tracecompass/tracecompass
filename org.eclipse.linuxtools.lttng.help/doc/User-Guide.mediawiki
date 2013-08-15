@@ -1245,7 +1245,9 @@ A new display will open for selecting the traces to import.
 
 [[Image:images/LTTng2ImportDialog.png]]
 
-Select the trace to be imported by selecting the relevant traces in the tree viewer, select a tracing project from the '''Available Projects''' combo box and select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the the selected traces will be stored in the '''Traces''' directory of the specified tracing project. From the '''Project Explorer''' view, the trace can be analyzed further.
+By default all traces are selected. Also, a default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Also if needed, change the tracing project from the '''Available Projects''' combo box. Select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. For '''Kernel''' traces the trace type '''LTTng Kernel''' and for '''UST''' traces the trace type '''Generic CTF Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
+
+'''Note''': The trace will be imported with a name constructed with information about session, whether it is a kernel or ust trace, ust buffer type (per UID or per PID) and snapshot details. 
 
 '''Note''': If the overwrite button ('''Overwrite existing trace without warning''') was not selected and a trace with the same name of a trace to be imported already exists in the project, then a new confirmation dialog box will open.
 
@@ -1259,11 +1261,7 @@ If the existing trace should not be overwritten select, then select the '''Renam
 
 ==== Importing Network Traces to a Tracing Project ====
 
-Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project|Importing Session Traces to a Tracing Project]]. For network traces a dialog will open for selecting a  project from the list of available tracing projects within the current Eclipse workspace.
-
-[[Image:images/LTTng2ImportSelectTracingProjectDialog.png]]
-
-Select a tracing project from the drop-down menu and then click on '''Next...'''. This will open the default dialog box for importing traces to a tracing project. Follow the instructions in chapter [[#Importing Traces in a Project|Importing Traces in a Project]] to import the network traces of the current session.
+Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project|Importing Session Traces to a Tracing Project]]. For network traces the '''Batch Import Trace Wizard''' will be displayed. Follow the instructions in chapter [[#Batch Importing|Batch Importing]] to import the network traces of the current session. 
 
 === Properties View ===
 
