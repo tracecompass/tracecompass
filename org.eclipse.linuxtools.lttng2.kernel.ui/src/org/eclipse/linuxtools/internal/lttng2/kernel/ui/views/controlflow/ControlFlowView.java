@@ -276,7 +276,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 buildTree(entryList, rootList);
             }
             Collections.sort(rootList, getEntryComparator());
-            putEntryList(trace, (ArrayList<TimeGraphEntry>) rootList.clone());
+            putEntryList(trace, new ArrayList<TimeGraphEntry>(rootList));
 
             if (trace.equals(getTrace())) {
                 refresh();

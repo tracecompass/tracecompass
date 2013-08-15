@@ -810,7 +810,7 @@ public class CallStackView extends TmfView {
             }
         }
         synchronized (fEntryListMap) {
-            fEntryListMap.put(trace, (ArrayList<ThreadEntry>) entryList.clone());
+            fEntryListMap.put(trace, new ArrayList<ThreadEntry>(entryList));
         }
         if (trace == fTrace) {
             refresh();
