@@ -10,7 +10,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.linuxtools.ctf.parser;bundle-version="1.0.0"
-Export-Package: org.eclipse.linuxtools.ctf.core.event,
+Export-Package: org.eclipse.linuxtools.ctf.core,
+ org.eclipse.linuxtools.ctf.core.event,
  org.eclipse.linuxtools.ctf.core.event.io,
  org.eclipse.linuxtools.ctf.core.event.types,
  org.eclipse.linuxtools.ctf.core.trace,
