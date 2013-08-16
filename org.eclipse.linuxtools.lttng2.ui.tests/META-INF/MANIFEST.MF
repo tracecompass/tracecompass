@@ -21,4 +21,9 @@ Import-Package: org.eclipse.rse.core,
  org.eclipse.rse.services.terminals,
  org.eclipse.rse.subsystems.files.core,
  org.eclipse.rse.subsystems.files.core.servicesubsystem
-Export-Package: org.eclipse.linuxtools.lttng2.ui.tests
+Export-Package: org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.stubs.service;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.stubs.shells;x-internal:=true,
+ org.eclipse.linuxtools.lttng2.ui.tests;x-friends:="org.eclipse.linuxtools.lttng.alltests",
+ org.eclipse.linuxtools.lttng2.ui.tests.control.model.component;x-internal:=true,
+ org.eclipse.linuxtools.lttng2.ui.tests.control.service;x-internal:=true

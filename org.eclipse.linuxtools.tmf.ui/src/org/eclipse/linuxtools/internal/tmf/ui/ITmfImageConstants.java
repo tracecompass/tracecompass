@@ -43,6 +43,8 @@ public interface ITmfImageConstants {
     public static final String IMG_UI_PREV_ITEM = IMG_UI_PREV_PAGE;
     public static final String IMG_UI_PIN_VIEW = ICONS_PATH + "elcl16/pin_view.gif";
     public static final String IMG_UI_HIDE_ARROWS = ICONS_PATH + "elcl16/hide_arrows.gif";
+    public static final String IMG_UI_FOLLOW_ARROW_FORWARD = ICONS_PATH + "elcl16/follow_arrow_fwd.gif";
+    public static final String IMG_UI_FOLLOW_ARROW_BACKWARD = ICONS_PATH + "elcl16/follow_arrow_bwd.gif";
 
     /* eview16 */
     public static final String IMG_UI_SEQ_DIAGRAM_OBJ = ICONS_PATH + "eview16/sequencediagram_view.gif";

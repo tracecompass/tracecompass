@@ -915,6 +915,58 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
     }
 
     /**
+     * Follow the arrow forward
+     *
+     * @since 2.1
+     */
+    public void followArrowFwd() {
+        ITimeGraphEntry trace = getSelectedTrace();
+        if (trace == null) {
+            return;
+        }
+        long selectedTime = ((ITimeDataProvider2) fTimeProvider).getSelectionBegin();
+        for (ILinkEvent link : fItemData.fLinks) {
+            if (link.getEntry() == trace && link.getTime() == selectedTime) {
+                selectItem(link.getDestinationEntry(), false);
+                if (link.getDuration() != 0) {
+                    fTimeProvider.setSelectedTimeNotify(link.getTime() + link.getDuration(), true);
+                    // Notify if visible time window has been adjusted
+                    fTimeProvider.setStartFinishTimeNotify(fTimeProvider.getTime0(), fTimeProvider.getTime1());
+                }
+                fireSelectionChanged();
+                return;
+            }
+        }
+        selectNextEvent();
+    }
+
+    /**
+     * Follow the arrow backward
+     *
+     * @since 2.1
+     */
+    public void followArrowBwd() {
+        ITimeGraphEntry trace = getSelectedTrace();
+        if (trace == null) {
+            return;
+        }
+        long selectedTime = ((ITimeDataProvider2) fTimeProvider).getSelectionBegin();
+        for (ILinkEvent link : fItemData.fLinks) {
+            if (link.getDestinationEntry() == trace && link.getTime() + link.getDuration() == selectedTime) {
+                selectItem(link.getEntry(), false);
+                if (link.getDuration() != 0) {
+                    fTimeProvider.setSelectedTimeNotify(link.getTime(), true);
+                    // Notify if visible time window has been adjusted
+                    fTimeProvider.setStartFinishTimeNotify(fTimeProvider.getTime0(), fTimeProvider.getTime1());
+                }
+                fireSelectionChanged();
+                return;
+            }
+        }
+        selectPrevEvent();
+    }
+
+    /**
      * Return the currently selected trace
      *
      * @return The entry matching the trace
@@ -2448,6 +2500,7 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
                 refreshExpanded(expandedItemList, item);
             }
             fExpandedItems = expandedItemList.toArray(new Item[0]);
+            fTopIndex = Math.min(fTopIndex, Math.max(0, fExpandedItems.length - 1));
         }
 
         private void refreshExpanded(List<Item> expandedItemList, Item item) {

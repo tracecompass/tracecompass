@@ -11,6 +11,11 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.linuxtools.ctf.core;bundle-version="3.0.0"
-Export-Package: org.eclipse.linuxtools.ctf.core.tests,
- org.eclipse.linuxtools.ctf.core.tests.shared
+Export-Package: org.eclipse.linuxtools.ctf.core.tests;x-friends:="org.eclipse.linuxtools.lttng.alltests",
+ org.eclipse.linuxtools.ctf.core.tests.event;x-internal:=true,
+ org.eclipse.linuxtools.ctf.core.tests.headless;x-internal:=true,
+ org.eclipse.linuxtools.ctf.core.tests.io;x-internal:=true,
+ org.eclipse.linuxtools.ctf.core.tests.shared,
+ org.eclipse.linuxtools.ctf.core.tests.trace;x-internal:=true,
+ org.eclipse.linuxtools.ctf.core.tests.types;x-internal:=true
 Import-Package: org.antlr.runtime;version="3.2.0"
