@@ -99,6 +99,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private final Color fSelectionBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
     private final Color fLastEventColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
     private final Color fHistoBarColor = new Color(Display.getDefault(), 74, 112, 139);
+    private final Color fLostEventColor = new Color(Display.getCurrent(), 208, 62, 120);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -119,12 +120,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private Text fTimeRangeEndText;
 
     /**
-     *  Histogram drawing area
+     * Histogram drawing area
      */
     protected Canvas fCanvas;
 
     /**
-     *  The histogram data model.
+     * The histogram data model.
      */
     protected final HistogramDataModel fDataModel;
 
@@ -182,6 +183,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         TmfSignalManager.deregister(this);
 
         fHistoBarColor.dispose();
+        fLastEventColor.dispose();
         fDataModel.removeHistogramListener(this);
     }
 
@@ -332,6 +334,16 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         return fDataModel;
     }
 
+    /**
+     * Returns the text control for the maximum of events in one bar
+     *
+     * @return the text control
+     * @since 2.1
+     */
+    public Text getMaxNbEventsText() {
+        return fMaxNbEventsText;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -355,10 +367,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Increase the histogram bucket corresponding to [timestamp]
      *
-     * @param eventCount
-     *            The new event count
-     * @param timestamp
-     *            The latest timestamp
+     * @param eventCount The new event count
+     * @param timestamp The latest timestamp
      */
     public void countEvent(final long eventCount, final long timestamp) {
         fDataModel.countEvent(eventCount, timestamp);
@@ -367,8 +377,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Sets the current event time and refresh the display
      *
-     * @param timestamp
-     *            The time of the current event
+     * @param timestamp The time of the current event
      * @deprecated As of 2.1, use {@link #setSelection(long, long)}
      */
     @Deprecated
@@ -381,10 +390,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Sets the current selection time range and refresh the display
      *
-     * @param beginTime
-     *            The begin time of the current selection
-     * @param endTime
-     *            The end time of the current selection
+     * @param beginTime The begin time of the current selection
+     * @param endTime The end time of the current selection
      * @since 2.1
      */
     public void setSelection(final long beginTime, final long endTime) {
@@ -431,48 +438,48 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         int index;
         switch (keyCode) {
 
-            case SWT.HOME:
-                index = 0;
-                while (index < fScaledData.fLastBucket && fScaledData.fData[index] == 0) {
-                    index++;
-                }
-                if (index < fScaledData.fLastBucket) {
-                    fScaledData.fSelectionBeginBucket = index;
-                }
-                break;
+        case SWT.HOME:
+            index = 0;
+            while (index < fScaledData.fLastBucket && fScaledData.fData[index] == 0) {
+                index++;
+            }
+            if (index < fScaledData.fLastBucket) {
+                fScaledData.fSelectionBeginBucket = index;
+            }
+            break;
 
-            case SWT.ARROW_RIGHT:
-                index = Math.max(0, fScaledData.fSelectionBeginBucket + 1);
-                while (index < fScaledData.fWidth && fScaledData.fData[index] == 0) {
-                    index++;
-                }
-                if (index < fScaledData.fLastBucket) {
-                    fScaledData.fSelectionBeginBucket = index;
-                }
-                break;
+        case SWT.ARROW_RIGHT:
+            index = Math.max(0, fScaledData.fSelectionBeginBucket + 1);
+            while (index < fScaledData.fWidth && fScaledData.fData[index] == 0) {
+                index++;
+            }
+            if (index < fScaledData.fLastBucket) {
+                fScaledData.fSelectionBeginBucket = index;
+            }
+            break;
 
-            case SWT.END:
-                index = fScaledData.fLastBucket;
-                while (index >= 0 && fScaledData.fData[index] == 0) {
-                    index--;
-                }
-                if (index >= 0) {
-                    fScaledData.fSelectionBeginBucket = index;
-                }
-                break;
+        case SWT.END:
+            index = fScaledData.fLastBucket;
+            while (index >= 0 && fScaledData.fData[index] == 0) {
+                index--;
+            }
+            if (index >= 0) {
+                fScaledData.fSelectionBeginBucket = index;
+            }
+            break;
 
-            case SWT.ARROW_LEFT:
-                index = Math.min(fScaledData.fLastBucket - 1, fScaledData.fSelectionBeginBucket - 1);
-                while (index >= 0 && fScaledData.fData[index] == 0) {
-                    index--;
-                }
-                if (index >= 0) {
-                    fScaledData.fSelectionBeginBucket = index;
-                }
-                break;
+        case SWT.ARROW_LEFT:
+            index = Math.min(fScaledData.fLastBucket - 1, fScaledData.fSelectionBeginBucket - 1);
+            while (index >= 0 && fScaledData.fData[index] == 0) {
+                index--;
+            }
+            if (index >= 0) {
+                fScaledData.fSelectionBeginBucket = index;
+            }
+            break;
 
-            default:
-                return;
+        default:
+            return;
         }
 
         fScaledData.fSelectionEndBucket = fScaledData.fSelectionBeginBucket;
@@ -499,18 +506,20 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         }
                         fDataModel.setSelection(fSelectionBegin, fSelectionEnd);
                         fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight, 1);
-                        synchronized(fDataModel) {
+                        synchronized (fDataModel) {
                             if (fScaledData != null) {
                                 fCanvas.redraw();
                                 if (fDataModel.getNbEvents() != 0) {
-                                    // Display histogram and update X-,Y-axis labels
+                                    // Display histogram and update X-,Y-axis
+                                    // labels
                                     fTimeRangeStartText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getFirstBucketTime()));
                                     fTimeRangeEndText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
                                 } else {
                                     fTimeRangeStartText.setText(""); //$NON-NLS-1$
                                     fTimeRangeEndText.setText(""); //$NON-NLS-1$
                                 }
-                                fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
+                                long maxNbEvents = HistogramScaledData.hideLostEvents ? fScaledData.fMaxValue : fScaledData.fMaxCombinedValue;
+                                fMaxNbEventsText.setText(Long.toString(maxNbEvents));
                                 // The Y-axis area might need to be re-sized
                                 fMaxNbEventsText.getParent().layout();
                             }
@@ -599,11 +608,26 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             imageGC.fillRectangle(0, 0, image.getBounds().width + 1, image.getBounds().height + 1);
 
             // Draw the histogram bars
-            imageGC.setBackground(fHistoBarColor);
             final int limit = width < scaledData.fWidth ? width : scaledData.fWidth;
+            double factor = HistogramScaledData.hideLostEvents ? scaledData.fScalingFactor : scaledData.fScalingFactorCombined;
             for (int i = 0; i < limit; i++) {
-                final int value = (int) Math.ceil(scaledData.fData[i] * scaledData.fScalingFactor);
-                imageGC.fillRectangle(i, height - value, 1, value);
+                imageGC.setForeground(fHistoBarColor);
+                final int value = (int) Math.ceil(scaledData.fData[i] * factor);
+                imageGC.drawLine(i, height - value, i, height);
+
+                if (!HistogramScaledData.hideLostEvents) {
+                    imageGC.setForeground(fLostEventColor);
+                    final int lostEventValue = (int) Math.ceil(scaledData.fLostEventsData[i] * factor);
+                    if (lostEventValue != 0) {
+                        if (lostEventValue == 1) {
+                            // in linux, a line from x to x is not drawn, in windows it is.
+                            imageGC.drawPoint(i, height - value - 1);
+                        } else {
+                            // drawing a line is inclusive, so we need to remove 1 from the destination to have the correct length
+                            imageGC.drawLine(i, height - value - lostEventValue, i, height - value - 1);
+                        }
+                    }
+                }
             }
 
             // Add a dashed line as a delimiter (at the right of the last bar)
@@ -730,15 +754,22 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         }
         final long endTime = fScaledData.getBucketEndTime(index);
         final int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
-
+        final String newLine = System.getProperty("line.separator"); //$NON-NLS-1$
         final StringBuffer buffer = new StringBuffer();
         buffer.append("Range = ["); //$NON-NLS-1$
         buffer.append(new TmfTimestamp(startTime, ITmfTimestamp.NANOSECOND_SCALE).toString());
-        buffer.append(","); //$NON-NLS-1$
+        buffer.append(',');
         buffer.append(new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE).toString());
-        buffer.append(")\n"); //$NON-NLS-1$
+        buffer.append(')');
+        buffer.append(newLine);
         buffer.append("Event count = "); //$NON-NLS-1$
         buffer.append(nbEvents);
+        if (!HistogramScaledData.hideLostEvents) {
+            final int nbLostEvents = (index >= 0) ? fScaledData.fLostEventsData[index] : 0;
+            buffer.append(newLine);
+            buffer.append("Lost events count = "); //$NON-NLS-1$
+            buffer.append(nbLostEvents);
+        }
         return buffer.toString();
     }
 
@@ -763,7 +794,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Format the timestamp and update the display
      *
-     * @param signal the incoming signal
+     * @param signal
+     *            the incoming signal
      * @since 2.0
      */
     @TmfSignalHandler
