@@ -55,7 +55,7 @@ public class TmfRangeSynchSignal extends TmfSignal {
      *            Object sending this signal
      * @param range
      *            The new time range
-     * @since 3.0
+     * @since 2.1
      */
     public TmfRangeSynchSignal(Object source, TmfTimeRange range) {
         super(source);

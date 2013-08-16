@@ -76,7 +76,7 @@ import org.eclipse.ui.IActionBars;
  * This view contains either a time graph viewer, or a time graph combo which is
  * divided between a tree viewer on the left and a time graph viewer on the right.
  *
- * @since 3.0
+ * @since 2.1
  */
 public abstract class AbstractTimeGraphView extends TmfView {
 

@@ -147,7 +147,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      *            The begin x-coordinate
      * @param end
      *            The end x-coordinate
-     * @since 3.0
+     * @since 2.1
      */
     public void setDragRange(int begin, int end) {
         if (NO_BUTTON == fDragState || DRAG_EXTERNAL == fDragState) {
@@ -555,7 +555,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      * Update the display to use the updated timestamp format
      *
      * @param signal the incoming signal
-     * @since 3.0
+     * @since 2.1
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {

@@ -53,7 +53,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
      *            Timestamp of begin of selection range
      * @param end
      *            Timestamp of end of selection range
-     * @since 3.0
+     * @since 2.1
      */
     public TmfTimeSynchSignal(Object source, ITmfTimestamp begin, ITmfTimestamp end) {
         super(source);
@@ -73,7 +73,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
 
     /**
      * @return The begin timestamp of selection
-     * @since 3.0
+     * @since 2.1
      */
     public ITmfTimestamp getBeginTime() {
         return fBeginTime;
@@ -81,7 +81,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
 
     /**
      * @return The end timestamp of selection
-     * @since 3.0
+     * @since 2.1
      */
     public ITmfTimestamp getEndTime() {
         return fEndTime;

@@ -274,7 +274,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @param signal
      *            Contains the information about the new selected time range.
-     * @since 3.0
+     * @since 2.1
      */
     @TmfSignalHandler
     public void timeSynchUpdated(TmfTimeSynchSignal signal) {

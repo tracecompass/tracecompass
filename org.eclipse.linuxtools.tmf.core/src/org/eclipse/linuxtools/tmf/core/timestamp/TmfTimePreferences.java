@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.internal.tmf.core.Activator;
  *
  * @author Francois Chouinard
  * @version 1.0
- * @since 3.0
+ * @since 2.1
  */
 public class TmfTimePreferences {
 

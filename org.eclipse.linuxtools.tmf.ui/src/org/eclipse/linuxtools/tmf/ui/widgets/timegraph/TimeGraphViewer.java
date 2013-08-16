@@ -174,7 +174,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
      *
      * @param links
      *            the links to display in this time graph combo
-     * @since 3.0
+     * @since 2.1
      */
     public void setLinks(List<ILinkEvent> links) {
         if (fTimeGraphCtrl != null) {
@@ -580,7 +580,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 3.0
+     * @since 2.1
      */
     @Override
     public long getSelectionBegin() {
@@ -588,7 +588,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 3.0
+     * @since 2.1
      */
     @Override
     public long getSelectionEnd() {
@@ -664,7 +664,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 3.0
+     * @since 2.1
      */
     @Override
     public void setSelectionRangeNotify(long beginTime, long endTime) {
@@ -679,7 +679,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     }
 
     /**
-     * @since 3.0
+     * @since 2.1
      */
     @Override
     public void setSelectionRange(long beginTime, long endTime) {
@@ -1468,7 +1468,7 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
      *
      * @return The Action object
      *
-     * @since 3.0
+     * @since 2.1
      */
     public Action getHideArrowsAction(final IDialogSettings dialogSettings) {
         if (fHideArrowsAction == null) {

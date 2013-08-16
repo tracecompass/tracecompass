@@ -19,7 +19,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * Utility class for common tmf.ui functionalities
  *
- * @since 3.0
+ * @since 2.1
  */
 public class TraceUtils {
 

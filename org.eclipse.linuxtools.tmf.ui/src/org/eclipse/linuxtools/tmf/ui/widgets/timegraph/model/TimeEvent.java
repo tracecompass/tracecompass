@@ -63,7 +63,7 @@ public class TimeEvent implements ITimeEvent {
      *            The duration of this event
      * @param value
      *            The status assigned to the event
-     * @since 3.0
+     * @since 2.1
      */
     public TimeEvent(ITimeGraphEntry entry, long time, long duration,
             int value) {
@@ -77,7 +77,7 @@ public class TimeEvent implements ITimeEvent {
      * Get this event's status
      *
      * @return The integer matching this status
-     * @since 3.0
+     * @since 2.1
      */
     public int getValue() {
         return fValue;
@@ -87,7 +87,7 @@ public class TimeEvent implements ITimeEvent {
      * Return whether an event has a value
      *
      * @return true if the event has a value
-     * @since 3.0
+     * @since 2.1
      */
     public boolean hasValue() {
         return (fValue != NOVALUE);

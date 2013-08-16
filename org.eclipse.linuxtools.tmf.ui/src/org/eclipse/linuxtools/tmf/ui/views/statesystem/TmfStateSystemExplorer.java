@@ -503,12 +503,12 @@ public class TmfStateSystemExplorer extends TmfView {
         };
         thread.start();
     }
-
+    
     /**
      * Update the display to use the updated timestamp format
      *
      * @param signal the incoming signal
-     * @since 3.0
+     * @since 2.1
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {

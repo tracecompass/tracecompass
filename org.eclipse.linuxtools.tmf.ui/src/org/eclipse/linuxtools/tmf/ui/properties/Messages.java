@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.properties;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * @since 3.0
+ * @since 2.1
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

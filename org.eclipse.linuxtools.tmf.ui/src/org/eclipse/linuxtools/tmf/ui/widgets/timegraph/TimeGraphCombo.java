@@ -350,7 +350,7 @@ public class TimeGraphCombo extends Composite {
      *            the style of widget to construct
      * @param weights
      *            The relative weights of each side of the sash form
-     * @since 3.0
+     * @since 2.1
      */
     public TimeGraphCombo(Composite parent, int style, int[] weights) {
         super(parent, style);
@@ -860,7 +860,7 @@ public class TimeGraphCombo extends Composite {
      * Sets or clears the list of links to display on this combo
      *
      * @param links the links to display in this time graph combo
-     * @since 3.0
+     * @since 2.1
      */
     public void setLinks(List<ILinkEvent> links) {
         fTimeGraphViewer.setLinks(links);

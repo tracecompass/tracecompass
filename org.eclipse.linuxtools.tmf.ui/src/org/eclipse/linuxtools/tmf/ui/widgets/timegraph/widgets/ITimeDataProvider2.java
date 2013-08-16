@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
  *
  * @version 1.0
  * @TODO: Move these to the ITimeDateProvider interface when API 3.0 is reached
- * @since 3.0
+ * @since 2.1
  */
 public interface ITimeDataProvider2 extends ITimeDataProvider {
 

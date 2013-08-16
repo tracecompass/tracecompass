@@ -174,7 +174,7 @@ public class StreamInputReader {
      * Gets the event definition hashmap for this StreamInput
      *
      * @return Unmodifiable map with the event definitions
-     * @since 3.0
+     * @since 2.1
      */
     public Map<Long, EventDefinition> getEventDefinitions() {
         return Collections.unmodifiableMap(eventDefs);
@@ -188,7 +188,7 @@ public class StreamInputReader {
      *            existing definition with the same id.
      * @param def
      *            The matching event definition
-     * @since 3.0
+     * @since 2.1
      */
     public void addEventDefinition(Long id, EventDefinition def) {
         eventDefs.put(id, def);

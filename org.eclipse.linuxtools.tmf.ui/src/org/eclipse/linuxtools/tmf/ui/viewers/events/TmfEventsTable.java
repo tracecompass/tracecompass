@@ -1876,7 +1876,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *
      * @param statusLineManager
      *            The status line manager, or null to disable status line messages
-     * @since 3.0
+     * @since 2.1
      */
     public void setStatusLineManager(IStatusLineManager statusLineManager) {
         if (fStatusLineManager != null && statusLineManager == null) {

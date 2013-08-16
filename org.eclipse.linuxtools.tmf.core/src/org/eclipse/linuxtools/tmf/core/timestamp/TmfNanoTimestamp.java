@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.core.timestamp;
 /**
  * A simplified timestamp where scale is nanoseconds and precision is set to 0.
  *
- * @since 3.0
+ * @since 2.1
  */
 public class TmfNanoTimestamp extends TmfTimestamp {
 

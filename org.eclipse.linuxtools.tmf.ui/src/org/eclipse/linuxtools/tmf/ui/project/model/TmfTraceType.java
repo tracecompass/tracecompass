@@ -553,7 +553,7 @@ public final class TmfTraceType {
      * @param traceType
      *            the trace type in human form (category:name)
      * @return true if the trace is a custom type
-     * @since 3.0
+     * @since 2.1
      */
     public static boolean isCustomTrace(String traceType) {
         final boolean startsWithTxt = traceType.startsWith(TmfTraceType.CUSTOM_TXT_CATEGORY);
@@ -567,7 +567,7 @@ public final class TmfTraceType {
      * @param traceType
      *            The trace type in human form (category:name)
      * @return the trace type ID or null if the trace is not a custom one
-     * @since 3.0
+     * @since 2.1
      */
     public static String getCustomTraceTypeId(String traceType) {
         String traceTypeId = null;

@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.timestamp;
 
 /**
- * @since 3.0
+ * @since 2.1
  */
 @SuppressWarnings({ "javadoc", "nls" })
 public interface ITmfTimePreferencesConstants {
