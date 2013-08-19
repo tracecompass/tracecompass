@@ -78,4 +78,23 @@ public interface ISessionInfo extends ITraceInfo {
      * @param isStreamedTrace <code>true</code> if streamed over network else <code>false</code>
      */
     void setStreamedTrace(boolean isStreamedTrace);
+
+    /**
+     * Returns whether the session is snapshot session or not
+     * @return <code>true</code> if it is snapshot session else <code>false</code>
+     */
+    boolean isSnapshotSession();
+
+    /**
+     * Gets the snapshot information the session or null if it is not a
+     * snapshot session.
+     * @return snapshot information
+     */
+    ISnapshotInfo getSnapshotInfo();
+
+    /**
+     * Sets the snapshot information of the session
+     * @param setSnapshotInfo - the snapshot data to set.
+     */
+    void setSnapshotInfo(ISnapshotInfo setSnapshotInfo);
 }

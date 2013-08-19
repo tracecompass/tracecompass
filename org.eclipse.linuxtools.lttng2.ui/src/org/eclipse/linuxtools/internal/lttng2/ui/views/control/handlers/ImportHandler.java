@@ -189,7 +189,7 @@ public class ImportHandler extends BaseControlViewHandler {
                 if (element instanceof TraceSessionComponent) {
                     // Add only TraceSessionComponents that are inactive and not destroyed
                     TraceSessionComponent tmpSession = (TraceSessionComponent) element;
-                    if ((tmpSession.getSessionState() == TraceSessionState.INACTIVE) && (!tmpSession.isDestroyed())) {
+                    if (((tmpSession.isSnapshotSession()) || (tmpSession.getSessionState() == TraceSessionState.INACTIVE)) && (!tmpSession.isDestroyed())) {
                         session = tmpSession;
                     }
                 }

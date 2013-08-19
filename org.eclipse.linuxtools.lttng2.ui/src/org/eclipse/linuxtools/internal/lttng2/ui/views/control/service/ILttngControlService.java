@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISnapshotInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IUstProviderInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
@@ -73,6 +74,19 @@ public interface ILttngControlService {
             throws ExecutionException;
 
     /**
+     * Retrieves the snapshot output information from the node
+     * @param sessionName
+     *            - the session name
+     * @param monitor
+     *            - a progress monitor
+     * @return snapshot output information
+     * @throws ExecutionException
+     *          if command fails
+     */
+    ISnapshotInfo getSnapshotInfo(String sessionName, IProgressMonitor monitor)
+            throws ExecutionException;
+
+    /**
      * Retrieves the kernel provider information (i.e. the kernel events)
      *
      * @param monitor
@@ -112,13 +126,15 @@ public interface ILttngControlService {
      *            - a session name to create
      * @param sessionPath
      *            - a path for storing the traces (use null for default)
+     * @param isSnapshot
+     *            - true for snapshot session else false
      * @param monitor
      *            - a progress monitor
      * @return the session information
      * @throws ExecutionException
      *             If the command fails
      */
-    ISessionInfo createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException;
+    ISessionInfo createSession(String sessionName, String sessionPath, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Creates a session with given session name and location.
@@ -132,13 +148,15 @@ public interface ILttngControlService {
      *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
      * @param dataUrl
      *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
+     * @param isSnapshot
+     *            - true for snapshot session else false
      * @param monitor
      *            - a progress monitor
      * @return the session information
      * @throws ExecutionException
      *             If the command fails
      */
-    ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, IProgressMonitor monitor) throws ExecutionException;
+    ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Destroys a session with given session name.
@@ -374,5 +392,18 @@ public interface ILttngControlService {
      *             If the command fails
      */
     void calibrate(boolean isKernel, IProgressMonitor monitor)
+            throws ExecutionException;
+
+    /**
+     * Records a snapshot.
+     *
+     * @param sessionName
+     *            - a session name
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
+     */
+    void recordSnapshot(String sessionName, IProgressMonitor monitor)
             throws ExecutionException;
 }

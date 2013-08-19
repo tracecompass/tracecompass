@@ -182,6 +182,13 @@
             name="%commands.control.calibrate">
       </command>
 
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.snapshot.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot"
+            name="%commands.control.snapshot">
+      </command>
+
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -242,6 +249,16 @@
          </command>
          <separator
                name="org.eclipse.linuxtools.internal.lttng2.ui.views.control.toolbar.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot"
+               icon="icons/elcl16/snapshot.gif"
+               label="%commands.control.snapshot"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.internal.lttng2.ui.views.control.toolbar.separator3"
                visible="true">
          </separator>
          <command
@@ -748,6 +765,30 @@
             </visibleWhen>
          </command>
 
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot"
+               icon="icons/elcl16/snapshot.gif"
+               label="%commands.control.snapshot"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <iterate
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent">
+                        </instanceof>
+                     </iterate>
+                     <count
+                           value="1">
+                     </count>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+
       </menuContribution>
       
    </extension>
@@ -967,6 +1008,23 @@
             </with>
          </activeWhen>
       </handler>
+
+      <handler
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.SnaphshotHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+
 
       <handler
             class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.AssignEventHandler"

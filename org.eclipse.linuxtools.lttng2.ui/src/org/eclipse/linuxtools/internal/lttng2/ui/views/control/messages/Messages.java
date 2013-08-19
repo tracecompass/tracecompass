@@ -86,6 +86,9 @@ final public class Messages extends NLS {
     public static String TraceControl_AddCalibrateJob;
     public static String TraceControl_AddCalibrateFailure;
 
+    public static String TraceControl_RecordSnapshotJob;
+    public static String TraceControl_RecordSnapshotFailure;
+
     // Dialogs
     public static String TraceControl_NewDialogTitle;
     public static String TraceControl_NewNodeExistingConnectionGroupName;
@@ -104,6 +107,8 @@ final public class Messages extends NLS {
     public static String TraceControl_CreateSessionNameTooltip;
     public static String TraceControl_CreateSessionPathLabel;
     public static String TraceControl_CreateSessionPathTooltip;
+    public static String TraceControl_CreateSessionSnapshotLabel;
+    public static String TraceControl_CreateSessionSnapshotTooltip;
 
     public static String TraceControl_CreateSessionConfigureStreamingButtonText;
     public static String TraceControl_CreateSessionConfigureStreamingButtonTooltip;
@@ -257,6 +262,9 @@ final public class Messages extends NLS {
     public static String TraceControl_HostNamePropertyName;
     public static String TraceControl_HostAddressPropertyName;
     public static String TraceControl_SessionPathPropertyName;
+    public static String TraceControl_SnapshotPathPropertyName;
+    public static String TraceControl_SnapshotNamePropertyName;
+    public static String TraceControl_SnapshotIdPropertyName;
     public static String TraceControl_ProviderNamePropertyName;
     public static String TraceControl_ProcessIdPropertyName;
     public static String TraceControl_ProbeAddressPropertyName;

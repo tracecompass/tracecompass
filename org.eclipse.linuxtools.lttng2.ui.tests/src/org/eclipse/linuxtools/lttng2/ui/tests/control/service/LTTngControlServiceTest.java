@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.IDomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IFieldInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISnapshotInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.IUstProviderInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement;
@@ -100,6 +101,9 @@ public class LTTngControlServiceTest {
     private static final String SCEN_CALIBRATE_HANDLING = "CalibrateHandling";
     private static final String SCEN_CREATE_SESSION_2_1 = "CreateSessionLttng2.1";
     private static final String SCEN_CREATE_SESSION_VERBOSE_2_1 = "CreateSessionLttngVerbose2.1";
+    private static final String SCEN_CREATE_SNAPSHOT_SESSION = "CreateSessionSnapshot";
+    private static final String SCEN_CREATE_STREAMED_SNAPSHOT_SESSION = "CreateSessionStreamedSnapshot";
+    private static final String SCEN_CREATE_SNAPSHOT_SESSION_ERRORS = "CreateSessionSnapshotErrors";
 
     // ------------------------------------------------------------------------
     // Test data
@@ -707,7 +711,7 @@ public class LTTngControlServiceTest {
         try {
             fShell.setScenario(SCEN_CREATE_SESSION1);
 
-            ISessionInfo info = fService.createSession("mysession2", null, new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("mysession2", null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession2", info.getName());
             assertNotNull(info.getSessionPath());
@@ -726,7 +730,7 @@ public class LTTngControlServiceTest {
             fShell.setScenario(SCEN_CREATE_SESSION_WITH_PROMPT);
 
             // First line has no shell prompt before the output
-            ISessionInfo info = fService.createSession("mysession2", null, new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("mysession2", null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession2", info.getName());
             assertNotNull(info.getSessionPath());
@@ -743,28 +747,28 @@ public class LTTngControlServiceTest {
         fShell.setScenario(SCEN_CREATE_SESSION_VARIANTS);
 
         try {
-            fService.createSession("alreadyExist", null, new NullProgressMonitor());
+            fService.createSession("alreadyExist", null, false, new NullProgressMonitor());
             fail("No exeption thrown");
         } catch (ExecutionException e) {
             // success
         }
 
         try {
-            fService.createSession("wrongName", null, new NullProgressMonitor());
+            fService.createSession("wrongName", null, false, new NullProgressMonitor());
             fail("No exeption thrown");
         } catch (ExecutionException e) {
             // success
         }
 
         try {
-            fService.createSession("withPath", "/home/user/hallo", new NullProgressMonitor());
+            fService.createSession("withPath", "/home/user/hallo", false, new NullProgressMonitor());
             fail("No exeption thrown");
         } catch (ExecutionException e) {
             // success
         }
 
         try {
-            ISessionInfo info = fService.createSession("session with spaces", null, new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("session with spaces", null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("session with spaces", info.getName());
             assertNotNull(info.getSessionPath());
@@ -776,7 +780,7 @@ public class LTTngControlServiceTest {
         }
 
         try {
-            ISessionInfo info = fService.createSession("pathWithSpaces", "/home/user/hallo user/here", new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("pathWithSpaces", "/home/user/hallo user/here", false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("pathWithSpaces", info.getName());
             assertNotNull(info.getSessionPath());
@@ -1162,35 +1166,35 @@ public class LTTngControlServiceTest {
         try {
             fShell.setScenario(SCEN_CREATE_SESSION_2_1);
 
-            ISessionInfo info = fService.createSession("mysession", "net://172.0.0.1", null, null, new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("mysession", "net://172.0.0.1", null, null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("net://172.0.0.1", info.getSessionPath());
             assertTrue(info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
-            info = fService.createSession("mysession", "file:///tmp", null, null, new NullProgressMonitor());
+            info = fService.createSession("mysession", "file:///tmp", null, null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("file:///tmp", info.getSessionPath());
             assertTrue(!info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
-            info = fService.createSession("mysession", "file:///tmp", null, null, new NullProgressMonitor());
+            info = fService.createSession("mysession", "file:///tmp", null, null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("file:///tmp", info.getSessionPath());
             assertTrue(!info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
-            info = fService.createSession("mysession", null, "tcp://172.0.0.1", "tcp://172.0.0.1:5343", new NullProgressMonitor());
+            info = fService.createSession("mysession", null, "tcp://172.0.0.1", "tcp://172.0.0.1:5343", false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("", info.getSessionPath()); // the complete network path is not available at this point
             assertTrue(info.isStreamedTrace());
             fService.destroySession("mysession", new NullProgressMonitor());
 
-            info = fService.createSession("mysession", "net://172.0.0.1:1234:2345", null, null, new NullProgressMonitor());
+            info = fService.createSession("mysession", "net://172.0.0.1:1234:2345", null, null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("net://172.0.0.1:1234:2345", info.getSessionPath());
@@ -1199,7 +1203,7 @@ public class LTTngControlServiceTest {
 
             // verbose
             enableVerbose();
-            info = fService.createSession("mysession", "net://172.0.0.1", null, null, new NullProgressMonitor());
+            info = fService.createSession("mysession", "net://172.0.0.1", null, null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("net://172.0.0.1", info.getSessionPath());
@@ -1219,7 +1223,7 @@ public class LTTngControlServiceTest {
             fShell.setScenario(SCEN_CREATE_SESSION_VERBOSE_2_1);
 
             enableVerbose();
-            ISessionInfo info = fService.createSession("mysession", "net://172.0.0.1", null, null, new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("mysession", "net://172.0.0.1", null, null, false, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession", info.getName());
             assertEquals("net://172.0.0.1", info.getSessionPath());
@@ -1229,6 +1233,113 @@ public class LTTngControlServiceTest {
             fail(e.toString());
         } finally {
             disableVerbose();
+        }
+    }
+
+    @Test
+    public void testCreateSnapshotSession() {
+        try {
+            fShell.setScenario(SCEN_CREATE_SNAPSHOT_SESSION);
+
+            ISessionInfo sessionInfo = fService.createSession("mysession", null, true, new NullProgressMonitor());
+            assertNotNull(sessionInfo);
+            assertEquals("mysession", sessionInfo.getName());
+            assertTrue(sessionInfo.isSnapshotSession());
+            assertEquals("", sessionInfo.getSessionPath());
+            assertTrue(!sessionInfo.isStreamedTrace());
+
+            assertEquals(TraceSessionState.INACTIVE, sessionInfo.getSessionState());
+
+            String[] names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names[0], "mysession");
+
+            ISnapshotInfo snapshotInfo = fService.getSnapshotInfo("mysession", new NullProgressMonitor());
+            assertNotNull(snapshotInfo);
+            assertEquals("snapshot-1", snapshotInfo.getName());
+            assertEquals("/home/user/lttng-traces/mysession-20130913-141651", snapshotInfo.getSnapshotPath());
+            assertEquals(1, snapshotInfo.getId());
+            assertTrue(!snapshotInfo.isStreamedSnapshot());
+
+            // we need to set the snapshotInfo to so that the session path is set correctly
+            sessionInfo.setSnapshotInfo(snapshotInfo);
+            assertEquals("/home/user/lttng-traces/mysession-20130913-141651", sessionInfo.getSessionPath());
+
+            fService.recordSnapshot("mysession", new NullProgressMonitor());
+
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    public void testCreateStreamedSnapshotSession() {
+        try {
+            fShell.setScenario(SCEN_CREATE_STREAMED_SNAPSHOT_SESSION);
+
+            ISessionInfo sessionInfo = fService.createSession("mysession", "net://172.0.0.1", null, null, false, new NullProgressMonitor());
+            assertNotNull(sessionInfo);
+            assertEquals("mysession", sessionInfo.getName());
+            assertTrue(sessionInfo.isSnapshotSession());
+
+            assertEquals(TraceSessionState.INACTIVE, sessionInfo.getSessionState());
+            assertTrue(sessionInfo.isStreamedTrace());
+
+            String[] names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names[0], "mysession");
+
+
+            ISnapshotInfo snapshotInfo = sessionInfo.getSnapshotInfo();
+            assertNotNull(sessionInfo);
+            assertEquals("snapshot-2", snapshotInfo.getName());
+            assertEquals("net4://172.0.0.1:5342/", snapshotInfo.getSnapshotPath());
+            assertEquals(2, snapshotInfo.getId());
+            assertTrue(snapshotInfo.isStreamedSnapshot());
+
+            // we need to set the snapshotInfo to so that the session path is set correctly
+            sessionInfo.setSnapshotInfo(snapshotInfo);
+            assertEquals("net4://172.0.0.1:5342/", sessionInfo.getSessionPath());
+
+            fService.recordSnapshot("mysession", new NullProgressMonitor());
+
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+
+    @Test
+    public void testCreateSnapshotSessionErrors() {
+        try {
+            fShell.setScenario(SCEN_CREATE_SNAPSHOT_SESSION_ERRORS);
+
+            String[] names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names[0], "mysession");
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+
+        try {
+            fService.getSnapshotInfo("blabla", new NullProgressMonitor());
+            fail("getSnapshoInfo() didn't fail");
+        } catch (ExecutionException e) {
+            // successful
+        }
+
+        try {
+            fService.recordSnapshot("blabla", new NullProgressMonitor());
+            fail("getSnapshoInfo() didn't fail");
+        } catch (ExecutionException e) {
+            // successful
+        }
+
+        try {
+            fService.recordSnapshot("mysession", new NullProgressMonitor());
+            fail("getSnapshoInfo() didn't fail");
+        } catch (ExecutionException e) {
+            // successful
         }
     }
 

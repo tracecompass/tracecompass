@@ -69,6 +69,13 @@ public class TraceSessionGroup extends TraceControlComponent {
     public boolean isNetworkStreamingSupported() {
         return getTargetNode().isNetworkStreamingSupported();
     }
+    /**
+     * Returns if node supports snapshots or not
+     * @return <code>true</code> if it supports snapshots else <code>false</code>
+     *
+     */    public boolean isSnapshotSupported() {
+        return getTargetNode().isSnapshotSupported();
+    }
 
     // ------------------------------------------------------------------------
     // Operations
@@ -109,13 +116,15 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a session name to create
      * @param sessionPath
      *            - a path for storing the traces (use null for default)
+     * @param isSnapshot
+     *            - true for snapshot session else false
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException {
-        ISessionInfo sessionInfo = getControlService().createSession(sessionName, sessionPath, monitor);
+    public void createSession(String sessionName, String sessionPath, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException {
+        ISessionInfo sessionInfo = getControlService().createSession(sessionName, sessionPath, isSnapshot, monitor);
 
         if (sessionInfo != null) {
             TraceSessionComponent session = new TraceSessionComponent(
@@ -137,13 +146,15 @@ public class TraceSessionGroup extends TraceControlComponent {
      *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
      * @param dataUrl
      *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
+     * @param isSnapshot
+     *            - true for snapshot session else false
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, IProgressMonitor monitor) throws ExecutionException {
-        ISessionInfo sessionInfo = getControlService().createSession(sessionName, networkUrl, controlUrl, dataUrl, monitor);
+    public void createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException {
+        ISessionInfo sessionInfo = getControlService().createSession(sessionName, networkUrl, controlUrl, dataUrl, isSnapshot, monitor);
 
         if (sessionInfo != null) {
             TraceSessionComponent session = new TraceSessionComponent(sessionInfo.getName(), TraceSessionGroup.this);
