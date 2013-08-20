@@ -252,7 +252,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         for (FileAndName traceToImport : fTraces) {
             try {
                 if (fLinked) {
-                    if (TmfImportHelper.createLink(fTargetFolder, Path.fromOSString(traceToImport.getFile().getAbsolutePath()), traceToImport.getName()) != null) {
+                    if (TmfImportHelper.createLink(fTargetFolder, Path.fromOSString(traceToImport.getFile().getAbsolutePath()), traceToImport.getName()) == null) {
                         success = false;
                     }
                     else {

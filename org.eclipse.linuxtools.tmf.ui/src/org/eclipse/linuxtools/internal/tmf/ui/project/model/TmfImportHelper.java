@@ -72,7 +72,7 @@ public class TmfImportHelper {
             }
         }
         forceFolderRefresh(parentFolder);
-        res = parentFolder.findMember(location.lastSegment());
+        res = parentFolder.findMember(targetName);
         return res;
     }
 
