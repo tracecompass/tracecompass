@@ -715,6 +715,7 @@ public final class TmfTraceType {
      * @return Status.OK_Status if successful, error is otherwise.
      * @throws CoreException
      *             An exception caused by accessing eclipse project items.
+     * @since 2.1
      */
     public static IStatus setTraceType(IPath path, TraceTypeHelper traceType) throws CoreException {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
