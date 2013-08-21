@@ -36,7 +36,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
      */
     private final List<IChannelInfo> fChannels = new ArrayList<IChannelInfo>();
     private boolean fIsKernel = false;
-    private BufferType fBufferType = null;
+    private BufferType fBufferType = BufferType.BUFFER_TYPE_UNKNOWN;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -163,7 +163,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
             }
             output.append(",isKernel=");
             output.append(String.valueOf(fIsKernel));
-            if (!fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
+            if ((fBufferType != null) && !fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
                 output.append(",BufferType=");
                 output.append(fBufferType);
             }

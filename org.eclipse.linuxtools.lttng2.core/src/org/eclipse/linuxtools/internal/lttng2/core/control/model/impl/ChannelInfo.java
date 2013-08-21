@@ -76,7 +76,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     /**
      * The value of buffer type
      */
-    private BufferType fBufferType;
+    private BufferType fBufferType = BufferType.BUFFER_TYPE_UNKNOWN;
 
 
     // ------------------------------------------------------------------------
@@ -301,7 +301,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
             output.append(fReadTimer);
             output.append(",output=");
             output.append(fOutputType);
-            if (!fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
+            if ((fBufferType != null) && !fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
                 output.append(",BufferType=");
                 output.append(fBufferType);
             }
