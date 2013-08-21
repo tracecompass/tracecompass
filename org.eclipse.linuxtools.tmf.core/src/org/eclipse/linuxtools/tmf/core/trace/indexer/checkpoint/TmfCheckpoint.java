@@ -14,7 +14,10 @@
 
 package org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
 /**
@@ -39,6 +42,8 @@ public class TmfCheckpoint implements ITmfCheckpoint {
     // The checkpoint timestamp
     private final ITmfTimestamp fTimestamp;
 
+    private final long fCheckpointRank;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -46,13 +51,37 @@ public class TmfCheckpoint implements ITmfCheckpoint {
     /**
      * Full constructor
      *
-     * @param timestamp the checkpoint timestamp
-     * @param location the corresponding trace location
+     * @param timestamp
+     *            the checkpoint timestamp
+     * @param location
+     *            the corresponding trace location
+     * @param checkpointRank
+     *            the rank of the checkpoint
      * @since 3.0
      */
-    public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfLocation location) {
+    public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfLocation location, long checkpointRank) {
         fTimestamp = timestamp;
         fLocation = location;
+        fCheckpointRank = checkpointRank;
+    }
+
+    /**
+     * Constructs a checkpoint using also a byte buffer to read the rank from
+     * disk.
+     *
+     * @param timestamp
+     *            the checkpoint timestamp
+     * @param location
+     *            the corresponding trace location
+     * @param bufferIn
+     *            the byte buffer to read from
+     *
+     * @since 3.0
+     */
+    public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfLocation location, ByteBuffer bufferIn) {
+        fTimestamp = timestamp;
+        fLocation = location;
+        fCheckpointRank = bufferIn.getLong();
     }
 
     /**
@@ -66,6 +95,7 @@ public class TmfCheckpoint implements ITmfCheckpoint {
         }
         fTimestamp = other.fTimestamp;
         fLocation = other.fLocation;
+        fCheckpointRank = other.fCheckpointRank;
     }
 
     // ------------------------------------------------------------------------
@@ -166,7 +196,27 @@ public class TmfCheckpoint implements ITmfCheckpoint {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return getClass().getSimpleName() + " [fLocation=" + fLocation + ", fTimestamp=" + fTimestamp + "]";
+        return getClass().getSimpleName() + " [fLocation=" + fLocation + ", fTimestamp=" + fTimestamp + ", fCheckpointRank=" + fCheckpointRank + "]";
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void serialize(ByteBuffer bufferOut) {
+        fLocation.serialize(bufferOut);
+        // Always serialize as base TmfTimestamp, this should be sufficient for indexing.
+        // If not, we can add API for the test to restore the time stamp, similarly to the location.
+        TmfTimestamp t = new TmfTimestamp(fTimestamp);
+        t.serialize(bufferOut);
+        bufferOut.putLong(fCheckpointRank);
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public long getCheckpointRank() {
+        return fCheckpointRank;
+    }
 }

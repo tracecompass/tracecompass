@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +36,11 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
 
@@ -44,7 +49,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
  *
  * @author Patrick Tassé
  */
-public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
+public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
@@ -396,5 +401,30 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser {
             return Status.OK_STATUS;
         }
         return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
+    }
+
+    private static int fCheckpointSize = -1;
+
+    @Override
+    public synchronized int getCheckpointSize() {
+        if (fCheckpointSize == -1) {
+            TmfCheckpoint c = new TmfCheckpoint(TmfTimestamp.ZERO, new TmfLongLocation(0L), 0);
+            ByteBuffer b = ByteBuffer.allocate(ITmfCheckpoint.MAX_SERIALIZE_SIZE);
+            b.clear();
+            c.serialize(b);
+            fCheckpointSize = b.position();
+        }
+
+        return fCheckpointSize;
+    }
+
+    @Override
+    public ITmfLocation restoreLocation(ByteBuffer bufferIn) {
+        return new TmfLongLocation(bufferIn);
+    }
+
+    @Override
+    protected ITmfTraceIndexer createIndexer(int interval) {
+        return new TmfBTreeTraceIndexer(this, interval);
     }
 }

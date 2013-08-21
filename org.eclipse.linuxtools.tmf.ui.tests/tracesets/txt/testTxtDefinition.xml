@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<CustomTxtTraceDefinitionList>
+<Definition name="testtxt">
+<TimeStampOutputFormat>dd/MM/yyyy HH:mm:ss:SSS</TimeStampOutputFormat>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(\S*\s\S*) (.*\S)</RegEx>
+<InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Time Stamp"/>
+<InputData action="0" format="" name="Message"/>
+</InputLine>
+<OutputColumn name="Time Stamp"/>
+<OutputColumn name="Message"/>
+</Definition>
+</CustomTxtTraceDefinitionList>

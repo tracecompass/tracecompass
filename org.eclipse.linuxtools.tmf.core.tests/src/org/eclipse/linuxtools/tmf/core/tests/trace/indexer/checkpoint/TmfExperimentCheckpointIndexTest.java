@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -34,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.ITmfCheckpointIndex;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
@@ -115,7 +115,7 @@ public class TmfExperimentCheckpointIndexTest {
         assertEquals("getStartTime",   1,          fExperiment.getStartTime().getValue());
         assertEquals("getEndTime",     NB_EVENTS,  fExperiment.getEndTime().getValue());
 
-        List<ITmfCheckpoint> checkpoints = fExperiment.getIndexer().getCheckpoints();
+        ITmfCheckpointIndex checkpoints = fExperiment.getIndexer().getCheckpoints();
         int pageSize = fExperiment.getCacheSize();
         assertTrue("Checkpoints exist",  checkpoints != null);
         assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE, checkpoints.size());
@@ -163,7 +163,7 @@ public class TmfExperimentCheckpointIndexTest {
         experiment.getIndexer().buildIndex(0, range, true);
 
         // Validate that each checkpoint points to the right event
-        List<ITmfCheckpoint> checkpoints = experiment.getIndexer().getCheckpoints();
+        ITmfCheckpointIndex checkpoints = experiment.getIndexer().getCheckpoints();
         assertTrue("Checkpoints exist",  checkpoints != null);
         assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE / 2, checkpoints.size());
 

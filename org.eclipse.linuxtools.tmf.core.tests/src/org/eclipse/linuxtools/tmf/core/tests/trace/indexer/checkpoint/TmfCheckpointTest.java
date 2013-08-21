@@ -44,13 +44,17 @@ public class TmfCheckpointTest {
     private Long aLong1 = 12345L;
     private Long aLong2 = 23456L;
     private Long aLong3 = 34567L;
+    private Long RANK1 = 1L;
+    private Long RANK2 = 2L;
+    private Long RANK3 = 3L;
+
     private ITmfLocation fLocation1 = new TmfLongLocation(aLong1);
     private ITmfLocation fLocation2 = new TmfLongLocation(aLong2);
     private ITmfLocation fLocation3 = new TmfLongLocation(aLong3);
 
-    private TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, fLocation1);
-    private TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, fLocation2);
-    private TmfCheckpoint fCheckpoint3 = new TmfCheckpoint(fTimestamp3, fLocation3);
+    private TmfCheckpoint fCheckpoint1 = new TmfCheckpoint(fTimestamp1, fLocation1, RANK1);
+    private TmfCheckpoint fCheckpoint2 = new TmfCheckpoint(fTimestamp2, fLocation2, RANK2);
+    private TmfCheckpoint fCheckpoint3 = new TmfCheckpoint(fTimestamp3, fLocation3, RANK3);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -104,10 +108,10 @@ public class TmfCheckpointTest {
 
     @Test
     public void testCompareToNull() {
-        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1);
-        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(null, fLocation2);
-        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(null, fLocation3);
-        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(null, fLocation1);
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1, RANK1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(null, fLocation2, RANK2);
+        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(null, fLocation3, RANK3);
+        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(null, fLocation1, RANK1);
 
         // Test the various 'null' vs. '!null' combinations
         assertEquals("compareTo",  0, checkpoint1.compareTo(fCheckpoint1));
@@ -144,8 +148,8 @@ public class TmfCheckpointTest {
 
     @Test
     public void testHashCodeNull() {
-        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1);
-        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp1, null);
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1, RANK1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp1, null, RANK1);
         final TmfCheckpoint checkpoint3 = new TmfCheckpoint(checkpoint1);
         final TmfCheckpoint checkpoint4 = new TmfCheckpoint(checkpoint2);
 
@@ -195,11 +199,11 @@ public class TmfCheckpointTest {
     @Test
     public void testNotEqual() {
         // Various checkpoints
-        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fTimestamp1, fLocation1);
-        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp2, fLocation1);
-        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(fTimestamp1, fLocation2);
-        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(fTimestamp1, null);
-        final TmfCheckpoint checkpoint5 = new TmfCheckpoint(null, fLocation1);
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fTimestamp1, fLocation1, RANK1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp2, fLocation1, RANK1);
+        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(fTimestamp1, fLocation2, RANK2);
+        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(fTimestamp1, null, RANK1);
+        final TmfCheckpoint checkpoint5 = new TmfCheckpoint(null, fLocation1, RANK1);
 
         // Null check
         assertFalse("equals", checkpoint1.equals(null));
@@ -225,11 +229,11 @@ public class TmfCheckpointTest {
     @Test
     public void testToString() {
         final String expected1 = "TmfCheckpoint [fLocation=" + fCheckpoint1.getLocation() +
-                ", fTimestamp=" + fCheckpoint1.getTimestamp() + "]";
+                ", fTimestamp=" + fCheckpoint1.getTimestamp() + ", fCheckpointRank=" + fCheckpoint1.getCheckpointRank() + "]";
         final String expected2 = "TmfCheckpoint [fLocation=" + fCheckpoint2.getLocation() +
-                ", fTimestamp=" + fCheckpoint2.getTimestamp() + "]";
+                ", fTimestamp=" + fCheckpoint2.getTimestamp() + ", fCheckpointRank=" + fCheckpoint2.getCheckpointRank() + "]";
         final String expected3 = "TmfCheckpoint [fLocation=" + fCheckpoint3.getLocation() +
-                ", fTimestamp=" + fCheckpoint3.getTimestamp() + "]";
+                ", fTimestamp=" + fCheckpoint3.getTimestamp() + ", fCheckpointRank=" + fCheckpoint3.getCheckpointRank() + "]";
 
         assertEquals("toString", expected1, fCheckpoint1.toString());
         assertEquals("toString", expected2, fCheckpoint2.toString());

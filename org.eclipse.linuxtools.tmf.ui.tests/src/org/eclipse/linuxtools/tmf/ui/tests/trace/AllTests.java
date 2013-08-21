@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Test suite for Xml parser validation
+ * Test suite for custom parsers
  * @author Matthew Khouzam
  *
  */
@@ -24,7 +24,9 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         CustomXmlTraceInvalidTest.class,
         CustomXmlTraceBadlyFormedTest.class,
-        CustomXmlTraceValidTest.class
+        CustomXmlTraceValidTest.class,
+        CustomXmlIndexTest.class,
+        CustomTxtIndexTest.class
 })
 public class AllTests {
 }

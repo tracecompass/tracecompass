@@ -7,23 +7,25 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Alexandre Montplaisir - Initial API and implementation
+ *     Marc-Andre Laperle - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.tests.trace.indexer.checkpoint;
+package org.eclipse.linuxtools.tmf.core.tests.trace.indexer;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Test suite for org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint
+ * Test suite indexer classes
+ *
+ * @author Marc-Andre Laperle
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    TmfBTreeIndexTest.class,
-    TmfCheckpointIndexTest.class,
-    TmfCheckpointIndexTest2.class,
-    TmfCheckpointTest.class,
-    TmfExperimentCheckpointIndexTest.class,
+    BTreeTest.class,
+    FlatArrayTest.class,
+    TmfMemoryIndexTest.class
 })
-public class AllTests {}
+public class AllTests {
+
+}

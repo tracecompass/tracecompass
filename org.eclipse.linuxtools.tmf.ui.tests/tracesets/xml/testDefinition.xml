@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<CustomXMLTraceDefinitionList>
+<Definition name="myxml">
+<TimeStampOutputFormat>HH:mm:ss:SSS</TimeStampOutputFormat>
+<InputElement name="trace">
+<InputElement logentry="true" name="element">
+<InputData action="0" format="" name="Message"/>
+<Attribute name="time">
+<InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Time Stamp"/>
+</Attribute>
+</InputElement>
+</InputElement>
+<OutputColumn name="Time Stamp"/>
+<OutputColumn name="Message"/>
+</Definition>
+</CustomXMLTraceDefinitionList>

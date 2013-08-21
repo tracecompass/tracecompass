@@ -30,9 +30,9 @@ import java.util.Map;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
@@ -45,6 +45,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
@@ -178,8 +179,8 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         super();
         fCacheSize = (cacheSize > 0) ? cacheSize : ITmfTrace.DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
-        fIndexer = (indexer != null) ? indexer : new TmfCheckpointIndexer(this, fCacheSize);
         fParser = parser;
+        fIndexer = indexer;
         initialize(resource, path, type);
     }
 
@@ -196,9 +197,21 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         }
         fCacheSize = trace.getCacheSize();
         fStreamingInterval = trace.getStreamingInterval();
-        fIndexer = new TmfCheckpointIndexer(this);
         fParser = trace.fParser;
         initialize(trace.getResource(), trace.getPath(), trace.getEventType());
+    }
+
+    /**
+     * Creates the indexer instance. Classes extending this class can override
+     * this to provide a different indexer implementation.
+     *
+     * @param interval the checkpoints interval
+     *
+     * @return the indexer
+     * @since 3.0
+     */
+    protected ITmfTraceIndexer createIndexer(int interval) {
+        return new TmfCheckpointIndexer(this, interval);
     }
 
     // ------------------------------------------------------------------------
@@ -207,7 +220,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
     @Override
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type) throws TmfTraceException {
-        fIndexer = new TmfCheckpointIndexer(this, fCacheSize);
         initialize(resource, path, type);
     }
 
@@ -232,8 +244,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         String traceName = (resource != null) ? resource.getName() : null;
         // If no resource was provided, extract the display name the trace path
         if (traceName == null) {
-            final int sep = path.lastIndexOf(IPath.SEPARATOR);
-            traceName = (sep >= 0) ? path.substring(sep + 1) : path;
+            traceName = new Path(path).lastSegment();
         }
         if (fParser == null) {
             if (this instanceof ITmfEventParser) {
@@ -245,6 +256,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         super.init(traceName, type);
         // register as VIP after super.init() because TmfComponent registers to signal manager there
         TmfSignalManager.registerVIP(this);
+        if (fIndexer == null) {
+            fIndexer = createIndexer(fCacheSize);
+        }
     }
 
     /**
@@ -747,6 +761,21 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     public void traceRangeUpdated(final TmfTraceRangeUpdatedSignal signal) {
         if (signal.getTrace() == this) {
             getIndexer().buildIndex(getNbEvents(), signal.getRange(), false);
+        }
+    }
+
+    /**
+     * Signal handler for the TmfTraceUpdatedSignal signal
+     *
+     * @param signal The incoming signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void traceUpdated(final TmfTraceUpdatedSignal signal) {
+        if (signal.getSource() == getIndexer()) {
+            fNbEvents = signal.getNbEvents();
+            fStartTime = signal.getRange().getStartTime();
+            fEndTime = signal.getRange().getEndTime();
         }
     }
 

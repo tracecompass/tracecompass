@@ -12,7 +12,10 @@
 
 package org.eclipse.linuxtools.tmf.core.trace.location;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 
 /**
  * A concrete implementation of TmfLocation based on ITmfTimestamp:s
@@ -40,9 +43,29 @@ public final class TmfTimestampLocation extends TmfLocation {
         super(other.getLocationInfo());
     }
 
+    /**
+     * Construct the location from the ByteBuffer.
+     *
+     * @param bufferIn
+     *            the buffer to read from
+     *
+     * @since 3.0
+     */
+    public TmfTimestampLocation(ByteBuffer bufferIn) {
+        super(new TmfTimestamp(bufferIn));
+    }
+
     @Override
     public ITmfTimestamp getLocationInfo() {
         return (ITmfTimestamp) super.getLocationInfo();
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void serialize(ByteBuffer bufferOut) {
+        TmfTimestamp t = new TmfTimestamp(getLocationInfo());
+        t.serialize(bufferOut);
+    }
 }
