@@ -424,25 +424,9 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
 
             if (fTargetNodeComponent.isBufferTypeConfigSupported()) {
                 fSharedBuffersButton.setEnabled(false);
-                fUIDBuffersButton.setEnabled(false);
-                fPIDBuffersButton.setEnabled(false);
-
-                if (fDomain.getBufferType() != null) {
-                    switch (fDomain.getBufferType()) {
-                    case BUFFER_PER_PID:
-                        fPIDBuffersButton.setSelection(true);
-                        break;
-                    case BUFFER_PER_UID:
-                        fUIDBuffersButton.setSelection(true);
-                        break;
-                    case BUFFER_SHARED:
-                        fSharedBuffersButton.setSelection(true);
-                        break;
-                        //$CASES-OMITTED$
-                    default:
-                        break;
-                    }
-                }
+                fUIDBuffersButton.setEnabled(!fHasKernel);
+                fPIDBuffersButton.setEnabled(!fHasKernel);
+                setBufferTypeButtonSelection();
             }
         }
 
@@ -585,8 +569,27 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         fNumberOfSubBuffersText.setText(DEFAULT_TEXT);
         fNumberOfSubBuffersText.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
         if (fTargetNodeComponent.isBufferTypeConfigSupported()) {
-            fPIDBuffersButton.setSelection(false);
-            fUIDBuffersButton.setSelection(false);
+            setBufferTypeButtonSelection();
         }
     }
+
+    private void setBufferTypeButtonSelection() {
+        if ((fDomain != null) && fDomain.getBufferType() != null) {
+            switch (fDomain.getBufferType()) {
+            case BUFFER_PER_PID:
+                fPIDBuffersButton.setSelection(true);
+                break;
+            case BUFFER_PER_UID:
+                fUIDBuffersButton.setSelection(true);
+                break;
+            case BUFFER_SHARED:
+                fSharedBuffersButton.setSelection(true);
+                break;
+                //$CASES-OMITTED$
+            default:
+                break;
+            }
+        }
+    }
+
 }
