@@ -576,4 +576,19 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
             experiment.closeEditors();
         }
     }
+
+    /**
+     * Get the instantiated trace associated with this element.
+     *
+     * @return The instantiated trace or null if trace is not (yet) available
+     * @since 2.1
+     */
+    public ITmfTrace getTrace() {
+        for (ITmfTrace trace : TmfTraceManager.getInstance().getOpenedTraces()) {
+            if (trace.getResource().equals(getResource())) {
+                return trace;
+            }
+        }
+        return null;
+    }
 }

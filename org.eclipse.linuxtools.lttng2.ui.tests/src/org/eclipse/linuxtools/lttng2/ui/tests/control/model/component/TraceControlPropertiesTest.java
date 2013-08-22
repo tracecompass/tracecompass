@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEnablement
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceSessionState;
-import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferTypeConstants;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferType;
 import org.eclipse.linuxtools.internal.lttng2.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventComponent;
@@ -238,7 +238,7 @@ public class TraceControlPropertiesTest {
         assertNotNull(domainSource.getPropertyDescriptors());
 
         assertEquals("Kernel", domainSource.getPropertyValue(TraceDomainPropertySource.TRACE_DOMAIN_NAME_PROPERTY_ID));
-        assertEquals(BufferTypeConstants.BUFFER_SHARED, domainSource.getPropertyValue(TraceDomainPropertySource.BUFFER_TYPE_PROPERTY_ID));
+        assertEquals(BufferType.BUFFER_SHARED.getInName(), domainSource.getPropertyValue(TraceDomainPropertySource.BUFFER_TYPE_PROPERTY_ID));
 
         ITraceControlComponent[] channels =  domains[0].getChildren();
         assertNotNull(channels);

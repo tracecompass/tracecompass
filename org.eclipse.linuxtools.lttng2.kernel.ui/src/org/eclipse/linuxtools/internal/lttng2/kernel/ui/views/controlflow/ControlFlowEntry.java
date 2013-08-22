@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
  */
 public class ControlFlowEntry extends TimeGraphEntry {
 
+    private final LttngKernelTrace fTrace;
     private final int fThreadId;
     private final int fParentThreadId;
     private final int fThreadQuark;
@@ -44,7 +45,8 @@ public class ControlFlowEntry extends TimeGraphEntry {
      *            The end time of this process
      */
     public ControlFlowEntry(int quark, LttngKernelTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
-        super(quark, trace, execName, startTime, endTime);
+        super(execName, startTime, endTime);
+        fTrace = trace;
         fThreadId = threadId;
         fParentThreadId = parentThreadId;
         fThreadQuark = quark;
@@ -59,9 +61,13 @@ public class ControlFlowEntry extends TimeGraphEntry {
         return fThreadId;
     }
 
-    @Override
+    /**
+     * Get the entry's kernel trace
+     *
+     * @return the entry's kernel trace
+     */
     public LttngKernelTrace getTrace() {
-        return (LttngKernelTrace) super.getTrace();
+        return fTrace;
     }
 
     /**

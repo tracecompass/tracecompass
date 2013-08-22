@@ -271,7 +271,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         if (fSessions[0].isEventFilteringSupported() && !fIsKernel) {
             String tempFilter = fFilterText.getText();
 
-            if(!tempFilter.matches("\\s*")) { //$NON-NLS-1$
+            if(!tempFilter.isEmpty() && !tempFilter.matches("\\s*")) { //$NON-NLS-1$
                 fFilterExpression = tempFilter;
             }
         }

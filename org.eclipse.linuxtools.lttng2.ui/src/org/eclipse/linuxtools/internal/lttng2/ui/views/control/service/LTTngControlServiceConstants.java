@@ -228,6 +228,10 @@ public interface LTTngControlServiceConstants {
      */
     static final String OPTION_PER_UID_BUFFERS = " --buffers-uid "; //$NON-NLS-1$
     /**
+     * Command line option for per PID buffers
+     */
+    static final String OPTION_PER_PID_BUFFERS = " --buffers-pid "; //$NON-NLS-1$
+    /**
      * Command line option for maximum size of trace files
      */
     static final String OPTION_MAX_SIZE_TRACE_FILES = " -C "; //$NON-NLS-1$

@@ -957,34 +957,39 @@ By default the domain '''Kernel''' is selected. To create a UST channel, select 
 If required update the following channel information and then press '''Ok'''.
 
 * '''Channel Name''': The name of the channel.
-* '''Number of Sub Buffers''': The number of sub-buffers of the channel.
-* '''Overwrite Mode''': The channel overwrite mode ('''true''' or '''false''')
-* '''Read Timer Interval''': The read timer interval.
 * '''Sub Buffer size''': The size of the sub-buffers of the channel (in bytes).
+* '''Number of Sub Buffers''': The number of sub-buffers of the channel.
 * '''Switch Timer Interval''': The switch timer interval.
+* '''Read Timer Interval''': The read timer interval.
+* '''Discard Mode''': '''Overwrite''' events in buffer or '''Discard''' new events when buffer is full.
 
 Upon successful operation, the requested domain will be created under the session tree node as well as the requested channel will be added under the domain. The channel will be '''ENABLED'''.
 
-==== Trace file rotation ====
+==== Configuring Trace File Rotation ====
 
-Since LTTng Tools v2.2.0 it is possible to set the maximum size of trace files and the maximum number of them. These options are located in the same dialog box that is used to enabling channels.
+Since LTTng Tools v2.2.0 it is possible to set the maximum size of trace files and the maximum number of them. These options are located in the same dialog box that is used for enabling channels.
 
 [[Image:images/LTTng2CreateChannelDialogFileRotation.png]]
 
 * '''Maximum size of trace files''': The maximum size of trace files
 * '''Maximum number of trace files''': The maximum number of trace files
 
-==== Per UID buffers ====
+==== Configuring per UID and per PID Buffers (UST only) ====
 
-Since LTTng Tools v2.2.0 it is possible to have one buffer per UID for UST traces. It can be activated in the dialog box when enabling channels.
+Since LTTng Tools v2.2.0 it is possible to configure the type of buffers for '''UST''' application. It is now possible to choose between per '''UID''' buffers (per user ID) and per '''PID''' buffers (per process ID) using the dialog box for enabling channels.
 
 [[Image:images/LTTng2CreateChannelDialogPerUIDBuffers.png]]
 
-* '''Per UID buffers''': To activate the per UID buffers option for UST channel only
+* '''Per PID buffers''': To activate the per PID buffers option for UST channels
+* '''Per UID buffers''': To activate the per UID buffers option for UST channels
 
-==== Periodical flush for metadata ====
+If no buffer type is selected then the default value of the tracer will be configured.
 
-Since LTTng Tools v2.2.0 it is possible to configure periodical flush for the metadata channel. To set this, use the checkbox '''Configure metadata channel''' then use the switcher timer interval for the interval.
+Note that '''Global shared buffers''' is only for kernel channel and is pre-selected when '''Kernel''' is selected in the dalog box.
+
+==== Configuring Periodical Flush for metadata Channel ====
+
+Since LTTng Tools v2.2.0 it is possible to configure periodical flush for the metadata channel. To set this, use the checkbox '''Configure metadata channel''' then fill the switch timer interval.
 
 [[Image:images/LTTng2CreateChannelDialogMetadataFlush.png]]
 
@@ -994,11 +999,7 @@ Once a domain is available, channels can be enabled directly using the domain. T
 
 [[Image:images/LTTng2CreateChannelOnDomainAction.png]]
 
-The dialog box for enabling channel will open for entering information about the channel to be created. Note that the domain is pre-selected and cannot be changed.
-
-[[Image:images/LTTng2CreateChannelOnDomainDialog.png]]
-
-Fill the relevant information and press '''Ok'''.
+The dialog box for enabling channel will open for entering information about the channel to be created. Note that the domain is pre-selected and cannot be changed. Fill the relevant information and press '''Ok'''.
 
 ==== Enabling and Disabling Channels ====
 
@@ -1245,7 +1246,9 @@ A new display will open for selecting the traces to import.
 
 [[Image:images/LTTng2ImportDialog.png]]
 
-Select the trace to be imported by selecting the relevant traces in the tree viewer, select a tracing project from the '''Available Projects''' combo box and select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the the selected traces will be stored in the '''Traces''' directory of the specified tracing project. From the '''Project Explorer''' view, the trace can be analyzed further.
+By default all traces are selected. Also, a default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Also if needed, change the tracing project from the '''Available Projects''' combo box. Select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. For '''Kernel''' traces the trace type '''LTTng Kernel''' and for '''UST''' traces the trace type '''Generic CTF Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
+
+'''Note''': The trace will be imported with a name constructed with information about session, whether it is a kernel or ust trace, ust buffer type (per UID or per PID) and snapshot details. 
 
 '''Note''': If the overwrite button ('''Overwrite existing trace without warning''') was not selected and a trace with the same name of a trace to be imported already exists in the project, then a new confirmation dialog box will open.
 
@@ -1259,11 +1262,7 @@ If the existing trace should not be overwritten select, then select the '''Renam
 
 ==== Importing Network Traces to a Tracing Project ====
 
-Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project|Importing Session Traces to a Tracing Project]]. For network traces a dialog will open for selecting a  project from the list of available tracing projects within the current Eclipse workspace.
-
-[[Image:images/LTTng2ImportSelectTracingProjectDialog.png]]
-
-Select a tracing project from the drop-down menu and then click on '''Next...'''. This will open the default dialog box for importing traces to a tracing project. Follow the instructions in chapter [[#Importing Traces in a Project|Importing Traces in a Project]] to import the network traces of the current session.
+Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project|Importing Session Traces to a Tracing Project]]. For network traces the '''Batch Import Trace Wizard''' will be displayed. Follow the instructions in chapter [[#Batch Importing|Batch Importing]] to import the network traces of the current session. 
 
 === Properties View ===
 

@@ -44,6 +44,15 @@ public interface IImportDialog {
      */
     void setSession(TraceSessionComponent session);
 
+    /**
+     * Sets the default project name to use
+     *
+     * @param defaultProject
+     *            the name of the default project to use
+     */
+    void setDefaultProject(String defaultProject);
+
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

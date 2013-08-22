@@ -234,10 +234,10 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     }
 
     /**
-     * Returns if node supports per UID buffers or not
-     * @return <code>true</code> if node supports per UID buffers else <code>false</code>
+     * Returns if node supports configuring buffer type  or not
+     * @return <code>true</code> if node supports buffer type configuration else <code>false</code>
      */
-    public boolean isPerUIDBuffersSupported() {
+    public boolean isBufferTypeConfigSupported() {
         return getControlService().isVersionSupported("2.2.0"); //$NON-NLS-1$
     }
 

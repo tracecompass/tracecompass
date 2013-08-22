@@ -14,6 +14,8 @@ package org.eclipse.linuxtools.internal.lttng2.core.control.model;
 
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.BufferType;
+
 /**
  * <p>
  * Interface for retrieval of trace channel information.
@@ -142,9 +144,9 @@ public interface IChannelInfo extends ITraceInfo {
      * Sets per UID buffers
      * @param buffersUID - enable or not
      */
-    void setBuffersUID(boolean buffersUID);
+    void setBufferType(BufferType buffersUID);
     /**
      * @return the value of buffersUID (enable or not)
      */
-    boolean isBuffersUID();
+    BufferType getBufferType();
 }
