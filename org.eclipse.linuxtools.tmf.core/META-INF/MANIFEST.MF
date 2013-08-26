@@ -18,6 +18,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse
  org.eclipse.linuxtools.internal.tmf.core.statesystem.backends;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.partial;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.core.statesystem.mipmap;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.trace;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.tmf.core,
  org.eclipse.linuxtools.tmf.core.callstack,
