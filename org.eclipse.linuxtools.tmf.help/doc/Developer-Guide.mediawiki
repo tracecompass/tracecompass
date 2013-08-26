@@ -1133,7 +1133,7 @@ The path and quark of an attribute will remain constant for the whole duration
 of the trace. However, the value carried by the attribute will change. The value
 of a specific attribute at a specific time is called the state value.
 
-In the TMF implementation, state values can be integers, longs, or strings.
+In the TMF implementation, state values can be integers, longs, doubles, or strings.
 There is also a "null value" type, which is used to indicate that no particular
 value is active for this attribute at this time, but without resorting to a
 'null' reference.
@@ -1410,8 +1410,8 @@ inserting state changes in the provider, and is also part of the state intervals
 obtained when doing queries.
 
 The abstract TmfStateValue class contains the factory methods to create new
-state values of either int, long or string types. To retrieve the real object
-inside the state value, one can use the .unbox* methods.
+state values of either int, long, double or string types. To retrieve the real
+object inside the state value, one can use the .unbox* methods.
 
 Note: Do not instantiate null values manually, use TmfStateValue.nullValue()
 
@@ -1501,9 +1501,9 @@ only in the "ongoing" one. It can also be useful for debugging and benchmarking.
 === In-memory history ===
 
 Available with TmfStateSystemFactory#newInMemHistory(). This is a simple wrapper
-using an ArrayList to store all state intervals in memory. The implementation
-at the moment is quite simple, it will iterate through all entries when doing
-queries to find the ones that match.
+using a TreeSet to store all state intervals in memory. The implementation at
+the moment is quite simple, it will perform a binary search on entries when
+doing queries to find the ones that match.
 
 The advantage of this method is that it's very quick to build and query, since
 all the information resides in memory. However, you are limited to 2^31 entries
@@ -1533,6 +1533,42 @@ cases like statistics, where you usually do full queries already, and you store
 lots of small states which are very easy to "compress".
 
 However, it can't really be used until bug 409630 is fixed.
+
+== State System Operations ==
+
+TmfStateSystemOperations is a static class that implements additional
+statistical operations that can be performed on attributes of the state system.
+
+These operations require that the attribute be one of the numerical values
+(int, long or double).
+
+The speed of these operations can be greatly improved for large data sets if
+the attribute was inserted in the state system as a mipmap attribute. Refer to
+the [[#Mipmap feature | Mipmap feature]] section.
+
+===== queryRangeMax() =====
+
+This method returns the maximum numerical value of an attribute in the
+specified time range. The attribute must be of type int, long or double.
+Null values are ignored. The returned value will be of the same state value
+type as the base attribute, or a null value if there is no state interval
+stored in the given time range.
+
+===== queryRangeMin() =====
+
+This method returns the minimum numerical value of an attribute in the
+specified time range. The attribute must be of type int, long or double.
+Null values are ignored. The returned value will be of the same state value
+type as the base attribute, or a null value if there is no state interval
+stored in the given time range.
+
+===== queryRangeAverage() =====
+
+This method returns the average numerical value of an attribute in the
+specified time range. The attribute must be of type int, long or double.
+Each state interval value is weighted according to time. Null values are
+counted as zero. The returned value will be a double primitive, which will
+be zero if there is no state interval stored in the given time range.
 
 == Code example ==
 
@@ -1858,6 +1894,49 @@ public class QueryExample {
         return count;
     }
 }
+</pre>
+
+== Mipmap feature ==
+
+The mipmap feature allows attributes to be inserted into the state system with
+additional computations performed to automatically store sub-attributes that
+can later be used for statistical operations. The mipmap has a resolution which
+represents the number of state attribute changes that are used to compute the
+value at the next mipmap level.
+
+The supported mipmap features are: max, min, and average. Each one of these
+features requires that the base attribute be a numerical state value (int, long
+or double). An attribute can be mipmapped for one or more of the features at
+the same time.
+
+To use a mipmapped attribute in queries, call the corresponding methods of the
+static class [[#State System Operations | TmfStateSystemOperations]].
+
+=== AbstractTmfMipmapStateProvider ===
+
+AbstractTmfMipmapStateProvider is an abstract provider class that allows adding
+features to a specific attribute into a mipmap tree. It extends AbstractTmfStateProvider.
+
+If a provider wants to add mipmapped attributes to its tree, it must extend
+AbstractTmfMipmapStateProvider and call modifyMipmapAttribute() in the event
+handler, specifying one or more mipmap features to compute. Then the structure
+of the attribute tree will be :
+
+<pre>
+|- <attribute>
+|   |- <mipmapFeature> (min/max/avg)
+|   |   |- 1
+|   |   |- 2
+|   |   |- 3
+|   |  ...
+|   |   |- n (maximum mipmap level)
+|   |- <mipmapFeature> (min/max/avg)
+|   |   |- 1
+|   |   |- 2
+|   |   |- 3
+|   |  ...
+|   |   |- n (maximum mipmap level)
+|  ...
 </pre>
 
 = UML2 Sequence Diagram Framework =
