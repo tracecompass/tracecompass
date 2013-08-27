@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkMatchDefinition;
+import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public class TcpEventMatching extends TmfNetworkMatchDefinition {
+public class TcpEventMatching implements ITmfNetworkMatchDefinition {
 
     @Override
     public Direction getDirection(ITmfEvent event) {

@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkMatchDefinition;
+import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -36,7 +36,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public class TcpLttngEventMatching extends TmfNetworkMatchDefinition {
+public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
 
     private static final String[] key_seq = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.SEQ };
     private static final String[] key_ackseq = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.ACKSEQ };

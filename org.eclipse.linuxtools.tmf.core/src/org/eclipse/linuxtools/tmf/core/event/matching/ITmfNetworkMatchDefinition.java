@@ -16,13 +16,13 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
 
 /**
- * Base class for all network match definitions, ie traces with send and receive
+ * Interface for all network match definitions, ie traces with send and receive
  * events
  *
  * @author Geneviève Bastien
  * @since 3.0
  */
-public abstract class TmfNetworkMatchDefinition implements ITmfMatchEventDefinition {
+public interface ITmfNetworkMatchDefinition extends ITmfMatchEventDefinition {
 
     /**
      * Returns the direction of this event, whether 'send', 'receive' or null if
@@ -32,6 +32,6 @@ public abstract class TmfNetworkMatchDefinition implements ITmfMatchEventDefinit
      *            The event to check
      * @return The direction of this event, null if uninteresting event
      */
-    public abstract Direction getDirection(ITmfEvent event);
+    Direction getDirection(ITmfEvent event);
 
 }

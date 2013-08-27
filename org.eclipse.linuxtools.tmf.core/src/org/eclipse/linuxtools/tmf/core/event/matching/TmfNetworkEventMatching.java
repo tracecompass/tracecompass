@@ -119,15 +119,10 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
      */
     @Override
     public void matchEvent(ITmfEvent event, int traceno) {
-        /*
-         * TODO: Should find a way to assert the type is right here. For now we
-         * just hope developers register NetworkMatchDefinition for Network
-         * match types...
-         */
-        TmfNetworkMatchDefinition def = (TmfNetworkMatchDefinition) getEventDefinition(event.getTrace());
-        if (def == null) {
+        if (!(getEventDefinition(event.getTrace()) instanceof ITmfNetworkMatchDefinition)) {
             return;
         }
+        ITmfNetworkMatchDefinition def = (ITmfNetworkMatchDefinition) getEventDefinition(event.getTrace());
 
         Direction evType = def.getDirection(event);
         if (evType == null) {
