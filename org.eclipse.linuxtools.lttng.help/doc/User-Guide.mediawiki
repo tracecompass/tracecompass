@@ -1387,9 +1387,9 @@ This dark yellow is what you'll see most of the time since scheduling puts proce
 
 The vertical blue line with T1 above it is the '''current selection indicator'''. When a time range is selected, the region between the begin and end time of the selection will be shaded and two lines with T1 and T2 above will be displayed. The time stamps corresponding to T1, T2 and their delta are shown in the status line when the mouse is hovering over the control flow.
 
-Arrows can be displayed that follow the execution of each CPU across processes. The arrows indicate when the scheduler switches from one process to another for a given CPU. The CPU being followed is indicated on the state tooltip. When the scheduler switches to or from the idle process, no arrow is displayed.
+Arrows can be displayed that follow the execution of each CPU across processes. The arrows indicate when the scheduler switches from one process to another for a given CPU. The CPU being followed is indicated on the state tooltip. When the scheduler switches to and from the idle process, the arrow skips to the next process which executes on the CPU after the idle process. Note that an appropriate zoom level is required for all arrows to be displayed.
 
-The display of arrows is optional and can be toggled using the '''Hide Arrows''' toolbar button. It is also possible to follow a CPU's execution across state changes and scheduler switching using the '''Follow Arrow Forward/Backward''' toolbar buttons.
+The display of arrows is optional and can be toggled using the '''Hide Arrows''' toolbar button. It is also possible to follow a CPU's execution across state changes and the scheduler's process switching using the '''Follow CPU Forward/Backward''' toolbar buttons.
 
 ==== Using the mouse ====
 
@@ -1490,11 +1490,11 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 | Toggles the display of arrows on or off
 |-
 | [[Image:images/follow_arrow_bwd.gif]]
-| Follow Arrow Backward
+| Follow CPU Backward
 | Selects the previous state following CPU execution across processes
 |-
 | [[Image:images/follow_arrow_fwd.gif]]
-| Follow Arrow Forward
+| Follow CPU Forward
 | Selects the next state following CPU execution across processes
 |}
 

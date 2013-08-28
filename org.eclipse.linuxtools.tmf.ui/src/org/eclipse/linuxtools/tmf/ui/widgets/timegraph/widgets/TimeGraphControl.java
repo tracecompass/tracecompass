@@ -1479,6 +1479,13 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
 
         int x0 = getXForTime(event.getTime());
         int x1 = getXForTime(event.getTime() + event.getDuration());
+
+        // limit the x-coordinates to prevent integer overflow in calculations
+        // and also GC.drawLine doesn't draw properly with large coordinates
+        final int limit = Integer.MAX_VALUE / 1024;
+        x0 = Math.max(-limit, Math.min(x0, limit));
+        x1 = Math.max(-limit, Math.min(x1, limit));
+
         int y0 = src.y + src.height / 2;
         int y1 = dst.y + dst.height / 2;
         drawArrow(getColorScheme(), event, new Rectangle(x0, y0, x1 - x0, y1 - y0), gc);
@@ -1540,8 +1547,8 @@ public class TimeGraphControl extends TimeGraphBaseControl implements FocusListe
         int factor = 10;
         double cos = 0.9510;
         double sin = 0.3090;
-        int lenx = x1 - x0;
-        int leny = y1 - y0;
+        long lenx = x1 - x0;
+        long leny = y1 - y0;
         double len = Math.sqrt(lenx * lenx + leny * leny);
 
         double dx = factor * lenx / len;
