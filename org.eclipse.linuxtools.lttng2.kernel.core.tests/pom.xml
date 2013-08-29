@@ -63,7 +63,7 @@
                 </includes>
                 <useUIHarness>false</useUIHarness>
                 <useUIThread>false</useUIThread>
-                <product>org.eclipse.sdk.ide</product>
+                <product>org.eclipse.platform.ide</product>
             </configuration>
         </plugin>
     </plugins>
