@@ -47,20 +47,26 @@ public class Messages extends NLS {
 
     /** Error opening a trace */
     public static String TmfOpenTraceHelper_ErrorOpeningTrace;
+    /** Error opening an experiment */
+    public static String TmfOpenTraceHelper_ErrorOpeningExperiment;
     /** Could not link trace */
     public static String TmfOpenTraceHelper_LinkFailed;
     /** No trace type match */
     public static String TmfOpenTraceHelper_NoTraceTypeMatch;
     /** Open Trace*/
     public static String TmfOpenTraceHelper_OpenTrace;
+    /** Open Experiment*/
+    public static String TmfOpenTraceHelper_OpenExperiment;
     /** Reduce was too efficient, no candidates found! */
     public static String TmfOpenTraceHelper_ReduceError;
     /** No trace type */
     public static String TmfOpenTraceHelper_NoTraceType;
+    /** Error opening trace*/
+    public static String TmfOpenTraceHelper_ErrorTrace;
+    /** Error opening experiment */
+    public static String TmfOpenTraceHelper_ErrorExperiment;
     /** Init error */
     public static String TmfOpenTraceHelper_InitError;
-    /** Error */
-    public static String TmfOpenTraceHelper_Error;
 
     static {
         // initialize resource bundle

@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.tests.project.model;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -94,8 +93,8 @@ public class ProjectModelTraceTest {
 
         ITmfTrace trace2 = TmfTraceManager.getInstance().getActiveTrace();
 
-        /* The trace was reopened, it is not the same as before */
-        assertFalse(trace2 == trace);
+        /* The trace was reopened, it should be the same as before */
+        assertTrue(trace2 == trace);
 
         /* Here, the getTrace() should return the same as active trace */
         trace = traceElement.getTrace();

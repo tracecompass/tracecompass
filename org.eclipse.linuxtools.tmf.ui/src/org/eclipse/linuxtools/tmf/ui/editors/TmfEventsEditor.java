@@ -41,7 +41,6 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
-import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -55,6 +54,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.Messages;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorContentProvider;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -122,7 +122,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             try {
                 final String traceTypeId = fFile.getPersistentProperty(TmfCommonConstants.TRACETYPE);
                 if (traceTypeId == null) {
-                    throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
+                    throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                 }
                 if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
                     // Special case: experiment bookmark resource
@@ -130,7 +130,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     ncp.getChildren(fFile.getProject()); // force the model to be populated
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
                     if (project == null) {
-                        throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
+                        throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                     }
                     for (final ITmfProjectModelElement projectElement : project.getExperimentsFolder().getChildren()) {
                         final String traceName = fFile.getParent().getName();
@@ -149,12 +149,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                     for (int j = 0; j < i; j++) {
                                         traces[j].dispose();
                                     }
-                                    throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
+                                    throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                                 }
                                 try {
                                     trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 } catch (final TmfTraceException e) {
-                                    throw new PartInitException(Messages.OpenTraceHandler_InitError, e);
+                                    throw new PartInitException(Messages.TmfOpenTraceHelper_InitError, e);
                                 }
                                 cacheSize = Math.min(cacheSize, trace.getCacheSize());
                                 traces[i] = trace;
@@ -178,12 +178,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             final ITmfTrace trace = traceElement.instantiateTrace();
                             final ITmfEvent traceEvent = traceElement.instantiateEvent();
                             if ((trace == null) || (traceEvent == null)) {
-                                throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
+                                throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                             }
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                             } catch (final TmfTraceException e) {
-                                throw new PartInitException(Messages.OpenTraceHandler_InitError, e);
+                                throw new PartInitException(Messages.TmfOpenTraceHelper_InitError, e);
                             }
                             fTrace = trace;
                             break;
@@ -200,12 +200,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             final ITmfTrace trace = traceElement.instantiateTrace();
                             final ITmfEvent traceEvent = traceElement.instantiateEvent();
                             if ((trace == null) || (traceEvent == null)) {
-                                throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
+                                throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                             }
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                             } catch (final TmfTraceException e) {
-                                throw new PartInitException(Messages.OpenTraceHandler_InitError, e);
+                                throw new PartInitException(Messages.TmfOpenTraceHelper_InitError, e);
                             }
                             fTrace = trace;
                             break;
