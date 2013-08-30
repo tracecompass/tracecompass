@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -199,7 +200,7 @@ public class TmfOpenTraceHelper {
 
         final IWorkbench wb = PlatformUI.getWorkbench();
         final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-        final IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
+        final IEditorPart editor = findEditor(new FileEditorInput(file), true);
         if (editor != null) {
             activePage.activate(editor);
             return;
@@ -271,7 +272,7 @@ public class TmfOpenTraceHelper {
 
         final IWorkbench wb = PlatformUI.getWorkbench();
         final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-        final IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
+        final IEditorPart editor = findEditor(new FileEditorInput(file), true);
         if (editor != null) {
             activePage.activate(editor);
             return;
@@ -361,6 +362,32 @@ public class TmfOpenTraceHelper {
         };
         thread.start();
     }
+
+    /**
+    * Returns the editor with the specified input. Returns null if there is no
+    * opened editor with that input. If restore is requested, the method finds
+    * and returns the editor even if it is not restored yet after a restart.
+    *
+    * @param input
+    *            the editor input
+    * @param restore
+    *            true if the editor should be restored
+    * @return an editor with input equals to <code>input</code>
+    */
+    private static IEditorPart findEditor(IEditorInput input, boolean restore) {
+        final IWorkbench wb = PlatformUI.getWorkbench();
+        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        for (IEditorReference editorReference : activePage.getEditorReferences()) {
+            try {
+                IEditorInput editorInput = editorReference.getEditorInput();
+                if (editorInput.equals(input)) {
+                    return editorReference.getEditor(restore);
+                }
+            } catch (PartInitException e) {
+            }
+        }
+        return null;
+   }
 
     /**
      * Reopen a trace from a trace element in the provided editor
