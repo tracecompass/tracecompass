@@ -14,7 +14,7 @@
   <parent>
     <artifactId>linuxtools-lttng-parent</artifactId>
     <groupId>org.eclipse.linuxtools.lttng</groupId>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.linuxtools.tracing.rcp</artifactId>
