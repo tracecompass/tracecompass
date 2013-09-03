@@ -1351,7 +1351,7 @@ The perspective can be opened from the Eclipse Open Perspective dialog ('''Windo
 
 == Control Flow View ==
 
-The '''''Control Flow View''''' is a LTTng-specific view that shows per-process events graphically. To enable it, select ''Control Flow'' under ''LTTng'' within the ''Show View'' window ('''Window''' -> '''Show View''' -> '''Other...'''):
+The '''''Control Flow''''' view is a LTTng-specific view that shows per-process events graphically. To enable it, select ''Control Flow'' under ''LTTng'' within the ''Show View'' window ('''Window''' -> '''Show View''' -> '''Other...'''):
 
 [[Image:images/Cfv_show_view.png]]
 
@@ -1359,11 +1359,11 @@ You should get something like this:
 
 [[Image:images/Cfv_global.png]]
 
-The view is divided into the following important sections: '''<span style="color: #C84545;">process tree</span>''', '''<span style="color: #A1C81A;">process TID, PTID and birth time</span>''', '''<span style="color: #67A3DC;">states flow</span>''' and the '''<span style="color: #AD77D7;">toolbar</span>'''.
+The view is divided into the following important sections: '''process tree and information''', '''control flow''' and the '''toolbar'''.
 
 The following sections provide detailed information for each part of the Control Flow View.
 
-=== Process tree and informations ===
+=== Process tree and information ===
 
 Processes are organized as a tree within this view. This way, child and parent processes are easy to identify.
 
@@ -1371,11 +1371,11 @@ Processes are organized as a tree within this view. This way, child and parent p
 
 The layout is based on the states computed from the trace events.
 
-A given process may be shown at different places within the tree since the nodes are '''unique (TID, birth time) couples'''. This means that if process B of parent A dies, you'll still see it in the tree. If process A forks process B again, it will be shown as a different node since it won't have the same birth time (and probably not the same TID). This has the advantage that the tree, once loaded, never changes: horizontal scrolling within the [[#States flow|states flow]] remains possible.
+A given process may be shown at different places within the tree since the nodes are '''unique (TID, birth time) couples'''. This means that if process B of parent A dies, you'll still see it in the tree. If process A forks process B again, it will be shown as a different node since it won't have the same birth time (and probably not the same TID). This has the advantage that the tree, once loaded, never changes: horizontal scrolling within the [[#Control flow|control flow]] remains possible.
 
 The TID column shows the process node's '''thread ID''' and the PTID column shows its '''parent thread ID''' (nothing is shown if the process has no parent).
 
-=== States flow ===
+=== Control flow ===
 
 This part of the Control Flow View is probably the most interesting one. Using the mouse, you can navigate through the trace (go left, right) and zoom on a specific region to inspect its details.
 
@@ -1385,7 +1385,11 @@ The colored bars you see represent '''states''' for the associated process node.
 
 This dark yellow is what you'll see most of the time since scheduling puts processes on hold while others run.
 
-The vertical blue line is the '''current selection indicator'''. When a time range is selected, the region between the begin and end time of the selection will be shaded.
+The vertical blue line with T1 above it is the '''current selection indicator'''. When a time range is selected, the region between the begin and end time of the selection will be shaded and two lines with T1 and T2 above will be displayed. The time stamps corresponding to T1, T2 and their delta are shown in the status line when the mouse is hovering over the control flow.
+
+Arrows can be displayed that follow the execution of each CPU across processes. The arrows indicate when the scheduler switches from one process to another for a given CPU. The CPU being followed is indicated on the state tooltip. When the scheduler switches to and from the idle process, the arrow skips to the next process which executes on the CPU after the idle process. Note that an appropriate zoom level is required for all arrows to be displayed.
+
+The display of arrows is optional and can be toggled using the '''Hide Arrows''' toolbar button. It is also possible to follow a CPU's execution across state changes and the scheduler's process switching using the '''Follow CPU Forward/Backward''' toolbar buttons.
 
 ==== Using the mouse ====
 
@@ -1435,6 +1439,8 @@ The tooltip indicates:
 
 * the process name
 * the pointed state name
+* the CPU (if applicable)
+* the system call name (if applicable)
 * the pointed state date and start/stop times
 * the pointed state duration (seconds)
 
@@ -1442,17 +1448,58 @@ The tooltip indicates:
 
 The Control Flow View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
-[[Image:images/Cfv_toolbar.png]]
-
-The '''Previous event''' and '''Next event''' buttons update the current time indicator so that it's on the previous or next event.
-
-The '''Previous process''' and '''Next process''' buttons select the previous and next process node within the process tree.
-
-The '''Process filter''' buttons opens a new dialog box for configuring the processes to show.
-
-[[Image:images/LTTng2_CFV_Filter.png]]
+{|
+| [[Image:images/filter_items.gif]]
+| Show View Filter
+| Opens the process filter dialog
+|-
+| [[Image:images/show_legend.gif]]
+| Show Legend
+| Displays the states legend
+|-
+| [[Image:images/home_nav.gif]]
+| Reset the Time Scale to Default
+| Resets the zoom window to the full range
+|-
+| [[Image:images/prev_event.gif]]
+| Select Previous Event
+| Selects the previous state for the selected process
+|-
+| [[Image:images/next_event.gif]]
+| Select Next Event
+| Selects the next state for the selected process
+|-
+| [[Image:images/prev_menu.gif]]
+| Select Previous Process
+| Selects the previous process
+|-
+| [[Image:images/next_menu.gif]]
+| Select Next Process
+| Selects the next process
+|-
+| [[Image:images/zoomin_nav.gif]]
+| Zoom In
+| Zooms in on the selection by 50%
+|-
+| [[Image:images/zoomout_nav.gif]]
+| Zoom Out
+| Zooms out on the selection by 50%
+|-
+| [[Image:images/hide_arrows.gif]]
+| Hide Arrows
+| Toggles the display of arrows on or off
+|-
+| [[Image:images/follow_arrow_bwd.gif]]
+| Follow CPU Backward
+| Selects the previous state following CPU execution across processes
+|-
+| [[Image:images/follow_arrow_fwd.gif]]
+| Follow CPU Forward
+| Selects the next state following CPU execution across processes
+|}
 
 == Resources View ==
+
 This view is specific to kernel trace. To open it, go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''LTTng/Resources''' in the list.
 
 [[Image:images/Rv_example.png| Example of resources view with all trace points and syscalls enabled]]
@@ -1488,11 +1535,39 @@ See Control Flow View's '''[[#Incomplete_regions|Incomplete regions]]'''.
 
 The Resources View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
-[[Image:images/Rv_toolbar.png]]
-
-The '''Previous event''' and '''Next event''' buttons update the current time indicator so that it's on the previous or next event.
-
-The '''Previous resource''' and '''Next resource''' buttons select the previous and next resource node within the resource tree.
+{|
+| [[Image:images/show_legend.gif]]
+| Show Legend
+| Displays the states legend
+|-
+| [[Image:images/home_nav.gif]]
+| Reset the Time Scale to Default
+| Resets the zoom window to the full range
+|-
+| [[Image:images/prev_event.gif]]
+| Select Previous Event
+| Selects the previous state for the selected resource
+|-
+| [[Image:images/next_event.gif]]
+| Select Next Event
+| Selects the next state for the selected resource
+|-
+| [[Image:images/prev_menu.gif]]
+| Select Previous Resource
+| Selects the previous resource
+|-
+| [[Image:images/next_menu.gif]]
+| Select Next Resource
+| Selects the next resource
+|-
+| [[Image:images/zoomin_nav.gif]]
+| Zoom In
+| Zooms in on the selection by 50%
+|-
+| [[Image:images/zoomout_nav.gif]]
+| Zoom Out
+| Zooms out on the selection by 50%
+|}
 
 == LTTng Kernel Events Editor ==
 

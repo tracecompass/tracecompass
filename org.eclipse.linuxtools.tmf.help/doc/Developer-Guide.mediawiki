@@ -914,15 +914,17 @@ Received by components that need to be notified of a new trace event count.
 
 ''Purpose''
 
-This signal is used to indicate that a new time has been selected.
+This signal is used to indicate that a new time or time range has been
+selected. It contains a begin and end time. If a single time is selected then
+the begin and end time are the same.
 
 ''Senders''
 
-Sent by any component that allows the user to select a time.
+Sent by any component that allows the user to select a time or time range.
 
 ''Receivers''
 
-Received by any component that needs to be notified of the currently selected time.
+Received by any component that needs to be notified of the currently selected time or time range.
 
 === TmfRangeSynchSignal ===
 

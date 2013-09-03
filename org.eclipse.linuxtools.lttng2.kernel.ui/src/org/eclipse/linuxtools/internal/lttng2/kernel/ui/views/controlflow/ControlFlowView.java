@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
@@ -102,9 +103,19 @@ public class ControlFlowView extends AbstractTimeGraphView {
         if (section == null) {
             section = settings.addNewSection(getClass().getName());
         }
-        manager.add(getTimeGraphCombo().getTimeGraphViewer().getHideArrowsAction(section));
-        manager.add(getTimeGraphCombo().getTimeGraphViewer().getFollowArrowBwdAction());
-        manager.add(getTimeGraphCombo().getTimeGraphViewer().getFollowArrowFwdAction());
+
+        IAction hideArrowsAction = getTimeGraphCombo().getTimeGraphViewer().getHideArrowsAction(section);
+        manager.add(hideArrowsAction);
+
+        IAction followArrowBwdAction = getTimeGraphCombo().getTimeGraphViewer().getFollowArrowBwdAction();
+        followArrowBwdAction.setText(Messages.ControlFlowView_followCPUBwdText);
+        followArrowBwdAction.setToolTipText(Messages.ControlFlowView_followCPUBwdText);
+        manager.add(followArrowBwdAction);
+
+        IAction followArrowFwdAction = getTimeGraphCombo().getTimeGraphViewer().getFollowArrowFwdAction();
+        followArrowFwdAction.setText(Messages.ControlFlowView_followCPUFwdText);
+        followArrowFwdAction.setToolTipText(Messages.ControlFlowView_followCPUFwdText);
+        manager.add(followArrowFwdAction);
     }
 
     @Override
@@ -463,22 +474,34 @@ public class ControlFlowView extends AbstractTimeGraphView {
                     }
                     List<Integer> currentThreadQuarks = ssq.getQuarks(Attributes.CPUS, "*", Attributes.CURRENT_THREAD); //$NON-NLS-1$
                     for (int currentThreadQuark : currentThreadQuarks) {
-                        List<ITmfStateInterval> currentThreadIntervals = ssq.queryHistoryRange(currentThreadQuark, start, end, resolution, monitor);
+                        // adjust the query range to include the previous and following intervals
+                        long qstart = Math.max(ssq.querySingleState(start, currentThreadQuark).getStartTime() - 1, ssq.getStartTime());
+                        long qend = Math.min(ssq.querySingleState(end, currentThreadQuark).getEndTime() + 1, ssq.getCurrentEndTime());
+                        List<ITmfStateInterval> currentThreadIntervals = ssq.queryHistoryRange(currentThreadQuark, qstart, qend, resolution, monitor);
                         int prevThread = 0;
                         long prevEnd = 0;
+                        long lastEnd = 0;
                         for (ITmfStateInterval currentThreadInterval : currentThreadIntervals) {
                             if (monitor.isCanceled()) {
                                 return null;
                             }
                             long time = currentThreadInterval.getStartTime();
+                            if (time != lastEnd) {
+                                // don't create links where there are gaps in intervals due to the resolution
+                                prevThread = 0;
+                                prevEnd = 0;
+                            }
                             int thread = currentThreadInterval.getStateValue().unboxInt();
-                            if (thread > 0 && prevThread > 0 && thread != prevThread && time == prevEnd) {
+                            if (thread > 0 && prevThread > 0) {
                                 ITimeGraphEntry prevEntry = findEntry(entryList, trace, prevThread);
                                 ITimeGraphEntry nextEntry = findEntry(entryList, trace, thread);
-                                list.add(new TimeLinkEvent(prevEntry, nextEntry, time, 0, 0));
+                                list.add(new TimeLinkEvent(prevEntry, nextEntry, prevEnd, time - prevEnd, 0));
                             }
-                            prevThread = thread;
-                            prevEnd = currentThreadInterval.getEndTime() + 1;
+                            lastEnd = currentThreadInterval.getEndTime() + 1;
+                            if (thread != 0) {
+                                prevThread = thread;
+                                prevEnd = lastEnd;
+                            }
                         }
                     }
                 } catch (TimeRangeException e) {

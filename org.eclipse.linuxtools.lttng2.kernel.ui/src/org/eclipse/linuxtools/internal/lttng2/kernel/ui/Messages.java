@@ -29,6 +29,8 @@ public class Messages extends NLS {
     public static String ControlFlowView_nextProcessActionToolTipText;
     public static String ControlFlowView_previousProcessActionNameText;
     public static String ControlFlowView_previousProcessActionToolTipText;
+    public static String ControlFlowView_followCPUBwdText;
+    public static String ControlFlowView_followCPUFwdText;
 
     public static String ControlFlowView_attributeSyscallName;
     public static String ControlFlowView_attributeCpuName;

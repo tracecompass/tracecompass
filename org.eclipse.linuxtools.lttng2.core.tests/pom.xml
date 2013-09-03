@@ -37,7 +37,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.2</version>
+            <version>1.7</version>
             <executions>
                 <execution>
                     <id>prepare</id>
@@ -62,7 +62,7 @@
                 <testClass>org.eclipse.linuxtools.lttng2.core.tests.AllTests</testClass>
                 <useUIHarness>false</useUIHarness>
                 <useUIThread>false</useUIThread>
-                <product>org.eclipse.sdk.ide</product>
+                <product>org.eclipse.platform.ide</product>
             </configuration>
         </plugin>
     </plugins>
