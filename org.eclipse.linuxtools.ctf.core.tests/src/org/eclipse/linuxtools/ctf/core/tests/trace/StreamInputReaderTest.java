@@ -16,12 +16,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.File;
 import java.nio.channels.FileChannel;
 import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
+import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
@@ -41,7 +42,7 @@ import org.junit.Test;
 @SuppressWarnings("javadoc")
 public class StreamInputReaderTest {
 
-    private static final int TRACE_INDEX = 0;
+    private static final CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
     private StreamInputReader fixture;
 
@@ -59,8 +60,8 @@ public class StreamInputReaderTest {
     }
 
     private static StreamInputReader getStreamInputReader() throws CTFReaderException {
-        assumeTrue(CtfTestTraces.tracesExist());
-        CTFTrace trace = CtfTestTraces.getTestTrace(TRACE_INDEX);
+        assumeTrue(testTrace.exists());
+        CTFTrace trace = testTrace.getTrace();
         Stream s = trace.getStream((long) 0);
         Set<StreamInput> streamInput = s.getStreamInputs();
         StreamInputReader retVal = null;
@@ -95,7 +96,7 @@ public class StreamInputReaderTest {
     @Test(expected = CTFReaderException.class)
     public void testStreamInputReader_invalid() throws CTFReaderException {
         StreamInput streamInput = new StreamInput(
-                new Stream(new CTFTrace("")), (FileChannel) null, CtfTestTraces.getEmptyFile());
+                new Stream(new CTFTrace("")), (FileChannel) null, new File(""));
 
         StreamInputReader result = new StreamInputReader(streamInput);
         assertNotNull(result);

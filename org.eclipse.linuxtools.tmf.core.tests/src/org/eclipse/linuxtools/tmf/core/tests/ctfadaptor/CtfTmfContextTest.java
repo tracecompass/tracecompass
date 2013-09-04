@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfContext;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ import org.junit.Test;
  */
 public class CtfTmfContextTest {
 
-    private static final int TRACE_INDEX = 0;
+    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
     private static final long begin = 1332170682440133097L; /* Trace start time */
     private static final long end = 1332170692664579801L; /* Trace end time */
 
@@ -58,9 +58,9 @@ public class CtfTmfContextTest {
      */
     @Before
     public void setUp() throws TmfTraceException {
-        assumeTrue(CtfTmfTestTraces.tracesExist());
+        assumeTrue(testTrace.exists());
         trace = new CtfTmfTrace();
-        String path = CtfTmfTestTraces.getTestTracePath(TRACE_INDEX);
+        String path = testTrace.getPath();
         trace.initTrace((IResource) null, path, CtfTmfEvent.class);
     }
 

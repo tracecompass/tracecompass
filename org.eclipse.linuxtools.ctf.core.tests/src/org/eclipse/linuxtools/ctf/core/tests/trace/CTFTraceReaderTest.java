@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
+import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
@@ -35,7 +35,7 @@ import org.junit.Test;
 @SuppressWarnings("javadoc")
 public class CTFTraceReaderTest {
 
-    private static final int TRACE_INDEX = 0;
+    private static final CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
     private CTFTraceReader fixture;
 
@@ -46,8 +46,8 @@ public class CTFTraceReaderTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        assumeTrue(CtfTestTraces.tracesExist());
-        fixture = new CTFTraceReader(CtfTestTraces.getTestTrace(TRACE_INDEX));
+        assumeTrue(testTrace.exists());
+        fixture = new CTFTraceReader(testTrace.getTrace());
     }
 
     /**
@@ -58,7 +58,7 @@ public class CTFTraceReaderTest {
      */
     @Test
     public void testOpen_existing() throws CTFReaderException {
-        CTFTrace trace = CtfTestTraces.getTestTrace(TRACE_INDEX);
+        CTFTrace trace = testTrace.getTrace();
 
         CTFTraceReader result = new CTFTraceReader(trace);
         assertNotNull(result);
@@ -155,7 +155,7 @@ public class CTFTraceReaderTest {
      */
     @Test
     public void testEquals() throws CTFReaderException {
-        CTFTraceReader fixture2 = new CTFTraceReader(CtfTestTraces.getTestTrace(TRACE_INDEX));
+        CTFTraceReader fixture2 = new CTFTraceReader(testTrace.getTrace());
         assertEquals(fixture, fixture2);
     }
 

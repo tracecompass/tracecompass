@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventFactory;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -43,7 +43,7 @@ import org.junit.Test;
  */
 public class CtfTmfEventTest {
 
-    private static final int TRACE_INDEX = 0;
+    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
 
     private static CtfTmfEvent nullEvent;
     private CtfTmfEvent fixture;
@@ -61,8 +61,8 @@ public class CtfTmfEventTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(CtfTmfTestTraces.tracesExist());
-        CtfTmfTrace trace = CtfTmfTestTraces.getTestTrace(TRACE_INDEX);
+        assumeTrue(testTrace.exists());
+        CtfTmfTrace trace = testTrace.getTrace();
         CtfIterator tr = new CtfIterator(trace);
         tr.advance();
         fixture = tr.getCurrentEvent();

@@ -20,7 +20,6 @@ import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKer
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,13 +35,13 @@ public class PartialStateSystemTest extends StateSystemTest {
      */
     @BeforeClass
     public static void initialize() {
-        assumeTrue(CtfTmfTestTraces.tracesExist());
+        assumeTrue(testTrace.exists());
         File stateFile = null;
         try {
             stateFile = File.createTempFile("test-partial", ".ht");
             stateFile.deleteOnExit();
 
-            input = new LttngKernelStateProvider(CtfTmfTestTraces.getTestTrace(TRACE_INDEX));
+            input = new LttngKernelStateProvider(testTrace.getTrace());
             ssq = TmfStateSystemFactory.newPartialHistory(stateFile, input, true);
         } catch (IOException e) {
             e.printStackTrace();

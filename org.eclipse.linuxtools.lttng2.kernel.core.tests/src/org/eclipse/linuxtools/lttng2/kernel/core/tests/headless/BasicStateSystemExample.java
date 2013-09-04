@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 
 /**
  * Simple example of how to use the state system using a CTF kernel trace.
@@ -43,7 +43,7 @@ public class BasicStateSystemExample {
         /* Read a trace and build the state system */
         try {
             File newStateFile = new File("/tmp/helloworldctf.ht");
-            ITmfStateProvider input = new LttngKernelStateProvider(CtfTmfTestTraces.getTestTrace(1));
+            ITmfStateProvider input = new LttngKernelStateProvider(CtfTmfTestTrace.TRACE2.getTrace());
             ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(newStateFile, input, true);
 
             requestExample(ss);

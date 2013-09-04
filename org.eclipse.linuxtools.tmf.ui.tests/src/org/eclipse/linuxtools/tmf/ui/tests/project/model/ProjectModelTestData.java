@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -40,8 +40,7 @@ public class ProjectModelTestData {
     /** Default test project name */
     public static final String PROJECT_NAME = "Test_Project";
 
-    private static final int TRACE_INDEX = 0;
-    private static final String PATH = CtfTmfTestTraces.getTestTracePath(TRACE_INDEX);
+    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
 
     /**
      * Gets a project element with traces all initialized
@@ -56,7 +55,7 @@ public class ProjectModelTestData {
         IFolder traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
 
         /* Create a trace, if it exist, it will be replaced */
-        File file = new File(PATH);
+        File file = new File(testTrace.getPath());
         String path = file.getAbsolutePath();
         final IPath pathString = Path.fromOSString(path);
         IResource linkedTrace = TmfImportHelper.createLink(traceFolder, pathString, pathString.lastSegment());
@@ -79,7 +78,7 @@ public class ProjectModelTestData {
      * @return The trace name
      */
     public static String getTraceName() {
-        File file = new File(PATH);
+        File file = new File(testTrace.getPath());
         String path = file.getAbsolutePath();
         final IPath pathString = Path.fromOSString(path);
         return pathString.lastSegment();
