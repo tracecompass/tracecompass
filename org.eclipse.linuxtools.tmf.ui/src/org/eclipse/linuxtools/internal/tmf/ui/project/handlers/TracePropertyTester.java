@@ -95,6 +95,7 @@ public class TracePropertyTester extends PropertyTester {
                 for (TmfTraceElement aTrace : trace.getTraces()) {
                     hasHistory |= aTrace.hasSupplementaryResources();
                 }
+                hasHistory |= trace.hasSupplementaryResources();
                 return hasHistory;
             }
             return false;
