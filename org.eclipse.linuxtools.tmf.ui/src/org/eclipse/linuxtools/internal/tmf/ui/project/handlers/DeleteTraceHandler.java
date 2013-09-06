@@ -126,24 +126,29 @@ public class DeleteTraceHandler extends AbstractHandler {
                     trace.closeEditors();
 
                     IPath path = resource.getLocation();
-                    if (path != null && (trace.getParent() instanceof TmfTraceFolder)) {
-                        TmfExperimentFolder experimentFolder = trace.getProject().getExperimentsFolder();
-
-                        // Propagate the removal to traces
-                        for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
-                            List<ITmfProjectModelElement> toRemove = new LinkedList<ITmfProjectModelElement>();
-                            for (ITmfProjectModelElement child : experiment.getChildren()) {
-                                if (child.getName().equals(trace.getName())) {
-                                    toRemove.add(child);
+                    if (path != null) {
+                        if (trace.getParent() instanceof TmfTraceFolder) {
+                            // Propagate the removal to experiments
+                            TmfExperimentFolder experimentFolder = trace.getProject().getExperimentsFolder();
+                            for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
+                                List<ITmfProjectModelElement> toRemove = new LinkedList<ITmfProjectModelElement>();
+                                for (ITmfProjectModelElement child : experiment.getChildren()) {
+                                    if (child.getName().equals(trace.getName())) {
+                                        toRemove.add(child);
+                                    }
+                                }
+                                for (ITmfProjectModelElement child : toRemove) {
+                                    ((TmfExperimentElement) experiment).removeTrace((TmfTraceElement) child);
                                 }
                             }
-                            for (ITmfProjectModelElement child : toRemove) {
-                                ((TmfExperimentElement) experiment).removeTrace((TmfTraceElement) child);
-                            }
-                        }
 
-                        // Delete supplementary files
-                        trace.deleteSupplementaryFolder();
+                            // Delete supplementary files
+                            trace.deleteSupplementaryFolder();
+
+                        } else if (trace.getParent() instanceof TmfExperimentElement) {
+                            TmfExperimentElement experimentElement = (TmfExperimentElement) trace.getParent();
+                            experimentElement.removeTrace(trace);
+                        }
                     }
 
                     // Finally, delete the trace

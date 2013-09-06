@@ -186,7 +186,7 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
         /* Finally, remove the trace from experiment*/
         removeChild(trace);
         trace.getResource().delete(true, null);
-
+        deleteSupplementaryResources();
     }
 
     private static void setProperties(IResource resource, String bundleName,
