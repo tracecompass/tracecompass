@@ -23,7 +23,10 @@ final class StringStateValue extends TmfStateValue {
     private final String valueStr;
 
     public StringStateValue(String valueAsString) {
-        assert (valueAsString != null);
+        if (valueAsString == null) {
+            /* Should not happen, see factory methods in TmfStateValue */
+            throw new IllegalArgumentException();
+        }
         this.valueStr = valueAsString;
     }
 
@@ -44,6 +47,15 @@ final class StringStateValue extends TmfStateValue {
 
     @Override
     public String toString() {
+        return valueStr;
+    }
+
+    // ------------------------------------------------------------------------
+    // Unboxing methods
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String unboxStr() {
         return valueStr;
     }
 }

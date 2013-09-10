@@ -45,4 +45,13 @@ final class LongStateValue extends TmfStateValue {
     public String toString() {
         return String.format("%3d", valueLong); //$NON-NLS-1$
     }
+
+    // ------------------------------------------------------------------------
+    // Unboxing methods
+    // ------------------------------------------------------------------------
+
+    @Override
+    public long unboxLong() {
+        return valueLong;
+    }
 }

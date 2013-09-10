@@ -128,7 +128,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                         try {
                             trace.initTrace(tl.get(i).getResource(), tl.get(i).getLocation().getPath(), traceEvent.getClass());
                         } catch (TmfTraceException e) {
-                            TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.OpenTraceHandler_InitError + CR + CR + e);
+                            TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_InitError + CR + CR + e);
                             trace.dispose();
                             for (int j = 0; j < i; j++) {
                                 traces[j].dispose();
@@ -234,7 +234,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
 
                     } catch (TmfTraceException e) {
                         Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingExperiment, exp.getName()), e);
-                        TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.OpenExperimentHandler_Error + CR + CR + e.getMessage());
+                        TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_Error + CR + CR + e.getMessage());
                     }
                 }
             };

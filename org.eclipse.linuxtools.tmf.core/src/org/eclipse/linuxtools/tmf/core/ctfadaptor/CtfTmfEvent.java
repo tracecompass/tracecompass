@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public final class CtfTmfEvent extends TmfEvent
+public class CtfTmfEvent extends TmfEvent
         implements ITmfSourceLookup, ITmfModelLookup, ITmfCustomAttributes {
 
     // ------------------------------------------------------------------------

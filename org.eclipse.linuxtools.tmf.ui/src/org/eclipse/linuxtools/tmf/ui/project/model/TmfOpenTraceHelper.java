@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Patrick Tasse - Update open trace and add open experiment
  **********************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -33,6 +34,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfTraceImportExcept
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.swt.widgets.Display;
@@ -40,6 +42,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -173,17 +176,36 @@ public class TmfOpenTraceHelper {
         if (found == null) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TmfOpenTraceHelper_ErrorOpeningTrace);
         }
-        return openTraceFromElement(found);
+        openTraceFromElement(found);
+        return Status.OK_STATUS;
     }
 
     /**
-     * Open a trace from a TmfTraceElement
+     * Open a trace from a trace element. If the trace is already opened,
+     * its editor is activated and brought to top.
      *
      * @param traceElement
      *            the {@link TmfTraceElement} to open
-     * @return Status.OK_STATUS
      */
-    public static IStatus openTraceFromElement(final TmfTraceElement traceElement) {
+    public static void openTraceFromElement(final TmfTraceElement traceElement) {
+
+        final IFile file;
+        try {
+            file = traceElement.createBookmarksFile();
+        } catch (final CoreException e) {
+            Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ' ' + traceElement.getName());
+            TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_ErrorTrace + ENDL + ENDL + e.getMessage());
+            return;
+        }
+
+        final IWorkbench wb = PlatformUI.getWorkbench();
+        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        final IEditorPart editor = findEditor(new FileEditorInput(file), true);
+        if (editor != null) {
+            activePage.activate(editor);
+            return;
+        }
+
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -191,16 +213,13 @@ public class TmfOpenTraceHelper {
                 final ITmfTrace trace = traceElement.instantiateTrace();
                 final ITmfEvent traceEvent = traceElement.instantiateEvent();
                 if ((trace == null) || (traceEvent == null)) {
+                    TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_NoTraceType);
                     if (trace != null) {
-                        TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_NoTraceType);
                         trace.dispose();
                     }
                     return;
                 }
 
-                // Get the editor_id from the extension point
-                String traceEditorId = traceElement.getEditorId();
-                final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
                 try {
                     trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                 } catch (final TmfTraceException e) {
@@ -209,35 +228,21 @@ public class TmfOpenTraceHelper {
                     return;
                 }
 
-                final IFile file;
-                try {
-                    file = traceElement.createBookmarksFile();
-                } catch (final CoreException e) {
-                    Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningTrace + traceElement.getName());
-                    TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_Error + ENDL + ENDL + e.getMessage());
-                    trace.dispose();
-                    return;
-                }
+                // Get the editor id from the extension point
+                String traceEditorId = traceElement.getEditorId();
+                final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
+                final IEditorInput editorInput = new TmfEditorInput(file, trace);
 
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            final IEditorInput editorInput = new TmfEditorInput(file, trace);
-                            final IWorkbench wb = PlatformUI.getWorkbench();
-                            final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-                            final IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
-                            if ((editor != null) && (editor instanceof IReusableEditor)) {
-                                activePage.reuseEditor((IReusableEditor) editor, editorInput);
-                                activePage.activate(editor);
-                            } else {
-                                activePage.openEditor(editorInput, editorId);
-                                IDE.setDefaultEditor(file, editorId);
-                                // editor should dispose the trace on close
-                            }
+                            activePage.openEditor(editorInput, editorId);
+                            IDE.setDefaultEditor(file, editorId);
+                            // editor should dispose the trace on close
                         } catch (final PartInitException e) {
                             TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ENDL + ENDL + e.getMessage());
-                            Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningTrace + traceElement.getName());
+                            Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ' ' + traceElement.getName());
                             trace.dispose();
                         }
                     }
@@ -245,7 +250,290 @@ public class TmfOpenTraceHelper {
             }
         };
         thread.start();
-        return Status.OK_STATUS;
+    }
+
+    /**
+     * Open an experiment from an experiment element. If the experiment is already opened,
+     * its editor is activated and brought to top.
+     *
+     * @param experimentElement
+     *            the {@link TmfExperimentElement} to open
+     */
+    public static void openExperimentFromElement(final TmfExperimentElement experimentElement) {
+
+        final IFile file;
+        try {
+            file = experimentElement.createBookmarksFile();
+        } catch (final CoreException e) {
+            Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningExperiment + ' ' + experimentElement.getName());
+            TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment, Messages.TmfOpenTraceHelper_ErrorExperiment + ENDL + ENDL + e.getMessage());
+            return;
+        }
+
+        final IWorkbench wb = PlatformUI.getWorkbench();
+        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        final IEditorPart editor = findEditor(new FileEditorInput(file), true);
+        if (editor != null) {
+            activePage.activate(editor);
+            return;
+        }
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+
+                /* Unlike traces, there is no instanceExperiment, so we call this function
+                 * here alone.  Maybe it would be better to do this on experiment's element
+                 * constructor?
+                 */
+                experimentElement.refreshSupplementaryFolder();
+
+                // Instantiate the experiment's traces
+                final List<TmfTraceElement> traceEntries = experimentElement.getTraces();
+                final int nbTraces = traceEntries.size();
+                int cacheSize = Integer.MAX_VALUE;
+                String commonEditorId = null;
+                final ITmfTrace[] traces = new ITmfTrace[nbTraces];
+                for (int i = 0; i < nbTraces; i++) {
+                    TmfTraceElement element = traceEntries.get(i);
+
+                    // Since trace is under an experiment, use the original trace from the traces folder
+                    element = element.getElementUnderTraceFolder();
+
+                    final ITmfTrace trace = element.instantiateTrace();
+                    final ITmfEvent traceEvent = element.instantiateEvent();
+                    if ((trace == null) || (traceEvent == null)) {
+                        TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment,
+                                Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ' ' + element.getName() +
+                                ENDL + Messages.TmfOpenTraceHelper_NoTraceType);
+                        for (int j = 0; j < i; j++) {
+                            traces[j].dispose();
+                        }
+                        if (trace != null) {
+                            trace.dispose();
+                        }
+                        return;
+                    }
+                    try {
+                        trace.initTrace(element.getResource(), element.getLocation().getPath(), traceEvent.getClass());
+                    } catch (final TmfTraceException e) {
+                        TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment,
+                                element.getName() + ':' + ' ' + Messages.TmfOpenTraceHelper_InitError + ENDL + ENDL + e);
+                        for (int j = 0; j < i; j++) {
+                            traces[j].dispose();
+                        }
+                        trace.dispose();
+                        return;
+                    }
+                    cacheSize = Math.min(cacheSize, trace.getCacheSize());
+
+                    // If all traces use the same editorId, use it, otherwise use the default
+                    final String editorId = element.getEditorId();
+                    if (commonEditorId == null) {
+                        commonEditorId = (editorId != null) ? editorId : TmfEventsEditor.ID;
+                    } else if (!commonEditorId.equals(editorId)) {
+                        commonEditorId = TmfEventsEditor.ID;
+                    }
+                    traces[i] = trace;
+                }
+
+                // Create the experiment
+                final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, experimentElement.getName(), traces, cacheSize, experimentElement.getResource());
+                experiment.setBookmarksFile(file);
+
+                final String editorId = commonEditorId;
+                final IEditorInput editorInput = new TmfEditorInput(file, experiment);
+
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            activePage.openEditor(editorInput, editorId);
+                            IDE.setDefaultEditor(file, editorId);
+                            // editor should dispose the trace on close
+                        } catch (final PartInitException e) {
+                            TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment, Messages.TmfOpenTraceHelper_ErrorOpeningExperiment + ENDL + ENDL + e.getMessage());
+                            Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningExperiment + ' ' + experimentElement.getName());
+                            experiment.dispose();
+                        }
+                    }
+                });
+            }
+        };
+        thread.start();
+    }
+
+    /**
+    * Returns the editor with the specified input. Returns null if there is no
+    * opened editor with that input. If restore is requested, the method finds
+    * and returns the editor even if it is not restored yet after a restart.
+    *
+    * @param input
+    *            the editor input
+    * @param restore
+    *            true if the editor should be restored
+    * @return an editor with input equals to <code>input</code>
+    */
+    private static IEditorPart findEditor(IEditorInput input, boolean restore) {
+        final IWorkbench wb = PlatformUI.getWorkbench();
+        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        for (IEditorReference editorReference : activePage.getEditorReferences()) {
+            try {
+                IEditorInput editorInput = editorReference.getEditorInput();
+                if (editorInput.equals(input)) {
+                    return editorReference.getEditor(restore);
+                }
+            } catch (PartInitException e) {
+            }
+        }
+        return null;
+   }
+
+    /**
+     * Reopen a trace from a trace element in the provided editor
+     *
+     * @param traceElement
+     *            the {@link TmfTraceElement} to open
+     * @param editor
+     *            the reusable editor
+     */
+    public static void reopenTraceFromElement(final TmfTraceElement traceElement, final IReusableEditor editor) {
+
+        final IFile file;
+        try {
+            file = traceElement.createBookmarksFile();
+        } catch (final CoreException e) {
+            Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ' ' + traceElement.getName());
+            TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_ErrorTrace + ENDL + ENDL + e.getMessage());
+            return;
+        }
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+
+                final ITmfTrace trace = traceElement.instantiateTrace();
+                final ITmfEvent traceEvent = traceElement.instantiateEvent();
+                if ((trace == null) || (traceEvent == null)) {
+                    TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_NoTraceType);
+                    if (trace != null) {
+                        trace.dispose();
+                    }
+                    return;
+                }
+
+                try {
+                    trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
+                } catch (final TmfTraceException e) {
+                    TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenTrace, Messages.TmfOpenTraceHelper_InitError + ENDL + ENDL + e);
+                    trace.dispose();
+                    return;
+                }
+
+                final IEditorInput editorInput = new TmfEditorInput(file, trace);
+
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        final IWorkbench wb = PlatformUI.getWorkbench();
+                        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+                        activePage.reuseEditor(editor, editorInput);
+                        activePage.activate(editor);
+                    }
+                });
+            }
+        };
+        thread.start();
+    }
+
+    /**
+     * Reopen an experiment from an experiment element in the provided editor
+     *
+     * @param experimentElement
+     *            the {@link TmfExperimentElement} to open
+     * @param editor
+     *            the reusable editor
+     */
+    public static void reopenExperimentFromElement(final TmfExperimentElement experimentElement, final IReusableEditor editor) {
+
+        final IFile file;
+        try {
+            file = experimentElement.createBookmarksFile();
+        } catch (final CoreException e) {
+            Activator.getDefault().logError(Messages.TmfOpenTraceHelper_ErrorOpeningExperiment + ' ' + experimentElement.getName());
+            TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment, Messages.TmfOpenTraceHelper_ErrorExperiment + ENDL + ENDL + e.getMessage());
+            return;
+        }
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+
+                /* Unlike traces, there is no instanceExperiment, so we call this function
+                 * here alone.  Maybe it would be better to do this on experiment's element
+                 * constructor?
+                 */
+                experimentElement.refreshSupplementaryFolder();
+
+                // Instantiate the experiment's traces
+                final List<TmfTraceElement> traceEntries = experimentElement.getTraces();
+                final int nbTraces = traceEntries.size();
+                int cacheSize = Integer.MAX_VALUE;
+                final ITmfTrace[] traces = new ITmfTrace[nbTraces];
+                for (int i = 0; i < nbTraces; i++) {
+                    TmfTraceElement element = traceEntries.get(i);
+
+                    // Since trace is under an experiment, use the original trace from the traces folder
+                    element = element.getElementUnderTraceFolder();
+
+                    final ITmfTrace trace = element.instantiateTrace();
+                    final ITmfEvent traceEvent = element.instantiateEvent();
+                    if ((trace == null) || (traceEvent == null)) {
+                        TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment,
+                                Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ' ' + element.getName() +
+                                ENDL + Messages.TmfOpenTraceHelper_NoTraceType);
+                        for (int j = 0; j < i; j++) {
+                            traces[j].dispose();
+                        }
+                        if (trace != null) {
+                            trace.dispose();
+                        }
+                        return;
+                    }
+                    try {
+                        trace.initTrace(element.getResource(), element.getLocation().getPath(), traceEvent.getClass());
+                    } catch (final TmfTraceException e) {
+                        TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment,
+                                element.getName() + ':' + ' ' + Messages.TmfOpenTraceHelper_InitError + ENDL + ENDL + e);
+                        for (int j = 0; j < i; j++) {
+                            traces[j].dispose();
+                        }
+                        trace.dispose();
+                        return;
+                    }
+                    cacheSize = Math.min(cacheSize, trace.getCacheSize());
+
+                    traces[i] = trace;
+                }
+
+                // Create the experiment
+                final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, experimentElement.getName(), traces, cacheSize, experimentElement.getResource());
+                experiment.setBookmarksFile(file);
+
+                final IEditorInput editorInput = new TmfEditorInput(file, experiment);
+
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        final IWorkbench wb = PlatformUI.getWorkbench();
+                        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+                        activePage.reuseEditor(editor, editorInput);
+                        activePage.activate(editor);
+                    }
+                });
+            }
+        };
+        thread.start();
     }
 
 }

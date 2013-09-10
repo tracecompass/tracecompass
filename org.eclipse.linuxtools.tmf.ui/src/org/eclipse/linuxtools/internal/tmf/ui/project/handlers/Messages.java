@@ -26,16 +26,6 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.tmf.ui.project.handlers.messages"; //$NON-NLS-1$
 
-    public static String OpenTraceHandler_Title;
-    public static String OpenTraceHandler_NoTraceType;
-    public static String OpenTraceHandler_InitError;
-    public static String OpenTraceHandler_Error;
-
-    public static String OpenExperimentHandler_Title;
-    public static String OpenExperimentHandler_NoTraceType;
-    public static String OpenExperimentHandler_InitError;
-    public static String OpenExperimentHandler_Error;
-
     public static String DeleteDialog_Title;
     public static String DeleteTraceHandler_Message;
     public static String DeleteTraceHandler_Error;
@@ -51,6 +41,7 @@ public class Messages extends NLS {
     public static String DropAdapterAssistant_RenameTraceTitle;
     public static String DropAdapterAssistant_RenameTraceMessage;
 
+    public static String SynchronizeTracesHandler_InitError;
     public static String SynchronizeTracesHandler_CopyProblem;
     public static String SynchronizeTracesHandler_WrongType;
     public static String SynchronizeTracesHandler_WrongTraceNumber;

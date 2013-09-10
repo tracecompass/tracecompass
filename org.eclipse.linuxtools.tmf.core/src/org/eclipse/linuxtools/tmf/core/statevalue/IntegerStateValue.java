@@ -45,4 +45,19 @@ final class IntegerStateValue extends TmfStateValue {
     public String toString() {
         return String.format("%3d", valueInt); //$NON-NLS-1$
     }
+
+    // ------------------------------------------------------------------------
+    // Unboxing methods
+    // ------------------------------------------------------------------------
+
+    @Override
+    public int unboxInt() {
+        return valueInt;
+    }
+
+    @Override
+    public long unboxLong() {
+        /* It's always safe to up-cast a int into a long */
+        return valueInt;
+    }
 }

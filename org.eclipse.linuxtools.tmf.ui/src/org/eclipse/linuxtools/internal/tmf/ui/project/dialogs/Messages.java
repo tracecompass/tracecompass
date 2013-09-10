@@ -7,7 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *     Francois Chouinard - Initial API and implementation
+ *     Marc-Andre Laperle - Add select/deselect all
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.dialogs;
@@ -24,6 +25,8 @@ public class Messages extends NLS {
 
     public static String SelectSpplementaryResources_DialogTitle;
     public static String SelectSpplementaryResources_ResourcesGroupTitle;
+    public static String SelectSpplementaryResources_SelectAll;
+    public static String SelectSpplementaryResources_DeselectAll;
 
     static {
         // initialize resource bundle

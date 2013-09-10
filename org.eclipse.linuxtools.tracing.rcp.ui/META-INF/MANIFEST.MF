@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.core.commands,
  org.eclipse.linuxtools.tmf.ui;bundle-version="2.0.0",
  org.eclipse.linuxtools.tmf.core;bundle-version="2.0.0",
  org.eclipse.update.configurator;bundle-version="3.3.200",
- org.eclipse.equinox.p2.ui.sdk;bundle-version="1.0.300"
+ org.eclipse.equinox.p2.ui.sdk
 Export-Package: org.eclipse.linuxtools.internal.tracing.rcp.ui;x-internal:=true,
  org.eclipse.linuxtools.internal.tracing.rcp.ui.cli;x-internal:=true,
  org.eclipse.linuxtools.internal.tracing.rcp.ui.commands;x-internal:=true,
