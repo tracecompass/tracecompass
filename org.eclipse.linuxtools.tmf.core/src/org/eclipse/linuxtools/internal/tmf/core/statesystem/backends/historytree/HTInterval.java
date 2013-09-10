@@ -37,10 +37,12 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
     private static final byte TYPE_INTEGER = 0;
     private static final byte TYPE_STRING = 1;
     private static final byte TYPE_LONG = 2;
+    private static final byte TYPE_DOUBLE = 3;
 
     /* String entry sizes of different state values */
     private static final int NO_ENTRY_SIZE = 0;
     private static final int LONG_ENTRY_SIZE = 8;
+    private static final int DOUBLE_ENTRY_SIZE = 8;
     // sizes of string values depend on the string itself
 
     private final long start;
@@ -183,6 +185,21 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
              */
             buffer.reset();
             break;
+
+        case TYPE_DOUBLE:
+            /* Go read the matching entry in the Strings section of the block */
+            buffer.mark();
+            buffer.position(valueOrOffset);
+            value = TmfStateValue.newValueDouble(buffer.getDouble());
+            valueSize = DOUBLE_ENTRY_SIZE;
+
+            /*
+             * Restore the file pointer's position (so we can read the next
+             * interval)
+             */
+            buffer.reset();
+            break;
+
         default:
             /* Unknown data, better to not make anything up... */
             throw new IOException(errMsg);
@@ -279,6 +296,28 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
             buffer.reset();
             break;
 
+        case TYPE_DOUBLE:
+            /* we use the valueOffset as an offset. */
+            buffer.putInt(endPosOfStringEntry - stringsEntrySize);
+            buffer.mark();
+            buffer.position(endPosOfStringEntry - stringsEntrySize);
+
+            /* Write the Double in the Strings section */
+            try {
+                buffer.putDouble(sv.unboxDouble());
+            } catch (StateValueTypeException e) {
+                /*
+                 * This should not happen, since the value told us it was of
+                 * type Double (corrupted value?)
+                 */
+                e.printStackTrace();
+            }
+            if (buffer.position() != endPosOfStringEntry) {
+                throw new IllegalStateException();
+            }
+            buffer.reset();
+            break;
+
         default:
             break;
         }
@@ -342,6 +381,9 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
         case LONG:
             /* The value's bytes are written directly into the strings section */
             return LONG_ENTRY_SIZE;
+        case DOUBLE:
+            /* The value is also written directly into the strings section */
+            return DOUBLE_ENTRY_SIZE;
         case STRING:
             try {
                 /* String's length + 2 (1 byte for size, 1 byte for \0 at the end */
@@ -419,6 +461,8 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
             return TYPE_STRING;
         case LONG:
             return TYPE_LONG;
+        case DOUBLE:
+            return TYPE_DOUBLE;
         default:
             /* Should not happen if the switch is fully covered */
             throw new IllegalStateException();

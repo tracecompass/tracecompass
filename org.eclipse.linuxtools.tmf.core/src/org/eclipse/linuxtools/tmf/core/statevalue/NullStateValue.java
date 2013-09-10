@@ -58,6 +58,11 @@ final class NullStateValue extends TmfStateValue {
     }
 
     @Override
+    public double unboxDouble() {
+        return Double.NaN;
+    }
+
+    @Override
     public String unboxStr() {
         return "nullValue"; //$NON-NLS-1$
     }

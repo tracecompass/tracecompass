@@ -357,6 +357,10 @@ public class TmfStateSystemExplorer extends TmfView {
                 value = String.valueOf(state.unboxLong());
                 item.setText(TYPE_COL, Messages.TypeLong);
                 break;
+            case DOUBLE:
+                value = String.valueOf(state.unboxDouble());
+                item.setText(TYPE_COL, Messages.TypeDouble);
+                break;
             case STRING:
                 value = state.unboxStr();
                 item.setText(TYPE_COL, Messages.TypeString);
@@ -503,7 +507,7 @@ public class TmfStateSystemExplorer extends TmfView {
         };
         thread.start();
     }
-    
+
     /**
      * Update the display to use the updated timestamp format
      *
