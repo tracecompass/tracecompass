@@ -20,7 +20,7 @@ import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
-import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTraces;
+import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
@@ -39,7 +39,7 @@ import org.junit.Test;
 @SuppressWarnings("javadoc")
 public class EventDeclarationTest {
 
-    private static final int TRACE_INDEX = 0;
+    private static final CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
     private EventDeclaration fixture;
 
@@ -50,12 +50,12 @@ public class EventDeclarationTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        assumeTrue(CtfTestTraces.tracesExist());
+        assumeTrue(testTrace.exists());
         fixture = new EventDeclaration();
         fixture.setContext(new StructDeclaration(1L));
         fixture.setId(1L);
         fixture.setFields(new StructDeclaration(1L));
-        fixture.setStream(new Stream(CtfTestTraces.getTestTrace(TRACE_INDEX)));
+        fixture.setStream(new Stream(testTrace.getTrace()));
         fixture.setName("");
     }
 
@@ -99,7 +99,7 @@ public class EventDeclarationTest {
         obj.setContext(new StructDeclaration(1L));
         obj.setId(1L);
         obj.setFields(new StructDeclaration(1L));
-        obj.setStream(new Stream(CtfTestTraces.getTestTrace(TRACE_INDEX)));
+        obj.setStream(new Stream(testTrace.getTrace()));
         obj.setName("");
 
         assertTrue(fixture.equals(fixture));
@@ -316,7 +316,7 @@ public class EventDeclarationTest {
      */
     @Test
     public void testEventDefinition() throws CTFReaderException {
-        CTFTrace trace = CtfTestTraces.getTestTrace(TRACE_INDEX);
+        CTFTrace trace = testTrace.getTrace();
         CTFTraceReader tr = new CTFTraceReader(trace);
         tr.advance();
         EventDefinition ed = new EventDefinition(null, null);

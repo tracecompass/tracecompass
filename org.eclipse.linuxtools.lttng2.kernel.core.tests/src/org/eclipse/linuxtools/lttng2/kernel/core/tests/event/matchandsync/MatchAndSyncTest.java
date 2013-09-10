@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpLttngEventMat
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.Test;
 
 /**
@@ -37,8 +37,8 @@ public class MatchAndSyncTest {
     @Test
     public void testMatching() {
         final String cr = System.getProperty("line.separator");
-        CtfTmfTrace trace1 = CtfTmfTestTraces.getTestTrace(3);
-        CtfTmfTrace trace2 = CtfTmfTestTraces.getTestTrace(4);
+        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
+        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
 
         CtfTmfTrace[] tracearr = new CtfTmfTrace[2];
         tracearr[0] = trace1;

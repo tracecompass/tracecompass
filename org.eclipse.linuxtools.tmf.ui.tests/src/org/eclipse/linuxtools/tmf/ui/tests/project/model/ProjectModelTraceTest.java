@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
@@ -41,7 +41,7 @@ public class ProjectModelTraceTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(CtfTmfTestTraces.tracesExist());
+        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
         try {
             fixture = ProjectModelTestData.getFilledProject();
         } catch (CoreException e) {

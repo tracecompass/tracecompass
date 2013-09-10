@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -42,8 +42,7 @@ public class EventContextTest {
     // ------------------------------------------------------------------------
 
     /* We use test trace #2, kernel_vm, which has event contexts */
-    private static final int TRACE_INDEX = 2;
-    private static final String PATH = CtfTmfTestTraces.getTestTracePath(TRACE_INDEX);
+    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL_VM;
 
     private static CtfTmfTrace fixture;
     private static long startTime;
@@ -61,9 +60,9 @@ public class EventContextTest {
      */
     @BeforeClass
     public static void setUp() throws TmfTraceException {
-        assumeTrue(CtfTmfTestTraces.tracesExist());
+        assumeTrue(testTrace.exists());
         fixture = new CtfTmfTrace();
-        fixture.initTrace((IResource) null, PATH, CtfTmfEvent.class);
+        fixture.initTrace((IResource) null, testTrace.getPath(), CtfTmfEvent.class);
         fixture.indexTrace(true);
 
         startTime = fixture.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();

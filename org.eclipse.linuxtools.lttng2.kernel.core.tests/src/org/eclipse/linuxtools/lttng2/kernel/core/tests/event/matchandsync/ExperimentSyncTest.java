@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransform;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.junit.After;
@@ -49,8 +49,8 @@ public class ExperimentSyncTest {
      */
     @Before
     public void setUp() {
-        CtfTmfTrace trace1 = CtfTmfTestTraces.getTestTrace(3);
-        CtfTmfTrace trace2 = CtfTmfTestTraces.getTestTrace(4);
+        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
+        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
 
         fTraces = new CtfTmfTrace[2];
         fTraces[0] = trace1;

@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -67,9 +67,10 @@ public class TmfTraceManagerTest {
      */
     @BeforeClass
     public static void setUpClass() {
-        assumeTrue(CtfTmfTestTraces.tracesExist());
-        trace1 = CtfTmfTestTraces.getTestTrace(1);
-        trace2 = CtfTmfTestTraces.getTestTrace(0);
+        assumeTrue(CtfTmfTestTrace.TRACE2.exists());
+        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
+        trace1 = CtfTmfTestTrace.TRACE2.getTrace();
+        trace2 = CtfTmfTestTrace.KERNEL.getTrace();
 
         trace1.indexTrace(true);
         trace2.indexTrace(true);

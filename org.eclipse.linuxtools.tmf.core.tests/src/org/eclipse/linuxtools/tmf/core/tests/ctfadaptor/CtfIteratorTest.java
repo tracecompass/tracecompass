@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationInfo;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTraces;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import org.junit.Test;
  */
 public class CtfIteratorTest {
 
-    private static final int TRACE_INDEX = 0;
+    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
 
     private CtfIterator fixture;
 
@@ -47,8 +47,8 @@ public class CtfIteratorTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(CtfTmfTestTraces.tracesExist());
-        fixture = new CtfIterator(getTrace());
+        assumeTrue(testTrace.exists());
+        fixture = new CtfIterator(testTrace.getTrace());
         CtfLocation ctfLocation = new CtfLocation(new CtfLocationInfo(1, 0));
         fixture.setLocation(ctfLocation);
         fixture.increaseRank();
@@ -64,16 +64,12 @@ public class CtfIteratorTest {
         }
     }
 
-    private static CtfTmfTrace getTrace() {
-        return CtfTmfTestTraces.getTestTrace(TRACE_INDEX);
-    }
-
     /**
      * Run the CtfIterator(CtfTmfTrace) constructor on a non init'ed trace.
      */
     @Test
     public void testCtfIterator_noinit() {
-        CtfTmfTrace trace = getTrace();
+        CtfTmfTrace trace = testTrace.getTrace();
         CtfIterator result = new CtfIterator(trace);
         assertNotNull(result);
     }
@@ -83,7 +79,7 @@ public class CtfIteratorTest {
      */
     @Test
     public void testCtfIterator_init() {
-        CtfTmfTrace trace = getTrace();
+        CtfTmfTrace trace = testTrace.getTrace();
         trace.init("test");
         CtfIterator result = new CtfIterator(trace);
 
@@ -96,7 +92,7 @@ public class CtfIteratorTest {
      */
     @Test
     public void testCtfIterator_position() {
-        CtfTmfTrace trace = getTrace();
+        CtfTmfTrace trace = testTrace.getTrace();
         long timestampValue = 1L;
         long rank = 1L;
         CtfIterator result = new CtfIterator(trace, new CtfLocationInfo(timestampValue, 0), rank);
@@ -128,7 +124,7 @@ public class CtfIteratorTest {
      */
     @Test
     public void testCompareTo() {
-        CtfIterator o = new CtfIterator(getTrace());
+        CtfIterator o = new CtfIterator(testTrace.getTrace());
         int result = fixture.compareTo(o);
 
         assertEquals(1L, result);
@@ -140,7 +136,7 @@ public class CtfIteratorTest {
      */
     @Test
     public void testEquals_other() {
-        CtfIterator obj = new CtfIterator(getTrace());
+        CtfIterator obj = new CtfIterator(testTrace.getTrace());
         CtfLocation ctfLocation1 = new CtfLocation(new CtfLocationInfo(1, 0));
         obj.setLocation(ctfLocation1);
         obj.increaseRank();

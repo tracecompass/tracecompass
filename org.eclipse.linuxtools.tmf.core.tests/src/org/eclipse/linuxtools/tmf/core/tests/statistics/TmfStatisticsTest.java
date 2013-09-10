@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
+import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.Test;
 
 /**
@@ -28,8 +29,8 @@ import org.junit.Test;
  */
 public abstract class TmfStatisticsTest {
 
-    /** The index of the test trace used for these tests */
-    protected static final int TRACE_INDEX = 0;
+    /** Test trace used for these tests */
+    protected static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
 
     /** The statistics back-end object */
     protected static ITmfStatistics backend;
