@@ -290,9 +290,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     /**
      * Build the state system(s) associated with this trace type.
      *
-     * Suppressing the warning, because the 'throws' will usually happen in
-     * sub-classes.
-     *
      * @return An IStatus indicating if the state system could be build
      *         successfully or not.
      * @since 3.0
