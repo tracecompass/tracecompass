@@ -27,7 +27,7 @@ final class DoubleStateValue extends TmfStateValue {
 
     @Override
     public Type getType() {
-        return Type.INTEGER;
+        return Type.DOUBLE;
     }
 
     @Override

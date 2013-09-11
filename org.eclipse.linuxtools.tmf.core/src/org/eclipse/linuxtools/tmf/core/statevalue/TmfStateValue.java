@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
  * example, we can save numerical values as integers instead of arrays of
  * 1-digit characters.
  *
- * For now the two available types are either int or String.
+ * The available types are Int, Long, Double and String.
  *
  * @version 1.0
  * @author Alexandre Montplaisir
@@ -159,7 +159,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
 
     private String unboxErrMsg(String targetType) {
         return "Type " + getClass().getSimpleName() + //$NON-NLS-1$
-                "cannot be unboxed into a " + targetType + " value."; //$NON-NLS-1$ //$NON-NLS-2$
+                " cannot be unboxed into a " + targetType + " value."; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
