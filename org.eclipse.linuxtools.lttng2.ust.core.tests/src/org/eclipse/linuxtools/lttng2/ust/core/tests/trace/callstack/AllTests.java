@@ -7,20 +7,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Alexandre Montplaisir - Initial API and implementation
+ *   Alexandre Montplaisir - Initial implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.ust.core.tests;
+package org.eclipse.linuxtools.lttng2.ust.core.tests.trace.callstack;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Runner for the lttng2.kernel unit tests.
+ * Test suite for org.eclipse.linuxtools.lttng2.ust.core.tests.trace.callstack
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ActivatorTest.class,
-    org.eclipse.linuxtools.lttng2.ust.core.tests.trace.callstack.AllTests.class
+    LttngUstCallStackProviderFastTest.class,
+    LttngUstCallStackProviderTest.class
 })
-public class AllTests { }
+public class AllTests {
+
+}

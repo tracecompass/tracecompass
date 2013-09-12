@@ -27,16 +27,27 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 public enum CtfTestTrace {
     /** Example kernel trace */
     KERNEL("../org.eclipse.linuxtools.ctf.core.tests/traces/kernel"),
+
     /** Another kernel trace */
     TRACE2("../org.eclipse.linuxtools.ctf.core.tests/traces/trace2"),
+
     /** Kernel trace with event contexts */
     KERNEL_VM("../org.eclipse.linuxtools.ctf.core.tests/traces/kernel_vm"),
+
     /** Trace synchronization: source trace */
     SYNC_SRC("../org.eclipse.linuxtools.ctf.core.tests/traces/synctraces/scp_src"),
+
     /** Trace synchronization: destination trace */
     SYNC_DEST("../org.eclipse.linuxtools.ctf.core.tests/traces/synctraces/scp_dest"),
+
     /** UST trace with lots of lost events */
-    HELLO_LOST("../org.eclipse.linuxtools.ctf.core.tests/traces/hello-lost");
+    HELLO_LOST("../org.eclipse.linuxtools.ctf.core.tests/traces/hello-lost"),
+
+    /** UST trace with lttng-ust-cyg-profile events (aka -finstrument-functions) */
+    CYG_PROFILE("../org.eclipse.linuxtools.ctf.core.tests/traces/cyg-profile/glxgears-cyg-profile"),
+
+    /** UST trace with lttng-ust-cyg-profile-fast events (no address in func_exit) */
+    CYG_PROFILE_FAST("../org.eclipse.linuxtools.ctf.core.tests/traces/cyg-profile/glxgears-cyg-profile-fast");
 
 
     private final String fPath;

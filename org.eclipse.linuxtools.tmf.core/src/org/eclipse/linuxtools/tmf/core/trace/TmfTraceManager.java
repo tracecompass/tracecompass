@@ -374,12 +374,18 @@ public final class TmfTraceManager {
     }
 
     /**
-     * Get a temporary directory based on a trace's name
+     * Get a temporary directory based on a trace's name. We will create the
+     * directory if it doesn't exist, so that it's ready to be used.
      */
     private static String getTemporaryDir(ITmfTrace trace) {
-        return System.getProperty("java.io.tmpdir") + //$NON-NLS-1$
+        String pathName = System.getProperty("java.io.tmpdir") + //$NON-NLS-1$
             File.separator +
             trace.getName() +
             File.separator;
+        File dir = new File(pathName);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return pathName;
     }
 }
