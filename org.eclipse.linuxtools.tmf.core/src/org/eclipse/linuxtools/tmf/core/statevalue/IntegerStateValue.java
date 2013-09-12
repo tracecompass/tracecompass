@@ -68,7 +68,7 @@ final class IntegerStateValue extends TmfStateValue {
 
     @Override
     public long unboxLong() {
-        /* It's always safe to up-cast a int into a long */
+        /* It's always safe to up-cast an int into a long */
         return value;
     }
 }

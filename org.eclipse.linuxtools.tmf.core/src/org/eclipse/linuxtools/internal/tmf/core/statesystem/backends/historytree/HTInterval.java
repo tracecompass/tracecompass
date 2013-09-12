@@ -237,8 +237,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
 
         case TYPE_NULL:
         case TYPE_INTEGER:
-            /* We write the 'valueOffset' field as a straight value. In the case
-             * of a null value, it will be unboxed as -1 */
+            /* We write the 'valueOffset' field as a straight value. */
             try {
                 buffer.putInt(sv.unboxInt());
             } catch (StateValueTypeException e) {
