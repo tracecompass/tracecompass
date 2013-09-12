@@ -36,6 +36,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -88,13 +89,9 @@ public class TmfEventTest {
     // ------------------------------------------------------------------------
 
     private static TmfTraceStub openTrace() {
-        final String DIRECTORY = "testfiles";
-        final String TEST_STREAM = "A-Test-10K";
-        final String path = DIRECTORY + File.separator + TEST_STREAM;
-
         TmfTraceStub trace = null;
         try {
-            final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
+            final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TmfTestTrace.A_TEST_10K.getFullPath()), null);
             final File test = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(test.toURI().getPath(), 500, false);
         } catch (final TmfTraceException e) {
