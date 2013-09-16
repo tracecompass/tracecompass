@@ -87,15 +87,11 @@
                     <exclude>*.sh</exclude>
                   </excludes>
                 </fileset>
-                <fileset>
-                  <directory>traces/kernel</directory>
-                </fileset>
-                <fileset>
-                  <directory>traces/trace2</directory>
-                </fileset>
-                <fileset>
-                  <directory>traces/ctf-testsuite</directory>
-                </fileset>
+                <fileset><directory>traces/ctf-testsuite</directory></fileset>
+                <fileset><directory>traces/hello-lost</directory></fileset>
+                <fileset><directory>traces/kernel</directory></fileset>
+                <fileset><directory>traces/kernel_vm</directory></fileset>
+                <fileset><directory>traces/trace2</directory></fileset>
               </filesets>
             </configuration>
             <goals>

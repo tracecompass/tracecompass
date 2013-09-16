@@ -36,6 +36,8 @@ public enum CtfTmfTestTrace {
     SYNC_SRC,
     /** Trace synchronization: destination trace */
     SYNC_DEST;
+    /** UST trace with lots of lost events */
+    HELLO_LOST;
 
 
     private final String fPath;

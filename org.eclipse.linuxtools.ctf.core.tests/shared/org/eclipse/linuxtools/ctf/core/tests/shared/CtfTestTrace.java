@@ -35,6 +35,8 @@ public enum CtfTestTrace {
     SYNC_SRC("../org.eclipse.linuxtools.ctf.core.tests/traces/synctraces/scp_src"),
     /** Trace synchronization: destination trace */
     SYNC_DEST("../org.eclipse.linuxtools.ctf.core.tests/traces/synctraces/scp_dest");
+    /** UST trace with lots of lost events */
+    HELLO_LOST("../org.eclipse.linuxtools.ctf.core.tests/traces/hello-lost");
 
 
     private final String fPath;

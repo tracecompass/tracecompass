@@ -22,6 +22,9 @@ wget http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2 -O- | tar xvjf -
 # Trace using event contexts
 wget http://www.dorsal.polymtl.ca/~alexmont/data/kernel_vm.tar.bz2 -O- | tar xvjf - &&
 
+# Trace with lost events
+wget http://www.dorsal.polymtl.ca/~alexmont/data/hello-lost.tar.bz2 -O- | tar xvjf - &&
+
 # CTF test suite, used for testing CTF parser compliance
 git clone https://github.com/efficios/ctf-testsuite.git
 
