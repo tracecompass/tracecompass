@@ -192,7 +192,7 @@ public class CtfTmfLostEventsTest {
         private CtfTmfEvent event = null;
 
         public OneEventRequestPerRank(long rank) {
-            super(CtfTmfEvent.class, TmfTimeRange.ETERNITY, rank, 1, 1, ExecutionType.FOREGROUND);
+            super(CtfTmfEvent.class, TmfTimeRange.ETERNITY, rank, 1, ExecutionType.FOREGROUND);
         }
 
         @Override
@@ -213,7 +213,7 @@ public class CtfTmfLostEventsTest {
         public OneEventRequestPerTs(ITmfTimestamp ts) {
             super(CtfTmfEvent.class,
                     new TmfTimeRange(ts, TmfTimestamp.PROJECT_IS_CANNED),
-                    0, 1, 1, ExecutionType.FOREGROUND);
+                    0, 1, ExecutionType.FOREGROUND);
         }
 
         @Override
@@ -233,7 +233,7 @@ public class CtfTmfLostEventsTest {
 
         public EventCountRequest() {
             super(CtfTmfEvent.class, TmfTimeRange.ETERNITY, 0,
-                    TmfDataRequest.ALL_DATA, 1, ExecutionType.FOREGROUND);
+                    TmfDataRequest.ALL_DATA, ExecutionType.FOREGROUND);
         }
 
         @Override

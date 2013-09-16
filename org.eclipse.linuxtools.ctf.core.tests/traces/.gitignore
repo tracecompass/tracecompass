@@ -1,10 +1,11 @@
 *.bz2
+*.gz
 *.tar
+*.ht
 /ctf-testsuite
 /hello-lost
 /kernel
 /kernel_vm
 /synctraces
 /trace2
-*.ht
 
