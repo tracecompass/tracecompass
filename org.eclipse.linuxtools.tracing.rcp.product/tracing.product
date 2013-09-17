@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Linux Tools Trace Viewer" uid="org.eclipse.linuxtools.tracing.rcp" id="org.eclipse.linuxtools.tracing.rcp.ui.product" application="org.eclipse.linuxtools.tracing.rcp.ui.application" version="0.0.1.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="Trace Viewer" uid="org.eclipse.linuxtools.tracing.rcp" id="org.eclipse.linuxtools.tracing.rcp.branding.product" application="org.eclipse.linuxtools.tracing.rcp.ui.application" version="0.0.1.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
-      <image path="/org.eclipse.linuxtools.tracing.rcp.ui/icons/alt_about.gif"/>
+      <image path="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_about.gif"/>
       <text>
          Linux Tools Trace Viewer
 
@@ -30,8 +30,7 @@ http://www.eclipse.org/legal/epl-v10.html
       <vmArgsWin>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.6</vmArgsWin>
    </launcherArgs>
 
-   <windowImages i16="/org.eclipse.linuxtools.tracing.rcp.ui/icons/alt_window_16.gif" i32="/org.eclipse.linuxtools.tracing.rcp.ui/icons/alt_window_32.gif"/>
-
+   <windowImages i16="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_window_16.gif" i32="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_window_32.gif"/>
 
    <launcher name="traceViewer">
       <solaris/>
@@ -180,24 +179,31 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
    </plugins>
 
    <features>
+      <feature id="org.eclipse.linuxtools.tracing.rcp.branding.feature"/>
       <feature id="org.eclipse.linuxtools.tracing.rcp"/>
       <feature id="org.eclipse.linuxtools.lttng2.kernel"/>
       <feature id="org.eclipse.linuxtools.lttng2"/>
-      <feature id="org.eclipse.linuxtools.tmf"/>
-      <feature id="org.eclipse.linuxtools.ctf"/>
-      <feature id="org.eclipse.e4.rcp"/>
-      <feature id="org.eclipse.rse.ssh"/>
-      <feature id="org.eclipse.rse.core"/>
-      <feature id="org.eclipse.rse.ftp"/>
+      <feature id="org.eclipse.equinox.p2.core.feature"/>
       <feature id="org.eclipse.rse.local"/>
       <feature id="org.eclipse.rse.dstore"/>
       <feature id="org.eclipse.rse.telnet"/>
+      <feature id="org.eclipse.platform"/>
       <feature id="org.eclipse.tm.terminal"/>
+      <feature id="org.eclipse.help"/>
       <feature id="org.eclipse.emf.ecore"/>
+      <feature id="org.eclipse.equinox.p2.rcp.feature"/>
+      <feature id="org.eclipse.equinox.p2.user.ui"/>
+      <feature id="org.eclipse.linuxtools.tmf"/>
+      <feature id="org.eclipse.rse.ssh"/>
+      <feature id="org.eclipse.rse.core"/>
+      <feature id="org.eclipse.rse.ftp"/>
+      <feature id="org.eclipse.rcp"/>
+      <feature id="org.eclipse.e4.rcp"/>
       <feature id="org.eclipse.rse"/>
       <feature id="org.eclipse.emf.common"/>
       <feature id="org.eclipse.rse.terminals"/>
-      <feature id="org.eclipse.help"/>
+      <feature id="org.eclipse.equinox.p2.extras.feature"/>
+      <feature id="org.eclipse.linuxtools.ctf"/>
    </features>
 
    <configurations>

@@ -23,8 +23,6 @@ public class Messages extends NLS {
 
     /** The name of the default tracing project. */
     public static String ApplicationWorkbenchWindowAdvisor_DefaultProjectName;
-    /** The RCP title. */
-    public static String ApplicationWorkbenchWindowAdvisor_WindowTitle;
     /** Error title for error during workspace creation */
     public static String Application_WorkspaceCreationError;
     /** Error message if workspace root doesn't exist */

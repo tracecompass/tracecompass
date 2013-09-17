@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.linuxtools.tracing.rcp.branding.feature"
+      label="%featureName"
+      version="0.0.1.qualifier"
+      provider-name="%featureProvider"
+      license-feature="org.eclipse.linuxtools.license.feature"
+      license-feature-version="1.0.0.qualifier">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <plugin
+         id="org.eclipse.linuxtools.tracing.rcp.branding"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>

@@ -48,6 +48,8 @@
   <profile>
     <id>tracingRcp</id>
       <modules>
+        <module>org.eclipse.linuxtools.tracing.rcp.branding</module>
+        <module>org.eclipse.linuxtools.tracing.rcp.branding.feature</module>
         <module>org.eclipse.linuxtools.tracing.rcp</module>
         <module>org.eclipse.linuxtools.tracing.rcp.help</module>
         <module>org.eclipse.linuxtools.tracing.rcp.ui</module>
@@ -150,6 +152,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
