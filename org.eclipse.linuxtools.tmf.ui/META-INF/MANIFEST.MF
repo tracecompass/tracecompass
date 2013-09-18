@@ -26,6 +26,8 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.internal.tmf.ui.project.dialogs;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.ui.project.handlers;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.ui.project.model;x-friends:="org.eclipse.linuxtools.lttng2.ui,org.eclipse.linuxtools.tmf.ui.tests",
+ org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport;x-internal:=true,
  org.eclipse.linuxtools.tmf.ui.editors,
  org.eclipse.linuxtools.tmf.ui.project.model,
  org.eclipse.linuxtools.tmf.ui.project.wizards,

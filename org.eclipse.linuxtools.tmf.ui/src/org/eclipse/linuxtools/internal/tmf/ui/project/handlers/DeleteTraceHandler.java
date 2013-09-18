@@ -15,25 +15,16 @@
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
@@ -120,34 +111,8 @@ public class DeleteTraceHandler extends AbstractHandler {
             Object element = iterator.next();
             if (element instanceof TmfTraceElement) {
                 final TmfTraceElement trace = (TmfTraceElement) element;
-                IResource resource = trace.getResource();
                 try {
-                    // Close the trace if open
-                    trace.closeEditors();
-
-                    IPath path = resource.getLocation();
-                    if (path != null && (trace.getParent() instanceof TmfTraceFolder)) {
-                        TmfExperimentFolder experimentFolder = trace.getProject().getExperimentsFolder();
-
-                        // Propagate the removal to traces
-                        for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
-                            List<ITmfProjectModelElement> toRemove = new LinkedList<ITmfProjectModelElement>();
-                            for (ITmfProjectModelElement child : experiment.getChildren()) {
-                                if (child.getName().equals(trace.getName())) {
-                                    toRemove.add(child);
-                                }
-                            }
-                            for (ITmfProjectModelElement child : toRemove) {
-                                ((TmfExperimentElement) experiment).removeTrace((TmfTraceElement) child);
-                            }
-                        }
-
-                        // Delete supplementary files
-                        trace.deleteSupplementaryFolder();
-                    }
-
-                    // Finally, delete the trace
-                    resource.delete(true, new NullProgressMonitor());
+                    trace.delete(null);
 
                     // Refresh the project
                     trace.getProject().refresh();
