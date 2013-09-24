@@ -256,7 +256,13 @@
                menuGroupId="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.menuGroupId"
                type="new"
                wizardId="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.newProject">
-            <enablement></enablement>
+               <enablement>
+                  <with variable="activeWorkbenchWindow.activePerspective">
+                     <equals
+                          value="org.eclipse.linuxtools.tmf.ui.perspective">
+                     </equals>
+                  </with>
+               </enablement>
          </commonWizard>
       </navigatorContent>
    </extension>

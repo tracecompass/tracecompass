@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.gdbtrace.ui.views;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.linuxtools.internal.gdbtrace.ui.GdbTraceUIPlugin;
+import org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -72,5 +73,7 @@ public class GdbPerspectiveFactory implements IPerspectiveFactory {
         // Create the middle right folder
         IFolderLayout traceControlFolder = layout.createFolder(TraceControlFolder, IPageLayout.RIGHT, 0.50f, DebugFolder);
         traceControlFolder.addView(TRACE_CONTROL_VIEW_ID);
+
+        layout.addNewWizardShortcut(NewTmfProjectWizard.ID);
     }
 }

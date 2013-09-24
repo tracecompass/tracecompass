@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
+import org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IFolderLayout;
@@ -73,6 +74,8 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
         bottomRightFolder.addView(PROPERTIES_VIEW_ID);
         bottomRightFolder.addView(BOOKMARKS_VIEW_ID);
+
+        layout.addNewWizardShortcut(NewTmfProjectWizard.ID);
     }
 
     /**
