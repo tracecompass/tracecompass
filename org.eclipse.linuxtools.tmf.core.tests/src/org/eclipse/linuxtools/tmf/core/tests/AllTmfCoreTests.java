@@ -28,6 +28,7 @@ import org.junit.runners.Suite;
     org.eclipse.linuxtools.tmf.core.tests.request.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.signal.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.statesystem.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.statesystem.backends.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.statistics.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.trace.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.uml2sd.AllTests.class,
