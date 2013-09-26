@@ -38,6 +38,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfEventRequestStub;
@@ -391,8 +392,7 @@ public class TmfCoalescedEventRequestTest {
     // Coalescing
     // ------------------------------------------------------------------------
 
-    private static final String DIRECTORY = "testfiles";
-    private static final String TEST_STREAM = "A-Test-10K";
+    private static final TmfTestTrace TEST_TRACE = TmfTestTrace.A_TEST_10K;
     private static final int NB_EVENTS = 5000;
 
     // Initialize the test trace
@@ -489,7 +489,7 @@ public class TmfCoalescedEventRequestTest {
 
     public void runCoalescedRequest(long startIndex) throws InterruptedException {
 
-        fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
+        fTrace = setupTrace(TEST_TRACE.getFullPath());
 
         TmfSignalManager.register(this);
         TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, startIndex, false);
@@ -536,7 +536,7 @@ public class TmfCoalescedEventRequestTest {
     @Test
     public void testCancelCoalescedRequest() throws InterruptedException {
 
-        fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
+        fTrace = setupTrace(TEST_TRACE.getFullPath());
 
         TmfSignalManager.register(this);
         TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, 0, true);
