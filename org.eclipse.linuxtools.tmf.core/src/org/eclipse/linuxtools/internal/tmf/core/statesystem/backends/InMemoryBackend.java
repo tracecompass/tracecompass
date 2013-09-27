@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Matthew Khouzam - Modified to use a TreeSet
  ******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends;
@@ -15,15 +16,15 @@ package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.interval.TmfIntervalEndComparator;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 
@@ -41,10 +42,35 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
  */
 public class InMemoryBackend implements IStateHistoryBackend {
 
+    /**
+     * We need to compare the end time and the attribute, because we can have 2
+     * intervals with the same end time (for different attributes). And TreeSet
+     * needs a unique "key" per element.
+     */
     private static final Comparator<ITmfStateInterval> END_COMPARATOR =
-            new TmfIntervalEndComparator();
+            new Comparator<ITmfStateInterval>() {
+                @Override
+                public int compare(ITmfStateInterval o1, ITmfStateInterval o2) {
+                    final long e1 = o1.getEndTime();
+                    final long e2 = o2.getEndTime();
+                    final int a1 = o1.getAttribute();
+                    final int a2 = o2.getAttribute();
+                    if (e1 < e2) {
+                        return -1;
+                    } else if (e1 > e2) {
+                        return 1;
+                    } else if (a1 < a2) {
+                        return -1;
+                    } else if (a1 > a2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
 
-    private final List<ITmfStateInterval> intervals;
+            };
+
+    private final TreeSet<ITmfStateInterval> intervals;
     private final long startTime;
     private long latestTime;
 
@@ -57,7 +83,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
     public InMemoryBackend(long startTime) {
         this.startTime = startTime;
         this.latestTime = startTime;
-        this.intervals = new ArrayList<ITmfStateInterval>();
+        this.intervals = new TreeSet<ITmfStateInterval>(END_COMPARATOR);
     }
 
     @Override
@@ -85,10 +111,9 @@ public class InMemoryBackend implements IStateHistoryBackend {
             latestTime = stateEndTime;
         }
 
-        /* Add the interval into the-array */
+        /* Add the interval into the tree */
         intervals.add(interval);
     }
-
 
     @Override
     public void doQuery(List<ITmfStateInterval> currentStateInfo, long t)
@@ -101,12 +126,15 @@ public class InMemoryBackend implements IStateHistoryBackend {
          * The intervals are sorted by end time, so we can binary search to get
          * the first possible interval, then only compare their start times.
          */
-        ITmfStateInterval entry;
-        for (int i = binarySearchEndTime(intervals, t); i < intervals.size(); i++) {
-            entry = intervals.get(i);
-            if (entry.getStartTime() <= t) {
+
+        Iterator<ITmfStateInterval> iter = serachforEndTime(intervals, t);
+        for (int modCount = 0; iter.hasNext() && modCount < currentStateInfo.size();) {
+            ITmfStateInterval entry = iter.next();
+            final long entryStartTime = entry.getStartTime();
+            if (entryStartTime <= t) {
                 /* Add this interval to the returned values */
                 currentStateInfo.set(entry.getAttribute(), entry);
+                modCount++;
             }
         }
     }
@@ -122,13 +150,17 @@ public class InMemoryBackend implements IStateHistoryBackend {
          * The intervals are sorted by end time, so we can binary search to get
          * the first possible interval, then only compare their start times.
          */
-        ITmfStateInterval entry;
-        for (int i = binarySearchEndTime(intervals, t); i < intervals.size(); i++) {
-            entry = intervals.get(i);
-            if (entry.getStartTime() <= t && entry.getAttribute() == attributeQuark) {
+        Iterator<ITmfStateInterval> iter = serachforEndTime(intervals, t);
+        while (iter.hasNext()) {
+            ITmfStateInterval entry = iter.next();
+            final boolean attributeMatches = (entry.getAttribute() == attributeQuark);
+            final long entryStartTime = entry.getStartTime();
+            if (attributeMatches) {
+                if (entryStartTime <= t) {
                     /* This is the droid we are looking for */
                     return entry;
                 }
+            }
         }
         throw new AttributeNotFoundException();
     }
@@ -179,25 +211,16 @@ public class InMemoryBackend implements IStateHistoryBackend {
         writer.println(intervals.toString());
     }
 
-    private static int binarySearchEndTime(List<ITmfStateInterval> list, long time) {
+    private static Iterator<ITmfStateInterval> serachforEndTime(TreeSet<ITmfStateInterval> tree, long time) {
         ITmfStateInterval dummyInterval = new TmfStateInterval(-1, time, -1, null);
-        int mid = Collections.binarySearch(list, dummyInterval, END_COMPARATOR);
-
-        /* The returned value is < 0 if the exact key was not found. */
-        if (mid < 0) {
-            mid = -mid - 1;
+        ITmfStateInterval myInterval = tree.lower(dummyInterval);
+        if (myInterval == null) {
+            return tree.iterator();
         }
-
-        /*
-         * Collections.binarySearch doesn't guarantee which element is returned
-         * if it falls on one of many equal ones. So make sure we are at the
-         * first one provided.
-         */
-        while ((mid > 0) &&
-                (list.get(mid).getEndTime() == list.get(mid-1).getEndTime())) {
-            mid--;
-        }
-        return mid;
+        final SortedSet<ITmfStateInterval> tailSet = tree.tailSet(myInterval);
+        Iterator<ITmfStateInterval> retVal = tailSet.iterator();
+        retVal.next();
+        return retVal;
     }
 
 }
