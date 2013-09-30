@@ -30,24 +30,18 @@ import org.eclipse.linuxtools.tmf.core.util.Pair;
 /**
  * This class implements additional statistical operations that can be
  * performed on attributes of the state system.
+ *
+ * @author Patrick Tassé
  */
-public class TmfStateSystemOperations {
+public final class TmfStateSystemOperations {
 
-    private final ITmfStateSystem ss;
-
-    /**
-     * Constructor
-     *
-     * @param ss
-     *            The state system on which to perform operations
-     */
-    public TmfStateSystemOperations(ITmfStateSystem ss) {
-        this.ss = ss;
-    }
+    private TmfStateSystemOperations() {}
 
     /**
      * Return the maximum value of an attribute over a time range
      *
+     * @param ss
+     *            The state system to query
      * @param t1
      *            The start time of the range
      * @param t2
@@ -55,28 +49,44 @@ public class TmfStateSystemOperations {
      * @param quark
      *            The quark of the attribute
      * @return The maximum value of the attribute in this range
+     * @throws TimeRangeException
+     *             If an invalid time range is specified
+     * @throws AttributeNotFoundException
+     *             If the specified quark doesn't match an attribute
+     * @throws StateValueTypeException
+     *             If the state value type of the attribute does not support the
+     *             "Max" operation
      */
-    public ITmfStateValue queryRangeMax(long t1, long t2, int quark) {
+    public static ITmfStateValue queryRangeMax(ITmfStateSystem ss, long t1, long t2, int quark)
+            throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
         ITmfStateValue max = TmfStateValue.nullValue();
-        try {
-            List<ITmfStateInterval> intervals = queryAttributeRange(t1, t2, quark, AbstractTmfMipmapStateProvider.MAX_STRING);
-            if (intervals.size() == 0) {
-                return TmfStateValue.nullValue();
-            }
-            for (ITmfStateInterval si : intervals) {
-                ITmfStateValue value = si.getStateValue();
-                if (value.getType() == Type.DOUBLE) {
-                    if (max.isNull() || si.getStateValue().unboxDouble() > max.unboxDouble()) {
-                        max = si.getStateValue();
-                    }
-                } else {
-                    if (max.isNull() || si.getStateValue().unboxLong() > max.unboxLong()) {
-                        max = si.getStateValue();
-                    }
+
+        List<ITmfStateInterval> intervals = queryAttributeRange(ss, t1, t2, quark, AbstractTmfMipmapStateProvider.MAX_STRING);
+        if (intervals.size() == 0) {
+            return TmfStateValue.nullValue();
+        }
+        for (ITmfStateInterval si : intervals) {
+            ITmfStateValue value = si.getStateValue();
+
+            switch (value.getType()) {
+            case DOUBLE:
+                if (max.isNull() || si.getStateValue().unboxDouble() > max.unboxDouble()) {
+                    max = si.getStateValue();
                 }
+                break;
+
+            case INTEGER:
+            case LONG:
+                if (max.isNull() || si.getStateValue().unboxLong() > max.unboxLong()) {
+                    max = si.getStateValue();
+                }
+                break;
+
+            case NULL:
+            case STRING:
+            default:
+                throw new StateValueTypeException();
             }
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
         }
         return max;
     }
@@ -84,6 +94,8 @@ public class TmfStateSystemOperations {
     /**
      * Return the minimum value of an attribute over a time range
      *
+     * @param ss
+     *            The state system to query
      * @param t1
      *            The start time of the range
      * @param t2
@@ -91,28 +103,45 @@ public class TmfStateSystemOperations {
      * @param quark
      *            The quark of the attribute
      * @return The minimum value of the attribute in this range
+     * @throws TimeRangeException
+     *             If an invalid time range is specified
+     * @throws AttributeNotFoundException
+     *             If the specified quark doesn't match an attribute
+     * @throws StateValueTypeException
+     *             If the state value type of the attribute does not support the
+     *             "Min" operation
      */
-    public ITmfStateValue queryRangeMin(long t1, long t2, int quark) {
+    public static ITmfStateValue queryRangeMin(ITmfStateSystem ss,
+            long t1, long t2, int quark)
+            throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
         ITmfStateValue min = TmfStateValue.nullValue();
-        try {
-            List<ITmfStateInterval> intervals = queryAttributeRange(t1, t2, quark, AbstractTmfMipmapStateProvider.MIN_STRING);
-            if (intervals.size() == 0) {
-                return TmfStateValue.nullValue();
-            }
-            for (ITmfStateInterval si : intervals) {
-                ITmfStateValue value = si.getStateValue();
-                if (value.getType() == Type.DOUBLE) {
-                    if (min.isNull() || si.getStateValue().unboxDouble() < min.unboxDouble()) {
-                        min = si.getStateValue();
-                    }
-                } else {
-                    if (min.isNull() || si.getStateValue().unboxLong() < min.unboxLong()) {
-                        min = si.getStateValue();
-                    }
+
+        List<ITmfStateInterval> intervals = queryAttributeRange(ss, t1, t2, quark, AbstractTmfMipmapStateProvider.MIN_STRING);
+        if (intervals.size() == 0) {
+            return TmfStateValue.nullValue();
+        }
+        for (ITmfStateInterval si : intervals) {
+            ITmfStateValue value = si.getStateValue();
+
+            switch (value.getType()) {
+            case DOUBLE:
+                if (min.isNull() || si.getStateValue().unboxDouble() < min.unboxDouble()) {
+                    min = si.getStateValue();
                 }
+                break;
+
+            case INTEGER:
+            case LONG:
+                if (min.isNull() || si.getStateValue().unboxLong() < min.unboxLong()) {
+                    min = si.getStateValue();
+                }
+                break;
+
+            case NULL:
+            case STRING:
+            default:
+                throw new StateValueTypeException();
             }
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
         }
         return min;
     }
@@ -120,6 +149,8 @@ public class TmfStateSystemOperations {
     /**
      * Return the weighted average value of an attribute over a time range
      *
+     * @param ss
+     *            The state system to query
      * @param t1
      *            The start time of the range
      * @param t2
@@ -127,40 +158,46 @@ public class TmfStateSystemOperations {
      * @param quark
      *            The quark of the attribute
      * @return The weighted average value of the attribute in this range
+     * @throws TimeRangeException
+     *             If an invalid time range is specified
+     * @throws AttributeNotFoundException
+     *             If the specified quark doesn't match an attribute
+     * @throws StateValueTypeException
+     *             If the state value type of the attribute does not support the
+     *             "Average" operation
      */
-    public double queryRangeAverage(long t1, long t2, int quark) {
+    public static double queryRangeAverage(ITmfStateSystem ss, long t1, long t2, int quark)
+            throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
         double avg = 0.0;
-        try {
-            List<ITmfStateInterval> intervals = queryAttributeRange(t1, t2, quark, AbstractTmfMipmapStateProvider.AVG_STRING);
-            if (intervals.size() == 0) {
-                return 0;
-            } else if (t1 == t2) {
-                ITmfStateValue value = intervals.get(0).getStateValue();
+        List<ITmfStateInterval> intervals = queryAttributeRange(ss, t1, t2, quark, AbstractTmfMipmapStateProvider.AVG_STRING);
+        if (intervals.size() == 0) {
+            return 0;
+        } else if (t1 == t2) {
+            ITmfStateValue value = intervals.get(0).getStateValue();
+            if (value.getType() == Type.DOUBLE) {
+                return value.unboxDouble();
+            }
+            return value.unboxLong();
+        }
+        for (ITmfStateInterval si : intervals) {
+            long startTime = Math.max(t1, si.getStartTime());
+            long endTime = Math.min(t2, si.getEndTime() + 1);
+            long delta = endTime - startTime;
+            if (delta > 0) {
+                ITmfStateValue value = si.getStateValue();
                 if (value.getType() == Type.DOUBLE) {
-                    return value.unboxDouble();
-                }
-                return value.unboxLong();
-            }
-            for (ITmfStateInterval si : intervals) {
-                long startTime = Math.max(t1, si.getStartTime());
-                long endTime = Math.min(t2, si.getEndTime() + 1);
-                long delta = endTime - startTime;
-                if (delta > 0) {
-                    ITmfStateValue value = si.getStateValue();
-                    if (value.getType() == Type.DOUBLE) {
-                        avg += si.getStateValue().unboxDouble() * ((double) delta / (double) (t2 - t1));
-                    } else {
-                        avg += si.getStateValue().unboxLong() * ((double) delta / (double) (t2 - t1));
-                    }
+                    avg += si.getStateValue().unboxDouble() * ((double) delta / (double) (t2 - t1));
+                } else {
+                    avg += si.getStateValue().unboxLong() * ((double) delta / (double) (t2 - t1));
                 }
             }
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
         }
         return avg;
     }
 
-    private List<ITmfStateInterval> queryAttributeRange(long t1, long t2, int baseQuark, String featureString) {
+    private static List<ITmfStateInterval> queryAttributeRange(ITmfStateSystem ss,
+            long t1, long t2, int baseQuark, String featureString)
+                    throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
         Pair<Long, Long> timeRange = new Pair<Long, Long>(t1, t2);
         int mipmapQuark = -1;
         List<ITmfStateInterval> intervals = new ArrayList<ITmfStateInterval>();
@@ -185,21 +222,23 @@ public class TmfStateSystemOperations {
             }
             ITmfStateInterval maxLevelInterval = ss.querySingleState(timeRange.getSecond(), mipmapQuark);
             int levelMax = maxLevelInterval.getStateValue().unboxInt();
-            queryMipmapAttributeRange(0, levelMax, baseQuark, mipmapQuark, timeRange, intervals);
+            queryMipmapAttributeRange(ss, 0, levelMax, baseQuark, mipmapQuark, timeRange, intervals);
             return intervals;
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
-        } catch (TimeRangeException e) {
-            e.printStackTrace();
+
         } catch (StateValueTypeException e) {
-            e.printStackTrace();
+            /* This is a special case, so we'll add a message to the exception */
+            throw new StateValueTypeException("State system advertises mipmaps," + //$NON-NLS-1$
+                    " but doesn't actually have them.", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {
-            /* Ignored */
+            /* We are shutting down, ignore the operation */
         }
         return intervals;
     }
 
-    private void queryMipmapAttributeRange(int currentLevel, int levelMax, int baseQuark, int mipmapQuark, Pair<Long, Long> timeRange, List<ITmfStateInterval> intervals) {
+    private static void queryMipmapAttributeRange(ITmfStateSystem ss,
+            int currentLevel, int levelMax, int baseQuark, int mipmapQuark,
+            Pair<Long, Long> timeRange, List<ITmfStateInterval> intervals)
+                    throws AttributeNotFoundException, TimeRangeException {
         int level = currentLevel;
         Pair<Long, Long> range = timeRange;
         ITmfStateInterval currentLevelInterval = null, nextLevelInterval = null;
@@ -229,7 +268,7 @@ public class TmfStateSystemOperations {
                 } else {
                     level++;
                 }
-                queryMipmapAttributeRange(level, levelMax, baseQuark, mipmapQuark, range, intervals);
+                queryMipmapAttributeRange(ss, level, levelMax, baseQuark, mipmapQuark, range, intervals);
                 return;
             }
 
@@ -259,33 +298,34 @@ public class TmfStateSystemOperations {
                 }
             }
 
-            queryMipmapAttributeRange(level, levelMax, baseQuark, mipmapQuark, range, intervals);
+            queryMipmapAttributeRange(ss, level, levelMax, baseQuark,
+                    mipmapQuark, range, intervals);
 
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
-        } catch (TimeRangeException e) {
-            e.printStackTrace();
         } catch (StateSystemDisposedException e) {
-            /* Ignored */
+            /* We are shutting down, ignore the operation */
         }
     }
 
-    private static Pair<Long, Long> updateTimeRange(Pair<Long, Long> timeRange, ITmfStateInterval currentLevelInterval) {
+    private static Pair<Long, Long> updateTimeRange(Pair<Long, Long> timeRange,
+            ITmfStateInterval currentLevelInterval) {
         if (currentLevelInterval.getEndTime() >= timeRange.getSecond()) {
             return null;
         }
-        long startTime = Math.max(timeRange.getFirst(), Math.min(currentLevelInterval.getEndTime() + 1, timeRange.getSecond()));
+        long startTime = Math.max(timeRange.getFirst(),
+                Math.min(currentLevelInterval.getEndTime() + 1, timeRange.getSecond()));
         return new Pair<Long, Long>(startTime, timeRange.getSecond());
     }
 
-    private static boolean isFullyOverlapped(Pair<Long, Long> range, ITmfStateInterval interval) {
-        if (range.getFirst() >= range.getSecond() || interval.getStartTime() >= interval.getEndTime()) {
+    private static boolean isFullyOverlapped(Pair<Long, Long> range,
+            ITmfStateInterval interval) {
+        if (range.getFirst() >= range.getSecond() ||
+                interval.getStartTime() >= interval.getEndTime()) {
             return false;
         }
-        if (range.getFirst() <= interval.getStartTime() && range.getSecond() >= interval.getEndTime()) {
+        if (range.getFirst() <= interval.getStartTime() &&
+                range.getSecond() >= interval.getEndTime()) {
             return true;
         }
         return false;
     }
-
 }

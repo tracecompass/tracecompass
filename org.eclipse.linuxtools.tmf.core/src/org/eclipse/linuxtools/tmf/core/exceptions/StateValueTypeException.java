@@ -43,4 +43,16 @@ public class StateValueTypeException extends Exception {
     public StateValueTypeException(String message) {
         super(message);
     }
+
+    /**
+     * Constructor with both a message and a cause.
+     *
+     * @param message
+     *            Message to attach to this exception
+     * @param e
+     *            Cause of this exception
+     */
+    public StateValueTypeException(String message, Throwable e) {
+        super(message, e);
+    }
 }

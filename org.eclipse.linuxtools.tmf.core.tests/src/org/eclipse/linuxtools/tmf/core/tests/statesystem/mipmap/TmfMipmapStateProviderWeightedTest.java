@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHisto
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.InMemoryBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemOperations;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
@@ -39,8 +40,6 @@ public class TmfMipmapStateProviderWeightedTest {
     private static final double DELTA = 0.0001;
     private static StateSystem ssqi;
     private static StateSystem ssqd;
-    private static TmfStateSystemOperations ssoi;
-    private static TmfStateSystemOperations ssod;
 
     /**
      * Startup code, build a state system with uneven state durations
@@ -51,13 +50,11 @@ public class TmfMipmapStateProviderWeightedTest {
         TmfMipmapStateProviderStub mmpi = new TmfMipmapStateProviderStub(RESOLUTION, Type.INTEGER);
         IStateHistoryBackend bei = new InMemoryBackend(0);
         ssqi = new StateSystem(bei);
-        ssoi = new TmfStateSystemOperations(ssqi);
         mmpi.assignTargetStateSystem(ssqi);
         /* setup for DOUBLE test */
         TmfMipmapStateProviderStub mmpd = new TmfMipmapStateProviderStub(RESOLUTION, Type.DOUBLE);
         IStateHistoryBackend bed = new InMemoryBackend(0);
         ssqd = new StateSystem(bed);
-        ssod = new TmfStateSystemOperations(ssqd);
         mmpd.assignTargetStateSystem(ssqd);
         /*
          * Every 10,000 ns chunk contains the following states:
@@ -105,23 +102,26 @@ public class TmfMipmapStateProviderWeightedTest {
         assertNotNull(ssqi);
         try {
             int quark = ssqi.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
-            assertEquals(TmfStateValue.nullValue(), ssoi.queryRangeMax(0, 0, quark));
-            assertEquals(10, ssoi.queryRangeMax(500, 1500, quark).unboxInt());
-            assertEquals(20, ssoi.queryRangeMax(1500, 5000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMax(5000, 10000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMax(0, 10000, quark).unboxInt());
-            assertEquals(TmfStateValue.nullValue(), ssoi.queryRangeMax(120000, 120000, quark));
-            assertEquals(10, ssoi.queryRangeMax(120500, 121500, quark).unboxInt());
-            assertEquals(20, ssoi.queryRangeMax(121500, 125000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMax(125000, 130000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMax(120000, 130000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMax(100000, 150000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMax(240000, 250000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMax(0, 250000, quark).unboxInt());
-            assertEquals(00, ssoi.queryRangeMax(250000, 250000, quark).unboxInt());
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMax(ssqi, 0, 0, quark));
+            assertEquals(10, TmfStateSystemOperations.queryRangeMax(ssqi, 500, 1500, quark).unboxInt());
+            assertEquals(20, TmfStateSystemOperations.queryRangeMax(ssqi, 1500, 5000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMax(ssqi, 5000, 10000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMax(ssqi, 0, 10000, quark).unboxInt());
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMax(ssqi, 120000, 120000, quark));
+            assertEquals(10, TmfStateSystemOperations.queryRangeMax(ssqi, 120500, 121500, quark).unboxInt());
+            assertEquals(20, TmfStateSystemOperations.queryRangeMax(ssqi, 121500, 125000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMax(ssqi, 125000, 130000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMax(ssqi, 120000, 130000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMax(ssqi, 100000, 150000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMax(ssqi, 240000, 250000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMax(ssqi, 0, 250000, quark).unboxInt());
+            assertEquals(00, TmfStateSystemOperations.queryRangeMax(ssqi, 250000, 250000, quark).unboxInt());
+
         } catch (AttributeNotFoundException e) {
             fail(e.getMessage());
         } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
             fail(e.getMessage());
         }
     }
@@ -135,23 +135,26 @@ public class TmfMipmapStateProviderWeightedTest {
         assertNotNull(ssqi);
         try {
             int quark = ssqi.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
-            assertEquals(TmfStateValue.nullValue(), ssoi.queryRangeMin(0, 0, quark));
-            assertEquals(10, ssoi.queryRangeMin(500, 1500, quark).unboxInt());
-            assertEquals(10, ssoi.queryRangeMin(1500, 5000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMin(5000, 10000, quark).unboxInt());
-            assertEquals(10, ssoi.queryRangeMin(0, 10000, quark).unboxInt());
-            assertEquals(TmfStateValue.nullValue(), ssoi.queryRangeMin(120000, 120000, quark));
-            assertEquals(10, ssoi.queryRangeMin(120500, 121500, quark).unboxInt());
-            assertEquals(10, ssoi.queryRangeMin(121500, 125000, quark).unboxInt());
-            assertEquals(30, ssoi.queryRangeMin(125000, 130000, quark).unboxInt());
-            assertEquals(10, ssoi.queryRangeMin(120000, 130000, quark).unboxInt());
-            assertEquals(10, ssoi.queryRangeMin(100000, 150000, quark).unboxInt());
-            assertEquals(00, ssoi.queryRangeMin(240000, 250000, quark).unboxInt());
-            assertEquals(00, ssoi.queryRangeMin(0, 250000, quark).unboxInt());
-            assertEquals(00, ssoi.queryRangeMin(250000, 250000, quark).unboxInt());
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMin(ssqi, 0, 0, quark));
+            assertEquals(10, TmfStateSystemOperations.queryRangeMin(ssqi, 500, 1500, quark).unboxInt());
+            assertEquals(10, TmfStateSystemOperations.queryRangeMin(ssqi, 1500, 5000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMin(ssqi, 5000, 10000, quark).unboxInt());
+            assertEquals(10, TmfStateSystemOperations.queryRangeMin(ssqi, 0, 10000, quark).unboxInt());
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMin(ssqi, 120000, 120000, quark));
+            assertEquals(10, TmfStateSystemOperations.queryRangeMin(ssqi, 120500, 121500, quark).unboxInt());
+            assertEquals(10, TmfStateSystemOperations.queryRangeMin(ssqi, 121500, 125000, quark).unboxInt());
+            assertEquals(30, TmfStateSystemOperations.queryRangeMin(ssqi, 125000, 130000, quark).unboxInt());
+            assertEquals(10, TmfStateSystemOperations.queryRangeMin(ssqi, 120000, 130000, quark).unboxInt());
+            assertEquals(10, TmfStateSystemOperations.queryRangeMin(ssqi, 100000, 150000, quark).unboxInt());
+            assertEquals(00, TmfStateSystemOperations.queryRangeMin(ssqi, 240000, 250000, quark).unboxInt());
+            assertEquals(00, TmfStateSystemOperations.queryRangeMin(ssqi, 0, 250000, quark).unboxInt());
+            assertEquals(00, TmfStateSystemOperations.queryRangeMin(ssqi, 250000, 250000, quark).unboxInt());
+
         } catch (AttributeNotFoundException e) {
             fail(e.getMessage());
         } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
             fail(e.getMessage());
         }
     }
@@ -165,28 +168,33 @@ public class TmfMipmapStateProviderWeightedTest {
         assertNotNull(ssqi);
         try {
             int quark = ssqi.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
-            assertEquals(0.0, ssoi.queryRangeAverage(0, 0, quark), DELTA);
-            assertEquals(5.0, ssoi.queryRangeAverage(500, 1500, quark), DELTA);
-            assertEquals(90.0 / 7, ssoi.queryRangeAverage(1500, 5000, quark), DELTA);
-            assertEquals(90.0 / 5, ssoi.queryRangeAverage(5000, 10000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(0, 10000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(0, 20000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(500, 20500, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(1000, 21000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(2000, 22000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(3000, 23000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(4000, 24000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(5000, 25000, quark), DELTA);
-            assertEquals(0.0, ssoi.queryRangeAverage(120000, 120000, quark), DELTA);
-            assertEquals(5.0, ssoi.queryRangeAverage(120500, 121500, quark), DELTA);
-            assertEquals(90.0 / 7, ssoi.queryRangeAverage(121500, 125000, quark), DELTA);
-            assertEquals(90.0 / 5, ssoi.queryRangeAverage(125000, 130000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(120000, 130000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(100000, 150000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(240000, 250000, quark), DELTA);
-            assertEquals(14.0, ssoi.queryRangeAverage(0, 250000, quark), DELTA);
-            assertEquals(0.0, ssoi.queryRangeAverage(250000, 250000, quark), DELTA);
+            assertEquals(0.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 0, 0, quark), DELTA);
+            assertEquals(5.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 500, 1500, quark), DELTA);
+            assertEquals(90.0 / 7, TmfStateSystemOperations.queryRangeAverage(ssqi, 1500, 5000, quark), DELTA);
+            assertEquals(90.0 / 5, TmfStateSystemOperations.queryRangeAverage(ssqi, 5000, 10000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 0, 10000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 0, 20000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 500, 20500, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 1000, 21000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 2000, 22000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 3000, 23000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 4000, 24000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 5000, 25000, quark), DELTA);
+            assertEquals(0.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 120000, 120000, quark), DELTA);
+            assertEquals(5.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 120500, 121500, quark), DELTA);
+            assertEquals(90.0 / 7, TmfStateSystemOperations.queryRangeAverage(ssqi, 121500, 125000, quark), DELTA);
+            assertEquals(90.0 / 5, TmfStateSystemOperations.queryRangeAverage(ssqi, 125000, 130000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 120000, 130000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 100000, 150000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 240000, 250000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 0, 250000, quark), DELTA);
+            assertEquals(0.0, TmfStateSystemOperations.queryRangeAverage(ssqi, 250000, 250000, quark), DELTA);
+
         } catch (AttributeNotFoundException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
+            fail(e.getMessage());
+        } catch (StateValueTypeException e) {
             fail(e.getMessage());
         }
     }
@@ -200,23 +208,26 @@ public class TmfMipmapStateProviderWeightedTest {
         assertNotNull(ssqd);
         try {
             int quark = ssqd.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
-            assertEquals(TmfStateValue.nullValue(), ssod.queryRangeMax(0, 0, quark));
-            assertEquals(10.0, ssod.queryRangeMax(500, 1500, quark).unboxDouble(), DELTA);
-            assertEquals(20.0, ssod.queryRangeMax(1500, 5000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMax(5000, 10000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMax(0, 10000, quark).unboxDouble(), DELTA);
-            assertEquals(TmfStateValue.nullValue(), ssod.queryRangeMax(120000, 120000, quark));
-            assertEquals(10.0, ssod.queryRangeMax(120500, 121500, quark).unboxDouble(), DELTA);
-            assertEquals(20.0, ssod.queryRangeMax(121500, 125000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMax(125000, 130000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMax(120000, 130000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMax(100000, 150000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMax(240000, 250000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMax(0, 250000, quark).unboxDouble(), DELTA);
-            assertEquals(00.0, ssod.queryRangeMax(250000, 250000, quark).unboxDouble(), DELTA);
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMax(ssqd, 0, 0, quark));
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMax(ssqd, 500, 1500, quark).unboxDouble(), DELTA);
+            assertEquals(20.0, TmfStateSystemOperations.queryRangeMax(ssqd, 1500, 5000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMax(ssqd, 5000, 10000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMax(ssqd, 0, 10000, quark).unboxDouble(), DELTA);
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMax(ssqd, 120000, 120000, quark));
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMax(ssqd, 120500, 121500, quark).unboxDouble(), DELTA);
+            assertEquals(20.0, TmfStateSystemOperations.queryRangeMax(ssqd, 121500, 125000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMax(ssqd, 125000, 130000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMax(ssqd, 120000, 130000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMax(ssqd, 100000, 150000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMax(ssqd, 240000, 250000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMax(ssqd, 0, 250000, quark).unboxDouble(), DELTA);
+            assertEquals(00.0, TmfStateSystemOperations.queryRangeMax(ssqd, 250000, 250000, quark).unboxDouble(), DELTA);
+
         } catch (AttributeNotFoundException e) {
             fail(e.getMessage());
         } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
             fail(e.getMessage());
         }
     }
@@ -230,23 +241,26 @@ public class TmfMipmapStateProviderWeightedTest {
         assertNotNull(ssqd);
         try {
             int quark = ssqd.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
-            assertEquals(TmfStateValue.nullValue(), ssod.queryRangeMin(0, 0, quark));
-            assertEquals(10.0, ssod.queryRangeMin(500, 1500, quark).unboxDouble(), DELTA);
-            assertEquals(10.0, ssod.queryRangeMin(1500, 5000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMin(5000, 10000, quark).unboxDouble(), DELTA);
-            assertEquals(10.0, ssod.queryRangeMin(0, 10000, quark).unboxDouble(), DELTA);
-            assertEquals(TmfStateValue.nullValue(), ssod.queryRangeMin(120000, 120000, quark));
-            assertEquals(10.0, ssod.queryRangeMin(120500, 121500, quark).unboxDouble(), DELTA);
-            assertEquals(10.0, ssod.queryRangeMin(121500, 125000, quark).unboxDouble(), DELTA);
-            assertEquals(30.0, ssod.queryRangeMin(125000, 130000, quark).unboxDouble(), DELTA);
-            assertEquals(10.0, ssod.queryRangeMin(120000, 130000, quark).unboxDouble(), DELTA);
-            assertEquals(10.0, ssod.queryRangeMin(100000, 150000, quark).unboxDouble(), DELTA);
-            assertEquals(00.0, ssod.queryRangeMin(240000, 250000, quark).unboxDouble(), DELTA);
-            assertEquals(00.0, ssod.queryRangeMin(0, 250000, quark).unboxDouble(), DELTA);
-            assertEquals(00.0, ssod.queryRangeMin(250000, 250000, quark).unboxDouble(), DELTA);
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMin(ssqd, 0, 0, quark));
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMin(ssqd, 500, 1500, quark).unboxDouble(), DELTA);
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMin(ssqd, 1500, 5000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMin(ssqd, 5000, 10000, quark).unboxDouble(), DELTA);
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMin(ssqd, 0, 10000, quark).unboxDouble(), DELTA);
+            assertEquals(TmfStateValue.nullValue(), TmfStateSystemOperations.queryRangeMin(ssqd, 120000, 120000, quark));
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMin(ssqd, 120500, 121500, quark).unboxDouble(), DELTA);
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMin(ssqd, 121500, 125000, quark).unboxDouble(), DELTA);
+            assertEquals(30.0, TmfStateSystemOperations.queryRangeMin(ssqd, 125000, 130000, quark).unboxDouble(), DELTA);
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMin(ssqd, 120000, 130000, quark).unboxDouble(), DELTA);
+            assertEquals(10.0, TmfStateSystemOperations.queryRangeMin(ssqd, 100000, 150000, quark).unboxDouble(), DELTA);
+            assertEquals(00.0, TmfStateSystemOperations.queryRangeMin(ssqd, 240000, 250000, quark).unboxDouble(), DELTA);
+            assertEquals(00.0, TmfStateSystemOperations.queryRangeMin(ssqd, 0, 250000, quark).unboxDouble(), DELTA);
+            assertEquals(00.0, TmfStateSystemOperations.queryRangeMin(ssqd, 250000, 250000, quark).unboxDouble(), DELTA);
+
         } catch (AttributeNotFoundException e) {
             fail(e.getMessage());
         } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
             fail(e.getMessage());
         }
     }
@@ -260,28 +274,33 @@ public class TmfMipmapStateProviderWeightedTest {
         assertNotNull(ssqd);
         try {
             int quark = ssqd.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
-            assertEquals(0.0, ssod.queryRangeAverage(0, 0, quark), DELTA);
-            assertEquals(5.0, ssod.queryRangeAverage(500, 1500, quark), DELTA);
-            assertEquals(90.0 / 7, ssod.queryRangeAverage(1500, 5000, quark), DELTA);
-            assertEquals(90.0 / 5, ssod.queryRangeAverage(5000, 10000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(0, 10000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(0, 20000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(500, 20500, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(1000, 21000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(2000, 22000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(3000, 23000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(4000, 24000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(5000, 25000, quark), DELTA);
-            assertEquals(0.0, ssod.queryRangeAverage(120000, 120000, quark), DELTA);
-            assertEquals(5.0, ssod.queryRangeAverage(120500, 121500, quark), DELTA);
-            assertEquals(90.0 / 7, ssod.queryRangeAverage(121500, 125000, quark), DELTA);
-            assertEquals(90.0 / 5, ssod.queryRangeAverage(125000, 130000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(120000, 130000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(100000, 150000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(240000, 250000, quark), DELTA);
-            assertEquals(14.0, ssod.queryRangeAverage(0, 250000, quark), DELTA);
-            assertEquals(0.0, ssod.queryRangeAverage(250000, 250000, quark), DELTA);
+            assertEquals(0.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 0, 0, quark), DELTA);
+            assertEquals(5.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 500, 1500, quark), DELTA);
+            assertEquals(90.0 / 7, TmfStateSystemOperations.queryRangeAverage(ssqd, 1500, 5000, quark), DELTA);
+            assertEquals(90.0 / 5, TmfStateSystemOperations.queryRangeAverage(ssqd, 5000, 10000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 0, 10000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 0, 20000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 500, 20500, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 1000, 21000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 2000, 22000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 3000, 23000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 4000, 24000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 5000, 25000, quark), DELTA);
+            assertEquals(0.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 120000, 120000, quark), DELTA);
+            assertEquals(5.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 120500, 121500, quark), DELTA);
+            assertEquals(90.0 / 7, TmfStateSystemOperations.queryRangeAverage(ssqd, 121500, 125000, quark), DELTA);
+            assertEquals(90.0 / 5, TmfStateSystemOperations.queryRangeAverage(ssqd, 125000, 130000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 120000, 130000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 100000, 150000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 240000, 250000, quark), DELTA);
+            assertEquals(14.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 0, 250000, quark), DELTA);
+            assertEquals(0.0, TmfStateSystemOperations.queryRangeAverage(ssqd, 250000, 250000, quark), DELTA);
+
         } catch (AttributeNotFoundException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
+            fail(e.getMessage());
+        } catch (StateValueTypeException e) {
             fail(e.getMessage());
         }
     }

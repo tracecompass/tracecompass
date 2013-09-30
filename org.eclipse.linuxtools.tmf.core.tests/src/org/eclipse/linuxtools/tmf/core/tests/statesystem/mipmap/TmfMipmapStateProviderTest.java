@@ -50,7 +50,6 @@ public class TmfMipmapStateProviderTest {
     private static final double DELTA = 0.0001;
     private static final long TEST_TIMESTAMP = 12345000L;
     private static StateSystem ssq;
-    private static TmfStateSystemOperations sso;
 
     /**
      * Startup code, build a state system with n attributes always going up
@@ -61,7 +60,6 @@ public class TmfMipmapStateProviderTest {
         TmfMipmapStateProviderStub mmp = new TmfMipmapStateProviderStub(RESOLUTION, Type.LONG);
         IStateHistoryBackend be = new InMemoryBackend(0);
         ssq = new StateSystem(be);
-        sso = new TmfStateSystemOperations(ssq);
         mmp.assignTargetStateSystem(ssq);
 
         for (long time = START_TIME; time <= END_TIME; time += INTERVAL) {
@@ -427,27 +425,29 @@ public class TmfMipmapStateProviderTest {
             long max;
             int quark = ssq.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
 
-            max = sso.queryRangeMax(0, START_TIME, quark).unboxLong();
+            max = TmfStateSystemOperations.queryRangeMax(ssq, 0, START_TIME, quark).unboxLong();
             assertEquals(START_TIME / INTERVAL, max);
 
-            max = sso.queryRangeMax(START_TIME, START_TIME, quark).unboxLong();
+            max = TmfStateSystemOperations.queryRangeMax(ssq, START_TIME, START_TIME, quark).unboxLong();
             assertEquals(START_TIME / INTERVAL, max);
 
-            max = sso.queryRangeMax(START_TIME, END_TIME / 2, quark).unboxLong();
+            max = TmfStateSystemOperations.queryRangeMax(ssq, START_TIME, END_TIME / 2, quark).unboxLong();
             assertEquals((END_TIME / 2 / INTERVAL), max);
 
-            max = sso.queryRangeMax(0, END_TIME, quark).unboxLong();
+            max = TmfStateSystemOperations.queryRangeMax(ssq, 0, END_TIME, quark).unboxLong();
             assertEquals(END_TIME / INTERVAL, max);
 
-            max = sso.queryRangeMax(END_TIME / 2, END_TIME, quark).unboxLong();
+            max = TmfStateSystemOperations.queryRangeMax(ssq, END_TIME / 2, END_TIME, quark).unboxLong();
             assertEquals(END_TIME / INTERVAL, max);
 
-            max = sso.queryRangeMax(START_TIME - INTERVAL / 2, END_TIME / 2 + INTERVAL / 2, quark).unboxLong();
+            max = TmfStateSystemOperations.queryRangeMax(ssq, START_TIME - INTERVAL / 2, END_TIME / 2 + INTERVAL / 2, quark).unboxLong();
             assertEquals(END_TIME / 2 / INTERVAL, max);
 
         } catch (AttributeNotFoundException e) {
             fail(e.getMessage());
         } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
             fail(e.getMessage());
         }
     }
@@ -467,27 +467,29 @@ public class TmfMipmapStateProviderTest {
             long min;
             int quark = ssq.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
 
-            min = sso.queryRangeMin(0, START_TIME, quark).unboxLong();
+            min = TmfStateSystemOperations.queryRangeMin(ssq, 0, START_TIME, quark).unboxLong();
             assertEquals(START_TIME / INTERVAL, min);
 
-            min = sso.queryRangeMin(START_TIME, START_TIME, quark).unboxLong();
+            min = TmfStateSystemOperations.queryRangeMin(ssq, START_TIME, START_TIME, quark).unboxLong();
             assertEquals(START_TIME / INTERVAL, min);
 
-            min = sso.queryRangeMin(START_TIME, END_TIME / 2, quark).unboxLong();
+            min = TmfStateSystemOperations.queryRangeMin(ssq, START_TIME, END_TIME / 2, quark).unboxLong();
             assertEquals((START_TIME / INTERVAL), min);
 
-            min = sso.queryRangeMin(0, END_TIME, quark).unboxLong();
+            min = TmfStateSystemOperations.queryRangeMin(ssq, 0, END_TIME, quark).unboxLong();
             assertEquals(START_TIME / INTERVAL, min);
 
-            min = sso.queryRangeMin(END_TIME / 2, END_TIME, quark).unboxLong();
+            min = TmfStateSystemOperations.queryRangeMin(ssq, END_TIME / 2, END_TIME, quark).unboxLong();
             assertEquals(END_TIME / 2 / INTERVAL, min);
 
-            min = sso.queryRangeMin(START_TIME - INTERVAL / 2, END_TIME / 2 + INTERVAL / 2, quark).unboxLong();
+            min = TmfStateSystemOperations.queryRangeMin(ssq, START_TIME - INTERVAL / 2, END_TIME / 2 + INTERVAL / 2, quark).unboxLong();
             assertEquals(START_TIME / INTERVAL, min);
 
         } catch (AttributeNotFoundException e) {
             fail(e.getMessage());
         } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
             fail(e.getMessage());
         }
     }
@@ -506,25 +508,29 @@ public class TmfMipmapStateProviderTest {
             double avg;
             int quark = ssq.getQuarkAbsolute(TEST_ATTRIBUTE_NAME);
 
-            avg = sso.queryRangeAverage(0, START_TIME, quark);
+            avg = TmfStateSystemOperations.queryRangeAverage(ssq, 0, START_TIME, quark);
             assertEquals((double) (START_TIME - INTERVAL) / INTERVAL, avg, DELTA);
 
-            avg = sso.queryRangeAverage(START_TIME, START_TIME, quark);
+            avg = TmfStateSystemOperations.queryRangeAverage(ssq, START_TIME, START_TIME, quark);
             assertEquals((double) START_TIME / INTERVAL, avg, DELTA);
 
-            avg = sso.queryRangeAverage(START_TIME, END_TIME / 2, quark);
+            avg = TmfStateSystemOperations.queryRangeAverage(ssq, START_TIME, END_TIME / 2, quark);
             assertEquals((double) (START_TIME + (END_TIME / 2 - INTERVAL)) / 2 / INTERVAL, avg, DELTA);
 
-            avg = sso.queryRangeAverage(0, END_TIME, quark);
+            avg = TmfStateSystemOperations.queryRangeAverage(ssq, 0, END_TIME, quark);
             assertEquals((double) (END_TIME - INTERVAL) / 2 / INTERVAL, avg, DELTA);
 
-            avg = sso.queryRangeAverage(END_TIME / 2, END_TIME, quark);
+            avg = TmfStateSystemOperations.queryRangeAverage(ssq, END_TIME / 2, END_TIME, quark);
             assertEquals((double) (END_TIME / 2 + (END_TIME - INTERVAL)) / 2 / INTERVAL, avg, DELTA);
 
-            avg = sso.queryRangeAverage(START_TIME - INTERVAL / 2, END_TIME / 2 + INTERVAL / 2, quark);
+            avg = TmfStateSystemOperations.queryRangeAverage(ssq, START_TIME - INTERVAL / 2, END_TIME / 2 + INTERVAL / 2, quark);
             assertEquals((double) (START_TIME + (END_TIME / 2 - INTERVAL)) / 2 / INTERVAL, avg, DELTA);
 
         } catch (AttributeNotFoundException e) {
+            fail(e.getMessage());
+        } catch (TimeRangeException e) {
+            fail(e.getMessage());
+        } catch (StateValueTypeException e) {
             fail(e.getMessage());
         }
     }
