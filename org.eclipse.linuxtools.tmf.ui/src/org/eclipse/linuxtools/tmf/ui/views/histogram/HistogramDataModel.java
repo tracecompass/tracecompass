@@ -501,7 +501,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            the number of lost events
      * @param fullRange
      *            Full range or time range for histogram request
-     * @since 2.1
+     * @since 2.2
      */
     public void countLostEvent(TmfTimeRange timeRange, long nbLostEvents, boolean fullRange) {
 

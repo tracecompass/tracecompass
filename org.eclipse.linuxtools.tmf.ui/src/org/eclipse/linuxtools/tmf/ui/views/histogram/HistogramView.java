@@ -309,7 +309,7 @@ public class HistogramView extends TmfView {
      * get the show lost events action
      *
      * @return The action object
-     * @since 2.1
+     * @since 2.2
      */
     public Action getShowLostEventsAction() {
         if (hideLostEventsAction == null) {

@@ -338,7 +338,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * Returns the text control for the maximum of events in one bar
      *
      * @return the text control
-     * @since 2.1
+     * @since 2.2
      */
     public Text getMaxNbEventsText() {
         return fMaxNbEventsText;

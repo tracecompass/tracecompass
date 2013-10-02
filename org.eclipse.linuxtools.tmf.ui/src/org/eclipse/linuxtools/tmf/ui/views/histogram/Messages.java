@@ -32,7 +32,7 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.ui.views.histogram.messages"; //$NON-NLS-1$
 
     /**
-     * @since 2.1
+     * @since 2.2
      */
     public static String HistogramView_hideLostEvents;
     /**

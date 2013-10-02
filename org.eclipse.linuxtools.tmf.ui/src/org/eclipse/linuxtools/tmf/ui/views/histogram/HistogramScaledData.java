@@ -57,7 +57,7 @@ public class HistogramScaledData {
     /**
      * Array of scaled values combined including the lost events.
      * This array contains the number of lost events for each bar in the histogram
-     * @since 2.1
+     * @since 2.2
      */
     public final int[] fLostEventsData;
     /**
@@ -70,7 +70,7 @@ public class HistogramScaledData {
     public long fMaxValue;
     /**
      * the maximum of events of all buckets including the lost events
-     * @since 2.1
+     * @since 2.2
      */
     public long fMaxCombinedValue;
     /**
@@ -98,7 +98,7 @@ public class HistogramScaledData {
     public double fScalingFactor;
     /**
      * The scaling factor used to fill the scaled data including the lost events.
-     * @since 2.1
+     * @since 2.2
      */
     public double fScalingFactorCombined;
     /**
@@ -114,7 +114,7 @@ public class HistogramScaledData {
     public long fFirstEventTime;
     /**
      * show the lost events or not
-     * @since 2.1
+     * @since 2.2
      */
     public static volatile boolean hideLostEvents = false;
     // ------------------------------------------------------------------------

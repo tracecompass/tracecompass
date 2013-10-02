@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.ctf.core;
  * names, etc.)
  *
  * @author Alexandre Montplaisir
- * @since 2.1
+ * @since 2.2
  */
 @SuppressWarnings("nls")
 public interface CTFStrings {
