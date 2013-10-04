@@ -21,8 +21,7 @@ import java.util.TreeMap;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfLostEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -224,8 +223,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
         private long total;
 
         public StatsTotalRequest(ITmfTrace trace, TmfTimeRange range) {
-            super(trace.getEventType(), range, 0, TmfDataRequest.ALL_DATA,
-                    ITmfDataRequest.ExecutionType.BACKGROUND);
+            super(trace.getEventType(), range, 0, TmfEventRequest.ALL_DATA,
+                    ITmfEventRequest.ExecutionType.BACKGROUND);
             total = 0;
         }
 
@@ -252,8 +251,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
         private final Map<String, Long> stats;
 
         public StatsPerTypeRequest(ITmfTrace trace, TmfTimeRange range) {
-            super(trace.getEventType(), range, 0, TmfDataRequest.ALL_DATA,
-                    ITmfDataRequest.ExecutionType.BACKGROUND);
+            super(trace.getEventType(), range, 0, TmfEventRequest.ALL_DATA,
+                    ITmfEventRequest.ExecutionType.BACKGROUND);
             this.stats = new HashMap<String, Long>();
         }
 
@@ -317,8 +316,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
                             new TmfTimestamp(borders[0], SCALE),
                             new TmfTimestamp(endTime, SCALE)),
                     0,
-                    TmfDataRequest.ALL_DATA,
-                    ITmfDataRequest.ExecutionType.BACKGROUND);
+                    TmfEventRequest.ALL_DATA,
+                    ITmfEventRequest.ExecutionType.BACKGROUND);
 
             /* Prepare the results map, with all counts at 0 */
             results = new TreeMap<Long, Long>();

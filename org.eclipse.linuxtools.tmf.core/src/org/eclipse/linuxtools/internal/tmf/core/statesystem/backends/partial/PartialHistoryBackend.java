@@ -26,9 +26,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
@@ -292,8 +290,8 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
             super(input.getExpectedEventType(),
                     TmfTimeRange.ETERNITY,
                     0,
-                    TmfDataRequest.ALL_DATA,
-                    ITmfDataRequest.ExecutionType.BACKGROUND);
+                    TmfEventRequest.ALL_DATA,
+                    ITmfEventRequest.ExecutionType.BACKGROUND);
             checkpoints.clear();
             this.trace = input.getTrace();
             this.checkpts = checkpoints;
@@ -333,8 +331,8 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
             super(sci.getExpectedEventType(),
                     range,
                     0,
-                    TmfDataRequest.ALL_DATA,
-                    ITmfDataRequest.ExecutionType.BACKGROUND);
+                    TmfEventRequest.ALL_DATA,
+                    ITmfEventRequest.ExecutionType.BACKGROUND);
             this.sci = sci;
             this.trace = sci.getTrace();
         }

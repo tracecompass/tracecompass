@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfLostEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
@@ -69,7 +69,7 @@ public class HistogramRequest extends TmfEventRequest {
     @Deprecated
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range,
             int rank, int nbEvents, int blockSize,
-            ITmfDataRequest.ExecutionType execType) {
+            ITmfEventRequest.ExecutionType execType) {
         super(ITmfEvent.class, range, rank, nbEvents, execType);
         fHistogram = histogram;
         if (execType == ExecutionType.FOREGROUND) {
@@ -101,7 +101,7 @@ public class HistogramRequest extends TmfEventRequest {
      */
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range,
             int rank, int nbEvents, int blockSize,
-            ITmfDataRequest.ExecutionType execType, boolean fullRange) {
+            ITmfEventRequest.ExecutionType execType, boolean fullRange) {
         super(ITmfEvent.class, range, rank, nbEvents, execType);
         fHistogram = histogram;
         fFullRange = fullRange;
@@ -116,7 +116,7 @@ public class HistogramRequest extends TmfEventRequest {
      *
      * @param event
      *            a event from the trace
-     * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
+     * @see org.eclipse.linuxtools.tmf.core.request.TmfEventRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
      */
     @Override
     public void handleData(ITmfEvent event) {
@@ -138,7 +138,7 @@ public class HistogramRequest extends TmfEventRequest {
      * Complete the request. It also notifies the histogram model about the
      * completion.
      *
-     * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleCompleted()
+     * @see org.eclipse.linuxtools.tmf.core.request.TmfEventRequest#handleCompleted()
      */
     @Override
     public void handleCompleted() {

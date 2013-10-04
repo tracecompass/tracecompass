@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfEventThread;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest.ExecutionType;
 
 /**
  * The request scheduler works with 5 slots with a specific time. It has 4 slots

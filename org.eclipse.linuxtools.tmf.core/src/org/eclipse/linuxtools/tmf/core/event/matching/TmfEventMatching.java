@@ -20,8 +20,7 @@ import java.util.Map;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -244,8 +243,8 @@ class EventMatchingBuildRequest extends TmfEventRequest {
         super(CtfTmfEvent.class,
                 TmfTimeRange.ETERNITY,
                 0,
-                TmfDataRequest.ALL_DATA,
-                ITmfDataRequest.ExecutionType.FOREGROUND);
+                TmfEventRequest.ALL_DATA,
+                ITmfEventRequest.ExecutionType.FOREGROUND);
         this.matching = matching;
         this.traceno = traceno;
     }

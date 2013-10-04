@@ -32,11 +32,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
-import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
+import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
@@ -1160,7 +1159,7 @@ public class TmfTraceTest {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1189,7 +1188,7 @@ public class TmfTraceTest {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1219,7 +1218,7 @@ public class TmfTraceTest {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1250,7 +1249,7 @@ public class TmfTraceTest {
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1271,17 +1270,18 @@ public class TmfTraceTest {
         final int nbEvents  = 1000;
         final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
 
-        final TmfDataRequest request = new TmfDataRequest(ITmfEvent.class,
+        final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                TmfTimeRange.ETERNITY,
                 startIndex,
                 nbEvents,
-                TmfDataRequest.ExecutionType.FOREGROUND) {
+                TmfEventRequest.ExecutionType.FOREGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
@@ -1319,7 +1319,7 @@ public class TmfTraceTest {
                 }
             }
         };
-        final ITmfDataProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
+        final ITmfEventProvider[] providers = TmfProviderManager.getProviders(ITmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
         request.waitForCompletion();
 

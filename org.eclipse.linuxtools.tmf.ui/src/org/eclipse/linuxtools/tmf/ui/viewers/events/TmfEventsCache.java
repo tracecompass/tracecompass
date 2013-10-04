@@ -21,10 +21,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
+import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -199,7 +200,7 @@ public class TmfEventsCache {
     public int getFilteredEventIndex(final long rank) {
         int current;
         int startRank;
-        TmfDataRequest request;
+        TmfEventRequest request;
         final ITmfFilter filter = fFilter;
         synchronized (this) {
             int start = 0;
@@ -235,14 +236,14 @@ public class TmfEventsCache {
 
         final int index = current * fCacheSize;
 
-        class DataRequest extends TmfDataRequest {
+        class DataRequest extends TmfEventRequest {
             ITmfFilter requestFilter;
             int requestRank;
             int requestIndex;
 
             DataRequest(Class<? extends ITmfEvent> dataType, ITmfFilter reqFilter, int start, int nbRequested) {
-                super(dataType, start, nbRequested,
-                        TmfDataRequest.ExecutionType.FOREGROUND);
+                super(dataType, TmfTimeRange.ETERNITY, start, nbRequested,
+                        TmfEventRequest.ExecutionType.FOREGROUND);
                 requestFilter = reqFilter;
                 requestRank = start;
                 requestIndex = index;
@@ -269,8 +270,8 @@ public class TmfEventsCache {
             }
         }
 
-        request = new DataRequest(ITmfEvent.class, filter, startRank, TmfDataRequest.ALL_DATA);
-        ((ITmfDataProvider) fTrace).sendRequest(request);
+        request = new DataRequest(ITmfEvent.class, filter, startRank, TmfEventRequest.ALL_DATA);
+        ((ITmfEventProvider) fTrace).sendRequest(request);
         try {
             request.waitForCompletion();
             return ((DataRequest) request).getFilteredIndex();
@@ -324,7 +325,7 @@ public class TmfEventsCache {
                 if (fFilter == null) {
                     nbRequested = fCache.length;
                 } else {
-                    nbRequested = TmfDataRequest.ALL_DATA;
+                    nbRequested = TmfEventRequest.ALL_DATA;
                     int i = startIndex / fCacheSize;
                     if (i < fFilterIndex.size()) {
                         skipCount = startIndex - (i * fCacheSize);
@@ -332,10 +333,11 @@ public class TmfEventsCache {
                     }
                 }
 
-                TmfDataRequest request = new TmfDataRequest(ITmfEvent.class,
+                TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
+                        TmfTimeRange.ETERNITY,
                         startIndex,
                         nbRequested,
-                        TmfDataRequest.ExecutionType.FOREGROUND) {
+                        TmfEventRequest.ExecutionType.FOREGROUND) {
                     private int count = 0;
                     private long rank = startIndex;
                     @Override
@@ -370,7 +372,7 @@ public class TmfEventsCache {
                     }
                 };
 
-                ((ITmfDataProvider) fTrace).sendRequest(request);
+                ((ITmfEventProvider) fTrace).sendRequest(request);
                 try {
                     request.waitForCompletion();
                 } catch (InterruptedException e) {

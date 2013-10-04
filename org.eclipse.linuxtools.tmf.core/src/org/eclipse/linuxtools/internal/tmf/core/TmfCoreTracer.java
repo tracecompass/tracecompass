@@ -18,9 +18,9 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
-import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
+import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 
 /**
@@ -211,7 +211,7 @@ public class TmfCoreTracer {
     }
 
     @SuppressWarnings("javadoc")
-    public static void traceRequest(ITmfDataRequest request, String msg) {
+    public static void traceRequest(ITmfEventRequest request, String msg) {
         if (REQUEST_CLASS_ENABLED) {
             String message = ("[REQ] Req=" + request.getRequestId() + " " + msg);
             trace(message);
@@ -228,7 +228,7 @@ public class TmfCoreTracer {
     }
 
     @SuppressWarnings("javadoc")
-    public static void traceEvent(ITmfDataProvider provider, ITmfDataRequest request, ITmfEvent event) {
+    public static void traceEvent(ITmfEventProvider provider, ITmfEventRequest request, ITmfEvent event) {
         if (EVENT_CLASS_ENABLED) {
             String message = ("[EVT] Provider=" + provider.toString()
                     + ", Req=" + request.getRequestId() + ", Event=" + event.getTimestamp());

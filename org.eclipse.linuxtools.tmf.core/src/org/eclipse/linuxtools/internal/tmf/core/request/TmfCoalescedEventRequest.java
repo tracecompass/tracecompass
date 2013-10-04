@@ -8,31 +8,41 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Merge with TmfCoalescedDataRequest
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.request;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
 /**
  * The TMF coalesced event request
  *
- * @version 1.0
  * @author Francois Chouinard
+ * @since 3.0
  */
-public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements ITmfEventRequest {
+public class TmfCoalescedEventRequest extends TmfEventRequest {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private TmfTimeRange fRange; // The requested events time range
+    /** The list of coalesced requests */
+    private final List<ITmfEventRequest> fRequests = new ArrayList<ITmfEventRequest>();
+
+    /**
+     * We do not use super.fRange, because in the case of coalesced requests,
+     * the global range can be modified as sub-requets are added.
+     */
+    private TmfTimeRange fRange;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -52,7 +62,7 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
      *            the beginning.
      * @param nbRequested
      *            The number of events requested. You can use
-     *            {@link TmfDataRequest#ALL_DATA} to request all events.
+     *            {@link TmfEventRequest#ALL_DATA} to request all events.
      * @param priority
      *            The requested execution priority
      */
@@ -61,7 +71,7 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
             long index,
             int nbRequested,
             ExecutionType priority) {
-        super(ITmfEvent.class, index, nbRequested, priority);
+        super(ITmfEvent.class, null, index, nbRequested, priority);
         fRange = range;
 
         if (TmfCoreTracer.isRequestTraced()) {
@@ -69,7 +79,7 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
             type = type.substring(type.lastIndexOf('.') + 1);
             @SuppressWarnings("nls")
             String message = "CREATED "
-                    + (getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)")
+                    + (getExecType() == ITmfEventRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)")
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
@@ -77,35 +87,75 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
         }
     }
 
+    @Override
+    public TmfTimeRange getRange() {
+        return fRange;
+    }
+
     // ------------------------------------------------------------------------
     // Management
     // ------------------------------------------------------------------------
 
-    @Override
-    public void addRequest(ITmfDataRequest request) {
-        super.addRequest(request);
-        if (request instanceof ITmfEventRequest) {
-            merge((ITmfEventRequest) request);
-        }
+    /**
+     * Add a request to this one.
+     *
+     * @param request
+     *            The request to add
+     */
+    public void addRequest(ITmfEventRequest request) {
+        fRequests.add(request);
+        merge(request);
     }
 
-    @Override
-    public boolean isCompatible(ITmfDataRequest request) {
-        if (request instanceof ITmfEventRequest) {
-            if (super.isCompatible(request)) {
-                return overlaps((ITmfEventRequest) request);
-            }
+    /**
+     * Check if a request is compatible with the current coalesced one
+     *
+     * @param request
+     *            The request to verify
+     * @return If the request is compatible, true or false
+     */
+    public boolean isCompatible(ITmfEventRequest request) {
+        if (request.getExecType() == getExecType() &&
+                ranksOverlap(request) &&
+                timeRangesOverlap(request)) {
+            return true;
         }
         return false;
     }
 
-    private boolean overlaps(ITmfEventRequest request) {
+    private boolean ranksOverlap(ITmfEventRequest request) {
+        long start = request.getIndex();
+        long end = start + request.getNbRequested();
+
+        // Return true if either the start or end index falls within
+        // the coalesced request boundaries
+        return (start <= (fIndex + fNbRequested + 1) && (end >= fIndex - 1));
+    }
+
+    private boolean timeRangesOverlap(ITmfEventRequest request) {
         ITmfTimestamp startTime = request.getRange().getStartTime();
         ITmfTimestamp endTime = request.getRange().getEndTime();
-        return (startTime.compareTo(endTime) <= 0) && (fRange.getStartTime().compareTo(fRange.getEndTime()) <= 0);
+        return (startTime.compareTo(endTime) <= 0) &&
+                (fRange.getStartTime().compareTo(fRange.getEndTime()) <= 0);
     }
 
     private void merge(ITmfEventRequest request) {
+        long start = request.getIndex();
+        long end = Math.min(start + request.getNbRequested(), TmfEventRequest.ALL_DATA);
+
+        if (start < fIndex) {
+            if (fNbRequested != TmfEventRequest.ALL_DATA) {
+                fNbRequested += (fIndex - start);
+            }
+            fIndex = start;
+        }
+        if ((request.getNbRequested() == TmfEventRequest.ALL_DATA) ||
+                (fNbRequested == TmfEventRequest.ALL_DATA)) {
+            fNbRequested = TmfEventRequest.ALL_DATA;
+        } else {
+            fNbRequested = (int) Math.max(end - fIndex, fNbRequested);
+        }
+
         ITmfTimestamp startTime = request.getRange().getStartTime();
         ITmfTimestamp endTime = request.getRange().getEndTime();
         if (!fRange.contains(startTime) && fRange.getStartTime().compareTo(startTime) > 0) {
@@ -116,41 +166,20 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
         }
     }
 
-    // ------------------------------------------------------------------------
-    // ITmfDataRequest
-    // ------------------------------------------------------------------------
-
-    @Override
-    public void handleData(ITmfEvent data) {
-        super.handleData(data);
-        long index = getIndex() + getNbRead() - 1;
-        for (ITmfDataRequest request : fRequests) {
-            if (data == null) {
-                request.handleData(null);
-            } else {
-                long start = request.getIndex();
-                long end = start + request.getNbRequested();
-                if (request instanceof ITmfEventRequest) {
-                    ITmfEventRequest req = (ITmfEventRequest) request;
-                    if (!req.isCompleted() && index >= start && index < end) {
-                        ITmfTimestamp ts = data.getTimestamp();
-                        if (req.getRange().contains(ts)) {
-                            if (req.getDataType().isInstance(data)) {
-                                req.handleData(data);
-                            }
-                        }
-                    }
-                }
-                else {
-                    TmfDataRequest req = (TmfDataRequest) request;
-                    if (!req.isCompleted() && index >= start && index < end) {
-                        if (req.getDataType().isInstance(data)) {
-                            req.handleData(data);
-                        }
-                    }
-                }
+    /**
+     * @return The list of IDs of the sub-requests
+     */
+    @SuppressWarnings("nls")
+    public String getSubRequestIds() {
+        StringBuffer result = new StringBuffer("[");
+        for (int i = 0; i < fRequests.size(); i++) {
+            if (i != 0) {
+                result.append(", ");
             }
+            result.append(fRequests.get(i).getRequestId());
         }
+        result.append("]");
+        return result.toString();
     }
 
     // ------------------------------------------------------------------------
@@ -158,13 +187,110 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
     // ------------------------------------------------------------------------
 
     @Override
-    public TmfTimeRange getRange() {
-        return fRange;
+    public void handleData(ITmfEvent data) {
+        super.handleData(data);
+        long index = getIndex() + getNbRead() - 1;
+        for (ITmfEventRequest request : fRequests) {
+            if (data == null) {
+                request.handleData(null);
+            } else {
+                long start = request.getIndex();
+                long end = start + request.getNbRequested();
+                if (!request.isCompleted() && index >= start && index < end) {
+                    ITmfTimestamp ts = data.getTimestamp();
+                    if (request.getRange().contains(ts)) {
+                        if (request.getDataType().isInstance(data)) {
+                            request.handleData(data);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
-    public void setStartIndex(int index) {
-        setIndex(index);
+    public void start() {
+        for (ITmfEventRequest request : fRequests) {
+            if (!request.isCompleted()) {
+                request.start();
+            }
+        }
+        super.start();
+    }
+
+    @Override
+    public void done() {
+        for (ITmfEventRequest request : fRequests) {
+            if (!request.isCompleted()) {
+                request.done();
+            }
+        }
+        super.done();
+    }
+
+    @Override
+    public void fail() {
+        for (ITmfEventRequest request : fRequests) {
+            request.fail();
+        }
+        super.fail();
+    }
+
+    @Override
+    public void cancel() {
+        for (ITmfEventRequest request : fRequests) {
+            if (!request.isCompleted()) {
+                request.cancel();
+            }
+        }
+        super.cancel();
+    }
+
+    @Override
+    public synchronized boolean isCompleted() {
+        // Firstly, check if coalescing request is completed
+        if (super.isCompleted()) {
+            return true;
+        }
+
+        // Secondly, check if all sub-requests are finished
+        if (fRequests.size() > 0) {
+            // If all sub requests are completed the coalesced request is
+            // treated as completed, too.
+            for (ITmfEventRequest request : fRequests) {
+                if (!request.isCompleted()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Coalescing request is not finished if there are no sub-requests
+        return false;
+    }
+
+    @Override
+    public synchronized boolean isCancelled() {
+        // Firstly, check if coalescing request is canceled
+        if (super.isCancelled()) {
+            return true;
+        }
+
+        // Secondly, check if all sub-requests are canceled
+        if (fRequests.size() > 0) {
+            // If all sub requests are canceled the coalesced request is
+            // treated as completed, too.
+            for (ITmfEventRequest request : fRequests) {
+                if (!request.isCancelled()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Coalescing request is not canceled if there are no sub-requests
+        return false;
+
     }
 
     // ------------------------------------------------------------------------
@@ -184,10 +310,7 @@ public class TmfCoalescedEventRequest extends TmfCoalescedDataRequest implements
             return (request.getDataType() == getDataType()) &&
                     (request.getIndex() == getIndex()) &&
                     (request.getNbRequested() == getNbRequested()) &&
-                    (request.getRange().equals(getRange()));
-        }
-        if (other instanceof TmfCoalescedDataRequest) {
-            return super.equals(other);
+                    (request.getRange().equals(fRange));
         }
         return false;
     }
