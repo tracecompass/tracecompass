@@ -45,6 +45,7 @@ public interface ITmfImageConstants {
     public static final String IMG_UI_HIDE_ARROWS = ICONS_PATH + "elcl16/hide_arrows.gif";
     public static final String IMG_UI_FOLLOW_ARROW_FORWARD = ICONS_PATH + "elcl16/follow_arrow_fwd.gif";
     public static final String IMG_UI_FOLLOW_ARROW_BACKWARD = ICONS_PATH + "elcl16/follow_arrow_bwd.gif";
+    public static final String IMG_UI_SHOW_LOST_EVENTS = ICONS_PATH + "elcl16/hide_lost_events.gif";
 
     /* eview16 */
     public static final String IMG_UI_SEQ_DIAGRAM_OBJ = ICONS_PATH + "eview16/sequencediagram_view.gif";

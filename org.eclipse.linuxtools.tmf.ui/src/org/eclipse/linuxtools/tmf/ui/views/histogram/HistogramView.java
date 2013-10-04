@@ -18,6 +18,11 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
@@ -39,6 +44,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 
 /**
  * The purpose of this view is to provide graphical time distribution statistics about the trace events.
@@ -100,6 +106,9 @@ public class HistogramView extends TmfView {
     // Throttlers for the time sync and time-range sync signals
     private final TmfSignalThrottler fTimeSyncThrottle;
     private final TmfSignalThrottler fTimeRangeSyncThrottle;
+
+    // Action for toggle showing the lost events
+    private Action hideLostEventsAction;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -251,6 +260,10 @@ public class HistogramView extends TmfView {
         MouseWheelListener listener = fFullTraceHistogram.getZoom();
         fTimeSpanControl.addMouseWheelListener(listener);
 
+
+        // View Action Handling
+        contributeToActionBars();
+
         ITmfTrace trace = getActiveTrace();
         if (trace != null) {
             traceSelected(new TmfTraceSelectedSignal(this, trace));
@@ -290,6 +303,36 @@ public class HistogramView extends TmfView {
         return new TmfTimeRange(
                 new TmfTimestamp(fWindowStartTime, ITmfTimestamp.NANOSECOND_SCALE),
                 new TmfTimestamp(fWindowEndTime, ITmfTimestamp.NANOSECOND_SCALE));
+    }
+
+    /**
+     * get the show lost events action
+     *
+     * @return The action object
+     * @since 2.2
+     */
+    public Action getShowLostEventsAction() {
+        if (hideLostEventsAction == null) {
+            /* show lost events */
+            hideLostEventsAction = new Action(Messages.HistogramView_hideLostEvents, IAction.AS_CHECK_BOX) {
+                @Override
+                public void run() {
+                    HistogramScaledData.hideLostEvents = hideLostEventsAction.isChecked();
+                    long maxNbEvents = HistogramScaledData.hideLostEvents ? fFullTraceHistogram.fScaledData.fMaxValue : fFullTraceHistogram.fScaledData.fMaxCombinedValue;
+                    fFullTraceHistogram.getMaxNbEventsText().setText(Long.toString(maxNbEvents));
+                    fFullTraceHistogram.getMaxNbEventsText().getParent().layout();
+                    fFullTraceHistogram.fCanvas.redraw();
+                    maxNbEvents = HistogramScaledData.hideLostEvents ? fTimeRangeHistogram.fScaledData.fMaxValue : fTimeRangeHistogram.fScaledData.fMaxCombinedValue;
+                    fTimeRangeHistogram.getMaxNbEventsText().setText(Long.toString(maxNbEvents));
+                    fTimeRangeHistogram.getMaxNbEventsText().getParent().layout();
+                    fTimeRangeHistogram.fCanvas.redraw();
+                }
+            };
+            hideLostEventsAction.setText(Messages.HistogramView_hideLostEvents);
+            hideLostEventsAction.setToolTipText(Messages.HistogramView_hideLostEvents);
+            hideLostEventsAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SHOW_LOST_EVENTS));
+        }
+        return hideLostEventsAction;
     }
 
     // ------------------------------------------------------------------------
@@ -615,7 +658,7 @@ public class HistogramView extends TmfView {
         fTimeRangeHistogram.setTimeRange(startTime, endTime - startTime);
 
         int cacheSize = fTrace.getCacheSize();
-        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, TmfDataRequest.ALL_DATA, cacheSize, ExecutionType.FOREGROUND);
+        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, TmfDataRequest.ALL_DATA, cacheSize, ExecutionType.FOREGROUND, false);
         fTrace.sendRequest(fTimeRangeRequest);
     }
 
@@ -625,8 +668,14 @@ public class HistogramView extends TmfView {
         }
         int cacheSize = fTrace.getCacheSize();
         fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(), fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
-                TmfDataRequest.ALL_DATA, cacheSize, ExecutionType.BACKGROUND);
+                TmfDataRequest.ALL_DATA, cacheSize, ExecutionType.BACKGROUND, true);
         fTrace.sendRequest(fFullTraceRequest);
+    }
+
+    private void contributeToActionBars() {
+        IActionBars bars = getViewSite().getActionBars();
+        bars.getToolBarManager().add(getShowLostEventsAction());
+        bars.getToolBarManager().add(new Separator());
     }
 
 }

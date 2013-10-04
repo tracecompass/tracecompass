@@ -23,6 +23,8 @@ package org.eclipse.linuxtools.tmf.core.statevalue;
  */
 final class NullStateValue extends TmfStateValue {
 
+    private final String value = "nullValue"; //$NON-NLS-1$
+
     @Override
     public Type getType() {
         return Type.NULL;
@@ -35,12 +37,12 @@ final class NullStateValue extends TmfStateValue {
 
     @Override
     public Object getValue() {
-        return null;
+        return value;
     }
 
     @Override
     public String toString() {
-        return "nullValue"; //$NON-NLS-1$
+        return value;
     }
 
     // ------------------------------------------------------------------------

@@ -11,22 +11,25 @@
  *   Yuriy Vashchuk - Heritage correction.
  *   Francois Chouinard - Cleanup and refactoring
  *   Francois Chouinard - Moved from LTTng to TMF
+ *   Simon Delisle - Added a new parameter to the constructor
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfLostEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
 /**
- * Class to request events for given time range from a trace to fill a HistogramDataModel and HistogramView.
+ * Class to request events for given time range from a trace to fill a
+ * HistogramDataModel and HistogramView.
  *
  * @version 1.0
  * @author Francois Chouinard
- * <p>
+ *         <p>
  */
 public class HistogramRequest extends TmfEventRequest {
 
@@ -38,6 +41,8 @@ public class HistogramRequest extends TmfEventRequest {
      * The histogram data model to fill.
      */
     protected final HistogramDataModel fHistogram;
+
+    private final boolean fFullRange;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -61,11 +66,45 @@ public class HistogramRequest extends TmfEventRequest {
      * @since 2.0
      *
      */
+    @Deprecated
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range,
             int rank, int nbEvents, int blockSize,
             ITmfDataRequest.ExecutionType execType) {
         super(ITmfEvent.class, range, rank, nbEvents, execType);
         fHistogram = histogram;
+        if (execType == ExecutionType.FOREGROUND) {
+            fFullRange = false;
+        } else {
+            fFullRange = true;
+        }
+    }
+
+    /**
+     * Constructor
+     *
+     * @param histogram
+     *            The histogram data model
+     * @param range
+     *            The time range to request data
+     * @param rank
+     *            The index of the first event to retrieve
+     * @param nbEvents
+     *            The number of events requested
+     * @param blockSize
+     *            The number of events per block
+     * @param execType
+     *            The requested execution priority
+     * @param fullRange
+     *            Full range or time range for histogram request
+     * @since 2.2
+     *
+     */
+    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range,
+            int rank, int nbEvents, int blockSize,
+            ITmfDataRequest.ExecutionType execType, boolean fullRange) {
+        super(ITmfEvent.class, range, rank, nbEvents, execType);
+        fHistogram = histogram;
+        fFullRange = fullRange;
     }
 
     // ------------------------------------------------------------------------
@@ -75,20 +114,29 @@ public class HistogramRequest extends TmfEventRequest {
     /**
      * Handle the event from the trace by updating the histogram data model.
      *
-     * @param event a event from the trace
+     * @param event
+     *            a event from the trace
      * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
      */
     @Override
     public void handleData(ITmfEvent event) {
         super.handleData(event);
         if (event != null) {
-            long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-            fHistogram.countEvent(getNbRead(), timestamp);
+            if (event instanceof ITmfLostEvent) {
+                ITmfLostEvent lostEvents = (ITmfLostEvent) event;
+                /* clear the old data when it is a new request */
+                fHistogram.countLostEvent(lostEvents.getTimeRange(), lostEvents.getNbLostEvents(), fFullRange);
+
+            } else { /* handle lost event */
+                long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                fHistogram.countEvent(getNbRead(), timestamp);
+            }
         }
     }
 
     /**
-     * Complete the request. It also notifies the histogram model about the completion.
+     * Complete the request. It also notifies the histogram model about the
+     * completion.
      *
      * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleCompleted()
      */

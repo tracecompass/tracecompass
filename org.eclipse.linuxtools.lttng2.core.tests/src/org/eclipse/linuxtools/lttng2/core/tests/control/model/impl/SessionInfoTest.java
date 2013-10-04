@@ -189,7 +189,7 @@ public class SessionInfoTest {
         String result = fixture.toString();
 
         // add additional test code here
-        assertEquals("[SessionInfo([TraceInfo(Name=sessionName)],State=INACTIVE,isStreamedTrace=false,Domains=)]", result);
+        assertEquals("[SessionInfo([TraceInfo(Name=sessionName)],Path=,State=INACTIVE,isStreamedTrace=false,Domains=)]", result);
     }
 
     /**
@@ -200,7 +200,31 @@ public class SessionInfoTest {
         String result = fSessionInfo1.toString();
 
         // add additional test code here
-        assertEquals("[SessionInfo([TraceInfo(Name=session1)],State=ACTIVE,isStreamedTrace=false,Domains=[DomainInfo([TraceInfo(Name=test1)],Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],isKernel=false)])]", result);
+        assertEquals("[SessionInfo([TraceInfo(Name=session1)],Path=/home/user/lttng-trace/mysession/,State=ACTIVE,isStreamedTrace=false,snapshotInfo="
+                + "[SnapshotInfo([TraceInfo(Name=snapshot-1)],snapshotPath=/home/user/lttng-trace/mysession/,ID=1,isStreamedSnapshot=false)],"
+                    + "Domains=[DomainInfo([TraceInfo(Name=test1)],"
+                        + "Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),"
+                            + "Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],"
+                + "isKernel=false)])]", result);
+    }
+
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
+    public void testToString_3() {
+        SessionInfo info = new SessionInfo((SessionInfo)fSessionInfo1);
+        info.setSnapshotInfo(null);
+        info.setSessionPath("/home/user/lttng-trace/mysession/");
+
+        String result = info.toString();
+
+        // add additional test code here
+        assertEquals("[SessionInfo([TraceInfo(Name=session1)],Path=/home/user/lttng-trace/mysession/,State=ACTIVE,isStreamedTrace=false,"
+                    + "Domains=[DomainInfo([TraceInfo(Name=test1)],"
+                        + "Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),"
+                            + "Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],"
+                + "isKernel=false)])]", result);
     }
 
     // ------------------------------------------------------------------------

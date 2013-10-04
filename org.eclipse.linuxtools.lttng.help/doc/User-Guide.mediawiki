@@ -524,6 +524,7 @@ The Histogram View displays the trace events distribution with respect to time. 
 
 [[Image:images/HistogramView.png]]
 
+The '''Hide Lost Events''' toggle button [[Image:images/hide_lost_events.gif]] in the local toolbar allows to hide the bars of lost events. When the button is selected it can be toggled again to show the lost events.
 
 On the top left, there are two data controls:
 
@@ -938,6 +939,15 @@ The text field '''Trace Path''' allows for specifying the path relative to the l
 
 To create a session with advanced options, fill in the relevant parameters and press '''Ok'''. Upon successful operation a new session will be created and added under the tree node '''Sessions'''.
 
+==== Creating a Snapshot Tracing Session ====
+LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After starting tracing the trace events are not stored on disk or over the network. They are only transfered to disk or over the network when the user records a snapshot. To create such a snapshot session, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]].
+
+[[Image:images/LTTng2CreateSessionDialog_Snapshot.png]]
+
+Fill in all necessary information, select checkbox for '''Snapshot Mode''' and press '''Ok'''. By default, the location for the snapshot output will be on the host where the host is located.
+
+Refer to chapter [[#Recording a Snapshot | Recording a Snapshot]] for how to create a snapshot.
+
 ==== Enabling Channels - General ====
 
 Enabling channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.
@@ -1199,9 +1209,17 @@ To start tracing, select one or more sessions to start in the Control View and p
 
 Upon successful operation, the tracing session will be '''ACTIVE''' and the icon of the session will be updated.
 
+==== Recording a Snapshot ====
+
+LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After creating a snapshot session (see [[#Creating a Snapshot Tracing Session | Creating a Snapshot Tracing Session]]) and starting tracing (see [[#Start Tracing | Start Tracing]]) it possible to record snapshots. To record a snapshot select one or more sessions and press the '''Record Snapshot''' button. Alternatively, press the right mouse button on the session tree nodes. A context-sensitive menu will show. Then select the '''Recored Snapshot''' menu item.
+
+[[Image:images/LTTng2RecordSnapshotAction.png]]
+
+This action can be executed many times. It is possible to import the recorded snpshots to a tracing project. The trace session might be '''ACTIVE''' or '''INACTIVE''' for that. Refer to section [[#Importing Session Traces to a Tracing Project | Importing Session Traces to a Tracing Project]] on how to import a trace to a tracing project.
+
 ==== Stop Tracing ====
 
-To stop tracing, select one or more sessions to stop in the Control View and press the '''Stop''' button. Alternatively, click the right mouse button on the session tree nodes. A context-sensitive menu will show. Then select the '''Stop''' menu item.
+To stop tracing, select one or more sessions to stop in the Control View and press the '''Stop''' button. Alternatively, click the right mouse button on the session tree node. A context-sensitive menu will show. Then select the '''Stop''' menu item.
 
 [[Image:images/LTTng2StopTracingAction.png]]
 
@@ -1288,8 +1306,11 @@ The Control View provides property information of selected tree component. Depen
 ** '''Log Level''': The log level of the event.
 * '''Session''' Properties
 ** '''Session Name''': The name of the Session.
-** '''Session Path''': The path on the remote host where the traces will be stored.
+** '''Session Path''': The path on the remote host where the traces will be stored. (Not shown for snapshot sessions).
 ** '''State''': The state of the session ('''ACTIVE''' or '''INACTIVE''')
+** '''Snapshot ID''': The snapshot ID. (Only shown for snapshot sessions).
+** '''Snapshot Name''': The name of the snapshot output configuration. (Only shown for snapshot sessions).
+** '''Snapshot Path''': The path where the snapshot session is located. (Only shown for snapshot sessions).
 * '''Domain''' Properties
 ** '''Domain Name''': The name of the domain.
 ** '''Buffer Type''': The buffer type of the domain.

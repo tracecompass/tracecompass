@@ -103,6 +103,14 @@ public interface LTTngControlServiceConstants {
      * Command to execute calibrate command to quantify LTTng overhead
      */
     static final String COMMAND_CALIBRATE = " calibrate "; //$NON-NLS-1$
+    /**
+     * Command to execute calibrate command to quantify LTTng overhead
+     */
+    static final String COMMAND_LIST_SNAPSHOT_OUTPUT = " snapshot list-output "; //$NON-NLS-1$
+    /**
+     * Command to execute calibrate command to quantify LTTng overhead
+     */
+    static final String COMMAND_RECORD_SNAPSHOT = " snapshot record "; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Command line options constants
@@ -127,6 +135,10 @@ public interface LTTngControlServiceConstants {
      * Command line option for output path.
      */
     static final String OPTION_OUTPUT_PATH = " -o "; //$NON-NLS-1$
+    /**
+     * Command line option for output path.
+     */
+    static final String OPTION_SNAPSHOT = " --snapshot "; //$NON-NLS-1$
     /**
      * Command line option for kernel tracer.
      */
@@ -254,11 +266,15 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match for session information (lttng list)
      */
-    static final Pattern SESSION_PATTERN = Pattern.compile("\\s+(\\d+)\\)\\s+(.*)\\s+\\((.*)\\)\\s+\\[(active|inactive)\\].*"); //$NON-NLS-1$
+    static final Pattern SESSION_PATTERN = Pattern.compile("\\s+(\\d+)\\)\\s+(.*)\\s+\\((.*)\\)\\s+\\[(active|inactive).*\\].*"); //$NON-NLS-1$
     /**
      * Pattern to match for session information (lttng list <session>)
      */
     static final Pattern TRACE_SESSION_PATTERN = Pattern.compile("\\s*Tracing\\s+session\\s+(.*)\\:\\s+\\[(active|inactive)\\].*"); //$NON-NLS-1$
+    /**
+     * Pattern to match for snapshot session information (lttng list <session>)
+     */
+    static final Pattern TRACE_SNAPSHOT_SESSION_PATTERN = Pattern.compile("\\s*Tracing\\s+session\\s+(.*)\\:\\s+\\[(active|inactive)\\s*snapshot\\].*"); //$NON-NLS-1$
     /**
      * Pattern to match for session path information (lttng list <session>)
      */
@@ -267,7 +283,7 @@ public interface LTTngControlServiceConstants {
      * Pattern to match session path for network tracing (lttng list <session>)
      * Note: file for protocol is not considered as network trace since local consumer will be used.
      */
-    static final Pattern TRACE_NETWORK_PATH_PATTERN = Pattern.compile("\\s*Trace\\s+path\\:\\s+(net|net6|tcp|tcp6)\\:\\/\\/(.*)(\\:(\\d*)\\/(.*)\\[data\\:\\s+(\\d*)\\]){0,1}"); //$NON-NLS-1$
+    static final Pattern TRACE_NETWORK_PATH_PATTERN = Pattern.compile("\\s*Trace\\s+path\\:\\s+(net|net4|net6|tcp|tcp6)\\:\\/\\/(.*)(\\:(\\d*)\\/(.*)\\[data\\:\\s+(\\d*)\\]){0,1}"); //$NON-NLS-1$
     /**
      * Sub-pattern to pattern TRACE_NETWORK_PATH_PATTERN to match file protocol
      */
@@ -392,4 +408,14 @@ public interface LTTngControlServiceConstants {
      * Pattern to match error line if no ust tracer is available or installed.
      */
     static final Pattern LIST_UST_NO_UST_PROVIDER_PATTERN = Pattern.compile(".*Unable\\s*to\\s*list\\s*UST\\s*event.*"); //$NON-NLS-1$;
+    /**
+     * Pattern to match for list snapshot information (lttng snapshot list-output)
+     */
+    static final Pattern LIST_SNAPSHOT_OUTPUT_PATTERN = Pattern.compile("\\s+\\[(\\d+)\\]\\s+(.*)\\:\\s+(.*)"); //$NON-NLS-1$
+    /**
+     * Pattern to match snapshot path for network tracing (lttng list <session>)
+     * Note: file for protocol is not considered as network trace since local consumer will be used.
+     */
+    static final Pattern SNAPSHOT_NETWORK_PATH_PATTERN = Pattern.compile("(net|net4|net6|tcp|tcp6)\\:\\/\\/(.*)(\\:(\\d*)\\/(.*)\\[data\\:\\s+(\\d*)\\]){0,1}"); //$NON-NLS-1$
+
 }
