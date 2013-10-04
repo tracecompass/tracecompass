@@ -16,6 +16,7 @@ Export-Package: org.eclipse.linuxtools.ctf.core.tests;x-friends:="org.eclipse.li
  org.eclipse.linuxtools.ctf.core.tests.headless;x-internal:=true,
  org.eclipse.linuxtools.ctf.core.tests.io;x-internal:=true,
  org.eclipse.linuxtools.ctf.core.tests.shared,
+ org.eclipse.linuxtools.ctf.core.tests.synthetictraces;x-internal:=true,
  org.eclipse.linuxtools.ctf.core.tests.trace;x-internal:=true,
  org.eclipse.linuxtools.ctf.core.tests.types;x-internal:=true
 Import-Package: org.antlr.runtime;version="3.2.0"
