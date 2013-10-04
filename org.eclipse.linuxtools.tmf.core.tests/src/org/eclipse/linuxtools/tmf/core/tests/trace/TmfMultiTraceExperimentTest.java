@@ -89,12 +89,12 @@ public class TmfMultiTraceExperimentTest {
 
             URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TmfTestTrace.O_TEST_10K.getFullPath()), null);
             File test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true, null, null);
+            final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true, null);
             traces[0] = trace1;
 
             location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TmfTestTrace.E_TEST_10K.getFullPath()), null);
             test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true, null, null);
+            final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true, null);
             traces[1] = trace2;
 
             return traces;

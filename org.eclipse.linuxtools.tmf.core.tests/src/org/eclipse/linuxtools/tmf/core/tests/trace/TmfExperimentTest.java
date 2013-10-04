@@ -83,7 +83,7 @@ public class TmfExperimentTest {
             try {
                 final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
                 final File test = new File(FileLocator.toFileURL(location).toURI());
-                final TmfTraceStub trace = new TmfTraceStub(test.getPath(), 0, true, null, null);
+                final TmfTraceStub trace = new TmfTraceStub(test.getPath(), 0, true, null);
                 fTestTraces[0] = trace;
             } catch (final TmfTraceException e) {
                 e.printStackTrace();

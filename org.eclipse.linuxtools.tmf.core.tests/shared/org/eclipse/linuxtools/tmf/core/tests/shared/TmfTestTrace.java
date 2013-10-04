@@ -80,7 +80,7 @@ public enum TmfTestTrace {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
             try {
                 File test = new File(FileLocator.toFileURL(location).toURI());
-                trace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null, null);
+                trace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
 
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);

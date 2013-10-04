@@ -134,7 +134,7 @@ public class Uml2SDTestFacility {
             // Create test trace object
             final URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path("tracesets/sdEvents"), null);
             final File test = new File(FileLocator.toFileURL(location).toURI());
-            return new TmfTraceStub(test.getPath(), 500, true, null, parser);
+            return new TmfTraceStub(test.getPath(), 500, true, parser);
         } catch (final TmfTraceException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

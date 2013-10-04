@@ -403,7 +403,7 @@ public class TmfCoalescedEventRequestTest {
             try {
                 URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
                 File test = new File(FileLocator.toFileURL(location).toURI());
-                fTrace = new TmfTraceStub(test.getPath(), 500, false, null, null);
+                fTrace = new TmfTraceStub(test.getPath(), 500, false, null);
             } catch (TmfTraceException e) {
                 e.printStackTrace();
             } catch (URISyntaxException e) {

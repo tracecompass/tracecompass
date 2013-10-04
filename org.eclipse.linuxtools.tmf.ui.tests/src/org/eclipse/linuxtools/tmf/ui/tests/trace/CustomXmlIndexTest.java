@@ -24,6 +24,7 @@ import java.util.Date;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 
 /**
  * Test suite for indexing using a CustomXmlTrace.
@@ -66,7 +67,11 @@ public class CustomXmlIndexTest extends AbstractCustomTraceIndexTest {
     private class TestXmlTrace extends CustomXmlTrace implements TestTrace {
         public TestXmlTrace(String path, CustomXmlTraceDefinition createDefinition, int blockSize) throws TmfTraceException {
             super(null, createDefinition, path, blockSize);
-            setIndexer(new TestIndexer(this, blockSize));
+        }
+
+        @Override
+        protected ITmfTraceIndexer createIndexer(int interval) {
+            return new TestIndexer(this, interval);
         }
 
         @Override

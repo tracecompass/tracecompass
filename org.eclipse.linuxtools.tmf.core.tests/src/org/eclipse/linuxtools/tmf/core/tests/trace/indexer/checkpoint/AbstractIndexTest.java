@@ -150,8 +150,12 @@ public abstract class AbstractIndexTest {
          *             when error occurs
          */
         public TestTrace(String path, int blockSize) throws TmfTraceException {
-            super(path, blockSize, false, null, null);
-            setIndexer(createTestIndexer(this));
+            super(path, blockSize, false, null);
+        }
+
+        @Override
+        protected ITmfTraceIndexer createIndexer(int interval) {
+            return createTestIndexer(this);
         }
 
         @Override
@@ -163,7 +167,11 @@ public abstract class AbstractIndexTest {
     private class EmptyTestTrace extends TmfEmptyTraceStub {
         public EmptyTestTrace() {
             super();
-            setIndexer(new TestIndexer(this));
+        }
+
+        @Override
+        protected ITmfTraceIndexer createIndexer(int interval) {
+            return new TestIndexer(this);
         }
 
         @Override

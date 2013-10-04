@@ -142,6 +142,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      */
     public TmfTrace() {
         super();
+        fIndexer = createIndexer(DEFAULT_BLOCK_SIZE);
     }
 
     /**
@@ -159,9 +160,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @param interval
      *            The trace streaming interval. You can use '0' for post-mortem
      *            traces.
-     * @param indexer
-     *            The trace indexer. You can pass 'null' to use a default
-     *            checkpoint indexer.
      * @param parser
      *            The trace event parser. Use 'null' if (and only if) the trace
      *            object itself is also the ITmfEventParser to be used.
@@ -173,14 +171,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             final String path,
             final int cacheSize,
             final long interval,
-            final ITmfTraceIndexer indexer,
             final ITmfEventParser parser)
                     throws TmfTraceException {
         super();
         fCacheSize = (cacheSize > 0) ? cacheSize : ITmfTrace.DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
         fParser = parser;
-        fIndexer = indexer;
         initialize(resource, path, type);
     }
 
@@ -256,9 +252,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         super.init(traceName, type);
         // register as VIP after super.init() because TmfComponent registers to signal manager there
         TmfSignalManager.registerVIP(this);
-        if (fIndexer == null) {
-            fIndexer = createIndexer(fCacheSize);
-        }
+        fIndexer = createIndexer(fCacheSize);
     }
 
     /**
@@ -518,16 +512,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      */
     protected void setStreamingInterval(final long interval) {
         fStreamingInterval = (interval > 0) ? interval : 0;
-    }
-
-    /**
-     * Set the trace indexer. Must be done at initialization time.
-     *
-     * @param indexer the trace indexer
-     * @since 3.0
-     */
-    protected void setIndexer(final ITmfTraceIndexer indexer) {
-        fIndexer = indexer;
     }
 
     /**

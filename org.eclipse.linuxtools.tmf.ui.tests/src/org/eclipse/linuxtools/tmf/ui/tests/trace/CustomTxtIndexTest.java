@@ -24,6 +24,7 @@ import java.util.Date;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 
 /**
  * Test suite for indexing using a CustomTxtTrace.
@@ -64,7 +65,11 @@ public class CustomTxtIndexTest extends AbstractCustomTraceIndexTest {
     private class TestTxtTrace extends CustomTxtTrace implements TestTrace {
         public TestTxtTrace(String path, CustomTxtTraceDefinition createDefinition, int blockSize) throws TmfTraceException {
             super(null, createDefinition, path, blockSize);
-            setIndexer(new TestIndexer(this, blockSize));
+        }
+
+        @Override
+        protected ITmfTraceIndexer createIndexer(int interval) {
+            return new TestIndexer(this, interval);
         }
 
         @Override
