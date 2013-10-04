@@ -37,21 +37,17 @@ public class TmfContextTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private final String aString = "some location";
     private final Long aLong = 12345L;
     private final TmfTimestamp aTimestamp = new TmfTimestamp();
 
-    private final TmfStringLocation fLocation1 = new TmfStringLocation(aString);
-    private final TmfLongLocation fLocation2 = new TmfLongLocation(aLong);
-    private final TmfTimestampLocation fLocation3 = new TmfTimestampLocation(aTimestamp);
+    private final TmfLongLocation fLocation1 = new TmfLongLocation(aLong);
+    private final TmfTimestampLocation fLocation2 = new TmfTimestampLocation(aTimestamp);
 
     private final long fRank1 = 1;
     private final long fRank2 = 2;
-    private final long fRank3 = 3;
 
     private final TmfContext fContext1 = new TmfContext(fLocation1, fRank1);
     private final TmfContext fContext2 = new TmfContext(fLocation2, fRank2);
-    private final TmfContext fContext3 = new TmfContext(fLocation3, fRank3);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -68,41 +64,33 @@ public class TmfContextTest {
     public void testTmfContextNoRank() {
         final TmfContext context1 = new TmfContext(fLocation1);
         final TmfContext context2 = new TmfContext(fLocation2);
-        final TmfContext context3 = new TmfContext(fLocation3);
 
         assertEquals("getLocation", fLocation1, context1.getLocation());
         assertEquals("getLocation", fLocation2, context2.getLocation());
-        assertEquals("getLocation", fLocation3, context3.getLocation());
 
         assertEquals("getRank", ITmfContext.UNKNOWN_RANK, context1.getRank());
         assertEquals("getRank", ITmfContext.UNKNOWN_RANK, context2.getRank());
-        assertEquals("getRank", ITmfContext.UNKNOWN_RANK, context3.getRank());
     }
 
     @Test
     public void testTmfContext() {
         assertEquals("getLocation", fLocation1, fContext1.getLocation());
         assertEquals("getLocation", fLocation2, fContext2.getLocation());
-        assertEquals("getLocation", fLocation3, fContext3.getLocation());
 
         assertEquals("getRank", fRank1, fContext1.getRank());
         assertEquals("getRank", fRank2, fContext2.getRank());
-        assertEquals("getRank", fRank3, fContext3.getRank());
     }
 
     @Test
     public void testTmfContextCopy() {
         final TmfContext context1 = new TmfContext(fContext1);
         final TmfContext context2 = new TmfContext(fContext2);
-        final TmfContext context3 = new TmfContext(fContext3);
 
         assertEquals("getLocation", fLocation1, context1.getLocation());
         assertEquals("getLocation", fLocation2, context2.getLocation());
-        assertEquals("getLocation", fLocation3, context3.getLocation());
 
         assertEquals("getRank", fRank1, context1.getRank());
         assertEquals("getRank", fRank2, context2.getRank());
-        assertEquals("getRank", fRank3, context3.getRank());
     }
 
     @Test
@@ -219,13 +207,11 @@ public class TmfContextTest {
 
     @Test
     public void testToString() {
-        final String expected1 = "TmfContext [fLocation=" + fLocation1 + ", fRank=" + 1 + "]";
-        final String expected2 = "TmfContext [fLocation=" + fLocation2 + ", fRank=" + 2 + "]";
-        final String expected3 = "TmfContext [fLocation=" + fLocation3 + ", fRank=" + 3 + "]";
+        final String expected1 = "TmfContext [fLocation=" + fLocation1 + ", fRank=" + fRank1 + "]";
+        final String expected2 = "TmfContext [fLocation=" + fLocation2 + ", fRank=" + fRank2 + "]";
 
         assertEquals("toString", expected1, fContext1.toString());
         assertEquals("toString", expected2, fContext2.toString());
-        assertEquals("toString", expected3, fContext3.toString());
     }
 
     // ------------------------------------------------------------------------
@@ -238,7 +224,7 @@ public class TmfContextTest {
         context1.setLocation(fContext2.getLocation());
 
         assertEquals("getLocation", fLocation2, context1.getLocation());
-        assertEquals("getRank", 1, context1.getRank());
+        assertEquals("getRank", fRank1, context1.getRank());
     }
 
     @Test
