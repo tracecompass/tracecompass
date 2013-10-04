@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfLostEvent;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
@@ -232,7 +233,7 @@ public class CtfTmfLostEventsTest {
 
         public EventCountRequest() {
             super(CtfTmfEvent.class, TmfTimeRange.ETERNITY, 0,
-                    TmfEventRequest.ALL_DATA, ExecutionType.FOREGROUND);
+                    ITmfEventRequest.ALL_DATA, ExecutionType.FOREGROUND);
         }
 
         @Override

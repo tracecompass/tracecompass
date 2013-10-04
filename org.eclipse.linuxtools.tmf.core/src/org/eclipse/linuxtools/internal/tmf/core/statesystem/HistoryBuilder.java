@@ -232,7 +232,7 @@ class StateSystemBuildRequest extends TmfEventRequest {
         super(builder.getStateProvider().getExpectedEventType(),
                 TmfTimeRange.ETERNITY,
                 0,
-                TmfEventRequest.ALL_DATA,
+                ITmfEventRequest.ALL_DATA,
                 ITmfEventRequest.ExecutionType.BACKGROUND);
         this.builder = builder;
         this.sci = builder.getStateProvider();

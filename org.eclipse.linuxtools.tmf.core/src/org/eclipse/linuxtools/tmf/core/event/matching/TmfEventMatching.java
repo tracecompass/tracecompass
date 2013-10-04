@@ -243,7 +243,7 @@ class EventMatchingBuildRequest extends TmfEventRequest {
         super(CtfTmfEvent.class,
                 TmfTimeRange.ETERNITY,
                 0,
-                TmfEventRequest.ALL_DATA,
+                ITmfEventRequest.ALL_DATA,
                 ITmfEventRequest.ExecutionType.FOREGROUND);
         this.matching = matching;
         this.traceno = traceno;

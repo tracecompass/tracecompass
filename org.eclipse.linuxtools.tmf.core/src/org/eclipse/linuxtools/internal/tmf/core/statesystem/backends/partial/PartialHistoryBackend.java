@@ -290,7 +290,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
             super(input.getExpectedEventType(),
                     TmfTimeRange.ETERNITY,
                     0,
-                    TmfEventRequest.ALL_DATA,
+                    ITmfEventRequest.ALL_DATA,
                     ITmfEventRequest.ExecutionType.BACKGROUND);
             checkpoints.clear();
             this.trace = input.getTrace();
@@ -331,7 +331,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
             super(sci.getExpectedEventType(),
                     range,
                     0,
-                    TmfEventRequest.ALL_DATA,
+                    ITmfEventRequest.ALL_DATA,
                     ITmfEventRequest.ExecutionType.BACKGROUND);
             this.sci = sci;
             this.trace = sci.getTrace();

@@ -141,17 +141,17 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
 
     private void merge(ITmfEventRequest request) {
         long start = request.getIndex();
-        long end = Math.min(start + request.getNbRequested(), TmfEventRequest.ALL_DATA);
+        long end = Math.min(start + request.getNbRequested(), ITmfEventRequest.ALL_DATA);
 
         if (start < fIndex) {
-            if (fNbRequested != TmfEventRequest.ALL_DATA) {
+            if (fNbRequested != ITmfEventRequest.ALL_DATA) {
                 fNbRequested += (fIndex - start);
             }
             fIndex = start;
         }
-        if ((request.getNbRequested() == TmfEventRequest.ALL_DATA) ||
-                (fNbRequested == TmfEventRequest.ALL_DATA)) {
-            fNbRequested = TmfEventRequest.ALL_DATA;
+        if ((request.getNbRequested() == ITmfEventRequest.ALL_DATA) ||
+                (fNbRequested == ITmfEventRequest.ALL_DATA)) {
+            fNbRequested = ITmfEventRequest.ALL_DATA;
         } else {
             fNbRequested = (int) Math.max(end - fIndex, fNbRequested);
         }

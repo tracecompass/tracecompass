@@ -23,8 +23,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest.ExecutionType;
-import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalThrottler;
@@ -658,7 +658,8 @@ public class HistogramView extends TmfView {
         fTimeRangeHistogram.setTimeRange(startTime, endTime - startTime);
 
         int cacheSize = fTrace.getCacheSize();
-        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, TmfEventRequest.ALL_DATA, cacheSize, ExecutionType.FOREGROUND, false);
+        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(),
+                timeRange, 0, ITmfEventRequest.ALL_DATA, cacheSize, ExecutionType.FOREGROUND, false);
         fTrace.sendRequest(fTimeRangeRequest);
     }
 
@@ -667,8 +668,12 @@ public class HistogramView extends TmfView {
             fFullTraceRequest.cancel();
         }
         int cacheSize = fTrace.getCacheSize();
-        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(), fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
-                TmfEventRequest.ALL_DATA, cacheSize, ExecutionType.BACKGROUND, true);
+        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(),
+                fullRange,
+                (int) fFullTraceHistogram.fDataModel.getNbEvents(),
+                ITmfEventRequest.ALL_DATA,
+                cacheSize,
+                ExecutionType.BACKGROUND, true);
         fTrace.sendRequest(fFullTraceRequest);
     }
 

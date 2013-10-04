@@ -311,7 +311,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             TmfTimeRange window = TmfTimeRange.ETERNITY;
 
             fIndexRequest = new TmfEventRequest(ITmfEvent.class, window, 0,
-                    TmfEventRequest.ALL_DATA, ITmfEventRequest.ExecutionType.BACKGROUND) {
+                    ITmfEventRequest.ALL_DATA, ITmfEventRequest.ExecutionType.BACKGROUND) {
 
                 private ITmfTimestamp fFirstTime = null;
                 private ITmfTimestamp fLastTime = null;
@@ -1075,7 +1075,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         }
 
         fPageRequest = new TmfEventRequest(ITmfEvent.class, window, 0,
-                TmfEventRequest.ALL_DATA, ITmfEventRequest.ExecutionType.FOREGROUND) {
+                ITmfEventRequest.ALL_DATA, ITmfEventRequest.ExecutionType.FOREGROUND) {
             private final List<ITmfSyncSequenceDiagramEvent> fSdEvent = new ArrayList<ITmfSyncSequenceDiagramEvent>();
 
             @Override
@@ -1246,7 +1246,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
          */
         public SearchJob(Criteria findCriteria, TmfTimeRange window) {
             super(Messages.TmfUml2SDSyncLoader_SearchJobDescrition);
-            fSearchRequest = new SearchEventRequest(window, TmfEventRequest.ALL_DATA,
+            fSearchRequest = new SearchEventRequest(window, ITmfEventRequest.ALL_DATA,
                     ITmfEventRequest.ExecutionType.FOREGROUND, findCriteria);
         }
 
