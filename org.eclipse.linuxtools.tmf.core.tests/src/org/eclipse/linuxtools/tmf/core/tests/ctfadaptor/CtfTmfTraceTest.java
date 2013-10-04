@@ -189,7 +189,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetEventType() {
-        Class<ITmfEvent> result = fixture.getEventType();
+        Class<? extends ITmfEvent> result = fixture.getEventType();
         assertNotNull(result);
     }
 
