@@ -102,7 +102,7 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
     public void read(BitBuffer input) {
         final long longNegBit = 0x0000000080000000L;
         int align = (int) declaration.getAlignment();
-        int pos = input.position() + ((align - (input.position() % align)) % align);
+        long pos = input.position() + ((align - (input.position() % align)) % align);
         input.position(pos);
         boolean signed = declaration.isSigned();
         int length = declaration.getLength();

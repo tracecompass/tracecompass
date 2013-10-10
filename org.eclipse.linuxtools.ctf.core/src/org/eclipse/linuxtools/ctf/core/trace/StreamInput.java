@@ -396,8 +396,8 @@ public class StreamInput implements IDefinitionScope {
          * If there is no packet context, infer the content and packet size from
          * the file size (assume that there is only one packet and no padding)
          */
-        packetIndex.setContentSizeBits((int) (fileSizeBytes * 8));
-        packetIndex.setPacketSizeBits((int) (fileSizeBytes * 8));
+        packetIndex.setContentSizeBits(fileSizeBytes * 8);
+        packetIndex.setPacketSizeBits(fileSizeBytes * 8);
     }
 
     private void parsePacketContext(long fileSizeBytes,

@@ -92,7 +92,7 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     @Override
     public void read(BitBuffer input) {
         final int align = (int) declaration.getAlignment();
-        int pos = input.position()
+        long pos = input.position()
                 + ((align - (input.position() % align)) % align);
         input.position(pos);
         final List<String> fieldList = declaration.getFieldsList();

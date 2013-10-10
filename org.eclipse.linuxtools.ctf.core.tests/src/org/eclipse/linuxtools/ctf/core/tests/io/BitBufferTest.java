@@ -143,7 +143,7 @@ public class BitBufferTest {
      */
     @Test
     public void testGetPosition() {
-        int result = fixture.position();
+        long result = fixture.position();
 
         assertEquals(1, result);
     }
