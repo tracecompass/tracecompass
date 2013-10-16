@@ -32,7 +32,6 @@ http://www.eclipse.org/legal/epl-v10.html
 
    <windowImages i16="/org.eclipse.linuxtools.tracing.rcp.ui/icons/alt_window_16.gif" i32="/org.eclipse.linuxtools.tracing.rcp.ui/icons/alt_window_32.gif"/>
 
-
    <launcher name="traceViewer">
       <solaris/>
       <win useIco="false">
@@ -182,6 +181,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
    <features>
       <feature id="org.eclipse.linuxtools.tracing.rcp"/>
       <feature id="org.eclipse.linuxtools.lttng2.kernel"/>
+      <feature id="org.eclipse.linuxtools.lttng2.ust"/>
       <feature id="org.eclipse.linuxtools.lttng2"/>
       <feature id="org.eclipse.linuxtools.tmf"/>
       <feature id="org.eclipse.linuxtools.ctf"/>
