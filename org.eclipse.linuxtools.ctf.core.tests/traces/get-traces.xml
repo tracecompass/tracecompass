@@ -15,6 +15,7 @@
   <get ignoreerrors="true" dest="trace2.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2"/>
   <get ignoreerrors="true" dest="kernel_vm.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/kernel_vm.tar.bz2" />
   <get ignoreerrors="true" dest="hello-lost.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/hello-lost.tar.bz2" />
+  <get ignoreerrors="true" dest="funky_trace.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/funky_trace.tar.bz2" />
   <exec executable = "git" failifexecutionfails="false">
     <arg value = "clone"/>
     <arg value = "https://github.com/efficios/ctf-testsuite.git"/>
@@ -31,6 +32,7 @@
       <available file="trace2.tar.bz2"/>
       <available file="kernel_vm.tar.bz2" />
       <available file="hello-lost.tar.bz2" />
+      <available file="funky_trace.tar.bz2" />
     </and>
   </condition>
   <antcall target="extractTraces"/>
@@ -47,10 +49,13 @@
     <bunzip2 src="trace2.tar.bz2"/>
     <bunzip2 src="kernel_vm.tar.bz2" />
     <bunzip2 src="hello-lost.tar.bz2" />
+    <bunzip2 src="funky_trace.tar.bz2" />
+
     <untar src="sample-ctf-trace-20120412.tar" dest="." />
     <untar src="trace2.tar" dest="." />
     <untar src="kernel_vm.tar" dest="." />
     <untar src="hello-lost.tar" dest="." />
+    <untar src="funky_trace.tar" dest="." />
     <echo message="Traces extracted successfully"/>
 </target>
 </project>
