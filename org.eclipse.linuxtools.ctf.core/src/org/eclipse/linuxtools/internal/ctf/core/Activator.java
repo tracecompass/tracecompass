@@ -92,7 +92,9 @@ public class Activator extends Plugin {
 
     /**
      * Log a message
-     * @param msg the message to log
+     *
+     * @param msg
+     *            The message to log
      */
     public static void log(String msg) {
         log(msg, null);
@@ -100,18 +102,37 @@ public class Activator extends Plugin {
 
     /**
      * Log a message with an exception
-     * @param msg the message
-     * @param e the exception
+     *
+     * @param msg
+     *            The message
+     * @param e
+     *            The exception
      */
     public static void log(String msg, Exception e) {
         getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
     }
 
     /**
+     * Log an error, with an associated exception
+     *
+     * @param msg
+     *            The error message
+     * @param e
+     *            The cause
+     */
+    public static void logError(String msg, Exception e) {
+        getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
+    }
+
+    /**
      * Log a message
-     * @param severity desired severity of the message in the log,
-     *    one of {@link IStatus#INFO}, {@link IStatus#WARNING} or {@link IStatus#ERROR}
-     * @param msg the message to log
+     *
+     * @param severity
+     *            Desired severity of the message in the log, one of
+     *            {@link IStatus#INFO}, {@link IStatus#WARNING} or
+     *            {@link IStatus#ERROR}
+     * @param msg
+     *            The message to log
      */
     public static void log(int severity, String msg) {
         getDefault().getLog().log(new Status(severity, PLUGIN_ID, msg));
