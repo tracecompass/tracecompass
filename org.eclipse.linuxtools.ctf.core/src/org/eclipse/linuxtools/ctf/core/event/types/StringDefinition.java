@@ -101,6 +101,11 @@ public class StringDefinition extends Definition {
 
     @Override
     public void read(BitBuffer input) {
+        /* Offset the buffer position wrt the current alignment */
+        int align = (int) declaration.getAlignment();
+        int pos = input.position() + ((align - (input.position() % align)) % align);
+        input.position(pos);
+
         string.setLength(0);
 
         char c = (char) input.getInt(8, false);

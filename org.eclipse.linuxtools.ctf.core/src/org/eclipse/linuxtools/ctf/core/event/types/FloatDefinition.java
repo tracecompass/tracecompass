@@ -86,11 +86,14 @@ public class FloatDefinition extends Definition {
 
     @Override
     public void read(BitBuffer input) {
-        int exp = declaration.getExponent();
-        int mant = declaration.getMantissa();
+        /* Offset the buffer position wrt the current alignment */
         int align = (int) declaration.getAlignment();
         int pos = input.position() + ((align - (input.position() % align)) % align);
         input.position(pos);
+
+        final int exp = declaration.getExponent();
+        final int mant = declaration.getMantissa();
+
         if ((exp + mant) == 32) {
             value = readRawFloat32(input, mant, exp);
         } else if ((exp + mant) == 64) {
