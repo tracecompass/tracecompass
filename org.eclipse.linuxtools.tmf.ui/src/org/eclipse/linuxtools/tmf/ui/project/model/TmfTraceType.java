@@ -305,16 +305,16 @@ public final class TmfTraceType {
 
         // add the custom trace types
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-            String traceTypeName = CUSTOM_TXT_CATEGORY + SEPARATOR + def.definitionName;
-            TraceTypeHelper tt = new TraceTypeHelper(traceTypeName, CUSTOM_TXT_CATEGORY, def.definitionName, new CustomTxtTrace(def));
-            fTraceTypes.put(traceTypeName, tt);
-            traceTypes.add(traceTypeName);
+            String traceTypeId = CustomTxtTrace.class.getCanonicalName() + SEPARATOR + def.definitionName;
+            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_TXT_CATEGORY, def.definitionName, new CustomTxtTrace(def));
+            fTraceTypes.put(traceTypeId, tt);
+            traceTypes.add(traceTypeId);
         }
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-            String traceTypeName = CUSTOM_XML_CATEGORY + SEPARATOR + def.definitionName;
-            TraceTypeHelper tt = new TraceTypeHelper(traceTypeName, CUSTOM_XML_CATEGORY, def.definitionName, new CustomXmlTrace(def));
-            fTraceTypes.put(traceTypeName, tt);
-            traceTypes.add(traceTypeName);
+            String traceTypeId = CustomXmlTrace.class.getCanonicalName() + SEPARATOR + def.definitionName;
+            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_XML_CATEGORY, def.definitionName, new CustomXmlTrace(def));
+            fTraceTypes.put(traceTypeId, tt);
+            traceTypes.add(traceTypeId);
         }
         return traceTypes;
     }
@@ -563,6 +563,23 @@ public final class TmfTraceType {
     }
 
     /**
+     * Is the trace type id a custom (user-defined) trace type. These are the traces
+     * like : text and xml defined by the custom trace wizard.
+     *
+     * @param traceTypeId
+     *            the trace type id
+     * @return true if the trace is a custom type
+     */
+    private static boolean isCustomTraceId(String traceTypeId) {
+        TraceTypeHelper traceType = getInstance().getTraceType(traceTypeId);
+        if (traceType != null) {
+            return isCustomTrace(traceType.getCategoryName() + SEPARATOR + traceType.getName());
+        }
+
+        return false;
+    }
+
+    /**
      * Gets the custom trace type ID from the custom trace name
      *
      * @param traceType
@@ -650,7 +667,7 @@ public final class TmfTraceType {
      * Only return the leaves of the trace types. Ignore custom trace types.
      */
     private static boolean isUnique(TraceTypeHelper trace, List<TraceTypeHelper> set) {
-        if (TmfTraceType.isCustomTrace(trace.getCanonicalName())) {
+        if (TmfTraceType.isCustomTraceId(trace.getCanonicalName())) {
             return true;
         }
         // check if the trace type is the leaf. we make an instance of the trace
@@ -721,8 +738,7 @@ public final class TmfTraceType {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
         String TRACE_NAME = path.lastSegment();
         String traceBundle = null, traceTypeId = traceType.getCanonicalName(), traceIcon = null;
-        if (TmfTraceType.isCustomTrace(traceTypeId)) {
-            traceTypeId = TmfTraceType.getCustomTraceTypeId(traceTypeId);
+        if (TmfTraceType.isCustomTraceId(traceTypeId)) {
             traceBundle = Activator.getDefault().getBundle().getSymbolicName();
             traceIcon = DEFAULT_TRACE_ICON_PATH;
         } else {

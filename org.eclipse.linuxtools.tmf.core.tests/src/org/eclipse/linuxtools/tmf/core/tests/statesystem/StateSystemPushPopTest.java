@@ -49,7 +49,7 @@ public class StateSystemPushPopTest {
     private ITmfStateInterval interval;
     private int attribute;
 
-    private final File testHtFile;
+    private File testHtFile;
 
     private final static String errMsg = "Caught exception: ";
 
@@ -60,17 +60,6 @@ public class StateSystemPushPopTest {
     private final static ITmfStateValue value3 = TmfStateValue.nullValue();
     private final static ITmfStateValue value4 = TmfStateValue.newValueString("D");
     private final static ITmfStateValue value5 = TmfStateValue.newValueLong(Long.MAX_VALUE);
-
-    /**
-     * Test case constructor
-     *
-     * @throws IOException
-     *             If we couldn't create the state history test file
-     */
-    public StateSystemPushPopTest() throws IOException {
-        testHtFile = File.createTempFile("test", ".ht");
-        testHtFile.deleteOnExit();
-    }
 
     /**
      * Initialization. We run the checks for the return values of
@@ -90,6 +79,7 @@ public class StateSystemPushPopTest {
     public void setUp() throws IOException, TimeRangeException,
             AttributeNotFoundException, StateValueTypeException {
         ITmfStateValue value;
+        testHtFile = File.createTempFile("test", ".ht");
 
         IStateHistoryBackend backend = new HistoryTreeBackend(testHtFile, 0, 0L);
         ss = new StateSystem(backend, true);

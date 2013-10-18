@@ -46,13 +46,21 @@ public class IntegerDeclaration implements IDeclaration {
 
     /**
      * Contructor
-     * @param len the length in bits
-     * @param signed is the integer signed? false == unsigned
-     * @param base the base (10-16 are most common)
-     * @param byteOrder Big endian little endian or other
-     * @param encoding ascii, utf8 or none.
-     * @param clock the clock path, can be null
-     * @param alignment the minimum alignment
+     *
+     * @param len
+     *            The length in bits
+     * @param signed
+     *            Is the integer signed? false == unsigned
+     * @param base
+     *            The base (10-16 are most common)
+     * @param byteOrder
+     *            Big endian little endian or other
+     * @param encoding
+     *            ascii, utf8 or none.
+     * @param clock
+     *            The clock path, can be null
+     * @param alignment
+     *            The minimum alignment. Should be >= 1
      */
     public IntegerDeclaration(int len, boolean signed, int base,
             ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
@@ -65,7 +73,7 @@ public class IntegerDeclaration implements IDeclaration {
         this.byteOrder = byteOrder;
         this.encoding = encoding;
         this.clock = clock;
-        this.alignment = alignment;
+        this.alignment = Math.max(alignment, 1);
     }
 
     // ------------------------------------------------------------------------

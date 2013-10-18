@@ -19,7 +19,10 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
 
 /**
  * Base unit test class for any type of ITmfStatistics. Sub-classes should
@@ -28,6 +31,10 @@ import org.junit.Test;
  * @author Alexandre Montplaisir
  */
 public abstract class TmfStatisticsTest {
+
+    /** Time-out tests after 20 seconds */
+    @Rule
+    public TestRule globalTimeout= new Timeout(20000);
 
     /** Test trace used for these tests */
     protected static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;

@@ -265,18 +265,18 @@ public class TmfEventsStatistics implements ITmfStatistics {
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
             if (event != null && event.getTrace() == trace) {
+                String eventType = event.getType().getName();
                 /*
                  * Special handling for lost events: instead of counting just
                  * one, we will count how many actual events it represents.
                  */
                 if (event instanceof ITmfLostEvent) {
                     ITmfLostEvent le = (ITmfLostEvent) event;
-                    incrementStats(Messages.LostEventsName, le.getNbLostEvents());
+                    incrementStats(eventType, le.getNbLostEvents());
                     return;
                 }
 
                 /* For standard event types, just increment by one */
-                String eventType = event.getType().getName();
                 incrementStats(eventType, 1L);
             }
         }
