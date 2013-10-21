@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>org.eclipse.linuxtools.tracing.rcp.branding</artifactId>
+  <packaging>eclipse-plugin</packaging>
+  <name>Linux Tools Trace Viewer Branding plug-in</name>
+
+  <parent>
+    <version>3.0.0-SNAPSHOT</version>
+    <groupId>org.eclipse.linuxtools.lttng</groupId>
+    <artifactId>linuxtools-lttng-parent</artifactId>
+  </parent>
+
+</project>

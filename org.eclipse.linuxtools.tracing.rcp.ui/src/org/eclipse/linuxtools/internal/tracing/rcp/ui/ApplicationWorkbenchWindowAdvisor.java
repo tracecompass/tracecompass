@@ -95,7 +95,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowCoolBar(false);
         configurer.setShowStatusLine(true);
         configurer.setShowProgressIndicator(true);
-        configurer.setTitle(Messages.ApplicationWorkbenchWindowAdvisor_WindowTitle);
     }
 
     @Override
