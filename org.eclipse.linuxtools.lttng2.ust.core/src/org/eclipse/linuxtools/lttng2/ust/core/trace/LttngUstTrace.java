@@ -8,9 +8,12 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Marc-Andre Laperle - Handle BufferOverflowException (Bug 420203)
  **********************************************************************/
 
 package org.eclipse.linuxtools.lttng2.ust.core.trace;
+
+import java.nio.BufferOverflowException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
@@ -43,10 +46,13 @@ public class LttngUstTrace extends CtfTmfTrace {
         try {
             temp = new CTFTrace(path);
         } catch (CTFReaderException e) {
-            status = new Status(IStatus.ERROR,  Activator.PLUGIN_ID, e.toString(), e);
+            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
             return status;
-        } catch (NullPointerException e){
-            status = new Status(IStatus.ERROR,  Activator.PLUGIN_ID, e.toString(), e);
+        } catch (NullPointerException e) {
+            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
+            return status;
+        } catch (final BufferOverflowException e) {
+            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_TraceReadError + ": " + Messages.LttngUstTrace_MalformedTrace); //$NON-NLS-1$
             return status;
         }
 
