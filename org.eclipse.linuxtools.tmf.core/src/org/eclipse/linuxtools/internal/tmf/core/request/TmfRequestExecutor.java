@@ -62,7 +62,7 @@ public class TmfRequestExecutor implements Executor {
     // The tasks
     private TmfEventThread fActiveTask;
 
-    private final Timer fTimer = new Timer(true);
+    private Timer fTimer;
     private TimerTask fTimerTask;
 
     private int fForegroundCycle = 0;
@@ -80,10 +80,6 @@ public class TmfRequestExecutor implements Executor {
         if (TmfCoreTracer.isComponentTraced()) {
             TmfCoreTracer.trace(fExecutor + " created"); //$NON-NLS-1$
         }
-
-        // Initialize the timer for the schedSwitch
-        fTimerTask = new SchedSwitch();
-        fTimer.schedule(fTimerTask, 0, REQUEST_TIME);
     }
 
     /**
@@ -126,6 +122,19 @@ public class TmfRequestExecutor implements Executor {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
+    /**
+     * Initialize the executor
+     */
+    public void init() {
+        if (fTimer != null) {
+            return;
+        }
+        // Initialize the timer for the schedSwitch
+        fTimerTask = new SchedSwitch();
+        fTimer = new Timer(true);
+        fTimer.schedule(fTimerTask, 0, REQUEST_TIME);
+    }
 
     @Override
     public synchronized void execute(final Runnable command) {
@@ -209,8 +218,13 @@ public class TmfRequestExecutor implements Executor {
      * Stops the executor
      */
     public synchronized void stop() {
-        fTimerTask.cancel();
-        fTimer.cancel();
+        if (fTimerTask != null) {
+            fTimerTask.cancel();
+        }
+
+        if (fTimer != null) {
+            fTimer.cancel();
+        }
 
         if (fActiveTask != null) {
             fActiveTask.cancel();

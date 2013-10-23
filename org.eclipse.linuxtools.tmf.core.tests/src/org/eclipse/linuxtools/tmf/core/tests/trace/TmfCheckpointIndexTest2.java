@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
@@ -107,6 +108,7 @@ public class TmfCheckpointIndexTest2 {
         public EmptyTestTrace() {
             super();
             setIndexer(new TestIndexer(this));
+            init(getClass().getSimpleName(), TmfEvent.class);
         }
         @Override
         public TestIndexer getIndexer() {
