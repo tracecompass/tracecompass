@@ -265,6 +265,15 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         return getControlService().isVersionSupported("2.3.0"); //$NON-NLS-1$
     }
 
+    /**
+     * Returns if node supports adding contexts on event
+     * @return <code>true</code> if it supports adding contexts on events else <code>false</code>
+     *
+     */
+    public boolean isContextOnEventSupported() {
+        return !getControlService().isVersionSupported("2.2.0"); //$NON-NLS-1$
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

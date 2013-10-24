@@ -1193,9 +1193,9 @@ Adding contexts on channels and events from the channel level, will enable the s
 
 A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. '''Note''' that the LTTng 2.0 tracer control on the remote host doesn't provide a way to retrieve added contexts. Hence it's not possible to display the context information in the GUI.
 
-==== Adding Contexts to a Event of a Specific Channel ====
+==== Adding Contexts to an Event of a Specific Channel ====
 
-Adding contexts to a event of a channel, select an event of a channel, click right mouse button on the corresponding event tree node and select the menu item '''Add Context...''' from the context-sensitive menu.
+Adding contexts to an event of a channel is only available in LTTng Tools versions v2.0.0-2.1.x. The menu option won't be visible for LTTng Tools version v2.2.0 or later. To add contexts on an event select an event of a channel, click right mouse button on the corresponding event tree node and select the menu item '''Add Context...''' from the context-sensitive menu.
 
 [[Image:images/LTTng2AddContextToEventsAction.png]]
 
