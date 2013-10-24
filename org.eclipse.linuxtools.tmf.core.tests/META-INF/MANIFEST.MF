@@ -16,4 +16,5 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.linuxtools.ctf.core.tests;bundle-version="3.0.0"
 Export-Package: org.eclipse.linuxtools.tmf.core.tests,
  org.eclipse.linuxtools.tmf.core.tests.shared,
- org.eclipse.linuxtools.tmf.tests.stubs.trace;x-friends:="org.eclipse.linuxtools.tmf.ui.tests"
+ org.eclipse.linuxtools.tmf.tests.stubs.trace;x-friends:="org.eclipse.linuxtools.tmf.ui.tests",
+ org.eclipse.linuxtools.tmf.tests.stubs.ctf;x-friends:="org.eclipse.linuxtools.tmf.ui.tests"
