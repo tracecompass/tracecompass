@@ -26,6 +26,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -366,5 +369,21 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
     @Override
     public ITmfLocation restoreLocation(ByteBuffer bufferIn) {
         return new TmfLongLocation(bufferIn);
+    }
+
+    /**
+     * Simulate trace opening, to be called by tests who need an actively opened
+     * trace
+     */
+    public void openTrace() {
+        TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, this, null));
+        selectTrace();
+    }
+
+    /**
+     * Simulate selecting the trace
+     */
+    public void selectTrace() {
+        TmfSignalManager.dispatchSignal(new TmfTraceSelectedSignal(this, this));
     }
 }

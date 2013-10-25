@@ -41,7 +41,6 @@ public enum TmfTestTrace {
     /** And oh! a fifth trace */
     R_TEST_10K("R-Test-10K");
 
-
     private final String fPath;
     private final String fDirectory = "testfiles";
     private ITmfTrace fTrace = null;
@@ -70,31 +69,39 @@ public enum TmfTestTrace {
 
     /**
      * Return a ITmfTrace object of this test trace. It will be already
-     * initTrace()'ed.
+     * initTrace()'ed. This method will always return a new trace and dispose of
+     * the old one.
+     *
+     * After being used by unit tests, traces must be properly disposed of by
+     * calling the {@link TmfTestTrace#dispose()} method.
      *
      * @return A {@link ITmfTrace} reference to this trace
      */
     public ITmfTrace getTrace() {
-        if (fTrace == null) {
-            TmfTraceStub trace = null;
-            final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
-            try {
-                File test = new File(FileLocator.toFileURL(location).toURI());
-                trace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
-
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (TmfTraceException e) {
-                throw new RuntimeException(e);
-            } finally {
-                if (trace != null) {
-                    trace.dispose();
-                }
-            }
-            fTrace = trace;
+        if (fTrace != null) {
+            fTrace.dispose();
+        }
+        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
+        try {
+            File test = new File(FileLocator.toFileURL(location).toURI());
+            fTrace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (TmfTraceException e) {
+            throw new RuntimeException(e);
         }
         return fTrace;
+    }
+
+    /**
+     * Dispose of the trace
+     */
+    public void dispose() {
+        if (fTrace != null) {
+            fTrace.dispose();
+            fTrace = null;
+        }
     }
 }
