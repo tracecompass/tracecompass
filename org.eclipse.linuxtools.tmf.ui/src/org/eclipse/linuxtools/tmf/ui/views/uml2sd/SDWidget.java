@@ -1327,17 +1327,8 @@ public class SDWidget extends ScrollView implements SelectionListener,
 
         update();
         Rectangle area = getClientArea();
-        Image dbuffer = null;
-        GC gcim = null;
-
-        try {
-            dbuffer = new Image(getDisplay(), area.width, area.height);
-        } catch (Exception e) {
-            Activator.getDefault().logError("Error creating image", e); //$NON-NLS-1$
-        }
-
-        gcim = new GC(dbuffer);
-
+        Image dbuffer = new Image(getDisplay(), area.width, area.height);
+        GC gcim = new GC(dbuffer);
         NGC context = new NGC(this, gcim);
 
         // Set the metrics to use for lifeline text and message text
