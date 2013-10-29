@@ -64,6 +64,12 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
         FUNC_EXIT_EVENTS.add("lttng_ust_cyg_profile_fast:func_exit"); //$NON-NLS-1$
     }
 
+    /**
+     * Version number of this state provider. Please bump this if you modify
+     * the contents of the generated state history in some way.
+     */
+    private static final int VERSION = 1;
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -91,6 +97,11 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     @Override
     public LttngUstCallStackProvider getNewInstance() {
         return new LttngUstCallStackProvider(getTrace());
+    }
+
+    @Override
+    public int getVersion() {
+        return VERSION;
     }
 
     // ------------------------------------------------------------------------
@@ -122,7 +133,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
             return null;
         }
         Long address = (Long) event.getContent().getField(FIELD_ADDR).getValue();
-        return getFunctionNameFromAddress(address.longValue());
+        return Long.toHexString(address);
     }
 
     @Override
@@ -140,7 +151,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
             return CallStackStateProvider.UNDEFINED;
         }
         Long address = (Long) field.getValue();
-        return getFunctionNameFromAddress(address.longValue());
+        return Long.toHexString(address);
     }
 
     @Override
@@ -155,17 +166,5 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
         }
 
         return new String(procName + '-' + vtid.toString());
-    }
-
-    // ------------------------------------------------------------------------
-    // Internal helper methods
-    // ------------------------------------------------------------------------
-
-    private static String getFunctionNameFromAddress(long address) {
-        /*
-         * We do not support getting the real function name yet, just print the
-         * hex string.
-         */
-        return new String("0x" + Long.toHexString(address)); //$NON-NLS-1$
     }
 }

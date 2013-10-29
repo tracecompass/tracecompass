@@ -77,12 +77,6 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
     private static final String NO_FUNCTION = "no function"; //$NON-NLS-1$
 
     /**
-     * Version number of this state provider. Please bump this if you modify
-     * the contents of the generated state history in some way.
-     */
-    private static final int VERSION = 0;
-
-    /**
      * Default constructor
      *
      * @param trace
@@ -90,11 +84,6 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      */
     public CallStackStateProvider(ITmfTrace trace) {
         super(trace, ITmfEvent.class, ID);
-    }
-
-    @Override
-    public int getVersion() {
-        return VERSION;
     }
 
     @Override

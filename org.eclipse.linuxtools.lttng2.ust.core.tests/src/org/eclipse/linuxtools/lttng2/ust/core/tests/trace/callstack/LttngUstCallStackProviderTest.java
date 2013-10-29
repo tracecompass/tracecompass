@@ -140,7 +140,7 @@ public class LttngUstCallStackProviderTest {
         String[] cs = TestUtils.getCallStack(fixture, PROCNAME, start);
         assertEquals(1, cs.length);
 
-        assertEquals("0x40472b", cs[0]);
+        assertEquals("40472b", cs[0]);
     }
 
     /**
@@ -151,8 +151,8 @@ public class LttngUstCallStackProviderTest {
         String[] cs = TestUtils.getCallStack(fixture, PROCNAME, 1378850463600000000L);
         assertEquals(2, cs.length);
 
-        assertEquals("0x40472b", cs[0]);
-        assertEquals("0x403d60", cs[1]);
+        assertEquals("40472b", cs[0]);
+        assertEquals("403d60", cs[1]);
     }
 
     /**
@@ -163,9 +163,9 @@ public class LttngUstCallStackProviderTest {
         String[] cs = TestUtils.getCallStack(fixture, PROCNAME, 1378850463770000000L);
         assertEquals(3, cs.length);
 
-        assertEquals("0x40472b", cs[0]);
-        assertEquals("0x403b14", cs[1]);
-        assertEquals("0x401b23", cs[2]);
+        assertEquals("40472b", cs[0]);
+        assertEquals("403b14", cs[1]);
+        assertEquals("401b23", cs[2]);
     }
 
     /**
@@ -176,10 +176,10 @@ public class LttngUstCallStackProviderTest {
         String[] cs = TestUtils.getCallStack(fixture, PROCNAME, 1378850463868753000L);
         assertEquals(4, cs.length);
 
-        assertEquals("0x40472b", cs[0]);
-        assertEquals("0x4045c8", cs[1]);
-        assertEquals("0x403760", cs[2]);
-        assertEquals("0x401aac", cs[3]);
+        assertEquals("40472b", cs[0]);
+        assertEquals("4045c8", cs[1]);
+        assertEquals("403760", cs[2]);
+        assertEquals("401aac", cs[3]);
     }
 
     /**
@@ -191,8 +191,8 @@ public class LttngUstCallStackProviderTest {
         String[] cs = TestUtils.getCallStack(fixture, PROCNAME, end);
         assertEquals(3, cs.length);
 
-        assertEquals("0x40472b", cs[0]);
-        assertEquals("0x4045c8", cs[1]);
-        assertEquals("0x403760", cs[2]);
+        assertEquals("40472b", cs[0]);
+        assertEquals("4045c8", cs[1]);
+        assertEquals("403760", cs[2]);
     }
 }
