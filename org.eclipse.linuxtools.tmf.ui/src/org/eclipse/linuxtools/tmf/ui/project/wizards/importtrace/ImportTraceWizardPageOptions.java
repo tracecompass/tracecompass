@@ -81,18 +81,22 @@ public class ImportTraceWizardPageOptions extends AbstractImportTraceWizardPage 
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                final String listItem = fProjects.getSelection()[0];
-                IFolder folder = fProjectsMap.get(listItem).getFolder(TRACE);
-                getBatchWizard().setTraceFolder(folder);
-                ImportTraceWizardPageOptions.this.setErrorMessage(null);
+                handleSelected();
             }
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                final String listItem = fProjects.getSelection()[0];
-                IFolder folder = fProjectsMap.get(listItem).getFolder(TRACE);
-                getBatchWizard().setTraceFolder(folder);
-                ImportTraceWizardPageOptions.this.setErrorMessage(null);
+                handleSelected();
+            }
+
+            private void handleSelected() {
+                String[] selection = fProjects.getSelection();
+                if (selection.length > 0) {
+                    final String listItem = selection[0];
+                    IFolder folder = fProjectsMap.get(listItem).getFolder(TRACE);
+                    getBatchWizard().setTraceFolder(folder);
+                    ImportTraceWizardPageOptions.this.setErrorMessage(null);
+                }
             }
         });
         if (proj != null) {
