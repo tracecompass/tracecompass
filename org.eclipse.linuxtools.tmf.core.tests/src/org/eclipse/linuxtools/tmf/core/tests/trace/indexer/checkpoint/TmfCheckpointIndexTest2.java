@@ -25,6 +25,7 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
@@ -109,6 +110,11 @@ public class TmfCheckpointIndexTest2 {
     }
 
     private class EmptyTestTrace extends TmfEmptyTraceStub {
+
+        public EmptyTestTrace() {
+            super();
+            init(getClass().getSimpleName(), TmfEvent.class);
+        }
 
         @Override
         protected ITmfTraceIndexer createIndexer(int interval) {

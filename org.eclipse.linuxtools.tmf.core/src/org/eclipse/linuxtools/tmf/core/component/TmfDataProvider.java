@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Replace background requests by pre-emptable requests
+ *   Patrick Tasse - Fix TimerThread leak
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.component;
@@ -76,7 +77,7 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
     /** Size of the fDataQueue */
     protected int fQueueSize = DEFAULT_QUEUE_SIZE;
 
-    private TmfRequestExecutor fExecutor;
+    private final TmfRequestExecutor fExecutor;
 
     private int fSignalDepth = 0;
     private final Object fLock = new Object();
@@ -110,7 +111,7 @@ public abstract class TmfDataProvider extends TmfComponent implements ITmfDataPr
         fType = type;
         fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<ITmfEvent>(fQueueSize) : new SynchronousQueue<ITmfEvent>();
 
-        fExecutor = new TmfRequestExecutor();
+        fExecutor.init();
         fSignalDepth = 0;
 
         fLogData = TmfCoreTracer.isEventTraced();

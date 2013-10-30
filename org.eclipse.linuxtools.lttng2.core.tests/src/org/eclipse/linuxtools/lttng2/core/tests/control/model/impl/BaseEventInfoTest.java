@@ -71,7 +71,7 @@ public class BaseEventInfoTest {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         TraceLogLevel level = fixture.getLogLevel();
         assertEquals("TRACE_DEBUG", level.getInName());
@@ -130,14 +130,14 @@ public class BaseEventInfoTest {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         fixture.setEventType("");
         result = fixture.getEventType();
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         fixture.setEventType("tracepoint");
         result = fixture.getEventType();
@@ -162,6 +162,15 @@ public class BaseEventInfoTest {
         assertEquals("PROBE", result.name());
         assertEquals("PROBE", result.toString());
         assertEquals(2, result.ordinal());
+
+        fixture.setEventType("function");
+        result = fixture.getEventType();
+        assertNotNull(result);
+        assertEquals("function", result.getInName());
+        assertEquals("FUNCTION", result.name());
+        assertEquals("FUNCTION", result.toString());
+        assertEquals(3, result.ordinal());
+
 
     }
 
@@ -188,7 +197,7 @@ public class BaseEventInfoTest {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         fixture.setEventType(TraceEventType.SYSCALL);
         result = fixture.getEventType();
@@ -205,6 +214,15 @@ public class BaseEventInfoTest {
         assertEquals("PROBE", result.name());
         assertEquals("PROBE", result.toString());
         assertEquals(2, result.ordinal());
+
+        fixture.setEventType(TraceEventType.FUNCTION);
+        result = fixture.getEventType();
+        assertNotNull(result);
+        assertEquals("function", result.getInName());
+        assertEquals("FUNCTION", result.name());
+        assertEquals("FUNCTION", result.toString());
+        assertEquals(3, result.ordinal());
+
 
     }
 

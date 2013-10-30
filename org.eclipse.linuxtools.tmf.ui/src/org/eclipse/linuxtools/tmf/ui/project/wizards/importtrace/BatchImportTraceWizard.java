@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Marc-Andre Laperle - Log some exceptions
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
@@ -165,9 +166,10 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
      *            the file to scan
      */
     public void addFileToScan(final String fileName) {
-        if (!fParentFiles.containsKey(fileName)) {
-            fParentFiles.put(fileName, new HashSet<String>());
-            startUpdateTask(Messages.BatchImportTraceWizardAdd + ' ' + fileName, fileName);
+        String absolutePath = new File(fileName).getAbsolutePath();
+        if (!fParentFiles.containsKey(absolutePath)) {
+            fParentFiles.put(absolutePath, new HashSet<String>());
+            startUpdateTask(Messages.BatchImportTraceWizardAdd + ' ' + absolutePath, absolutePath);
 
         }
 
@@ -185,7 +187,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         startUpdateTask(Messages.BatchImportTraceWizardRemove + ' ' + fileName, null);
     }
 
-    private void startUpdateTask(final String taskName, final String fileName) {
+    private void startUpdateTask(final String taskName, final String fileAbsolutePath) {
         try {
             this.getContainer().run(true, true, new IRunnableWithProgress() {
 
@@ -198,12 +200,13 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                         sm = SubMonitor.convert(monitor);
                         sm.setTaskName(taskName);
                         sm.setWorkRemaining(TOTALWORK);
-                        updateFiles(sm, fileName);
+                        updateFiles(sm, fileAbsolutePath);
                         sm.done();
                     }
                 }
             });
         } catch (InvocationTargetException e) {
+            Activator.getDefault().logError(Messages.ImportTraceWizardImportProblem, e);
         } catch (InterruptedException e) {
         }
     }
@@ -484,7 +487,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         } catch (InterruptedException e) {
             return false;
         } catch (InvocationTargetException e) {
-            System.out.println(e.getTargetException());
+            Activator.getDefault().logError(Messages.ImportTraceWizardImportProblem, e);
             return false;
         }
 
@@ -590,7 +593,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
     /*
      * I am a job. Make me work
      */
-    private synchronized IStatus updateFiles(IProgressMonitor monitor, String traceToScan) {
+    private synchronized IStatus updateFiles(IProgressMonitor monitor, String traceToScanAbsPath) {
         final Set<String> filesToScan = new TreeSet<String>();
 
         int workToDo = 1;
@@ -609,8 +612,8 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                 final Set<String> parentFilesToScan = fParentFiles.get(fileToAdd.getAbsolutePath());
                 recurse(parentFilesToScan, fileToAdd, monitor, step);
                 if (monitor.isCanceled()) {
-                    fParentFilesToScan.remove(traceToScan);
-                    fParentFiles.remove(traceToScan);
+                    fParentFilesToScan.remove(traceToScanAbsPath);
+                    fParentFiles.remove(traceToScanAbsPath);
                     return CANCEL_STATUS;
                 }
             }
@@ -621,8 +624,8 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
             }
             IStatus cancelled = updateScanQueue(monitor, filesToScan, fTraceTypesToScan);
             if (cancelled.matches(IStatus.CANCEL)) {
-                fParentFilesToScan.remove(traceToScan);
-                fParentFiles.remove(traceToScan);
+                fParentFilesToScan.remove(traceToScanAbsPath);
+                fParentFiles.remove(traceToScanAbsPath);
             }
         } catch (InterruptedException e) {
             monitor.done();

@@ -146,7 +146,7 @@ public class ModelImplFactory {
         fProbeEventInfo1.setAddress("0xc1231234");
 
         fProbeEventInfo2 = new ProbeEventInfo("probeEvent2");
-        fProbeEventInfo2.setEventType(TraceEventType.UNKNOWN);
+        fProbeEventInfo2.setEventType(TraceEventType.FUNCTION);
         fProbeEventInfo2.setState(TraceEnablement.DISABLED);
         fProbeEventInfo2.setOffset("0x100");
         fProbeEventInfo2.setSymbol("init_post");

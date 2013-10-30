@@ -70,7 +70,7 @@ public class EventInfoTest {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         TraceEnablement state = fixture.getState();
         assertEquals("disabled", state.getInName());
@@ -129,7 +129,7 @@ public class EventInfoTest {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         // setEventType(String typeName)
         String typeName = "";
@@ -139,7 +139,7 @@ public class EventInfoTest {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         typeName = "unknown";
 
@@ -149,7 +149,7 @@ public class EventInfoTest {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(3, result.ordinal());
+        assertEquals(4, result.ordinal());
 
         // setState(String stateName)
         fixture.setState("disabled");

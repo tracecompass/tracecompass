@@ -1235,7 +1235,8 @@ public class LTTngControlService implements ILttngControlService {
                     eventInfo.setFilterExpression(filter);
                 }
 
-                if (eventInfo.getEventType() == TraceEventType.PROBE) {
+                if ((eventInfo.getEventType() == TraceEventType.PROBE) ||
+                        (eventInfo.getEventType() == TraceEventType.FUNCTION)){
                     IProbeEventInfo probeEvent = new ProbeEventInfo(eventInfo.getName());
                     probeEvent.setLogLevel(eventInfo.getLogLevel());
                     probeEvent.setEventType(eventInfo.getEventType());
@@ -1246,7 +1247,7 @@ public class LTTngControlService implements ILttngControlService {
 
                     // myevent2 (type: probe) [enabled]
                     // addr: 0xc0101340
-                    // myevent0 (type: probe) [enabled]
+                    // myevent0 (type: function) [enabled]
                     // offset: 0x0
                     // symbol: init_post
                     index++;

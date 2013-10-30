@@ -28,6 +28,16 @@ public class Messages extends NLS {
      */
     public static String LttngUstTrace_DomainError;
 
+    /**
+     * Malformed trace (buffer overflow maybe?)
+     */
+    public static String LttngUstTrace_MalformedTrace;
+
+    /**
+     * Trace read error
+     */
+    public static String LttngUstTrace_TraceReadError;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

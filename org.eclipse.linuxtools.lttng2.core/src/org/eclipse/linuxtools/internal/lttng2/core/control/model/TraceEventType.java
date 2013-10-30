@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2013 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,6 +25,8 @@ public enum TraceEventType {
     SYSCALL("syscall"), //$NON-NLS-1$
     /** Event type: probe */
     PROBE("probe"),  //$NON-NLS-1$
+    /** Event type: function */
+    FUNCTION("function"), //$NON-NLS-1$
     /** Event type unknown */
     UNKNOWN("unknown"); //$NON-NLS-1$
 
