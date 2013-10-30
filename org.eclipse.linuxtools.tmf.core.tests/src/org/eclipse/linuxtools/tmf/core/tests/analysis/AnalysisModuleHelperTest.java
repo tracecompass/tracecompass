@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.analysis.Messages;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
-import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisModuleHelperCE;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisModuleHelperConfigElement;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
@@ -43,7 +43,7 @@ import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 /**
- * Test suite for the {@link TmfAnalysisModuleHelperCE} class
+ * Test suite for the {@link TmfAnalysisModuleHelperConfigElement} class
  *
  * @author Geneviève Bastien
  */
@@ -59,10 +59,10 @@ public class AnalysisModuleHelperTest {
     public void getModules() {
         fModule = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
         assertNotNull(fModule);
-        assertTrue(fModule instanceof TmfAnalysisModuleHelperCE);
+        assertTrue(fModule instanceof TmfAnalysisModuleHelperConfigElement);
         fCtfModule = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_CTF);
         assertNotNull(fCtfModule);
-        assertTrue(fCtfModule instanceof TmfAnalysisModuleHelperCE);
+        assertTrue(fCtfModule instanceof TmfAnalysisModuleHelperConfigElement);
     }
 
     /**
@@ -96,7 +96,7 @@ public class AnalysisModuleHelperTest {
     }
 
     /**
-     * Test the {@link TmfAnalysisModuleHelperCE#appliesToTraceType(Class)}
+     * Test the {@link TmfAnalysisModuleHelperConfigElement#appliesToTraceType(Class)}
      * method for the 2 modules
      */
     @Test
@@ -113,7 +113,7 @@ public class AnalysisModuleHelperTest {
     }
 
     /**
-     * Test the {@link TmfAnalysisModuleHelperCE#newModule(ITmfTrace)} method
+     * Test the {@link TmfAnalysisModuleHelperConfigElement#newModule(ITmfTrace)} method
      * for the 2 modules
      */
     @Test

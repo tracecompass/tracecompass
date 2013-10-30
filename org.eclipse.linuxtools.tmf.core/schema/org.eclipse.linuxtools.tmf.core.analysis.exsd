@@ -19,6 +19,7 @@
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
             <element ref="module"/>
+            <element ref="source"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -143,6 +144,26 @@
                <documentation>
                   Does this tracetype element mean the class applies or not (default true)
                </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="source">
+      <annotation>
+         <documentation>
+            Specifies a class that provides analysis modules.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The fully qualified name of a class that implements the &lt;samp&gt;IAnalysisModuleSource&lt;/samp&gt; interface.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleSource"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>

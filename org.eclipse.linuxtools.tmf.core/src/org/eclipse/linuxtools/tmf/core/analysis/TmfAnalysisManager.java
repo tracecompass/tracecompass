@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
-import org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisType;
+import org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisModuleSources;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -37,6 +37,32 @@ public class TmfAnalysisManager {
     private static final Map<String, IAnalysisModuleHelper> fAnalysisModules = new HashMap<>();
     private static final Map<String, List<Class<? extends IAnalysisParameterProvider>>> fParameterProviders = new HashMap<>();
     private static final Map<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider> fParamProviderInstances = new HashMap<>();
+    private static final List<IAnalysisModuleSource> fSources = new ArrayList<>();
+
+    /**
+     * Registers a new source of modules
+     *
+     * @param source
+     *            A {@link IAnalysisModuleSource} instance
+     */
+    public static void registerModuleSource(IAnalysisModuleSource source) {
+        synchronized (fSources) {
+            fSources.add(source);
+            refreshModules();
+        }
+    }
+
+    /**
+     * Cleans the module source list and initialize it from the extension point
+     */
+    public static void initializeModuleSources() {
+        synchronized (fSources) {
+            fSources.clear();
+            for (IAnalysisModuleSource source : TmfAnalysisModuleSources.getSources()) {
+                fSources.add(source);
+            }
+        }
+    }
 
     /**
      * Gets all available analysis module helpers
@@ -48,8 +74,11 @@ public class TmfAnalysisManager {
     public static Map<String, IAnalysisModuleHelper> getAnalysisModules() {
         synchronized (fAnalysisModules) {
             if (fAnalysisModules.isEmpty()) {
-                TmfAnalysisType analysis = TmfAnalysisType.getInstance();
-                fAnalysisModules.putAll(analysis.getAnalysisModules());
+                for (IAnalysisModuleSource source : fSources) {
+                    for (IAnalysisModuleHelper helper : source.getAnalysisModules()) {
+                        fAnalysisModules.put(helper.getId(), helper);
+                    }
+                }
             }
         }
         return Collections.unmodifiableMap(fAnalysisModules);
@@ -143,6 +172,16 @@ public class TmfAnalysisManager {
             }
         }
         return providerList;
+    }
+
+    /**
+     * Clear the list of modules so that next time, it is computed again from
+     * sources
+     */
+    public static void refreshModules() {
+        synchronized (fAnalysisModules) {
+            fAnalysisModules.clear();
+        }
     }
 
 }

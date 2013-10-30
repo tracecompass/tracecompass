@@ -8,4 +8,10 @@
       </initializer>
    </extension>
    <extension-point id="org.eclipse.linuxtools.tmf.core.analysis" name="Trace Analysis Module" schema="schema/org.eclipse.linuxtools.tmf.core.analysis.exsd"/>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <source
+            class="org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement">
+      </source>
+   </extension>
 </plugin>

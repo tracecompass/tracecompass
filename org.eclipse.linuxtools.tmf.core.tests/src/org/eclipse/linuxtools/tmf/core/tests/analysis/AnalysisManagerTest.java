@@ -19,11 +19,14 @@ import static org.junit.Assume.assumeTrue;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
+import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleSource;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.tests.stubs.analysis.AnalysisModuleSourceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.analysis.AnalysisModuleTestHelper;
 import org.junit.After;
 import org.junit.Test;
 
@@ -87,6 +90,37 @@ public class AnalysisManagerTest {
         assertFalse(map.containsKey(MODULE_PARAM));
         assertFalse(map.containsKey(MODULE_PARAM_DEFAULT));
         assertTrue(map.containsKey(MODULE_CTF));
+    }
+
+    /**
+     * Test suite to test refresh of analysis module when adding a {@link IAnalysisModuleSource}
+     */
+    @Test
+    public void testSources() {
+        /* Make sure that modules in the new source are not in the list already */
+        /* Generic TmfTrace */
+        ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
+        Map<String, IAnalysisModuleHelper> map = TmfAnalysisManager.getAnalysisModules(trace.getClass());
+
+        assertFalse(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TEST.name()));
+
+        /* Ctf trace */
+        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
+        CtfTmfTrace ctftrace = CtfTmfTestTrace.KERNEL.getTrace();
+
+        map = TmfAnalysisManager.getAnalysisModules(ctftrace.getClass());
+
+        assertFalse(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TESTCTF.name()));
+
+        /* Add new source */
+        TmfAnalysisManager.registerModuleSource(new AnalysisModuleSourceStub());
+
+        /* Now make sure the modules are present */
+        map = TmfAnalysisManager.getAnalysisModules(trace.getClass());
+        assertTrue(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TEST.name()));
+
+        map = TmfAnalysisManager.getAnalysisModules(ctftrace.getClass());
+        assertTrue(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TESTCTF.name()));
     }
 
 }

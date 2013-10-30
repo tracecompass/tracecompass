@@ -12,24 +12,24 @@
 
 package org.eclipse.linuxtools.internal.tmf.core.analysis;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
-import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisModuleHelperCE;
+import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleSource;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisModuleHelperConfigElement;
 
 /**
- * Utility class for accessing TMF analysis type extensions from the platform's
- * extensions registry.
+ * Utility class for accessing TMF analysis module extensions from the
+ * platform's extensions registry.
  *
  * @author Geneviève Bastien
  * @since 3.0
  */
-public final class TmfAnalysisType {
+public final class TmfAnalysisModuleSourceConfigElement implements IAnalysisModuleSource {
 
     /** Extension point ID */
     public static final String TMF_ANALYSIS_TYPE_ID = "org.eclipse.linuxtools.tmf.core.analysis"; //$NON-NLS-1$
@@ -68,18 +68,15 @@ public final class TmfAnalysisType {
     public static final String APPLIES_ATTR = "applies"; //$NON-NLS-1$
 
     /**
-     * The mapping of available trace type IDs to their corresponding
-     * configuration element
+     * The mapping of available analysis ID to their corresponding helper
      */
-    private final Map<String, IAnalysisModuleHelper> fAnalysisTypeAttributes = new HashMap<>();
-
-    private static TmfAnalysisType fInstance = null;
+    private final List<IAnalysisModuleHelper> fAnalysisHelpers = new ArrayList<>();
 
     /**
      * Retrieves all configuration elements from the platform extension registry
-     * for the trace type extension.
+     * for the analysis module extension.
      *
-     * @return an array of trace type configuration elements
+     * @return an array of analysis module configuration elements
      */
     public static IConfigurationElement[] getTypeElements() {
         IConfigurationElement[] elements =
@@ -93,40 +90,26 @@ public final class TmfAnalysisType {
         return typeElements.toArray(new IConfigurationElement[typeElements.size()]);
     }
 
-    private TmfAnalysisType() {
-        populateAnalysisTypes();
-    }
-
     /**
-     * The analysis type instance
-     *
-     * @return the analysis type instance
+     * Constructor
      */
-    public static synchronized TmfAnalysisType getInstance() {
-        if (fInstance == null) {
-            fInstance = new TmfAnalysisType();
-        }
-        return fInstance;
+    public TmfAnalysisModuleSourceConfigElement() {
+        populateAnalysisList();
     }
 
-    /**
-     * Get the list of analysis modules
-     *
-     * @return list of analysis modules
-     */
-    public Map<String, IAnalysisModuleHelper> getAnalysisModules() {
-        return fAnalysisTypeAttributes;
+    @Override
+    public Iterable<IAnalysisModuleHelper> getAnalysisModules() {
+        return fAnalysisHelpers;
     }
 
-    private void populateAnalysisTypes() {
-        if (fAnalysisTypeAttributes.isEmpty()) {
-            // Populate the Categories and Trace Types
+    private void populateAnalysisList() {
+        if (fAnalysisHelpers.isEmpty()) {
+            // Populate the analysis module list
             IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_ANALYSIS_TYPE_ID);
             for (IConfigurationElement ce : config) {
                 String elementName = ce.getName();
-                if (elementName.equals(TmfAnalysisType.MODULE_ELEM)) {
-                    String analysisTypeId = ce.getAttribute(TmfAnalysisType.ID_ATTR);
-                    fAnalysisTypeAttributes.put(analysisTypeId, new TmfAnalysisModuleHelperCE(ce));
+                if (elementName.equals(TmfAnalysisModuleSourceConfigElement.MODULE_ELEM)) {
+                    fAnalysisHelpers.add(new TmfAnalysisModuleHelperConfigElement(ce));
                 }
             }
         }

@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
-import org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisType;
+import org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.osgi.util.NLS;
@@ -30,7 +30,7 @@ import org.osgi.framework.Bundle;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public class TmfAnalysisModuleHelperCE implements IAnalysisModuleHelper {
+public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelper {
 
     private final IConfigurationElement fCe;
 
@@ -40,7 +40,7 @@ public class TmfAnalysisModuleHelperCE implements IAnalysisModuleHelper {
      * @param ce
      *            The source {@link IConfigurationElement} of this module helper
      */
-    public TmfAnalysisModuleHelperCE(IConfigurationElement ce) {
+    public TmfAnalysisModuleHelperConfigElement(IConfigurationElement ce) {
         fCe = ce;
     }
 
@@ -50,17 +50,17 @@ public class TmfAnalysisModuleHelperCE implements IAnalysisModuleHelper {
 
     @Override
     public String getId() {
-        return fCe.getAttribute(TmfAnalysisType.ID_ATTR);
+        return fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.ID_ATTR);
     }
 
     @Override
     public String getName() {
-        return fCe.getAttribute(TmfAnalysisType.NAME_ATTR);
+        return fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR);
     }
 
     @Override
     public boolean isAutomatic() {
-        return Boolean.valueOf(fCe.getAttribute(TmfAnalysisType.AUTOMATIC_ATTR));
+        return Boolean.valueOf(fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.AUTOMATIC_ATTR));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class TmfAnalysisModuleHelperCE implements IAnalysisModuleHelper {
 
     @Override
     public String getIcon() {
-        return fCe.getAttribute(TmfAnalysisType.ICON_ATTR);
+        return fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.ICON_ATTR);
     }
 
     @Override
@@ -83,12 +83,12 @@ public class TmfAnalysisModuleHelperCE implements IAnalysisModuleHelper {
         boolean applies = false;
 
         /* Get the module's applying tracetypes */
-        final IConfigurationElement[] tracetypeCE = fCe.getChildren(TmfAnalysisType.TRACETYPE_ELEM);
+        final IConfigurationElement[] tracetypeCE = fCe.getChildren(TmfAnalysisModuleSourceConfigElement.TRACETYPE_ELEM);
         for (IConfigurationElement element : tracetypeCE) {
             Class<?> applyclass;
             try {
-                applyclass = getBundle().loadClass(element.getAttribute(TmfAnalysisType.CLASS_ATTR));
-                String classAppliesVal = element.getAttribute(TmfAnalysisType.APPLIES_ATTR);
+                applyclass = getBundle().loadClass(element.getAttribute(TmfAnalysisModuleSourceConfigElement.CLASS_ATTR));
+                String classAppliesVal = element.getAttribute(TmfAnalysisModuleSourceConfigElement.APPLIES_ATTR);
                 boolean classApplies = true;
                 if (classAppliesVal != null) {
                     classApplies = Boolean.valueOf(classAppliesVal);
@@ -121,18 +121,18 @@ public class TmfAnalysisModuleHelperCE implements IAnalysisModuleHelper {
 
         IAnalysisModule module = null;
         try {
-            module = (IAnalysisModule) fCe.createExecutableExtension(TmfAnalysisType.ANALYSIS_MODULE_ATTR);
+            module = (IAnalysisModule) fCe.createExecutableExtension(TmfAnalysisModuleSourceConfigElement.ANALYSIS_MODULE_ATTR);
             module.setName(getName());
             module.setId(getId());
             module.setAutomatic(isAutomatic());
 
             /* Get the module's parameters */
-            final IConfigurationElement[] parametersCE = fCe.getChildren(TmfAnalysisType.PARAMETER_ELEM);
+            final IConfigurationElement[] parametersCE = fCe.getChildren(TmfAnalysisModuleSourceConfigElement.PARAMETER_ELEM);
             for (IConfigurationElement element : parametersCE) {
-                module.addParameter(element.getAttribute(TmfAnalysisType.NAME_ATTR));
-                String defaultValue = element.getAttribute(TmfAnalysisType.DEFAULT_VALUE_ATTR);
+                module.addParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR));
+                String defaultValue = element.getAttribute(TmfAnalysisModuleSourceConfigElement.DEFAULT_VALUE_ATTR);
                 if (defaultValue != null) {
-                    module.setParameter(element.getAttribute(TmfAnalysisType.NAME_ATTR), defaultValue);
+                    module.setParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR), defaultValue);
                 }
             }
             module.setTrace(trace);
