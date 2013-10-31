@@ -21,8 +21,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.tracing.rcp.ui.messages.messages"; //$NON-NLS-1$
 
-    /** The name of the default tracing project. */
-    public static String ApplicationWorkbenchWindowAdvisor_DefaultProjectName;
     /** Error title for error during workspace creation */
     public static String Application_WorkspaceCreationError;
     /** Error message if workspace root doesn't exist */

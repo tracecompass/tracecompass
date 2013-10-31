@@ -18,9 +18,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.tracing.rcp.ui.cli.CliParser;
-import org.eclipse.linuxtools.internal.tracing.rcp.ui.messages.Messages;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorContentProvider;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
@@ -113,12 +113,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if (traceToOpen != null) {
             final IWorkspace workspace = ResourcesPlugin.getWorkspace();
             final IWorkspaceRoot root = workspace.getRoot();
-            IProject project = root.getProject(Messages.ApplicationWorkbenchWindowAdvisor_DefaultProjectName);
+            IProject project = root.getProject(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME);
             final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
             ncp.getChildren( project ); // force the model to be populated
             TmfOpenTraceHelper oth = new TmfOpenTraceHelper();
             try {
-                oth.openTraceFromPath(Messages.ApplicationWorkbenchWindowAdvisor_DefaultProjectName,traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
+                oth.openTraceFromPath(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME,traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
             } catch (CoreException e) {
                 TracingRcpPlugin.getDefault().logError(e.getMessage());
             }
@@ -143,7 +143,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     }
 
     private static void createDefaultProject() {
-        TmfProjectRegistry.createProject(Messages.ApplicationWorkbenchWindowAdvisor_DefaultProjectName, null, new NullProgressMonitor());
+        TmfProjectRegistry.createProject(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
     }
 
     /**
