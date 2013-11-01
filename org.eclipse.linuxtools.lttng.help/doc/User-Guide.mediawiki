@@ -283,6 +283,60 @@ Upon successful importing the traces will be stored in the '''Traces''' folder. 
 
 Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
 
+=== Trace Package Exporting and Importing ===
+
+A trace package is an archive file that contains the trace itself and can also contain its bookmarks and its supplementary files. Including supplementary files in the package can improve performance of opening an imported trace but at the expense of package size.
+
+==== Exporting ====
+
+The '''Export Trace Package Wizard''' allows users to select a trace and export its files and bookmarks to an archive on a media.
+
+The '''Traces''' folder holds the set of traces available for a tracing project. To export a trace contained in the '''Traces''' folder, one can open the '''Export...''' menu from the '''File''' main menu. Then select '''Trace Package Export'''
+
+[[Image:images/tracePackageImages/fileExport.png]]
+
+At this point, the '''Trace Package Export''' is opened. The project containing the trace has to be selected first then the trace to be exported.
+
+[[Image:images/tracePackageImages/chooseTrace.png]]
+
+One can also open the wizard and skip the first page by selecting a trace in the '''Traces''' folder by double clicking on the project name, double clicking on the '''Traces''' folder, right-clicking on the trace then selecting '''Export Trace Package...''' menu item in the context-sensitive menu.
+
+[[Image:images/tracePackageImages/exportSelectedTrace.png]]
+
+Next, the user can choose the content to export and various format options for the resulting file.
+
+[[Image:images/tracePackageImages/exportPackage.png]]
+
+The '''Trace''' item is always selected and represents the files that constitute the trace. The '''Supplementary files''' items represent files that are typically generated when a trace is opened by the viewer. Sharing these files can speed up opening a trace dramatically but also increases the size of the exported archive file. The ''Size'' column can help to decide whether or not to include these files. Lastly, by selecting '''Bookmarks''', the user can export all the bookmarks so that they can be shared along with the trace.
+
+The '''To archive file''' field is used to specify the location where to save the resulting archive.
+
+The '''Options''' section allows the user to choose between a tar archive or a zip archive. Compression can also be toggled on or off.
+
+When Finish button is clicked, the package is generated and saved to the media.
+
+==== Importing ====
+
+The '''Import Trace Package Wizard''' allows users to select a previously exported trace package from their media and import the content of the package in the workspace.
+
+The '''Traces''' folder holds the set of traces for a tracing project. To import a trace package to the '''Traces''' folder, one can open the '''Import...''' menu from the '''File''' main menu. Then select '''Trace Package Import'''.
+
+[[Image:images/tracePackageImages/fileImport.png]]
+
+One can also open the wizard by double clicking on the project name, right-clicking on the  '''Traces''' folder then selecting '''Import Trace Package...''' menu item in the context-sensitive menu.
+
+[[Image:images/tracePackageImages/importTraceFolder.png]]
+
+At this point, the '''Trace Package Import Wizard''' is opened.
+
+[[Image:images/tracePackageImages/importPackage.png]]
+
+The '''From archive file''' field is used to specify the location of the trace package to export. The user can choose the content to import in the tree.
+
+If the wizard was opened using the File menu, the destination project has to be selected in the '''Into project''' field.
+
+When Finish is clicked, the trace is imported under the project's Trace folder.
+
 === Selecting a Trace Type ===
 
 If no trace type was selected a trace type as to be associated to a trace before it can be opened. To select a trace type select the relevant trace and click the right mouse button. In the context-sensitive menu, select '''Select Trace Type...''' menu item. A sub-menu will show will all available trace type categories. From the relevant category select the required trace type. The examples, below show how to select the '''Common Trace Format''' types '''LTTng Kernel''' and '''Generic CTF trace'''.
