@@ -110,22 +110,20 @@ public final class TmfTimeRange {
     /**
      * Check if the timestamp is within the time range
      *
-     * @param ts the timestamp to check
-     * @return true if [startTime] <= [ts] <= [endTime]
+     * @param ts
+     *            The timestamp to check
+     * @return True if [startTime] <= [ts] <= [endTime]
      */
     public boolean contains(final ITmfTimestamp ts) {
-        // Zero acts as a "universal donor" timestamp
-        if (ts.equals(TmfTimestamp.ZERO)) {
-            return true;
-        }
         return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
     }
 
     /**
      * Check if the time range is within the time range
      *
-     * @param range the other time range
-     * @return true if [range] is fully contained
+     * @param range
+     *            The other time range
+     * @return True if [range] is fully contained
      */
     public boolean contains(final TmfTimeRange range) {
         final ITmfTimestamp startTime = range.getStartTime();
