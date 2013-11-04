@@ -176,12 +176,14 @@ public class TmfEventThread implements Runnable {
             TmfCoreTracer.traceRequest(fRequest, "read first event"); //$NON-NLS-1$
 
             while (event != null && !fProvider.isCompleted(fRequest, event, nbRead)) {
-                pausedLatch.await();
 
                 TmfCoreTracer.traceEvent(fProvider, fRequest, event);
                 if (fRequest.getDataType().isInstance(event)) {
                     fRequest.handleData(event);
                 }
+
+                // Pause execution if requested
+                pausedLatch.await();
 
                 // To avoid an unnecessary read passed the last event requested
                 if (++nbRead < nbRequested) {
