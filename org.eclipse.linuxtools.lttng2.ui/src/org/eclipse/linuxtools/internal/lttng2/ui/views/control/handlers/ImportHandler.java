@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -136,11 +137,17 @@ public class ImportHandler extends BaseControlViewHandler {
                         try {
                             ImportFileInfo remoteFile = iterator.next();
 
-                            downloadTrace(remoteFile, selectedProject);
+                            downloadTrace(remoteFile, selectedProject, monitor);
 
                             // Set trace type
                             IFolder traceFolder = selectedProject.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
                             TmfImportHelper.forceFolderRefresh(traceFolder);
+
+                            if(monitor.isCanceled()) {
+                                status.add(Status.CANCEL_STATUS);
+                                break;
+                            }
+
                             IFile file = traceFolder.getFile(remoteFile.getLocalTraceName());
 
                             TraceTypeHelper helper = null;
@@ -220,9 +227,11 @@ public class ImportHandler extends BaseControlViewHandler {
      *            - trace information of trace to import
      * @param project
      *            - project to import to
+     * @param monitor
+     *            - a progress monitor
      * @throws ExecutionException
      */
-    private static void downloadTrace(ImportFileInfo trace, IProject project)
+    private static void downloadTrace(ImportFileInfo trace, IProject project, IProgressMonitor monitor)
             throws ExecutionException {
         try {
             IRemoteFileSubSystem fsss = trace.getImportFile().getParentRemoteFileSubSystem();
@@ -243,16 +252,18 @@ public class ImportHandler extends BaseControlViewHandler {
             }
 
             IRemoteFile[] sources = fsss.list(trace.getImportFile(), IFileService.FILE_TYPE_FILES, new NullProgressMonitor());
+            SubMonitor subMonitor = SubMonitor.convert(monitor, sources.length);
+            subMonitor.beginTask(Messages.TraceControl_DownloadTask, sources.length);
 
-            String[] destinations = new String[sources.length];
-            String[] encodings = new String[sources.length];
             for (int i = 0; i < sources.length; i++) {
-                destinations[i] = folder.getLocation().addTrailingSeparator().append(sources[i].getName()).toString();
-                encodings[i] = null;
+                if (subMonitor.isCanceled()) {
+                    monitor.setCanceled(true);
+                    return;
+                }
+                String destination = folder.getLocation().addTrailingSeparator().append(sources[i].getName()).toString();
+                subMonitor.setTaskName(Messages.TraceControl_DownloadTask + ' '  + traceName + '/' +sources[i].getName());
+                fsss.download(sources[i], destination, null, subMonitor.newChild(1));
             }
-
-            fsss.downloadMultiple(sources, destinations, encodings, new NullProgressMonitor());
-
         } catch (SystemMessageException e) {
             throw new ExecutionException(e.toString(), e);
         } catch (CoreException e) {
