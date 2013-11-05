@@ -101,7 +101,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
      */
     public GetEventInfoDialog(Shell shell) {
         super(shell);
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------

@@ -99,7 +99,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      */
     public EnableEventsDialog(Shell shell) {
         super(shell);
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------

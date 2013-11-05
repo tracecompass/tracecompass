@@ -129,7 +129,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
      */
     public ImportDialog(Shell shell) {
         super(shell);
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------
