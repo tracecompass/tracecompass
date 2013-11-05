@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Yuriy Vashchuk - Initial API and implementation
+ *   Xavier Raynaud - add cut/copy/paste/dnd support
  *   based on Francois Chouinard ProjectView code.
  */
 
@@ -22,7 +23,10 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -40,6 +44,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.xml.sax.SAXException;
@@ -57,7 +62,6 @@ public class FilterView extends TmfView {
 
     private static final Image SAVE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/save_button.gif"); //$NON-NLS-1$
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
-    private static final Image DELETE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
     private static final Image IMPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/import_button.gif"); //$NON-NLS-1$
     private static final Image EXPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/export_button.gif"); //$NON-NLS-1$
 
@@ -72,7 +76,6 @@ public class FilterView extends TmfView {
 
     private SaveAction fSaveAction;
     private AddAction fAddAction;
-    private DeleteAction fDeleteAction;
     private ExportAction fExportAction;
     private ImportAction fImportAction;
 
@@ -141,14 +144,33 @@ public class FilterView extends TmfView {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
-                    fDeleteAction.setEnabled(true);
                     fExportAction.setEnabled(true);
                 } else {
-                    fDeleteAction.setEnabled(false);
                     fExportAction.setEnabled(false);
                 }
             }
         });
+        this.getSite().setSelectionProvider(fViewer.getTreeViewer());
+
+        // Adds root context menu
+        MenuManager menuManager = new MenuManager();
+        menuManager.setRemoveAllWhenShown(true);
+        menuManager.addMenuListener(new IMenuListener() {
+            @Override
+            public void menuAboutToShow(IMenuManager manager) {
+                fViewer.fillContextMenu(manager);
+            }
+        });
+        Menu contextMenu = menuManager.createContextMenu(fViewer.getTreeViewer().getTree());
+        fViewer.getTreeViewer().getTree().setMenu(contextMenu);
+        this.getSite().registerContextMenu(menuManager, fViewer.getTreeViewer());
+    }
+
+    /**
+     * @return the ITmfFilterTreeNode currently selected
+     */
+    ITmfFilterTreeNode getSelection() {
+        return fViewer.getSelection();
     }
 
     @Override
@@ -186,11 +208,6 @@ public class FilterView extends TmfView {
         fAddAction.setImageDescriptor(ImageDescriptor.createFromImage(ADD_IMAGE));
         fAddAction.setToolTipText(Messages.FilterView_AddActionToolTipText);
 
-        fDeleteAction = new DeleteAction();
-        fDeleteAction.setImageDescriptor(ImageDescriptor.createFromImage(DELETE_IMAGE));
-        fDeleteAction.setToolTipText(Messages.FilterView_DeleteActionToolTipText);
-        fDeleteAction.setEnabled(false);
-
         fExportAction = new ExportAction();
         fExportAction.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMAGE));
         fExportAction.setToolTipText(Messages.FilterView_ExportActionToolTipText);
@@ -200,9 +217,9 @@ public class FilterView extends TmfView {
         fImportAction.setToolTipText(Messages.FilterView_ImportActionToolTipText);
 
         manager.add(fSaveAction);
-        manager.add(new Separator());
+        manager.add(new Separator("add_delete")); //$NON-NLS-1$
         manager.add(fAddAction);
-        manager.add(fDeleteAction);
+        manager.add(new Separator("edit")); //$NON-NLS-1$
         manager.add(new Separator());
         manager.add(fExportAction);
         manager.add(fImportAction);
@@ -222,17 +239,6 @@ public class FilterView extends TmfView {
             TmfFilterNode newNode = new TmfFilterNode(fRoot, ""); //$NON-NLS-1$
             refresh();
             setSelection(newNode);
-        }
-    }
-
-    private class DeleteAction extends Action {
-        @Override
-        public void run() {
-            ITmfFilterTreeNode node = fViewer.getSelection();
-            if (node != null) {
-                node.remove();
-            }
-            refresh();
         }
     }
 

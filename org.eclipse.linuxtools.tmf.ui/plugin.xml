@@ -771,6 +771,70 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.linuxtools.tmf.ui.views.filter?after=add_delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.linuxtools.tmf.ui.views.filter?after=edit">
+         <command
+               commandId="org.eclipse.ui.edit.cut"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.linuxtools.tmf.ui.views.filter?after=edit">
+         <command
+               commandId="org.eclipse.ui.edit.copy"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.linuxtools.tmf.ui.views.filter?after=edit">
+         <command
+               commandId="org.eclipse.ui.edit.paste"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.linuxtools.tmf.ui.views.filter?after=delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.linuxtools.tmf.ui.views.filter?after=edit">
+         <command
+               commandId="org.eclipse.ui.edit.cut"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.linuxtools.tmf.ui.views.filter?after=edit">
+         <command
+               commandId="org.eclipse.ui.edit.copy"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.linuxtools.tmf.ui.views.filter?after=edit">
+         <command
+               commandId="org.eclipse.ui.edit.paste"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -1221,6 +1285,54 @@
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.commands.ExportToTextCommandHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.exportToText">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.views.filter.CopyHandler"
+            commandId="org.eclipse.ui.edit.copy">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.views.filter.PasteHandler"
+            commandId="org.eclipse.ui.edit.paste">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.views.filter.CutHandler"
+            commandId="org.eclipse.ui.edit.cut">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.views.filter.DeleteHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+               </instanceof>
+            </with>
+         </activeWhen>
       </handler>
    </extension>
    <extension point="org.eclipse.ui.bindings">
