@@ -103,9 +103,7 @@ public class EnumDefinition extends SimpleDatatypeDefinition {
 
     @Override
     public void read(BitBuffer input) {
-        int align = (int) declaration.getAlignment();
-        int pos = input.position() + ((align-(input.position() % align))%align);
-        input.position(pos);
+        alignRead(input, this.declaration);
         integerValue.read(input);
         long val = integerValue.getValue();
 
