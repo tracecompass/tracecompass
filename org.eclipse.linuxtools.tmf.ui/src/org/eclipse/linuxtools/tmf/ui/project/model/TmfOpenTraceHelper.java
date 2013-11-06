@@ -80,10 +80,33 @@ public class TmfOpenTraceHelper {
      *             end
      */
     public IStatus openTraceFromPath(String projectRoot, String path, Shell shell) throws CoreException {
+        return openTraceFromPath(projectRoot, path, shell, null);
+    }
+
+    /**
+     * Opens a trace from a path while importing it to the project
+     * "projectRoot". The trace is linked as a resource.
+     *
+     * @param projectRoot
+     *            The project to import to
+     * @param path
+     *            the file to import
+     * @param shell
+     *            the shell to use for dialogs
+     * @param tracetypeHint
+     *            The trace type id, can be null
+     * @return IStatus OK if successful
+     * @throws CoreException
+     *             core exceptions if something is not well set up in the back
+     *             end
+     *
+     * @since 2.2
+     */
+    public IStatus openTraceFromPath(String projectRoot, String path, Shell shell, String tracetypeHint) throws CoreException {
         TmfTraceType tt = TmfTraceType.getInstance();
         TraceTypeHelper traceTypeToSet = null;
         try {
-            traceTypeToSet = tt.selectTraceType(path, shell);
+            traceTypeToSet = tt.selectTraceType(path, shell, tracetypeHint);
         } catch (TmfTraceImportException e) {
             MessageBox mb = new MessageBox(shell);
             mb.setMessage(e.getMessage());
@@ -181,8 +204,8 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-     * Open a trace from a trace element. If the trace is already opened,
-     * its editor is activated and brought to top.
+     * Open a trace from a trace element. If the trace is already opened, its
+     * editor is activated and brought to top.
      *
      * @param traceElement
      *            the {@link TmfTraceElement} to open
@@ -253,8 +276,8 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-     * Open an experiment from an experiment element. If the experiment is already opened,
-     * its editor is activated and brought to top.
+     * Open an experiment from an experiment element. If the experiment is
+     * already opened, its editor is activated and brought to top.
      *
      * @param experimentElement
      *            the {@link TmfExperimentElement} to open
@@ -282,9 +305,10 @@ public class TmfOpenTraceHelper {
             @Override
             public void run() {
 
-                /* Unlike traces, there is no instanceExperiment, so we call this function
-                 * here alone.  Maybe it would be better to do this on experiment's element
-                 * constructor?
+                /*
+                 * Unlike traces, there is no instanceExperiment, so we call
+                 * this function here alone. Maybe it would be better to do this
+                 * on experiment's element constructor?
                  */
                 experimentElement.refreshSupplementaryFolder();
 
@@ -297,7 +321,8 @@ public class TmfOpenTraceHelper {
                 for (int i = 0; i < nbTraces; i++) {
                     TmfTraceElement element = traceEntries.get(i);
 
-                    // Since trace is under an experiment, use the original trace from the traces folder
+                    // Since trace is under an experiment, use the original
+                    // trace from the traces folder
                     element = element.getElementUnderTraceFolder();
 
                     final ITmfTrace trace = element.instantiateTrace();
@@ -305,7 +330,7 @@ public class TmfOpenTraceHelper {
                     if ((trace == null) || (traceEvent == null)) {
                         TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment,
                                 Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ' ' + element.getName() +
-                                ENDL + Messages.TmfOpenTraceHelper_NoTraceType);
+                                        ENDL + Messages.TmfOpenTraceHelper_NoTraceType);
                         for (int j = 0; j < i; j++) {
                             traces[j].dispose();
                         }
@@ -327,7 +352,8 @@ public class TmfOpenTraceHelper {
                     }
                     cacheSize = Math.min(cacheSize, trace.getCacheSize());
 
-                    // If all traces use the same editorId, use it, otherwise use the default
+                    // If all traces use the same editorId, use it, otherwise
+                    // use the default
                     final String editorId = element.getEditorId();
                     if (commonEditorId == null) {
                         commonEditorId = (editorId != null) ? editorId : TmfEventsEditor.ID;
@@ -364,16 +390,16 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-    * Returns the editor with the specified input. Returns null if there is no
-    * opened editor with that input. If restore is requested, the method finds
-    * and returns the editor even if it is not restored yet after a restart.
-    *
-    * @param input
-    *            the editor input
-    * @param restore
-    *            true if the editor should be restored
-    * @return an editor with input equals to <code>input</code>
-    */
+     * Returns the editor with the specified input. Returns null if there is no
+     * opened editor with that input. If restore is requested, the method finds
+     * and returns the editor even if it is not restored yet after a restart.
+     *
+     * @param input
+     *            the editor input
+     * @param restore
+     *            true if the editor should be restored
+     * @return an editor with input equals to <code>input</code>
+     */
     private static IEditorPart findEditor(IEditorInput input, boolean restore) {
         final IWorkbench wb = PlatformUI.getWorkbench();
         final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
@@ -387,7 +413,7 @@ public class TmfOpenTraceHelper {
             }
         }
         return null;
-   }
+    }
 
     /**
      * Reopen a trace from a trace element in the provided editor
@@ -469,9 +495,10 @@ public class TmfOpenTraceHelper {
             @Override
             public void run() {
 
-                /* Unlike traces, there is no instanceExperiment, so we call this function
-                 * here alone.  Maybe it would be better to do this on experiment's element
-                 * constructor?
+                /*
+                 * Unlike traces, there is no instanceExperiment, so we call
+                 * this function here alone. Maybe it would be better to do this
+                 * on experiment's element constructor?
                  */
                 experimentElement.refreshSupplementaryFolder();
 
@@ -483,7 +510,8 @@ public class TmfOpenTraceHelper {
                 for (int i = 0; i < nbTraces; i++) {
                     TmfTraceElement element = traceEntries.get(i);
 
-                    // Since trace is under an experiment, use the original trace from the traces folder
+                    // Since trace is under an experiment, use the original
+                    // trace from the traces folder
                     element = element.getElementUnderTraceFolder();
 
                     final ITmfTrace trace = element.instantiateTrace();
@@ -491,7 +519,7 @@ public class TmfOpenTraceHelper {
                     if ((trace == null) || (traceEvent == null)) {
                         TraceUtils.displayErrorMsg(Messages.TmfOpenTraceHelper_OpenExperiment,
                                 Messages.TmfOpenTraceHelper_ErrorOpeningTrace + ' ' + element.getName() +
-                                ENDL + Messages.TmfOpenTraceHelper_NoTraceType);
+                                        ENDL + Messages.TmfOpenTraceHelper_NoTraceType);
                         for (int j = 0; j < i; j++) {
                             traces[j].dispose();
                         }

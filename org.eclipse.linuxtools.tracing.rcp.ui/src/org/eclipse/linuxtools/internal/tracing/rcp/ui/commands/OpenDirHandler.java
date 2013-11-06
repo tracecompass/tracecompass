@@ -17,6 +17,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.internal.tracing.rcp.ui.TracingRcpPlugin;
 import org.eclipse.linuxtools.internal.tracing.rcp.ui.messages.Messages;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -41,7 +42,7 @@ public class OpenDirHandler extends AbstractHandler{
         }
         TmfOpenTraceHelper oth = new TmfOpenTraceHelper();
         try {
-            oth.openTraceFromPath(Messages.ApplicationWorkbenchWindowAdvisor_DefaultProjectName, dir, shell);
+            oth.openTraceFromPath(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, dir, shell);
         } catch (CoreException e) {
             TracingRcpPlugin.getDefault().logError(e.getMessage(), e);
         }

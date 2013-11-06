@@ -110,7 +110,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
      */
     public NewConnectionDialog(Shell shell) {
         super(shell);
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------

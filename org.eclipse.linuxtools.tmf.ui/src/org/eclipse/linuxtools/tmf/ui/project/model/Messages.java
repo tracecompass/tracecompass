@@ -50,6 +50,11 @@ public class Messages extends NLS {
 
     /** The description for the linked property */
     public static String TmfTraceElement_IsLinked;
+    /**
+     * The title for the select trace type dialog
+     * @since 2.2
+     * */
+    public static String TmfTraceType_SelectTraceType;
 
     /** Error opening a trace */
     public static String TmfOpenTraceHelper_ErrorOpeningTrace;

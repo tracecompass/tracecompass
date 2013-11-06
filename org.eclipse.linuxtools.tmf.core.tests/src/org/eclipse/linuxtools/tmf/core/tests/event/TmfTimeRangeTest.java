@@ -257,8 +257,6 @@ public class TmfTimeRangeTest {
 
         assertFalse("contains (low value)", range.contains(new TmfTimestamp(12340)));
         assertFalse("contains (high value)", range.contains(new TmfTimestamp(12351)));
-
-        assertTrue("contains (zero)", range.contains(TmfTimestamp.ZERO));
     }
 
     @Test

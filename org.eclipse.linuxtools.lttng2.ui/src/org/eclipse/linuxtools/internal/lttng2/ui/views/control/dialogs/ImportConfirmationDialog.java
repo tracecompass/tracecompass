@@ -83,7 +83,7 @@ public class ImportConfirmationDialog extends Dialog implements IImportConfirmat
      */
     public ImportConfirmationDialog(Shell shell) {
         super(shell);
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------

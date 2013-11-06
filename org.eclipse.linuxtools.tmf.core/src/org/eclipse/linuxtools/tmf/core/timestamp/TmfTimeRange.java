@@ -22,7 +22,7 @@ package org.eclipse.linuxtools.tmf.core.timestamp;
  *
  * @see ITmfTimestamp
  */
-public final class TmfTimeRange {
+public class TmfTimeRange {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -31,8 +31,7 @@ public final class TmfTimeRange {
     /**
      * The full possible time range
      */
-    public static final TmfTimeRange ETERNITY =
-            new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
+    public static final TmfTimeRange ETERNITY = new EternityTimeRange();
 
     /**
      * The null time range
@@ -110,22 +109,20 @@ public final class TmfTimeRange {
     /**
      * Check if the timestamp is within the time range
      *
-     * @param ts the timestamp to check
-     * @return true if [startTime] <= [ts] <= [endTime]
+     * @param ts
+     *            The timestamp to check
+     * @return True if [startTime] <= [ts] <= [endTime]
      */
     public boolean contains(final ITmfTimestamp ts) {
-        // Zero acts as a "universal donor" timestamp
-        if (ts.equals(TmfTimestamp.ZERO)) {
-            return true;
-        }
         return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
     }
 
     /**
      * Check if the time range is within the time range
      *
-     * @param range the other time range
-     * @return true if [range] is fully contained
+     * @param range
+     *            The other time range
+     * @return True if [range] is fully contained
      */
     public boolean contains(final TmfTimeRange range) {
         final ITmfTimestamp startTime = range.getStartTime();
@@ -195,4 +192,33 @@ public final class TmfTimeRange {
         return "TmfTimeRange [fStartTime=" + fStartTime + ", fEndTime=" + fEndTime + "]";
     }
 
+    // ------------------------------------------------------------------------
+    // Inner classes
+    // ------------------------------------------------------------------------
+
+    /**
+     * "Eternity" time range, representing the largest time range possible,
+     * which includes any other time range or timestamp.
+     */
+    private static final class EternityTimeRange extends TmfTimeRange {
+
+        public EternityTimeRange() {
+            super(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
+        }
+
+        @Override
+        public boolean contains(ITmfTimestamp ts) {
+            return true;
+        }
+
+        @Override
+        public boolean contains(TmfTimeRange range) {
+            return true;
+        }
+
+        @Override
+        public TmfTimeRange getIntersection(TmfTimeRange range) {
+            return range;
+        }
+    }
 }

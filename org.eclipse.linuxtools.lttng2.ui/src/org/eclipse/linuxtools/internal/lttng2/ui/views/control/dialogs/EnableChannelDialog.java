@@ -202,7 +202,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
             }
         };
 
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------

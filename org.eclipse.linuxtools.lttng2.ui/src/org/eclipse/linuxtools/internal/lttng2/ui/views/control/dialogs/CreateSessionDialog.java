@@ -228,7 +228,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
      */
     public CreateSessionDialog(Shell shell) {
         super(shell);
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------
