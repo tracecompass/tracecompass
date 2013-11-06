@@ -121,12 +121,14 @@
     <module>org.eclipse.linuxtools.lttng2.kernel.core.tests</module>
     <module>org.eclipse.linuxtools.lttng2.kernel.ui</module>
     <module>org.eclipse.linuxtools.lttng2.kernel.ui.tests</module>
+    <module>org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests</module>
 
     <module>org.eclipse.linuxtools.lttng2.ust</module>
     <module>org.eclipse.linuxtools.lttng2.ust.core</module>
     <module>org.eclipse.linuxtools.lttng2.ust.core.tests</module>
     <module>org.eclipse.linuxtools.lttng2.ust.ui</module>
     <module>org.eclipse.linuxtools.lttng2.ust.ui.tests</module>
+
 
     <module>org.eclipse.linuxtools.gdbtrace</module>
     <module>org.eclipse.linuxtools.gdbtrace.core</module>
