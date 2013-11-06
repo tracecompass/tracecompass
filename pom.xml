@@ -100,6 +100,7 @@
     <module>org.eclipse.linuxtools.tmf.core.tests</module>
     <module>org.eclipse.linuxtools.tmf.ui</module>
     <module>org.eclipse.linuxtools.tmf.ui.tests</module>
+    <module>org.eclipse.linuxtools.tmf.ui.swtbot.tests</module>
     <module>org.eclipse.linuxtools.tmf.help</module>
 
     <module>org.eclipse.linuxtools.tmf.analysis.xml.core</module>
@@ -138,7 +139,6 @@
     <module>org.eclipse.linuxtools.tracing.rcp</module>
     <module>org.eclipse.linuxtools.tracing.rcp.help</module>
     <module>org.eclipse.linuxtools.tracing.rcp.ui</module>
-
   </modules>
 
     <build>
