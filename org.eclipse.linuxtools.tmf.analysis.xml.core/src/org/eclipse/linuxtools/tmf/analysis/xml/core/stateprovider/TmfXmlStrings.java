@@ -30,4 +30,9 @@ public interface TmfXmlStrings {
     static final String NAME = "name";
     static final String VERSION = "version";
 
+    /* XML head element */
+    static final String HEAD = "head";
+    static final String TRACETYPE = "tracetype";
+    static final String ID = "id";
+
 }
