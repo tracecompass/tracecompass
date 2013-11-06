@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: org.eclipse.linuxtools.tmf.analysis.xml.core.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.linuxtools.tmf.analysis.xml.core.tests.Activator
+Bundle-Vendor: %Bundle-Vendor
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.junit,
+ org.eclipse.linuxtools.tmf.analysis.xml.core,
+ org.eclipse.core.resources,
+ org.eclipse.linuxtools.tmf.core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: org.junit.runners
