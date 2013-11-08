@@ -100,6 +100,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private final Color fLastEventColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
     private final Color fHistoBarColor = new Color(Display.getDefault(), 74, 112, 139);
     private final Color fLostEventColor = new Color(Display.getCurrent(), 208, 62, 120);
+    private final Color fFillColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -509,15 +510,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         synchronized (fDataModel) {
                             if (fScaledData != null) {
                                 fCanvas.redraw();
-                                if (fDataModel.getNbEvents() != 0) {
-                                    // Display histogram and update X-,Y-axis
-                                    // labels
-                                    fTimeRangeStartText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getFirstBucketTime()));
-                                    fTimeRangeEndText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
-                                } else {
-                                    fTimeRangeStartText.setText(""); //$NON-NLS-1$
-                                    fTimeRangeEndText.setText(""); //$NON-NLS-1$
-                                }
+                                // Display histogram and update X-,Y-axis labels
+                                updateRangeTextControls();
                                 long maxNbEvents = HistogramScaledData.hideLostEvents ? fScaledData.fMaxValue : fScaledData.fMaxCombinedValue;
                                 fMaxNbEventsText.setText(Long.toString(maxNbEvents));
                                 // The Y-axis area might need to be re-sized
@@ -553,7 +547,22 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     private void updateSelectionTime() {
+        fSelectionBegin = Math.min(fSelectionBegin, fDataModel.getEndTime());
+        fSelectionEnd = Math.min(fSelectionEnd, fDataModel.getEndTime());
         ((HistogramView) fParentView).updateSelectionTime(fSelectionBegin, fSelectionEnd);
+    }
+
+    /**
+     * Update the range text controls
+     */
+    private void updateRangeTextControls() {
+        if (fDataModel != null && fDataModel.getStartTime() < fDataModel.getEndTime()) {
+            fTimeRangeStartText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getStartTime()));
+            fTimeRangeEndText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
+        } else {
+            fTimeRangeStartText.setText(""); //$NON-NLS-1$
+            fTimeRangeEndText.setText(""); //$NON-NLS-1$
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -630,13 +639,13 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 }
             }
 
-            // Add a dashed line as a delimiter (at the right of the last bar)
-            int lastEventIndex = limit - 1;
-            while (lastEventIndex >= 0 && scaledData.fData[lastEventIndex] == 0) {
-                lastEventIndex--;
-            }
-            lastEventIndex += (lastEventIndex < limit - 1) ? 1 : 0;
-            drawDelimiter(imageGC, fLastEventColor, height, lastEventIndex);
+            // Add a dashed line as a delimiter
+            int delimiterIndex = (int) ((getDataModel().getEndTime() - scaledData.getFirstBucketTime()) / scaledData.fBucketDuration) + 1;
+            drawDelimiter(imageGC, fLastEventColor, height, delimiterIndex);
+
+            // Fill the area to the right of delimiter with background color
+            imageGC.setBackground(fFillColor);
+            imageGC.fillRectangle(delimiterIndex + 1, 0, width - (delimiterIndex + 1), height);
 
             // Draw the selection bars
             int alpha = imageGC.getAlpha();
@@ -647,7 +656,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             if (beginBucket >= 0 && beginBucket < limit) {
                 imageGC.drawLine(beginBucket, 0, beginBucket, height);
             }
-            final int endBucket = Math.min(lastEventIndex, scaledData.fSelectionEndBucket);
+            final int endBucket = scaledData.fSelectionEndBucket;
             if (endBucket >= 0 && endBucket < limit && endBucket != beginBucket) {
                 imageGC.drawLine(endBucket, 0, endBucket, height);
             }
@@ -804,11 +813,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             return;
         }
 
-        String newTS = TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getFirstBucketTime());
-        fTimeRangeStartText.setText(newTS);
-
-        newTS = TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime());
-        fTimeRangeEndText.setText(newTS);
+        updateRangeTextControls();
 
         fComposite.layout();
     }

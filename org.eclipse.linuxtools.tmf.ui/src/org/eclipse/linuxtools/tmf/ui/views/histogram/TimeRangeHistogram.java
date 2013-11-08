@@ -77,6 +77,7 @@ public class TimeRangeHistogram extends Histogram {
         fZoom.setNewRange(startTime, duration);
         if (getDataModel().getNbEvents() == 0) {
             getDataModel().setTimeRange(startTime, startTime + duration);
+            getDataModel().setEndTime(startTime + duration);
         }
     }
 
