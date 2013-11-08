@@ -32,6 +32,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -87,7 +88,7 @@ import org.eclipse.swt.widgets.Text;
  * @version 1.1
  * @author Francois Chouinard
  */
-public abstract class Histogram implements ControlListener, PaintListener, KeyListener, MouseListener, MouseTrackListener, IHistogramModelListener {
+public abstract class Histogram implements ControlListener, PaintListener, KeyListener, MouseListener, MouseMoveListener, MouseTrackListener, IHistogramModelListener {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -101,6 +102,23 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private final Color fHistoBarColor = new Color(Display.getDefault(), 74, 112, 139);
     private final Color fLostEventColor = new Color(Display.getCurrent(), 208, 62, 120);
     private final Color fFillColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+    // Drag states
+    /**
+     * No drag in progress
+     * @since 2.2
+     */
+    protected final int DRAG_NONE = 0;
+    /**
+     * Drag the selection
+     * @since 2.2
+     */
+    protected final int DRAG_SELECTION = 1;
+    /**
+     * Drag the time range
+     * @since 2.2
+     */
+    protected final int DRAG_RANGE = 2;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -150,6 +168,21 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     private long fSelectionEnd = 0L;
 
+    /**
+     * The drag state
+     * @see #DRAG_NONE
+     * @see #DRAG_SELECTION
+     * @see #DRAG_RANGE
+     * @since 2.2
+     */
+    protected int fDragState = DRAG_NONE;
+
+    /**
+     * The button that started a mouse drag, or 0 if no drag in progress
+     * @since 2.2
+     */
+    protected int fDragButton = 0;
+
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
@@ -173,6 +206,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fCanvas.addKeyListener(this);
         fCanvas.addMouseListener(this);
         fCanvas.addMouseTrackListener(this);
+        fCanvas.addMouseMoveListener(this);
 
         TmfSignalManager.register(this);
     }
@@ -353,7 +387,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * @param startTime A start time
      * @param endTime A end time.
      */
-    public abstract void updateTimeRange(long startTime, long endTime);
+    public void updateTimeRange(long startTime, long endTime) {
+        if (fDragState == DRAG_NONE) {
+            ((HistogramView) fParentView).updateTimeRange(startTime, endTime);
+        }
+    }
 
     /**
      * Clear the histogram and reset the data
@@ -547,8 +585,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     private void updateSelectionTime() {
-        fSelectionBegin = Math.min(fSelectionBegin, fDataModel.getEndTime());
-        fSelectionEnd = Math.min(fSelectionEnd, fDataModel.getEndTime());
         ((HistogramView) fParentView).updateSelectionTime(fSelectionBegin, fSelectionEnd);
     }
 
@@ -639,14 +675,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 }
             }
 
-            // Add a dashed line as a delimiter
-            int delimiterIndex = (int) ((getDataModel().getEndTime() - scaledData.getFirstBucketTime()) / scaledData.fBucketDuration) + 1;
-            drawDelimiter(imageGC, fLastEventColor, height, delimiterIndex);
-
-            // Fill the area to the right of delimiter with background color
-            imageGC.setBackground(fFillColor);
-            imageGC.fillRectangle(delimiterIndex + 1, 0, width - (delimiterIndex + 1), height);
-
             // Draw the selection bars
             int alpha = imageGC.getAlpha();
             imageGC.setAlpha(100);
@@ -660,10 +688,23 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             if (endBucket >= 0 && endBucket < limit && endBucket != beginBucket) {
                 imageGC.drawLine(endBucket, 0, endBucket, height);
             }
-            if (endBucket - beginBucket > 1) {
-                imageGC.fillRectangle(beginBucket + 1, 0, endBucket - beginBucket - 1, height);
+            if (Math.abs(endBucket - beginBucket) > 1) {
+                if (endBucket > beginBucket) {
+                    imageGC.fillRectangle(beginBucket + 1, 0, endBucket - beginBucket - 1, height);
+                } else {
+                    imageGC.fillRectangle(endBucket + 1, 0, beginBucket - endBucket - 1, height);
+                }
             }
             imageGC.setAlpha(alpha);
+
+            // Add a dashed line as a delimiter
+            int delimiterIndex = (int) ((getDataModel().getEndTime() - scaledData.getFirstBucketTime()) / scaledData.fBucketDuration) + 1;
+            drawDelimiter(imageGC, fLastEventColor, height, delimiterIndex);
+
+            // Fill the area to the right of delimiter with background color
+            imageGC.setBackground(fFillColor);
+            imageGC.fillRectangle(delimiterIndex + 1, 0, width - (delimiterIndex + 1), height);
+
         } catch (final Exception e) {
             // Do nothing
         }
@@ -702,35 +743,49 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void mouseDown(final MouseEvent event) {
-        if (fDataModel.getNbEvents() > 0 && fScaledData.fLastBucket >= event.x) {
-            if ((event.stateMask & SWT.MODIFIER_MASK) == 0) {
-                fScaledData.fSelectionBeginBucket = event.x;
-                fScaledData.fSelectionEndBucket = event.x;
-                fSelectionBegin = getTimestamp(event.x);
-                fSelectionEnd = fSelectionBegin;
-            } else if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT) {
-                if (fSelectionBegin == fSelectionEnd) {
-                    if (event.x < fScaledData.fSelectionBeginBucket) {
-                        fScaledData.fSelectionBeginBucket = event.x;
-                        fSelectionBegin = getTimestamp(event.x);
-                    } else {
-                        fScaledData.fSelectionEndBucket = event.x;
-                        fSelectionEnd = getTimestamp(event.x);
-                    }
-                } else if (Math.abs(event.x - fScaledData.fSelectionBeginBucket) <= Math.abs(event.x - fScaledData.fSelectionEndBucket)) {
-                    fScaledData.fSelectionBeginBucket = event.x;
-                    fSelectionBegin = getTimestamp(event.x);
-                } else {
-                    fScaledData.fSelectionEndBucket = event.x;
-                    fSelectionEnd = getTimestamp(event.x);
+        if (event.button == 1 && fDragState == DRAG_NONE && fDataModel.getNbEvents() != 0) {
+            fDragState = DRAG_SELECTION;
+            fDragButton = event.button;
+            if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT) {
+                if (Math.abs(event.x - fScaledData.fSelectionBeginBucket) < Math.abs(event.x - fScaledData.fSelectionEndBucket)) {
+                    fScaledData.fSelectionBeginBucket = fScaledData.fSelectionEndBucket;
+                    fSelectionBegin = fSelectionEnd;
                 }
+                fSelectionEnd = Math.min(getTimestamp(event.x), getEndTime());
+                fScaledData.fSelectionEndBucket = (int) ((fSelectionEnd - fScaledData.fFirstBucketTime) / fScaledData.fBucketDuration);
+            } else {
+                fSelectionBegin = Math.min(getTimestamp(event.x), getEndTime());
+                fScaledData.fSelectionBeginBucket = (int) ((fSelectionBegin - fScaledData.fFirstBucketTime) / fScaledData.fBucketDuration);
+                fSelectionEnd = fSelectionBegin;
+                fScaledData.fSelectionEndBucket = fScaledData.fSelectionBeginBucket;
             }
-            updateSelectionTime();
+            fCanvas.redraw();
         }
     }
 
     @Override
     public void mouseUp(final MouseEvent event) {
+        if (fDragState == DRAG_SELECTION && event.button == fDragButton) {
+            fDragState = DRAG_NONE;
+            fDragButton = 0;
+            updateSelectionTime();
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // MouseMoveListener
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.2
+     */
+    @Override
+    public void mouseMove(MouseEvent event) {
+        if (fDragState == DRAG_SELECTION && fDataModel.getNbEvents() > 0) {
+            fSelectionEnd = Math.max(getStartTime(), Math.min(getEndTime(), getTimestamp(event.x)));
+            fScaledData.fSelectionEndBucket = (int) ((fSelectionEnd - fScaledData.fFirstBucketTime) / fScaledData.fBucketDuration);
+            fCanvas.redraw();
+        }
     }
 
     // ------------------------------------------------------------------------

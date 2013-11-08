@@ -55,11 +55,6 @@ public class TimeRangeHistogram extends Histogram {
     // ------------------------------------------------------------------------
 
     @Override
-    public void updateTimeRange(long startTime, long endTime) {
-        ((HistogramView) fParentView).updateTimeRange(startTime, endTime);
-    }
-
-    @Override
     public synchronized void clear() {
         if (fZoom != null) {
             fZoom.setFullRange(0L, 0L);
