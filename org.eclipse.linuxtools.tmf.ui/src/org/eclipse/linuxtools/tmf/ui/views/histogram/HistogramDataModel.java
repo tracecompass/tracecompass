@@ -614,20 +614,8 @@ public class HistogramDataModel implements IHistogramDataModel {
 
         fBucketDuration = Math.max(fBucketDuration, 1);
         // Set selection begin and end index in the scaled histogram
-        if (fSelectionBegin < fFirstBucketTime) {
-            result.fSelectionBeginBucket = -1;
-        } else if (fSelectionBegin > fEndTime) {
-            result.fSelectionBeginBucket = fLastBucket;
-        } else {
-            result.fSelectionBeginBucket = (int) ((fSelectionBegin - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
-        }
-        if (fSelectionEnd < fFirstBucketTime) {
-            result.fSelectionEndBucket = -1;
-        } else if (fSelectionEnd > fEndTime) {
-            result.fSelectionEndBucket = fLastBucket;
-        } else {
-            result.fSelectionEndBucket = (int) ((fSelectionEnd - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
-        }
+        result.fSelectionBeginBucket = (int) ((fSelectionBegin - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
+        result.fSelectionEndBucket = (int) ((fSelectionEnd - fFirstBucketTime) / fBucketDuration) / bucketsPerBar;
 
         result.fFirstBucketTime = fFirstBucketTime;
         result.fFirstEventTime = fFirstEventTime;
