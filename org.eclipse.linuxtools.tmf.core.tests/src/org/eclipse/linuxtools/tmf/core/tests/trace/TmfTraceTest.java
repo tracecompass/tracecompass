@@ -38,7 +38,6 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
-import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
@@ -438,13 +437,6 @@ public class TmfTraceTest {
     // ------------------------------------------------------------------------
     // State system, statistics and modules methods
     // ------------------------------------------------------------------------
-
-    @Test
-    public void testGetStatistics() {
-        /* Should be null in unit tests */
-        ITmfStatistics stats = fTrace.getStatistics();
-        assertNull(stats);
-    }
 
     @Test
     public void testGetModulesByClass() {

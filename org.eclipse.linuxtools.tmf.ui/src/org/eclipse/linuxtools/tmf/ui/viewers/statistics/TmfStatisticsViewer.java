@@ -42,6 +42,7 @@ import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfTreeContentProvider;
+import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsModule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -735,8 +736,13 @@ public class TmfStatisticsViewer extends TmfViewer {
                     continue;
                 }
 
-                /* Retrieves the statistics object */
-                final ITmfStatistics stats = aTrace.getStatistics();
+                /* Retrieve the statistics object */
+                final TmfStatisticsModule statsMod = aTrace.getAnalysisModuleOfClass(TmfStatisticsModule.class, TmfStatisticsModule.ID);
+                if (statsMod == null) {
+                    /* No statistics module available for this trace */
+                    continue;
+                }
+                final ITmfStatistics stats = statsMod.getStatistics();
                 if (stats == null) {
                     /*
                      * The statistics provider for this trace is not accessible
@@ -755,7 +761,7 @@ public class TmfStatisticsViewer extends TmfViewer {
                  * be sent through a {@link TmfStatsUpdatedSignal}, and will be
                  * processed by the signal handler.
                  */
-                aTrace.getStatistics().updateStats(isGlobal, start, end);
+                stats.updateStats(isGlobal, start, end);
             }
         }
     }

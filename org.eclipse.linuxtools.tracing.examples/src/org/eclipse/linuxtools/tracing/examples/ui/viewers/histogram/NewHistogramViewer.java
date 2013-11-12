@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.barcharts.TmfBarChartViewer;
+import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsModule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -73,7 +74,14 @@ public class NewHistogramViewer extends TmfBarChartViewer {
 
                     /* Add the values for each trace */
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
-                        ITmfStatistics stats = trace.getStatistics();
+                        /* Retrieve the statistics object */
+                        final TmfStatisticsModule statsMod =
+                               trace.getAnalysisModuleOfClass(TmfStatisticsModule.class, TmfStatisticsModule.ID);
+                        if (statsMod == null) {
+                            /* No statistics module available for this trace */
+                            continue;
+                        }
+                        final ITmfStatistics stats = statsMod.getStatistics();
                         List<Long> values = stats.histogramQuery(start, end, nb);
 
                         for (int i = 0; i < nb; i++) {

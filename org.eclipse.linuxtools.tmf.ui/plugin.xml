@@ -1610,4 +1610,18 @@
             name="%project.new.category.name">
       </category>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsModule"
+            automatic="true"
+            id="org.eclipse.linuxtools.tmf.ui.views.statistics.analysis"
+            name="Tmf Statistics Analysis">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.tmf.core.trace.TmfTrace">
+         </tracetype>
+      </module>
+   </extension>
+
 </plugin>

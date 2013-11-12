@@ -37,7 +37,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
@@ -172,13 +171,6 @@ public class TmfExperimentTest {
     // ------------------------------------------------------------------------
     // State system, statistics and modules methods
     // ------------------------------------------------------------------------
-
-    @Test
-    public void testGetStatistics() {
-        /* There should not be any experiment-specific statistics */
-        ITmfStatistics stats = fExperiment.getStatistics();
-        assertNull(stats);
-    }
 
     @Test
     public void testGetAnalysisModules() {

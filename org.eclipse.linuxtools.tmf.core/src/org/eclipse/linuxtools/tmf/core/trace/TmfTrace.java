@@ -53,8 +53,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
-import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
@@ -122,8 +120,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     // The trace parser
     private ITmfEventParser fParser;
 
-    // The trace's statistics
-    private ITmfStatistics fStatistics;
 
     /**
      * The collection of state systems that are registered with this trace. Each
@@ -284,27 +280,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     }
 
     /**
-     * The default implementation of TmfTrace uses a TmfStatistics back-end.
-     * Override this if you want to specify another type (or none at all).
-     *
-     * @return An IStatus indicating if the statistics could be built
-     *         successfully or not.
-     * @since 3.0
-     */
-    protected IStatus buildStatistics() {
-        /*
-         * Initialize the statistics provider, but only if a Resource has been
-         * set (so we don't build it for experiments, for unit tests, etc.)
-         */
-        try {
-            fStatistics = (fResource == null ? null : new TmfStateStatistics(this) );
-        } catch (TmfTraceException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
-        }
-        return Status.OK_STATUS;
-    }
-
-    /**
      * Build the state system(s) associated with this trace type.
      *
      * @return An IStatus indicating if the state system could be build
@@ -405,11 +380,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             getIndexer().dispose();
         }
 
-        /* Clean up the statistics */
-        if (fStatistics != null) {
-            fStatistics.dispose();
-        }
-
         /* Clean up the state systems */
         for (ITmfStateSystem ss : fStateSystems.values()) {
             ss.dispose();
@@ -467,14 +437,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      */
     protected ITmfEventParser getParser() {
         return fParser;
-    }
-
-    /**
-     * @since 2.0
-     */
-    @Override
-    public ITmfStatistics getStatistics() {
-        return fStatistics;
     }
 
     /**
@@ -787,7 +749,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
          * this trace.
          */
         MultiStatus status = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, null, null);
-        status.add(buildStatistics());
         status.add(buildStateSystem());
         status.add(executeAnalysis());
         if (!status.isOK()) {
