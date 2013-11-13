@@ -263,6 +263,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData.horizontalAlignment = SWT.FILL;
         gridData.verticalAlignment = SWT.FILL;
         gridData.grabExcessHorizontalSpace = true;
+        gridData.grabExcessVerticalSpace = true;
         composite.setLayoutData(gridData);
 
         // Y-axis max event
@@ -283,7 +284,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData.verticalSpan = 2;
         gridData.horizontalAlignment = SWT.FILL;
         gridData.verticalAlignment = SWT.FILL;
+        gridData.heightHint = 0;
+        gridData.widthHint = 0;
         gridData.grabExcessHorizontalSpace = true;
+        gridData.grabExcessVerticalSpace = true;
         canvasComposite.setLayoutData(gridData);
         canvasComposite.setLayout(new FillLayout());
         fCanvas = new Canvas(canvasComposite, SWT.DOUBLE_BUFFERED);
@@ -577,6 +581,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                                 long maxNbEvents = HistogramScaledData.hideLostEvents ? fScaledData.fMaxValue : fScaledData.fMaxCombinedValue;
                                 fMaxNbEventsText.setText(Long.toString(maxNbEvents));
                                 // The Y-axis area might need to be re-sized
+                                GridData gd = (GridData) fMaxNbEventsText.getLayoutData();
+                                gd.widthHint = Math.max(gd.widthHint, fMaxNbEventsText.computeSize(SWT.DEFAULT, SWT.DEFAULT).x);
                                 fMaxNbEventsText.getParent().layout();
                             }
                         }
