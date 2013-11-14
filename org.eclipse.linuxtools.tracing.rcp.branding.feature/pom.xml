@@ -23,7 +23,7 @@
 
   <name>Linux Tools Trace Viewer Branding Feature</name>
 
-  <groupId>org.eclipse.linuxtools.tracing.rcp</groupId>
+  <groupId>org.eclipse.linuxtools.tracing.rcp.branding</groupId>
 
   <build>
     <plugins>

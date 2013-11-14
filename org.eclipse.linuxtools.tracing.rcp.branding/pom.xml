@@ -8,6 +8,8 @@
   <packaging>eclipse-plugin</packaging>
   <name>Linux Tools Trace Viewer Branding plug-in</name>
 
+  <groupId>org.eclipse.linuxtools.tracing.rcp.branding</groupId>
+
   <parent>
     <version>2.1.0-SNAPSHOT</version>
     <groupId>org.eclipse.linuxtools.lttng</groupId>
