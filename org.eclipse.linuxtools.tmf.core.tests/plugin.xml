@@ -37,6 +37,15 @@
                class="org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestStateSystemModule"
+            automatic="false"
+            id="org.eclipse.linuxtools.tmf.core.tests.analysis.sstest"
+            name="Test State System">
+         <tracetype
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
+         </tracetype>
+      </module>
    </extension>
 
 </plugin>
