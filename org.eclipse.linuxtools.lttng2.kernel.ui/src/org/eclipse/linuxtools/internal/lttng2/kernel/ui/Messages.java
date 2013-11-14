@@ -49,6 +49,8 @@ public class Messages extends NLS {
     public static String ResourcesView_attributeProcessName;
     public static String ResourcesView_attributeSyscallName;
 
+    public static String LttngKernelAnalysis_Help;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

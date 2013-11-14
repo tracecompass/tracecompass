@@ -153,6 +153,17 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
      * @return The help message
      */
     public String getHelpMessage() {
+        ITmfProjectModelElement parent = getParent();
+
+        if (parent instanceof TmfTraceElement) {
+            TmfTraceElement traceElement = (TmfTraceElement) parent;
+            ITmfTrace trace = traceElement.getTrace();
+            if (trace != null) {
+                IAnalysisModule module = trace.getAnalysisModule(fAnalysisId);
+                return module.getHelpText();
+            }
+        }
+
         IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(fAnalysisId);
         if (helper == null) {
             return new String();

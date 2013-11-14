@@ -19,9 +19,10 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
+import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.linuxtools.lttng2.kernel.ui.analysis.LttngKernelAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -156,6 +157,11 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             ResourcesEntry entry = (ResourcesEntry) event.getEntry();
 
             if (tcEvent.hasValue()) {
+                LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+                ITmfStateSystem ss = module.getStateSystem();
+                if (ss == null) {
+                    return retMap;
+                }
                 // Check for IRQ or Soft_IRQ type
                 if (entry.getType().equals(Type.IRQ) || entry.getType().equals(Type.SOFT_IRQ)) {
 
@@ -172,7 +178,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
                     if (status == StateValues.CPU_STATUS_IRQ) {
                         // In IRQ state get the IRQ that caused the interruption
-                        ITmfStateSystem ss = entry.getTrace().getStateSystems().get(LttngKernelTrace.STATE_ID);
                         int cpu = entry.getId();
 
                         try {
@@ -189,18 +194,13 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                                     break;
                                 }
                             }
-                        } catch (AttributeNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (TimeRangeException e) {
-                            e.printStackTrace();
-                        } catch (StateValueTypeException e) {
-                            e.printStackTrace();
+                        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+                            Activator.getDefault().logError("Error in ResourcesPresentationProvider", e); //$NON-NLS-1$
                         } catch (StateSystemDisposedException e) {
                             /* Ignored */
                         }
                     } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
                         // In SOFT_IRQ state get the SOFT_IRQ that caused the interruption
-                        ITmfStateSystem ss = entry.getTrace().getStateSystems().get(LttngKernelTrace.STATE_ID);
                         int cpu = entry.getId();
 
                         try {
@@ -217,49 +217,40 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                                     break;
                                 }
                             }
-                        } catch (AttributeNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (TimeRangeException e) {
-                            e.printStackTrace();
-                        } catch (StateValueTypeException e) {
-                            e.printStackTrace();
+                        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+                            Activator.getDefault().logError("Error in ResourcesPresentationProvider", e); //$NON-NLS-1$
                         } catch (StateSystemDisposedException e) {
                             /* Ignored */
                         }
                     } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL) {
                         // In running state get the current tid
-                        ITmfStateSystem ssq = entry.getTrace().getStateSystems().get(LttngKernelTrace.STATE_ID);
 
                         try {
                             retMap.put(Messages.ResourcesView_attributeHoverTime, Utils.formatTime(hoverTime, TimeFormat.CALENDAR, Resolution.NANOSEC));
                             int cpuQuark = entry.getQuark();
-                            int currentThreadQuark = ssq.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
-                            ITmfStateInterval interval = ssq.querySingleState(hoverTime, currentThreadQuark);
+                            int currentThreadQuark = ss.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
+                            ITmfStateInterval interval = ss.querySingleState(hoverTime, currentThreadQuark);
                             if (!interval.getStateValue().isNull()) {
                                 ITmfStateValue value = interval.getStateValue();
                                 int currentThreadId = value.unboxInt();
                                 retMap.put(Messages.ResourcesView_attributeTidName, Integer.toString(currentThreadId));
-                                int execNameQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.EXEC_NAME);
-                                interval = ssq.querySingleState(hoverTime, execNameQuark);
+                                int execNameQuark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.EXEC_NAME);
+                                interval = ss.querySingleState(hoverTime, execNameQuark);
                                 if (!interval.getStateValue().isNull()) {
                                     value = interval.getStateValue();
                                     retMap.put(Messages.ResourcesView_attributeProcessName, value.unboxStr());
                                 }
                                 if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
-                                    int syscallQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
-                                    interval = ssq.querySingleState(hoverTime, syscallQuark);
+                                    int syscallQuark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
+                                    interval = ss.querySingleState(hoverTime, syscallQuark);
                                     if (!interval.getStateValue().isNull()) {
                                         value = interval.getStateValue();
                                         retMap.put(Messages.ResourcesView_attributeSyscallName, value.unboxStr());
                                     }
                                 }
                             }
-                        } catch (AttributeNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (TimeRangeException e) {
-                            e.printStackTrace();
-                        } catch (StateValueTypeException e) {
-                            e.printStackTrace();
+                        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+                            Activator.getDefault().logError("Error in ResourcesPresentationProvider", e); //$NON-NLS-1$
                         } catch (StateSystemDisposedException e) {
                             /* Ignored */
                         }
@@ -296,7 +287,11 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             return;
         }
 
-        ITmfStateSystem ss = entry.getTrace().getStateSystems().get(LttngKernelTrace.STATE_ID);
+        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        ITmfStateSystem ss = module.getStateSystem();
+        if (ss == null) {
+            return;
+        }
         long time = event.getTime();
         try {
             while (time < event.getTime() + event.getDuration()) {
@@ -348,12 +343,8 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                     }
                 }
             }
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
-        } catch (TimeRangeException e) {
-            e.printStackTrace();
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
+        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+            Activator.getDefault().logError("Error in ResourcesPresentationProvider", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {
             /* Ignored */
         }
