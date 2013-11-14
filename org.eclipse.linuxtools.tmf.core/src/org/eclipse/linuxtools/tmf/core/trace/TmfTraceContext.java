@@ -9,10 +9,12 @@
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
  *   Patrick Tasse - Support selection range
+ *   Xavier Raynaud - Support filters tracking
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
+import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -33,20 +35,37 @@ final class TmfTraceContext {
 
     private final TmfTimeRange fSelection;
     private final TmfTimeRange fWindowRange;
+    private final ITmfFilter fFilter;
 
     public TmfTraceContext(ITmfTimestamp beginTs, ITmfTimestamp endTs, TmfTimeRange tr) {
         fSelection = new TmfTimeRange(beginTs, endTs);
         fWindowRange = tr;
+        fFilter = null;
     }
 
     public TmfTraceContext(TmfTraceContext prevCtx, ITmfTimestamp beginTs, ITmfTimestamp endTs) {
         fSelection = new TmfTimeRange(beginTs, endTs);
         fWindowRange = prevCtx.fWindowRange;
+        fFilter = prevCtx.fFilter;
     }
 
     public TmfTraceContext(TmfTraceContext prevCtx, TmfTimeRange tr) {
         fSelection = prevCtx.fSelection;
         fWindowRange = tr;
+        fFilter = prevCtx.fFilter;
+    }
+
+    /**
+     * @param prevCtx
+     *              The previous context
+     * @param filter
+     *              The applied filter
+     * @since 2.2
+     */
+    public TmfTraceContext(TmfTraceContext prevCtx, ITmfFilter filter) {
+        fSelection = prevCtx.fSelection;
+        fWindowRange = prevCtx.fWindowRange;
+        fFilter = filter;
     }
 
     public ITmfTimestamp getSelectionBegin() {
@@ -59,6 +78,14 @@ final class TmfTraceContext {
 
     public TmfTimeRange getWindowRange() {
         return fWindowRange;
+    }
+
+    /**
+     * @return the current filter applied to the trace
+     * @since 2.2
+     */
+    public ITmfFilter getFilter() {
+        return fFilter;
     }
 
     public boolean isValid() {

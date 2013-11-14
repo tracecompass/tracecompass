@@ -111,7 +111,7 @@ public class GdbEventsTable extends TmfEventsTable {
 
     @Override
     protected ITmfEventField[] extractItemFields(ITmfEvent event) {
-        ITmfEventField[] fields = new TmfEventField[0];
+        ITmfEventField[] fields = EMPTY_FIELD_ARRAY;
         if (event != null) {
             GdbTraceEventContent content = (GdbTraceEventContent) event.getContent();
             fields = new TmfEventField[] {
