@@ -25,9 +25,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.core.signal.TmfStatsUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
@@ -53,8 +50,6 @@ public class TmfStateStatistics implements ITmfStatistics {
     // Fields
     // ------------------------------------------------------------------------
 
-    private final ITmfTrace trace;
-
     /** The event totals state system */
     private final ITmfStateSystem totalsStats;
 
@@ -68,18 +63,13 @@ public class TmfStateStatistics implements ITmfStatistics {
     /**
      * Constructor
      *
-     * @param trace
-     *            The trace for which we build these statistics
      * @param totals
      *            The state system containing the "totals" information
      * @param eventTypes
      *            The state system containing the "event types" information
      * @since 3.0
      */
-    public TmfStateStatistics(@NonNull ITmfTrace trace,
-            @NonNull ITmfStateSystem totals,
-            @NonNull ITmfStateSystem eventTypes) {
-        this.trace = trace;
+    public TmfStateStatistics(@NonNull ITmfStateSystem totals, @NonNull ITmfStateSystem eventTypes) {
         this.totalsStats = totals;
         this.typesStats = eventTypes;
     }
@@ -102,7 +92,6 @@ public class TmfStateStatistics implements ITmfStatistics {
     @Deprecated
     public TmfStateStatistics(ITmfTrace trace, File totalsHistoryFile,
             File typesHistoryFile) throws TmfTraceException {
-        this.trace = trace;
         final ITmfStateProvider totalsInput = new TmfStatisticsTotalsModule().new StatsProviderTotals(trace);
         final ITmfStateProvider typesInput = new TmfStatisticsEventTypesModule().new StatsProviderEventTypes(trace);
         this.totalsStats = TmfStateSystemFactory.newFullHistory(totalsHistoryFile, totalsInput, true);
@@ -137,36 +126,6 @@ public class TmfStateStatistics implements ITmfStatistics {
     public void dispose() {
         totalsStats.dispose();
         typesStats.dispose();
-    }
-
-    @Override
-    public void updateStats(final boolean isGlobal, final long start,
-            final long end) {
-        /*
-         * Since we are currently in a signal handler (ie, in the UI thread),
-         * and since state system queries can be arbitrarily long (O(log n) wrt
-         * the size of the trace), we will run those queries in a separate
-         * thread and update the statistics view out-of-band.
-         */
-        Thread statsThread = new Thread("Statistics update") { //$NON-NLS-1$
-            @Override
-            public void run() {
-                /* Wait until the history building is completed */
-                if (!waitUntilBuilt()) {
-                    return;
-                }
-
-                /* Range should be valid for both global and time range queries */
-                long total = getEventsInRange(start, end);
-                Map<String, Long> map = getEventTypesInRange(start, end);
-
-                /* Send the signal to notify the stats viewer to update its display */
-                TmfSignal sig = new TmfStatsUpdatedSignal(this, trace, isGlobal, total, map);
-                TmfSignalManager.dispatchSignal(sig);
-            }
-        };
-        statsThread.start();
-        return;
     }
 
     @Override
@@ -392,20 +351,6 @@ public class TmfStateStatistics implements ITmfStatistics {
         }
         return end;
     }
-
-    /**
-     * Wait until both backing state systems are finished building.
-     *
-     * @return If both state systems were built successfully
-     */
-    private boolean waitUntilBuilt() {
-        totalsStats.waitUntilBuilt();
-        typesStats.waitUntilBuilt();
-        boolean check1 = !totalsStats.isCancelled();
-        boolean check2 = !typesStats.isCancelled();
-        return (check1 && check2);
-    }
-
 
     /**
      * The attribute names that are used in the state provider

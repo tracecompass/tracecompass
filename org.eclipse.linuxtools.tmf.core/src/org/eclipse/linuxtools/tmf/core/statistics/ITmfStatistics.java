@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.tmf.core.statistics;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.core.signal.TmfStatsUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
@@ -32,37 +31,14 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 public interface ITmfStatistics {
 
     /**
-     * This method provides a centralized and asynchronous way of querying
-     * statistics information. It is an alternative to the other get* methods,
-     * and should not block the caller for too long.
-     *
-     * Implementors can usually call their own getEventTotal(),
-     * getEventsInRange(), etc. but should do so in a separate thread, and
-     * should send a {@link TmfStatsUpdatedSignal} whenever they are done (that
-     * signal will carry the results).
-     *
-     * @param isGlobal
-     *            Is this for a global query (whole time range of a trace), or
-     *            just for a specific time range.
-     * @param start
-     *            The start time of the query range. Has no effect if isGlobal
-     *            is true.
-     * @param end
-     *            The end time of the query range. Has no effect if isGlobal is
-     *            true.
-     */
-    void updateStats(boolean isGlobal, long start, long end);
-
-    /**
      * Run a histogram query on the statistics back-end. This means, return the
      * total number of events in a series of 'nb' equal-sized ranges between
      * 'start' and 'end'. As its name implies, this is typically used to fill
      * the histogram data (where each range represents one pixel on the
      * histogram).
      *
-     * Unlike {@link #updateStats}, this method will block the caller until the
-     * results are returned, so it should not be called from a signal handler or
-     * from the UI thread.
+     * This method will block the caller until the results are returned, so it
+     * should not be called from a signal handler or from the UI thread.
      *
      * @param start
      *            Start time of the query
