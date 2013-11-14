@@ -15,7 +15,7 @@
   <xs:element name="tmf-export">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="trace">
+        <xs:element name="trace" maxOccurs="unbounded" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
 

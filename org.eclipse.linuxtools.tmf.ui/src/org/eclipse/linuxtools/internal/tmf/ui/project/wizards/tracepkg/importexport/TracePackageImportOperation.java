@@ -61,25 +61,22 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 @SuppressWarnings("restriction")
 public class TracePackageImportOperation extends AbstractTracePackageOperation implements IOverwriteQuery {
 
-    private final TracePackageTraceElement fImportTraceElement;
+    private final TracePackageElement[] fImportTraceElements;
     private final TmfTraceFolder fTmfTraceFolder;
-
-    // Result of reading the manifest
-    private TracePackageElement fResultElement;
 
     /**
      * Constructs a new import operation
      *
-     * @param importTraceElement
+     * @param importTraceElements
      *            the trace element to be imported
      * @param fileName
      *            the output file name
      * @param tmfTraceFolder
      *            the destination folder
      */
-    public TracePackageImportOperation(String fileName, TracePackageTraceElement importTraceElement, TmfTraceFolder tmfTraceFolder) {
+    public TracePackageImportOperation(String fileName, TracePackageElement[] importTraceElements, TmfTraceFolder tmfTraceFolder) {
         super(fileName);
-        fImportTraceElement = importTraceElement;
+        fImportTraceElements = importTraceElements;
         fTmfTraceFolder = tmfTraceFolder;
     }
 
@@ -168,7 +165,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
      */
     @Override
     public void run(IProgressMonitor progressMonitor) {
-        int totalWork = getNbCheckedElements(new TracePackageElement[] { fImportTraceElement }) * 2;
+        int totalWork = getNbCheckedElements(fImportTraceElements) * 2;
         progressMonitor.beginTask(Messages.TracePackageImportOperation_ImportingPackage, totalWork);
         doRun(progressMonitor);
         progressMonitor.done();
@@ -176,79 +173,95 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
     private void doRun(IProgressMonitor progressMonitor) {
         try {
-            setStatus(deleteExistingTrace(progressMonitor));
+            setStatus(deleteExistingTraces(progressMonitor));
             if (getStatus().getSeverity() != IStatus.OK) {
                 return;
             }
 
-            TracePackageElement[] children = fImportTraceElement.getChildren();
-            for (TracePackageElement element : children) {
-                ModalContext.checkCanceled(progressMonitor);
-
-                if (element instanceof TracePackageFilesElement) {
-                    TracePackageFilesElement traceFilesElement = (TracePackageFilesElement) element;
-                    setStatus(importTraceFiles(progressMonitor, traceFilesElement));
-
-                } else if (element instanceof TracePackageSupplFilesElement) {
-                    TracePackageSupplFilesElement suppFilesElement = (TracePackageSupplFilesElement) element;
-                    setStatus(importSupplFiles(progressMonitor, suppFilesElement));
+            for (TracePackageElement packageElement : fImportTraceElements) {
+                TracePackageTraceElement traceElement = (TracePackageTraceElement) packageElement;
+                if (!isFilesChecked(packageElement)) {
+                    continue;
                 }
 
-                if (getStatus().getSeverity() != IStatus.OK) {
+                TracePackageElement[] children = traceElement.getChildren();
+                for (TracePackageElement element : children) {
+                    ModalContext.checkCanceled(progressMonitor);
+
+                    if (element instanceof TracePackageFilesElement) {
+                        TracePackageFilesElement traceFilesElement = (TracePackageFilesElement) element;
+                        setStatus(importTraceFiles(traceFilesElement, progressMonitor));
+
+                    } else if (element instanceof TracePackageSupplFilesElement) {
+                        TracePackageSupplFilesElement suppFilesElement = (TracePackageSupplFilesElement) element;
+                        setStatus(importSupplFiles(suppFilesElement, traceElement, progressMonitor));
+                    }
+
+                    if (getStatus().getSeverity() != IStatus.OK) {
+                        return;
+                    }
+                }
+
+                String traceName = traceElement.getText();
+                IResource traceRes = fTmfTraceFolder.getResource().findMember(traceName);
+                if (traceRes == null || !traceRes.exists()) {
+                    setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.ImportTracePackageWizardPage_ErrorFindingImportedTrace, traceName)));
                     return;
                 }
+
+                TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceElement.getTraceType());
+                if (traceType == null) {
+                    setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.ImportTracePackageWizardPage_ErrorSettingTraceType, traceElement.getTraceType(), traceName)));
+                    return;
+                }
+
+                try {
+                    TmfTraceType.setTraceType(traceRes.getFullPath(), traceType);
+                } catch (CoreException e) {
+                    setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.ImportTracePackageWizardPage_ErrorSettingTraceType, traceElement.getTraceType(), traceName), e));
+                }
+
+                importBookmarks(traceRes, traceElement, progressMonitor);
             }
 
-            String traceName = fImportTraceElement.getText();
-            IResource traceRes = fTmfTraceFolder.getResource().findMember(traceName);
-            if (traceRes == null || !traceRes.exists()) {
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.ImportTracePackageWizardPage_ErrorFindingImportedTrace, traceName)));
-                return;
-            }
 
-            TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(fImportTraceElement.getTraceType());
-            if (traceType == null) {
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.ImportTracePackageWizardPage_ErrorSettingTraceType, fImportTraceElement.getTraceType(), traceName)));
-                return;
-            }
-
-            try {
-                TmfTraceType.setTraceType(traceRes.getFullPath(), traceType);
-            } catch (CoreException e) {
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.ImportTracePackageWizardPage_ErrorSettingTraceType, fImportTraceElement.getTraceType(), traceName), e));
-            }
-
-            importBookmarks(traceRes, progressMonitor);
 
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
         }
     }
 
-    private IStatus deleteExistingTrace(IProgressMonitor progressMonitor) {
+    private IStatus deleteExistingTraces(IProgressMonitor progressMonitor) {
         List<TmfTraceElement> traces = fTmfTraceFolder.getTraces();
-        TmfTraceElement existingTrace = null;
 
-        for (TmfTraceElement t : traces) {
-            if (t.getName().equals(fImportTraceElement.getText())) {
-                existingTrace = t;
-                break;
+        for (TracePackageElement packageElement : fImportTraceElements) {
+            TracePackageTraceElement traceElement = (TracePackageTraceElement) packageElement;
+            if (!isFilesChecked(traceElement)) {
+                continue;
             }
-        }
 
-        if (existingTrace != null) {
-            try {
-                existingTrace.delete(new SubProgressMonitor(progressMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
-            } catch (CoreException e) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
+            TmfTraceElement existingTrace = null;
+            for (TmfTraceElement t : traces) {
+                if (t.getName().equals(traceElement.getText())) {
+                    existingTrace = t;
+                    break;
+                }
+            }
+
+            if (existingTrace != null) {
+                try {
+                    existingTrace.delete(new SubProgressMonitor(progressMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+                } catch (CoreException e) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
+                }
             }
         }
 
         return Status.OK_STATUS;
     }
 
-    private void importBookmarks(IResource traceRes, IProgressMonitor monitor) {
-        for (TracePackageElement o : fImportTraceElement.getChildren()) {
+    private void importBookmarks(IResource traceRes, TracePackageTraceElement traceElement, IProgressMonitor monitor) {
+        for (TracePackageElement o : traceElement.getChildren()) {
             if (o instanceof TracePackageBookmarkElement && o.isChecked()) {
 
                 // Get element
@@ -315,7 +328,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         return fileMatch || folderMatch;
     }
 
-    private IStatus importTraceFiles(IProgressMonitor monitor, TracePackageFilesElement traceFilesElement) {
+    private IStatus importTraceFiles(TracePackageFilesElement traceFilesElement, IProgressMonitor monitor) {
         List<String> fileNames = new ArrayList<String>();
         IPath prefix = new Path(TmfTraceFolder.TRACE_FOLDER_NAME);
         fileNames.add(traceFilesElement.getFileName());
@@ -327,7 +340,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         return status;
     }
 
-    private IStatus importSupplFiles(IProgressMonitor monitor, TracePackageSupplFilesElement suppFilesElement) {
+    private IStatus importSupplFiles(TracePackageSupplFilesElement suppFilesElement, TracePackageTraceElement traceElement, IProgressMonitor monitor) {
         List<String> fileNames = new ArrayList<String>();
         for (TracePackageElement child : suppFilesElement.getChildren()) {
             TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
@@ -336,20 +349,20 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
         if (!fileNames.isEmpty()) {
             List<TmfTraceElement> traces = fTmfTraceFolder.getTraces();
-            TmfTraceElement traceElement = null;
+            TmfTraceElement tmfTraceElement = null;
             for (TmfTraceElement t : traces) {
-                if (t.getName().equals(fImportTraceElement.getText())) {
-                    traceElement = t;
+                if (t.getName().equals(traceElement.getText())) {
+                    tmfTraceElement = t;
                     break;
                 }
             }
 
-            if (traceElement != null) {
+            if (tmfTraceElement != null) {
                 ArchiveFile archiveFile = getSpecifiedArchiveFile();
-                traceElement.refreshSupplementaryFolder();
-                String traceName = traceElement.getResource().getName();
+                tmfTraceElement.refreshSupplementaryFolder();
+                String traceName = tmfTraceElement.getResource().getName();
                 // Project/.tracing/tracename
-                IPath destinationContainerPath = traceElement.getTraceSupplementaryFolder(traceName).getFullPath();
+                IPath destinationContainerPath = tmfTraceElement.getTraceSupplementaryFolder(traceName).getFullPath();
                 // .tracing/tracename
                 IPath pathInArchive = new Path(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME).append(traceName);
                 return importFiles(archiveFile, fileNames, pathInArchive, destinationContainerPath, monitor);
@@ -419,14 +432,4 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         // We always overwrite once we reach this point
         return null;
     }
-
-    /**
-     * Get the resulting element from extracting the manifest from the archive
-     *
-     * @return the resulting element
-     */
-    public TracePackageElement getResultElement() {
-        return fResultElement;
-    }
-
 }
