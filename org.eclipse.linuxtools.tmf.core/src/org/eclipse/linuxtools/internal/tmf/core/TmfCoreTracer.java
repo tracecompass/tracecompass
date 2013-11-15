@@ -167,6 +167,10 @@ public class TmfCoreTracer {
      * @param msg the trace message to log
      */
     public static synchronized void trace(String msg) {
+        // Leave when there is no place to write the message.
+        if (fTraceFile == null) {
+            return;
+        }
 
         // Set the timestamp (ms resolution)
         long currentTime = System.currentTimeMillis();
@@ -185,14 +189,12 @@ public class TmfCoreTracer {
         message.append(msg);
 
         // Write to file
-        if (fTraceFile != null) {
-            try {
-                fTraceFile.write(message.toString());
-                fTraceFile.newLine();
-                fTraceFile.flush();
-            } catch (IOException e) {
-                Activator.logError("Error writing to log file", e);
-            }
+        try {
+            fTraceFile.write(message.toString());
+            fTraceFile.newLine();
+            fTraceFile.flush();
+        } catch (IOException e) {
+            Activator.logError("Error writing to log file", e);
         }
     }
 
