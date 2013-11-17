@@ -72,7 +72,7 @@ public class IOStructGen {
     // ------------------------------------------------------------------------
 
     /**
-     * Constuctor
+     * Constructor
      *
      * @param tree
      *            the tree (ANTLR generated) with the parsed TSDL data.
@@ -256,7 +256,7 @@ public class IOStructGen {
 
         for (CommonTree child : children) {
             String left;
-            /* this is a regex to find the leading and trailing quotes*/
+            /* this is a regex to find the leading and trailing quotes */
             final String regex = "^\"|\"$"; //$NON-NLS-1$
             /* this is to replace the previous quotes with nothing... effectively deleting them */
             final String nullString = ""; //$NON-NLS-1$

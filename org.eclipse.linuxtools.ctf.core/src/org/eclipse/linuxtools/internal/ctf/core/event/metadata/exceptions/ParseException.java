@@ -30,7 +30,7 @@ public class ParseException extends Exception {
     /**
      * Constructor
      *
-     * @param message (to be sent to logs
+     * @param message to be sent to logs
      */
     public ParseException(String message) {
         super(message);

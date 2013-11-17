@@ -40,7 +40,7 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
      * @param fileName
      *            The name of the trace file from which this event comes
      * @param cpu
-     *            The CPU on which this event happend
+     *            The CPU on which this event happened
      * @param declaration
      *            The CTF Event Declaration object that created this event
      * @param timeRange
@@ -74,6 +74,5 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
     public long getNbLostEvents() {
         return fNbLost;
     }
-
 
 }

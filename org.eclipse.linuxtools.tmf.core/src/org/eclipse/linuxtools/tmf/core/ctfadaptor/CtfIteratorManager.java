@@ -139,7 +139,7 @@ class CtfTraceManager {
      *
      * @param context
      *            the context to look up
-     * @return the iterator refering to the context
+     * @return the iterator referring to the context
      */
     public CtfIterator getIterator(final CtfTmfContext context) {
         /*

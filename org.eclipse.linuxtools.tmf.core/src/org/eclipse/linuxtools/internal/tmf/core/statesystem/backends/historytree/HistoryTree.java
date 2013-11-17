@@ -59,7 +59,7 @@ class HistoryTree {
     private final HT_IO treeIO;
 
     // ------------------------------------------------------------------------
-    // Variable Fields (will change throughout the existance of the SHT)
+    // Variable Fields (will change throughout the existence of the SHT)
     // ------------------------------------------------------------------------
 
     /** Latest timestamp found in the tree (at any given moment) */

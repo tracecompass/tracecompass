@@ -171,7 +171,7 @@ public class EventDeclaration implements IEventDeclaration {
     }
 
     /**
-     * Sets the id of am event declaration
+     * Sets the id of an event declaration
      *
      * @param id
      *            the id
@@ -186,7 +186,7 @@ public class EventDeclaration implements IEventDeclaration {
     }
 
     /**
-     * Sets the stream of am event declaration
+     * Sets the stream of an event declaration
      *
      * @param stream
      *            the stream
