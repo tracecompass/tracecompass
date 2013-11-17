@@ -6,10 +6,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Matthew Khouzam - Initial API and implementation
+ *     Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.tests;
+package org.eclipse.linuxtools.ctf.core.tests.ctftestsuite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -20,17 +20,12 @@ import org.junit.runners.Suite;
  * package.
  *
  * @author ematkho
- * @version 1.0
+ * @version $Revision: 1.0 $
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    CtfCorePluginTest.class,
-    org.eclipse.linuxtools.ctf.core.tests.ctftestsuite.TestAll.class,
-    org.eclipse.linuxtools.ctf.core.tests.event.TestAll.class,
-    org.eclipse.linuxtools.ctf.core.tests.io.TestAll.class,
-    org.eclipse.linuxtools.ctf.core.tests.trace.TestAll.class,
-    org.eclipse.linuxtools.ctf.core.tests.types.TestAll.class
+    CtfTestSuiteTest.class
 })
-public class AllCtfCoreTests {
+public class TestAll {
 
 }
