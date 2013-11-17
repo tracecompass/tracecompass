@@ -8,12 +8,14 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Marc-Andre Laperle - Remember last selected directory
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -42,6 +44,8 @@ public class ImportTraceWizardSelectDirectoriesPage extends AbstractImportTraceW
      * ID
      */
     public static String ID = "org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.ImportTraceWizardPagePopulate"; //$NON-NLS-1$
+
+    private static final String STORE_DIRECTORY_ID = ID + ".STORE_DIRECTORY_ID"; //$NON-NLS-1$
 
     /**
      * Constructor. Creates the trace wizard page.
@@ -144,12 +148,18 @@ public class ImportTraceWizardSelectDirectoriesPage extends AbstractImportTraceW
 
             FileDialog dialog = new
                     FileDialog(Display.getCurrent().getActiveShell(), SWT.NONE);
+
+            String lastDirectory = getLastSelectedDirectory();
+            if (lastDirectory != null) {
+                dialog.setFilterPath(lastDirectory);
+            }
+
             String fn = dialog.open();
             if (null != fn) {
                 File f = new File(fn);
                 if (f.exists()) {
                     getBatchWizard().addFileToScan(fn);
-
+                    saveSelectedDirectory(f.getParentFile());
                 }
             }
             updateButtons();
@@ -184,12 +194,17 @@ public class ImportTraceWizardSelectDirectoriesPage extends AbstractImportTraceW
 
             DirectoryDialog dialog = new
                     DirectoryDialog(Display.getCurrent().getActiveShell(), SWT.NONE);
+            String lastDirectory = getLastSelectedDirectory();
+            if (lastDirectory != null) {
+                dialog.setFilterPath(lastDirectory);
+            }
+
             String fn = dialog.open();
             if (null != fn) {
                 File f = new File(fn);
                 if (f.exists()) {
                     getBatchWizard().addFileToScan(fn);
-
+                    saveSelectedDirectory(f);
                 }
             }
             updateButtons();
@@ -197,6 +212,28 @@ public class ImportTraceWizardSelectDirectoriesPage extends AbstractImportTraceW
 
         @Override
         public void widgetDefaultSelected(SelectionEvent e) {
+        }
+    }
+
+    private String getLastSelectedDirectory() {
+        final IDialogSettings settings = getDialogSettings();
+        if (settings != null) {
+            final String directory = settings.get(STORE_DIRECTORY_ID);
+            if (directory != null && !directory.isEmpty()) {
+                final File file = new File(directory);
+                if (file.exists()) {
+                    return directory.toString();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private void saveSelectedDirectory(File directory) {
+        final IDialogSettings settings = getDialogSettings();
+        if (settings != null && directory != null && directory.exists()) {
+            settings.put(STORE_DIRECTORY_ID, directory.toString());
         }
     }
 
