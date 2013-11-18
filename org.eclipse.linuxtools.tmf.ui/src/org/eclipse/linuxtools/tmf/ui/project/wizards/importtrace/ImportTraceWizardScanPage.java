@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -142,7 +143,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
         // --------------------
 
         column = new TreeViewerColumn(traceTypeViewer, SWT.NONE);
-        column.getColumn().setWidth(COL_WIDTH);
+        column.getColumn().setWidth(500);
         column.getColumn().setText(Messages.ImportTraceWizardImportCaption);
         column.setLabelProvider(new ColumnLabelProvider() {
             @Override
@@ -152,6 +153,73 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
                     return elem.getFile().getPath();
                 }
                 return null;
+            }
+        });
+        // --------------------
+        // Column 3
+        // --------------------
+
+        column = new TreeViewerColumn(traceTypeViewer, SWT.NONE);
+
+        column.getColumn().setWidth(80);
+        column.getColumn().setText(Messages.ImportTraceWizardScanPageSize);
+        column.getColumn().setAlignment(SWT.RIGHT);
+        column.setLabelProvider(new ColumnLabelProvider() {
+
+            @Override
+            public String getText(Object element) {
+                if (element instanceof FileAndName) {
+
+                    FileAndName elem = (FileAndName) element;
+                    long len = recurseSize(elem.getFile());
+                    if (len > 0) {
+                        double sizeb10 = Math.log10(len);
+                        DecimalFormat df = new DecimalFormat();
+                        df.setMaximumFractionDigits(2);
+                        df.setMinimumFractionDigits(0);
+                        if (sizeb10 > 12) {
+                            final double tbSize = len / 1024.0 / 1024 / 1024 / 1024;
+                            return df.format(tbSize) + Messages.ImportTraceWizardScanPageTerabyte;
+                        }
+                        if (sizeb10 > 9) {
+                            final double gbSize = len / 1024.0 / 1024 / 1024;
+                            return df.format(gbSize) + Messages.ImportTraceWizardScanPageGigabyte;
+                        }
+                        if (sizeb10 > 6) {
+                            final double mbSize = len / 1024.0 / 1024;
+                            return df.format(mbSize) + Messages.ImportTraceWizardScanPageMegabyte;
+                        }
+                        if (sizeb10 > 3) {
+                            final double kbSize = len / 1024.0;
+                            return df.format(kbSize) + Messages.ImportTraceWizardScanPageKilobyte;
+                        }
+                    }
+                    return Long.toString(len) + Messages.ImportTraceWizardScanPagebyte;
+
+                }
+                return null;
+            }
+
+            private long recurseSize(File file) {
+                if (file.isFile() && file.canRead()) {
+                    return file.length();
+                }
+                long size = 0;
+                if (file.exists() && file.isDirectory() && file.canRead()) {
+                    final File[] listFiles = file.listFiles();
+                    if (listFiles != null) {
+                        for (File child : listFiles) {
+                            if (child.isFile() && child.canRead()) {
+                                size += child.length();
+                            } else if (child.isDirectory()) {
+                                size += recurseSize(child);
+                            } else {
+                                Activator.getDefault().logError("Unknown \"file\" type for " + child + ' ' + child.toString()); //$NON-NLS-1$
+                            }
+                        }
+                    }
+                }
+                return size;
             }
         });
 

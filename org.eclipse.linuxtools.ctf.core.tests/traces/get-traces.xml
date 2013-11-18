@@ -17,6 +17,7 @@
   <get ignoreerrors="true" dest="synctraces.tar.gz" skipexisting="true" src="http://www.dorsal.polymtl.ca/~gbastien/traces/synctraces.tar.gz" />
   <get ignoreerrors="true" dest="hello-lost.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/hello-lost.tar.bz2" />
   <get ignoreerrors="true" dest="cyg-profile.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/cyg-profile.tar.bz2" />
+  <get ignoreerrors="true" dest="funky_trace.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/funky_trace.tar.bz2" />
   <exec executable = "git" failifexecutionfails="false">
     <arg value = "clone"/>
     <arg value = "https://github.com/efficios/ctf-testsuite.git"/>
@@ -35,6 +36,7 @@
       <available file="synctraces.tar.gz" />
       <available file="hello-lost.tar.bz2" />
       <available file="cyg-profile.tar.bz2" />
+      <available file="funky_trace.tar.bz2" />
     </and>
   </condition>
   <antcall target="extractTraces"/>
@@ -53,6 +55,7 @@
     <gunzip src="synctraces.tar.gz" />
     <bunzip2 src="hello-lost.tar.bz2" />
     <bunzip2 src="cyg-profile.tar.bz2" />
+    <bunzip2 src="funky_trace.tar.bz2" />
 
     <untar src="sample-ctf-trace-20120412.tar" dest="." />
     <untar src="trace2.tar" dest="." />
@@ -60,6 +63,7 @@
     <untar src="synctraces.tar" dest="." />
     <untar src="hello-lost.tar" dest="." />
     <untar src="cyg-profile.tar" dest="." />
+    <untar src="funky_trace.tar" dest="." />
 
     <echo message="Traces extracted successfully"/>
 </target>
