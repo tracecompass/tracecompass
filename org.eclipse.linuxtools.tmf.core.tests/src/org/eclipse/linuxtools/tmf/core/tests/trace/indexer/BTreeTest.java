@@ -38,7 +38,7 @@ public class BTreeTest extends AbstractCheckpointCollectionTest {
 
     @Override
     protected BTree createCollection() {
-        fBTree = new BTree(DEGREE, getFile(), (ITmfPersistentlyIndexable) getTrace());
+        fCheckpointCollection = fBTree = new BTree(DEGREE, getFile(), (ITmfPersistentlyIndexable) getTrace());
         return fBTree;
     }
 

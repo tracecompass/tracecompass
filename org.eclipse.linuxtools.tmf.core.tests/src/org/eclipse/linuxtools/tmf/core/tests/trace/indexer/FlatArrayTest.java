@@ -35,7 +35,7 @@ public class FlatArrayTest extends AbstractCheckpointCollectionTest {
 
     @Override
     protected FlatArray createCollection() {
-        fFlatArray = new FlatArray(getFile(), (ITmfPersistentlyIndexable) getTrace());
+        fCheckpointCollection = fFlatArray = new FlatArray(getFile(), (ITmfPersistentlyIndexable) getTrace());
         return fFlatArray;
     }
 
