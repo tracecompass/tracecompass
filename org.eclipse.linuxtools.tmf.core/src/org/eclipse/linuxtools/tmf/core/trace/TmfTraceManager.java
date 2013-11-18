@@ -9,6 +9,7 @@
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
  *   Patrick Tasse - Support selection range
+ *   Xavier Raynaud - Support filters tracking
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace;
@@ -22,6 +23,8 @@ import java.util.Set;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
+import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
+import org.eclipse.linuxtools.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -36,7 +39,8 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 /**
  * Central trace manager for TMF. It tracks the currently opened traces and
  * experiment, as well as the currently-selected time or time range and the
- * current window time range for each one of those.
+ * current window time range for each one of those. It also tracks filters
+ * applied for each trace.
  *
  * It's a singleton class, so only one instance should exist (available via
  * {@link #getInstance()}).
@@ -117,6 +121,17 @@ public final class TmfTraceManager {
      */
     public synchronized TmfTimeRange getCurrentRange() {
         return getCurrentTraceContext().getWindowRange();
+    }
+
+    /**
+     * Gets the filter applied to the current trace
+     *
+     * @return
+     *          a filter, or <code>null</code>
+     * @since 2.2
+     */
+    public synchronized ITmfFilter getCurrentFilter() {
+        return getCurrentTraceContext().getFilter();
     }
 
     /**
@@ -250,6 +265,23 @@ public final class TmfTraceManager {
             throw new RuntimeException();
         }
         fCurrentTrace = newTrace;
+    }
+
+    /**
+     * Signal handler for the filterApplied signal.
+     *
+     * @param signal
+     *            The incoming signal
+     * @since 2.2
+     */
+    @TmfSignalHandler
+    public synchronized void filterApplied(TmfEventFilterAppliedSignal signal) {
+        final ITmfTrace newTrace = signal.getTrace();
+        TmfTraceContext context = fTraces.get(newTrace);
+        if (context == null) {
+            throw new RuntimeException();
+        }
+        fTraces.put(newTrace, new TmfTraceContext(context, signal.getEventFilter()));
     }
 
     /**

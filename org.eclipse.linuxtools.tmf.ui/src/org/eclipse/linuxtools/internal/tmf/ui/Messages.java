@@ -69,6 +69,8 @@ public class Messages extends NLS {
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
     public static String TmfEventsTable_ClearFiltersActionText;
     public static String TmfEventsTable_ContentColumnHeader;
+
+    public static String TmfEventsTable_Export_to_text;
     public static String TmfEventsTable_FilterHint;
     public static String TmfEventsTable_HideRawActionText;
     public static String TmfEventsTable_HideTableActionText;
@@ -301,6 +303,10 @@ public class Messages extends NLS {
     public static String CallStackView_ImportMappingButtonTooltip;
     public static String CallStackView_ImportMappingDialogTitle;
     public static String CallStackView_ImportMappingJobName;
+
+    public static String ExportToTextJob_Export_to;
+    public static String ExportToTextJob_Export_trace_to;
+    public static String ExportToTextJob_Unable_to_export_trace;
 
     static {
         // initialize resource bundle

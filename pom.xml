@@ -48,11 +48,6 @@
   <profile>
     <id>tracingRcp</id>
       <modules>
-        <module>org.eclipse.linuxtools.tracing.rcp.branding</module>
-        <module>org.eclipse.linuxtools.tracing.rcp.branding.feature</module>
-        <module>org.eclipse.linuxtools.tracing.rcp</module>
-        <module>org.eclipse.linuxtools.tracing.rcp.help</module>
-        <module>org.eclipse.linuxtools.tracing.rcp.ui</module>
         <module>org.eclipse.linuxtools.tracing.rcp.product</module>
       </modules>
   </profile>
@@ -106,6 +101,13 @@
     <module>org.eclipse.linuxtools.gdbtrace.ui</module>
     <module>org.eclipse.linuxtools.gdbtrace.ui.tests</module>
     <module>org.eclipse.linuxtools.gdbtrace.help</module>
+
+    <module>org.eclipse.linuxtools.tracing.rcp.branding</module>
+    <module>org.eclipse.linuxtools.tracing.rcp.branding.feature</module>
+    <module>org.eclipse.linuxtools.tracing.rcp</module>
+    <module>org.eclipse.linuxtools.tracing.rcp.help</module>
+    <module>org.eclipse.linuxtools.tracing.rcp.ui</module>
+
   </modules>
 
     <build>

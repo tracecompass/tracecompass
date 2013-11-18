@@ -68,7 +68,7 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
     public SelectSupplementaryResourcesDialog(Shell shell, IResource[] resources) {
         super(shell);
         fAvailableResources = Arrays.copyOf(resources, resources.length);
-        setShellStyle(SWT.RESIZE);
+        setShellStyle(SWT.RESIZE | getShellStyle());
     }
 
     // ------------------------------------------------------------------------

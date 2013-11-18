@@ -517,6 +517,11 @@ If a source file is available in the trace for the selected event, the item '''O
 
 If an EMF model URI is available in the trace for the selected event, the item '''Open Model Element''' is shown in the context menu. Selecting this menu item will attempt to open the model file in the project specified in the URI. The model file will be opened in its default model editor. If the model file is not found, an error dialog is shown displaying the URI information.
 
+=== Exporting To Text ===
+It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering| Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
+
+''Note'':  The columns in the text file are separated by tabs.    
+
 == Histogram View ==
 
 The Histogram View displays the trace events distribution with respect to time. When streaming a trace, this view is dynamically updated as the events are received.
@@ -1193,9 +1198,9 @@ Adding contexts on channels and events from the channel level, will enable the s
 
 A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. '''Note''' that the LTTng 2.0 tracer control on the remote host doesn't provide a way to retrieve added contexts. Hence it's not possible to display the context information in the GUI.
 
-==== Adding Contexts to a Event of a Specific Channel ====
+==== Adding Contexts to an Event of a Specific Channel ====
 
-Adding contexts to a event of a channel, select an event of a channel, click right mouse button on the corresponding event tree node and select the menu item '''Add Context...''' from the context-sensitive menu.
+Adding contexts to an event of a channel is only available in LTTng Tools versions v2.0.0-2.1.x. The menu option won't be visible for LTTng Tools version v2.2.0 or later. To add contexts on an event select an event of a channel, click right mouse button on the corresponding event tree node and select the menu item '''Add Context...''' from the context-sensitive menu.
 
 [[Image:images/LTTng2AddContextToEventsAction.png]]
 
@@ -1264,7 +1269,7 @@ A new display will open for selecting the traces to import.
 
 [[Image:images/LTTng2ImportDialog.png]]
 
-By default all traces are selected. Also, a default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Also if needed, change the tracing project from the '''Available Projects''' combo box. Select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. For '''Kernel''' traces the trace type '''LTTng Kernel''' and for '''UST''' traces the trace type '''Generic CTF Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
+By default all traces are selected. A default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Use buttons '''Select All''' or '''Deselect All''' to select or deselect all traces. Also if needed, change the tracing project from the '''Available Projects''' combo box. Select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. For '''Kernel''' traces the trace type '''LTTng Kernel''' and for '''UST''' traces the trace type '''Generic CTF Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
 
 '''Note''': The trace will be imported with a name constructed with information about session, whether it is a kernel or ust trace, ust buffer type (per UID or per PID) and snapshot details. 
 

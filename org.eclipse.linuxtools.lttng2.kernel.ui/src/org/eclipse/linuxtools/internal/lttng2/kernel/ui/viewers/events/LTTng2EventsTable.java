@@ -70,7 +70,7 @@ public class LTTng2EventsTable extends TmfEventsTable {
 
     @Override
     protected ITmfEventField[] extractItemFields(ITmfEvent event) {
-        ITmfEventField[] fields = new TmfEventField[0];
+        ITmfEventField[] fields = EMPTY_FIELD_ARRAY;
         if (event != null) {
             fields = new TmfEventField[] {
                      new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, event.getTimestamp().toString(), null),

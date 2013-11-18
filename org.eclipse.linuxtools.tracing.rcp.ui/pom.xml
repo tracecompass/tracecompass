@@ -6,7 +6,7 @@
 
     <version>0.0.1-SNAPSHOT</version>
     <artifactId>org.eclipse.linuxtools.tracing.rcp.ui</artifactId>
-    <groupId>org.eclipse.linuxtools.tracing.rcp.ui</groupId>
+    <groupId>org.eclipse.linuxtools.tracing.rcp</groupId>
 
     <name>Linux Tools Trace Viewer UI Plug-in</name>
 
