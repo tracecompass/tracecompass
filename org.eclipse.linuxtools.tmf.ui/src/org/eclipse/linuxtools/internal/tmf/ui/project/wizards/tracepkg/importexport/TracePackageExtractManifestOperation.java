@@ -19,8 +19,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -125,7 +127,12 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 setStatus(Status.OK_STATUS);
             }
             else {
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.TracePackageExtractManifestOperation_ErrorManifestNotFound, ITracePackageConstants.MANIFEST_FILENAME)));
+                elements = generateElementsFromArchive();
+                if (elements.length > 0) {
+                    setStatus(Status.OK_STATUS);
+                } else {
+                    setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.TracePackageExtractManifestOperation_ErrorManifestNotFound, ITracePackageConstants.MANIFEST_FILENAME)));
+                }
             }
 
             fResultElements = elements;
@@ -135,6 +142,29 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
         } catch (Exception e) {
             setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TracePackageExtractManifestOperation_ErrorReadingManifest, e));
         }
+    }
+
+    private TracePackageElement[] generateElementsFromArchive() {
+        ArchiveFile archiveFile = getSpecifiedArchiveFile();
+        Enumeration<?> entries = archiveFile.entries();
+        Set<String> traceFileNames = new HashSet<String>();
+        while (entries.hasMoreElements()) {
+            ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
+            String entryName = entry.getName();
+            IPath fullArchivePath = new Path(entryName);
+            if (!fullArchivePath.hasTrailingSeparator() && fullArchivePath.segmentCount() > 0) {
+                traceFileNames.add(fullArchivePath.segment(0));
+            }
+        }
+
+        List<TracePackageElement> packageElements = new ArrayList<TracePackageElement>();
+        for (String traceFileName : traceFileNames) {
+            TracePackageTraceElement traceElement = new TracePackageTraceElement(null, traceFileName, null);
+            traceElement.setChildren(new TracePackageElement[] { new TracePackageFilesElement(traceElement, traceFileName) });
+            packageElements.add(traceElement);
+        }
+
+        return packageElements.toArray(new TracePackageElement[] {});
     }
 
     /**
