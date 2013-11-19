@@ -125,6 +125,11 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     public synchronized boolean seek(final CtfLocationInfo ctfLocationData) {
         boolean ret = false;
 
+        /* Avoid the cost of seeking at the current location. */
+        if (curLocation.getLocationInfo().equals(ctfLocationData)) {
+            return super.hasMoreEvents();
+        }
+
         /* Adjust the timestamp depending on the trace's offset */
         long currTimestamp = ctfLocationData.getTimestamp();
         final long offsetTimestamp = this.getCtfTmfTrace().getCTFTrace().timestampNanoToCycles(currTimestamp);
