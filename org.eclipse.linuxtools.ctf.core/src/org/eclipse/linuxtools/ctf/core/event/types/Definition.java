@@ -138,10 +138,16 @@ public abstract class Definition {
      */
     protected static void alignRead(BitBuffer input, IDeclaration declaration) {
         int mask = (int) declaration.getAlignment() - 1;
+
         /*
          * The alignment is a power of 2
          */
-        int pos = (input.position() + mask) & ~mask;
+        int pos = input.position();
+        if ((pos & mask) == 0) {
+            return;
+        }
+        pos = (pos + mask) & ~mask;
+
         input.position(pos);
     }
 
