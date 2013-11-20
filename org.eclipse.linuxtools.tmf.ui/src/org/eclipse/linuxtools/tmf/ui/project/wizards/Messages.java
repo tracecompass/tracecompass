@@ -33,96 +33,25 @@ public class Messages extends NLS {
      */
     public static String NewProjectWizard_DialogMessage;
     /**
-     * The dialog title of the import trace wizard
-     */
-    public static String ImportTraceWizard_DialogTitle;
-    /**
-     * The title of the file system within the import trace wizard
-     */
-    public static String ImportTraceWizard_FileSystemTitle;
-    /**
-     * The title of the the import trace wizard page.
-     */
-    public static String ImportTraceWizard_ImportTrace;
-    /**
-     * The label of the directory location (import trace wizard)
-     */
-    public static String ImportTraceWizard_DirectoryLocation;
-    /**
-     * The title of the select trace directory dialog (import trace wizard)
-     */
-    public static String ImportTraceWizard_SelectTraceDirectoryTitle;
-    /**
-     * The message of the select trace directory dialog (import trace wizard)
-     */
-    public static String ImportTraceWizard_SelectTraceDirectoryMessage;
-    /**
-     * The title of the trace type label (import trace wizard)
-     */
-    public static String ImportTraceWizard_TraceType;
-    /**
-     * The label of the overwrite checkbox (import trace wizard)
-     */
-    public static String ImportTraceWizard_OverwriteExistingTrace;
-    /**
-     * The label of the checkbox to create a link to the trace in workspace (import trace wizard)
-     */
-    public static String ImportTraceWizard_CreateLinksInWorkspace;
-    /**
-     * The error message for invalid trace directory (import trace wizard)
-     */
-    public static String ImportTraceWizard_InvalidTraceDirectory;
-    /**
-     * The error message when a trace validation failed (import trace wizard).
-     */
-    public static String ImportTraceWizard_TraceValidationFailed;
-    /**
-     * The error message when trace source is empty (import trace wizard).
-     */
-    public static String ImportTraceWizard_SelectTraceSourceEmpty;
-    /**
-     * The error message when no trace is selected (import trace wizard).
-     */
-    public static String ImportTraceWizard_SelectTraceNoneSelected;
-    /**
-     * The error message when an error occurred during import operation.
-     */
-    public static String ImportTraceWizard_ImportProblem;
-    /**
-     * The error message if destination directory is a virtual folder.
-     */
-    public static String ImportTraceWizard_CannotImportFilesUnderAVirtualFolder;
-    /**
-     * The error message if destination directory is a virtual folder (for a link).
-     */
-    public static String ImportTraceWizard_HaveToCreateLinksUnderAVirtualFolder;
-    /**
-     * The label string of the browse button.
-     */
-    public static String ImportTraceWizard_BrowseButton;
-    /**
-     * The information label string.
-     */
-    public static String ImportTraceWizard_Information;
-    /**
      *  The title of the select traces wizard.
      */
     public static String SelectTracesWizard_WindowTitle;
     /**
      * The column header for the traces (select traces wizard page).
      */
-	public static String SelectTracesWizardPage_TraceColumnHeader;
-	/**
-	 * The title of select traces wizard page.
-	 */
-	public static String SelectTracesWizardPage_WindowTitle;
-	/**
-	 * The description of the select traces wizard page.
-	 */
-	public static String SelectTracesWizardPage_Description;
-	/**
-	 * The error message when no name was entered in a dialog box (new trace or experiment dialog)
-	 */
+    public static String SelectTracesWizardPage_TraceColumnHeader;
+    /**
+     * The title of select traces wizard page.
+     */
+    public static String SelectTracesWizardPage_WindowTitle;
+    /**
+     * The description of the select traces wizard page.
+     */
+    public static String SelectTracesWizardPage_Description;
+    /**
+     * The error message when no name was entered in a dialog box (new trace or
+     * experiment dialog)
+     */
     public static String Dialog_EmptyNameError;
     /**
      * The error message when name of trace or experiment already exists
