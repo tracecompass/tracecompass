@@ -20,5 +20,4 @@ Require-Bundle: org.eclipse.core.commands,
  org.eclipse.equinox.p2.ui.sdk
 Export-Package: org.eclipse.linuxtools.internal.tracing.rcp.ui;x-internal:=true,
  org.eclipse.linuxtools.internal.tracing.rcp.ui.cli;x-internal:=true,
- org.eclipse.linuxtools.internal.tracing.rcp.ui.commands;x-internal:=true,
  org.eclipse.linuxtools.internal.tracing.rcp.ui.messages;x-internal:=true
