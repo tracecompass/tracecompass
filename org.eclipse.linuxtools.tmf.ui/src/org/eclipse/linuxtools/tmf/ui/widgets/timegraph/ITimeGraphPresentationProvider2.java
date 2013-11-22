@@ -40,4 +40,21 @@ public interface ITimeGraphPresentationProvider2 extends ITimeGraphPresentationP
      */
     void setDrawingHelper(ITmfTimeGraphDrawingHelper helper);
 
+    /**
+     * Adds a color settings listener, to be notified when the presentation
+     * provider's state colors change.
+     *
+     * @param listener
+     *            The new listener for color settings changes
+     */
+    public void addColorListener(ITimeGraphColorListener listener);
+
+    /**
+     * Removes a color settings listener.
+     *
+     * @param listener
+     *            The color settings listener to remove
+     */
+    public void removeColorListener(ITimeGraphColorListener listener);
+
 }
