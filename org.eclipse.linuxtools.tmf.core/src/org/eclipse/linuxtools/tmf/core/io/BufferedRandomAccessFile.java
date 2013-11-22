@@ -29,12 +29,12 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
 	private static final int DEFAULT_BUF_SIZE = 8192;
 	private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8"); //$NON-NLS-1$
 
-	final int BUF_SIZE;
-	byte buffer[];
-	int buf_end = 0;
-	int buf_pos = 0;
-	long real_pos = 0;
-	StringBuilder sb = new StringBuilder();
+	private final int BUF_SIZE;
+	private final byte buffer[];
+	private int buf_end = 0;
+	private int buf_pos = 0;
+	private long real_pos = 0;
+	private final StringBuilder sb = new StringBuilder();
 
     /**
      * Constructor using the default buffer size
