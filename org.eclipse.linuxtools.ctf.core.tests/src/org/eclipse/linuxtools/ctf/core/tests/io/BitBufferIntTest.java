@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Part of the BitBuffet tests with test the methods to read/write integers.
+ * Part of the BitBuffer tests which test the methods to read/write integers.
  * These are separated from the main file because the fixture is different.
  *
  * @author alexmont
