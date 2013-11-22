@@ -17,7 +17,7 @@ import java.util.Arrays;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
- * A CTF array definiton
+ * A CTF array definition
  *
  * Arrays are fixed-length. Their length is declared in the type
  * declaration within the meta-data. They contain an array of "inner type"

@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 
 /**
- * A CTF definiton
+ * A CTF definition
  *
  * A definition is like an object of a declaration class. It fills the declaration
  * with values. <br>

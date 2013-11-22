@@ -32,7 +32,7 @@ public class FloatDefinition extends Definition {
     private double value;
 
     // ------------------------------------------------------------------------
-    // Contructors
+    // Constructors
     // ------------------------------------------------------------------------
 
     /**
@@ -52,11 +52,11 @@ public class FloatDefinition extends Definition {
     }
 
     // ------------------------------------------------------------------------
-    // Gettters/Setters/Predicates
+    // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
     /**
-     * THe value of a float stored, fit into a double. This should be extended
+     * The value of a float stored, fit into a double. This should be extended
      * for exotic floats if this is necessary.
      *
      * @return the value of the float field fit into a double.

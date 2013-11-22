@@ -35,7 +35,7 @@ public abstract class SimpleDatatypeDefinition extends Definition {
     }
 
     /**
-     * gets the value in integer form
+     * Gets the value in integer form
      *
      * @return the integer in a Long, can be null
      */
@@ -44,7 +44,7 @@ public abstract class SimpleDatatypeDefinition extends Definition {
     }
 
     /**
-     * gets the value in string form
+     * Gets the value in string form
      *
      * @return the integer in a String, can be null
      */

@@ -37,7 +37,7 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
     private long value;
 
     // ------------------------------------------------------------------------
-    // Contructors
+    // Constructors
     // ------------------------------------------------------------------------
 
     /**
@@ -57,7 +57,7 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
     }
 
     // ------------------------------------------------------------------------
-    // Gettters/Setters/Predicates
+    // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
     /**

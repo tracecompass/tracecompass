@@ -90,7 +90,7 @@ public class EnumDeclaration implements IDeclaration {
     }
 
     /**
-     * check if the label for a value (enum a{day=0,night=1} would return "day" for query(0)
+     * Check if the label for a value (enum a{day=0,night=1} would return "day" for query(0)
      * @param value the value to lookup
      * @return the label of that value, can be null
      */
@@ -124,7 +124,7 @@ public class EnumDeclaration implements IDeclaration {
         }
 
         /**
-         * return the first label that matches a value
+         * Return the first label that matches a value
          * @param value the value to query
          * @return the label corresponding to that value
          */

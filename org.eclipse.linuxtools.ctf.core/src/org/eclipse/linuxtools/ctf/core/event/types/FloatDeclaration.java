@@ -58,7 +58,7 @@ public class FloatDeclaration implements IDeclaration {
     }
 
     // ------------------------------------------------------------------------
-    // Gettters/Setters/Predicates
+    // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
     /**
