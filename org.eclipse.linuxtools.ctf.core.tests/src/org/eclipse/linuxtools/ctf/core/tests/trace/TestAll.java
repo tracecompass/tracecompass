@@ -31,7 +31,6 @@ import org.junit.runners.Suite;
     MetadataTest.class,
     StreamInputPacketIndexEntryTest.class,
     StreamInputPacketIndexTest.class,
-    StreamInputReaderComparatorTest.class,
     StreamInputReaderTest.class,
     StreamInputReaderTimestampComparatorTest.class,
     StreamInputTest.class,
