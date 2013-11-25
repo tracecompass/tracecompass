@@ -36,12 +36,19 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
 
 /**
  * Test suite for the scheduler.
  */
 public class TmfSchedulerTest {
+
+    /** Time-out tests after 60 seconds */
+    @Rule
+    public TestRule globalTimeout= new Timeout(60000);
 
     // ------------------------------------------------------------------------
     // Constants

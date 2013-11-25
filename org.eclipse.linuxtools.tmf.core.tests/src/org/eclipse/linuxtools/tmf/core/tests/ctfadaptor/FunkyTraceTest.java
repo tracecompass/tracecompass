@@ -26,7 +26,10 @@ import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
 
 /**
  * More advanced CTF tests using "funky_trace", a trace generated with the
@@ -36,6 +39,10 @@ import org.junit.Test;
  * @author Alexandre Montplaisir
  */
 public class FunkyTraceTest {
+
+    /** Time-out tests after 20 seconds */
+    @Rule
+    public TestRule globalTimeout= new Timeout(20000);
 
     // ------------------------------------------------------------------------
     // Attributes
