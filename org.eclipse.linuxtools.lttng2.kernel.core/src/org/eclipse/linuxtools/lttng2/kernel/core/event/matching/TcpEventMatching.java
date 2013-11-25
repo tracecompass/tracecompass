@@ -18,9 +18,10 @@ import java.util.List;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.TcpEventStrings;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
-import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -37,9 +38,24 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  */
 public class TcpEventMatching implements ITmfNetworkMatchDefinition {
 
+    private static boolean canMatchPacket(final ITmfEvent event) {
+        /* Make sure all required fields are present to match with this event */
+        ITmfEventField content = event.getContent();
+        if ((content.getField(TcpEventStrings.SEQ) != null) &&
+                (content.getField(TcpEventStrings.ACKSEQ) != null) && (content.getField(TcpEventStrings.FLAGS) != null)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public Direction getDirection(ITmfEvent event) {
         String evname = event.getType().getName();
+
+        if (!canMatchPacket(event)) {
+            return null;
+        }
+
         /* Is the event a tcp socket in or out event */
         if (evname.equals(TcpEventStrings.INET_SOCK_LOCAL_IN)) {
             return Direction.IN;
