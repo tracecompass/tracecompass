@@ -80,7 +80,14 @@ public class Utils {
          * This idea is to rotate the domain by the length of the negative
          * space, and then use the signed operator.
          */
-        return Long.compare(left + Long.MIN_VALUE, right + Long.MIN_VALUE);
+        final long a = left + Long.MIN_VALUE;
+        final long b = right + Long.MIN_VALUE;
+        if (a < b) {
+            return -1;
+        } else if (a > b) {
+            return 1;
+        }
+        return 0;
     }
 
     /**
