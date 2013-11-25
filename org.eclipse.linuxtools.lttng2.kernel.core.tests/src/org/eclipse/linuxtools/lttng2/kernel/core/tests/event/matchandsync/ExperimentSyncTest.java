@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng2.kernel.core.tests.event.matchandsync;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
@@ -49,6 +50,8 @@ public class ExperimentSyncTest {
      */
     @Before
     public void setUp() {
+        assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
+        assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
         CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
         CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
 
@@ -69,6 +72,8 @@ public class ExperimentSyncTest {
     public void cleanUp() {
         fTraces[0].setTimestampTransform(TmfTimestampTransform.IDENTITY);
         fTraces[1].setTimestampTransform(TmfTimestampTransform.IDENTITY);
+        CtfTmfTestTrace.SYNC_SRC.dispose();
+        CtfTmfTestTrace.SYNC_DEST.dispose();
     }
 
     /**
