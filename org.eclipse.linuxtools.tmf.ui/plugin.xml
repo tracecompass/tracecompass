@@ -1331,20 +1331,6 @@
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.BatchImportTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.batch_import">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                  </instanceof>
-               </iterate>
-            </and>
-         </activeWhen>
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.commands.ExportToTextCommandHandler"

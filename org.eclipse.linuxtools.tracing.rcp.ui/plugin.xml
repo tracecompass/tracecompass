@@ -66,6 +66,11 @@
                   label="%command.OpenDirectory.label"
                   style="push">
             </command>
+            <command
+                  commandId="org.eclipse.linuxtools.tmf.ui.batch_import"
+                  label="%command.batch_import"
+                  style="push">
+            </command>
             <separator
                   name="OpenSeparator"
                   visible="true">

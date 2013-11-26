@@ -29,7 +29,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -52,7 +52,8 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     // Controls data
     private final Composite fParent;
     private Font fFont;
-    private final Group fGroup;
+    private final Composite fComposite;
+    private final Label fLabel;
 
     /**
      * The text value field.
@@ -96,20 +97,26 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
         GridLayout gridLayout;
         GridData gridData;
 
-        // Group control
-        gridLayout = new GridLayout(1, true);
-        gridLayout.horizontalSpacing = 0;
-        gridLayout.verticalSpacing = 0;
-        fGroup = new Group(fParent, SWT.SHADOW_NONE);
-        fGroup.setText(label);
-        fGroup.setFont(fFont);
-        fGroup.setLayout(gridLayout);
+        // Composite
+        gridLayout = new GridLayout(3, false);
+        gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
+        fComposite = new Composite(fParent, SWT.NONE);
+        fComposite.setLayout(gridLayout);
 
-        // Group control
-        gridData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
-        gridData.horizontalIndent = 0;
-        gridData.verticalIndent = 0;
-        fTextValue = new Text(fGroup, SWT.BORDER);
+        gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        Label filler = new Label(fComposite, SWT.NONE);
+        filler.setLayoutData(gridData);
+
+        // Label
+        gridData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+        fLabel = new Label(fComposite, SWT.NONE);
+        fLabel.setText(label);
+        fLabel.setFont(fFont);
+
+        // Text control
+        gridData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+        fTextValue = new Text(fComposite, SWT.BORDER);
         fTextValue.setFont(fFont);
         fTextValue.setLayoutData(gridData);
 
@@ -140,7 +147,7 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
      * @return <code>true</code> if widget is disposed else <code>false</code>
      */
     public boolean isDisposed() {
-        return fGroup.isDisposed();
+        return fComposite.isDisposed();
     }
 
     // ------------------------------------------------------------------------
@@ -157,7 +164,20 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
      * @param layoutData A GridData to set.
      */
     public void setLayoutData(GridData layoutData) {
-        fGroup.setLayoutData(layoutData);
+        fComposite.setLayoutData(layoutData);
+    }
+
+    /**
+     * Enables the receiver if the argument is <code>true</code>,
+     * and disables it otherwise. A disabled control is typically
+     * not selectable from the user interface and draws with an
+     * inactive or "grayed" look.
+     *
+     * @param enabled the new enabled state
+     * @since 2.2
+     */
+    public void setEnabled(boolean enabled) {
+        fTextValue.setEnabled(enabled);
     }
 
     /**
@@ -174,6 +194,7 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
             if (!isDisposed()) {
                 fValue = time;
                 fTextValue.setText(displayTime);
+                fComposite.layout();
                 fParent.getParent().layout();
             }
             return;
@@ -242,7 +263,7 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
 
     @Override
     public void keyPressed(KeyEvent event) {
-        switch (event.keyCode) {
+        switch (event.character) {
             case SWT.CR:
                 updateValue();
                 break;

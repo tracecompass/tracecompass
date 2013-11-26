@@ -16,13 +16,10 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * A histogram widget that displays the event distribution of a whole trace.
@@ -32,14 +29,7 @@ import org.eclipse.swt.widgets.Display;
  * @version 1.1
  * @author Francois Chouinard
  */
-public class FullTraceHistogram extends Histogram implements MouseMoveListener {
-
-    // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
-    // Histogram colors
-    private final Color fTimeRangeColor = new Color(Display.getCurrent(), 255, 128, 0);
+public class FullTraceHistogram extends Histogram {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -64,12 +54,10 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         super(view, parent);
         fZoom = new HistogramZoom(this, getStartTime(), getTimeLimit());
         addMouseWheelListener(fZoom);
-        fCanvas.addMouseMoveListener(this);
     }
 
     @Override
     public void dispose() {
-        fTimeRangeColor.dispose();
         super.dispose();
     }
 
@@ -111,39 +99,71 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         fDataModel.complete();
     }
 
-    @Override
-    public void updateTimeRange(long startTime, long endTime) {
-        ((HistogramView) fParentView).updateTimeRange(startTime, endTime);
-    }
-
     // ------------------------------------------------------------------------
     // MouseListener
     // ------------------------------------------------------------------------
 
-    private boolean fMouseDown;
     private int fStartPosition;
+    private boolean fMouseMoved;
 
     @Override
     public void mouseDown(MouseEvent event) {
-        fMouseDown = true;
-        fStartPosition = event.x;
+        if (fDragState == DRAG_NONE && fDataModel.getNbEvents() != 0) {
+            if (event.button == 2 || (event.button == 1 && (event.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL)) {
+                fDragState = DRAG_RANGE;
+                fDragButton = event.button;
+                fStartPosition = event.x;
+                fMouseMoved = false;
+                return;
+            } else if (event.button == 3) {
+                fDragState = DRAG_ZOOM;
+                fDragButton = event.button;
+                long time = Math.min(getTimestamp(event.x), getEndTime());
+                if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT) {
+                    if (time < fRangeStartTime + fRangeDuration / 2) {
+                        fRangeStartTime = fRangeStartTime + fRangeDuration;
+                    }
+                } else {
+                    fRangeStartTime = time;
+                }
+                fRangeDuration = time - fRangeStartTime;
+                fCanvas.redraw();
+                return;
+            }
+        }
+        super.mouseDown(event);
     }
 
     @Override
     public void mouseUp(MouseEvent event) {
-        if (fMouseDown) {
-            fMouseDown = false;
-            // Check if mouse click without move; if so, just set the current event time
-            if (event.x == fStartPosition) {
-                super.mouseDown(event);
-                return;
+        if (fDragState == DRAG_RANGE && event.button == fDragButton) {
+            fDragState = DRAG_NONE;
+            fDragButton = 0;
+            if (!fMouseMoved) {
+                // if single click without move, center on the click
+                long startTime = getTimestamp(event.x) - fRangeDuration / 2;
+                fRangeStartTime = Math.max(getStartTime(), Math.min(getEndTime() - fRangeDuration, startTime));
             }
-
             ((HistogramView) fParentView).updateTimeRange(fRangeStartTime, fRangeStartTime + fRangeDuration);
-
+            return;
+        } else if (fDragState == DRAG_ZOOM && event.button == fDragButton) {
+            fDragState = DRAG_NONE;
+            fDragButton = 0;
+            if (fRangeDuration < 0) {
+                fRangeStartTime = fRangeStartTime + fRangeDuration;
+                fRangeDuration = -fRangeDuration;
+            }
+            if (fRangeDuration > 0) {
+                ((HistogramView) fParentView).updateTimeRange(fRangeStartTime, fRangeStartTime + fRangeDuration);
+            } else {
+                fRangeStartTime = fZoom.getStartTime();
+                fRangeDuration = fZoom.getDuration();
+                fCanvas.redraw();
+            }
+            return;
         }
+        super.mouseUp(event);
     }
-
 
     // ------------------------------------------------------------------------
     // MouseMoveListener
@@ -151,8 +171,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
 
     @Override
     public void mouseMove(MouseEvent event) {
-
-        if (fMouseDown) {
+        if (fDragState == DRAG_RANGE) {
             int nbBuckets = event.x - fStartPosition;
             long delta = nbBuckets * fScaledData.fBucketDuration;
             long newStart = fZoom.getStartTime() + delta;
@@ -165,8 +184,16 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
                 newStart = newEnd - fZoom.getDuration();
             }
             fRangeStartTime = newStart;
-            fDataModel.complete();
+            fCanvas.redraw();
+            fMouseMoved = true;
+            return;
+        } else if (fDragState == DRAG_ZOOM) {
+            long endTime = Math.max(getStartTime(), Math.min(getEndTime(), getTimestamp(event.x)));
+            fRangeDuration = endTime - fRangeStartTime;
+            fCanvas.redraw();
+            return;
         }
+        super.mouseMove(event);
     }
 
     // ------------------------------------------------------------------------
@@ -183,8 +210,8 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         Image rangeRectangleImage = new Image(image.getDevice(), image, SWT.IMAGE_COPY);
         GC rangeWindowGC = new GC(rangeRectangleImage);
 
-        if ((fScaledData != null) && (fRangeStartTime != 0)) {
-            drawTimeRangeWindow(rangeWindowGC);
+        if ((fScaledData != null) && (fRangeDuration != 0 || fDragState == DRAG_ZOOM)) {
+            drawTimeRangeWindow(rangeWindowGC, fRangeStartTime, fRangeDuration);
         }
 
         // Draws the buffer image onto the canvas.
@@ -192,39 +219,6 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
 
         rangeWindowGC.dispose();
         rangeRectangleImage.dispose();
-    }
-
-    private void drawTimeRangeWindow(GC imageGC) {
-
-        // Map times to histogram coordinates
-        long bucketSpan = Math.max(fScaledData.fBucketDuration, 1);
-        int rangeWidth = (int) (fRangeDuration / bucketSpan);
-
-        int left = (int) ((fRangeStartTime - fDataModel.getFirstBucketTime()) / bucketSpan);
-        int right = left + rangeWidth;
-        int center = (left + right) / 2;
-        int height = fCanvas.getSize().y;
-
-        // Draw the selection window
-        imageGC.setForeground(fTimeRangeColor);
-        imageGC.setLineWidth(1);
-        imageGC.setLineStyle(SWT.LINE_SOLID);
-        imageGC.drawRoundRectangle(left, 0, rangeWidth, height - 1, 15, 15);
-
-        // Fill the selection window
-        imageGC.setBackground(fTimeRangeColor);
-        imageGC.setAlpha(35);
-        imageGC.fillRoundRectangle(left + 1, 1, rangeWidth - 1, height - 2, 15, 15);
-        imageGC.setAlpha(255);
-
-        // Draw the cross hair
-        imageGC.setForeground(fTimeRangeColor);
-        imageGC.setLineWidth(1);
-        imageGC.setLineStyle(SWT.LINE_SOLID);
-
-        int chHalfWidth = ((rangeWidth < 60) ? (rangeWidth * 2) / 3 : 40) / 2;
-        imageGC.drawLine(center - chHalfWidth, height / 2, center + chHalfWidth, height / 2);
-        imageGC.drawLine(center, (height / 2) - chHalfWidth, center, (height / 2) + chHalfWidth);
     }
 
     /**
