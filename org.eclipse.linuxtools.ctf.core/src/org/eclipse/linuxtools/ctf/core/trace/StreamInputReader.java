@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.internal.ctf.core.Activator;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
@@ -226,16 +225,7 @@ public class StreamInputReader {
          * If an event is available, read it.
          */
         if (this.packetReader.hasMoreEvents()) {
-            try {
-                this.setCurrentEvent(this.packetReader.readNextEvent());
-            } catch (CTFReaderException e) {
-                /*
-                 * Some problem happened, we'll assume that there are no more
-                 * events
-                 */
-                Activator.logError("Error reading CTF event in stream", e); //$NON-NLS-1$
-                return false;
-            }
+            this.setCurrentEvent(this.packetReader.readNextEvent());
             return true;
         }
         this.setCurrentEvent(null);
