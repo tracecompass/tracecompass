@@ -36,6 +36,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -335,6 +336,7 @@ public class TmfSchedulerTest {
     /**
      * Test if the scheduler is working as expected
      */
+    @Ignore
     @Test
     public void executionOrder() {
         List<String> expectedOrder = new LinkedList<String>();

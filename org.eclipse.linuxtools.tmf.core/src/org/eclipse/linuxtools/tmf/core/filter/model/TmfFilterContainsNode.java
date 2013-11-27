@@ -85,7 +85,9 @@ public class TmfFilterContainsNode extends TmfFilterTreeNode {
 	 */
 	public void setValue(String value) {
 		this.fValue = value;
-		fValueUpperCase = value.toUpperCase();
+		if (value != null) {
+		    fValueUpperCase = value.toUpperCase();
+		}
 	}
 
 	/**
