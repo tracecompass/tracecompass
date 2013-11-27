@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
  * <b><u>StreamInput</u></b>
  * <p>
  * Represents a trace file that belongs to a certain stream.
+ *
  * @since 2.0
  */
 public class StreamInput implements IDefinitionScope {
@@ -124,8 +125,7 @@ public class StreamInput implements IDefinitionScope {
     }
 
     /**
-     * Gets the filechannel of the streamInput. This is a limited Java
-     * resource.
+     * Gets the filechannel of the streamInput. This is a limited Java resource.
      *
      * @return the filechannel
      */
@@ -245,7 +245,10 @@ public class StreamInput implements IDefinitionScope {
             StructDefinition streamPacketContextDef, BitBuffer bitBuffer)
             throws CTFReaderException {
 
-        /* Ignoring the return value, but this call is needed to initialize the input */
+        /*
+         * Ignoring the return value, but this call is needed to initialize the
+         * input
+         */
         createPacketBitBuffer(fileSizeBytes, packetOffsetBytes, packetIndex, bitBuffer);
 
         /*
@@ -272,8 +275,7 @@ public class StreamInput implements IDefinitionScope {
 
         if (packetIndex.getPacketSizeBits() > ((fileSizeBytes - packetIndex
                 .getOffsetBytes()) * 8)) {
-            throw new CTFReaderException(
-                    "Not enough data remaining in the file for the size of this packet"); //$NON-NLS-1$
+            throw new CTFReaderException("Not enough data remaining in the file for the size of this packet"); //$NON-NLS-1$
         }
 
         /*
@@ -383,8 +385,7 @@ public class StreamInput implements IDefinitionScope {
             long streamID = streamIDDef.getValue();
 
             if (streamID != getStream().getId()) {
-                throw new CTFReaderException(
-                        "Stream ID changing within a StreamInput"); //$NON-NLS-1$
+                throw new CTFReaderException("Stream ID changing within a StreamInput"); //$NON-NLS-1$
             }
         }
     }
@@ -429,14 +430,17 @@ public class StreamInput implements IDefinitionScope {
         String device = (String) packetIndex.lookupAttribute("device"); //$NON-NLS-1$
         // LTTng Specific
         Long cpuId = (Long) packetIndex.lookupAttribute("cpu_id"); //$NON-NLS-1$
-        Long lostEvents = (Long) packetIndex.lookupAttribute("events_discarded");  //$NON-NLS-1$
+        Long lostEvents = (Long) packetIndex.lookupAttribute("events_discarded"); //$NON-NLS-1$
 
         /* Read the content size in bits */
         if (contentSize != null) {
             packetIndex.setContentSizeBits(contentSize.intValue());
+        } else if (packetSize != null) {
+            packetIndex.setContentSizeBits(packetSize.longValue());
         } else {
             packetIndex.setContentSizeBits((int) (fileSizeBytes * 8));
         }
+
 
         /* Read the packet size in bits */
         if (packetSize != null) {
