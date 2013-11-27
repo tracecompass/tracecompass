@@ -103,9 +103,9 @@ public class FloatDefinition extends Definition {
 
     private static double readRawFloat64(BitBuffer input, final int manBits,
             final int expBits) throws CTFReaderException {
-        long low = input.getInt(32, false);
+        long low = input.get(32, false);
         low = low & 0x00000000FFFFFFFFL;
-        long high = input.getInt(32, false);
+        long high = input.get(32, false);
         high = high & 0x00000000FFFFFFFFL;
         long temp = (high << 32) | low;
         return createFloat(temp, manBits - 1, expBits);
@@ -135,7 +135,7 @@ public class FloatDefinition extends Definition {
 
     private static double readRawFloat32(BitBuffer input, final int manBits,
             final int expBits) throws CTFReaderException {
-        long temp = input.getInt(32, false);
+        long temp = input.get(32, false);
         return createFloat(temp, manBits - 1, expBits);
     }
 

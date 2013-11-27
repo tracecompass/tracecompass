@@ -6,10 +6,11 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: Matthew Khouzam - Initial Design and implementation
- * Contributors: Francis Giraldeau - Initial API and implementation
- * Contributors: Philippe Proulx - Some refinement and optimization
- * Contributors: Etienne Bergeron <Etienne.Bergeron@gmail.com> - fix zero size read + cleanup
+ * Contributors:
+ *  Matthew Khouzam - Initial Design and implementation + overhaul
+ *  Francis Giraldeau - Initial API and implementation
+ *  Philippe Proulx - Some refinement and optimization
+ *  Etienne Bergeron <Etienne.Bergeron@gmail.com> - fix zero size read + cleanup
  *******************************************************************************/
 
 package org.eclipse.linuxtools.ctf.core.event.io;
@@ -23,6 +24,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * <b><u>BitBuffer</u></b>
  * <p>
  * A bitwise buffer capable of accessing fields with bit offsets.
+ *
  * @since 2.0
  */
 public final class BitBuffer {
@@ -95,13 +97,70 @@ public final class BitBuffer {
      * Reads next four bytes from the current bit position according to current
      * byte order.
      *
-     * @return The int value read from the buffer
+     * @return The int value (signed) read from the buffer
      * @throws CTFReaderException
-     *             An error occurred reading the data. When the buffer is read
-     *             beyond its end, this exception will be raised.
+     *             An error occurred reading the long. This exception can be
+     *             raised if the buffer tries to read out of bounds
      */
     public int getInt() throws CTFReaderException {
         return getInt(BIT_INT, true);
+    }
+
+    /**
+     * Relative <i>get</i> method for reading 64-bit integer.
+     *
+     * Reads next eight bytes from the current bit position according to current
+     * byte order.
+     *
+     * @return The long value (signed) read from the buffer
+     * @throws CTFReaderException
+     *             An error occurred reading the long. This exception can be
+     *             raised if the buffer tries to read out of bounds
+     */
+    public long getLong() throws CTFReaderException {
+        return get(BIT_LONG, true);
+    }
+
+    /**
+     * Relative <i>get</i> method for reading long of <i>length</i> bits.
+     *
+     * Reads <i>length</i> bits starting at the current position. The result is
+     * signed extended if <i>signed</i> is true. The current position is
+     * increased of <i>length</i> bits.
+     *
+     * @param length
+     *            The length in bits of this integer
+     * @param signed
+     *            The sign extended flag
+     * @return The long value read from the buffer
+     * @throws CTFReaderException
+     *             An error occurred reading the data. If more than 64 bits at a
+     *             time are read, or the buffer is read beyond its end, this
+     *             exception will be raised.
+     */
+    public long get(int length, boolean signed) throws CTFReaderException {
+        if (length > BIT_LONG) {
+            throw new CTFReaderException("Cannot read a long longer than 64 bits. Rquested: " + length); //$NON-NLS-1$
+        }
+        if (length > BIT_INT) {
+            final int highShift = length - BIT_INT;
+            long a = getInt();
+            long b = getInt(highShift, false);
+            long retVal;
+            /* Cast the signed-extended int into a unsigned int. */
+            a &= 0xFFFFFFFFL;
+            b &= (1L << highShift) - 1L;
+
+            retVal = (this.byteOrder == ByteOrder.BIG_ENDIAN) ? ((a << highShift) | b) : ((b << BIT_INT) | a);
+            /* sign extend */
+            if (signed) {
+                int signExtendBits = BIT_LONG - length;
+                retVal = (retVal << signExtendBits) >> signExtendBits;
+            }
+            return retVal;
+        }
+        long retVal = getInt(length, signed);
+        return (signed ? retVal : (retVal & 0xFFFFFFFFL));
     }
 
     /**
@@ -120,7 +179,7 @@ public final class BitBuffer {
      *             An error occurred reading the data. When the buffer is read
      *             beyond its end, this exception will be raised.
      */
-    public int getInt(int length, boolean signed) throws CTFReaderException {
+    private int getInt(int length, boolean signed) throws CTFReaderException {
 
         /* Nothing to read. */
         if (length == 0) {
@@ -138,9 +197,15 @@ public final class BitBuffer {
         int val = 0;
         boolean gotIt = false;
 
-        /* Try a fast read when the position is byte-aligned by using the */
-        /* native methods of ByteBuffer. */
-        if (this.pos % BitBuffer.BIT_CHAR == 0) {
+        /*
+         * Try a fast read when the position is byte-aligned by using
+         * java.nio.ByteBuffer's native methods
+         */
+        /*
+         * A faster alignment detection as the compiler cannot guaranty that pos
+         * is always positive.
+         */
+        if ((this.pos & (BitBuffer.BIT_CHAR - 1)) == 0) {
             switch (length) {
             case BitBuffer.BIT_CHAR:
                 // Byte

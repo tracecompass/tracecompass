@@ -122,9 +122,9 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
 
         // TODO: use the eventual getLong from BitBuffer
         if (length == 64) {
-            long low = input.getInt(32, false);
+            long low = input.get(32, false);
             low = low & 0x00000000FFFFFFFFL;
-            long high = input.getInt(32, false);
+            long high = input.get(32, false);
             high = high & 0x00000000FFFFFFFFL;
             if (this.declaration.getByteOrder() != ByteOrder.BIG_ENDIAN) {
                 bits = (high << 32) | low;
@@ -132,7 +132,7 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
                 bits = (low << 32) | high;
             }
         } else {
-            bits = input.getInt(length, signed);
+            bits = input.get(length, signed);
             bits = bits & 0x00000000FFFFFFFFL;
             /*
              * The previous line loses sign information but is necessary, this

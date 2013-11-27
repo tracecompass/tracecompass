@@ -115,10 +115,10 @@ public class StringDefinition extends Definition {
         /* Offset the buffer position wrt the current alignment */
         alignRead(input, this.declaration);
         string.setLength(0);
-        char c = (char) input.getInt(8, false);
+        char c = (char) input.get(8, false);
         while (c != 0) {
             string.append(c);
-            c = (char) input.getInt(8, false);
+            c = (char) input.get(8, false);
         }
     }
 
