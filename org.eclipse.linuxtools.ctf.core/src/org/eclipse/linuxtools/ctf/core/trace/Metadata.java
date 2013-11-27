@@ -28,9 +28,9 @@ import java.util.UUID;
 
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.RewriteCardinalityException;
 import org.eclipse.linuxtools.ctf.parser.CTFLexer;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
 import org.eclipse.linuxtools.ctf.parser.CTFParser.parse_return;
@@ -177,9 +177,9 @@ public class Metadata {
             tempException = new CTFReaderException(e);
         } catch (ParseException e) {
             tempException = new CTFReaderException(e);
-        } catch (MismatchedTokenException e) {
-            tempException = new CtfAntlrException(e);
         } catch (RecognitionException e) {
+            tempException = new CtfAntlrException(e);
+        } catch (RewriteCardinalityException e){
             tempException = new CtfAntlrException(e);
         }
 
