@@ -49,9 +49,9 @@ public final class BitBuffer {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private ByteBuffer buf;
-    private long pos;
-    private ByteOrder byteOrder;
+    private ByteBuffer fBuffer;
+    private long fPosition;
+    private ByteOrder fByteOrder;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -84,7 +84,11 @@ public final class BitBuffer {
     public BitBuffer(ByteBuffer buf, ByteOrder order) {
         setByteBuffer(buf);
         setByteOrder(order);
-        position(0);
+        resetPosition();
+    }
+
+    private void resetPosition() {
+        fPosition = 0;
     }
 
     // ------------------------------------------------------------------------
@@ -151,7 +155,7 @@ public final class BitBuffer {
             a &= 0xFFFFFFFFL;
             b &= (1L << highShift) - 1L;
 
-            retVal = (this.byteOrder == ByteOrder.BIG_ENDIAN) ? ((a << highShift) | b) : ((b << BIT_INT) | a);
+            retVal = (fByteOrder == ByteOrder.BIG_ENDIAN) ? ((a << highShift) | b) : ((b << BIT_INT) | a);
             /* sign extend */
             if (signed) {
                 int signExtendBits = BIT_LONG - length;
@@ -205,11 +209,11 @@ public final class BitBuffer {
          * A faster alignment detection as the compiler cannot guaranty that pos
          * is always positive.
          */
-        if ((this.pos & (BitBuffer.BIT_CHAR - 1)) == 0) {
+        if ((fPosition & (BitBuffer.BIT_CHAR - 1)) == 0) {
             switch (length) {
             case BitBuffer.BIT_CHAR:
                 // Byte
-                val = this.buf.get((int) (this.pos / 8));
+                val = fBuffer.get((int) (fPosition / 8));
                 if (!signed) {
                     val = val & 0xff;
                 }
@@ -218,7 +222,7 @@ public final class BitBuffer {
 
             case BitBuffer.BIT_SHORT:
                 // Word
-                val = this.buf.getShort((int) (this.pos / 8));
+                val = fBuffer.getShort((int) (fPosition / 8));
                 if (!signed) {
                     val = val & 0xffff;
                 }
@@ -227,7 +231,7 @@ public final class BitBuffer {
 
             case BitBuffer.BIT_INT:
                 // Double word
-                val = this.buf.getInt((int) (this.pos / 8));
+                val = fBuffer.getInt((int) (fPosition / 8));
                 gotIt = true;
                 break;
 
@@ -239,13 +243,13 @@ public final class BitBuffer {
         /* When not byte-aligned, fall-back to a general decoder. */
         if (!gotIt) {
             // Nothing read yet: use longer methods
-            if (this.byteOrder == ByteOrder.LITTLE_ENDIAN) {
-                val = getIntLE(this.pos, length, signed);
+            if (fByteOrder == ByteOrder.LITTLE_ENDIAN) {
+                val = getIntLE(fPosition, length, signed);
             } else {
-                val = getIntBE(this.pos, length, signed);
+                val = getIntBE(fPosition, length, signed);
             }
         }
-        this.pos += length;
+        fPosition += length;
 
         return val;
     }
@@ -259,7 +263,7 @@ public final class BitBuffer {
         int value = 0;
 
         currByte = startByte;
-        cache = this.buf.get(currByte) & 0xFF;
+        cache = fBuffer.get(currByte) & 0xFF;
         boolean isNeg = (cache & (1 << (BIT_CHAR - (index % BIT_CHAR) - 1))) != 0;
         if (signed && isNeg) {
             value = ~0;
@@ -285,19 +289,19 @@ public final class BitBuffer {
         }
         for (; currByte < (endByte - 1); currByte++) {
             value <<= BIT_CHAR;
-            value |= this.buf.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & 0xFF;
         }
         lshift = (int) (end % BIT_CHAR);
         if (lshift > 0) {
             mask = ~((~0) << lshift);
-            cmask = this.buf.get(currByte) & 0xFF;
+            cmask = fBuffer.get(currByte) & 0xFF;
             cmask >>>= BIT_CHAR - lshift;
             cmask &= mask;
             value <<= lshift;
             value |= cmask;
         } else {
             value <<= BIT_CHAR;
-            value |= this.buf.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & 0xFF;
         }
         return value;
     }
@@ -311,7 +315,7 @@ public final class BitBuffer {
         int value = 0;
 
         currByte = endByte - 1;
-        cache = buf.get(currByte) & 0xFF;
+        cache = fBuffer.get(currByte) & 0xFF;
         mod = (int) (end % BIT_CHAR);
         lshift = (mod > 0) ? mod : BIT_CHAR;
         boolean isNeg = (cache & (1 << (lshift - 1))) != 0;
@@ -338,19 +342,19 @@ public final class BitBuffer {
         }
         for (; currByte >= (startByte + 1); currByte--) {
             value <<= BIT_CHAR;
-            value |= buf.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & 0xFF;
         }
         lshift = (int) (index % BIT_CHAR);
         if (lshift > 0) {
             mask = ~((~0) << (BIT_CHAR - lshift));
-            cmask = buf.get(currByte) & 0xFF;
+            cmask = fBuffer.get(currByte) & 0xFF;
             cmask >>>= lshift;
             cmask &= mask;
             value <<= (BIT_CHAR - lshift);
             value |= cmask;
         } else {
             value <<= BIT_CHAR;
-            value |= buf.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & 0xFF;
         }
         return value;
     }
@@ -394,7 +398,7 @@ public final class BitBuffer {
      *             beyond its end, this exception will be raised.
      */
     public void putInt(int length, int value) throws CTFReaderException {
-        final long curPos = this.pos;
+        final long curPos = fPosition;
 
         if (!canRead(length)) {
             throw new CTFReaderException("Cannot write to bitbuffer, " //$NON-NLS-1$
@@ -403,12 +407,12 @@ public final class BitBuffer {
         if (length == 0) {
             return;
         }
-        if (this.byteOrder == ByteOrder.LITTLE_ENDIAN) {
+        if (fByteOrder == ByteOrder.LITTLE_ENDIAN) {
             putIntLE(curPos, length, value);
         } else {
             putIntBE(curPos, length, value);
         }
-        this.pos += length;
+        fPosition += length;
     }
 
     private void putIntBE(long index, int length, int value) {
@@ -441,8 +445,8 @@ public final class BitBuffer {
              * already cleared
              */
             cmask &= ~mask;
-            int b = this.buf.get(startByte) & 0xFF;
-            this.buf.put(startByte, (byte) ((b & mask) | cmask));
+            int b = fBuffer.get(startByte) & 0xFF;
+            fBuffer.put(startByte, (byte) ((b & mask) | cmask));
             return;
         }
 
@@ -454,25 +458,25 @@ public final class BitBuffer {
             mask = ~((~0) << lshift);
             cmask = correctedValue << lshift;
             cmask &= ~mask;
-            int b = this.buf.get(currByte) & 0xFF;
-            this.buf.put(currByte, (byte) ((b & mask) | cmask));
+            int b = fBuffer.get(currByte) & 0xFF;
+            fBuffer.put(currByte, (byte) ((b & mask) | cmask));
             correctedValue >>>= cshift;
             currByte--;
         }
 
         /* middle byte(s) */
         for (; currByte >= (startByte + 1); currByte--) {
-            this.buf.put(currByte, (byte) correctedValue);
+            fBuffer.put(currByte, (byte) correctedValue);
             correctedValue >>>= BIT_CHAR;
         }
         /* end byte contains LSB */
         if ((index % BIT_CHAR) > 0) {
             mask = (~0) << (BIT_CHAR - (index % BIT_CHAR));
             cmask = correctedValue & ~mask;
-            int b = this.buf.get(currByte) & 0xFF;
-            this.buf.put(currByte, (byte) ((b & mask) | cmask));
+            int b = fBuffer.get(currByte) & 0xFF;
+            fBuffer.put(currByte, (byte) ((b & mask) | cmask));
         } else {
-            this.buf.put(currByte, (byte) correctedValue);
+            fBuffer.put(currByte, (byte) correctedValue);
         }
     }
 
@@ -506,8 +510,8 @@ public final class BitBuffer {
              * already cleared
              */
             cmask &= ~mask;
-            int b = this.buf.get(startByte) & 0xFF;
-            this.buf.put(startByte, (byte) ((b & mask) | cmask));
+            int b = fBuffer.get(startByte) & 0xFF;
+            fBuffer.put(startByte, (byte) ((b & mask) | cmask));
             return;
         }
 
@@ -518,25 +522,25 @@ public final class BitBuffer {
             mask = ~((~0) << cshift);
             cmask = correctedValue << cshift;
             cmask &= ~mask;
-            int b = this.buf.get(currByte) & 0xFF;
-            this.buf.put(currByte, (byte) ((b & mask) | cmask));
+            int b = fBuffer.get(currByte) & 0xFF;
+            fBuffer.put(currByte, (byte) ((b & mask) | cmask));
             correctedValue >>>= BIT_CHAR - cshift;
             currByte++;
         }
 
         /* middle byte(s) */
         for (; currByte < (endByte - 1); currByte++) {
-            this.buf.put(currByte, (byte) correctedValue);
+            fBuffer.put(currByte, (byte) correctedValue);
             correctedValue >>>= BIT_CHAR;
         }
         /* end byte */
         if ((end % BIT_CHAR) > 0) {
             mask = (~0) << (end % BIT_CHAR);
             cmask = correctedValue & ~mask;
-            int b = this.buf.get(currByte) & 0xFF;
-            this.buf.put(currByte, (byte) ((b & mask) | cmask));
+            int b = fBuffer.get(currByte) & 0xFF;
+            fBuffer.put(currByte, (byte) ((b & mask) | cmask));
         } else {
-            this.buf.put(currByte, (byte) correctedValue);
+            fBuffer.put(currByte, (byte) correctedValue);
         }
     }
 
@@ -552,11 +556,11 @@ public final class BitBuffer {
      * @return does the buffer have enough room to read the next "length"
      */
     public boolean canRead(int length) {
-        if (this.buf == null) {
+        if (fBuffer == null) {
             return false;
         }
 
-        if ((this.pos + length) > (((long) this.buf.capacity()) * BIT_CHAR)) {
+        if ((fPosition + length) > (((long) fBuffer.capacity()) * BIT_CHAR)) {
             return false;
         }
         return true;
@@ -569,9 +573,9 @@ public final class BitBuffer {
      *            The order of the buffer.
      */
     public void setByteOrder(ByteOrder order) {
-        this.byteOrder = order;
-        if (this.buf != null) {
-            this.buf.order(order);
+        fByteOrder = order;
+        if (fBuffer != null) {
+            fBuffer.order(order);
         }
     }
 
@@ -581,7 +585,7 @@ public final class BitBuffer {
      * @return The order of the buffer.
      */
     public ByteOrder getByteOrder() {
-        return this.byteOrder;
+        return fByteOrder;
     }
 
     /**
@@ -589,9 +593,15 @@ public final class BitBuffer {
      *
      * @param newPosition
      *            The new position of the buffer.
+     * @throws CTFReaderException
+     *             Thrown on out of bounds exceptions
      */
-    public void position(long newPosition) {
-        this.pos = newPosition;
+    public void position(long newPosition) throws CTFReaderException {
+
+        if ((fBuffer != null) && (newPosition / 8) > fBuffer.capacity()) {
+            throw new CTFReaderException("Out of bounds exception on a position move, attempting to access position: " + newPosition); //$NON-NLS-1$
+        }
+        fPosition = newPosition;
     }
 
     /**
@@ -601,7 +611,7 @@ public final class BitBuffer {
      * @return order The position of the buffer.
      */
     public long position() {
-        return this.pos;
+        return fPosition;
     }
 
     /**
@@ -611,9 +621,9 @@ public final class BitBuffer {
      *            the byte buffer
      */
     public void setByteBuffer(ByteBuffer buf) {
-        this.buf = buf;
+        fBuffer = buf;
         if (buf != null) {
-            this.buf.order(this.byteOrder);
+            fBuffer.order(fByteOrder);
         }
         clear();
     }
@@ -624,19 +634,18 @@ public final class BitBuffer {
      * @return The byte buffer
      */
     public ByteBuffer getByteBuffer() {
-        return this.buf;
+        return fBuffer;
     }
 
     /**
      * Resets the bitbuffer.
      */
     public void clear() {
-        position(0);
-
-        if (this.buf == null) {
+        resetPosition();
+        if (fBuffer == null) {
             return;
         }
-        this.buf.clear();
+        fBuffer.clear();
     }
 
 }
