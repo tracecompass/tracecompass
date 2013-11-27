@@ -129,7 +129,7 @@ public class IntegerDeclaration implements IDeclaration {
     }
 
     @Override
-    public long getAlignment(){
+    public long getAlignment() {
         return alignment;
     }
 
@@ -137,7 +137,7 @@ public class IntegerDeclaration implements IDeclaration {
      * The integer's clock, since timestamps are stored in ints
      * @return the integer's clock, can be null. (most often it is)
      */
-    public String getClock(){
+    public String getClock() {
         return clock;
     }
     // ------------------------------------------------------------------------

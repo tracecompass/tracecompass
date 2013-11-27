@@ -40,7 +40,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
 
     /**
      * We do not use super.fRange, because in the case of coalesced requests,
-     * the global range can be modified as sub-requets are added.
+     * the global range can be modified as sub-request are added.
      */
     private TmfTimeRange fRange;
 

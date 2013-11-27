@@ -129,7 +129,7 @@ public final class CtfLocation extends TmfLocation {
 
     @Override
     public String toString() {
-        if( this.getLocationInfo().equals(CtfLocation.INVALID_LOCATION )) {
+        if (this.getLocationInfo().equals(CtfLocation.INVALID_LOCATION )) {
             return getClass().getSimpleName() + " [INVALID]"; //$NON-NLS-1$
         }
         return super.toString();

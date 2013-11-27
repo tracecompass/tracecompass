@@ -53,14 +53,14 @@ public final class AttributeTree {
     }
 
     /**
-     * "Existing file" constructor Builds a attribute tree from a "mapping file"
-     * or mapping section previously saved somewhere.
+     * "Existing file" constructor. Builds an attribute tree from a
+     * "mapping file" or mapping section previously saved somewhere.
      *
      * @param ss
      *            StateSystem to which this AT is attached
      * @param fis
      *            File stream where to read the AT information. Make sure it's
-     *            seeked at the right place!
+     *            sought at the right place!
      * @throws IOException
      */
     AttributeTree(StateSystem ss, FileInputStream fis) throws IOException {
@@ -138,7 +138,7 @@ public final class AttributeTree {
      * FileOutputStream defines where (which file/position).
      *
      * @param fos
-     *            Where to write. Make sure it's seeked at the right position
+     *            Where to write. Make sure it's sought at the right position
      *            you want.
      * @return The total number of bytes written.
      */

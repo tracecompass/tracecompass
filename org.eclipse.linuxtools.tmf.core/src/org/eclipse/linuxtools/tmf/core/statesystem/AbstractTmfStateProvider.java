@@ -72,7 +72,6 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
         String id2 = (id == null ? "Unamed" : id); //$NON-NLS-1$
         eventHandlerThread = new Thread(new EventProcessor(), id2 + " Event Handler"); //$NON-NLS-1$
-
     }
 
     @Override
@@ -146,7 +145,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         try {
             eventsQueue.put(ev);
             while (!eventsQueue.isEmpty()) {
-                    Thread.sleep(100);
+                Thread.sleep(100);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -200,7 +199,6 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 }
                 /* We've received the last event, clean up */
                 closeStateSystem();
-                return;
             } catch (InterruptedException e) {
                 /* We've been interrupted abnormally */
                 System.out.println("Event handler interrupted!"); //$NON-NLS-1$
