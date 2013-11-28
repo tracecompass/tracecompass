@@ -22,10 +22,10 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 final class LongStateValue extends TmfStateValue {
 
-    private final Long valueLong;
+    private final long value;
 
     public LongStateValue(long valueAsLong) {
-        this.valueLong = new Long(valueAsLong);
+        this.value = valueAsLong;
     }
 
     @Override
@@ -37,15 +37,23 @@ final class LongStateValue extends TmfStateValue {
     public boolean isNull() {
         return false;
     }
+    @Override
+    public boolean equals(@Nullable Object object) {
+        if (!(object instanceof LongStateValue)) {
+            return false;
+        }
+        LongStateValue other = (LongStateValue) object;
+        return (this.value == other.value);
+    }
 
     @Override
-    public Long getValue() {
-        return valueLong;
+    public int hashCode() {
+        return ((int) value) ^ ((int) (value >>> 32));
     }
 
     @Override
     public @Nullable String toString() {
-        return String.format("%3d", valueLong); //$NON-NLS-1$
+        return String.format("%3d", value); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -54,6 +62,6 @@ final class LongStateValue extends TmfStateValue {
 
     @Override
     public long unboxLong() {
-        return valueLong;
+        return value;
     }
 }

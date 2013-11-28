@@ -21,10 +21,10 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 final class DoubleStateValue extends TmfStateValue {
 
-    private final Double valueDouble;
+    private final double value;
 
     public DoubleStateValue(double value) {
-        valueDouble = new Double(value);
+        this.value = value;
     }
 
     @Override
@@ -38,13 +38,23 @@ final class DoubleStateValue extends TmfStateValue {
     }
 
     @Override
-    public Double getValue() {
-        return valueDouble;
+    public boolean equals(@Nullable Object object) {
+        if (!(object instanceof DoubleStateValue)) {
+            return false;
+        }
+        DoubleStateValue other = (DoubleStateValue) object;
+        return (Double.compare(this.value, other.value) == 0);
+    }
+
+    @Override
+    public int hashCode() {
+        long bits = Double.doubleToLongBits(value);
+        return ((int) bits) ^ ((int) (bits >>> 32));
     }
 
     @Override
     public @Nullable String toString() {
-        return String.format("%3f", valueDouble); //$NON-NLS-1$
+        return String.format("%3f", value); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -53,6 +63,6 @@ final class DoubleStateValue extends TmfStateValue {
 
     @Override
     public double unboxDouble() {
-        return valueDouble;
+        return value;
     }
 }
