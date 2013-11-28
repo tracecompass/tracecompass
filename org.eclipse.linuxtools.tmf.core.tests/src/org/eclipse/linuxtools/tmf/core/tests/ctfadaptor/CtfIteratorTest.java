@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocation;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfLocationInfo;
@@ -45,9 +46,10 @@ public class CtfIteratorTest {
 
     /**
      * Perform pre-test initialization.
+     * @throws CTFReaderException error
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         assumeTrue(testTrace.exists());
         trace = testTrace.getTrace();
         iterator = new CtfIterator(trace);
@@ -68,18 +70,20 @@ public class CtfIteratorTest {
 
     /**
      * Run the CtfIterator(CtfTmfTrace) constructor on a non init'ed trace.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testCtfIterator_noinit() {
+    public void testCtfIterator_noinit() throws CTFReaderException {
         CtfIterator result = new CtfIterator(trace);
         assertNotNull(result);
     }
 
     /**
      * Run the CtfIterator(CtfTmfTrace) constructor on an init'ed trace.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testCtfIterator_init() {
+    public void testCtfIterator_init() throws CTFReaderException {
         trace.init("test");
         CtfIterator result = new CtfIterator(trace);
 
@@ -89,9 +93,10 @@ public class CtfIteratorTest {
     /**
      * Run the CtfIterator(CtfTmfTrace,long,long) constructor test, which
      * specifies an initial position for the iterator.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testCtfIterator_position() {
+    public void testCtfIterator_position() throws CTFReaderException {
         long timestampValue = 1L;
         long rank = 1L;
         CtfIterator result = new CtfIterator(trace, new CtfLocationInfo(timestampValue, 0), rank);
@@ -120,9 +125,10 @@ public class CtfIteratorTest {
 
     /**
      * Run the int compareTo(CtfIterator) method test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testCompareTo() {
+    public void testCompareTo() throws CTFReaderException {
         CtfIterator o = new CtfIterator(trace);
         int result = iterator.compareTo(o);
 
@@ -132,9 +138,10 @@ public class CtfIteratorTest {
     /**
      * Run the boolean equals(Object) method test. Compare with another iterator
      * on the same trace.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testEquals_other() {
+    public void testEquals_other() throws CTFReaderException {
         CtfIterator obj = new CtfIterator(trace);
         CtfLocation ctfLocation1 = new CtfLocation(new CtfLocationInfo(1, 0));
         obj.setLocation(ctfLocation1);

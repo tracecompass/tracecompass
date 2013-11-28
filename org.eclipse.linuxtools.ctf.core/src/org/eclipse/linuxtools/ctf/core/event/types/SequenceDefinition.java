@@ -136,7 +136,7 @@ public class SequenceDefinition extends Definition {
     // ------------------------------------------------------------------------
 
     @Override
-    public void read(BitBuffer input) {
+    public void read(BitBuffer input) throws CTFReaderException {
         currentLength = (int) lengthDefinition.getValue();
 
         if ((definitions == null) || (definitions.length < currentLength)) {

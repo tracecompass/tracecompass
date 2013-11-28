@@ -140,9 +140,10 @@ public class StreamInputReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testGoToLastEvent1() {
+    public void testGoToLastEvent1() throws CTFReaderException {
         final long endTimestamp = goToEnd();
         final long endTime = 4287422460315L;
         assertEquals(endTime , endTimestamp  );
@@ -150,9 +151,10 @@ public class StreamInputReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testGoToLastEvent2() {
+    public void testGoToLastEvent2() throws CTFReaderException {
         long timestamp = -1;
         while(fixture.readNextEvent()) {
             timestamp = fixture.getCurrentEvent().getTimestamp();
@@ -161,25 +163,27 @@ public class StreamInputReaderTest {
         assertEquals(0 , timestamp- endTimestamp );
     }
 
-    private long goToEnd() {
+    private long goToEnd() throws CTFReaderException {
         fixture.goToLastEvent();
         return fixture.getCurrentEvent().getTimestamp();
     }
 
     /**
      * Run the boolean readNextEvent() method test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testReadNextEvent() {
+    public void testReadNextEvent() throws CTFReaderException {
         boolean result = fixture.readNextEvent();
         assertTrue(result);
     }
 
     /**
      * Run the void seek(long) method test. Seek by direct timestamp
+     * @throws CTFReaderException error
      */
     @Test
-    public void testSeek_timestamp() {
+    public void testSeek_timestamp() throws CTFReaderException {
         long timestamp = 1L;
         fixture.seek(timestamp);
     }

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
  * A CTF variant definition (similar to a C union).
@@ -147,7 +148,7 @@ public class VariantDefinition extends Definition implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     @Override
-    public void read(BitBuffer input) {
+    public void read(BitBuffer input) throws CTFReaderException {
         currentField = tagDefinition.getValue();
 
         Definition field = definitions.get(currentField);

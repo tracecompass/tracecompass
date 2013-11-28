@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -218,9 +219,10 @@ public class StructDefinitionTest {
 
     /**
      * Run the void read(BitBuffer) method test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testRead_() {
+    public void testRead_() throws CTFReaderException {
         ByteBuffer bb = ByteBuffer.allocateDirect(128);
         bb.put((byte) 20);
         BitBuffer input = new BitBuffer(bb);

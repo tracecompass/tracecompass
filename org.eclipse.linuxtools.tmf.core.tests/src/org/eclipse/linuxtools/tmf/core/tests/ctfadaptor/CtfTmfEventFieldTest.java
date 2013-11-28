@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventField;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,9 +61,10 @@ public class CtfTmfEventFieldTest {
 
     /**
      * Perform pre-test initialization.
+     * @throws CTFReaderException error
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         StructDeclaration sDec = new StructDeclaration(1l);
         StringDeclaration strDec = new StringDeclaration();
         IntegerDeclaration intDec = new IntegerDeclaration(8, false, 8,

@@ -17,6 +17,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class BitBufferIntTest {
      */
     @Before
     public void setUp() {
-        fixture = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
+        fixture = new BitBuffer(ByteBuffer.allocateDirect(128));
         fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
         createBuffer(fixture);
     }
@@ -55,18 +56,24 @@ public class BitBufferIntTest {
 
     /**
      * Run the int getInt() method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_base() {
+    public void testGetInt_base() throws CTFReaderException {
         int result = fixture.getInt();
         assertEquals(0x020406, result);
     }
 
     /**
      * Run the int getInt(int) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_pos0() {
+    public void testGetInt_pos0() throws CTFReaderException {
         fixture.position(0);
         int result = fixture.getInt();
         assertEquals(0x010203, result);
@@ -74,9 +81,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the int getInt(int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_pos1() {
+    public void testGetInt_pos1() throws CTFReaderException {
         fixture.position(1);
         int length = 1;
         boolean signed = true;
@@ -87,9 +97,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the int getInt(int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_pos2() {
+    public void testGetInt_pos2() throws CTFReaderException {
         fixture.position(2);
         int length = 0;
         boolean signed = true;
@@ -100,9 +113,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the int getInt(int,int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_signed() {
+    public void testGetInt_signed() throws CTFReaderException {
         fixture.position(1);
         int length = 0;
         boolean signed = true;
@@ -113,9 +129,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the int getInt(int,int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_signed_length1() {
+    public void testGetInt_signed_length1() throws CTFReaderException {
         fixture.position(1);
         int length = 1;
         boolean signed = true;
@@ -127,11 +146,13 @@ public class BitBufferIntTest {
     /**
      * Run the int getInt(int,int,boolean) method test with a little-endian
      * BitBuffer.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_le1() {
-        BitBuffer le_fixture = new BitBuffer(
-                java.nio.ByteBuffer.allocateDirect(128));
+    public void testGetInt_le1() throws CTFReaderException {
+        BitBuffer le_fixture = new BitBuffer(ByteBuffer.allocateDirect(128));
         le_fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         createBuffer(le_fixture);
         le_fixture.position(1);
@@ -145,11 +166,13 @@ public class BitBufferIntTest {
     /**
      * Run the int getInt(int,int,boolean) method test with a little-endian
      * BitBuffer.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testGetInt_le2() {
-        BitBuffer le_fixture = new BitBuffer(
-                java.nio.ByteBuffer.allocateDirect(128));
+    public void testGetInt_le2() throws CTFReaderException {
+        BitBuffer le_fixture = new BitBuffer(ByteBuffer.allocateDirect(128));
         le_fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         createBuffer(le_fixture);
         le_fixture.position(0);
@@ -160,11 +183,13 @@ public class BitBufferIntTest {
 
     /**
      * Run the int getInt(int,boolean) method test and expect an overflow.
+     *
+     * @throws CTFReaderException
+     *             Expected
      */
-    @Test(expected = java.nio.BufferOverflowException.class)
-    public void testGetInt_invalid() {
-        BitBuffer small_fixture = new BitBuffer(
-                java.nio.ByteBuffer.allocateDirect(128));
+    @Test(expected = CTFReaderException.class)
+    public void testGetInt_invalid() throws CTFReaderException {
+        BitBuffer small_fixture = new BitBuffer(ByteBuffer.allocateDirect(128));
         small_fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
         createBuffer(small_fixture, 2);
         small_fixture.position(10);
@@ -177,11 +202,13 @@ public class BitBufferIntTest {
 
     /**
      * Run the int getInt(int,int,boolean) method test and expect an overflow.
+     *
+     * @throws CTFReaderException
+     *             Expected
      */
-    @Test(expected = java.nio.BufferOverflowException.class)
-    public void testGetInt_invalid2() {
-        BitBuffer small_fixture = new BitBuffer(
-                java.nio.ByteBuffer.allocateDirect(128));
+    @Test(expected = CTFReaderException.class)
+    public void testGetInt_invalid2() throws CTFReaderException {
+        BitBuffer small_fixture = new BitBuffer(ByteBuffer.allocateDirect(128));
         small_fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
         createBuffer(small_fixture, 2);
         small_fixture.position(1);
@@ -194,9 +221,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the void putInt(int) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testPutInt() {
+    public void testPutInt() throws CTFReaderException {
         int value = 1;
         fixture.position(1);
         fixture.putInt(value);
@@ -204,9 +234,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the void putInt(int,int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testPutInt_signed() {
+    public void testPutInt_signed() throws CTFReaderException {
         int length = 1;
         int value = 1;
 
@@ -216,9 +249,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the void putInt(int,int,int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testPutInt_length0() {
+    public void testPutInt_length0() throws CTFReaderException {
         int length = 0;
         int value = 1;
 
@@ -228,9 +264,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the void putInt(int,int,int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testPutInt_length1() {
+    public void testPutInt_length1() throws CTFReaderException {
         int length = 1;
         int value = 1;
 
@@ -240,9 +279,12 @@ public class BitBufferIntTest {
 
     /**
      * Run the void putInt(int) method test.
+     *
+     * @throws CTFReaderException
+     *             Not expected
      */
     @Test
-    public void testPutInt_hex() {
+    public void testPutInt_hex() throws CTFReaderException {
         final int value = 0x010203;
         int read;
 
@@ -259,11 +301,14 @@ public class BitBufferIntTest {
 
     /**
      * Run the void putInt(int,int,int,boolean) method test.
+     *
+     * @throws CTFReaderException
+     *             Expected
      */
-    @Test(expected = java.nio.BufferOverflowException.class)
-    public void testPutInt_invalid() {
+    @Test(expected = CTFReaderException.class)
+    public void testPutInt_invalid() throws CTFReaderException {
         BitBuffer fixture2;
-        fixture2 = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
+        fixture2 = new BitBuffer(ByteBuffer.allocateDirect(128));
         fixture2.setByteOrder(ByteOrder.BIG_ENDIAN);
         createBuffer(fixture2, 4);
         fixture2.position(1);

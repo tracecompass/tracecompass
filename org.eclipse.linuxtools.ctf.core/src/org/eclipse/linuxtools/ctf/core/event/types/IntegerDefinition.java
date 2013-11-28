@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
  * A CTF integer definition.
@@ -99,7 +100,7 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
     }
 
     @Override
-    public void read(BitBuffer input) {
+    public void read(BitBuffer input) throws CTFReaderException {
         final long longNegBit = 0x0000000080000000L;
         /* Offset the buffer position wrt the current alignment */
         alignRead(input, this.declaration);

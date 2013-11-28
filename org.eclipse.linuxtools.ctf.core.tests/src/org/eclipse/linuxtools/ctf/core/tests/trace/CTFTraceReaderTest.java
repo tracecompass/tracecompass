@@ -94,9 +94,10 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the boolean advance() method test. Test advancing normally.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testAdvance_normal() {
+    public void testAdvance_normal() throws CTFReaderException {
         boolean result = fixture.advance();
         assertTrue(result);
     }
@@ -104,9 +105,10 @@ public class CTFTraceReaderTest {
     /**
      * Run the boolean advance() method test. Test advancing when we're at the
      * end, so we expect that there is no more events.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testAdvance_end() {
+    public void testAdvance_end() throws CTFReaderException {
         int i = 0;
         boolean result = fixture.advance();
         while (result) {
@@ -128,9 +130,10 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the CTFTraceReader copy constructor test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testCopyFrom() {
+    public void testCopyFrom() throws CTFReaderException {
         CTFTraceReader result = fixture.copyFrom();
         assertNotNull(result);
     }
@@ -172,9 +175,10 @@ public class CTFTraceReaderTest {
     /**
      * Run the getCurrentEventDef() method test. Get the last event's
      * definition.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testGetCurrentEventDef_last() {
+    public void testGetCurrentEventDef_last() throws CTFReaderException {
         fixture.goToLastEvent();
         EventDefinition result = fixture.getCurrentEventDef();
         assertNotNull(result);
@@ -200,9 +204,10 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testGoToLastEvent() {
+    public void testGoToLastEvent() throws CTFReaderException {
         fixture.goToLastEvent();
         long ts1 = getTimestamp();
         long ts2 = fixture.getEndTime();
@@ -222,54 +227,60 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void printStats() method test with no 'width' parameter.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testPrintStats_noparam() {
+    public void testPrintStats_noparam() throws CTFReaderException {
         fixture.advance();
         fixture.printStats();
     }
 
     /**
      * Run the void printStats(int) method test with width = 0.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testPrintStats_width0() {
+    public void testPrintStats_width0() throws CTFReaderException {
         fixture.advance();
         fixture.printStats(0);
     }
 
     /**
      * Run the void printStats(int) method test with width = 1.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testPrintStats_width1() {
+    public void testPrintStats_width1() throws CTFReaderException {
         fixture.advance();
         fixture.printStats(1);
     }
 
     /**
      * Run the void printStats(int) method test with width = 2.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testPrintStats_width2() {
+    public void testPrintStats_width2() throws CTFReaderException {
         fixture.advance();
         fixture.printStats(2);
     }
 
     /**
      * Run the void printStats(int) method test with width = 10.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testPrintStats_width10() {
+    public void testPrintStats_width10() throws CTFReaderException {
         fixture.advance();
         fixture.printStats(10);
     }
 
     /**
      * Run the void printStats(int) method test with width = 100.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testPrintStats_100() {
+    public void testPrintStats_100() throws CTFReaderException {
         for (int i = 0; i < 1000; i++) {
             fixture.advance();
         }
@@ -278,9 +289,10 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the boolean seek(long) method test.
+     * @throws CTFReaderException error
      */
     @Test
-    public void testSeek() {
+    public void testSeek() throws CTFReaderException {
         long timestamp = 1L;
         boolean result = fixture.seek(timestamp);
         assertTrue(result);

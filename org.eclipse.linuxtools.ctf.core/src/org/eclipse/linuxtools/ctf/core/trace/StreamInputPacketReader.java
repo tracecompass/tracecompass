@@ -205,8 +205,10 @@ public class StreamInputPacketReader implements IDefinitionScope {
      *
      * @param currentPacket
      *            The index entry of the packet to switch to.
+     * @throws CTFReaderException
+     *             If we get an error reading the packet
      */
-    void setCurrentPacket(StreamInputPacketIndexEntry currentPacket) {
+    void setCurrentPacket(StreamInputPacketIndexEntry currentPacket) throws CTFReaderException {
         StreamInputPacketIndexEntry prevPacket = null;
         this.currentPacket = currentPacket;
 
