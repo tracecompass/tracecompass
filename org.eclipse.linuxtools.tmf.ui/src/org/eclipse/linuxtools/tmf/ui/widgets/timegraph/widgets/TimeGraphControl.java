@@ -235,11 +235,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
             ((ITimeGraphPresentationProvider2) timeGraphProvider).addColorListener(this);
         }
 
-        if (fEventColorMap != null) {
-            for (Color color : fEventColorMap) {
-                fResourceManager.destroyColor(color.getRGB());
-            }
-        }
         StateItem[] stateItems = fTimeGraphProvider.getStateTable();
         colorSettingsChanged(stateItems);
     }
@@ -2418,8 +2413,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     @Override
     public void colorSettingsChanged(StateItem[] stateItems) {
         /* Destroy previous colors from the resource manager */
-        for (Color color : fEventColorMap) {
-            fResourceManager.destroyColor(color.getRGB());
+        if (fEventColorMap != null) {
+            for (Color color : fEventColorMap) {
+                fResourceManager.destroyColor(color.getRGB());
+            }
         }
         if (stateItems != null) {
             fEventColorMap = new Color[stateItems.length];
