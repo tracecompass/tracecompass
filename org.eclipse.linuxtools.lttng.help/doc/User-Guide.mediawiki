@@ -112,10 +112,9 @@ Here are the quick steps to verify that your installation is functional:
 ** Right-click in the Project view and select "New Project"
 ** Enter the name of your project (e.g. "MyLTTngProject")
 ** The project will be created. It will contain 2 empty folders: "Traces" and "Experiments"
-* Import a sample trace
-** Right-click on the newly created project "Traces" folder and select "Import..."
+* Open a sample trace
+** Right-click on the newly created project "Traces" folder and select "Open Trace Directory..."
 ** Navigate to the sample LTTng trace that you want to visualize
-** Select that trace (check box), select the trace type (e.g. CTF: Kernel Trace), and press "Finish"
 ** The newly imported trace should appear under the Traces folder
 * Visualize the trace
 ** Expand the Traces folder
@@ -189,7 +188,19 @@ A new project will appear in the '''Project Explorer''' view.
 Tracing projects have two sub-folders: '''Traces''' which holds the individual traces, and '''Experiments''' which holds sets of traces that we want to correlate.
 
 === Importing Traces in a Project ===
+
+==== Open Trace File, Open Trace Directory ====
+
+To open a single trace, right-click on the Traces folder and select '''Open Trace File...''' (for logs and such) or '''Open Trace directory...''' (for CTF traces).
+
+[[Image:images/OpenTraceFile.png]]
+
+Select the file or directory, and the trace will be imported into the selected Traces folder. It will attempt to auto-detect the trace type. If the trace validates as more than one trace type, a window will prompt the user to select a trace type. Once a trace type is selected, the trace will load.
+
+Note that a trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of available trace types can vary.
+
 ==== Batch Importing ====
+
 The '''Batch Import Trace Wizard''' allows users to search their media for traces and import multiple traces of varying trace types simultaneously. It also handles name clashes and renaming of traces.
 
 The '''Traces''' folder holds the set of traces available for a tracing project. To import a set of traces to the '''Traces''' folder, one can open the '''Import...''' menu from the '''File''' main menu.
@@ -266,22 +277,6 @@ If the '''Finish''' button is grayed, or if the user wishes to import to a diffe
 You will then see the traces in the '''Traces''' folder as shown below and can '''open''' them by '''double-clicking''' on them. For more details on how to open a trace see section [[#Opening_a_Trace_or_Experiment|Opening a Trace or Experiment]].
 
 [[Image:images/importImages/importFinish.png]]
-
-==== Importing ====
-
-The previous way of importing a trace is still available. To access it, simply  select '''Import...''' menu item in the context-sensitive menu.
-
-[[Image:images/ProjectImportTraceAction.png]]
-
-A new display will show for selecting traces to import. By default, it shows the correct destination directory where the traces will be imported to. Now, specify the location of the traces by entering the path directly in the '''Source Directory''' or by browsing the file system (click on button browse). Then select the traces to import in the list of files and folders. Optionally, select the '''Trace Type''' from the drop-down menu, select or deselect the checkboxes for '''Overwrite existing trace without warning''' and '''Create links into workspace'''. When all options are configured, click on '''Finish'''.
-
-Note, that traces of certain types (e.g. LTTng Kernel) are actually a composite of multiple channel traces grouped under a folder. It is the folder that has to be imported.
-
-[[Image:images/ProjectImportTraceDialog.png]]
-
-Upon successful importing the traces will be stored in the '''Traces''' folder. If a trace type was selected in the import dialog, then the corresponding icon will be displayed. If no trace type is selected the unknown icon [[Image:images/unknown_parser.gif]] will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
-
-Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
 
 === Trace Package Exporting and Importing ===
 
