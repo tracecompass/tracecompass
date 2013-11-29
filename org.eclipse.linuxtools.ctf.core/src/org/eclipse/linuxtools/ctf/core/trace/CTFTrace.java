@@ -379,11 +379,11 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     /**
-     * Method majortIsSet is the major version number set?
+     * Method majorIsSet is the major version number set?
      *
      * @return boolean is the major set?
      */
-    public boolean majortIsSet() {
+    public boolean majorIsSet() {
         return major != null;
     }
 

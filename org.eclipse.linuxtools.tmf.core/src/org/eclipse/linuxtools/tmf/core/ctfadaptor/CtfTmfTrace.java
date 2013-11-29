@@ -86,7 +86,7 @@ public class CtfTmfTrace extends TmfTrace
      * @param eventType
      *            The type of events that will be read from this trace
      * @throws TmfTraceException
-     *             If something when wrong while reading the trace
+     *             If something went wrong while reading the trace
      */
     @Override
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> eventType)
@@ -151,7 +151,7 @@ public class CtfTmfTrace extends TmfTrace
         IStatus validTrace = Status.OK_STATUS;
         try {
             final CTFTrace temp = new CTFTrace(path);
-            if (!temp.majortIsSet()) {
+            if (!temp.majorIsSet()) {
                 validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
             } else {
                 CTFTraceReader ctfTraceReader = new CTFTraceReader(temp);
