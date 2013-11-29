@@ -29,6 +29,19 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
  * @author Alexandre Montplaisir
  */
 public abstract class TmfStateValue implements ITmfStateValue {
+
+    // ------------------------------------------------------------------------
+    // State value caches (sizes must be powers of 2)
+    // ------------------------------------------------------------------------
+
+    private static final int INT_CACHE_SIZE = 128;
+    private static final int LONG_CACHE_SIZE = 128;
+    private static final int DOUBLE_CACHE_SIZE = 128;
+
+    private static final IntegerStateValue intCache[] = new IntegerStateValue[INT_CACHE_SIZE];
+    private static final LongStateValue longCache[] = new LongStateValue[LONG_CACHE_SIZE];
+    private static final DoubleStateValue doubleCache[] = new DoubleStateValue[DOUBLE_CACHE_SIZE];
+
     // ------------------------------------------------------------------------
     // Factory methods to instantiate new state values
     // ------------------------------------------------------------------------
@@ -56,7 +69,17 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @return The newly-created TmfStateValue object
      */
     public static TmfStateValue newValueInt(int intValue) {
-        return new IntegerStateValue(intValue);
+        /* Lookup in cache for the existence of the same value. */
+        int offset = intValue & (INT_CACHE_SIZE - 1);
+        IntegerStateValue cached = intCache[offset];
+        if (cached != null && cached.unboxInt() == intValue) {
+            return cached;
+        }
+
+        /* Not in cache, create a new value and cache it. */
+        IntegerStateValue newValue = new IntegerStateValue(intValue);
+        intCache[offset] = newValue;
+        return newValue;
     }
 
     /**
@@ -68,7 +91,17 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @since 2.0
      */
     public static TmfStateValue newValueLong(long longValue) {
-        return new LongStateValue(longValue);
+        /* Lookup in cache for the existence of the same value. */
+        int offset = (int) longValue & (LONG_CACHE_SIZE - 1);
+        LongStateValue cached = longCache[offset];
+        if (cached != null && cached.unboxLong() == longValue) {
+            return cached;
+        }
+
+        /* Not in cache, create a new value and cache it. */
+        LongStateValue newValue = new LongStateValue(longValue);
+        longCache[offset] = newValue;
+        return newValue;
     }
 
     /**
@@ -79,7 +112,22 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @return The newly-created TmfStateValue object
      */
     public static TmfStateValue newValueDouble(double value) {
-        return new DoubleStateValue(value);
+        /* Lookup in cache for the existence of the same value. */
+        int offset = (int) Double.doubleToLongBits(value) & (DOUBLE_CACHE_SIZE - 1);
+        DoubleStateValue cached = doubleCache[offset];
+
+        /*
+         * We're using Double.compare() instead of .equals(), because .compare()
+         * works when both values are Double.NaN.
+         */
+        if (cached != null && Double.compare(cached.unboxDouble(), value) == 0) {
+            return cached;
+        }
+
+        /* Not in cache, create a new value and cache it. */
+        DoubleStateValue newValue = new DoubleStateValue(value);
+        doubleCache[offset] = newValue;
+        return newValue;
     }
 
     /**
