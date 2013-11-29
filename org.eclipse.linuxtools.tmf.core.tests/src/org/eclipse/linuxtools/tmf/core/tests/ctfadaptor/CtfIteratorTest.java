@@ -115,15 +115,6 @@ public class CtfIteratorTest {
     }
 
     /**
-     * Run the CtfIterator clone() method test.
-     */
-    @Test
-    public void testClone() {
-        CtfIterator result = iterator.clone();
-        assertNotNull(result);
-    }
-
-    /**
      * Run the int compareTo(CtfIterator) method test.
      * @throws CTFReaderException error
      */
