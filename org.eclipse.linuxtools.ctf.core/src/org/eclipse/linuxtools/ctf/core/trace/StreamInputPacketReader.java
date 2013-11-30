@@ -327,7 +327,9 @@ public class StreamInputPacketReader implements IDefinitionScope {
             Definition idDef = sehd.lookupDefinition("id"); //$NON-NLS-1$
             if (idDef instanceof SimpleDatatypeDefinition) {
                 eventID = ((SimpleDatatypeDefinition) idDef).getIntegerValue();
-            } // else, eventID remains 0
+            } else if (idDef != null) {
+                throw new CTFReaderException("Incorrect event id : " + eventID);
+            }
 
             /*
              * Get the timestamp from the event header (may be overridden later
