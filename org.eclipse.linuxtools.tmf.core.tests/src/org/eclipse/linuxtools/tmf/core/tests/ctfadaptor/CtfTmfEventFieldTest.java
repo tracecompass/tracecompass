@@ -13,9 +13,11 @@
 
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
@@ -57,14 +59,26 @@ public class CtfTmfEventFieldTest {
     private static final String VARIANT = "variant";
     private static final String ENUM = "enum";
 
+    private static final byte TEST_NUMBER = 2;
+    private static final String TEST_STRING = "two";
+
     private StructDefinition fixture;
 
     /**
      * Perform pre-test initialization.
-     * @throws CTFReaderException error
+     *
+     * @throws UnsupportedEncodingException
+     *             Thrown when UTF-8 encoding is not available.
+     * @throws CTFReaderException
+     *             error
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws UnsupportedEncodingException, CTFReaderException {
+        final byte[] testStringBytes = TEST_STRING.getBytes("UTF-8");
+
+        int capacity = 2048;
+        ByteBuffer bb = ByteBuffer.allocateDirect(capacity);
+
         StructDeclaration sDec = new StructDeclaration(1l);
         StringDeclaration strDec = new StringDeclaration();
         IntegerDeclaration intDec = new IntegerDeclaration(8, false, 8,
@@ -73,37 +87,51 @@ public class CtfTmfEventFieldTest {
                 ByteOrder.BIG_ENDIAN, 8);
         ArrayDeclaration arrDec = new ArrayDeclaration(2, intDec);
         SequenceDeclaration seqDec = new SequenceDeclaration(LEN, intDec);
-        StructDeclaration structDec = new StructDeclaration(32);
+        StructDeclaration structDec = new StructDeclaration(8);
         EnumDeclaration enumDec = new EnumDeclaration(intDec);
         VariantDeclaration varDec = new VariantDeclaration();
+
         sDec.addField(INT, intDec);
+        bb.put(TEST_NUMBER);
+
         sDec.addField(LEN, intDec);
+        bb.put(TEST_NUMBER);
+
         sDec.addField(FLOAT, flDec);
+        bb.putFloat(TEST_NUMBER);
+
         sDec.addField(STR, strDec);
+        bb.put(testStringBytes);
+        bb.put((byte) 0);
+
         sDec.addField(ARRAY, arrDec);
+        bb.put(TEST_NUMBER);
+        bb.put(TEST_NUMBER);
+
         sDec.addField(SEQ, seqDec);
+        bb.put(TEST_NUMBER);
+        bb.put(TEST_NUMBER);
+
         structDec.addField(STR, strDec);
         structDec.addField(INT, intDec);
         sDec.addField(STRUCT, structDec);
+        bb.put(testStringBytes);
+        bb.put((byte) 0);
+        bb.put(TEST_NUMBER);
+
         enumDec.add(0, 1, LEN);
         enumDec.add(2, 3, FLOAT);
         sDec.addField(ENUM, enumDec);
+        bb.put(TEST_NUMBER);
+
         varDec.addField(LEN, intDec);
         varDec.addField(FLOAT, flDec);
         varDec.setTag(ENUM);
         sDec.addField(VARIANT, varDec);
+        bb.putFloat(TEST_NUMBER);
+
         fixture = sDec.createDefinition(fixture, ROOT);
-        int capacity = 2048;
-        java.nio.ByteBuffer bb = java.nio.ByteBuffer.allocateDirect(capacity);
-        for (int i = 0; i < capacity; i++) {
-            bb.put((byte) 2);
-        }
-        bb.position(20);
-        bb.put((byte) 0);
-        bb.position(40);
-        bb.put((byte) 0);
-        bb.position(60);
-        bb.put((byte) 0);
+
         bb.position(0);
         fixture.read(new BitBuffer(bb));
     }
@@ -115,7 +143,7 @@ public class CtfTmfEventFieldTest {
     public void testParseField_float() {
         FloatDefinition fieldDef = (FloatDefinition) fixture.lookupDefinition(FLOAT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, "_" + NAME);
-        assertEquals("test=9.551467814359616E-38", result.toString());
+        assertEquals("test=2.0", result.toString());
     }
 
     /**
@@ -167,7 +195,7 @@ public class CtfTmfEventFieldTest {
     public void testParseField_string() {
         Definition fieldDef = fixture.lookupDefinition(STR);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        assertEquals("test=", result.toString());
+        assertEquals("test=two", result.toString());
     }
 
     /**
@@ -177,7 +205,7 @@ public class CtfTmfEventFieldTest {
     public void testParseField_struct() {
         Definition fieldDef = fixture.lookupDefinition(STRUCT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        assertEquals("test=[str=, int=02]", result.toString());
+        assertEquals("test=[str=two, int=02]", result.toString());
     }
 
     /**
@@ -197,6 +225,6 @@ public class CtfTmfEventFieldTest {
     public void testParseField_variant() {
         Definition fieldDef = fixture.lookupDefinition(VARIANT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        assertEquals("test=float=9.551467814359616E-38", result.toString());
+        assertEquals("test=float=2.0", result.toString());
     }
 }
