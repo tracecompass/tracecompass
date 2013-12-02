@@ -49,7 +49,12 @@ public class CtfTmfEventFieldTest {
 
     private static final String ROOT = "root";
     private static final String SEQ = "seq";
-    private static final String ARRAY = "array";
+    private static final String ARRAY_STR = "array_str";
+    private static final String ARRAY_FLOAT = "array_float";
+    private static final String ARRAY_INT = "array_int";
+    private static final String ARRAY_STRUCT = "array_struct";
+    private static final String ARRAY_VARIANT = "array_variant";
+    private static final String ARRAY_ENUM = "array_enum";
     private static final String STR = "str";
     private static final String FLOAT = "float";
     private static final String LEN = "len";
@@ -61,6 +66,8 @@ public class CtfTmfEventFieldTest {
 
     private static final byte TEST_NUMBER = 2;
     private static final String TEST_STRING = "two";
+
+    private static final int ARRAY_SIZE = 2;
 
     private StructDefinition fixture;
 
@@ -85,14 +92,24 @@ public class CtfTmfEventFieldTest {
                 ByteOrder.BIG_ENDIAN, Encoding.NONE, null, 8);
         FloatDeclaration flDec = new FloatDeclaration(8, 24,
                 ByteOrder.BIG_ENDIAN, 8);
-        ArrayDeclaration arrDec = new ArrayDeclaration(2, intDec);
         SequenceDeclaration seqDec = new SequenceDeclaration(LEN, intDec);
         StructDeclaration structDec = new StructDeclaration(8);
         EnumDeclaration enumDec = new EnumDeclaration(intDec);
         VariantDeclaration varDec = new VariantDeclaration();
+        ArrayDeclaration arrStrDec = new ArrayDeclaration(ARRAY_SIZE, strDec);
+        ArrayDeclaration arrFloatDec = new ArrayDeclaration(ARRAY_SIZE, flDec);
+        ArrayDeclaration arrIntDec = new ArrayDeclaration(ARRAY_SIZE, intDec);
+        ArrayDeclaration arrStructDec = new ArrayDeclaration(ARRAY_SIZE, structDec);
+        ArrayDeclaration arrVariantDec = new ArrayDeclaration(ARRAY_SIZE, varDec);
+        ArrayDeclaration arrEnumDec = new ArrayDeclaration(ARRAY_SIZE, enumDec);
 
         sDec.addField(INT, intDec);
         bb.put(TEST_NUMBER);
+
+        sDec.addField(ARRAY_INT, arrIntDec);
+        for (int i = 0; i < ARRAY_SIZE; ++i) {
+            bb.put(TEST_NUMBER);
+        }
 
         sDec.addField(LEN, intDec);
         bb.put(TEST_NUMBER);
@@ -100,13 +117,20 @@ public class CtfTmfEventFieldTest {
         sDec.addField(FLOAT, flDec);
         bb.putFloat(TEST_NUMBER);
 
+        sDec.addField(ARRAY_FLOAT, arrFloatDec);
+        for (int i = 0; i < ARRAY_SIZE; ++i) {
+            bb.putFloat(TEST_NUMBER);
+        }
+
         sDec.addField(STR, strDec);
         bb.put(testStringBytes);
         bb.put((byte) 0);
 
-        sDec.addField(ARRAY, arrDec);
-        bb.put(TEST_NUMBER);
-        bb.put(TEST_NUMBER);
+        sDec.addField(ARRAY_STR, arrStrDec);
+        for (int i = 0; i < ARRAY_SIZE; ++i) {
+            bb.put(testStringBytes);
+            bb.put((byte) 0);
+        }
 
         sDec.addField(SEQ, seqDec);
         bb.put(TEST_NUMBER);
@@ -119,16 +143,33 @@ public class CtfTmfEventFieldTest {
         bb.put((byte) 0);
         bb.put(TEST_NUMBER);
 
+        sDec.addField(ARRAY_STRUCT, arrStructDec);
+        for (int i = 0; i < ARRAY_SIZE; ++i) {
+            bb.put(testStringBytes);
+            bb.put((byte) 0);
+            bb.put(TEST_NUMBER);
+        }
+
         enumDec.add(0, 1, LEN);
         enumDec.add(2, 3, FLOAT);
         sDec.addField(ENUM, enumDec);
         bb.put(TEST_NUMBER);
+
+        sDec.addField(ARRAY_ENUM, arrEnumDec);
+        for (int i = 0; i < ARRAY_SIZE; ++i) {
+            bb.put(TEST_NUMBER);
+        }
 
         varDec.addField(LEN, intDec);
         varDec.addField(FLOAT, flDec);
         varDec.setTag(ENUM);
         sDec.addField(VARIANT, varDec);
         bb.putFloat(TEST_NUMBER);
+
+        sDec.addField(ARRAY_VARIANT, arrVariantDec);
+        for (int i = 0; i < ARRAY_SIZE; ++i) {
+            bb.putFloat(TEST_NUMBER);
+        }
 
         fixture = sDec.createDefinition(fixture, ROOT);
 
@@ -147,13 +188,14 @@ public class CtfTmfEventFieldTest {
     }
 
     /**
-     * Run the CtfTmfEventField parseField(Definition,String) method test.
+     * Run the CtfTmfEventField parseField(Definition,String) method test for an
+     * array of floats field.
      */
     @Test
-    public void testParseField_array() {
-        Definition fieldDef = fixture.lookupArray(ARRAY);
+    public void testParseField_array_float() {
+        Definition fieldDef = fixture.lookupArray(ARRAY_FLOAT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
-        assertEquals("test=[02, 02]", result.toString());
+        assertEquals("test=[2.0, 2.0]", result.toString());
     }
 
     /**
@@ -164,6 +206,17 @@ public class CtfTmfEventFieldTest {
         Definition fieldDef = fixture.lookupDefinition(INT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=02", result.toString());
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test for an
+     * array of integers field.
+     */
+    @Test
+    public void testParseField_array_int() {
+        Definition fieldDef = fixture.lookupArray(ARRAY_INT);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        assertEquals("test=[02, 02]", result.toString());
     }
 
     /**
@@ -199,6 +252,17 @@ public class CtfTmfEventFieldTest {
     }
 
     /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test for an
+     * array of strings field.
+     */
+    @Test
+    public void testParseField_array_string() {
+        Definition fieldDef = fixture.lookupArray(ARRAY_STR);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        assertEquals("test=[two, two]", result.toString());
+    }
+
+    /**
      * Run the CtfTmfEventField parseField(Definition,String) method test.
      */
     @Test
@@ -206,6 +270,17 @@ public class CtfTmfEventFieldTest {
         Definition fieldDef = fixture.lookupDefinition(STRUCT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=[str=two, int=02]", result.toString());
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test for an
+     * array of structs field.
+     */
+    @Test
+    public void testParseField_array_struct() {
+        Definition fieldDef = fixture.lookupArray(ARRAY_STRUCT);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        assertEquals("test=[[str=two, int=02], [str=two, int=02]]", result.toString());
     }
 
     /**
@@ -219,6 +294,17 @@ public class CtfTmfEventFieldTest {
     }
 
     /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test for an
+     * array of enums field.
+     */
+    @Test
+    public void testParseField_array_enum() {
+        Definition fieldDef = fixture.lookupArray(ARRAY_ENUM);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        assertEquals("test=[float, float]", result.toString());
+    }
+
+    /**
      * Run the CtfTmfEventField parseField(Definition,String) method test.
      */
     @Test
@@ -226,5 +312,16 @@ public class CtfTmfEventFieldTest {
         Definition fieldDef = fixture.lookupDefinition(VARIANT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=float=2.0", result.toString());
+    }
+
+    /**
+     * Run the CtfTmfEventField parseField(Definition,String) method test for an
+     * array of variants field.
+     */
+    @Test
+    public void testParseField_array_variant() {
+        Definition fieldDef = fixture.lookupArray(ARRAY_VARIANT);
+        CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
+        assertEquals("test=[float=2.0, float=2.0]", result.toString());
     }
 }
