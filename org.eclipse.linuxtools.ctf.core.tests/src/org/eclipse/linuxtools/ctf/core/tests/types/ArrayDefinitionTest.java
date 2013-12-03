@@ -111,7 +111,7 @@ public class ArrayDefinitionTest {
             String content = "test" + i;
             defs[i] = new StringDefinition(
                     new StringDeclaration(Encoding.UTF8), null, content);
-            defs[i].setString(new StringBuilder(content));
+            defs[i].setValue(content);
         }
         return defs;
     }

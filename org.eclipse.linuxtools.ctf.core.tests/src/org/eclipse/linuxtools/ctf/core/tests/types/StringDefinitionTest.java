@@ -11,6 +11,7 @@
 
 package org.eclipse.linuxtools.ctf.core.tests.types;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
@@ -63,18 +64,7 @@ public class StringDefinitionTest {
      */
     @Test
     public void testGetDeclaration() {
-        fixture.setString(new StringBuilder());
         StringDeclaration result = fixture.getDeclaration();
-        assertNotNull(result);
-    }
-
-    /**
-     * Run the StringBuilder getString() method test.
-     */
-    @Test
-    public void testGetString() {
-        fixture.setString(new StringBuilder());
-        StringBuilder result = fixture.getString();
         assertNotNull(result);
     }
 
@@ -83,9 +73,19 @@ public class StringDefinitionTest {
      */
     @Test
     public void testGetValue() {
-        fixture.setString(new StringBuilder());
         String result = fixture.getValue();
         assertNotNull(result);
+    }
+
+    /**
+     * Run the String setValue() method test.
+     */
+    @Test
+    public void testSetValue() {
+        fixture.setValue("dummy");
+        String result = fixture.getValue();
+        assertNotNull(result);
+        assertEquals("dummy", result);
     }
 
     /**
@@ -94,7 +94,6 @@ public class StringDefinitionTest {
      */
     @Test
     public void testRead() throws CTFReaderException {
-        fixture.setString(new StringBuilder());
         BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
         fixture.read(input);
     }
@@ -104,19 +103,8 @@ public class StringDefinitionTest {
      */
     @Test
     public void testSetDeclaration() {
-        fixture.setString(new StringBuilder());
         StringDeclaration declaration = new StringDeclaration();
         fixture.setDeclaration(declaration);
-    }
-
-    /**
-     * Run the void setString(StringBuilder) method test.
-     */
-    @Test
-    public void testSetString() {
-        fixture.setString(new StringBuilder());
-        StringBuilder string = new StringBuilder();
-        fixture.setString(string);
     }
 
     /**
@@ -124,7 +112,6 @@ public class StringDefinitionTest {
      */
     @Test
     public void testToString() {
-        fixture.setString(new StringBuilder());
         String result = fixture.toString();
         assertNotNull(result);
     }

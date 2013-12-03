@@ -105,7 +105,7 @@ public class CTFEventFieldTest {
     public void testParseField_simple3() {
         StringDefinition fieldDef = new StringDefinition(
                 new StringDeclaration(), null, fieldName);
-        fieldDef.setString(new StringBuilder("Hello World"));
+        fieldDef.setValue("Hello World");
 
         String other = "\"Hello World\"";
         assertNotNull(fieldDef);
