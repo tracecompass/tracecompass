@@ -108,7 +108,7 @@ public class FullTraceHistogram extends Histogram {
 
     @Override
     public void mouseDown(MouseEvent event) {
-        if (fDragState == DRAG_NONE && fDataModel.getNbEvents() != 0) {
+        if (fScaledData != null && fDragState == DRAG_NONE && fDataModel.getNbEvents() != 0) {
             if (event.button == 2 || (event.button == 1 && (event.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL)) {
                 fDragState = DRAG_RANGE;
                 fDragButton = event.button;
