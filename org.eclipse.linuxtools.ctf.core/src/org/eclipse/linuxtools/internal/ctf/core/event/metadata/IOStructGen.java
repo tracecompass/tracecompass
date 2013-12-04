@@ -270,8 +270,7 @@ public class IOStructGen {
             } else if (left.equals("func")) { //$NON-NLS-1$
                 funcName = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
             } else if (left.equals("ip")) { //$NON-NLS-1$
-                /* trim the 0x */
-                ip = Long.parseLong(child.getChild(1).getChild(0).getChild(0).getText().substring(2), 16);
+                ip = Long.decode(child.getChild(1).getChild(0).getChild(0).getText());
             } else if (left.equals("file")) { //$NON-NLS-1$
                 fileName = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
             } else if (left.equals("line")) { //$NON-NLS-1$
