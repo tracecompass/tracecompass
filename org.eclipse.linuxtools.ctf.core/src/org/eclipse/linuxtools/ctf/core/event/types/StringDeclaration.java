@@ -71,7 +71,8 @@ public class StringDeclaration implements IDeclaration {
 
     @Override
     public long getAlignment() {
-        return 8; //FIXME: should be the elementtype.
+        // See ctf 4.2.5: Strings are always aligned on byte size.
+        return 8;
     }
     // ------------------------------------------------------------------------
     // Operations
