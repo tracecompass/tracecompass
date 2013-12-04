@@ -114,7 +114,7 @@ public class TimeRangeHistogram extends Histogram {
 
     @Override
     public void mouseDown(MouseEvent event) {
-        if (fScaledData != null && fDragState == DRAG_NONE && fDataModel.getNbEvents() != 0) {
+        if (fScaledData != null && fDragState == DRAG_NONE && fDataModel.getStartTime() < fDataModel.getEndTime()) {
             if (event.button == 2 || (event.button == 1 && (event.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL)) {
                 fDragState = DRAG_RANGE;
                 fDragButton = event.button;
