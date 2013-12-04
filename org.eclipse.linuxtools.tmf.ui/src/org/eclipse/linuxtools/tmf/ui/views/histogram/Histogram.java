@@ -417,6 +417,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     public void clear() {
         fDataModel.clear();
+        fDragState = DRAG_NONE;
+        fDragButton = 0;
         synchronized (fDataModel) {
             fScaledData = null;
         }
