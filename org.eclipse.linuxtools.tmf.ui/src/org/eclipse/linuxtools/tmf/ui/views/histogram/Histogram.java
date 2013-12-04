@@ -685,6 +685,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             final int width = image.getBounds().width;
             final int height = image.getBounds().height;
 
+            // Turn off anti-aliasing
+            int aliasing = imageGC.getAntialias();
+            imageGC.setAntialias(SWT.OFF);
+
             // Clear the drawing area
             imageGC.setBackground(fBackgroundColor);
             imageGC.fillRectangle(0, 0, image.getBounds().width + 1, image.getBounds().height + 1);
@@ -693,24 +697,24 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             final int limit = width < scaledData.fWidth ? width : scaledData.fWidth;
             double factor = HistogramScaledData.hideLostEvents ? scaledData.fScalingFactor : scaledData.fScalingFactorCombined;
             for (int i = 0; i < limit; i++) {
-                imageGC.setForeground(fHistoBarColor);
                 final int value = (int) Math.ceil(scaledData.fData[i] * factor);
                 int x = i + fOffset;
-                imageGC.drawLine(x, height - value, x, height);
 
+                // in Linux, the last pixel in a line is not drawn,
+                // so draw lost events first, one pixel too far
                 if (!HistogramScaledData.hideLostEvents) {
                     imageGC.setForeground(fLostEventColor);
                     final int lostEventValue = (int) Math.ceil(scaledData.fLostEventsData[i] * factor);
                     if (lostEventValue != 0) {
-                        if (lostEventValue == 1) {
-                            // in linux, a line from x to x is not drawn, in windows it is.
-                            imageGC.drawPoint(x, height - value - 1);
-                        } else {
-                            // drawing a line is inclusive, so we need to remove 1 from the destination to have the correct length
-                            imageGC.drawLine(x, height - value - lostEventValue, x, height - value - 1);
-                        }
+                        // drawing a line is inclusive, so we should remove 1 from y2
+                        // but we don't because Linux
+                        imageGC.drawLine(x, height - value - lostEventValue, x, height - value);
                     }
                 }
+
+                // then draw normal events second, to overwrite that extra pixel
+                imageGC.setForeground(fHistoBarColor);
+                imageGC.drawLine(x, height - value, x, height);
             }
 
             // Draw the selection bars
@@ -743,6 +747,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             imageGC.setBackground(fFillColor);
             imageGC.fillRectangle(delimiterIndex + 1, 0, width - (delimiterIndex + 1), height);
 
+            // Restore anti-aliasing
+            imageGC.setAntialias(aliasing);
+
         } catch (final Exception e) {
             // Do nothing
         }
@@ -771,6 +778,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     protected void drawTimeRangeWindow(GC imageGC, long rangeStartTime, long rangeDuration) {
 
+        if (fScaledData == null) {
+            return;
+        }
+
         // Map times to histogram coordinates
         long bucketSpan = Math.max(fScaledData.fBucketDuration, 1);
         long startTime = Math.min(rangeStartTime, rangeStartTime + rangeDuration);
@@ -780,17 +791,18 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         int right = left + rangeWidth;
         int center = (left + right) / 2;
         int height = fCanvas.getSize().y;
+        int arc = Math.min(15, rangeWidth);
 
         // Draw the selection window
         imageGC.setForeground(fTimeRangeColor);
         imageGC.setLineWidth(1);
         imageGC.setLineStyle(SWT.LINE_SOLID);
-        imageGC.drawRoundRectangle(left, 0, rangeWidth, height - 1, 15, 15);
+        imageGC.drawRoundRectangle(left, 0, rangeWidth, height - 1, arc, arc);
 
         // Fill the selection window
         imageGC.setBackground(fTimeRangeColor);
         imageGC.setAlpha(35);
-        imageGC.fillRoundRectangle(left + 1, 1, rangeWidth - 1, height - 2, 15, 15);
+        imageGC.fillRoundRectangle(left + 1, 1, rangeWidth - 1, height - 2, arc, arc);
         imageGC.setAlpha(255);
 
         // Draw the cross hair
@@ -826,7 +838,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void mouseDown(final MouseEvent event) {
-        if (event.button == 1 && fDragState == DRAG_NONE && fDataModel.getNbEvents() != 0) {
+        if (fScaledData != null && event.button == 1 && fDragState == DRAG_NONE && fDataModel.getNbEvents() != 0) {
             fDragState = DRAG_SELECTION;
             fDragButton = event.button;
             if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT) {

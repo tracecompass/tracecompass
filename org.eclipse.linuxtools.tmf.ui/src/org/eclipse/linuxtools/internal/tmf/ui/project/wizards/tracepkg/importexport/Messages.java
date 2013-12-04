@@ -188,6 +188,11 @@ public class Messages extends NLS {
     public static String TracePackageImportOperation_ErrorCreatingBookmark;
 
     /**
+     * Text for the detecting trace type job
+     */
+    public static String TracePackageImportOperation_DetectingTraceType;
+
+    /**
      * Text when error occurs creating a bookmark file
      */
     public static String TracePackageImportOperation_ErrorCreatingBookmarkFile;

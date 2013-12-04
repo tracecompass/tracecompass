@@ -25,8 +25,8 @@ public class Messages extends NLS {
 
     public static String SelectSpplementaryResources_DialogTitle;
     public static String SelectSpplementaryResources_ResourcesGroupTitle;
-    public static String SelectSpplementaryResources_SelectAll;
-    public static String SelectSpplementaryResources_DeselectAll;
+    public static String Dialog_SelectAll;
+    public static String Dialog_DeselectAll;
 
     static {
         // initialize resource bundle

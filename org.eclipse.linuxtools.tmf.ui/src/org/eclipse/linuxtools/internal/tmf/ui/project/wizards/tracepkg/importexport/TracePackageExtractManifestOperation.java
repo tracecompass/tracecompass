@@ -19,8 +19,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -65,7 +67,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
     private static final String EXPORT_MANIFEST_SCHEMA_FILE_NAME = "export-manifest.xsd"; //$NON-NLS-1$
 
     // Result of reading the manifest
-    private TracePackageElement fResultElement;
+    private TracePackageElement[] fResultElements;
 
     /**
      * Constructs a new import operation for reading the manifest
@@ -87,7 +89,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
      */
     @Override
     public void run(IProgressMonitor progressMonitor) {
-        TracePackageElement element = null;
+        TracePackageElement[] elements = null;
         try {
             progressMonitor.worked(1);
             ArchiveFile archiveFile = getSpecifiedArchiveFile();
@@ -114,7 +116,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                     validateManifest(inputStream);
 
                     inputStream = archiveFile.getInputStream(entry);
-                    element = loadElementsFromManifest(inputStream);
+                    elements = loadElementsFromManifest(inputStream);
                     break;
                 }
 
@@ -125,10 +127,15 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 setStatus(Status.OK_STATUS);
             }
             else {
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.TracePackageExtractManifestOperation_ErrorManifestNotFound, ITracePackageConstants.MANIFEST_FILENAME)));
+                elements = generateElementsFromArchive();
+                if (elements.length > 0) {
+                    setStatus(Status.OK_STATUS);
+                } else {
+                    setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.TracePackageExtractManifestOperation_ErrorManifestNotFound, ITracePackageConstants.MANIFEST_FILENAME)));
+                }
             }
 
-            fResultElement = element;
+            fResultElements = elements;
 
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
@@ -137,13 +144,36 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
         }
     }
 
+    private TracePackageElement[] generateElementsFromArchive() {
+        ArchiveFile archiveFile = getSpecifiedArchiveFile();
+        Enumeration<?> entries = archiveFile.entries();
+        Set<String> traceFileNames = new HashSet<String>();
+        while (entries.hasMoreElements()) {
+            ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
+            String entryName = entry.getName();
+            IPath fullArchivePath = new Path(entryName);
+            if (!fullArchivePath.hasTrailingSeparator() && fullArchivePath.segmentCount() > 0) {
+                traceFileNames.add(fullArchivePath.segment(0));
+            }
+        }
+
+        List<TracePackageElement> packageElements = new ArrayList<TracePackageElement>();
+        for (String traceFileName : traceFileNames) {
+            TracePackageTraceElement traceElement = new TracePackageTraceElement(null, traceFileName, null);
+            traceElement.setChildren(new TracePackageElement[] { new TracePackageFilesElement(traceElement, traceFileName) });
+            packageElements.add(traceElement);
+        }
+
+        return packageElements.toArray(new TracePackageElement[] {});
+    }
+
     /**
      * Get the resulting element from extracting the manifest from the archive
      *
      * @return the resulting element
      */
-    public TracePackageElement getResultElement() {
-        return fResultElement;
+    public TracePackageElement[] getResultElement() {
+        return fResultElements;
     }
 
     private static void validateManifest(InputStream xml) throws IOException
@@ -165,7 +195,8 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
         }
     }
 
-    private static TracePackageElement loadElementsFromManifest(InputStream inputStream) throws IOException, SAXException, ParserConfigurationException {
+    private static TracePackageElement[] loadElementsFromManifest(InputStream inputStream) throws IOException, SAXException, ParserConfigurationException {
+        List<TracePackageElement> packageElements = new ArrayList<TracePackageElement>();
         TracePackageElement element = null;
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
 
@@ -236,8 +267,9 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 }
 
                 element.setChildren(children.toArray(new TracePackageElement[] {}));
+                packageElements.add(element);
             }
         }
-        return element;
+        return packageElements.toArray(new TracePackageElement[] {});
     }
 }

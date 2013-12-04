@@ -627,18 +627,26 @@
                   checkEnabled="false">
                <with
                      variable="selection">
-                  <and>
-                     <count
-                           value="1">
-                     </count>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof>
-                     </iterate>
-                  </and>
+                     <or>
+                        <iterate
+                              ifEmpty="false"
+                              operator="and">
+                           <instanceof
+                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                           </instanceof>
+                        </iterate>
+                        <and>
+                           <count
+                                 value="1">
+                           </count>
+                           <iterate
+                                 operator="and">
+                              <instanceof
+                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                              </instanceof>
+                           </iterate>
+                        </and>
+                     </or>
                </with>
             </visibleWhen>
          </command>
@@ -1260,19 +1268,6 @@
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ExportTracePackageHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.exporttracepkg">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     operator="and">
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                  </instanceof>
-               </iterate>
-            </and>
-         </activeWhen>
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ImportTracePackageHandler"

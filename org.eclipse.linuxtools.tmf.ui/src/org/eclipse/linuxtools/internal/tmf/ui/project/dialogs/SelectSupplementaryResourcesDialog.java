@@ -178,7 +178,7 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
         btComp.setLayoutData(gd);
 
         final Button selectAll = new Button(btComp, SWT.PUSH);
-        selectAll.setText(Messages.SelectSpplementaryResources_SelectAll);
+        selectAll.setText(Messages.Dialog_SelectAll);
         selectAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -192,7 +192,7 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
         });
 
         final Button deselectAll = new Button(btComp, SWT.PUSH);
-        deselectAll.setText(Messages.SelectSpplementaryResources_DeselectAll);
+        deselectAll.setText(Messages.Dialog_DeselectAll);
         deselectAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
