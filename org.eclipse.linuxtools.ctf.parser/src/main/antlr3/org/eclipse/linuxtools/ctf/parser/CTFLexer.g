@@ -1,17 +1,17 @@
 lexer grammar CTFLexer;
 
 options {
-  language = Java;
+    language = Java;
 }
 
 @lexer::header {
- package org.eclipse.linuxtools.ctf.parser;
+    package org.eclipse.linuxtools.ctf.parser;
 }
 
 /*
- * Lexer grammers 
+ * Lexer grammers
  */
- 
+
 /*
  * Keywords
  */
@@ -78,15 +78,6 @@ ARROW              : '->' ;
 DOT                : '.' ;
 fragment BACKSLASH : '\\' ;
 
-/*
- * Boolean literals
- * - We better leave them as identifiers and numbers...
- */
-/*TRUE  : 'true'  | 'TRUE' ;
-FALSE : 'false' | 'FALSE' ;
-ZERO  : '0' ;
-ONE   : '1' ;*/
-
 
 /*
  * Integer literals
@@ -108,23 +99,23 @@ fragment NONZERO_DIGIT : '1'..'9' ;
  * Integer suffix for long, long long and unsigned.
  *
  * Matches all possible combination of L, LL and U.
- */ 
+ */
 fragment INTEGER_TYPES_SUFFIX :
-	  ('l' ('l')? | 'L' ('L')?)             // l, ll
-	| ('u' | 'U')                           // u
-	| ('u' | 'U') ('l' ('l')? | 'L' ('L')?) // ul, ull 
-	| ('l' ('l')? | 'L' ('L')?) ('u'| 'U')  // lu, llu
-	;
+    ('l' ('l')? | 'L' ('L')?)             // l, ll
+  | ('u' | 'U')                           // u
+  | ('u' | 'U') ('l' ('l')? | 'L' ('L')?) // ul, ull
+  | ('l' ('l')? | 'L' ('L')?) ('u'| 'U')  // lu, llu
+  ;
 
 /**
  * Escape sequences
  */
 fragment ESCAPE_SEQUENCE :
-	  BACKSLASH ('\'' | '"' | '?' | BACKSLASH | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' )
-	| OCTAL_ESCAPE
-	| UNICODE_ESCAPE
-	| HEXADECIMAL_ESCAPE
-	;
+    BACKSLASH ('\'' | '"' | '?' | BACKSLASH | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' )
+  | OCTAL_ESCAPE
+  | UNICODE_ESCAPE
+  | HEXADECIMAL_ESCAPE
+    ;
 
 /**
  * Octal escape sequence
@@ -173,7 +164,7 @@ WS : (' ' | '\r' | '\t' | '\u000C' | '\n') { $channel=HIDDEN; } ;
 
 /**
  * Multiline comment
- */ 
+ */
 // About the greedy option: see page 100-101 of The Definitive ANTLR reference
 // COMMENT : '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;} ;
 COMMENT : COMMENT_OPEN .* COMMENT_CLOSE { $channel = HIDDEN; } ;

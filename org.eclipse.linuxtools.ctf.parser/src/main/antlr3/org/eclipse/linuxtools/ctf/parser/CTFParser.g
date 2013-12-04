@@ -1,70 +1,70 @@
 parser grammar CTFParser;
 
 options {
-  language   = Java;
-  output     = AST;
-  ASTLabelType = CommonTree;
-  tokenVocab = CTFLexer;
+    language   = Java;
+    output     = AST;
+    ASTLabelType = CommonTree;
+    tokenVocab = CTFLexer;
 }
 
 tokens {
-	ROOT;
-	
-	EVENT;
-	STREAM;
-	TRACE;
-	ENV;
-	CLOCK;
-	CALLSITE;
-	
-	DECLARATION;
-	SV_DECLARATION;
-	TYPE_SPECIFIER_LIST;
-	TYPE_DECLARATOR_LIST;
-	TYPE_DECLARATOR;
-	
-	STRUCT;
-	STRUCT_NAME;
-	STRUCT_BODY;
-	ALIGN;
-	
-	CTF_EXPRESSION_TYPE;
-	CTF_EXPRESSION_VAL;
-  CTF_LEFT;
-  CTF_RIGHT;
+    ROOT;
 
-	UNARY_EXPRESSION_STRING;
-	UNARY_EXPRESSION_STRING_QUOTES;
-  UNARY_EXPRESSION_DEC;
-  UNARY_EXPRESSION_HEX;
-  UNARY_EXPRESSION_OCT;
-  LENGTH;
-  
-  TYPEDEF;
-	
-	TYPEALIAS;
-	TYPEALIAS_TARGET;
-	TYPEALIAS_ALIAS;
-	
-	INTEGER;
-	STRING;
-	FLOATING_POINT;
-	
-	ENUM;
-	ENUM_CONTAINER_TYPE;
-	ENUM_ENUMERATOR;
-	ENUM_NAME;
-	ENUM_VALUE;
-	ENUM_VALUE_RANGE;
-	ENUM_BODY;
-	
-	VARIANT;
-	VARIANT_NAME;
-	VARIANT_TAG;
-	VARIANT_BODY;
-	
-	DECLARATOR;
-	LENGTH;
+    EVENT;
+    STREAM;
+    TRACE;
+    ENV;
+    CLOCK;
+    CALLSITE;
+
+    DECLARATION;
+    SV_DECLARATION;
+    TYPE_SPECIFIER_LIST;
+    TYPE_DECLARATOR_LIST;
+    TYPE_DECLARATOR;
+
+    STRUCT;
+    STRUCT_NAME;
+    STRUCT_BODY;
+    ALIGN;
+
+    CTF_EXPRESSION_TYPE;
+    CTF_EXPRESSION_VAL;
+    CTF_LEFT;
+    CTF_RIGHT;
+
+    UNARY_EXPRESSION_STRING;
+    UNARY_EXPRESSION_STRING_QUOTES;
+    UNARY_EXPRESSION_DEC;
+    UNARY_EXPRESSION_HEX;
+    UNARY_EXPRESSION_OCT;
+    LENGTH;
+
+    TYPEDEF;
+
+    TYPEALIAS;
+    TYPEALIAS_TARGET;
+    TYPEALIAS_ALIAS;
+
+    INTEGER;
+    STRING;
+    FLOATING_POINT;
+
+    ENUM;
+    ENUM_CONTAINER_TYPE;
+    ENUM_ENUMERATOR;
+    ENUM_NAME;
+    ENUM_VALUE;
+    ENUM_VALUE_RANGE;
+    ENUM_BODY;
+
+    VARIANT;
+    VARIANT_NAME;
+    VARIANT_TAG;
+    VARIANT_BODY;
+
+    DECLARATOR;
+    LENGTH;
 }
 
 /*
@@ -73,325 +73,313 @@ tokens {
  * later we will have to track the info about the target type.
  */
 scope Symbols {
-  Set<String> types;
+    Set<String> types;
 }
 
 @header {
-package  org.eclipse.linuxtools.ctf.parser;
-import java.util.Set;
-import java.util.HashSet;
+    package org.eclipse.linuxtools.ctf.parser;
+    import java.util.Set;
+    import java.util.HashSet;
 }
 
 @members {
-  public CTFParser(TokenStream input, boolean verbose) {
-    this(input);
-    this.verbose = verbose;
-  }
+    public CTFParser(TokenStream input, boolean verbose) {
+        this(input);
+        this.verbose = verbose;
+    }
 
-  /* To disable automatic error recovery. When we have a mismatched token, simply throw an exception. */
-  @Override
-  protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException
-  {
-    throw new MismatchedTokenException(ttype, input);
-  }
-  
-  /**
-   * Checks if a given name has been defined has a type.
-   * From: http://www.antlr.org/grammar/1153358328744/C.g 
-   *
-   * @param name The name to check.
-   * @return True if is is a type, false otherwise.
-   */   
-  boolean isTypeName(String name) {
-    for (int i = Symbols_stack.size() - 1; i >= 0; i--) {
-      Symbols_scope scope = (Symbols_scope)Symbols_stack.get(i);
-      if (scope.types.contains(name)) {
-        return true;
-      }
+    /* To disable automatic error recovery. When we have a mismatched token, simply throw an exception. */
+    @Override
+    protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
+        throw new MismatchedTokenException(ttype, input);
     }
-    return false;
-  }
-  
-  void addTypeName(String name) {
-    $Symbols::types.add(name);
-    if (verbose) {
-      debug_print("New type: " + name);
+
+    /**
+     * Checks if a given name has been defined has a type.
+     * From: http://www.antlr.org/grammar/1153358328744/C.g
+     *
+     * @param name The name to check.
+     * @return True if is is a type, false otherwise.
+     */
+    boolean isTypeName(String name) {
+        for (int i = Symbols_stack.size() - 1; i >= 0; i--) {
+            Symbols_scope scope = (Symbols_scope) Symbols_stack.get(i);
+            if (scope.types.contains(name)) {
+                return true;
+            }
+        }
+        return false;
     }
-  }
-  
-  boolean _inTypedef = false;
-  
-  void typedefOn() {
-    debug_print("typedefOn");
-    _inTypedef = true;
-  }
-  
-  void typedefOff() {
-  debug_print("typedefOff");
-    _inTypedef = false;
-  }
-  
-  boolean inTypedef() {
-    return _inTypedef;
-  }
-  
-  boolean _inTypealiasAlias = false;
-  
-  void typealiasAliasOn() {
-  debug_print("typealiasAliasOn");
-    _inTypealiasAlias = true;
-  }
-  
-  void typealiasAliasOff() {
-  debug_print("typealiasAliasOff");
-    _inTypealiasAlias = false;
-  }
-  
-  boolean inTypealiasAlias() {
-    return _inTypealiasAlias;
-  }
-  
-  void print_tabs(int n) {
-    for (int i = 0; i < n; i++) {
-      System.out.print("  ");
+
+    void addTypeName(String name) {
+        $Symbols::types.add(name);
+        if (verbose) {
+            debug_print("New type: " + name);
+        }
     }
-  }
-  
-  void enter(String name) {
-    if (verbose) {
-	    if (state.backtracking == 0) {
-		    print_tabs(depth);
-		    debug_print("+ " + name);
-		    depth++;
-		  }
-	  }
-  }
-  
-  void exit(String name) {
-    if (verbose) {
-	    depth--;
-	    print_tabs(depth);
-	    debug_print("- " + name);
-	  }
-  }
-  
-  void debug_print(String str) {
-    if (verbose) {
-      System.out.println(str);
+
+    boolean _inTypedef = false;
+
+    void typedefOn() {
+        debug_print("typedefOn");
+        _inTypedef = true;
     }
-  }
-  
-  int depth = 0;
-  
-  /* Prints rule entry and exit while parsing */
-  boolean verbose = false;
+
+    void typedefOff() {
+        debug_print("typedefOff");
+        _inTypedef = false;
+    }
+
+    boolean inTypedef() {
+        return _inTypedef;
+    }
+
+    boolean _inTypealiasAlias = false;
+
+    void typealiasAliasOn() {
+        debug_print("typealiasAliasOn");
+        _inTypealiasAlias = true;
+    }
+
+    void typealiasAliasOff() {
+         debug_print("typealiasAliasOff");
+        _inTypealiasAlias = false;
+    }
+
+    boolean inTypealiasAlias() {
+        return _inTypealiasAlias;
+    }
+
+    void print_tabs(int n) {
+        for (int i = 0; i < n; i++) {
+            System.out.print("  ");
+        }
+    }
+
+    void enter(String name) {
+        if (verbose) {
+            if (state.backtracking == 0) {
+                print_tabs(depth);
+                debug_print("+ " + name);
+                depth++;
+            }
+        }
+    }
+
+    void exit(String name) {
+        if (verbose) {
+            depth--;
+            print_tabs(depth);
+            debug_print("- " + name);
+        }
+    }
+
+    void debug_print(String str) {
+        if (verbose) {
+            System.out.println(str);
+        }
+    }
+
+    int depth = 0;
+
+    /* Prints rule entry and exit while parsing */
+    boolean verbose = false;
 }
 
 /* To disable automatic error recovery. By default, the catch block of every rule simple rethrows the error. */
 @rulecatch {
-	catch (RecognitionException e)
-	{
-	  throw e;
-	}
+    catch (RecognitionException e) {
+        throw e;
+    }
 }
 
 /* The top-level rule. */
 parse
 scope Symbols;
 @init {
-  enter("parse");
-  debug_print("Scope push " + Symbols_stack.size());
-  $Symbols::types = new HashSet<String>();
+    enter("parse");
+    debug_print("Scope push " + Symbols_stack.size());
+    $Symbols::types = new HashSet<String>();
 }
 @after {
-  debug_print("Scope pop " + Symbols_stack.size());
-  exit("parse");
-  
-  debug_print("Final depth, should be 0: " + depth);
+    debug_print("Scope pop " + Symbols_stack.size());
+    exit("parse");
+
+    debug_print("Final depth, should be 0: " + depth);
 }
-:
-  declaration+ EOF -> ^(ROOT declaration+) 
+  : declaration+ EOF -> ^(ROOT declaration+)
   ;
 
 numberLiteral
 @init {
-  enter("numberLiteral");
+    enter("numberLiteral");
 }
 @after {
-  debug_print($numberLiteral.text);
-  exit("numberLiteral");
+    debug_print($numberLiteral.text);
+    exit("numberLiteral");
 }
-:
-  SIGN*  (HEX_LITERAL -> ^(UNARY_EXPRESSION_HEX HEX_LITERAL SIGN*)
+  : SIGN*  (HEX_LITERAL -> ^(UNARY_EXPRESSION_HEX HEX_LITERAL SIGN*)
   | DECIMAL_LITERAL -> ^(UNARY_EXPRESSION_DEC DECIMAL_LITERAL SIGN*)
   | OCTAL_LITERAL -> ^(UNARY_EXPRESSION_OCT OCTAL_LITERAL SIGN*))
   ;
 
 constant
 @init {
-  enter("constant");
+    enter("constant");
 }
 @after {
-  exit("constant");
+    exit("constant");
 }
-:
-   numberLiteral
+  : numberLiteral
   | enumConstant
   | CHARACTER_LITERAL
   ;
 
 primaryExpression
 @init {
-  enter("primaryExpression"); 
+    enter("primaryExpression");
 }
 @after {
-  exit("primaryExpression");
+    exit("primaryExpression");
 }
-:
-    (IDENTIFIER) => IDENTIFIER { debug_print("IDENTIFIER: " + $IDENTIFIER.text);} -> ^(UNARY_EXPRESSION_STRING IDENTIFIER)
+  : (IDENTIFIER) => IDENTIFIER
+      { debug_print("IDENTIFIER: " + $IDENTIFIER.text); }
+      -> ^(UNARY_EXPRESSION_STRING IDENTIFIER)
   | (ctfKeyword) => ctfKeyword -> ^(UNARY_EXPRESSION_STRING ctfKeyword)
-  | (STRING_LITERAL) => STRING_LITERAL { debug_print("STRING_LITERAL: " + $STRING_LITERAL.text);} -> ^(UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL)
+  | (STRING_LITERAL) => STRING_LITERAL
+      { debug_print("STRING_LITERAL: " + $STRING_LITERAL.text); }
+      -> ^(UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL)
   /*| (LPAREN unaryExpression RPAREN)*/ // Not supported yet
   | constant
   ;
 
 reference
 @init {
-  enter("reference");
+    enter("reference");
 }
 @after {
-  debug_print($reference.text);
-  exit("reference");
+    debug_print($reference.text);
+    exit("reference");
 }
-:
-  (ref=DOT | ref=ARROW) IDENTIFIER -> ^($ref ^(UNARY_EXPRESSION_STRING IDENTIFIER))
+  : (ref=DOT | ref=ARROW) IDENTIFIER -> ^($ref ^(UNARY_EXPRESSION_STRING IDENTIFIER))
   ;
 
 postfixExpressionSuffix
 @init {
-  enter("postfixExpressionSuffix");
+    enter("postfixExpressionSuffix");
 }
 @after {
-  exit("postfixExpressionSuffix");
+    exit("postfixExpressionSuffix");
 }
-:
-    (OPENBRAC unaryExpression CLOSEBRAC!)
+  : (OPENBRAC unaryExpression CLOSEBRAC!)
   | reference
   ;
 
 postfixExpression
 @init {
-  enter("postfixExpression");
+    enter("postfixExpression");
 }
 @after {
-  exit("postfixExpression");
+    exit("postfixExpression");
 }
-:
-  (primaryExpression) (postfixExpressionSuffix)*|
-  ((ctfSpecifierHead)  (postfixExpressionSuffix)+)// added for ctfV1.8
+  : (primaryExpression) (postfixExpressionSuffix)*
+  | ((ctfSpecifierHead) (postfixExpressionSuffix)+)  // added for ctf-v1.8
   ;
 
 unaryExpression
 @init {
-  enter("unaryExpression");
+    enter("unaryExpression");
 }
 @after {
-  exit("unaryExpression");
+    exit("unaryExpression");
 }
-:
-    /*((SIGN postfixExpression[true])
-    | postfixExpression[false])*/
-    postfixExpression
+  : postfixExpression
+  /* | ((SIGN postfixExpression[true]) | postfixExpression[false]) */
   ;
 
 enumConstant
 @init {
-  enter("enumConstant");
+    enter("enumConstant");
 }
 @after {
-  debug_print($enumConstant.text);
-  exit("enumConstant");
+    debug_print($enumConstant.text);
+    exit("enumConstant");
 }
-:
-    STRING_LITERAL -> ^(UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL)
-    | IDENTIFIER -> ^(UNARY_EXPRESSION_STRING IDENTIFIER)
-    | ctfKeyword -> ^(UNARY_EXPRESSION_STRING ctfKeyword)
+  : STRING_LITERAL -> ^(UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL)
+  | IDENTIFIER -> ^(UNARY_EXPRESSION_STRING IDENTIFIER)
+  | ctfKeyword -> ^(UNARY_EXPRESSION_STRING ctfKeyword)
   ;
 // 2.2
 
 declaration
 @init {
-  enter("declaration");
+    enter("declaration");
 }
 @after {
-  exit("declaration");
-  if (inTypedef())
-    typedefOff();
+    exit("declaration");
+    if (inTypedef()) {
+        typedefOff();
+    }
 }
-:
-  (declarationSpecifiers declaratorList? TERM)
-  
-  // When the declaration is completely parsed and was a typedef, we add the declarators to the symbol table.
-  -> {inTypedef()}? ^(DECLARATION ^(TYPEDEF declaratorList declarationSpecifiers)) 
-  -> ^(DECLARATION declarationSpecifiers declaratorList?)
-  
+  : (declarationSpecifiers declaratorList? TERM)
+      // When the declaration is completely parsed and was a typedef,
+      // we add the declarators to the symbol table.
+      -> {inTypedef()}? ^(DECLARATION ^(TYPEDEF declaratorList declarationSpecifiers))
+      -> ^(DECLARATION declarationSpecifiers declaratorList?)
   | (ctfSpecifier TERM!)
   ;
 
 declarationSpecifiers
 @init {
-  enter("declarationSpecifiers");
+    enter("declarationSpecifiers");
 }
 @after {
-  debug_print($declarationSpecifiers.text);
-  exit("declarationSpecifiers");
+    debug_print($declarationSpecifiers.text);
+    exit("declarationSpecifiers");
 }
-:
-  ( 
-     // We don't want to keep the typedef keyword in the specifier list.
-     // Instead, we keep track that we encountered a typedef in the declaration. 
-     storageClassSpecifier
-   | typeQualifier
-   | typeSpecifier
+  : (
+      // We don't want to keep the typedef keyword in the specifier list.
+      // Instead, we keep track that we encountered a typedef in the declaration.
+        storageClassSpecifier
+      | typeQualifier
+      | typeSpecifier
   )+ -> ^(TYPE_SPECIFIER_LIST typeQualifier* typeSpecifier*)
   ;
 
 declaratorList
 @init {
-  enter("declaratorList");
+    enter("declaratorList");
 }
 @after {
-  exit("declaratorList");
-} 
-:
-  declarator (SEPARATOR declarator)* -> ^(TYPE_DECLARATOR_LIST declarator+)
+    exit("declaratorList");
+}
+  : declarator (SEPARATOR declarator)* -> ^(TYPE_DECLARATOR_LIST declarator+)
   ;
 
 abstractDeclaratorList
 @init {
-  enter("abstractDeclaratorList");
+    enter("abstractDeclaratorList");
 }
 @after {
-  exit("abstractDeclaratorList");
+    exit("abstractDeclaratorList");
 }
-:
-  abstractDeclarator (SEPARATOR abstractDeclarator)* -> ^(TYPE_DECLARATOR_LIST abstractDeclarator+)
+  : abstractDeclarator (SEPARATOR abstractDeclarator)*
+      -> ^(TYPE_DECLARATOR_LIST abstractDeclarator+)
   ;
 
-storageClassSpecifier :
-  TYPEDEFTOK  {typedefOn();}
+storageClassSpecifier
+  : TYPEDEFTOK  { typedefOn(); }
   ;
 
 typeSpecifier
 @init {
-  enter("typeSpecifier");
+    enter("typeSpecifier");
 }
 @after {
-  debug_print($typeSpecifier.text);
-  exit("typeSpecifier");
+    debug_print($typeSpecifier.text);
+    exit("typeSpecifier");
 }
-:
-  FLOATTOK
+  : FLOATTOK
   | INTTOK
   | LONGTOK
   | SHORTTOK
@@ -407,70 +395,66 @@ typeSpecifier
   | variantSpecifier
   | enumSpecifier
   | ctfTypeSpecifier
-  | {inTypealiasAlias() || isTypeName(input.LT(1).getText())}? => typedefName
+  | { inTypealiasAlias() || isTypeName(input.LT(1).getText()) }? => typedefName
   ;
 
 typeQualifier
 @init {
-  enter("typeQualifier");
+    enter("typeQualifier");
 }
 @after {
-  debug_print($typeQualifier.text);
-  exit("typeQualifier");
+    debug_print($typeQualifier.text);
+    exit("typeQualifier");
 }
-:
-  CONSTTOK
+  : CONSTTOK
   ;
 
-alignAttribute :
-  ALIGNTOK LPAREN unaryExpression RPAREN -> ^(ALIGN unaryExpression)
+alignAttribute
+  : ALIGNTOK LPAREN unaryExpression RPAREN -> ^(ALIGN unaryExpression)
   ;
-  
+
   // you can have an empty struct but not an empty variant
 structBody
 scope Symbols;
 @init {
-  enter("structBody");
-  debug_print("Scope push " + Symbols_stack.size());
-  $Symbols::types = new HashSet<String>();
+    enter("structBody");
+    debug_print("Scope push " + Symbols_stack.size());
+    $Symbols::types = new HashSet<String>();
 }
 @after {
-  debug_print("Scope pop " + Symbols_stack.size());
-  exit("structBody");
+    debug_print("Scope pop " + Symbols_stack.size());
+    exit("structBody");
 }
-:
-  LCURL structOrVariantDeclarationList? RCURL -> ^(STRUCT_BODY structOrVariantDeclarationList?)
+  : LCURL structOrVariantDeclarationList? RCURL
+      -> ^(STRUCT_BODY structOrVariantDeclarationList?)
   ;
-  
 
-  
 structSpecifier
 @init {
-  enter("structSpecifier");
+    enter("structSpecifier");
 }
 @after {
-  exit("structSpecifier");
+    exit("structSpecifier");
 }
-:
-  STRUCTTOK
+  : STRUCTTOK
   (
     // We have an IDENTIFIER after 'struct'
     (
-	    structName
-	    (
-	      alignAttribute 
-	    | 
-	      (
-	        structBody
-	        ( /* structBody can return an empty tree, so we need those ? */
-	         alignAttribute 
-	        |
-	         /* empty */ 
-	        )
-	      )
-	    | 
-	      /* empty */
-	    )
+        structName
+        (
+          alignAttribute
+        |
+          (
+            structBody
+            ( /* structBody can return an empty tree, so we need those ? */
+             alignAttribute
+            |
+             /* empty */
+            )
+          )
+        |
+          /* empty */
+        )
     )
   |
     // We have a body after 'struct'
@@ -487,48 +471,46 @@ structSpecifier
 
 structName
 @init {
-  enter("structName");
+    enter("structName");
 }
 @after {
-  debug_print($structName.text);
-  exit("structName");
+    debug_print($structName.text);
+    exit("structName");
 }
-:
-  IDENTIFIER -> ^(STRUCT_NAME IDENTIFIER)
+  : IDENTIFIER -> ^(STRUCT_NAME IDENTIFIER)
   ;
 
 structOrVariantDeclarationList
 @init {
-  enter("structOrVariantDeclarationList");
+    enter("structOrVariantDeclarationList");
 }
 @after {
-  exit("structOrVariantDeclarationList");
+    exit("structOrVariantDeclarationList");
 }
-:
-  structOrVariantDeclaration+
+  : structOrVariantDeclaration+
   ;
 
 structOrVariantDeclaration
 @init {
-  enter("structOrVariantDeclaration");
+    enter("structOrVariantDeclaration");
 }
 @after {
-  exit("structOrVariantDeclaration");
+    exit("structOrVariantDeclaration");
 }
 :
-  (	  
-	  (
-	   declarationSpecifiers
-	     (
-	       /* If we met a "typedef" */
-	       {inTypedef()}? => declaratorList {typedefOff();}
-	         -> ^(TYPEDEF declaratorList declarationSpecifiers)
-	       | structOrVariantDeclaratorList
-	         -> ^(SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList)
-	     )
-	  )
+  (
+      (
+       declarationSpecifiers
+         (
+           /* If we met a "typedef" */
+           {inTypedef()}? => declaratorList {typedefOff();}
+             -> ^(TYPEDEF declaratorList declarationSpecifiers)
+           | structOrVariantDeclaratorList
+             -> ^(SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList)
+         )
+      )
     |
-    // Lines 3 and 4 
+    // Lines 3 and 4
     typealiasDecl -> typealiasDecl
   )
   TERM
@@ -536,34 +518,34 @@ structOrVariantDeclaration
 
 specifierQualifierList
 @init {
-  enter("specifierQualifierList");
+    enter("specifierQualifierList");
 }
 @after {
-  exit("specifierQualifierList");
+    exit("specifierQualifierList");
 }
-:
-  (typeQualifier | typeSpecifier)+ -> ^(TYPE_SPECIFIER_LIST typeQualifier* typeSpecifier*)
+  : (typeQualifier | typeSpecifier)+
+      -> ^(TYPE_SPECIFIER_LIST typeQualifier* typeSpecifier*)
   ;
 
 structOrVariantDeclaratorList
 @init {
-  enter("structOrVariantDeclaratorList");
+    enter("structOrVariantDeclaratorList");
 }
 @after {
-  exit("structOrVariantDeclaratorList");
+    exit("structOrVariantDeclaratorList");
 }
-:
-  structOrVariantDeclarator (SEPARATOR structOrVariantDeclarator)* -> ^(TYPE_DECLARATOR_LIST structOrVariantDeclarator+)
+  : structOrVariantDeclarator (SEPARATOR structOrVariantDeclarator)*
+      -> ^(TYPE_DECLARATOR_LIST structOrVariantDeclarator+)
   ;
 
 structOrVariantDeclarator
 @init {
-  enter("structOrVariantDeclarator");
+    enter("structOrVariantDeclarator");
 }
 @after {
-  exit("structOrVariantDeclarator");
+    exit("structOrVariantDeclarator");
 }
-:
+  :
   /* Bitfields not supported yet */
     (declarator (COLON numberLiteral)?) -> declarator
   /*| (COLON numberLiteral)*/
@@ -571,16 +553,16 @@ structOrVariantDeclarator
 
 variantSpecifier
 @init {
-  enter("variantSpecifier");
+    enter("variantSpecifier");
 }
 @after {
-  exit("variantSpecifier");
+    exit("variantSpecifier");
 }
 :
   VARIANTTOK
   (
     (
-      variantName 
+      variantName
       (
         (
           variantTag
@@ -603,238 +585,228 @@ variantSpecifier
 
 variantName
 @init {
-  enter("variantName");
+    enter("variantName");
 }
 @after {
-  debug_print($variantName.text);
-  exit("variantName");
+    debug_print($variantName.text);
+    exit("variantName");
 }
-:
-  IDENTIFIER -> ^(VARIANT_NAME IDENTIFIER)
+  : IDENTIFIER -> ^(VARIANT_NAME IDENTIFIER)
   ;
 
 variantBody
 scope Symbols;
 @init {
-  enter("variantBody");
-  debug_print("Scope push " + Symbols_stack.size());
-  $Symbols::types = new HashSet<String>();
+    enter("variantBody");
+    debug_print("Scope push " + Symbols_stack.size());
+    $Symbols::types = new HashSet<String>();
 }
 @after {
-  debug_print("Scope pop " + Symbols_stack.size());
-  exit("variantBody");
+    debug_print("Scope pop " + Symbols_stack.size());
+    exit("variantBody");
 }
-:
-  LCURL structOrVariantDeclarationList RCURL -> ^(VARIANT_BODY structOrVariantDeclarationList)
+  : LCURL structOrVariantDeclarationList RCURL
+      -> ^(VARIANT_BODY structOrVariantDeclarationList)
   ;
 
 variantTag
 @init {
-  enter("variantTag");
+    enter("variantTag");
 }
 @after {
-  debug_print($variantTag.text);
-  exit("variantTag");
+    debug_print($variantTag.text);
+    exit("variantTag");
 }
-:
-  LT IDENTIFIER GT -> ^(VARIANT_TAG IDENTIFIER)
+  : LT IDENTIFIER GT -> ^(VARIANT_TAG IDENTIFIER)
   ;
 
 enumSpecifier
 @init {
-  enter("enumSpecifier");
+    enter("enumSpecifier");
 }
 @after {
-  exit("enumSpecifier");
+    exit("enumSpecifier");
 }
 :
-	ENUMTOK
-	(
-		// Lines 1 to 5, when we have "ENUMTOK IDENTIFIER".
-		(
-			enumName
-			(
-				enumContainerType enumBody
-		  |
-				enumBody
-			|
-				// no enumDeclarator or enumBodym
-			)
-		)
-	|
-	  // Lines 1, 2, 4, 5, when we have no IDENTIFIER.
-		(
-			enumContainerType enumBody
-		|
-			enumBody
-		)
-	) -> ^(ENUM enumName? enumContainerType? enumBody?)
+    ENUMTOK
+    (
+        // Lines 1 to 5, when we have "ENUMTOK IDENTIFIER".
+        (
+            enumName
+            (
+                enumContainerType enumBody
+          |
+                enumBody
+            |
+                // no enumDeclarator or enumBodym
+            )
+        )
+    |
+      // Lines 1, 2, 4, 5, when we have no IDENTIFIER.
+        (
+            enumContainerType enumBody
+        |
+            enumBody
+        )
+    ) -> ^(ENUM enumName? enumContainerType? enumBody?)
   ;
 
 enumName
 @init {
-  enter("enumName");
+    enter("enumName");
 }
 @after {
-  debug_print($enumName.text);
-  exit("enumName");
+    debug_print($enumName.text);
+    exit("enumName");
 }
 :
   IDENTIFIER -> ^(ENUM_NAME IDENTIFIER)
   ;
-  
+
 enumBody
 @init {
-  enter("enumBody");
+    enter("enumBody");
 }
 @after {
-  exit("enumBody");
+    exit("enumBody");
 }
-:
-  LCURL enumeratorList (SEPARATOR RCURL | RCURL) -> ^(ENUM_BODY enumeratorList)
+  : LCURL enumeratorList (SEPARATOR RCURL | RCURL) -> ^(ENUM_BODY enumeratorList)
   ;
 
 enumContainerType
 @init {
-  enter("enumContainerType");
+    enter("enumContainerType");
 }
 @after {
-  exit("enumContainerType");
+    exit("enumContainerType");
 }
-:
-  COLON declarationSpecifiers -> ^(ENUM_CONTAINER_TYPE declarationSpecifiers)
+  : COLON declarationSpecifiers -> ^(ENUM_CONTAINER_TYPE declarationSpecifiers)
   ;
 
 enumeratorList
 @init {
-  enter("enumeratorList");
+    enter("enumeratorList");
 }
 @after {
-  exit("enumeratorList");
+    exit("enumeratorList");
 }
-:
-  enumerator (SEPARATOR enumerator)* -> (^(ENUM_ENUMERATOR enumerator))+
+  : enumerator (SEPARATOR enumerator)* -> (^(ENUM_ENUMERATOR enumerator))+
   ;
 
 enumerator
 @init {
-  enter("enumerator");
+    enter("enumerator");
 }
 @after {
-  exit("enumerator");
+    exit("enumerator");
 }
-:
-  enumConstant enumeratorValue?
+  : enumConstant enumeratorValue?
   ;
 
 enumeratorValue
 @init {
-  enter("enumeratorValue");
+    enter("enumeratorValue");
 }
 @after {
-  exit("enumeratorValue");
+    exit("enumeratorValue");
 }
-:
-  ASSIGNMENT e1=unaryExpression
-  ( 
+  : ASSIGNMENT e1=unaryExpression
+  (
     -> ^(ENUM_VALUE $e1)
     | ELIPSES e2=unaryExpression -> ^(ENUM_VALUE_RANGE $e1 $e2)
   )
   ;
-  
+
 
 declarator
 @init {
-  enter("declarator");
+    enter("declarator");
 }
 @after {
-  exit("declarator");
+    exit("declarator");
 }
-:
-  pointer* directDeclarator -> ^(TYPE_DECLARATOR pointer* directDeclarator)
+  : pointer* directDeclarator -> ^(TYPE_DECLARATOR pointer* directDeclarator)
   ;
 
 directDeclarator
 @init {
-  enter("directDeclarator");
+    enter("directDeclarator");
 }
 @after {
-  exit("directDeclarator");
+    exit("directDeclarator");
 }
-:
-  (   
-	    IDENTIFIER { if (inTypedef()) addTypeName($IDENTIFIER.text); } {debug_print($IDENTIFIER.text);} 
-	  /*| LPAREN declarator RPAREN*/ /* Not supported yet */
-	)
-	directDeclaratorSuffix*
-	;
-	
-directDeclaratorSuffix:
-		OPENBRAC directDeclaratorLength CLOSEBRAC -> ^(LENGTH directDeclaratorLength)
+  : (
+      IDENTIFIER
+       { if (inTypedef()) addTypeName($IDENTIFIER.text); }
+       { debug_print($IDENTIFIER.text); }
+      /*| LPAREN declarator RPAREN*/ /* Not supported yet */
+    )
+    directDeclaratorSuffix*
   ;
 
-directDeclaratorLength :
-  unaryExpression
+directDeclaratorSuffix
+  : OPENBRAC directDeclaratorLength CLOSEBRAC -> ^(LENGTH directDeclaratorLength)
   ;
-  
-  
+
+directDeclaratorLength
+  : unaryExpression
+  ;
+
 abstractDeclarator
 @init {
-  enter("abstractDeclarator");
+    enter("abstractDeclarator");
 }
 @after {
-  exit("abstractDeclarator");
+    exit("abstractDeclarator");
 }
-:
-    (pointer+ directAbstractDeclarator?) -> ^(TYPE_DECLARATOR pointer+ directAbstractDeclarator?)
-  | directAbstractDeclarator -> ^(TYPE_DECLARATOR directAbstractDeclarator)
+  : (pointer+ directAbstractDeclarator?)
+      -> ^(TYPE_DECLARATOR pointer+ directAbstractDeclarator?)
+  | directAbstractDeclarator
+      -> ^(TYPE_DECLARATOR directAbstractDeclarator)
   ;
 
 /*
   In the CTF grammar, direct-abstract-declarator can be empty (because of identifier-opt).
-  We take care of that by appending a '?' to each use of "abstractDeclaratorList". 
+  We take care of that by appending a '?' to each use of "abstractDeclaratorList".
 */
 directAbstractDeclarator
 @init {
-  enter("directAbstractDeclarator");
+    enter("directAbstractDeclarator");
 }
 @after {
-  debug_print($directAbstractDeclarator.text);
-  exit("directAbstractDeclarator");
+    debug_print($directAbstractDeclarator.text);
+    exit("directAbstractDeclarator");
 }
-:
-  (
-     IDENTIFIER
-    | (LPAREN abstractDeclarator RPAREN)
-  )
-  (
-    OPENBRAC unaryExpression? CLOSEBRAC
+  : (
+      IDENTIFIER
+      | (LPAREN abstractDeclarator RPAREN)
+  ) (
+      OPENBRAC unaryExpression? CLOSEBRAC
   )?
   ;
 
 pointer
 @init {
-  enter("pointer");
+    enter("pointer");
 }
 @after {
-  debug_print($pointer.text);
-  exit("pointer");
+    debug_print($pointer.text);
+    exit("pointer");
 }
-:
-  POINTER typeQualifierList? -> ^(POINTER typeQualifierList?)
+  : POINTER typeQualifierList? -> ^(POINTER typeQualifierList?)
   ;
 
-typeQualifierList :
-  typeQualifier+
+typeQualifierList
+  : typeQualifier+
   ;
 
 typedefName
 @init {
-  enter("typedefName");
+    enter("typedefName");
 }
 @after {
- debug_print("typedefName: " + $typedefName.text);
- exit("typedefName");
+   debug_print("typedefName: " + $typedefName.text);
+   exit("typedefName");
 }
 :
   {inTypealiasAlias() || isTypeName(input.LT(1).getText())}? IDENTIFIER { if ((inTypedef() || inTypealiasAlias()) && !isTypeName($IDENTIFIER.text)) { addTypeName($IDENTIFIER.text); } }
@@ -844,52 +816,47 @@ typedefName
  * What goes in the target part of a typealias.
  *
  * For example, the integer part in:
- * typealias integer {...} := my_new_integer;  
- */ 
+ * typealias integer {...} := my_new_integer;
+ */
 typealiasTarget
 @init {
-  enter("typealiasTarget");
+    enter("typealiasTarget");
 }
 @after {
- exit("typealiasTarget");
+    exit("typealiasTarget");
 }
-:
-  declarationSpecifiers abstractDeclaratorList?
+  : declarationSpecifiers abstractDeclaratorList?
   ;
-  
+
 /**
  * What goes in the alias part of a typealias.
  *
  * For example, the my_new_integer part in:
- * typealias integer {...} := my_new_integer;  
- */ 
+ * typealias integer {...} := my_new_integer;
+ */
 typealiasAlias
 @init {
-  enter("typealiasAlias");
-  typealiasAliasOn();
+    enter("typealiasAlias");
+    typealiasAliasOn();
 }
 @after {
-  exit("typealiasAlias");
-  typealiasAliasOff();
+    exit("typealiasAlias");
+    typealiasAliasOff();
 }
-:
-  (
-  abstractDeclaratorList
-  |
-  (declarationSpecifiers abstractDeclaratorList?)
-  ) 
+  : ( abstractDeclaratorList
+      | (declarationSpecifiers abstractDeclaratorList?)
+    )
   ;
-  
+
 typealiasDecl
 @init {
-  enter("typealiasDecl");
+    enter("typealiasDecl");
 }
 @after {
-  exit("typealiasDecl");
+    exit("typealiasDecl");
 }
-:
-  TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias
-  -> ^(TYPEALIAS ^(TYPEALIAS_TARGET typealiasTarget) ^(TYPEALIAS_ALIAS typealiasAlias))
+  : TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias
+      -> ^(TYPEALIAS ^(TYPEALIAS_TARGET typealiasTarget) ^(TYPEALIAS_ALIAS typealiasAlias))
   ;
 
 // 2.3 CTF stuff
@@ -897,14 +864,13 @@ typealiasDecl
 // TODO: Ajouter ceux qui manquent
 ctfKeyword
 @init {
-  enter("ctfKeyword");
+    enter("ctfKeyword");
 }
 @after {
-  debug_print($ctfKeyword.text);
-  exit("ctfKeyword");
+    debug_print($ctfKeyword.text);
+    exit("ctfKeyword");
 }
-:
-    ALIGNTOK
+  : ALIGNTOK
   | EVENTTOK
   | SIGNEDTOK
   | STRINGTOK
@@ -912,46 +878,42 @@ ctfKeyword
 
 ctfSpecifier
 @init {
-  enter("ctfSpecifier");
+    enter("ctfSpecifier");
 }
 @after {
-  exit("ctfSpecifier");
+    exit("ctfSpecifier");
 }
-  :
-  // event {...}, stream {...}, trace {...} 
-  ctfSpecifierHead ctfBody -> ^(ctfSpecifierHead ctfBody)
-  |
+  // event {...}, stream {...}, trace {...}
+  : ctfSpecifierHead ctfBody -> ^(ctfSpecifierHead ctfBody)
   // typealias
-  typealiasDecl -> ^(DECLARATION typealiasDecl)
+  | typealiasDecl -> ^(DECLARATION typealiasDecl)
   ;
 
 ctfSpecifierHead
 @init {
-  enter("ctfSpecifierHead");
+    enter("ctfSpecifierHead");
 }
 @after {
-  debug_print($ctfSpecifierHead.text);
-  exit("ctfSpecifierHead");
+    debug_print($ctfSpecifierHead.text);
+    exit("ctfSpecifierHead");
 }
-:
-	  EVENTTOK -> EVENT
-	| STREAMTOK -> STREAM
-	| TRACETOK -> TRACE
-	| ENVTOK -> ENV
-	| CLOCKTOK -> CLOCK
-	| CALLSITETOK -> CALLSITE
+  : EVENTTOK -> EVENT
+  | STREAMTOK -> STREAM
+  | TRACETOK -> TRACE
+  | ENVTOK -> ENV
+  | CLOCKTOK -> CLOCK
+  | CALLSITETOK -> CALLSITE
   ;
 
 ctfTypeSpecifier
 @init {
-  enter("ctfTypeSpecifier");
+    enter("ctfTypeSpecifier");
 }
 @after {
-  exit("ctfTypeSpecifier");
+    exit("ctfTypeSpecifier");
 }
-:
-  /* ctfBody can return an empty tree if the body is empty */ 
-    FLOATINGPOINTTOK ctfBody -> ^(FLOATING_POINT ctfBody?)
+    /* ctfBody can return an empty tree if the body is empty */
+  : FLOATINGPOINTTOK ctfBody -> ^(FLOATING_POINT ctfBody?)
   | INTEGERTOK ctfBody -> ^(INTEGER ctfBody?)
   | STRINGTOK ctfBody? -> ^(STRING ctfBody?)
   ;
@@ -959,32 +921,30 @@ ctfTypeSpecifier
 ctfBody
 scope Symbols;
 @init {
-  enter("ctfBody");
-  debug_print("Scope push " +  + Symbols_stack.size());
-  $Symbols::types = new HashSet<String>();
+    enter("ctfBody");
+    debug_print("Scope push " +  + Symbols_stack.size());
+    $Symbols::types = new HashSet<String>();
 }
 @after {
-  debug_print("Scope pop " +  + Symbols_stack.size());
-  exit("ctfBody");
+    debug_print("Scope pop " +  + Symbols_stack.size());
+    exit("ctfBody");
 }
-:
-  LCURL ctfAssignmentExpressionList? RCURL -> ctfAssignmentExpressionList?
+  : LCURL ctfAssignmentExpressionList? RCURL -> ctfAssignmentExpressionList?
   ;
 
-ctfAssignmentExpressionList :
-  (ctfAssignmentExpression TERM!)+
+ctfAssignmentExpressionList
+  : (ctfAssignmentExpression TERM!)+
   ;
-
 
 ctfAssignmentExpression
 @init {
-  enter("ctfAssignmentExpression");
+    enter("ctfAssignmentExpression");
 }
 @after {
-  if (inTypedef()) {
-    typedefOff();
-  }
-  exit("ctfAssignmentExpression");
+    if (inTypedef()) {
+        typedefOff();
+    }
+    exit("ctfAssignmentExpression");
 }
 :
   (
@@ -994,12 +954,12 @@ ctfAssignmentExpression
       | (type_assignment=TYPE_ASSIGNMENT  right2=typeSpecifier) -> ^(CTF_EXPRESSION_TYPE ^(CTF_LEFT $left) ^(CTF_RIGHT ^(TYPE_SPECIFIER_LIST $right2)))
     )
   )
-  
+
   |
 
     (declarationSpecifiers {inTypedef()}? declaratorList)
     -> ^(TYPEDEF declaratorList declarationSpecifiers)
   |
-  
+
     typealiasDecl
   ;
