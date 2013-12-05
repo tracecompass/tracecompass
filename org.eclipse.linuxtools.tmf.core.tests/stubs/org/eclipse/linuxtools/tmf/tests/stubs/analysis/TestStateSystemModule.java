@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.analysis;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 
@@ -21,10 +21,11 @@ import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
  *
  * @author Geneviève Bastien
  */
+@NonNullByDefault
 public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
 
     @Override
-    protected @NonNull ITmfStateProvider createStateProvider() {
+    protected ITmfStateProvider createStateProvider() {
         return new TestStateSystemProvider(getTrace());
     }
 

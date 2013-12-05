@@ -275,6 +275,8 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
                 if (!fAnalysisCancelled) {
                     return Status.OK_STATUS;
                 }
+                // Reset analysis so that it can be executed again.
+                resetAnalysis();
                 return Status.CANCEL_STATUS;
             }
 
