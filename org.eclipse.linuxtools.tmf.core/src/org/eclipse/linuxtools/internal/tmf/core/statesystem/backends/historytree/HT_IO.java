@@ -40,6 +40,7 @@ class HT_IO {
     private final FileChannel fcIn;
     private final FileChannel fcOut;
 
+    // TODO test/benchmark optimal cache size
     private final int CACHE_SIZE = 256;
     private final HTNode fNodeCache[] = new HTNode[CACHE_SIZE];
 
