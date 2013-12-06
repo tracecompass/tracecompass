@@ -114,7 +114,7 @@ fragment ESCAPE_SEQUENCE
   | OCTAL_ESCAPE
   | UNICODE_ESCAPE
   | HEXADECIMAL_ESCAPE
-    ;
+  ;
 
 /**
  * Octal escape sequence
