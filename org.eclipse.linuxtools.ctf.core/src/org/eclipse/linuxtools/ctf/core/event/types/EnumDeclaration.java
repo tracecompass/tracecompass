@@ -117,6 +117,7 @@ public class EnumDeclaration implements IDeclaration {
      * Gets a set of labels of the enum
      *
      * @return A set of labels of the enum, can be empty but not null
+     * @since 3.0
      */
     public Set<String> getLabels() {
         return Collections.unmodifiableSet(fLabels);

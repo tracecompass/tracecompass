@@ -450,6 +450,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @param request
      *            The request to be canceled
+     * @since 3.0
      */
     protected void cancelOngoingRequest(ITmfEventRequest request) {
         if (request != null && !request.isCompleted()) {

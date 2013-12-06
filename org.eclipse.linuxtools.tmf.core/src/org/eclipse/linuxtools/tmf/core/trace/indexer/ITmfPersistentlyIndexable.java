@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
  * persisted to disk.
  *
  * @author Marc-Andre Laperle
+ * @since 3.0
  */
 public interface ITmfPersistentlyIndexable {
 

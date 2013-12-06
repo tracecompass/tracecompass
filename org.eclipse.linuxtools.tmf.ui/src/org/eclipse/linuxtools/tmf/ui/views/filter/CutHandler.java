@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 /**
  * Handler for cut command in filter view
  * @author Xavier Raynaud <xavier.raynaud@kalray.eu>
- * @since 2.2
+ * @since 3.0
  */
 public class CutHandler extends CopyHandler {
 

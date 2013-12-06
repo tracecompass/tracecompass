@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * Handler for delete command in filter view
  * @author Xavier Raynaud <xavier.raynaud@kalray.eu>
- * @since 2.2
+ * @since 3.0
  */
 public class DeleteHandler extends AbstractHandler {
 

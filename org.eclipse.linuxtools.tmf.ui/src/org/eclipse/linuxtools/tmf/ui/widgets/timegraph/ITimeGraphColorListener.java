@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
  * A time graph state color change listener
  *
  * @author Geneviève Bastien
+ * @since 3.0
  */
 public interface ITimeGraphColorListener {
 

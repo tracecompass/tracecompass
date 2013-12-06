@@ -110,6 +110,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @param value
      *            The double value to contain
      * @return The newly-created TmfStateValue object
+     * @since 3.0
      */
     public static TmfStateValue newValueDouble(double value) {
         /* Lookup in cache for the existence of the same value. */
@@ -164,6 +165,9 @@ public abstract class TmfStateValue implements ITmfStateValue {
         throw new StateValueTypeException(unboxErrMsg("Long")); //$NON-NLS-1$
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
     public double unboxDouble() throws StateValueTypeException {
         throw new StateValueTypeException(unboxErrMsg("Double")); //$NON-NLS-1$

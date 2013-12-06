@@ -714,6 +714,7 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
      *
      * @param signal
      *            The incoming signal
+     * @since 3.0
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {

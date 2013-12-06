@@ -21,6 +21,7 @@ import org.osgi.framework.Bundle;
  * creates module from a source when requested.
  *
  * @author Geneviève Bastien
+ * @since 3.0
  */
 public interface IAnalysisModuleHelper {
 

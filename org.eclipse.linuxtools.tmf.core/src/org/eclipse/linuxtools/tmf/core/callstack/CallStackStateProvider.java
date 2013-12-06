@@ -144,6 +144,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      *            The event to check
      * @return If false, the event will be ignored by the state provider. If
      *         true processing will continue.
+     * @since 3.0
      */
     protected abstract boolean considerEvent(ITmfEvent event);
 
@@ -173,6 +174,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      * @param event
      *            The event
      * @return The thread name (as will be shown in the view)
+     * @since 3.0
      */
     protected abstract String getThreadName(ITmfEvent event);
 }

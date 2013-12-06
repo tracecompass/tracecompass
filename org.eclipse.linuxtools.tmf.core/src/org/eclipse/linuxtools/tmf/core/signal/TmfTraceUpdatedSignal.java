@@ -40,6 +40,7 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
      *            The new time range of the trace
      * @param nbEvents
      *            The number of events in the trace
+     * @since 3.0
      */
     public TmfTraceUpdatedSignal(Object source, ITmfTrace trace, TmfTimeRange range, long nbEvents) {
         super(source);
@@ -67,6 +68,7 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
      * Returns the number of events indicated by this signal
      *
      * @return the number of events indicated by this signal
+     * @since 3.0
      */
     public long getNbEvents() {
         return fNbEvents;

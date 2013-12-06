@@ -33,7 +33,8 @@ public interface ITmfStateValue {
         INTEGER,
         /** 64-bit integer value */
         LONG,
-        /** IEEE 754 double precision number */
+        /** IEEE 754 double precision number
+         * @since 3.0*/
         DOUBLE,
         /** Variable-length string value */
         STRING,
@@ -82,6 +83,7 @@ public interface ITmfStateValue {
      * @return The double contained in the state value
      * @throws StateValueTypeException
      *             If the contained value cannot be read as a double
+     * @since 3.0
      */
     double unboxDouble() throws StateValueTypeException;
 
