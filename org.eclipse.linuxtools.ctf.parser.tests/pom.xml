@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2013 Ericsson
+
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>linuxtools-lttng-parent</artifactId>
+    <groupId>org.eclipse.linuxtools.lttng</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.linuxtools.ctf.parser.tests</artifactId>
+  <groupId>org.eclipse.linuxtools.ctf</groupId>
+  <version>3.0.0-SNAPSHOT</version>
+  <packaging>eclipse-test-plugin</packaging>
+
+  <name>Linux Tools CTF Parser Tests Plug-in</name>
+
+ <build>
+    <plugins>
+        <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-surefire-plugin</artifactId>
+            <version>${tycho-version}</version>
+            <configuration>
+                <testSuite>org.eclipse.linuxtools.ctf.parser.tests</testSuite>
+                <testClass>org.eclipse.linuxtools.ctf.parser.tests.AllCtfParserTests</testClass>
+                <useUIHarness>false</useUIHarness>
+                <useUIThread>false</useUIThread>
+                <product>org.eclipse.platform.ide</product>
+            </configuration>
+        </plugin>
+    </plugins>
+  </build>
+
+</project>

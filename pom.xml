@@ -68,6 +68,7 @@
     <module>org.eclipse.linuxtools.ctf.core</module>
     <module>org.eclipse.linuxtools.ctf.core.tests</module>
     <module>org.eclipse.linuxtools.ctf.parser</module>
+    <module>org.eclipse.linuxtools.ctf.parser.tests</module>
 
     <module>org.eclipse.linuxtools.tmf</module>
     <module>org.eclipse.linuxtools.tmf.core</module>
