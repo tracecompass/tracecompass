@@ -69,7 +69,7 @@ public class MetadataTest {
      * Test toString
      */
     @Test
-    public void testToSting() {
+    public void testToString() {
         String result = fixture.toString();
         assertNotNull(result);
     }
