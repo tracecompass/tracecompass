@@ -24,6 +24,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -634,22 +635,12 @@ public class CTFTrace implements IDefinitionScope {
     /**
      * Gets the Environment variables from the trace metadata (See CTF spec)
      *
-     * @return the environment variables in a map form (key value)
+     * @return The environment variables in the form of an unmodifiable map
+     *         (key, value)
      * @since 2.0
      */
     public Map<String, String> getEnvironment() {
-        return environment;
-    }
-
-    /**
-     * Look up a specific environment variable
-     *
-     * @param key
-     *            the key to look for
-     * @return the value of the variable, can be null.
-     */
-    public String lookupEnvironment(String key) {
-        return environment.get(key);
+        return Collections.unmodifiableMap(environment);
     }
 
     /**

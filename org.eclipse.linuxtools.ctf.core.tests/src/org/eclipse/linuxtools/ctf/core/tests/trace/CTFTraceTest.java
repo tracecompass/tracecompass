@@ -357,7 +357,7 @@ public class CTFTraceTest {
     @Test
     public void testLookupEnvironment_1() {
         String key = "";
-        String result = fixture.lookupEnvironment(key);
+        String result = fixture.getEnvironment().get(key);
         assertNull(result);
     }
 
@@ -367,7 +367,7 @@ public class CTFTraceTest {
     @Test
     public void testLookupEnvironment_2() {
         String key = "otherTest";
-        String result = fixture.lookupEnvironment(key);
+        String result = fixture.getEnvironment().get(key);
         assertNull(result);
     }
 
@@ -378,7 +378,7 @@ public class CTFTraceTest {
     public void testLookupEnvironment_3() {
         String key = "test";
         fixture.addEnvironmentVar(key, key);
-        String result = fixture.lookupEnvironment(key);
+        String result = fixture.getEnvironment().get(key);
         assertTrue(result.equals(key));
     }
 
@@ -390,7 +390,7 @@ public class CTFTraceTest {
         String key = "test";
         fixture.addEnvironmentVar(key, "bozo");
         fixture.addEnvironmentVar(key, "the clown");
-        String result = fixture.lookupEnvironment(key);
+        String result = fixture.getEnvironment().get(key);
         assertNotNull(result);
     }
 
