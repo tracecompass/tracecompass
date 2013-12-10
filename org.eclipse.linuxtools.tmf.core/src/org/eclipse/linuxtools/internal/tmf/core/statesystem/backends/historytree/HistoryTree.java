@@ -65,7 +65,7 @@ class HistoryTree {
     /** Latest timestamp found in the tree (at any given moment) */
     private long treeEnd;
 
-    /** How many nodes exist in this tree, total */
+    /** The total number of nodes that exists in this tree */
     private int nodeCount;
 
     /** "Cache" to keep the active nodes in memory */
@@ -94,7 +94,7 @@ class HistoryTree {
         latestBranch = new ArrayList<CoreNode>();
 
         /* Prepare the IO object */
-        treeIO = new HT_IO(this, true);
+        treeIO = new HT_IO(config, true);
 
         /* Add the first node to the tree */
         CoreNode firstNode = initNewCoreNode(-1, conf.getTreeStart());
@@ -137,7 +137,7 @@ class HistoryTree {
         buffer.flip();
 
         /*
-         * Check the magic number,to make sure we're opening the right type of
+         * Check the magic number to make sure we're opening the right type of
          * file
          */
         res = buffer.getInt();
@@ -158,9 +158,11 @@ class HistoryTree {
         if (res != expProviderVersion &&
                 expProviderVersion != ITmfStateProvider.IGNORE_PROVIDER_VERSION) {
             /*
-             * The existing history was built using a event handler that doesn't
-             * match the current one in the framework. Information could be all
-             * wrong, so we'll force a rebuild of the history file instead.
+             * The existing history was built using an event handler that doesn't
+             * match the current one in the framework.
+             *
+             * Information could be all wrong. Instead of keeping an incorrect
+             * history file, a rebuild is done.
              */
             fc.close();
             fis.close();
@@ -182,7 +184,7 @@ class HistoryTree {
          * file, not extremely elegant. But how to pass the information here to
          * the SHT otherwise?
          */
-        this.treeIO = new HT_IO(this, false);
+        this.treeIO = new HT_IO(config, false);
 
         rebuildLatestBranch(rootNodeSeqNb);
         this.treeEnd = latestBranch.get(0).getNodeEnd();
@@ -289,12 +291,49 @@ class HistoryTree {
         return nodeCount;
     }
 
-    HT_IO getTreeIO() {
-        return treeIO;
-    }
-
     List<CoreNode> getLatestBranch() {
         return Collections.unmodifiableList(latestBranch);
+    }
+
+    // ------------------------------------------------------------------------
+    // HT_IO interface
+    // ------------------------------------------------------------------------
+
+    File supplyATWriterFile() {
+        return config.getStateFile();
+    }
+
+    FileInputStream supplyATReader() {
+        return treeIO.supplyATReader(getNodeCount());
+    }
+
+    long supplyATWriterFilePos() {
+        return HistoryTree.TREE_HEADER_SIZE
+                + ((long) getNodeCount() * config.getBlockSize());
+    }
+
+    HTNode readNode(int seqNumber) throws ClosedChannelException {
+        /* Try to read the node from memory */
+        for (HTNode node : getLatestBranch()) {
+            if (node.getSequenceNumber() == seqNumber) {
+                return node;
+            }
+        }
+
+        /* Read the node from disk */
+        return treeIO.readNode(seqNumber);
+    }
+
+    void writeNode(HTNode node) {
+        treeIO.writeNode(node);
+    }
+
+    void closeFile() {
+        treeIO.closeFile();
+    }
+
+    void deleteFile() {
+        treeIO.deleteFile();
     }
 
     // ------------------------------------------------------------------------
@@ -316,10 +355,10 @@ class HistoryTree {
 
         this.latestBranch = new ArrayList<CoreNode>();
 
-        nextChildNode = treeIO.readNodeFromDisk(rootNodeSeqNb);
+        nextChildNode = treeIO.readNode(rootNodeSeqNb);
         latestBranch.add((CoreNode) nextChildNode);
         while (latestBranch.get(latestBranch.size() - 1).getNbChildren() > 0) {
-            nextChildNode = treeIO.readNodeFromDisk(latestBranch.get(latestBranch.size() - 1).getLatestChild());
+            nextChildNode = treeIO.readNode(latestBranch.get(latestBranch.size() - 1).getLatestChild());
             latestBranch.add((CoreNode) nextChildNode);
         }
     }
@@ -516,7 +555,7 @@ class HistoryTree {
          * node has to be on disk
          */
         if (currentNode.isDone()) {
-            return treeIO.readNodeFromDisk(potentialNextSeqNb);
+            return treeIO.readNode(potentialNextSeqNb);
         }
         return treeIO.readNode(potentialNextSeqNb);
     }
