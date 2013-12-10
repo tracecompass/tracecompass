@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
  *
  * It extends HTNode by adding support for child nodes, and also extensions.
  *
- * @author alexmont
+ * @author Alexandre Montplaisir
  *
  */
 class CoreNode extends HTNode {
@@ -45,8 +45,8 @@ class CoreNode extends HTNode {
     /**
      * Initial constructor. Use this to initialize a new EMPTY node.
      *
-     * @param tree
-     *            The HistoryTree to which this node belongs
+     * @param config
+     *            Configuration of the History Tree
      * @param seqNumber
      *            The (unique) sequence number assigned to this particular node
      * @param parentSeqNumber
@@ -54,11 +54,11 @@ class CoreNode extends HTNode {
      * @param start
      *            The earliest timestamp stored in this node
      */
-    CoreNode(HistoryTree tree, int seqNumber, int parentSeqNumber,
+    CoreNode(HTConfig config, int seqNumber, int parentSeqNumber,
             long start) {
-        super(tree, seqNumber, parentSeqNumber, start);
+        super(config, seqNumber, parentSeqNumber, start);
         this.nbChildren = 0;
-        int size = getTree().getConfig().getMaxChildren();
+        int size = config.getMaxChildren();
 
         /*
          * We instantiate the two following arrays at full size right away,
@@ -72,7 +72,7 @@ class CoreNode extends HTNode {
 
     @Override
     protected void readSpecificHeader(ByteBuffer buffer) {
-        int size = getTree().getConfig().getMaxChildren();
+        int size = getConfig().getMaxChildren();
 
         extension = buffer.getInt();
         nbChildren = buffer.getInt();
@@ -96,7 +96,7 @@ class CoreNode extends HTNode {
 
     @Override
     protected void writeSpecificHeader(ByteBuffer buffer) {
-        int size = getTree().getConfig().getMaxChildren();
+        int size = getConfig().getMaxChildren();
 
         buffer.putInt(extension);
         buffer.putInt(nbChildren);
@@ -149,7 +149,7 @@ class CoreNode extends HTNode {
      *            The SHTNode object of the new child
      */
     void linkNewChild(CoreNode childNode) {
-        assert (this.nbChildren < getTree().getConfig().getMaxChildren());
+        assert (this.nbChildren < getConfig().getMaxChildren());
 
         this.children[nbChildren] = childNode.getSequenceNumber();
         this.childStart[nbChildren] = childNode.getNodeStart();
@@ -163,7 +163,7 @@ class CoreNode extends HTNode {
 
     @Override
     protected int getTotalHeaderSize() {
-        int maxChildren = getTree().getConfig().getMaxChildren();
+        int maxChildren = getConfig().getMaxChildren();
         int specificSize =
                   SIZE_INT /* 1x int (extension node) */
                 + SIZE_INT /* 1x int (nbChildren) */

@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
  * Meta-container for the History Tree. This structure contains all the
  * high-level data relevant to the tree.
  *
- * @author alexmont
+ * @author Alexandre Montplaisir
  *
  */
 class HistoryTree {
@@ -468,7 +468,7 @@ class HistoryTree {
      * @return The newly created node
      */
     private CoreNode initNewCoreNode(int parentSeqNumber, long startTime) {
-        CoreNode newNode = new CoreNode(this, this.nodeCount, parentSeqNumber,
+        CoreNode newNode = new CoreNode(config, this.nodeCount, parentSeqNumber,
                 startTime);
         this.nodeCount++;
 

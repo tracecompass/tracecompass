@@ -25,7 +25,7 @@ import java.nio.channels.FileChannel;
  * tree-file on disk and all the caching mechanisms. Every HistoryTree should
  * contain 1 and only 1 HT_IO element.
  *
- * @author alexmont
+ * @author Alexandre Montplaisir
  *
  */
 class HT_IO {
@@ -130,7 +130,7 @@ class HT_IO {
         /* Lookup on disk */
         try {
             seekFCToNodePos(fcIn, seqNumber);
-            readNode = HTNode.readNode(tree, fcIn);
+            readNode = HTNode.readNode(tree.getConfig(), fcIn);
 
             /* Put the node in the cache. */
             fNodeCache[offset] = readNode;
