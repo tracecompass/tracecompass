@@ -428,9 +428,8 @@ public class IOStructGen {
             } else {
                 trace.setByteOrder(byteOrder);
                 final DeclarationScope parentScope = scope.getParentScope();
-                String types[] = parentScope.getTypeNames();
 
-                for (String type : types) {
+                for (String type : parentScope.getTypeNames()) {
                     IDeclaration d = parentScope.lookupType(type);
                     if (d instanceof IntegerDeclaration) {
                         addByteOrder(byteOrder, parentScope, type, (IntegerDeclaration) d);
