@@ -135,9 +135,6 @@ public class CTFTrace implements IDefinitionScope {
     private static final FileFilter METADATA_FILE_FILTER = new MetadataFileFilter();
     private static final Comparator<File> METADATA_COMPARATOR = new MetadataComparator();
 
-    /** map of all the event types */
-    private final Map<Long, HashMap<Long, IEventDeclaration>> eventDecs = new HashMap<Long, HashMap<Long, IEventDeclaration>>();
-
     /** Callsite helpers */
     private CTFCallsiteComparator ctfCallsiteComparator = new CTFCallsiteComparator();
 
@@ -257,7 +254,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 2.0
      */
     public Map<Long, IEventDeclaration> getEvents(Long streamId) {
-        return eventDecs.get(streamId);
+        return streams.get(streamId).getEvents();
     }
 
     /**
@@ -630,13 +627,12 @@ public class CTFTrace implements IDefinitionScope {
             throw new ParseException("Stream id already exists"); //$NON-NLS-1$
         }
 
-        /* It should be ok now. */
+        /* This stream is valid and has a unique id. */
         streams.put(stream.getId(), stream);
-        eventDecs.put(stream.getId(), new HashMap<Long, IEventDeclaration>());
     }
 
     /**
-     * gets the Environment variables from the trace metadata (See CTF spec)
+     * Gets the Environment variables from the trace metadata (See CTF spec)
      *
      * @return the environment variables in a map form (key value)
      * @since 2.0
@@ -789,34 +785,6 @@ public class CTFTrace implements IDefinitionScope {
             retVal = nanos;
         }
         return retVal - getOffset();
-    }
-
-    /**
-     * Does a given stream contain any events?
-     *
-     * @param id
-     *            the stream ID
-     * @return true if the stream has events.
-     */
-    public boolean hasEvents(Long id) {
-        return eventDecs.containsKey(id);
-    }
-
-    /**
-     * Add an event declaration map to the events map.
-     *
-     * @param id
-     *            the id of a stream
-     * @return the hashmap containing events.
-     * @since 2.0
-     */
-    public Map<Long, IEventDeclaration> createEvents(Long id) {
-        HashMap<Long, IEventDeclaration> value = eventDecs.get(id);
-        if (value == null) {
-            value = new HashMap<Long, IEventDeclaration>();
-            eventDecs.put(id, value);
-        }
-        return value;
     }
 
     /**
