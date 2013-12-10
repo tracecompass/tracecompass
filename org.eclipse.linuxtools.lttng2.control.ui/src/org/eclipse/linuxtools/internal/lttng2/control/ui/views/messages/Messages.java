@@ -292,6 +292,13 @@ public final class Messages extends NLS {
     public static String TraceControl_VerboseLevelVeryVerbosePreference;
     public static String TraceControl_VerboseLevelVeryVeryVerbosePreference;
 
+    public static String TraceControl_ExecuteScriptJob;
+    public static String TraceControl_ExecuteScriptError;
+
+    public static String TraceControl_ExecuteScriptDialogTitle;
+    public static String TraceControl_ExecuteScriptBrowseText;
+    public static String TraceControl_ExecuteScriptSelectLabel;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

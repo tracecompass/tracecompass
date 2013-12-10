@@ -999,6 +999,20 @@ public class LTTngControlService implements ILttngControlService {
         executeCommand(command.toString(), monitor);
     }
 
+    @Override
+    public void runCommands(IProgressMonitor monitor, List<String> commands) throws ExecutionException {
+        for (String command : commands) {
+            if (monitor.isCanceled()) {
+                return;
+            }
+
+            if (command.isEmpty() || command.startsWith("#")) { //$NON-NLS-1$
+                continue;
+            }
+            executeCommand(command, monitor);
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------

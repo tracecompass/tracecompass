@@ -12,6 +12,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl;
 
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -128,6 +130,20 @@ public class TraceSessionGroup extends TraceControlComponent {
             addChild(session);
             session.getConfigurationFromNode(monitor);
         }
+    }
+
+    /**
+     * Command to execute a list of commands
+     * @param monitor
+     *            - a progress monitor
+     * @param commands
+     *            - a list of commands to execute
+     * @throws ExecutionException
+     *            If the command fails
+     */
+    public void executeCommands(IProgressMonitor monitor, List<String> commands) throws ExecutionException {
+        getControlService().runCommands(monitor, commands);
+        getTargetNode().refresh();
     }
 
     /**

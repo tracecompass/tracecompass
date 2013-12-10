@@ -64,6 +64,12 @@
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.execute.command.script.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.executeScript"
+            name="%commands.control.execute.command.script">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
             description="%commands.control.destroy.session.description"
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.destroySession"
             name="%commands.control.destroy.session">
@@ -348,6 +354,24 @@
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createSession"
                icon="icons/elcl16/add_button.gif"
                label="%commands.control.create.session"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.executeScript"
+               icon="icons/elcl16/add_button.gif"
+               label="%commands.control.execute.command.script"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -877,6 +901,21 @@
       <handler
             class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.CreateSessionHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createSession">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.ExecuteCommandScriptHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.executeScript">
          <activeWhen>
             <with
                   variable="selection">

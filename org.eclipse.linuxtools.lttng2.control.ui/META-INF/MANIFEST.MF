@@ -38,7 +38,8 @@ Export-Package: org.eclipse.linuxtools.internal.lttng2.control.ui;x-fr
  x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",org.eclip
  se.linuxtools.internal.lttng2.control.ui.views.service;x-friends:="or
  g.eclipse.linuxtools.lttng2.control.ui.tests"
-Import-Package: org.eclipse.rse.core,
+Import-Package: com.google.common.collect,
+ org.eclipse.rse.core,
  org.eclipse.rse.core.model,
  org.eclipse.rse.core.subsystems,
  org.eclipse.rse.services,

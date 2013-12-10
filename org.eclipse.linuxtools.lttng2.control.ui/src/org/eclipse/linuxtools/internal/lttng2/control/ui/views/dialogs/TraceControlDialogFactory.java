@@ -49,6 +49,11 @@ public final class TraceControlDialogFactory {
     private ICreateSessionDialog fCreateSessionDialog;
 
     /**
+     * The command script selection dialog.
+     */
+    private ISelectCommandScriptDialog fCommandScriptDialog;
+
+    /**
      * The enable events dialog.
      */
     private IEnableEventsDialog fEnableEventsDialog;
@@ -146,6 +151,16 @@ public final class TraceControlDialogFactory {
             fCreateSessionDialog = new CreateSessionDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
         return fCreateSessionDialog;
+    }
+
+    /**
+     * @return command script selection dialog implementation
+     */
+    public ISelectCommandScriptDialog getCommandScriptDialog() {
+        if (fCommandScriptDialog == null) {
+            fCommandScriptDialog = new OpenCommandScriptDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+        }
+        return fCommandScriptDialog;
     }
 
     /**

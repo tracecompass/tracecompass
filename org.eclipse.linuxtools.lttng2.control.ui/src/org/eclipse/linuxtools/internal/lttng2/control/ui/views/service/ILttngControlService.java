@@ -381,4 +381,17 @@ public interface ILttngControlService {
      */
     void recordSnapshot(String sessionName, IProgressMonitor monitor)
             throws ExecutionException;
+
+    /**
+     * Executes a list of commands
+     *
+     * @param monitor
+     *      - a progress monitor
+     * @param commands
+     *      - array of commands
+     * @throws ExecutionException
+     *      If a command fails
+     */
+    void runCommands(IProgressMonitor monitor, List<String> commands)
+            throws ExecutionException;
 }
