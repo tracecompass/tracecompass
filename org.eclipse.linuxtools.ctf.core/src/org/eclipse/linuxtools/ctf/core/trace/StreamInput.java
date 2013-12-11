@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.UUID;
@@ -122,15 +122,6 @@ public class StreamInput implements IDefinitionScope {
      */
     StreamInputPacketIndex getIndex() {
         return index;
-    }
-
-    /**
-     * Gets the filechannel of the streamInput. This is a limited Java resource.
-     *
-     * @return the filechannel
-     */
-    public FileChannel getFileChannel() {
-        return fileChannel;
     }
 
     /**
@@ -299,6 +290,10 @@ public class StreamInput implements IDefinitionScope {
                 + ((packetIndex.getPacketSizeBits() + 7) / 8);
     }
 
+    ByteBuffer getByteBufferAt(long position, long size) throws IOException {
+        return fileChannel.map(MapMode.READ_ONLY, position, size);
+    }
+
     /**
      * @param fileSizeBytes
      * @param packetOffsetBytes
@@ -307,7 +302,7 @@ public class StreamInput implements IDefinitionScope {
      * @return
      * @throws CTFReaderException
      */
-    private MappedByteBuffer createPacketBitBuffer(long fileSizeBytes,
+    private ByteBuffer createPacketBitBuffer(long fileSizeBytes,
             long packetOffsetBytes, StreamInputPacketIndexEntry packetIndex,
             BitBuffer bitBuffer) throws CTFReaderException {
         /*
@@ -328,10 +323,10 @@ public class StreamInput implements IDefinitionScope {
         /*
          * Map the packet.
          */
-        MappedByteBuffer bb;
+        ByteBuffer bb;
 
         try {
-            bb = fileChannel.map(MapMode.READ_ONLY, packetOffsetBytes, mapSize);
+            bb = getByteBufferAt(packetOffsetBytes, mapSize);
         } catch (IOException e) {
             throw new CTFReaderException(e);
         }

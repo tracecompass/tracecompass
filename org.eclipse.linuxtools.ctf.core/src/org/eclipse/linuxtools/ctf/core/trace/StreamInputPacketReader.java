@@ -12,8 +12,7 @@
 package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel.MapMode;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 
 import org.eclipse.linuxtools.ctf.core.CTFStrings;
@@ -216,10 +215,9 @@ public class StreamInputPacketReader implements IDefinitionScope {
             /*
              * Change the map of the BitBuffer.
              */
-            MappedByteBuffer bb = null;
+            ByteBuffer bb = null;
             try {
-                bb = streamInputReader.getStreamInput().getFileChannel()
-                        .map(MapMode.READ_ONLY,
+                bb = streamInputReader.getStreamInput().getByteBufferAt(
                                 this.currentPacket.getOffsetBytes(),
                                 (this.currentPacket.getPacketSizeBits() + 7) / 8);
             } catch (IOException e) {
