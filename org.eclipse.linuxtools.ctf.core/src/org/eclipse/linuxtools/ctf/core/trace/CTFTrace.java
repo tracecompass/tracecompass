@@ -48,7 +48,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.event.CTFCallsiteComparator;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
-import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndex;
 
 /**
  * A CTF trace on the file system.
@@ -138,9 +137,6 @@ public class CTFTrace implements IDefinitionScope {
 
     /** map of all the event types */
     private final Map<Long, HashMap<Long, IEventDeclaration>> eventDecs = new HashMap<Long, HashMap<Long, IEventDeclaration>>();
-
-    /** map of all the indexes */
-    private final Map<StreamInput, StreamInputPacketIndex> indexes = new HashMap<StreamInput, StreamInputPacketIndex>();
 
     /** Callsite helpers */
     private CTFCallsiteComparator ctfCallsiteComparator = new CTFCallsiteComparator();
@@ -262,20 +258,6 @@ public class CTFTrace implements IDefinitionScope {
      */
     public Map<Long, IEventDeclaration> getEvents(Long streamId) {
         return eventDecs.get(streamId);
-    }
-
-    /**
-     * Gets an index for a given StreamInput
-     *
-     * @param id
-     *            the StreamInput
-     * @return The index
-     */
-    StreamInputPacketIndex getIndex(StreamInput id) {
-        if (!indexes.containsKey(id)) {
-            indexes.put(id, new StreamInputPacketIndex());
-        }
-        return indexes.get(id);
     }
 
     /**
