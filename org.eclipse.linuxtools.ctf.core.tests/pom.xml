@@ -94,6 +94,7 @@
                 <fileset><directory>traces/kernel</directory></fileset>
                 <fileset><directory>traces/kernel_vm</directory></fileset>
                 <fileset><directory>traces/synctraces</directory></fileset>
+                <fileset><directory>traces/synthetic-trace</directory></fileset>
                 <fileset><directory>traces/trace2</directory></fileset>
               </filesets>
             </configuration>
