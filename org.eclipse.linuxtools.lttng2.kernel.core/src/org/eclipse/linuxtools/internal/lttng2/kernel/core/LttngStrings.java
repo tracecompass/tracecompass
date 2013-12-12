@@ -49,6 +49,7 @@ public interface LttngStrings {
     static final String IRQ = "irq";
     static final String COMM = "comm";
     static final String NAME = "name";
+    static final String PID = "pid";
     static final String TID = "tid";
     static final String PPID = "ppid";
     static final String STATUS = "status";
