@@ -46,7 +46,7 @@ public final class AttributeTree {
      * @param ss
      *            The StateSystem to which this AT is attached
      */
-    AttributeTree(StateSystem ss) {
+    public AttributeTree(StateSystem ss) {
         this.ss = ss;
         this.attributeList = Collections.synchronizedList(new ArrayList<Attribute>());
         this.attributeTreeRoot = new AlphaNumAttribute(null, "root", -1); //$NON-NLS-1$
@@ -62,8 +62,9 @@ public final class AttributeTree {
      *            File stream where to read the AT information. Make sure it's
      *            sought at the right place!
      * @throws IOException
+     *             If there is a problem reading from the file stream
      */
-    AttributeTree(StateSystem ss, FileInputStream fis) throws IOException {
+    public AttributeTree(StateSystem ss, FileInputStream fis) throws IOException {
         this(ss);
         DataInputStream in = new DataInputStream(new BufferedInputStream(fis));
 
@@ -134,15 +135,15 @@ public final class AttributeTree {
     }
 
     /**
-     * Tell the Attribute Tree to write itself somewhere. The passed
-     * FileOutputStream defines where (which file/position).
+     * Tell the Attribute Tree to write itself somewhere in a file.
      *
-     * @param fos
-     *            Where to write. Make sure it's sought at the right position
-     *            you want.
+     * @param file
+     *            The file to write to
+     * @param pos
+     *            The position (in bytes) in the file where to write
      * @return The total number of bytes written.
      */
-    int writeSelf(File file, long pos) {
+    public int writeSelf(File file, long pos) {
         int total = 0;
         byte[] curByteArray;
 
@@ -193,24 +194,26 @@ public final class AttributeTree {
      * this also equals the integer value (quark) the next added attribute will
      * have.
      *
-     * @return
+     * @return The current number of attributes in the tree
      */
-    int getNbAttributes() {
+    public int getNbAttributes() {
         return attributeList.size();
     }
 
     /**
-     * This is the version to specifically add missing attributes.
+     * Get the quark for a given attribute path. No new attribute will be
+     * created : if the specified path does not exist, throw an error.
      *
-     * If 'numericalNode' is true, all the new attributes created will be of
-     * type 'NumericalNode' instead of 'AlphaNumNode'. Be careful with this, if
-     * you do not want ALL added attributes to be numerical, call this function
-     * first with 'false' to create the parent nodes, then call it again to make
-     * sure only the final node is numerical.
-     *
+     * @param startingNodeQuark
+     *            The quark of the attribute from which relative queries will
+     *            start. Use '-1' to start at the root node.
+     * @param subPath
+     *            The path to the attribute, relative to the starting node.
+     * @return The quark of the specified attribute
      * @throws AttributeNotFoundException
+     *             If the specified path was not found
      */
-    int getQuarkDontAdd(int startingNodeQuark, String... subPath)
+    public int getQuarkDontAdd(int startingNodeQuark, String... subPath)
             throws AttributeNotFoundException {
         assert (startingNodeQuark >= -1);
 
@@ -243,9 +246,21 @@ public final class AttributeTree {
         return knownQuark;
     }
 
-    // FIXME synchronized here is probably quite costly... maybe only locking
-    // the "for" would be enough?
-    synchronized int getQuarkAndAdd(int startingNodeQuark, String... subPath) {
+    /**
+     * Get the quark of a given attribute path. If that specified path does not
+     * exist, it will be created (and the quark that was just created will be
+     * returned).
+     *
+     * @param startingNodeQuark
+     *            The quark of the attribute from which relative queries will
+     *            start. Use '-1' to start at the root node.
+     * @param subPath
+     *            The path to the attribute, relative to the starting node.
+     * @return The quark of the attribute represented by the path
+     */
+    public synchronized int getQuarkAndAdd(int startingNodeQuark, String... subPath) {
+        // FIXME synchronized here is probably quite costly... maybe only locking
+        // the "for" would be enough?
         assert (subPath != null && subPath.length > 0);
         assert (startingNodeQuark >= -1);
 
@@ -305,19 +320,21 @@ public final class AttributeTree {
         return knownQuark;
     }
 
-    int getSubAttributesCount(int quark) {
-        return attributeList.get(quark).getSubAttributes().size();
-    }
-
     /**
      * Returns the sub-attributes of the quark passed in parameter
      *
      * @param attributeQuark
+     *            The quark of the attribute to print the sub-attributes of.
      * @param recursive
-     * @return
+     *            Should the query be recursive or not? If false, only children
+     *            one level deep will be returned. If true, all descendants will
+     *            be returned (depth-first search)
+     * @return The list of quarks representing the children attributes
      * @throws AttributeNotFoundException
+     *             If 'attributeQuark' is invalid, or if there is no attrbiute
+     *             associated to it.
      */
-    List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
+    public List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
             throws AttributeNotFoundException {
         List<Integer> listOfChildren = new ArrayList<>();
         Attribute startingAttribute;
@@ -350,18 +367,38 @@ public final class AttributeTree {
         }
     }
 
-    String getAttributeName(int quark) {
+    /**
+     * Get then base name of an attribute specified by a quark.
+     *
+     * @param quark
+     *            The quark of the attribute
+     * @return The (base) name of the attribute
+     */
+    public String getAttributeName(int quark) {
         return attributeList.get(quark).getName();
     }
 
-    String getFullAttributeName(int quark) {
+    /**
+     * Get the full path name of an attribute specified by a quark.
+     *
+     * @param quark
+     *            The quark of the attribute
+     * @return The full path name of the attribute
+     */
+    public String getFullAttributeName(int quark) {
         if (quark >= attributeList.size() || quark < 0) {
             return null;
         }
         return attributeList.get(quark).getFullAttributeName();
     }
 
-    void debugPrint(PrintWriter writer) {
+    /**
+     * Debug-print all the attributes in the tree.
+     *
+     * @param writer
+     *            The writer where to print the output
+     */
+    public void debugPrint(PrintWriter writer) {
         attributeTreeRoot.debugPrint(writer);
     }
 
