@@ -15,11 +15,11 @@ package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytre
 import java.io.File;
 
 /**
- * Configuration object for a StateHistoryTree.
+ * Configuration object for the {@link HistoryTree}.
  *
- * @author alexmont
+ * @author Alexandre Montplaisir
  */
-final class HTConfig {
+public final class HTConfig {
 
     private static final int DEFAULT_BLOCKSIZE = 64 * 1024;
     private static final int DEFAULT_MAXCHILDREN = 50;
@@ -30,7 +30,25 @@ final class HTConfig {
     private final int providerVersion;
     private final long treeStart;
 
-    HTConfig(File newStateFile, int blockSize, int maxChildren,
+    /**
+     * Full constructor.
+     *
+     * @param newStateFile
+     *            The name of the history file
+     * @param blockSize
+     *            The size of each "block" on disk. One node will always fit in
+     *            one block.
+     * @param maxChildren
+     *            The maximum number of children allowed per core (non-leaf)
+     *            node.
+     * @param providerVersion
+     *            The version of the state provider. If a file already exists,
+     *            and their versions match, the history file will not be rebuilt
+     *            uselessly.
+     * @param startTime
+     *            The start time of the history
+     */
+    public HTConfig(File newStateFile, int blockSize, int maxChildren,
             int providerVersion, long startTime) {
         this.stateFile = newStateFile;
         this.blockSize = blockSize;
@@ -40,12 +58,19 @@ final class HTConfig {
     }
 
     /**
-     * Version using default values for blocksize and maxchildren
+     * Version of the constructor using default values for 'blockSize' and
+     * 'maxChildren'.
      *
-     * @param stateFileName
+     * @param newStateFile
+     *            The name of the history file
+     * @param providerVersion
+     *            The version of the state provider. If a file already exists,
+     *            and their versions match, the history file will not be rebuilt
+     *            uselessly.
      * @param startTime
+     *            The start time of the history
      */
-    HTConfig(File newStateFile, int providerVersion, long startTime) {
+    public HTConfig(File newStateFile, int providerVersion, long startTime) {
         this(newStateFile, DEFAULT_BLOCKSIZE, DEFAULT_MAXCHILDREN, providerVersion, startTime);
     }
 
@@ -53,22 +78,47 @@ final class HTConfig {
     // Getters
     // ------------------------------------------------------------------------
 
+    /**
+     * Get the history file.
+     *
+     * @return The history file
+     */
     public File getStateFile() {
         return stateFile;
     }
 
+    /**
+     * Get the configure block size.
+     *
+     * @return The block size
+     */
     public int getBlockSize() {
         return blockSize;
     }
 
+    /**
+     * Get the maximum amount of children allowed.
+     *
+     * @return The maximum amount of children
+     */
     public int getMaxChildren() {
         return maxChildren;
     }
 
+    /**
+     * Get the state provider's version.
+     *
+     * @return The state provider's version
+     */
     public int getProviderVersion() {
         return providerVersion;
     }
 
+    /**
+     * Get the start time of the history
+     *
+     * @return The start time
+     */
     public long getTreeStart() {
         return treeStart;
     }

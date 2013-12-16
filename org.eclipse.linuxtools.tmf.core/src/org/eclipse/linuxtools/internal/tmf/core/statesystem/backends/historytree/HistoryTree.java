@@ -32,9 +32,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
  * high-level data relevant to the tree.
  *
  * @author Alexandre Montplaisir
- *
  */
-class HistoryTree {
+public class HistoryTree {
 
     /**
      * Size of the "tree header" in the tree-file The nodes will use this offset
@@ -76,10 +75,16 @@ class HistoryTree {
     // ------------------------------------------------------------------------
 
     /**
-     * Create a new State History from scratch, using a SHTConfig object for
-     * configuration
+     * Create a new State History from scratch, using a {@link HTConfig} object
+     * for configuration.
+     *
+     * @param conf
+     *            The config to use for this History Tree.
+     * @throws IOException
+     *             If an error happens trying to open/write to the file
+     *             specified in the config
      */
-    HistoryTree(HTConfig conf) throws IOException {
+    public HistoryTree(HTConfig conf) throws IOException {
         /*
          * Simple check to make sure we have enough place in the 0th block
          * for the tree configuration
@@ -105,13 +110,14 @@ class HistoryTree {
      * "Reader" constructor : instantiate a SHTree from an existing tree file on
      * disk
      *
-     * @param existingFileName
+     * @param existingStateFile
      *            Path/filename of the history-file we are to open
      * @param expProviderVersion
      *            The expected version of the state provider
      * @throws IOException
+     *             If an error happens reading the file
      */
-    HistoryTree(File existingStateFile, int expProviderVersion) throws IOException {
+    public HistoryTree(File existingStateFile, int expProviderVersion) throws IOException {
         /*
          * Open the file ourselves, get the tree header information we need,
          * then pass on the descriptor to the TreeIO object.
@@ -204,7 +210,7 @@ class HistoryTree {
      * @param requestedEndTime
      *            The greatest timestamp present in the history tree
      */
-    void closeTree(long requestedEndTime) {
+    public void closeTree(long requestedEndTime) {
         ByteBuffer buffer;
         int i, res;
 
@@ -267,23 +273,39 @@ class HistoryTree {
     // Accessors
     // ------------------------------------------------------------------------
 
-    HTConfig getConfig() {
-        return config;
-    }
-
-    long getTreeStart() {
+    /**
+     * Get the start time of this tree.
+     *
+     * @return The start time
+     */
+    public long getTreeStart() {
         return config.getTreeStart();
     }
 
-    long getTreeEnd() {
+    /**
+     * Get the current end time of this tree.
+     *
+     * @return The end time
+     */
+    public long getTreeEnd() {
         return treeEnd;
     }
 
-    int getNodeCount() {
+    /**
+     * Get the number of nodes in this tree.
+     *
+     * @return The number of nodes
+     */
+    public int getNodeCount() {
         return nodeCount;
     }
 
-    List<CoreNode> getLatestBranch() {
+    /**
+     * Return the latest (right-most) branch of nodes.
+     *
+     * @return The latest branch
+     */
+    public List<CoreNode> getLatestBranch() {
         return Collections.unmodifiableList(latestBranch);
     }
 
@@ -291,20 +313,47 @@ class HistoryTree {
     // HT_IO interface
     // ------------------------------------------------------------------------
 
-    File supplyATWriterFile() {
-        return config.getStateFile();
-    }
-
-    FileInputStream supplyATReader() {
+    /**
+     * Return the FileInputStream reader with which we will read an attribute
+     * tree (it will be sought to the correct position).
+     *
+     * @return The FileInputStream indicating the file and position from which
+     *         the attribute tree can be read.
+     */
+    public FileInputStream supplyATReader() {
         return treeIO.supplyATReader(getNodeCount());
     }
 
-    long supplyATWriterFilePos() {
+    /**
+     * Return the file to which we will write the attribute tree.
+     *
+     * @return The file to which we will write the attribute tree
+     */
+    public File supplyATWriterFile() {
+        return config.getStateFile();
+    }
+
+    /**
+     * Return the position in the file (given by {@link #supplyATWriterFile})
+     * where to start writing the attribute tree.
+     *
+     * @return The position in the file where to start writing
+     */
+    public long supplyATWriterFilePos() {
         return HistoryTree.TREE_HEADER_SIZE
                 + ((long) getNodeCount() * config.getBlockSize());
     }
 
-    HTNode readNode(int seqNumber) throws ClosedChannelException {
+    /**
+     * Read a node from the tree.
+     *
+     * @param seqNumber
+     *            The sequence number of the node to read
+     * @return The node
+     * @throws ClosedChannelException
+     *             If the tree IO is unavailable
+     */
+    public HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Try to read the node from memory */
         for (HTNode node : getLatestBranch()) {
             if (node.getSequenceNumber() == seqNumber) {
@@ -316,15 +365,27 @@ class HistoryTree {
         return treeIO.readNode(seqNumber);
     }
 
-    void writeNode(HTNode node) {
+    /**
+     * Write a node object to the history file.
+     *
+     * @param node
+     *            The node to write to disk
+     */
+    public void writeNode(HTNode node) {
         treeIO.writeNode(node);
     }
 
-    void closeFile() {
+    /**
+     * Close the history file.
+     */
+    public void closeFile() {
         treeIO.closeFile();
     }
 
-    void deleteFile() {
+    /**
+     * Delete the history file.
+     */
+    public void deleteFile() {
         treeIO.deleteFile();
     }
 
@@ -356,12 +417,14 @@ class HistoryTree {
     }
 
     /**
-     * Insert an interval in the tree
+     * Insert an interval in the tree.
      *
      * @param interval
      *            The interval to be inserted
+     * @throws TimeRangeException
+     *             If the start of end time of the interval are invalid
      */
-    void insertInterval(HTInterval interval) throws TimeRangeException {
+    public void insertInterval(HTInterval interval) throws TimeRangeException {
         if (interval.getStartTime() < config.getTreeStart()) {
             throw new TimeRangeException();
         }
@@ -523,7 +586,7 @@ class HistoryTree {
      * @throws ClosedChannelException
      *             If the file channel was closed while we were reading the tree
      */
-    HTNode selectNextChild(CoreNode currentNode, long t) throws ClosedChannelException {
+    public HTNode selectNextChild(CoreNode currentNode, long t) throws ClosedChannelException {
         assert (currentNode.getNbChildren() > 0);
         int potentialNextSeqNb = currentNode.getSequenceNumber();
 
@@ -552,7 +615,12 @@ class HistoryTree {
         return treeIO.readNode(potentialNextSeqNb);
     }
 
-    long getFileSize() {
+    /**
+     * Get the current size of the history file.
+     *
+     * @return The history file size
+     */
+    public long getFileSize() {
         return config.getStateFile().length();
     }
 
@@ -560,10 +628,19 @@ class HistoryTree {
     // Test/debugging methods
     // ------------------------------------------------------------------------
 
-    /* Only used for debugging, shouldn't be externalized */
+    /**
+     * Debugging method to make sure all intervals contained in the given node
+     * have valid start and end times.
+     *
+     * @param zenode
+     *            The node to check
+     * @return True if everything is fine, false if there is at least one
+     *         invalid timestamp (end time < start time, time outside of the
+     *         range of the node, etc.)
+     */
     @SuppressWarnings("nls")
-    boolean checkNodeIntegrity(HTNode zenode) {
-
+    public boolean checkNodeIntegrity(HTNode zenode) {
+        /* Only used for debugging, shouldn't be externalized */
         HTNode otherNode;
         CoreNode node;
         StringBuffer buf = new StringBuffer();
@@ -631,7 +708,11 @@ class HistoryTree {
         return ret;
     }
 
-    void checkIntegrity() {
+    /**
+     * Check the integrity of all the nodes in the tree. Calls
+     * {@link #checkNodeIntegrity} for every node in the tree.
+     */
+    public void checkIntegrity() {
         try {
             for (int i = 0; i < nodeCount; i++) {
                 checkNodeIntegrity(treeIO.readNode(i));
@@ -694,7 +775,7 @@ class HistoryTree {
      * @param printIntervals
      *            Flag to enable full output of the interval information
      */
-    void debugPrintFullTree(PrintWriter writer, boolean printIntervals) {
+    public void debugPrintFullTree(PrintWriter writer, boolean printIntervals) {
         /* Only used for debugging, shouldn't be externalized */
 
         this.preOrderPrint(writer, false, latestBranch.get(0), 0);

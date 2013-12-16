@@ -30,7 +30,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  *
  * @author Alexandre Montplaisir
  */
-abstract class HTNode {
+public abstract class HTNode {
 
     /**
      * Size of an entry in the data section.
@@ -62,7 +62,19 @@ abstract class HTNode {
     /* Vector containing all the intervals contained in this node */
     private final List<HTInterval> intervals;
 
-    HTNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) {
+    /**
+     * Constructor
+     *
+     * @param config
+     *            Configuration of the History Tree
+     * @param seqNumber
+     *            The (unique) sequence number assigned to this particular node
+     * @param parentSeqNumber
+     *            The sequence number of this node's parent node
+     * @param start
+     *            The earliest timestamp stored in this node
+     */
+    protected HTNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) {
         this.config = config;
         this.nodeStart = start;
         this.sequenceNumber = seqNumber;
@@ -74,17 +86,19 @@ abstract class HTNode {
     }
 
     /**
-     * Reader factory constructor. Build a Node object (of the right type) by
-     * reading a block in the file.
+     * Reader factory method. Build a Node object (of the right type) by reading
+     * a block in the file.
      *
      * @param config
      *            Configuration of the History Tree
      * @param fc
      *            FileChannel to the history file, ALREADY SEEKED at the start
      *            of the node.
+     * @return The node object
      * @throws IOException
+     *             If there was an error reading from the file channel
      */
-    static final HTNode readNode(HTConfig config, FileChannel fc)
+    public static final HTNode readNode(HTConfig config, FileChannel fc)
             throws IOException {
         HTNode newNode = null;
         int res, i;
@@ -145,7 +159,16 @@ abstract class HTNode {
         return newNode;
     }
 
-    final void writeSelf(FileChannel fc) throws IOException {
+    /**
+     * Write this node to the given file channel.
+     *
+     * @param fc
+     *            The file channel to write to (should be sought to be correct
+     *            position)
+     * @throws IOException
+     *             If there was an error writing
+     */
+    public final void writeSelf(FileChannel fc) throws IOException {
         final int blockSize = config.getBlockSize();
         int curStringsEntryEndPos = blockSize;
 
@@ -201,38 +224,71 @@ abstract class HTNode {
     // Accessors
     // ------------------------------------------------------------------------
 
-    HTConfig getConfig() {
+    /**
+     * Retrieve the history tree configuration used for this node.
+     *
+     * @return The history tree config
+     */
+    protected HTConfig getConfig() {
         return config;
     }
 
-    long getNodeStart() {
+    /**
+     * Get the start time of this node.
+     *
+     * @return The start time of this node
+     */
+    public long getNodeStart() {
         return nodeStart;
     }
 
-    long getNodeEnd() {
+    /**
+     * Get the end time of this node.
+     *
+     * @return The end time  of this node
+     */
+    public long getNodeEnd() {
         if (this.isDone) {
             return nodeEnd;
         }
         return 0;
     }
 
-    int getSequenceNumber() {
+    /**
+     * Get the sequence number of this node.
+     *
+     * @return The sequence number of this node
+     */
+    public int getSequenceNumber() {
         return sequenceNumber;
     }
 
-    int getParentSequenceNumber() {
+    /**
+     * Get the sequence number of this node's parent.
+     *
+     * @return The parent sequence number
+     */
+    public int getParentSequenceNumber() {
         return parentSequenceNumber;
     }
 
     /**
      * Change this node's parent. Used when we create a new root node for
      * example.
+     *
+     * @param newParent
+     *            The sequence number of the node that is the new parent
      */
-    void setParentSequenceNumber(int newParent) {
+    public void setParentSequenceNumber(int newParent) {
         parentSequenceNumber = newParent;
     }
 
-    boolean isDone() {
+    /**
+     * Return if this node is "done" (full and written to disk).
+     *
+     * @return If this node is done or not
+     */
+    public boolean isDone() {
         return isDone;
     }
 
@@ -240,8 +296,9 @@ abstract class HTNode {
      * Add an interval to this node
      *
      * @param newInterval
+     *            Interval to add to this node
      */
-    void addInterval(HTInterval newInterval) {
+    public void addInterval(HTInterval newInterval) {
         /* Just in case, but should be checked before even calling this function */
         assert (newInterval.getIntervalSize() <= this.getNodeFreeSpace());
 
@@ -257,9 +314,8 @@ abstract class HTNode {
      *
      * @param endtime
      *            The nodeEnd time that the node will have
-     * @throws TimeRangeException
      */
-    void closeThisNode(long endtime) {
+    public void closeThisNode(long endtime) {
         assert (endtime >= this.nodeStart);
 
         if (intervals.size() > 0) {
@@ -293,8 +349,9 @@ abstract class HTNode {
      *            The timestamp for which the query is for. Only return
      *            intervals that intersect t.
      * @throws TimeRangeException
+     *             If 't' is invalid
      */
-    void writeInfoFromNode(List<ITmfStateInterval> stateInfo, long t)
+    public void writeInfoFromNode(List<ITmfStateInterval> stateInfo, long t)
             throws TimeRangeException {
         assert (this.isDone); // not sure this will always be the case...
         int startIndex;
@@ -321,12 +378,14 @@ abstract class HTNode {
      * key/timestamp pair cannot be found, we return null.
      *
      * @param key
+     *            The attribute quark to look for
      * @param t
+     *            The timestamp
      * @return The Interval containing the information we want, or null if it
      *         wasn't found
-     * @throws TimeRangeException
+     * @throws TimeRangeException If 't' is invalid
      */
-    HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
+    public HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
         assert (this.isDone);
         int startIndex;
         HTInterval curInterval;
@@ -403,16 +462,21 @@ abstract class HTNode {
     /**
      * Returns the free space in the node, which is simply put, the
      * stringSectionOffset - dataSectionOffset
+     *
+     * @return The amount of free space in the node (in bytes)
      */
-    int getNodeFreeSpace() {
+    public int getNodeFreeSpace() {
         return stringSectionOffset - this.getDataSectionEndOffset();
     }
 
     /**
-     * Returns the current space utilisation of this node, as a percentage.
+     * Returns the current space utilization of this node, as a percentage.
      * (used space / total usable space, which excludes the header)
+     *
+     * @return The percentage (value between 0 and 100) of space utilization in
+     *         in this node.
      */
-    long getNodeUsagePRC() {
+    public long getNodeUsagePercent() {
         final int blockSize = config.getBlockSize();
         float freePercent = (float) this.getNodeFreeSpace()
                 / (float) (blockSize - this.getTotalHeaderSize())
@@ -420,6 +484,13 @@ abstract class HTNode {
         return (long) (100L - freePercent);
     }
 
+    /**
+     * Convert from a boolean to a byte primitive.
+     *
+     * @param thebool
+     *            The boolean to convert
+     * @return A byte worth 0 (false) or 1 (true)
+     */
     protected static final byte boolToByte(boolean thebool) {
         if (thebool) {
             return (byte) 1;
@@ -427,7 +498,14 @@ abstract class HTNode {
         return (byte) 0;
     }
 
-    static final boolean byteToBool(byte thebyte) {
+    /**
+     * Convert from a byte primitive (0 or 1) to a boolean.
+     *
+     * @param thebyte
+     *            The byte to convert
+     * @return True if 'thebyte' is 1, false otherwise
+     */
+    protected static final boolean byteToBool(byte thebyte) {
         return (thebyte == (byte) 1);
     }
 
@@ -441,7 +519,7 @@ abstract class HTNode {
         /* Only used for debugging, shouldn't be externalized */
         StringBuffer buf = new StringBuffer("Node #" + sequenceNumber + ", ");
         buf.append(this.toStringSpecific());
-        buf.append(intervals.size() + " intervals (" + this.getNodeUsagePRC()
+        buf.append(intervals.size() + " intervals (" + this.getNodeUsagePercent()
                 + "% used), ");
 
         buf.append("[" + this.nodeStart + " - ");
@@ -460,7 +538,7 @@ abstract class HTNode {
      *            PrintWriter in which we will print the debug output
      */
     @SuppressWarnings("nls")
-    void debugPrintIntervals(PrintWriter writer) {
+    public void debugPrintIntervals(PrintWriter writer) {
         /* Only used for debugging, shouldn't be externalized */
         writer.println("Node #" + sequenceNumber + ":");
 
@@ -502,13 +580,42 @@ abstract class HTNode {
     // Abstract methods
     // ------------------------------------------------------------------------
 
-    protected abstract byte getNodeType();
+    /**
+     * Get the byte value representing the node type.
+     *
+     * @return The node type
+     */
+    public abstract byte getNodeType();
 
-    protected abstract int getTotalHeaderSize();
+    /**
+     * Return the total header size of this node type.
+     *
+     * @return The total header size
+     */
+    public abstract int getTotalHeaderSize();
 
-    protected abstract void readSpecificHeader(ByteBuffer buffer);
+    /**
+     * Read the type-specific part of the node header from a byte buffer.
+     *
+     * @param buffer
+     *            The byte buffer to read from. It should be already positioned
+     *            correctly.
+     */
+    public abstract void readSpecificHeader(ByteBuffer buffer);
 
-    protected abstract void writeSpecificHeader(ByteBuffer buffer);
+    /**
+     * Write the type-specific part of the header in a byte buffer.
+     *
+     * @param buffer
+     *            The buffer to write to. It should already be at the correct
+     *            position.
+     */
+    public abstract void writeSpecificHeader(ByteBuffer buffer);
 
-    protected abstract String toStringSpecific();
+    /**
+     * Node-type-specific toString method. Used for debugging.
+     *
+     * @return A string representing the node
+     */
+    public abstract String toStringSpecific();
 }

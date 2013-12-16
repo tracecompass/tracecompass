@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
  * @author Alexandre Montplaisir
  *
  */
-class CoreNode extends HTNode {
+public class CoreNode extends HTNode {
 
     /** Number of bytes in a int */
     private static final int SIZE_INT = 4;
@@ -40,7 +40,7 @@ class CoreNode extends HTNode {
     private long[] childStart;
 
     /** Seq number of this node's extension. -1 if none */
-    private int extension;
+    private int extension = -1;
 
     /**
      * Initial constructor. Use this to initialize a new EMPTY node.
@@ -54,7 +54,7 @@ class CoreNode extends HTNode {
      * @param start
      *            The earliest timestamp stored in this node
      */
-    CoreNode(HTConfig config, int seqNumber, int parentSeqNumber,
+    protected CoreNode(HTConfig config, int seqNumber, int parentSeqNumber,
             long start) {
         super(config, seqNumber, parentSeqNumber, start);
         this.nbChildren = 0;
@@ -71,7 +71,7 @@ class CoreNode extends HTNode {
     }
 
     @Override
-    protected void readSpecificHeader(ByteBuffer buffer) {
+    public void readSpecificHeader(ByteBuffer buffer) {
         int size = getConfig().getMaxChildren();
 
         extension = buffer.getInt();
@@ -95,7 +95,7 @@ class CoreNode extends HTNode {
     }
 
     @Override
-    protected void writeSpecificHeader(ByteBuffer buffer) {
+    public void writeSpecificHeader(ByteBuffer buffer) {
         int size = getConfig().getMaxChildren();
 
         buffer.putInt(extension);
@@ -118,27 +118,61 @@ class CoreNode extends HTNode {
         }
     }
 
-    int getNbChildren() {
+    /**
+     * Return the number of child nodes this node has.
+     *
+     * @return The number of child nodes
+     */
+    public int getNbChildren() {
         return nbChildren;
     }
 
-    int getChild(int index) {
+    /**
+     * Get the child node corresponding to the specified index
+     *
+     * @param index The index of the child to lookup
+     * @return The child node
+     */
+    public int getChild(int index) {
         return children[index];
     }
 
-    int getLatestChild() {
+    /**
+     * Get the latest (right-most) child node of this node.
+     *
+     * @return The latest child node
+     */
+    public int getLatestChild() {
         return children[nbChildren - 1];
     }
 
-    long getChildStart(int index) {
+    /**
+     * Get the start time of the specified child node.
+     *
+     * @param index
+     *            The index of the child node
+     * @return The start time of the that child node.
+     */
+    public long getChildStart(int index) {
         return childStart[index];
     }
 
-    long getLatestChildStart() {
+    /**
+     * Get the start time of the latest (right-most) child node.
+     *
+     * @return The start time of the latest child
+     */
+    public long getLatestChildStart() {
         return childStart[nbChildren - 1];
     }
 
-    int getExtensionSequenceNumber() {
+    /**
+     * Get the sequence number of the extension to this node (if there is one).
+     *
+     * @return The sequence number of the extended node. '-1' is returned if
+     *         there is no extension node.
+     */
+    public int getExtensionSequenceNumber() {
         return extension;
     }
 
@@ -148,7 +182,7 @@ class CoreNode extends HTNode {
      * @param childNode
      *            The SHTNode object of the new child
      */
-    void linkNewChild(CoreNode childNode) {
+    public void linkNewChild(CoreNode childNode) {
         assert (this.nbChildren < getConfig().getMaxChildren());
 
         this.children[nbChildren] = childNode.getSequenceNumber();
@@ -157,12 +191,12 @@ class CoreNode extends HTNode {
     }
 
     @Override
-    protected byte getNodeType() {
+    public byte getNodeType() {
         return 1;
     }
 
     @Override
-    protected int getTotalHeaderSize() {
+    public int getTotalHeaderSize() {
         int maxChildren = getConfig().getMaxChildren();
         int specificSize =
                   SIZE_INT /* 1x int (extension node) */
@@ -178,7 +212,7 @@ class CoreNode extends HTNode {
     }
 
     @Override
-    protected String toStringSpecific() {
+    public String toStringSpecific() {
         /* Only used for debugging, shouldn't be externalized */
         return "Core Node, " + nbChildren + " children, "; //$NON-NLS-1$ //$NON-NLS-2$
     }

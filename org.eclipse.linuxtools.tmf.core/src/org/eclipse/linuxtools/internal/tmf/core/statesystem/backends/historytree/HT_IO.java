@@ -56,7 +56,7 @@ class HT_IO {
      * @throws IOException
      *             An exception can be thrown when file cannot be accessed
      */
-    HT_IO(HTConfig config, boolean newFile) throws IOException {
+    public HT_IO(HTConfig config, boolean newFile) throws IOException {
         fConfig = config;
 
         File historyTreeFile = config.getStateFile();
@@ -87,16 +87,17 @@ class HT_IO {
     }
 
     /**
-     * This method here isn't private, if we know for sure the node cannot be in
-     * memory it's a bit faster to use this directly (when opening a file from
-     * disk for example)
+     * Read a node from the file on disk.
      *
+     * @param seqNumber
+     *            The sequence number of the node to read.
+     * @return The object representing the node
      * @throws ClosedChannelException
      *             Usually happens because the file was closed while we were
      *             reading. Instead of using a big reader-writer lock, we'll
      *             just catch this exception.
      */
-    synchronized HTNode readNode(int seqNumber) throws ClosedChannelException {
+    public synchronized HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Do a cache lookup */
         int offset = seqNumber & (CACHE_SIZE - 1);
         HTNode readNode = fNodeCache[offset];
@@ -121,7 +122,7 @@ class HT_IO {
         }
     }
 
-    void writeNode(HTNode node) {
+    public void writeNode(HTNode node) {
         try {
             /* Insert the node into the cache. */
             int seqNumber = node.getSequenceNumber();
@@ -137,11 +138,11 @@ class HT_IO {
         }
     }
 
-    FileChannel getFcOut() {
+    public  FileChannel getFcOut() {
         return this.fcOut;
     }
 
-    FileInputStream supplyATReader(int nodeOffset) {
+    public FileInputStream supplyATReader(int nodeOffset) {
         try {
             /*
              * Position ourselves at the start of the Mapping section in the
@@ -154,7 +155,7 @@ class HT_IO {
         return fis;
     }
 
-    synchronized void closeFile() {
+    public synchronized void closeFile() {
         try {
             fis.close();
             fos.close();
@@ -163,7 +164,7 @@ class HT_IO {
         }
     }
 
-    synchronized void deleteFile() {
+    public synchronized void deleteFile() {
         closeFile();
 
         File historyTreeFile = fConfig.getStateFile();

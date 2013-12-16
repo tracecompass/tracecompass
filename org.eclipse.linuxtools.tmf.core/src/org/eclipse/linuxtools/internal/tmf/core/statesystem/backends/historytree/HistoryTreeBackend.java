@@ -277,7 +277,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         try {
             for (int seq = 0; seq < sht.getNodeCount(); seq++) {
                 node = sht.readNode(seq);
-                total += node.getNodeUsagePRC();
+                total += node.getNodeUsagePercent();
             }
         } catch (ClosedChannelException e) {
             e.printStackTrace();
