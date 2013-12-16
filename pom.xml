@@ -43,7 +43,11 @@
       </comments>
     </license>
   </licenses>
-  
+
+<properties>
+  <base.test.vmargs>-Xms256m -Xmx1024m -XX:MaxPermSize=256m</base.test.vmargs>
+</properties>
+
 <profiles>
   <profile>
     <id>tracingRcp</id>
@@ -59,8 +63,29 @@
       <modules>
         <module>org.eclipse.linuxtools.lttng.releng-site</module>
       </modules>
-  </profile> 
-
+  </profile>
+  <profile>
+    <id>macosx</id>
+    <activation>
+      <os>
+        <family>mac</family>
+      </os>
+    </activation>
+    <properties>
+      <base.ui.test.vmargs>${base.test.vmargs} -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</base.ui.test.vmargs>
+    </properties>
+  </profile>
+  <profile>
+    <id>not-macosx</id>
+    <activation>
+      <os>
+        <family>!mac</family>
+      </os>
+    </activation>
+    <properties>
+      <base.ui.test.vmargs>${base.test.vmargs}</base.ui.test.vmargs>
+    </properties>
+  </profile>
 </profiles>
 
   <modules>
