@@ -8,23 +8,28 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Bernd Hufmann - Use state system analysis module instead of factory
  ******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
-import java.io.IOException;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,23 +45,29 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     private static File stateFile;
     private static File stateFileBenchmark;
 
+    private static final String TEST_FILE_NAME = "test.ht";
+    private static final String BENCHMARK_FILE_NAME = "test.benchmark.ht";
+
     /**
      * Initialize the test cases (build the history file once for all tests).
      */
     @BeforeClass
     public static void initialize() {
         assumeTrue(testTrace.exists());
-        try {
-            stateFile = File.createTempFile("test", ".ht");
-            stateFileBenchmark = File.createTempFile("test", ".ht.benchmark");
+        stateFile = createStateFile(TEST_FILE_NAME);
+        stateFileBenchmark = createStateFile(BENCHMARK_FILE_NAME);
 
-            input = new LttngKernelStateProvider(testTrace.getTrace());
-            ssq = TmfStateSystemFactory.newFullHistory(stateFile, input, true);
-        } catch (IOException e) {
-            fail();
-        } catch (TmfTraceException e) {
+        TestLttngKernelAnalysisModule module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
+        try {
+            module.setTrace(testTrace.getTrace());
+        } catch (TmfAnalysisException e) {
             fail();
         }
+        module.schedule();
+        assertTrue(module.waitForCompletion(new NullProgressMonitor()));
+        ssq = module.getStateSystem();
+
+        assertNotNull(ssq);
     }
 
     /**
@@ -78,16 +89,19 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
      */
     @Test
     public void testBuild() {
+        TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(BENCHMARK_FILE_NAME);
         try {
-            ITmfStateProvider input2 = new LttngKernelStateProvider(testTrace.getTrace());
-            ITmfStateSystem ssb2 = TmfStateSystemFactory.newFullHistory(stateFileBenchmark, input2, true);
-
-            assertEquals(startTime, ssb2.getStartTime());
-            assertEquals(endTime, ssb2.getCurrentEndTime());
-
-        } catch (TmfTraceException e) {
+            module2.setTrace(testTrace.getTrace());
+        } catch (TmfAnalysisException e) {
             fail();
         }
+        module2.schedule();
+        assertTrue(module2.waitForCompletion(new NullProgressMonitor()));
+        ITmfStateSystem ssb2 = module2.getStateSystem();
+
+        assertNotNull(ssb2);
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
     }
 
     /**
@@ -95,17 +109,66 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
      */
     @Test
     public void testOpenExistingStateFile() {
+        /* 'newStateFile' should have already been created */
+        TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            /* 'newStateFile' should have already been created */
-            ITmfStateSystem ssb2 = TmfStateSystemFactory.newFullHistory(stateFile, null, true);
+            module2.setTrace(testTrace.getTrace());
+        } catch (TmfAnalysisException e) {
+            fail();
+        }
+        module2.schedule();
+        assertTrue(module2.waitForCompletion(new NullProgressMonitor()));
+        ITmfStateSystem ssb2 = module2.getStateSystem();
 
-            assertNotNull(ssb2);
-            assertEquals(startTime, ssb2.getStartTime());
-            assertEquals(endTime, ssb2.getCurrentEndTime());
+        assertNotNull(ssb2);
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
+    }
 
-         } catch (TmfTraceException e) {
-             fail();
-         }
+    private static class TestLttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
+
+        private final String htFileName;
+
+        /**
+         * Constructor adding the views to the analysis
+         * @param htFileName
+         *      The History File Name
+         */
+        public TestLttngKernelAnalysisModule(String htFileName) {
+            super();
+            this.htFileName = htFileName;
+        }
+
+        @Override
+        public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+            if (!(trace instanceof CtfTmfTrace)) {
+                throw new IllegalStateException("TestLttngKernelAnalysisModule: trace should be of type CtfTmfTrace"); //$NON-NLS-1$
+            }
+            super.setTrace(trace);
+        }
+
+        @Override
+        protected ITmfStateProvider createStateProvider() {
+            return new LttngKernelStateProvider((CtfTmfTrace) getTrace());
+        }
+
+        @Override
+        protected StateSystemBackendType getBackendType() {
+            return StateSystemBackendType.FULL;
+        }
+
+        @Override
+        protected String getSsFileName() {
+            return htFileName;
+        }
+    }
+
+    private static File createStateFile(String name) {
+        File file = new File(TmfTraceManager.getSupplementaryFileDir(testTrace.getTrace()) + name);
+        if (file.exists()) {
+            file.delete();
+        }
+        return file;
     }
 
 }
