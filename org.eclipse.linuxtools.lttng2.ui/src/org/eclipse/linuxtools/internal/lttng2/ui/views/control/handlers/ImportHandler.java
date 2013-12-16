@@ -40,7 +40,6 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ImportFil
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
-import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -102,18 +101,16 @@ public class ImportHandler extends BaseControlViewHandler {
 
             // create default project
             IProject project = TmfProjectRegistry.createProject(DEFAULT_REMOTE_PROJECT_NAME, null, null);
-            TmfImportHelper.forceFolderRefresh(project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME));
 
             if (param.getSession().isStreamedTrace()) {
                 // Streamed trace
-                TmfProjectElement projectElement = TmfProjectRegistry.getProject(project);
+                TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                 TmfTraceFolder traceFolder = projectElement.getTracesFolder();
 
                 BatchImportTraceWizard wizard = new BatchImportTraceWizard();
                 wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(traceFolder));
                 WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
                 dialog.open();
-                traceFolder.refresh();
                 return null;
             }
 
@@ -141,9 +138,8 @@ public class ImportHandler extends BaseControlViewHandler {
 
                             // Set trace type
                             IFolder traceFolder = selectedProject.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
-                            TmfImportHelper.forceFolderRefresh(traceFolder);
 
-                            if(monitor.isCanceled()) {
+                            if (monitor.isCanceled()) {
                                 status.add(Status.CANCEL_STATUS);
                                 break;
                             }

@@ -125,9 +125,7 @@ public class ExportTracePackageSelectTraceWizardPage extends WizardPage {
                 TableItem[] items = projectTable.getSelection();
                 fSelectedProject = (IProject) items[0].getData();
 
-                // Make sure all the elements are created
-                new TmfNavigatorContentProvider().getChildren(fSelectedProject);
-                TmfProjectElement project = TmfProjectRegistry.getProject(fSelectedProject);
+                TmfProjectElement project = TmfProjectRegistry.getProject(fSelectedProject, true);
 
                 TmfTraceFolder tracesFolder = project.getTracesFolder();
                 List<TmfTraceElement> traces = tracesFolder.getTraces();

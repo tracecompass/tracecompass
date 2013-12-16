@@ -761,7 +761,6 @@ public final class TmfTraceType {
      */
     public static IStatus setTraceType(IPath path, TraceTypeHelper traceType) throws CoreException {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-        String TRACE_NAME = path.lastSegment();
         String traceBundle = null, traceTypeId = traceType.getCanonicalName(), traceIcon = null;
         if (TmfTraceType.isCustomTraceId(traceTypeId)) {
             traceBundle = Activator.getDefault().getBundle().getSymbolicName();
@@ -776,29 +775,16 @@ public final class TmfTraceType {
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
         resource.setPersistentProperty(TmfCommonConstants.TRACEICON, traceIcon);
 
-        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject());
-        if (tmfProject != null) {
-            final TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
-            tracesFolder.refresh();
-
-            List<TmfTraceElement> traces = tracesFolder.getTraces();
-            boolean found = false;
-            for (TmfTraceElement traceElement : traces) {
-                if (traceElement.getName().equals(resource.getName())) {
-                    traceElement.refreshTraceType();
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                TmfTraceElement te = new TmfTraceElement(TRACE_NAME, resource, tracesFolder);
-                te.refreshTraceType();
-                traces = tracesFolder.getTraces();
-                for (TmfTraceElement traceElement : traces) {
-                    traceElement.refreshTraceType();
-                }
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject(), true);
+        final TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
+        List<TmfTraceElement> traces = tracesFolder.getTraces();
+        for (TmfTraceElement traceElement : traces) {
+            if (traceElement.getName().equals(resource.getName())) {
+                traceElement.refreshTraceType();
+                break;
             }
         }
+        tmfProject.refresh();
         return Status.OK_STATUS;
     }
 

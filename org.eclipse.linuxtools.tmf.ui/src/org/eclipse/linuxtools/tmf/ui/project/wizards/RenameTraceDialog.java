@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.swt.SWT;
@@ -64,7 +63,6 @@ public class RenameTraceDialog extends SelectionStatusDialog {
     private Text fNewTraceNameText;
     private String fNewTraceName;
     private final IContainer fTraceFolder;
-    private final TmfProjectElement fProject;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -79,7 +77,6 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         fTrace = trace;
         TmfTraceFolder folder = (TmfTraceFolder) trace.getParent();
         fTraceFolder = folder.getResource();
-        fProject = trace.getProject();
         setTitle(Messages.RenameTraceDialog_DialogTitle);
         setStatusLineAboveButtons(true);
     }
@@ -196,10 +193,6 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         }
         setSelectionResult(new IResource[] { trace });
         super.okPressed();
-
-        if (fProject != null) {
-            fProject.refresh();
-        }
     }
 
     private IResource renameTrace(final String newName) {

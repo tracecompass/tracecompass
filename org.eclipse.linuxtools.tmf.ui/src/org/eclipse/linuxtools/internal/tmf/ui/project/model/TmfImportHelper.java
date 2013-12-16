@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorContentProvider;
 
 /**
  * Import helper used to import traces
@@ -71,20 +70,7 @@ public class TmfImportHelper {
                 Activator.getDefault().logError(result.getMessage());
             }
         }
-        forceFolderRefresh(parentFolder);
         res = parentFolder.findMember(targetName);
         return res;
-    }
-
-    /**
-     * Refresh the folders to have sub-folders
-     *
-     * @param parentFolder
-     *            the folder to refresh
-     */
-    public static void forceFolderRefresh(IFolder parentFolder) {
-        final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
-        // force the model to be populated
-        ncp.getChildren(parentFolder.getProject());
     }
 }

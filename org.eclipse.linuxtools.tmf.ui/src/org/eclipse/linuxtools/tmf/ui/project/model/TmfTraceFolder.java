@@ -14,9 +14,13 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
@@ -87,9 +91,34 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     }
 
     @Override
-    public void refresh() {
-        TmfProjectElement project = (TmfProjectElement) getParent();
-        project.refresh();
+    void refreshChildren() {
+        IFolder folder = getResource();
+
+        // Get the children from the model
+        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();
+        for (ITmfProjectModelElement element : getChildren()) {
+            childrenMap.put(element.getResource().getName(), element);
+        }
+
+        try {
+            IResource[] members = folder.members();
+            for (IResource resource : members) {
+                String name = resource.getName();
+                ITmfProjectModelElement element = childrenMap.get(name);
+                if (element instanceof TmfTraceElement) {
+                    childrenMap.remove(name);
+                } else {
+                    element = new TmfTraceElement(name, resource, this);
+                }
+                ((TmfTraceElement) element).refreshChildren();
+            }
+        } catch (CoreException e) {
+        }
+
+        // Cleanup dangling children from the model
+        for (ITmfProjectModelElement danglingChild : childrenMap.values()) {
+            removeChild(danglingChild);
+        }
     }
 
     // ------------------------------------------------------------------------

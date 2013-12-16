@@ -185,10 +185,8 @@ public class TmfOpenTraceHelper {
         final IWorkspace workspace = ResourcesPlugin.getWorkspace();
         final IWorkspaceRoot root = workspace.getRoot();
         IProject project = root.getProject(projectRoot);
-        TmfImportHelper.forceFolderRefresh(project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME));
-
-        final TmfProjectElement project2 = TmfProjectRegistry.getProject(project, true);
-        final TmfTraceFolder tracesFolder = project2.getTracesFolder();
+        final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+        final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
         final List<TmfTraceElement> traces = tracesFolder.getTraces();
         TmfTraceElement found = null;
         for (TmfTraceElement candidate : traces) {

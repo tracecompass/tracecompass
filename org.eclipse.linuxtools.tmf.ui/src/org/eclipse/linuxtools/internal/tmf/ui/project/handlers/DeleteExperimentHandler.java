@@ -92,9 +92,6 @@ public class DeleteExperimentHandler extends AbstractHandler {
                         // Finally, delete the experiment
                         resource.delete(true, null);
 
-                        // Refresh the project
-                        experiment.getProject().refresh();
-
                     } catch (final CoreException e) {
                         Display.getDefault().asyncExec(new Runnable() {
                             @Override

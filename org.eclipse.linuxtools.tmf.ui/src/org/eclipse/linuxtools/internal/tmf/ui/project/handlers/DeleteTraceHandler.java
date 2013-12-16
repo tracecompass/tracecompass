@@ -113,10 +113,6 @@ public class DeleteTraceHandler extends AbstractHandler {
                 final TmfTraceElement trace = (TmfTraceElement) element;
                 try {
                     trace.delete(null);
-
-                    // Refresh the project
-                    trace.getProject().refresh();
-
                 } catch (final CoreException e) {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override

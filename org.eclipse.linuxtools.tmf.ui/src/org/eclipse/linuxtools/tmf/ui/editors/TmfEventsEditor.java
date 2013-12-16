@@ -53,7 +53,6 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.Messages;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorContentProvider;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
@@ -125,9 +124,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 }
                 if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
                     // Special case: experiment bookmark resource
-                    final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
-                    ncp.getChildren(fFile.getProject()); // force the model to be populated
-                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
+                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     if (project == null) {
                         throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                     }
@@ -144,9 +141,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     }
                 } else if (traceTypeId.equals(TmfTrace.class.getCanonicalName())) {
                     // Special case: trace bookmark resource
-                    final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
-                    ncp.getChildren(fFile.getProject()); // force the model to be populated
-                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
+                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
                         final String traceName = fFile.getParent().getName();
                         if (projectElement.getName().equals(traceName)) {
@@ -159,9 +154,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                         }
                     }
                 } else {
-                    final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
-                    ncp.getChildren(fFile.getProject()); // force the model to be populated
-                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
+                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
                         if (projectElement.getResource().equals(fFile)) {
                             final TmfTraceElement traceElement = (TmfTraceElement) projectElement;

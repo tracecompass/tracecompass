@@ -192,6 +192,15 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
     }
 
     // ------------------------------------------------------------------------
+    // TmfProjectModelElement
+    // ------------------------------------------------------------------------
+
+    @Override
+    void refreshChildren() {
+        refreshAnalysis();
+    }
+
+    // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /**

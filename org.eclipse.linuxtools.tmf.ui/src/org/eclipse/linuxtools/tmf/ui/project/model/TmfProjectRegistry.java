@@ -9,10 +9,12 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Added project creation utility
+ *   Patrick Tasse - Refactor resource change listener
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +22,9 @@ import java.util.Map;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -28,6 +33,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 /**
  * Factory class storing TMF tracing projects and creating TMF project model elements.
@@ -35,10 +42,19 @@ import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfProjectRegistry {
+public class TmfProjectRegistry implements IResourceChangeListener {
+
+    // Create the singleton instance
+    static {
+        new TmfProjectRegistry();
+    }
 
     // The map of project resource to project model elements
     private static Map<IProject, TmfProjectElement> registry = new HashMap<>();
+
+    private TmfProjectRegistry() {
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+    }
 
     /**
      * Get the project model element for a project resource
@@ -60,6 +76,8 @@ public class TmfProjectRegistry {
         if (element == null && force) {
             registry.put(project, new TmfProjectElement(project.getName(), project, null));
             element = registry.get(project);
+            // force the model to be populated
+            element.refreshChildren();
         }
         return element;
     }
@@ -76,49 +94,84 @@ public class TmfProjectRegistry {
      * @return the IProject object or null
      * @since 2.0
      */
-    public static IProject createProject(String projectName, URI projectLocation, IProgressMonitor monitor) {
+    public static IProject createProject(String projectName, final URI projectLocation, IProgressMonitor monitor) {
 
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
-        IProject project = root.getProject(projectName);
-        try {
-            if (!project.exists()) {
-                IProjectDescription description = workspace.newProjectDescription(project.getName());
-                if (projectLocation != null) {
-                    description.setLocationURI(projectLocation);
+        final IProject project = root.getProject(projectName);
+        WorkspaceModifyOperation action = new WorkspaceModifyOperation() {
+            @Override
+            protected void execute(IProgressMonitor progressMonitor) throws CoreException, InvocationTargetException, InterruptedException {
+                if (!project.exists()) {
+                    IProjectDescription description = workspace.newProjectDescription(project.getName());
+                    if (projectLocation != null) {
+                        description.setLocationURI(projectLocation);
+                    }
+                    project.create(description, progressMonitor);
                 }
-                project.create(description, monitor);
+
+                if (!project.isOpen()) {
+                    project.open(progressMonitor);
+                }
+
+                IProjectDescription description = project.getDescription();
+                description.setNatureIds(new String[] { TmfProjectNature.ID });
+                project.setDescription(description, null);
+
+                IFolder folder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+                if (!folder.exists()) {
+                    folder.create(true, true, null);
+                }
+
+                folder = project.getFolder(TmfExperimentFolder.EXPER_FOLDER_NAME);
+                if (!folder.exists()) {
+                    folder.create(true, true, null);
+                }
+
+                // create folder for supplementary tracing files
+                folder = project.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
+
+                if (!folder.exists()) {
+                    folder.create(true, true, null);
+                }
             }
-
-            if (!project.isOpen()) {
-                project.open(monitor);
-            }
-
-            IProjectDescription description = project.getDescription();
-            description.setNatureIds(new String[] { TmfProjectNature.ID });
-            project.setDescription(description, null);
-
-            IFolder folder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
-            if (!folder.exists()) {
-                folder.create(true, true, null);
-            }
-
-            folder = project.getFolder(TmfExperimentFolder.EXPER_FOLDER_NAME);
-            if (!folder.exists()) {
-                folder.create(true, true, null);
-            }
-
-            // create folder for supplementary tracing files
-            folder = project.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
-
-            if (!folder.exists()) {
-                folder.create(true, true, null);
-            }
-            return project;
-        } catch (CoreException e) {
+        };
+        try {
+            PlatformUI.getWorkbench().getProgressService().run(false, false, action);
+        } catch (InvocationTargetException e) {
             Activator.getDefault().logError("Error creating TMF project " + project.getName(), e); //$NON-NLS-1$
+        } catch (InterruptedException e) {
         }
-        return null;
+        return project;
+    }
+
+    // ------------------------------------------------------------------------
+    // IResourceChangeListener
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void resourceChanged(IResourceChangeEvent event) {
+        if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+            for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
+                if (delta.getResource() instanceof IProject) {
+                    IProject project = (IProject) delta.getResource();
+                    try {
+                        if (delta.getKind() == IResourceDelta.CHANGED &&
+                                project.isOpen() && project.hasNature(TmfProjectNature.ID)) {
+                            TmfProjectElement projectElement = getProject(project, true);
+                            projectElement.refresh();
+                        } else if (delta.getKind() == IResourceDelta.REMOVED) {
+                            registry.remove(project);
+                        }
+                    } catch (CoreException e) {
+                        Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$
+                    }
+                }
+            }
+        }
     }
 
 }

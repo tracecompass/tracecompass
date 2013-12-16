@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -61,10 +61,6 @@ public class BatchImportTraceHandler extends AbstractHandler {
         wizard.init(PlatformUI.getWorkbench(), selection);
         WizardDialog dialog = new WizardDialog(activeWorkbenchWindow.getShell(), wizard);
         dialog.open();
-
-        if (traceFolder != null) {
-            traceFolder.refresh();
-        }
 
         return null;
     }

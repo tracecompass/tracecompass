@@ -30,7 +30,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -63,7 +62,6 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
     private final TmfExperimentElement fExperiment;
     private Text fNewExperimentName;
     private IFolder fExperimentFolder;
-    private TmfProjectElement fProject;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -82,7 +80,6 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         fExperiment = experiment;
         TmfExperimentFolder folder = (TmfExperimentFolder) experiment.getParent();
         fExperimentFolder = folder.getResource();
-        fProject = experiment.getProject();
         setTitle(Messages.CopyExperimentDialog_DialogTitle);
         setStatusLineAboveButtons(true);
     }
@@ -189,10 +186,6 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         }
         setSelectionResult(new IFolder[] { folder });
         super.okPressed();
-
-        if (fProject != null) {
-            fProject.refresh();
-        }
     }
 
     private IFolder copyExperiment(final String newName) {

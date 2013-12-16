@@ -13,8 +13,6 @@
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -111,56 +109,49 @@ public class RenameTraceHandler extends AbstractHandler {
         // Fire the Rename Trace dialog
         Shell shell = window.getShell();
         TmfTraceFolder traceFolder = (TmfTraceFolder) fTrace.getParent();
-        TmfTraceElement oldTrace = fTrace;
+        final TmfTraceElement oldTrace = fTrace;
         RenameTraceDialog dialog = new RenameTraceDialog(shell, fTrace);
         if (dialog.open() != Window.OK) {
             return null;
         }
 
         // Locate the new trace object
-        TmfTraceElement newTrace = null;
+        TmfTraceElement trace = null;
         String newTraceName = dialog.getNewTraceName();
         for (ITmfProjectModelElement element : traceFolder.getChildren()) {
-            if (element instanceof TmfTraceElement) {
-                TmfTraceElement trace = (TmfTraceElement) element;
-                if (trace.getName().equals(newTraceName)) {
-                    newTrace = trace;
-                    break;
-                }
+            if (element instanceof TmfTraceElement && element.getName().equals(newTraceName)) {
+                trace = (TmfTraceElement) element;
+                break;
             }
         }
+        final TmfTraceElement newTrace = trace;
         if (newTrace == null) {
             return null;
         }
 
-        List<WorkspaceModifyOperation> removeOps = new ArrayList<>();
-        TmfExperimentFolder experimentFolder = newTrace.getProject().getExperimentsFolder();
-        for (final ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
-            for (final ITmfProjectModelElement trace : experiment.getChildren()) {
-                if (trace.getName().equals(oldTrace.getName())) {
-                    // Create a link to the renamed trace
-                    createTraceLink(newTrace, experiment);
-
-                    // Queue the removal of the old trace link
-                    removeOps.add(new WorkspaceModifyOperation() {
-                        @Override
-                        protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
-                            experiment.removeChild(trace);
-                            trace.getResource().delete(true, null);
-                            experiment.refresh();
+        WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
+            @Override
+            protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
+                TmfExperimentFolder experimentFolder = newTrace.getProject().getExperimentsFolder();
+                for (final ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
+                    ITmfProjectModelElement[] traces = experiment.getChildren().toArray(new ITmfProjectModelElement[0]);
+                    for (final ITmfProjectModelElement expTrace : traces) {
+                        if (expTrace.getName().equals(oldTrace.getName())) {
+                            // Create a link to the renamed trace
+                            createTraceLink(newTrace, experiment);
+                            // Remove the old trace link
+                            expTrace.getResource().delete(true, null);
                         }
-                    });
+                    }
                 }
             }
-        }
+        };
 
-        for (WorkspaceModifyOperation operation : removeOps) {
-            try {
-                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
-            } catch (InterruptedException exception) {
-            } catch (InvocationTargetException exception) {
-            } catch (RuntimeException exception) {
-            }
+        try {
+            PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
+        } catch (InterruptedException exception) {
+        } catch (InvocationTargetException exception) {
+        } catch (RuntimeException exception) {
         }
 
         return null;
@@ -199,7 +190,6 @@ public class RenameTraceHandler extends AbstractHandler {
                     Activator.getDefault().logError("RenamaeTraceHandler: Invalid Trace Location: " + location); //$NON-NLS-1$
                 }
             }
-            experiment.refresh();
         } catch (CoreException e) {
             Activator.getDefault().logError("Error renaming trace" + trace.getName(), e); //$NON-NLS-1$
         }

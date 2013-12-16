@@ -120,7 +120,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
         // If target is a project, use its trace folder
         if (targetToUse instanceof IProject) {
-            TmfProjectElement projectElement = TmfProjectRegistry.getProject((IProject) targetToUse);
+            TmfProjectElement projectElement = TmfProjectRegistry.getProject((IProject) targetToUse, true);
             if (projectElement != null) {
                 targetToUse = projectElement.getTracesFolder();
             }
