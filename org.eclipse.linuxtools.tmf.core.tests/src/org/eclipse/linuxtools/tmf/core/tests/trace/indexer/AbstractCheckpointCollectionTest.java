@@ -216,9 +216,9 @@ public abstract class AbstractCheckpointCollectionTest {
     public void testVersionChange() throws IOException {
         fCheckpointCollection.setIndexComplete();
         fCheckpointCollection.dispose();
-        RandomAccessFile f = new RandomAccessFile(fFile, "rw");
-        f.writeInt(-1);
-        f.close();
+        try (RandomAccessFile f = new RandomAccessFile(fFile, "rw");) {
+            f.writeInt(-1);
+        }
 
         fCheckpointCollection = createCollection();
         assertTrue(fCheckpointCollection.isCreatedFromScratch());
@@ -253,7 +253,7 @@ public abstract class AbstractCheckpointCollectionTest {
         }
 
         boolean random = true;
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         for (int i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
             if (random) {
                 Random rand = new Random();
@@ -302,7 +302,7 @@ public abstract class AbstractCheckpointCollectionTest {
         }
 
         boolean random = true;
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         for (int i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
             if (random) {
                 Random rand = new Random();

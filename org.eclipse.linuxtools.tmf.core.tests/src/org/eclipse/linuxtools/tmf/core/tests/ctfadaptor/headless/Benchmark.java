@@ -40,7 +40,7 @@ public class Benchmark {
 
         // Work variables
         Long nbEvent = 0L;
-        final Vector<Double> benchs = new Vector<Double>();
+        final Vector<Double> benchs = new Vector<>();
         CtfTmfTrace trace = null;
         long start, stop;
         for (int loops = 0; loops < NUM_LOOPS; loops++) {

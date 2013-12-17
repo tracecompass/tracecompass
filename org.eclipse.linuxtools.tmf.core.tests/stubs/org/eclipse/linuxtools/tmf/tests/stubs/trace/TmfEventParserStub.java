@@ -51,7 +51,7 @@ public class TmfEventParserStub implements ITmfEventParser {
         fEventStream = eventStream;
         fTypes = new TmfEventType[NB_TYPES];
         for (int i = 0; i < NB_TYPES; i++) {
-            final Vector<String> fields = new Vector<String>();
+            final Vector<String> fields = new Vector<>();
             for (int j = 1; j <= i; j++) {
                 final String field = "Fmt-" + i + "-Fld-" + j;
                 fields.add(field);

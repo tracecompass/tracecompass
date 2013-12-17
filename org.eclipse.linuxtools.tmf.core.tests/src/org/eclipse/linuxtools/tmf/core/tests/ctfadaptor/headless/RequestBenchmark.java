@@ -42,7 +42,7 @@ public class RequestBenchmark extends TmfEventRequest {
     // Work variables
     private static int nbEvent = 0;
     private static TmfExperiment fExperiment = null;
-    private static Vector<Double> benchs = new Vector<Double>();
+    private static Vector<Double> benchs = new Vector<>();
 
     /**
      * Run the benchmark

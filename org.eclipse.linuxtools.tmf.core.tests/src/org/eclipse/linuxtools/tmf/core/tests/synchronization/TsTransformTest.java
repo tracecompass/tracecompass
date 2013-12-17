@@ -82,7 +82,7 @@ public class TsTransformTest {
      */
     @Test
     public void testEquality() {
-        Map<ITmfTimestampTransform, String> map = new HashMap<ITmfTimestampTransform, String>();
+        Map<ITmfTimestampTransform, String> map = new HashMap<>();
         ITmfTimestampTransform ttl = new TmfTimestampTransformLinear(BigDecimal.valueOf(2.0), BigDecimal.valueOf(3));
         ITmfTimestampTransform ttl2 = new TmfTimestampTransformLinear(BigDecimal.valueOf(2.0), BigDecimal.valueOf(3));
         ITmfTimestampTransform ttl3 = new TmfTimestampTransformLinear(BigDecimal.valueOf(3), BigDecimal.valueOf(3));

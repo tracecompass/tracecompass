@@ -103,7 +103,7 @@ public class TmfEventProviderTest {
     @Test
     public void testGetPlainEvents() {
         final int NB_EVENTS = 1000;
-        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<>();
 
         // Get the TmfSyntheticEventStub provider
         ITmfEventProvider[] eventProviders = TmfProviderManager.getProviders(ITmfEvent.class,
@@ -146,8 +146,8 @@ public class TmfEventProviderTest {
         final int NUMBER_EVENTS_BEFORE_CANCEL_REQ1 = 10;
         final int NUMBER_EVENTS_BEFORE_CANCEL_REQ2 = 800;
 
-        final Vector<ITmfEvent> requestedEventsReq1 = new Vector<ITmfEvent>();
-        final Vector<ITmfEvent> requestedEventsReq2 = new Vector<ITmfEvent>();
+        final Vector<ITmfEvent> requestedEventsReq1 = new Vector<>();
+        final Vector<ITmfEvent> requestedEventsReq2 = new Vector<>();
 
         // Get the TmfSyntheticEventStub provider
         ITmfEventProvider[] eventProviders = TmfProviderManager.getProviders(ITmfEvent.class,
@@ -252,7 +252,7 @@ public class TmfEventProviderTest {
     private static void getSyntheticData(final TmfTimeRange range,
             final int nbEvents) throws InterruptedException {
 
-        final Vector<ITmfEvent> requestedEvents = new Vector<ITmfEvent>();
+        final Vector<ITmfEvent> requestedEvents = new Vector<>();
 
         // Get the event provider
         ITmfEventProvider[] eventProviders = TmfProviderManager

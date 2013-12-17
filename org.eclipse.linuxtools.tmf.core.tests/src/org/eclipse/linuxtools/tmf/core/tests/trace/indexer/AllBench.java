@@ -60,33 +60,33 @@ public class AllBench {
 
     private static void generateDataFile(ArrayList<Integer> list, int checkpointsNums) throws IOException {
         File randomDataFile = new File("data" + checkpointsNums);
-        RandomAccessFile f = new RandomAccessFile(randomDataFile, "rw");
-        if (randomDataFile.exists()) {
-            for (int i = 0; i < checkpointsNums; i++) {
-                Random rand = new Random();
-                int nextInt = rand.nextInt(checkpointsNums);
-                list.add(nextInt);
-                f.writeInt(nextInt);
-            }
-        } else {
-            for (int i = 0; i < checkpointsNums; i++) {
-                list.add(f.readInt());
+        try (RandomAccessFile f = new RandomAccessFile(randomDataFile, "rw");) {
+            if (randomDataFile.exists()) {
+                for (int i = 0; i < checkpointsNums; i++) {
+                    Random rand = new Random();
+                    int nextInt = rand.nextInt(checkpointsNums);
+                    list.add(nextInt);
+                    f.writeInt(nextInt);
+                }
+            } else {
+                for (int i = 0; i < checkpointsNums; i++) {
+                    list.add(f.readInt());
+                }
             }
         }
-        f.close();
     }
 
     @SuppressWarnings("javadoc")
     public static void main(String[] args) throws IOException {
         int checkpointsNums [] = new int [] { 5000, 50000, 500000, 1000000 };
-        nums = new ArrayList<ArrayList<Integer>>(checkpointsNums.length);
+        nums = new ArrayList<>(checkpointsNums.length);
 
         System.out.println("DEGREE: " + BTREE_DEGREE);
 
         AllBench b = new AllBench();
         b.setUp();
         for (int i = 0; i < checkpointsNums.length; i++) {
-            ArrayList<Integer> list = new ArrayList<Integer>();
+            ArrayList<Integer> list = new ArrayList<>();
             generateDataFile(list, checkpointsNums[i]);
             nums.add(list);
 
@@ -113,7 +113,7 @@ public class AllBench {
 
         writeCheckpoints(checkpointsNum);
 
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         for (int i = 0; i < checkpointsNum; i++) {
             list.add(i);
         }
@@ -131,7 +131,7 @@ public class AllBench {
 
         writeCheckpointsArray(checkpointsNum);
 
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         for (int i = 0; i < checkpointsNum; i++) {
             list.add(i);
         }
