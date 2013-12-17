@@ -38,13 +38,13 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
     /** The current start time for the state value */
     protected long currentStartTime;
     /** The list of ongoing state intervals per mipmap level */
-    protected List<List<ITmfStateInterval>> intervals = new ArrayList<List<ITmfStateInterval>>();
+    protected List<List<ITmfStateInterval>> intervals = new ArrayList<>();
     /** The state system used to store the mipmap attributes */
     protected ITmfStateSystemBuilder ss;
 
     private int mipmapResolution;
     private int mipmapQuark;
-    private List<Integer> levelQuarks = new ArrayList<Integer>();
+    private List<Integer> levelQuarks = new ArrayList<>();
 
     /**
      * Constructor

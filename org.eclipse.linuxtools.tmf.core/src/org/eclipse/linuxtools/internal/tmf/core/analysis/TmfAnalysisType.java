@@ -71,7 +71,7 @@ public final class TmfAnalysisType {
      * The mapping of available trace type IDs to their corresponding
      * configuration element
      */
-    private final Map<String, IAnalysisModuleHelper> fAnalysisTypeAttributes = new HashMap<String, IAnalysisModuleHelper>();
+    private final Map<String, IAnalysisModuleHelper> fAnalysisTypeAttributes = new HashMap<>();
 
     private static TmfAnalysisType fInstance = null;
 
@@ -84,7 +84,7 @@ public final class TmfAnalysisType {
     public static IConfigurationElement[] getTypeElements() {
         IConfigurationElement[] elements =
                 Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_ANALYSIS_TYPE_ID);
-        List<IConfigurationElement> typeElements = new LinkedList<IConfigurationElement>();
+        List<IConfigurationElement> typeElements = new LinkedList<>();
         for (IConfigurationElement element : elements) {
             if (element.getName().equals(MODULE_ELEM)) {
                 typeElements.add(element);

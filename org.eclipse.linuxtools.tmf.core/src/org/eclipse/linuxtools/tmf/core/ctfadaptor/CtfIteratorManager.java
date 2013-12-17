@@ -33,7 +33,7 @@ public abstract class CtfIteratorManager {
     /*
      * The map of traces to trace managers.
      */
-    private static HashMap<CtfTmfTrace, CtfTraceManager> map = new HashMap<CtfTmfTrace, CtfTraceManager>();
+    private static HashMap<CtfTmfTrace, CtfTraceManager> map = new HashMap<>();
 
     /**
      * Registers a trace to the iterator manager, the trace can now get
@@ -120,8 +120,8 @@ class CtfTraceManager {
     private final Random fRnd;
 
     public CtfTraceManager(CtfTmfTrace trace) {
-        fMap = new HashMap<CtfTmfContext, CtfIterator>();
-        fRandomAccess = new ArrayList<CtfTmfContext>();
+        fMap = new HashMap<>();
+        fRandomAccess = new ArrayList<>();
         fRnd = new Random(System.nanoTime());
         fTrace = trace;
     }

@@ -158,7 +158,7 @@ public class CtfTmfEvent extends TmfEvent
     @Override
     public Set<String> listCustomAttributes() {
         if (fDeclaration == null) {
-            return new HashSet<String>();
+            return new HashSet<>();
         }
         return fDeclaration.getCustomAttributes();
     }

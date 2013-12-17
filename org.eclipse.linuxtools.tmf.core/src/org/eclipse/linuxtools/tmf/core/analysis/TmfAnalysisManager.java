@@ -34,9 +34,9 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  */
 public class TmfAnalysisManager {
 
-    private static final Map<String, IAnalysisModuleHelper> fAnalysisModules = new HashMap<String, IAnalysisModuleHelper>();
-    private static final Map<String, List<Class<? extends IAnalysisParameterProvider>>> fParameterProviders = new HashMap<String, List<Class<? extends IAnalysisParameterProvider>>>();
-    private static final Map<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider> fParamProviderInstances = new HashMap<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider>();
+    private static final Map<String, IAnalysisModuleHelper> fAnalysisModules = new HashMap<>();
+    private static final Map<String, List<Class<? extends IAnalysisParameterProvider>>> fParameterProviders = new HashMap<>();
+    private static final Map<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider> fParamProviderInstances = new HashMap<>();
 
     /**
      * Gets all available analysis module helpers
@@ -66,7 +66,7 @@ public class TmfAnalysisManager {
      */
     public static Map<String, IAnalysisModuleHelper> getAnalysisModules(Class<? extends ITmfTrace> traceclass) {
         Map<String, IAnalysisModuleHelper> allModules = getAnalysisModules();
-        Map<String, IAnalysisModuleHelper> map = new HashMap<String, IAnalysisModuleHelper>();
+        Map<String, IAnalysisModuleHelper> map = new HashMap<>();
         for (IAnalysisModuleHelper module : allModules.values()) {
             if (module.appliesToTraceType(traceclass)) {
                 map.put(module.getId(), module);
@@ -114,7 +114,7 @@ public class TmfAnalysisManager {
      * @return A parameter provider if one applies to the trace, null otherwise
      */
     public static List<IAnalysisParameterProvider> getParameterProviders(IAnalysisModule module, ITmfTrace trace) {
-        List<IAnalysisParameterProvider> providerList = new ArrayList<IAnalysisParameterProvider>();
+        List<IAnalysisParameterProvider> providerList = new ArrayList<>();
         synchronized (fParameterProviders) {
             if (!fParameterProviders.containsKey(module.getId())) {
                 return providerList;

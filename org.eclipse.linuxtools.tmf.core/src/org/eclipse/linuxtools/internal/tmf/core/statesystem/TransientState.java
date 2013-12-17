@@ -54,9 +54,9 @@ class TransientState {
     TransientState(IStateHistoryBackend backend) {
         this.backend = backend;
         isActive = true;
-        ongoingStateInfo = new ArrayList<ITmfStateValue>();
-        ongoingStateStartTimes = new ArrayList<Long>();
-        stateValueTypes = new ArrayList<Type>();
+        ongoingStateInfo = new ArrayList<>();
+        ongoingStateStartTimes = new ArrayList<>();
+        stateValueTypes = new ArrayList<>();
 
         if (backend != null) {
             latestTime = backend.getStartTime();
@@ -117,9 +117,9 @@ class TransientState {
      */
     synchronized void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
         int size = newStateIntervals.size();
-        ongoingStateInfo = new ArrayList<ITmfStateValue>(size);
-        ongoingStateStartTimes = new ArrayList<Long>(size);
-        stateValueTypes = new ArrayList<Type>(size);
+        ongoingStateInfo = new ArrayList<>(size);
+        ongoingStateStartTimes = new ArrayList<>(size);
+        stateValueTypes = new ArrayList<>(size);
 
         for (ITmfStateInterval interval : newStateIntervals) {
             ongoingStateInfo.add(interval.getStateValue());

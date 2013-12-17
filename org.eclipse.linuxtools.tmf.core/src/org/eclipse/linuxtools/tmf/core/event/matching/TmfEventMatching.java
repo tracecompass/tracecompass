@@ -56,9 +56,9 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
      */
     private final IMatchProcessingUnit fMatches;
 
-    private static final Map<MatchingType, List<ITmfMatchEventDefinition>> fMatchDefinitions = new HashMap<MatchingType, List<ITmfMatchEventDefinition>>();
+    private static final Map<MatchingType, List<ITmfMatchEventDefinition>> fMatchDefinitions = new HashMap<>();
 
-    private final Map<ITmfTrace, ITmfMatchEventDefinition> fMatchMap = new HashMap<ITmfTrace, ITmfMatchEventDefinition>();
+    private final Map<ITmfTrace, ITmfMatchEventDefinition> fMatchMap = new HashMap<>();
 
     /**
      * Constructor with multiple traces and a match processing object

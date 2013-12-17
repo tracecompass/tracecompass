@@ -36,7 +36,7 @@ public class TmfEventMatches implements IMatchProcessingUnit {
      * Constructor
      */
     public TmfEventMatches() {
-        fMatches = new ArrayList<TmfEventDependency>();
+        fMatches = new ArrayList<>();
     }
 
     /**

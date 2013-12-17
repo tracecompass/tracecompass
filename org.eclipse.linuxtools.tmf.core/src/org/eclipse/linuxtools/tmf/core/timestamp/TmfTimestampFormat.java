@@ -222,7 +222,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     private String fPattern;
 
     // The timestamp pattern
-    private List<String> fSupplPatterns = new ArrayList<String>();
+    private List<String> fSupplPatterns = new ArrayList<>();
 
     /**
      * The supplementary pattern letters. Can be redefined by sub-classes

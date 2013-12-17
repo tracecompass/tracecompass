@@ -83,7 +83,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
     public InMemoryBackend(long startTime) {
         this.startTime = startTime;
         this.latestTime = startTime;
-        this.intervals = new TreeSet<ITmfStateInterval>(END_COMPARATOR);
+        this.intervals = new TreeSet<>(END_COMPARATOR);
     }
 
     @Override

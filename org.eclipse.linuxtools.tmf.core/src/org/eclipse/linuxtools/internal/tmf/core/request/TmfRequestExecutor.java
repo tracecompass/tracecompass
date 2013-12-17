@@ -56,8 +56,8 @@ public class TmfRequestExecutor implements Executor {
     private final String fExecutorName;
 
     // The request queues
-    private final Queue<TmfEventThread> fForegroundTasks = new ArrayBlockingQueue<TmfEventThread>(100);
-    private final Queue<TmfEventThread> fBackgroundTasks = new ArrayBlockingQueue<TmfEventThread>(100);
+    private final Queue<TmfEventThread> fForegroundTasks = new ArrayBlockingQueue<>(100);
+    private final Queue<TmfEventThread> fBackgroundTasks = new ArrayBlockingQueue<>(100);
 
     // The tasks
     private TmfEventThread fActiveTask;

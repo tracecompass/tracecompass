@@ -70,8 +70,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
     private final IStateHistoryBackend innerHistory;
 
     /** Checkpoints map, <Timestamp, Rank in the trace> */
-    private final TreeMap<Long, Long> checkpoints =
-            new TreeMap<Long, Long>();
+    private final TreeMap<Long, Long> checkpoints = new TreeMap<>();
 
     /** Latch tracking if the initial checkpoint registration is done */
     private final CountDownLatch checkpointsReady = new CountDownLatch(1);

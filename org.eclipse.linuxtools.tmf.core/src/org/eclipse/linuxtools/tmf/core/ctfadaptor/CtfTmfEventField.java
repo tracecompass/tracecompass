@@ -153,7 +153,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
             String curFieldName = null;
             Definition curFieldDef;
             CtfTmfEventField curField;
-            List<ITmfEventField> list = new ArrayList<ITmfEventField>();
+            List<ITmfEventField> list = new ArrayList<>();
             /* Recursively parse the fields */
             for (Entry<String, Definition> entry : strDef.getDefinitions().entrySet()) {
                 curFieldName = entry.getKey();
@@ -293,7 +293,7 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
     @Override
     public synchronized String getFormattedValue() {
         if (formattedValue == null) {
-            List<String> strings = new ArrayList<String>();
+            List<String> strings = new ArrayList<>();
             for (long value : getValue()) {
                 strings.add(IntegerDefinition.formatNumber(value, base, signed));
             }
@@ -333,7 +333,7 @@ final class CTFArrayField extends CtfTmfEventField {
     @Override
     public synchronized String getFormattedValue() {
         if (formattedValue == null) {
-            List<String> strings = new ArrayList<String>();
+            List<String> strings = new ArrayList<>();
             for (CtfTmfEventField element : getValue()) {
                 strings.add(element.getFormattedValue());
             }

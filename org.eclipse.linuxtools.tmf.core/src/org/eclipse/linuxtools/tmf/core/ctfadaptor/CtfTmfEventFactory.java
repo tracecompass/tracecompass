@@ -130,7 +130,7 @@ public final class CtfTmfEventFactory {
      * mess, and put them into something ITmfEventField can cope with.
      */
     private static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
-        List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
+        List<CtfTmfEventField> fields = new ArrayList<>();
 
         StructDefinition structFields = eventDef.getFields();
         for (Map.Entry<String, Definition> entry : structFields.getDefinitions().entrySet()) {

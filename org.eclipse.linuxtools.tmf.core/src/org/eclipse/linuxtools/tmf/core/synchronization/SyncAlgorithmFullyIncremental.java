@@ -56,7 +56,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
      * Initialization of the attributes
      */
     public SyncAlgorithmFullyIncremental() {
-        fSyncs = new LinkedList<ConvexHull>();
+        fSyncs = new LinkedList<>();
     }
 
     /**
@@ -162,7 +162,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     @Override
     public Map<String, Map<String, Object>> getStats() {
-        Map<String, Map<String, Object>> statmap = new LinkedHashMap<String, Map<String, Object>>();
+        Map<String, Map<String, Object>> statmap = new LinkedHashMap<>();
         for (ConvexHull traceSync : fSyncs) {
             statmap.put(traceSync.getReferenceTrace() + " <==> " + traceSync.getOtherTrace(), traceSync.getStats()); //$NON-NLS-1$
         }
@@ -189,13 +189,13 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
          * The list of meaningful points on the upper hull (received by the
          * reference trace, below in a graph)
          */
-        private final LinkedList<SyncPoint> fUpperBoundList = new LinkedList<SyncPoint>();
+        private final LinkedList<SyncPoint> fUpperBoundList = new LinkedList<>();
 
         /**
          * The list of meaninful points on the lower hull (sent by the reference
          * trace, above in a graph)
          */
-        private final LinkedList<SyncPoint> fLowerBoundList = new LinkedList<SyncPoint>();
+        private final LinkedList<SyncPoint> fLowerBoundList = new LinkedList<>();
 
         /** Points forming the line with maximum slope */
         private final SyncPoint[] fLmax;
@@ -213,7 +213,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         private String fReferenceTrace = "", fOtherTrace = ""; //$NON-NLS-1$//$NON-NLS-2$
         private SyncQuality fQuality;
 
-        private Map<String, Object> fStats = new LinkedHashMap<String, Object>();
+        private Map<String, Object> fStats = new LinkedHashMap<>();
 
         /**
          * Initialization of the attributes

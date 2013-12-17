@@ -199,9 +199,9 @@ public final class TmfStateSystemOperations {
     private static List<ITmfStateInterval> queryAttributeRange(ITmfStateSystem ss,
             long t1, long t2, int baseQuark, String featureString)
                     throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
-        Pair<Long, Long> timeRange = new Pair<Long, Long>(t1, t2);
+        Pair<Long, Long> timeRange = new Pair<>(t1, t2);
         int mipmapQuark = -1;
-        List<ITmfStateInterval> intervals = new ArrayList<ITmfStateInterval>();
+        List<ITmfStateInterval> intervals = new ArrayList<>();
         try {
             try {
                 mipmapQuark = ss.getQuarkRelative(baseQuark, featureString);
@@ -314,7 +314,7 @@ public final class TmfStateSystemOperations {
         }
         long startTime = Math.max(timeRange.getFirst(),
                 Math.min(currentLevelInterval.getEndTime() + 1, timeRange.getSecond()));
-        return new Pair<Long, Long>(startTime, timeRange.getSecond());
+        return new Pair<>(startTime, timeRange.getSecond());
     }
 
     private static boolean isFullyOverlapped(Pair<Long, Long> range,

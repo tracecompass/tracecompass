@@ -37,7 +37,7 @@ public class TmfMemoryIndex implements ITmfCheckpointIndex, ICheckpointCollectio
      * @param trace the trace
      */
     public TmfMemoryIndex(ITmfTrace trace) {
-        fCheckpoints = new ArrayList<ITmfCheckpoint>();
+        fCheckpoints = new ArrayList<>();
     }
 
     @Override

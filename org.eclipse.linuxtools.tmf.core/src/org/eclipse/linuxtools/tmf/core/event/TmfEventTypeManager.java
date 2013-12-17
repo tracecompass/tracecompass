@@ -44,7 +44,7 @@ public final class TmfEventTypeManager {
      * The singleton constructor
      */
     private TmfEventTypeManager() {
-        fEventTypes = new HashMap<String, HashMap<String, ITmfEventType>>();
+        fEventTypes = new HashMap<>();
     }
 
     /**
@@ -70,7 +70,7 @@ public final class TmfEventTypeManager {
     public synchronized void add(final String context, final ITmfEventType type) {
         HashMap<String, ITmfEventType> types = fEventTypes.get(context);
         if (types == null) {
-            types = new HashMap<String, ITmfEventType>();
+            types = new HashMap<>();
         }
         types.put(type.getName(), type);
         fEventTypes.put(context, types);

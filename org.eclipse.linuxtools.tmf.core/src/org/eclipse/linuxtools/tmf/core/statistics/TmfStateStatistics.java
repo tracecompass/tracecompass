@@ -211,7 +211,7 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     @Override
     public List<Long> histogramQuery(final long start, final long end, final int nb) {
-        final List<Long> list = new LinkedList<Long>();
+        final List<Long> list = new LinkedList<>();
         final long increment = (end - start) / nb;
 
         if (!totalsStats.waitUntilBuilt()) {
@@ -277,7 +277,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         /* We need the complete state history to be built to answer this. */
         typesStats.waitUntilBuilt();
 
-        Map<String, Long> map = new HashMap<String, Long>();
+        Map<String, Long> map = new HashMap<>();
         long endTime = typesStats.getCurrentEndTime();
 
         try {
@@ -335,7 +335,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         // end time, and answer as soon as possible...
         typesStats.waitUntilBuilt();
 
-        Map<String, Long> map = new HashMap<String, Long>();
+        Map<String, Long> map = new HashMap<>();
 
         /* Make sure the start/end times are within the state history, so we
          * don't get TimeRange exceptions.

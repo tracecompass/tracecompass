@@ -124,7 +124,7 @@ public class TmfFilterEqualsNode extends TmfFilterTreeNode {
 
 	@Override
 	public List<String> getValidChildren() {
-		return new ArrayList<String>(0);
+		return new ArrayList<>(0);
 	}
 
 	@Override

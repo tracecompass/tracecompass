@@ -70,7 +70,7 @@ abstract class HTNode {
 
         this.stringSectionOffset = config.getBlockSize();
         this.isDone = false;
-        this.intervals = new ArrayList<HTInterval>();
+        this.intervals = new ArrayList<>();
     }
 
     /**

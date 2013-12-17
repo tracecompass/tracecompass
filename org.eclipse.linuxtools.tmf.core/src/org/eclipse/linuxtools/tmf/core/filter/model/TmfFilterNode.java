@@ -83,7 +83,7 @@ public class TmfFilterNode extends TmfFilterTreeNode {
 		if (getChildrenCount() == 0) {
 			return super.getValidChildren();
 		}
-        return new ArrayList<String>(0); // only one child allowed
+        return new ArrayList<>(0); // only one child allowed
 	}
 
 	@Override

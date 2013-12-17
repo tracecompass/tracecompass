@@ -64,7 +64,7 @@ public final class TmfTraceManager {
     // ------------------------------------------------------------------------
 
     private TmfTraceManager() {
-        fTraces = new LinkedHashMap<ITmfTrace, TmfTraceContext>();
+        fTraces = new LinkedHashMap<>();
         TmfSignalManager.registerVIP(this);
     }
 

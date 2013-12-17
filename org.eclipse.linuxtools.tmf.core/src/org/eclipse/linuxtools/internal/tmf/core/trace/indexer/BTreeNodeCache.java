@@ -42,7 +42,7 @@ public class BTreeNodeCache {
      * kept at the front of the double-ended queue and the least recently used
      * node is kept at the back.
      */
-    private final Deque<BTreeNode> fCachedNodes = new ArrayDeque<BTreeNode>(CACHE_SIZE);
+    private final Deque<BTreeNode> fCachedNodes = new ArrayDeque<>(CACHE_SIZE);
 
     private int fCcheMisses = 0;
 

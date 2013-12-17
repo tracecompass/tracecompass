@@ -18,7 +18,6 @@ package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -133,12 +132,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @since 2.0
      */
     protected final Map<String, ITmfStateSystem> fStateSystems =
-            new LinkedHashMap<String, ITmfStateSystem>();
+            new LinkedHashMap<>();
 
     private ITmfTimestampTransform fTsTransform;
 
     private final Map<String, IAnalysisModule> fAnalysisModules =
-            new LinkedHashMap<String, IAnalysisModule>();
+            new LinkedHashMap<>();
 
     private static final String SYNCHRONIZATION_FORMULA_FILE = "sync_formula"; //$NON-NLS-1$
 
@@ -358,7 +357,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      */
     @Override
     public <T> Map<String, T> getAnalysisModules(Class<T> moduleclass) {
-        Map<String, T> modules = new HashMap<String, T>();
+        Map<String, T> modules = new HashMap<>();
         for (Entry<String, IAnalysisModule> entry : fAnalysisModules.entrySet()) {
             if (moduleclass.isAssignableFrom(entry.getValue().getClass())) {
                 modules.put(entry.getKey(), moduleclass.cast(entry.getValue()));
@@ -882,18 +881,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             File sync_file = getSyncFormulaFile();
             if (sync_file != null && sync_file.exists()) {
 
-                try {
-                    FileInputStream fis = new FileInputStream(sync_file);
-                    ObjectInputStream ois = new ObjectInputStream(fis);
+                try (FileInputStream fis = new FileInputStream(sync_file);
+                        ObjectInputStream ois = new ObjectInputStream(fis);) {
+
                     fTsTransform = (ITmfTimestampTransform) ois.readObject();
 
-                    ois.close();
-                    fis.close();
-                } catch (ClassNotFoundException e1) {
-                    fTsTransform = TmfTimestampTransform.IDENTITY;
-                } catch (FileNotFoundException e1) {
-                    fTsTransform = TmfTimestampTransform.IDENTITY;
-                } catch (IOException e1) {
+                } catch (ClassNotFoundException | IOException e) {
                     fTsTransform = TmfTimestampTransform.IDENTITY;
                 }
             } else {

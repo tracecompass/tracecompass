@@ -137,7 +137,7 @@ public class TmfTimePreferences {
     }
 
     private static Map<String, String> getPreferenceMap(boolean defaultValues) {
-        Map<String, String> prefsMap = new HashMap<String, String>();
+        Map<String, String> prefsMap = new HashMap<>();
         IEclipsePreferences prefs = defaultValues ? DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID) : InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.SUBSEC, SUBSEC_DEFAULT);
         prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.TIME_DELIMITER, TIME_DELIMITER_DEFAULT);

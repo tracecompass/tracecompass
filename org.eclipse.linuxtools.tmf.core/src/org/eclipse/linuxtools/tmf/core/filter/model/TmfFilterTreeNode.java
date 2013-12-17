@@ -40,7 +40,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
     };
 
     private ITmfFilterTreeNode parent = null;
-    private ArrayList<ITmfFilterTreeNode> children = new ArrayList<ITmfFilterTreeNode>();
+    private ArrayList<ITmfFilterTreeNode> children = new ArrayList<>();
 
     /**
      * @param parent
@@ -159,7 +159,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
         try {
             TmfFilterTreeNode clone = (TmfFilterTreeNode) super.clone();
             clone.parent = null;
-            clone.children = new ArrayList<ITmfFilterTreeNode>(children.size());
+            clone.children = new ArrayList<>(children.size());
             for (ITmfFilterTreeNode child : getChildren()) {
                 clone.addChild(child.clone());
             }

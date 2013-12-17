@@ -67,7 +67,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
             Class<? extends ITmfEvent> eventType, String id) {
         this.trace = trace;
         this.eventType = eventType;
-        eventsQueue = new ArrayBlockingQueue<ITmfEvent>(DEFAULT_EVENTS_QUEUE_SIZE);
+        eventsQueue = new ArrayBlockingQueue<>(DEFAULT_EVENTS_QUEUE_SIZE);
         ssAssigned = false;
 
         String id2 = (id == null ? "Unamed" : id); //$NON-NLS-1$

@@ -91,7 +91,7 @@ class HistoryTree {
         config = conf;
         treeEnd = conf.getTreeStart();
         nodeCount = 0;
-        latestBranch = new ArrayList<CoreNode>();
+        latestBranch = new ArrayList<>();
 
         /* Prepare the IO object */
         treeIO = new HT_IO(config, true);
@@ -128,57 +128,53 @@ class HistoryTree {
             throw new IOException("Empty target file"); //$NON-NLS-1$
         }
 
-        FileInputStream fis = new FileInputStream(existingStateFile);
-        ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
-        FileChannel fc = fis.getChannel();
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        buffer.clear();
-        fc.read(buffer);
-        buffer.flip();
+        try (FileInputStream fis = new FileInputStream(existingStateFile);
+                FileChannel fc = fis.getChannel();) {
 
-        /*
-         * Check the magic number to make sure we're opening the right type of
-         * file
-         */
-        res = buffer.getInt();
-        if (res != HISTORY_FILE_MAGIC_NUMBER) {
-            fc.close();
-            fis.close();
-            throw new IOException("Wrong magic number"); //$NON-NLS-1$
-        }
+            ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
 
-        res = buffer.getInt(); /* File format version number */
-        if (res != FILE_VERSION) {
-            fc.close();
-            fis.close();
-            throw new IOException("Mismatching History Tree file format versions"); //$NON-NLS-1$
-        }
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            buffer.clear();
+            fc.read(buffer);
+            buffer.flip();
 
-        res = buffer.getInt(); /* Event handler's version number */
-        if (res != expProviderVersion &&
-                expProviderVersion != ITmfStateProvider.IGNORE_PROVIDER_VERSION) {
             /*
-             * The existing history was built using an event handler that doesn't
-             * match the current one in the framework.
-             *
-             * Information could be all wrong. Instead of keeping an incorrect
-             * history file, a rebuild is done.
+             * Check the magic number to make sure we're opening the right type
+             * of file
              */
-            fc.close();
-            fis.close();
-            throw new IOException("Mismatching event handler versions"); //$NON-NLS-1$
+            res = buffer.getInt();
+            if (res != HISTORY_FILE_MAGIC_NUMBER) {
+                throw new IOException("Wrong magic number"); //$NON-NLS-1$
+            }
+
+            res = buffer.getInt(); /* File format version number */
+            if (res != FILE_VERSION) {
+                throw new IOException("Mismatching History Tree file format versions"); //$NON-NLS-1$
+            }
+
+            res = buffer.getInt(); /* Event handler's version number */
+            if (res != expProviderVersion &&
+                    expProviderVersion != ITmfStateProvider.IGNORE_PROVIDER_VERSION) {
+                /*
+                 * The existing history was built using an event handler that
+                 * doesn't match the current one in the framework.
+                 *
+                 * Information could be all wrong. Instead of keeping an
+                 * incorrect history file, a rebuild is done.
+                 */
+                throw new IOException("Mismatching event handler versions"); //$NON-NLS-1$
+            }
+
+            bs = buffer.getInt(); /* Block Size */
+            maxc = buffer.getInt(); /* Max nb of children per node */
+
+            this.nodeCount = buffer.getInt();
+            rootNodeSeqNb = buffer.getInt();
+            startTime = buffer.getLong();
+
+            this.config = new HTConfig(existingStateFile, bs, maxc, expProviderVersion, startTime);
         }
 
-        bs = buffer.getInt(); /* Block Size */
-        maxc = buffer.getInt(); /* Max nb of children per node */
-
-        this.nodeCount = buffer.getInt();
-        rootNodeSeqNb = buffer.getInt();
-        startTime = buffer.getLong();
-
-        this.config = new HTConfig(existingStateFile, bs, maxc, expProviderVersion, startTime);
-        fc.close();
-        fis.close();
         /*
          * FIXME We close fis here and the TreeIO will then reopen the same
          * file, not extremely elegant. But how to pass the information here to
@@ -194,8 +190,6 @@ class HistoryTree {
          * with was is actually in the root node.
          */
         if (startTime != latestBranch.get(0).getNodeStart()) {
-            fc.close();
-            fis.close();
             throw new IOException("Inconsistent start times in the" + //$NON-NLS-1$
                     "history file, it might be corrupted."); //$NON-NLS-1$
         }
@@ -211,7 +205,6 @@ class HistoryTree {
      *            The greatest timestamp present in the history tree
      */
     void closeTree(long requestedEndTime) {
-        FileChannel fc;
         ByteBuffer buffer;
         int i, res;
 
@@ -230,13 +223,12 @@ class HistoryTree {
             treeIO.writeNode(latestBranch.get(i));
         }
 
-        fc = treeIO.getFcOut();
-        buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        buffer.clear();
+        try (FileChannel fc = treeIO.getFcOut();) {
+            buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            buffer.clear();
 
-        /* Save the config of the tree to the header of the file */
-        try {
+            /* Save the config of the tree to the header of the file */
             fc.position(0);
 
             buffer.putInt(HISTORY_FILE_MAGIC_NUMBER);
@@ -261,12 +253,12 @@ class HistoryTree {
             /* done writing the file header */
 
         } catch (IOException e) {
-            /* We should not have any problems at this point... */
-        } finally {
-            try {
-                fc.close();
-            } catch (IOException e) {
-            }
+            /*
+             * If we were able to write so far, there should not be any problem
+             * at this point...
+             */
+            // FIXME still, the IOException should be propagated upwards
+            throw new RuntimeException();
         }
         return;
     }
@@ -353,7 +345,7 @@ class HistoryTree {
     private void rebuildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
         HTNode nextChildNode;
 
-        this.latestBranch = new ArrayList<CoreNode>();
+        this.latestBranch = new ArrayList<>();
 
         nextChildNode = treeIO.readNode(rootNodeSeqNb);
         latestBranch.add((CoreNode) nextChildNode);
@@ -486,7 +478,7 @@ class HistoryTree {
 
         /* Rebuild a new latestBranch */
         depth = latestBranch.size();
-        latestBranch = new ArrayList<CoreNode>();
+        latestBranch = new ArrayList<>();
         latestBranch.add(newRootNode);
         for (i = 1; i < depth + 1; i++) {
             prevNode = latestBranch.get(i - 1);
