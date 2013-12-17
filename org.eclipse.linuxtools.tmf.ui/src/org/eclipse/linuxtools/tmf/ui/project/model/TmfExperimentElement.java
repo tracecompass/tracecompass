@@ -118,6 +118,10 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
             childrenMap.put(element.getResource().getName(), element);
         }
 
+        /*
+         * TODO: add the experiment analysis when experiment types are available
+         * and we can have analysis for experiments
+         */
         try {
             IResource[] members = folder.members();
             for (IResource resource : members) {
@@ -346,7 +350,7 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
     }
 
     /**
-     * Get the list of analysis elements
+     * Get the list of analysis model elements under this experiment
      *
      * @return Array of analysis elements
      * @since 3.0

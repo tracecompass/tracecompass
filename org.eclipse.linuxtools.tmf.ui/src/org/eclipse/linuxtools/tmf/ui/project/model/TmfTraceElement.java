@@ -197,7 +197,67 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
 
     @Override
     void refreshChildren() {
-        refreshAnalysis();
+
+        /* Refreshes the analysis under this trace */
+        Map<String, TmfAnalysisElement> childrenMap = new HashMap<>();
+        for (TmfAnalysisElement analysis : getAvailableAnalysis()) {
+            childrenMap.put(analysis.getAnalysisId(), analysis);
+        }
+
+        TraceTypeHelper helper = TmfTraceType.getInstance().getTraceType(getTraceType());
+
+        Class<? extends ITmfTrace> traceClass = null;
+
+        if (helper == null && fTraceTypeId != null) {
+            if (fTraceTypeId.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+                for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+                    if (fTraceTypeId.equals(CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                        traceClass = CustomTxtTrace.class;
+                    }
+                }
+            }
+            if (fTraceTypeId.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+                for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+                    if (fTraceTypeId.equals(CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                        traceClass = CustomTxtTrace.class;
+                    }
+                }
+            }
+        } else if (helper != null) {
+            traceClass = helper.getTraceClass();
+        }
+
+        /* Remove all analysis and return */
+        if (traceClass == null) {
+            for (TmfAnalysisElement analysis : childrenMap.values()) {
+                removeChild(analysis);
+            }
+            return;
+        }
+
+        /** Get the base path to put the resource to */
+        IPath path = fResource.getFullPath();
+
+        /* Add all new analysis modules or refresh outputs of existing ones */
+        for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
+
+            /* If the analysis is not a child of the trace, create it */
+            TmfAnalysisElement analysis = childrenMap.remove(module.getId());
+            if (analysis == null) {
+                /**
+                 * No need for the resource to exist, nothing will be done with
+                 * it
+                 */
+                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(module.getId()));
+                analysis = new TmfAnalysisElement(module.getName(), newresource, this, module.getId());
+            }
+            analysis.refreshChildren();
+        }
+
+        /* Remove analysis that are not children of this trace anymore */
+        for (TmfAnalysisElement analysis : childrenMap.values()) {
+            removeChild(analysis);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -219,7 +279,6 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
     public void refreshTraceType() {
         try {
             fTraceTypeId = getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
-            refreshAnalysis();
         } catch (CoreException e) {
             Activator.getDefault().logError("Error refreshing trace type pesistent property for trace " + getName(), e); //$NON-NLS-1$
         }
@@ -654,68 +713,21 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
         return null;
     }
 
-    private void refreshAnalysis() {
-        List<TmfAnalysisElement> list = getAvailableAnalysis();
-
-        /* Remove children */
-        getChildren().clear();
-
-        /* Add the children again */
-        for (TmfAnalysisElement module : list) {
-            addChild(module);
-        }
-
-    }
-
     /**
-     * Get the list of analysis elements
+     * Get the list of analysis model elements under this trace
      *
      * @return Array of analysis elements
      * @since 3.0
      */
     public List<TmfAnalysisElement> getAvailableAnalysis() {
-        List<TmfAnalysisElement> list = new ArrayList<>();
-
-        TraceTypeHelper helper = TmfTraceType.getInstance().getTraceType(getTraceType());
-
-        Class<? extends ITmfTrace> traceClass = null;
-
-        if (helper == null && fTraceTypeId != null) {
-            if (fTraceTypeId.startsWith(CustomTxtTrace.class.getCanonicalName())) {
-                for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                    if (fTraceTypeId.equals(CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
-                        traceClass = CustomTxtTrace.class;
-                    }
-                }
+        List<ITmfProjectModelElement> children = getChildren();
+        List<TmfAnalysisElement> analysis = new ArrayList<>();
+        for (ITmfProjectModelElement child : children) {
+            if (child instanceof TmfAnalysisElement) {
+                analysis.add((TmfAnalysisElement) child);
             }
-            if (fTraceTypeId.startsWith(CustomXmlTrace.class.getCanonicalName())) {
-                for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                    if (fTraceTypeId.equals(CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
-                        traceClass = CustomTxtTrace.class;
-                    }
-                }
-            }
-        } else if (helper != null) {
-            traceClass = helper.getTraceClass();
         }
-
-        if (traceClass == null) {
-            return list;
-        }
-
-        /** Get the base path to put the resource to */
-        IPath path = fResource.getFullPath();
-
-        for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
-
-            /** No need for the resource to exist, nothing will be done with it */
-            IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(module.getId()));
-
-            TmfAnalysisElement analysis = new TmfAnalysisElement(module.getName(), newresource, this, module.getId());
-            list.add(analysis);
-        }
-
-        return list;
+        return analysis;
     }
 
     /**
@@ -732,7 +744,6 @@ public class TmfTraceElement extends TmfWithFolderElement implements IActionFilt
             return;
         }
 
-        refreshAnalysis();
         getParent().refresh();
     }
 }

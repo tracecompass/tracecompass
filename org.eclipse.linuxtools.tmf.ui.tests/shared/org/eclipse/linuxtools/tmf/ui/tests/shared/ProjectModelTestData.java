@@ -82,6 +82,8 @@ public class ProjectModelTestData {
         TmfTraceElement traceElement = projectElement.getTracesFolder().getTraces().get(0);
         traceElement.refreshTraceType();
 
+        projectElement.refresh();
+
         return projectElement;
     }
 
