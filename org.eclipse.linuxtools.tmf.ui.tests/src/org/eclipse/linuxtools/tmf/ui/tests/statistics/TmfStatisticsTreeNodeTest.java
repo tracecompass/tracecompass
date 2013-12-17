@@ -110,7 +110,7 @@ public class TmfStatisticsTreeNodeTest {
         treeNode = childrenTreeNode.iterator().next();
         assertEquals(Messages.TmfStatisticsData_EventTypes, treeNode.getName());
 
-        Vector<String> keyExpected = new Vector<String>();
+        Vector<String> keyExpected = new Vector<>();
         keyExpected.add(fTypeId1);
         keyExpected.add(fTypeId2);
         keyExpected.add(fTypeId3);

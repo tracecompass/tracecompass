@@ -49,7 +49,7 @@ public class TmfUml2SDSyncLoaderFilterTest {
         fFacility.selectExperiment();
 
         /* Create Filter Criteria */
-        filterToSave = new ArrayList<FilterCriteria>();
+        filterToSave = new ArrayList<>();
         Criteria criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.FIRST_PLAYER_NAME);

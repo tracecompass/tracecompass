@@ -124,7 +124,7 @@ public class TmfBaseStatisticsDataTest {
         treeNode = childrenTreeNode.iterator().next();
         assertEquals("getChildren", Messages.TmfStatisticsData_EventTypes, treeNode.getName());
 
-        Vector<String> keyExpected = new Vector<String>();
+        Vector<String> keyExpected = new Vector<>();
         keyExpected.add(fEvent1.getType().getName());
         keyExpected.add(fEvent3.getType().getName());
         // Getting children of a category

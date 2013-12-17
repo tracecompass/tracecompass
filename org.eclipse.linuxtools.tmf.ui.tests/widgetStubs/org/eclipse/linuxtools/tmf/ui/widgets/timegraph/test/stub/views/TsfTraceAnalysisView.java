@@ -135,7 +135,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
         public TreeParent(String name) {
             super(name);
-            children = new ArrayList<TreeObject>();
+            children = new ArrayList<>();
         }
 
         public void addChild(TreeObject child) {

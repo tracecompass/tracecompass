@@ -43,7 +43,7 @@ public class CustomXmlTraceInvalidTest extends CustomXmlTraceTest{
     @Parameters(name = "{index}: path {0}")
     public static Collection<Object[]> getFiles() {
         File[] invalidFiles = (new File(pathname)).listFiles();
-        Collection<Object[]> params = new ArrayList<Object[]>();
+        Collection<Object[]> params = new ArrayList<>();
         for (File f : invalidFiles) {
             Object[] arr = new Object[] { f.getAbsolutePath() };
             params.add(arr);

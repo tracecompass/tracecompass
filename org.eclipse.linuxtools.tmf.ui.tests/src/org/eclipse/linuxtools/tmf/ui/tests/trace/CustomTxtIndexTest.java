@@ -51,13 +51,13 @@ public class CustomTxtIndexTest extends AbstractCustomTraceIndexTest {
     protected TestTrace createTrace() throws Exception {
         CustomTxtTraceDefinition definition = createDefinition();
         final File file = new File(TRACE_PATH);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        for (int i = 0; i < NB_EVENTS; ++i) {
-            SimpleDateFormat f = new SimpleDateFormat(TIMESTAMP_FORMAT);
-            String eventStr = f.format(new Date(i)) + " hello world\n";
-            writer.write(eventStr);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file));) {
+            for (int i = 0; i < NB_EVENTS; ++i) {
+                SimpleDateFormat f = new SimpleDateFormat(TIMESTAMP_FORMAT);
+                String eventStr = f.format(new Date(i)) + " hello world\n";
+                writer.write(eventStr);
+            }
         }
-        writer.close();
 
         return new TestTxtTrace(file.toString(), definition, BLOCK_SIZE);
     }

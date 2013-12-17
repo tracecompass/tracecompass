@@ -51,15 +51,15 @@ public class CustomXmlIndexTest extends AbstractCustomTraceIndexTest {
     protected TestTrace createTrace() throws Exception {
         CustomXmlTraceDefinition definition = createDefinition();
         final File file = new File(TRACE_PATH);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write("<trace>");
-        for (int i = 0; i < NB_EVENTS; ++i) {
-            SimpleDateFormat f = new SimpleDateFormat(TIMESTAMP_FORMAT);
-            String eventStr = "<element time=\"" + f.format(new Date(i)) + "\">message</element>\n";
-            writer.write(eventStr);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file));) {
+            writer.write("<trace>");
+            for (int i = 0; i < NB_EVENTS; ++i) {
+                SimpleDateFormat f = new SimpleDateFormat(TIMESTAMP_FORMAT);
+                String eventStr = "<element time=\"" + f.format(new Date(i)) + "\">message</element>\n";
+                writer.write(eventStr);
+            }
+            writer.write("</trace>");
         }
-        writer.write("</trace>");
-        writer.close();
 
         return new TestXmlTrace(file.toString(), definition, BLOCK_SIZE);
     }

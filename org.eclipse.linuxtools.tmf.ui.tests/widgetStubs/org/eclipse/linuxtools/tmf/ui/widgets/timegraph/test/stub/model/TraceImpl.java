@@ -29,7 +29,7 @@ public class TraceImpl implements ITimeGraphEntry {
     private long startTime = 0;
     private long stopTime = 1;
     private String className = "defaultClassName";
-    private Vector<ITimeEvent> traceEvents = new Vector<ITimeEvent>();
+    private Vector<ITimeEvent> traceEvents = new Vector<>();
 
     // ========================================================================
     // Constructor

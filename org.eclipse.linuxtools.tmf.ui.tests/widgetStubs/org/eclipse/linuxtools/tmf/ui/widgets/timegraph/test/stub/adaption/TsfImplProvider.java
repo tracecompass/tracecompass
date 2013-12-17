@@ -33,7 +33,7 @@ public class TsfImplProvider extends TimeGraphPresentationProvider {
 
 	@Override
 	public Map<String, String> getEventHoverToolTipInfo(ITimeEvent revent) {
-		Map<String, String> toolTipEventMsgs = new HashMap<String, String>();
+		Map<String, String> toolTipEventMsgs = new HashMap<>();
 		if (revent instanceof EventImpl) {
 			toolTipEventMsgs.put("Test Tip1", "Test Value tip1");
 			toolTipEventMsgs.put("Test Tip2", "Test Value tip2");
