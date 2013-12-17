@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.tmf.analysis.xml.ui;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
