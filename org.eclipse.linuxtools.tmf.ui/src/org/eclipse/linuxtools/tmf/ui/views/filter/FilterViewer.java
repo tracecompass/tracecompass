@@ -333,7 +333,7 @@ class FilterViewer extends Composite {
         }
 
         protected String[] getFieldsList(ITmfFilterTreeNode node) {
-            ArrayList<String> fieldsList = new ArrayList<String>();
+            ArrayList<String> fieldsList = new ArrayList<>();
             ITmfFilterTreeNode curNode = node;
             while (curNode != null) {
                 if (curNode instanceof TmfFilterEventTypeNode) {
@@ -548,7 +548,7 @@ class FilterViewer extends Composite {
         }
 
         protected Map<String, Object> getEventsTypeMap() {
-            Map<String, Object> eventsTypeMap = new LinkedHashMap<String, Object>();
+            Map<String, Object> eventsTypeMap = new LinkedHashMap<>();
             for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                 String categoryName = TmfTraceType.getCategoryName(ce.getAttribute(TmfTraceType.CATEGORY_ATTR));
                 String text = categoryName + " : " + ce.getAttribute(TmfTraceType.NAME_ATTR); //$NON-NLS-1$

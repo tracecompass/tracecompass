@@ -31,7 +31,7 @@ public class TmfStatisticsTreeManager {
     /**
      * Contains the experiment name as the key and the traces data
      */
-    private static final Map<String, TmfStatisticsTree> fTreeInstances = new HashMap<String, TmfStatisticsTree>();
+    private static final Map<String, TmfStatisticsTree> fTreeInstances = new HashMap<>();
 
     /**
      * Provide a statisticsTree instance per trace

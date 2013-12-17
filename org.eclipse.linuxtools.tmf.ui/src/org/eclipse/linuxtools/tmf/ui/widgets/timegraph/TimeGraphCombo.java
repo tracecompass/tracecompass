@@ -93,10 +93,10 @@ public class TimeGraphCombo extends Composite {
     private List<? extends ITimeGraphEntry> fTopInput;
 
     /** The selection listener map */
-    private final Map<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<ITimeGraphSelectionListener, SelectionListenerWrapper>();
+    private final Map<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<>();
 
     /** The map of viewer filters */
-    private final Map<ViewerFilter, ViewerFilter> fViewerFilterMap = new HashMap<ViewerFilter, ViewerFilter>();
+    private final Map<ViewerFilter, ViewerFilter> fViewerFilterMap = new HashMap<>();
 
     /**
      * Flag to block the tree selection changed listener when triggered by the
@@ -703,7 +703,7 @@ public class TimeGraphCombo extends Composite {
             fFilterDialog.setMessage(Messages.TmfTimeFilterDialog_MESSAGE);
             fFilterDialog.setExpandedElements(allElements.toArray());
             if (fFilter.getFiltered() != null) {
-                ArrayList<? extends ITimeGraphEntry> nonFilteredElements = new ArrayList<ITimeGraphEntry>(allElements);
+                ArrayList<? extends ITimeGraphEntry> nonFilteredElements = new ArrayList<>(allElements);
                 nonFilteredElements.removeAll(fFilter.getFiltered());
                 fFilterDialog.setInitialElementSelections(nonFilteredElements);
             } else {
@@ -849,7 +849,7 @@ public class TimeGraphCombo extends Composite {
      * @param input the input of this time graph combo, or <code>null</code> if none
      */
     public void setInput(ITimeGraphEntry[] input) {
-        fTopInput = new ArrayList<ITimeGraphEntry>(Arrays.asList(input));
+        fTopInput = new ArrayList<>(Arrays.asList(input));
         fFilter.setFiltered(null);
         fInhibitTreeSelection = true;
         fTreeViewer.setInput(input);
@@ -993,7 +993,7 @@ public class TimeGraphCombo extends Composite {
     // ------------------------------------------------------------------------
 
     private List<TreeItem> getVisibleExpandedItems(Tree tree) {
-        ArrayList<TreeItem> items = new ArrayList<TreeItem>();
+        ArrayList<TreeItem> items = new ArrayList<>();
         for (TreeItem item : tree.getItems()) {
             if (item.getData() == FILLER) {
                 break;
@@ -1007,7 +1007,7 @@ public class TimeGraphCombo extends Composite {
     }
 
     private List<TreeItem> getVisibleExpandedItems(TreeItem treeItem) {
-        ArrayList<TreeItem> items = new ArrayList<TreeItem>();
+        ArrayList<TreeItem> items = new ArrayList<>();
         for (TreeItem item : treeItem.getItems()) {
             items.add(item);
             if (item.getExpanded()) {
@@ -1024,7 +1024,7 @@ public class TimeGraphCombo extends Composite {
      * @return All the inputs
      */
     private List<? extends ITimeGraphEntry> listAllInputs(List<? extends ITimeGraphEntry> inputs) {
-        ArrayList<ITimeGraphEntry> items = new ArrayList<ITimeGraphEntry>();
+        ArrayList<ITimeGraphEntry> items = new ArrayList<>();
         for (ITimeGraphEntry entry : inputs) {
             items.add(entry);
             if (entry.hasChildren()) {

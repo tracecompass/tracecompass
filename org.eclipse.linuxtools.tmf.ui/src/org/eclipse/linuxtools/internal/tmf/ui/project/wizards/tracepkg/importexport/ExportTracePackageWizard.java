@@ -46,7 +46,7 @@ public class ExportTracePackageWizard extends Wizard implements IExportWizard {
             section = workbenchSettings.addNewSection(STORE_EXPORT_TRACE_WIZARD);
         }
         setDialogSettings(section);
-        fSelectedTraces = new ArrayList<TmfTraceElement>();
+        fSelectedTraces = new ArrayList<>();
     }
 
     /**

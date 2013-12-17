@@ -31,17 +31,10 @@ import org.eclipse.jdt.annotation.Nullable;
 class FunctionNameMapper {
 
     public static @Nullable Map<String, String> mapFromNmTextFile(File mappingFile) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
-        FileReader fr;
-        try {
-            fr = new FileReader(mappingFile);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
-        BufferedReader reader = new BufferedReader(fr);
-
-        try {
+        try (FileReader fr = new FileReader(mappingFile);
+                BufferedReader reader = new BufferedReader(fr);) {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 String[] elems = line.split(" "); //$NON-NLS-1$
                 /* Only lines with 3 elements contain addresses */
@@ -52,13 +45,10 @@ class FunctionNameMapper {
                     map.put(address, name);
                 }
             }
-
+        } catch (FileNotFoundException e) {
+            return null;
         } catch (IOException e) {
             /* Stop reading the file at this point */
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {}
         }
 
         if (map.isEmpty()) {

@@ -115,12 +115,12 @@ public abstract class GraphNode {
      */
     public void addNode(GraphNode nodeToAdd) {
         if (!fHasChilden) {
-            fNodes = new HashMap<String, List<GraphNode>>(2);
-            fForwardNodes = new HashMap<String, List<GraphNode>>(2);
-            fBackwardNodes = new HashMap<String, List<GraphNode>>(2);
-            fIndexes = new HashMap<String, Integer>(2);
-            fBackwardSort = new HashMap<String, Boolean>(2);
-            fForwardSort = new HashMap<String, Boolean>(2);
+            fNodes = new HashMap<>(2);
+            fForwardNodes = new HashMap<>(2);
+            fBackwardNodes = new HashMap<>(2);
+            fIndexes = new HashMap<>(2);
+            fBackwardSort = new HashMap<>(2);
+            fForwardSort = new HashMap<>(2);
             fHasChilden = true;
         }
 
@@ -160,7 +160,7 @@ public abstract class GraphNode {
         }
 
         if (fNodeList == null) {
-            fNodeList = new ArrayList<GraphNode>();
+            fNodeList = new ArrayList<>();
         }
 
         fNodeList.add(nodeToAdd);
@@ -401,7 +401,7 @@ public abstract class GraphNode {
      * @return the list of nodes
      */
     public List<GraphNode> getNodeList(GraphNode from, GraphNode to) {
-        List<GraphNode> result = new ArrayList<GraphNode>();
+        List<GraphNode> result = new ArrayList<>();
 
         if (from != null) {
             result.add(from);

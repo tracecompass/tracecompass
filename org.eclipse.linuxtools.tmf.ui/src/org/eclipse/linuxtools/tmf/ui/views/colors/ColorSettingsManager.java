@@ -54,7 +54,7 @@ public class ColorSettingsManager {
 	private static ColorSetting[] fColorSettings = ColorSettingsXML.load(COLOR_SETTINGS_PATH_NAME);
 
 	// The listener list
-	private static List<IColorSettingsListener> fListeners = new ArrayList<IColorSettingsListener>();
+	private static List<IColorSettingsListener> fListeners = new ArrayList<>();
 
 	/**
 	 * Returns an array of color settings.

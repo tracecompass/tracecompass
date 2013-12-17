@@ -126,7 +126,7 @@ public class ImportTraceWizardSelectTraceTypePage extends AbstractImportTraceWiz
 
     @Override
     public boolean canFlipToNextPage() {
-        List<String> tracesToScan = new ArrayList<String>();
+        List<String> tracesToScan = new ArrayList<>();
         String elements[] = (String[]) fProvider.getElements(null);
         for (String traceFamily : elements) {
             final TraceTypeHelper[] children = (TraceTypeHelper[]) fProvider.getChildren(traceFamily);

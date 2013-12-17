@@ -37,7 +37,7 @@ public class CallStackEntry implements ITimeGraphEntry {
     private String fFunctionName;
     private long fStartTime;
     private long fEndTime;
-    private List<ITimeEvent> fEventList = new ArrayList<ITimeEvent>(1);
+    private List<ITimeEvent> fEventList = new ArrayList<>(1);
     private List<ITimeEvent> fZoomedEventList = null;
 
     /**

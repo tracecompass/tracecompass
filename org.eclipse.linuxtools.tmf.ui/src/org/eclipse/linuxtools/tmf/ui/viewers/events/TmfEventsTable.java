@@ -264,7 +264,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private ListenerList selectionChangedListeners = new ListenerList();
 
     // Bookmark map <Rank, MarkerId>
-    private Map<Long, Long> fBookmarksMap = new HashMap<Long, Long>();
+    private Map<Long, Long> fBookmarksMap = new HashMap<>();
     private IFile fBookmarksFile;
     private long fPendingGotoRank = -1;
 
@@ -645,7 +645,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     try {
                         String fileName = cs.getFileName();
                         final String trimmedPath = fileName.replaceAll("\\.\\./", ""); //$NON-NLS-1$ //$NON-NLS-2$
-                        final ArrayList<IFile> files = new ArrayList<IFile>();
+                        final ArrayList<IFile> files = new ArrayList<>();
                         ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
                             @Override
                             public boolean visit(IResource resource) throws CoreException {
@@ -751,7 +751,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 IHandlerService handlerService = (IHandlerService) activePage.getActiveEditor().getSite().getService(IHandlerService.class);
                 ICommandService cmdService = (ICommandService) activePage.getActiveEditor().getSite().getService(ICommandService.class);
                 try {
-                    HashMap<String, Object> parameters = new HashMap<String, Object>();
+                    HashMap<String, Object> parameters = new HashMap<>();
                     StringBuilder header = new StringBuilder();
                     boolean needTab = false;
                     for (TableColumn tc: fTable.getColumns()) {
@@ -2033,7 +2033,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (fTable == null || fTable.isDisposed()) {
             return StructuredSelection.EMPTY;
         }
-        List<Object> list = new ArrayList<Object>(fTable.getSelection().length);
+        List<Object> list = new ArrayList<>(fTable.getSelection().length);
         for (TableItem item : fTable.getSelection()) {
             if (item.getData() != null) {
                 list.add(item.getData());

@@ -687,7 +687,7 @@ public class Frame extends BasicFrame {
     protected List<SDTimeEvent> buildTimeArray() {
 
         if (!hasChildren()) {
-            return new ArrayList<SDTimeEvent>();
+            return new ArrayList<>();
         }
 
         List<SDTimeEvent> timeArray = super.buildTimeArray();
@@ -706,7 +706,7 @@ public class Frame extends BasicFrame {
                                 SDTimeEvent f = new SDTimeEvent(time, event, eo);
                                 timeArray.add(f);
                                 if (fExecutionOccurrencesWithTime == null) {
-                                    fExecutionOccurrencesWithTime = new ArrayList<SDTimeEvent>();
+                                    fExecutionOccurrencesWithTime = new ArrayList<>();
                                 }
                                 fExecutionOccurrencesWithTime.add(f);
                                 event = eo.getEndOccurrence();

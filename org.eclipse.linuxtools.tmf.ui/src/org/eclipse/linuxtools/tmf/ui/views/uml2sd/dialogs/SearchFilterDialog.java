@@ -296,7 +296,7 @@ public class SearchFilterDialog extends Dialog {
         fCriteria.save(section);
 
         if (fCriteria.getExpression().length() > 0) {
-            ArrayList<String> list = new ArrayList<String>();
+            ArrayList<String> list = new ArrayList<>();
             for (int i = 0; i < fExpressionList.length; i++) {
                 list.add(fExpressionList[i]);
             }

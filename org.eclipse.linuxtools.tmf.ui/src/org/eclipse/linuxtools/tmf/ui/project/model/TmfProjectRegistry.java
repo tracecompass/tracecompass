@@ -38,7 +38,7 @@ import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 public class TmfProjectRegistry {
 
     // The map of project resource to project model elements
-    private static Map<IProject, TmfProjectElement> registry = new HashMap<IProject, TmfProjectElement>();
+    private static Map<IProject, TmfProjectElement> registry = new HashMap<>();
 
     /**
      * Get the project model element for a project resource

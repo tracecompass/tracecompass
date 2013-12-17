@@ -55,7 +55,7 @@ public class CustomEventsTable extends TmfEventsTable {
         if (fDefinition == null) {
             return;
         }
-        List<ColumnData> columnData = new LinkedList<ColumnData>();
+        List<ColumnData> columnData = new LinkedList<>();
         for (OutputColumn outputColumn : fDefinition.outputs) {
             ColumnData column = new ColumnData(outputColumn.name, 0, SWT.LEFT);
             columnData.add(column);

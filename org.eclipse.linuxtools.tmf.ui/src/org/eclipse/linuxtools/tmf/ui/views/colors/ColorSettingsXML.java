@@ -163,7 +163,7 @@ public class ColorSettingsXML {
     // Helper class
     private static class ColorSettingsContentHandler extends DefaultHandler {
 
-        private List<ColorSetting> colorSettings = new ArrayList<ColorSetting>(0);
+        private List<ColorSetting> colorSettings = new ArrayList<>(0);
         private RGB fg = new RGB(0, 0, 0);
         private RGB bg = new RGB(255, 255, 255);
         private RGB tickColor = new RGB(0, 0, 0);
@@ -174,7 +174,7 @@ public class ColorSettingsXML {
         public void startElement(String uri, String localName, String qName, Attributes attributes)
                 throws SAXException {
             if (localName.equals(COLOR_SETTINGS_TAG)) {
-                colorSettings = new ArrayList<ColorSetting>();
+                colorSettings = new ArrayList<>();
             } else if (localName.equals(COLOR_SETTING_TAG)) {
                 fg = null;
                 bg = null;

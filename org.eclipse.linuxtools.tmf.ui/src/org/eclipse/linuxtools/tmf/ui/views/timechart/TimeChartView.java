@@ -78,9 +78,9 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     private final int fDisplayWidth;
     private TimeGraphViewer fViewer;
-    private final ArrayList<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<TimeChartAnalysisEntry>();
-    private final Map<ITmfTrace, TimeChartDecorationProvider> fDecorationProviders = new HashMap<ITmfTrace, TimeChartDecorationProvider>();
-    private final ArrayList<DecorateThread> fDecorateThreads = new ArrayList<DecorateThread>();
+    private final ArrayList<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<>();
+    private final Map<ITmfTrace, TimeChartDecorationProvider> fDecorationProviders = new HashMap<>();
+    private final ArrayList<DecorateThread> fDecorateThreads = new ArrayList<>();
     private long fStartTime = 0;
     private long fStopTime = Long.MAX_VALUE;
     private boolean fRefreshBusy = false;

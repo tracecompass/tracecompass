@@ -296,19 +296,19 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
 
     @Override
     protected Object createElementViewerInput() {
-        List<TracePackageTraceElement> traceElements = new ArrayList<TracePackageTraceElement>();
+        List<TracePackageTraceElement> traceElements = new ArrayList<>();
         for (TmfTraceElement tmfTraceElement : fSelectedTraces) {
             TracePackageTraceElement traceElement = new TracePackageTraceElement(null, tmfTraceElement);
 
             // Trace files
-            List<TracePackageElement> children = new ArrayList<TracePackageElement>();
+            List<TracePackageElement> children = new ArrayList<>();
             TracePackageFilesElement filesElement = new TracePackageFilesElement(traceElement, tmfTraceElement.getResource());
             filesElement.setChecked(true);
             children.add(filesElement);
 
             // Supplementary files
             IResource[] supplementaryResources = tmfTraceElement.getSupplementaryResources();
-            List<TracePackageElement> suppFilesChildren = new ArrayList<TracePackageElement>();
+            List<TracePackageElement> suppFilesChildren = new ArrayList<>();
             TracePackageSupplFilesElement suppFilesElement = new TracePackageSupplFilesElement(traceElement);
             children.add(suppFilesElement);
             for (IResource res : supplementaryResources) {

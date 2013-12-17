@@ -107,7 +107,7 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
      */
     public TimeGraphFilterDialog(Shell parent) {
         super(parent);
-        setResult(new ArrayList<Object>(0));
+        setResult(new ArrayList<>(0));
         setStatusLineAboveButtons(true);
         setHelpAvailable(false);
         fExpandedElements = null;
@@ -151,7 +151,7 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
      */
     public void addFilter(ViewerFilter filter) {
         if (fFilters == null) {
-            fFilters = new ArrayList<ViewerFilter>();
+            fFilters = new ArrayList<>();
         }
         fFilters.add(filter);
     }

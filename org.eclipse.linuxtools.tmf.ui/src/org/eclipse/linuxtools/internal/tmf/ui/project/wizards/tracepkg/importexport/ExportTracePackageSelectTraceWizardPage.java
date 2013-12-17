@@ -184,7 +184,7 @@ public class ExportTracePackageSelectTraceWizardPage extends WizardPage {
 
     private ArrayList<TmfTraceElement> getCheckedTraces() {
         TableItem[] items = fTraceTable.getItems();
-        ArrayList<TmfTraceElement> traces = new ArrayList<TmfTraceElement>();
+        ArrayList<TmfTraceElement> traces = new ArrayList<>();
         for (TableItem item : items) {
             if (item.getChecked()) {
                 TmfTraceElement trace = (TmfTraceElement) item.getData();

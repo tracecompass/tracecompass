@@ -87,7 +87,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
         fTraceExportElements = traceExportElements;
         fUseCompression = useCompression;
         fUseTar = useTar;
-        fResources = new HashSet<IResource>();
+        fResources = new HashSet<>();
     }
 
     /**
@@ -285,7 +285,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
     }
 
     private IStatus exportToArchive(IProgressMonitor monitor, int totalWork) throws InvocationTargetException, InterruptedException {
-        ArchiveFileExportOperation op = new ArchiveFileExportOperation(new ArrayList<IResource>(fResources), getFileName());
+        ArchiveFileExportOperation op = new ArchiveFileExportOperation(new ArrayList<>(fResources), getFileName());
         op.setCreateLeadupStructure(false);
         op.setUseCompression(fUseCompression);
         op.setUseTarFormat(fUseTar);

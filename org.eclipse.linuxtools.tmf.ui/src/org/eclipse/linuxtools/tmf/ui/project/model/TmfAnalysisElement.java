@@ -73,7 +73,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
      * @return Array of analysis elements
      */
     public List<TmfAnalysisOutputElement> getAvailableOutputs() {
-        List<TmfAnalysisOutputElement> list = new ArrayList<TmfAnalysisOutputElement>();
+        List<TmfAnalysisOutputElement> list = new ArrayList<>();
 
         IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(fAnalysisId);
         if (helper == null) {

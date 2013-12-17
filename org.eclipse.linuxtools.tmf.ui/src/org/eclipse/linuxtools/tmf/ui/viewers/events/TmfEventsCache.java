@@ -72,7 +72,7 @@ public class TmfEventsCache {
     private ITmfTrace fTrace;
     private final TmfEventsTable fTable;
     private ITmfFilter fFilter;
-    private final List<Integer> fFilterIndex = new ArrayList<Integer>(); // contains the event rank at each 'cache size' filtered events
+    private final List<Integer> fFilterIndex = new ArrayList<>(); // contains the event rank at each 'cache size' filtered events
 
     /**
      * Constructor for the event cache

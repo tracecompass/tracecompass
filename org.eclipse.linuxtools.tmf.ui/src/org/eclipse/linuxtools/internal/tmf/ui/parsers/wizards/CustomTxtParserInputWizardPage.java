@@ -538,7 +538,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
      * @return The list of input names
      */
     public List<String> getInputNames() {
-        List<String> inputs = new ArrayList<String>();
+        List<String> inputs = new ArrayList<>();
         for (InputLine inputLine : definition.inputs) {
             for (String inputName : getInputNames(inputLine)) {
                 if (!inputs.contains(inputName)) {
@@ -557,7 +557,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
      * @return The list of input names
      */
     public List<String> getInputNames(InputLine inputLine) {
-        List<String> inputs = new ArrayList<String>();
+        List<String> inputs = new ArrayList<>();
         if (inputLine.columns != null) {
             for (InputData inputData : inputLine.columns) {
                 String inputName = inputData.name;
@@ -628,103 +628,137 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         }
         inputText.setStyleRanges(new StyleRange[] {});
 
-        Scanner scanner = new Scanner(inputText.getText());
-        scanner.useDelimiter("\n"); //$NON-NLS-1$
-        int rawPos = 0;
-        // skip starting delimiters
-        String skip = scanner.findWithinHorizon("\\A\n+", 0); //$NON-NLS-1$
-        if (skip != null) {
-            rawPos += skip.length();
-        }
+        try (Scanner scanner = new Scanner(inputText.getText());) {
+            scanner.useDelimiter("\n"); //$NON-NLS-1$
 
-        timeStampFormat = null;
-        if (selectedLine != null) {
-            for (InputGroup input : selectedLine.inputs) {
-                input.previewText.setText(Messages.CustomTxtParserInputWizardPage_noMathcingLine);
+            int rawPos = 0;
+            // skip starting delimiters
+            String skip = scanner.findWithinHorizon("\\A\n+", 0); //$NON-NLS-1$
+            if (skip != null) {
+                rawPos += skip.length();
             }
-        }
 
-        Map<String, String> data = new HashMap<String, String>();
-        int rootLineMatches = 0;
-        String firstEntryTimeStamp = null;
-        String firstEntryTimeStampInputFormat = null;
-        String log = null;
-    event:
-        while (scanner.hasNext()) {
-            if (rootLineMatches > 0 && !updateAll) {
-                break;
-            }
-            if (log == null) {
-                log = scanner.next();
-            }
-            int length = log.length();
-            for (InputLine rootInputLine : definition.inputs) {
-                Pattern pattern;
-                try {
-                    pattern = rootInputLine.getPattern();
-                } catch (PatternSyntaxException e) {
-                    continue;
+            timeStampFormat = null;
+            if (selectedLine != null) {
+                for (InputGroup input : selectedLine.inputs) {
+                    input.previewText.setText(Messages.CustomTxtParserInputWizardPage_noMathcingLine);
                 }
-                Matcher matcher = pattern.matcher(log);
-                if (matcher.find()) {
-                    rootLineMatches++;
-                    inputText.setStyleRange(new StyleRange(rawPos, length,
-                            COLOR_BLACK, COLOR_YELLOW, SWT.ITALIC));
-                    data = new HashMap<String, String>();
-                    timeStampFormat = null;
-                    updatePreviewLine(rootInputLine, matcher, data, rawPos, rootLineMatches);
-                    if (rootLineMatches == 1) {
-                        firstEntryTimeStamp = data.get(CustomTraceDefinition.TAG_TIMESTAMP);
-                        firstEntryTimeStampInputFormat = timeStampFormat;
+            }
+
+            Map<String, String> data = new HashMap<>();
+            int rootLineMatches = 0;
+            String firstEntryTimeStamp = null;
+            String firstEntryTimeStampInputFormat = null;
+            String log = null;
+            event: while (scanner.hasNext()) {
+                if (rootLineMatches > 0 && !updateAll) {
+                    break;
+                }
+                if (log == null) {
+                    log = scanner.next();
+                }
+                int length = log.length();
+                for (InputLine rootInputLine : definition.inputs) {
+                    Pattern pattern;
+                    try {
+                        pattern = rootInputLine.getPattern();
+                    } catch (PatternSyntaxException e) {
+                        continue;
                     }
-                    HashMap<InputLine, Integer> countMap = new HashMap<InputLine, Integer>();
-                    InputLine currentInput = null;
-                    if (rootInputLine.childrenInputs != null && rootInputLine.childrenInputs.size() > 0) {
-                        currentInput = rootInputLine.childrenInputs.get(0);
-                        countMap.put(currentInput, 0);
-                    }
-                    rawPos += length + 1; // +1 for \n
-                    while (scanner.hasNext()) {
-                        log = scanner.next();
-                        length = log.length();
-                        boolean processed = false;
-                        if (currentInput == null) {
-                            for (InputLine input : definition.inputs) {
-                                matcher = input.getPattern().matcher(log);
-                                if (matcher.find()) {
-                                    continue event;
+                    Matcher matcher = pattern.matcher(log);
+                    if (matcher.find()) {
+                        rootLineMatches++;
+                        inputText.setStyleRange(new StyleRange(rawPos, length,
+                                COLOR_BLACK, COLOR_YELLOW, SWT.ITALIC));
+                        data = new HashMap<>();
+                        timeStampFormat = null;
+                        updatePreviewLine(rootInputLine, matcher, data, rawPos, rootLineMatches);
+                        if (rootLineMatches == 1) {
+                            firstEntryTimeStamp = data.get(CustomTraceDefinition.TAG_TIMESTAMP);
+                            firstEntryTimeStampInputFormat = timeStampFormat;
+                        }
+                        HashMap<InputLine, Integer> countMap = new HashMap<>();
+                        InputLine currentInput = null;
+                        if (rootInputLine.childrenInputs != null && rootInputLine.childrenInputs.size() > 0) {
+                            currentInput = rootInputLine.childrenInputs.get(0);
+                            countMap.put(currentInput, 0);
+                        }
+                        rawPos += length + 1; // +1 for \n
+                        while (scanner.hasNext()) {
+                            log = scanner.next();
+                            length = log.length();
+                            boolean processed = false;
+                            if (currentInput == null) {
+                                for (InputLine input : definition.inputs) {
+                                    matcher = input.getPattern().matcher(log);
+                                    if (matcher.find()) {
+                                        continue event;
+                                    }
                                 }
-                            }
-                        } else {
-                            if (countMap.get(currentInput) >= currentInput.getMinCount()) {
-                                List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
-                                if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
-                                    for (InputLine input : definition.inputs) {
+                            } else {
+                                if (countMap.get(currentInput) >= currentInput.getMinCount()) {
+                                    List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
+                                    if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
+                                        for (InputLine input : definition.inputs) {
+                                            matcher = input.getPattern().matcher(log);
+                                            if (matcher.find()) {
+                                                continue event;
+                                            }
+                                        }
+                                    }
+                                    for (InputLine input : nextInputs) {
                                         matcher = input.getPattern().matcher(log);
                                         if (matcher.find()) {
-                                            continue event;
+                                            inputText.setStyleRange(new StyleRange(rawPos, length,
+                                                    COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
+                                            currentInput = input;
+                                            updatePreviewLine(currentInput, matcher, data, rawPos, rootLineMatches);
+                                            if (countMap.get(currentInput) == null) {
+                                                countMap.put(currentInput, 1);
+                                            } else {
+                                                countMap.put(currentInput, countMap.get(currentInput) + 1);
+                                            }
+                                            Iterator<InputLine> iter = countMap.keySet().iterator();
+                                            while (iter.hasNext()) {
+                                                InputLine inputLine = iter.next();
+                                                if (inputLine.level > currentInput.level) {
+                                                    iter.remove();
+                                                }
+                                            }
+                                            if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
+                                                currentInput = currentInput.childrenInputs.get(0);
+                                                countMap.put(currentInput, 0);
+                                            } else {
+                                                if (countMap.get(currentInput) >= currentInput.getMaxCount()) {
+                                                    if (currentInput.getNextInputs(countMap).size() > 0) {
+                                                        currentInput = currentInput.getNextInputs(countMap).get(0);
+                                                        if (countMap.get(currentInput) == null) {
+                                                            countMap.put(currentInput, 0);
+                                                        }
+                                                        iter = countMap.keySet().iterator();
+                                                        while (iter.hasNext()) {
+                                                            InputLine inputLine = iter.next();
+                                                            if (inputLine.level > currentInput.level) {
+                                                                iter.remove();
+                                                            }
+                                                        }
+                                                    } else {
+                                                        currentInput = null;
+                                                    }
+                                                }
+                                            }
+                                            processed = true;
+                                            break;
                                         }
                                     }
                                 }
-                                for (InputLine input : nextInputs) {
-                                    matcher = input.getPattern().matcher(log);
+                                if (!processed && currentInput != null) {
+                                    matcher = currentInput.getPattern().matcher(log);
                                     if (matcher.find()) {
                                         inputText.setStyleRange(new StyleRange(rawPos, length,
                                                 COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
-                                        currentInput = input;
                                         updatePreviewLine(currentInput, matcher, data, rawPos, rootLineMatches);
-                                        if (countMap.get(currentInput) == null) {
-                                            countMap.put(currentInput, 1);
-                                        } else {
-                                            countMap.put(currentInput, countMap.get(currentInput) + 1);
-                                        }
-                                        Iterator<InputLine> iter = countMap.keySet().iterator();
-                                        while (iter.hasNext()) {
-                                            InputLine inputLine = iter.next();
-                                            if (inputLine.level > currentInput.level) {
-                                                iter.remove();
-                                            }
-                                        }
+                                        countMap.put(currentInput, countMap.get(currentInput) + 1);
                                         if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
                                             currentInput = currentInput.childrenInputs.get(0);
                                             countMap.put(currentInput, 0);
@@ -735,7 +769,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                                     if (countMap.get(currentInput) == null) {
                                                         countMap.put(currentInput, 0);
                                                     }
-                                                    iter = countMap.keySet().iterator();
+                                                    Iterator<InputLine> iter = countMap.keySet().iterator();
                                                     while (iter.hasNext()) {
                                                         InputLine inputLine = iter.next();
                                                         if (inputLine.level > currentInput.level) {
@@ -747,79 +781,46 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                                 }
                                             }
                                         }
-                                        processed = true;
-                                        break;
                                     }
                                 }
                             }
-                            if (!processed && currentInput != null) {
-                                matcher = currentInput.getPattern().matcher(log);
-                                if (matcher.find()) {
-                                    inputText.setStyleRange(new StyleRange(rawPos, length,
-                                            COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
-                                    updatePreviewLine(currentInput, matcher, data, rawPos, rootLineMatches);
-                                    countMap.put(currentInput, countMap.get(currentInput) + 1);
-                                    if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
-                                        currentInput = currentInput.childrenInputs.get(0);
-                                        countMap.put(currentInput, 0);
-                                    } else {
-                                        if (countMap.get(currentInput) >= currentInput.getMaxCount()) {
-                                            if (currentInput.getNextInputs(countMap).size() > 0) {
-                                                currentInput = currentInput.getNextInputs(countMap).get(0);
-                                                if (countMap.get(currentInput) == null) {
-                                                    countMap.put(currentInput, 0);
-                                                }
-                                                Iterator<InputLine> iter = countMap.keySet().iterator();
-                                                while (iter.hasNext()) {
-                                                    InputLine inputLine = iter.next();
-                                                    if (inputLine.level > currentInput.level) {
-                                                        iter.remove();
-                                                    }
-                                                }
-                                            } else {
-                                                currentInput = null;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            rawPos += length + 1; // +1 for \n
                         }
-                        rawPos += length + 1; // +1 for \n
-                    }
 
-                    break;
-                }
-            }
-            rawPos += length + 1; // +1 for \n
-            log = null;
-        }
-        scanner.close();
-        if (rootLineMatches == 1) {
-            firstEntryTimeStamp = data.get(CustomTraceDefinition.TAG_TIMESTAMP);
-            firstEntryTimeStampInputFormat = timeStampFormat;
-        }
-        if (firstEntryTimeStamp == null) {
-            timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noTimestampGroup);
-            if (selectedLine != null) {
-                for (InputGroup group : selectedLine.inputs) {
-                    if (group.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
-                        timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noMatchingTimestamp);
                         break;
                     }
                 }
-            }
-        } else {
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(firstEntryTimeStampInputFormat);
-                Date date = dateFormat.parse(firstEntryTimeStamp);
-                dateFormat = new SimpleDateFormat(timestampOutputFormatText.getText().trim());
-                timestampPreviewText.setText(dateFormat.format(date));
-            } catch (ParseException e) {
-                timestampPreviewText.setText("*parse exception* [" + firstEntryTimeStamp + "] <> [" + firstEntryTimeStampInputFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            } catch (IllegalArgumentException e) {
-                timestampPreviewText.setText("*parse exception* [Illegal Argument]"); //$NON-NLS-1$
+                rawPos += length + 1; // +1 for \n
+                log = null;
             }
 
+            if (rootLineMatches == 1) {
+                firstEntryTimeStamp = data.get(CustomTraceDefinition.TAG_TIMESTAMP);
+                firstEntryTimeStampInputFormat = timeStampFormat;
+            }
+            if (firstEntryTimeStamp == null) {
+                timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noTimestampGroup);
+                if (selectedLine != null) {
+                    for (InputGroup group : selectedLine.inputs) {
+                        if (group.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                            timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noMatchingTimestamp);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(firstEntryTimeStampInputFormat);
+                    Date date = dateFormat.parse(firstEntryTimeStamp);
+                    dateFormat = new SimpleDateFormat(timestampOutputFormatText.getText().trim());
+                    timestampPreviewText.setText(dateFormat.format(date));
+                } catch (ParseException e) {
+                    timestampPreviewText.setText("*parse exception* [" + firstEntryTimeStamp + "] <> [" + firstEntryTimeStampInputFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                } catch (IllegalArgumentException e) {
+                    timestampPreviewText.setText("*parse exception* [Illegal Argument]"); //$NON-NLS-1$
+                }
+
+            }
         }
     }
 
@@ -995,7 +996,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         private Label cardinalityMaxLabel;
         private Text cardinalityMaxText;
         private Button infiniteButton;
-        private List<InputGroup> inputs = new ArrayList<InputGroup>();
+        private List<InputGroup> inputs = new ArrayList<>();
         private Button addGroupButton;
         private Label addGroupLabel;
 
@@ -1276,7 +1277,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 inputLine.cardinality = Cardinality.ZERO_OR_MORE;
                 break;
             }
-            inputLine.columns = new ArrayList<InputData>(inputs.size());
+            inputLine.columns = new ArrayList<>(inputs.size());
             for (int i = 0; i < inputs.size(); i++) {
                 InputGroup grp = inputs.get(i);
                 InputData inputData = new InputData();

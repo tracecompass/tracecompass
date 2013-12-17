@@ -102,7 +102,7 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
      */
     public List<TmfTraceElement> getTraces() {
         List<ITmfProjectModelElement> children = getChildren();
-        List<TmfTraceElement> traces = new ArrayList<TmfTraceElement>();
+        List<TmfTraceElement> traces = new ArrayList<>();
         for (ITmfProjectModelElement child : children) {
             if (child instanceof TmfTraceElement) {
                 traces.add((TmfTraceElement) child);

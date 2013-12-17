@@ -71,7 +71,7 @@ public class TmfStatisticsTreeNode {
         fTree = tree;
         fPath = path;
         fParent = parent;
-        fChildren = new HashMap<String, TmfStatisticsTreeNode>();
+        fChildren = new HashMap<>();
         fValues = new TmfStatisticsValues();
     }
 

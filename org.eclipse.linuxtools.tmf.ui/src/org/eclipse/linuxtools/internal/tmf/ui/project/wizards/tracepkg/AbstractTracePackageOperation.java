@@ -218,7 +218,7 @@ abstract public class AbstractTracePackageOperation {
 
         @Override
         public Enumeration<? extends ArchiveEntry> entries() {
-            Vector<ArchiveEntry> v = new Vector<ArchiveEntry>();
+            Vector<ArchiveEntry> v = new Vector<>();
             for (Enumeration<?> e = fTarFile.entries(); e.hasMoreElements();) {
                 v.add(new TarArchiveEntry((TarEntry) e.nextElement()));
             }
@@ -329,7 +329,7 @@ abstract public class AbstractTracePackageOperation {
 
         @Override
         public Enumeration<? extends ArchiveEntry> entries() {
-            Vector<ArchiveEntry> v = new Vector<ArchiveEntry>();
+            Vector<ArchiveEntry> v = new Vector<>();
             for (Enumeration<?> e = fZipFile.entries(); e.hasMoreElements();) {
                 v.add(new ZipAchiveEntry((ZipEntry) e.nextElement()));
             }

@@ -35,8 +35,8 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
  */
 class ImportTraceContentProvider implements ITreeContentProvider {
 
-    private final Map<String, String> fTraceTypes = new HashMap<String, String>();
-    private final Map<String, Set<FileAndName>> fTraceFiles = new HashMap<String, Set<FileAndName>>();
+    private final Map<String, String> fTraceTypes = new HashMap<>();
+    private final Map<String, Set<FileAndName>> fTraceFiles = new HashMap<>();
     private final List<String> fTraceTypesToScan;
     private final Set<String> fParentFilesToScan;
 
@@ -91,7 +91,7 @@ class ImportTraceContentProvider implements ITreeContentProvider {
 
     @Override
     public synchronized Object[] getElements(Object inputElement) {
-        List<String> candidates = new ArrayList<String>();
+        List<String> candidates = new ArrayList<>();
 
         for (String candidate : fTraceTypesToScan) {
             for (Entry<String, String> entry : fTraceTypes.entrySet()) {
@@ -110,7 +110,7 @@ class ImportTraceContentProvider implements ITreeContentProvider {
         if (parentElement instanceof String) {
             final Set<FileAndName> children = fTraceFiles.get(fTraceTypes.get(parentElement));
             if (children != null) {
-                Set<FileAndName> candidates = new TreeSet<FileAndName>();
+                Set<FileAndName> candidates = new TreeSet<>();
                 for (FileAndName child : children) {
                     for (String parent : fParentFilesToScan) {
                         // this is going to be slow, but less slow than UI

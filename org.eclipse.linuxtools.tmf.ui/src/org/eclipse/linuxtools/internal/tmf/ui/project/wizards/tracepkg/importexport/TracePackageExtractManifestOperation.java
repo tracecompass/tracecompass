@@ -147,7 +147,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
     private TracePackageElement[] generateElementsFromArchive() {
         ArchiveFile archiveFile = getSpecifiedArchiveFile();
         Enumeration<?> entries = archiveFile.entries();
-        Set<String> traceFileNames = new HashSet<String>();
+        Set<String> traceFileNames = new HashSet<>();
         while (entries.hasMoreElements()) {
             ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
             String entryName = entry.getName();
@@ -157,7 +157,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
             }
         }
 
-        List<TracePackageElement> packageElements = new ArrayList<TracePackageElement>();
+        List<TracePackageElement> packageElements = new ArrayList<>();
         for (String traceFileName : traceFileNames) {
             TracePackageTraceElement traceElement = new TracePackageTraceElement(null, traceFileName, null);
             traceElement.setChildren(new TracePackageElement[] { new TracePackageFilesElement(traceElement, traceFileName) });
@@ -196,7 +196,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
     }
 
     private static TracePackageElement[] loadElementsFromManifest(InputStream inputStream) throws IOException, SAXException, ParserConfigurationException {
-        List<TracePackageElement> packageElements = new ArrayList<TracePackageElement>();
+        List<TracePackageElement> packageElements = new ArrayList<>();
         TracePackageElement element = null;
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
 
@@ -209,7 +209,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 String traceType = traceElement.getAttribute(ITracePackageConstants.TRACE_TYPE_ATTRIB);
                 element = new TracePackageTraceElement(null, traceName, traceType);
 
-                List<TracePackageElement> children = new ArrayList<TracePackageElement>();
+                List<TracePackageElement> children = new ArrayList<>();
                 NodeList fileElements = traceElement.getElementsByTagName(ITracePackageConstants.TRACE_FILE_ELEMENT);
                 for (int j = 0; j < fileElements.getLength(); ++j) {
                     Node fileNode = fileElements.item(j);
@@ -223,7 +223,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 TracePackageSupplFilesElement supplFilesElement = new TracePackageSupplFilesElement(element);
 
                 // Supplementary files
-                List<TracePackageSupplFileElement> suppFiles = new ArrayList<TracePackageSupplFileElement>();
+                List<TracePackageSupplFileElement> suppFiles = new ArrayList<>();
                 NodeList suppFilesElements = traceElement.getElementsByTagName(ITracePackageConstants.SUPPLEMENTARY_FILE_ELEMENT);
                 for (int j = 0; j < suppFilesElements.getLength(); ++j) {
                     Node suppFileNode = suppFilesElements.item(j);
@@ -241,7 +241,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 }
 
                 // bookmarks
-                List<Map<String, String>> bookmarkAttribs = new ArrayList<Map<String, String>>();
+                List<Map<String, String>> bookmarkAttribs = new ArrayList<>();
                 NodeList bookmarksElements = traceElement.getElementsByTagName(ITracePackageConstants.BOOKMARKS_ELEMENT);
                 for (int j = 0; j < bookmarksElements.getLength(); ++j) {
                     Node bookmarksNode = bookmarksElements.item(j);
@@ -252,7 +252,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                             if (bookmarkNode.getNodeType() == Node.ELEMENT_NODE) {
                                 Element bookmarkElement = (Element) bookmarkNode;
                                 NamedNodeMap attributesMap = bookmarkElement.getAttributes();
-                                Map<String, String> attribs = new HashMap<String, String>();
+                                Map<String, String> attribs = new HashMap<>();
                                 for (int l = 0; l < attributesMap.getLength(); ++l) {
                                     Node item = attributesMap.item(l);
                                     attribs.put(item.getNodeName(), item.getNodeValue());

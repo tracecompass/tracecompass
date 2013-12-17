@@ -87,8 +87,8 @@ public class SynchronizeTracesHandler extends AbstractHandler {
 
         // Make sure selection contains only traces
         fSelection = null;
-        final ArrayList<TmfTraceElement> tl = new ArrayList<TmfTraceElement>();
-        final ArrayList<TmfExperimentElement> uiexperiment = new ArrayList<TmfExperimentElement>();
+        final ArrayList<TmfTraceElement> tl = new ArrayList<>();
+        final ArrayList<TmfExperimentElement> uiexperiment = new ArrayList<>();
         if (selection instanceof TreeSelection) {
             fSelection = (TreeSelection) selection;
             Iterator<Object> iterator = fSelection.iterator();

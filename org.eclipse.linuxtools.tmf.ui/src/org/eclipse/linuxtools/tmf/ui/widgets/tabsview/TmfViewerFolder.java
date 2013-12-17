@@ -67,7 +67,7 @@ public class TmfViewerFolder extends Composite {
         super(parent, style);
         setLayout(new FillLayout());
 
-        fViewers = new HashMap<String, ITmfViewer>();
+        fViewers = new HashMap<>();
         initFolder();
     }
 

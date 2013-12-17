@@ -30,8 +30,8 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TraceTypeHelper;
  */
 public class TraceTypeContentProvider implements ITreeContentProvider {
 
-    private final List<String> fTraceCategory = new ArrayList<String>();
-    private final Map<String, List<TraceTypeHelper>> fTraceType = new HashMap<String, List<TraceTypeHelper>>();
+    private final List<String> fTraceCategory = new ArrayList<>();
+    private final Map<String, List<TraceTypeHelper>> fTraceType = new HashMap<>();
 
     /**
      * Default Constructor

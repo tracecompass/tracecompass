@@ -39,7 +39,7 @@ public class FilterTreeContentProvider implements ITreeContentProvider {
     @Override
     public Object[] getElements(Object inputElement) {
         if (inputElement instanceof ITmfFilterTreeNode) {
-            ArrayList<ITmfFilterTreeNode> result = new ArrayList<ITmfFilterTreeNode>();
+            ArrayList<ITmfFilterTreeNode> result = new ArrayList<>();
             for (int i = 0; i < ((ITmfFilterTreeNode) inputElement).getChildrenCount(); i++) {
                 result.add(((ITmfFilterTreeNode) inputElement).getChild(i));
             }
@@ -51,7 +51,7 @@ public class FilterTreeContentProvider implements ITreeContentProvider {
 
     @Override
     public Object[] getChildren(Object parentElement) {
-        ArrayList<ITmfFilterTreeNode> result = new ArrayList<ITmfFilterTreeNode>();
+        ArrayList<ITmfFilterTreeNode> result = new ArrayList<>();
         for (int i = 0; i < ((ITmfFilterTreeNode) parentElement).getChildrenCount(); i++) {
             result.add(((ITmfFilterTreeNode) parentElement).getChild(i));
         }

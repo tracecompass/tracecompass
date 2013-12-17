@@ -159,7 +159,7 @@ public class ColorsView extends TmfView {
         gl.verticalSpacing = 1;
         fListComposite.setLayout(gl);
 
-        fColorSettings = new ArrayList<ColorSetting>(Arrays.asList(ColorSettingsManager.getColorSettings()));
+        fColorSettings = new ArrayList<>(Arrays.asList(ColorSettingsManager.getColorSettings()));
         for (ColorSetting colorSetting : fColorSettings) {
             new ColorSettingRow(fListComposite, colorSetting);
         }
@@ -373,7 +373,7 @@ public class ColorsView extends TmfView {
                                     control.dispose();
                                 }
                             }
-                            fColorSettings = new ArrayList<ColorSetting>();
+                            fColorSettings = new ArrayList<>();
                             fSelectedRow = null;
                         }
                     }

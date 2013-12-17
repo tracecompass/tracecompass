@@ -70,7 +70,7 @@ public class CustomEvent extends TmfEvent {
      */
     public CustomEvent(CustomTraceDefinition definition) {
         fDefinition = definition;
-        fData = new HashMap<String, String>();
+        fData = new HashMap<>();
     }
 
     /**
@@ -84,7 +84,7 @@ public class CustomEvent extends TmfEvent {
     public CustomEvent(CustomTraceDefinition definition, TmfEvent other) {
         super(other);
         fDefinition = definition;
-        fData = new HashMap<String, String>();
+        fData = new HashMap<>();
 
         /* Set our overridden fields */
         customEventTimestamp = other.getTimestamp();
@@ -114,7 +114,7 @@ public class CustomEvent extends TmfEvent {
         /* Do not use upstream's fields for stuff we override */
         super(parentTrace, null, source, null, null, reference);
         fDefinition = definition;
-        fData = new HashMap<String, String>();
+        fData = new HashMap<>();
 
         /* Set our overridden fields */
         customEventTimestamp = timestamp;

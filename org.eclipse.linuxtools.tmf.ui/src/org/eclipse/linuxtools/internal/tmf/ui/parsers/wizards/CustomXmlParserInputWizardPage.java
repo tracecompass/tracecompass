@@ -640,7 +640,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
      * @return The input names for this element
      */
     public List<String> getInputNames(InputElement inputElement) {
-        List<String> inputs = new ArrayList<String>();
+        List<String> inputs = new ArrayList<>();
         if (inputElement.inputName != null && !inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
             String inputName = inputElement.inputName;
             if (!inputs.contains(inputName)) {
@@ -690,16 +690,13 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             }
         }
         if (inputStream != null) {
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(inputStream));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));) {
                 StringBuilder sb = new StringBuilder();
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n"); //$NON-NLS-1$
                 }
                 parseXmlInput(sb.toString());
-                reader.close();
                 return sb.toString();
             } catch (IOException e) {
                 return ""; //$NON-NLS-1$
@@ -845,8 +842,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private class ElementNode {
         private final InputElement inputElement;
         private final Group group;
-        private List<Attribute> attributes = new ArrayList<Attribute>();
-        private List<ElementNode> childElements = new ArrayList<ElementNode>();
+        private List<Attribute> attributes = new ArrayList<>();
+        private List<ElementNode> childElements = new ArrayList<>();
         private Text elementNameText;
         private Composite tagComposite;
         private Combo tagCombo;
@@ -1179,7 +1176,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 }
                 inputElement.inputAction = actionCombo.getSelectionIndex();
             }
-            inputElement.attributes = new ArrayList<InputAttribute>(attributes.size());
+            inputElement.attributes = new ArrayList<>(attributes.size());
             for (int i = 0; i < attributes.size(); i++) {
                 Attribute attribute = attributes.get(i);
                 InputAttribute inputAttribute = new InputAttribute();
@@ -1376,7 +1373,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (!documentElement.getNodeName().equals(definition.rootInputElement.elementName)) {
                 return null;
             }
-            ArrayList<String> elementNames = new ArrayList<String>();
+            ArrayList<String> elementNames = new ArrayList<>();
             while (currentElement != null) {
                 elementNames.add(currentElement.elementName);
                 currentElement = currentElement.parentElement;

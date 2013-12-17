@@ -173,9 +173,9 @@ public class TmfStateSystemExplorer extends TmfView {
              * sub-tree in the UI thread.
              */
             Map<String, ITmfStateSystemAnalysisModule> modules = currentTrace.getAnalysisModules(ITmfStateSystemAnalysisModule.class);
-            final Map<String, ITmfStateSystem> sss = new HashMap<String, ITmfStateSystem>();
+            final Map<String, ITmfStateSystem> sss = new HashMap<>();
             final Map<String, List<ITmfStateInterval>> fullStates =
-                    new LinkedHashMap<String, List<ITmfStateInterval>>();
+                    new LinkedHashMap<>();
             for (Entry<String, ITmfStateSystemAnalysisModule> entry : modules.entrySet()) {
                 /*
                  * FIXME: For now, this view is a way to execute and display

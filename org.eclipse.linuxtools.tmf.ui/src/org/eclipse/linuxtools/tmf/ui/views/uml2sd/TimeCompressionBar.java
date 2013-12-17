@@ -156,7 +156,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         super(parent, s | SWT.NO_BACKGROUND, false);
         setVScrollBarMode(ScrollView.ALWAYS_OFF);
         setHScrollBarMode(ScrollView.ALWAYS_OFF);
-        fListenerList = new ArrayList<ITimeCompressionListener>();
+        fListenerList = new ArrayList<>();
         fColors = new ColorImpl[NUMBER_STEPS];
         int greenBlue = BASE_GREEN_BLUE_VALUE;
         final int step = COLOR_STEP;
@@ -276,7 +276,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         if (fFrame == null) {
             return;
         }
-        fNodeList = new ArrayList<SDTimeEvent>();
+        fNodeList = new ArrayList<>();
         int messageArraysStep = 1;
 
         if ((Metrics.getMessageFontHeigth() + Metrics.MESSAGES_NAME_SPACING * 2) * fZoomValue < Metrics.MESSAGE_SIGNIFICANT_VSPACING + 1) {

@@ -97,9 +97,9 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     private TimeGraphColorScheme fColorScheme;
     private ITimeGraphPresentationProvider fTimeGraphProvider;
 
-    private List<ITimeGraphSelectionListener> fSelectionListeners = new ArrayList<ITimeGraphSelectionListener>();
-    private List<ITimeGraphTimeListener> fTimeListeners = new ArrayList<ITimeGraphTimeListener>();
-    private List<ITimeGraphRangeListener> fRangeListeners = new ArrayList<ITimeGraphRangeListener>();
+    private List<ITimeGraphSelectionListener> fSelectionListeners = new ArrayList<>();
+    private List<ITimeGraphTimeListener> fTimeListeners = new ArrayList<>();
+    private List<ITimeGraphRangeListener> fRangeListeners = new ArrayList<>();
 
     // Time format, using Epoch reference, Relative time format(default) or
     // Number

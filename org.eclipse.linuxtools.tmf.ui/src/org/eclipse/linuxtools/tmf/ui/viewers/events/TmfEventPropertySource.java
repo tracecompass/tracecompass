@@ -123,7 +123,7 @@ public class TmfEventPropertySource implements IPropertySource {
 
         @Override
         public IPropertyDescriptor[] getPropertyDescriptors() {
-            List<IPropertyDescriptor> descriptors= new ArrayList<IPropertyDescriptor>(fContent.getFields().length);
+            List<IPropertyDescriptor> descriptors= new ArrayList<>(fContent.getFields().length);
             for (ITmfEventField field : fContent.getFields()) {
                 if (field != null) {
                     descriptors.add(new ReadOnlyTextPropertyDescriptor(field, field.getName()));
@@ -181,7 +181,7 @@ public class TmfEventPropertySource implements IPropertySource {
 
         @Override
         public IPropertyDescriptor[] getPropertyDescriptors() {
-            List<IPropertyDescriptor> descriptors= new ArrayList<IPropertyDescriptor>();
+            List<IPropertyDescriptor> descriptors= new ArrayList<>();
             if (fSourceLookup.getCallsite() != null) {
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_FILE_NAME, NAME_FILE_NAME));
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_LINE_NUMBER, NAME_LINE_NUMBER));
@@ -235,7 +235,7 @@ public class TmfEventPropertySource implements IPropertySource {
 
         @Override
         public IPropertyDescriptor[] getPropertyDescriptors() {
-            List<IPropertyDescriptor> descriptors = new ArrayList<IPropertyDescriptor>();
+            List<IPropertyDescriptor> descriptors = new ArrayList<>();
 
             for (String customAttribute : event.listCustomAttributes()) {
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(customAttribute, customAttribute));
@@ -280,7 +280,7 @@ public class TmfEventPropertySource implements IPropertySource {
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> descriptors= new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> descriptors= new ArrayList<>();
 
         /* Display basic event information */
         descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP, NAME_TIMESTAMP));

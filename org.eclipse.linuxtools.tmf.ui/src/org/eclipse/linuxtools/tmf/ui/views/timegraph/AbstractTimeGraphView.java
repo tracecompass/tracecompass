@@ -101,10 +101,10 @@ public abstract class AbstractTimeGraphView extends TmfView {
     private List<TimeGraphEntry> fEntryList;
 
     /** The trace to entry list hash map */
-    private final Map<ITmfTrace, List<TimeGraphEntry>> fEntryListMap = new HashMap<ITmfTrace, List<TimeGraphEntry>>();
+    private final Map<ITmfTrace, List<TimeGraphEntry>> fEntryListMap = new HashMap<>();
 
     /* The trace to build thread hash map */
-    private final Map<ITmfTrace, BuildThread> fBuildThreadMap = new HashMap<ITmfTrace, BuildThread>();
+    private final Map<ITmfTrace, BuildThread> fBuildThreadMap = new HashMap<>();
 
     /** The start time */
     private long fStartTime;
@@ -972,7 +972,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
      */
     protected List<ILinkEvent> getLinkList(long startTime, long endTime,
             long resolution, IProgressMonitor monitor) {
-        return new ArrayList<ILinkEvent>();
+        return new ArrayList<>();
     }
 
 
@@ -990,7 +990,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 synchronized (fEntryListMap) {
                     fEntryList = fEntryListMap.get(fTrace);
                     if (fEntryList == null) {
-                        fEntryList = new ArrayList<TimeGraphEntry>();
+                        fEntryList = new ArrayList<>();
                     }
                     entries = fEntryList.toArray(new ITimeGraphEntry[0]);
                 }

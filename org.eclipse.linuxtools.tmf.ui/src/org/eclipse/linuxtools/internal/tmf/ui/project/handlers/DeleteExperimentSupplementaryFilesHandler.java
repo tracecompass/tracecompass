@@ -74,7 +74,7 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
             TreeSelection sel = (TreeSelection) selection;
             // There should be only one item selected as per the plugin.xml
             Object element = sel.getFirstElement();
-            List<IResource> resourcesList = new ArrayList<IResource>();
+            List<IResource> resourcesList = new ArrayList<>();
 
             if (element instanceof TmfExperimentElement) {
 
@@ -87,7 +87,7 @@ public class DeleteExperimentSupplementaryFilesHandler extends AbstractHandler {
                 resourcesList.addAll(experimentResources);
 
                 // Map to know which trace to close for each resource
-                HashMap<IResource, TmfTraceElement> traceMap = new HashMap<IResource, TmfTraceElement>();
+                HashMap<IResource, TmfTraceElement> traceMap = new HashMap<>();
 
                 for (TmfTraceElement aTrace : experiment.getTraces()) {
 

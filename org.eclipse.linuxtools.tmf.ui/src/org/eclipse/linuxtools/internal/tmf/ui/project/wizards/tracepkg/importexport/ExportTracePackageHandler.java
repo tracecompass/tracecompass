@@ -48,7 +48,7 @@ public class ExportTracePackageHandler extends AbstractHandler {
 
         ISelection currentSelection = HandlerUtil.getCurrentSelection(event);
         IStructuredSelection sec = StructuredSelection.EMPTY;
-        List<TmfTraceElement> selectedTraces = new ArrayList<TmfTraceElement>();
+        List<TmfTraceElement> selectedTraces = new ArrayList<>();
         if (currentSelection instanceof IStructuredSelection) {
             sec = (IStructuredSelection) currentSelection;
             Object[] selectedElements = sec.toArray();

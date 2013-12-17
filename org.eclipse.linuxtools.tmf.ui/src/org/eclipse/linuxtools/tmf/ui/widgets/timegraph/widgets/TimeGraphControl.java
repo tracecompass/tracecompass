@@ -131,15 +131,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private ITimeGraphPresentationProvider fTimeGraphProvider = null;
     private ItemData fItemData = null;
     private List<SelectionListener> fSelectionListeners;
-    private final List<ISelectionChangedListener> fSelectionChangedListeners = new ArrayList<ISelectionChangedListener>();
-    private final List<ITimeGraphTreeListener> fTreeListeners = new ArrayList<ITimeGraphTreeListener>();
-    private final List<MenuDetectListener> fTimeGraphEntryMenuListeners = new ArrayList<MenuDetectListener>();
-    private final List<MenuDetectListener> fTimeEventMenuListeners = new ArrayList<MenuDetectListener>();
+    private final List<ISelectionChangedListener> fSelectionChangedListeners = new ArrayList<>();
+    private final List<ITimeGraphTreeListener> fTreeListeners = new ArrayList<>();
+    private final List<MenuDetectListener> fTimeGraphEntryMenuListeners = new ArrayList<>();
+    private final List<MenuDetectListener> fTimeEventMenuListeners = new ArrayList<>();
     private final Cursor fDragCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_HAND);
     private final Cursor fResizeCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
     private final Cursor fWaitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_WAIT);
     private final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
-    private final List<ViewerFilter> fFilters = new ArrayList<ViewerFilter>();
+    private final List<ViewerFilter> fFilters = new ArrayList<>();
     private MenuDetectEvent fPendingMenuDetectEvent = null;
     private boolean fHideArrows = false;
 
@@ -287,7 +287,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             SWT.error(SWT.ERROR_NULL_ARGUMENT);
         }
         if (null == fSelectionListeners) {
-            fSelectionListeners = new ArrayList<SelectionListener>();
+            fSelectionListeners = new ArrayList<>();
         }
         fSelectionListeners.add(listener);
     }
@@ -1162,7 +1162,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @return The expanded elements
      */
     public ITimeGraphEntry[] getExpandedElements() {
-        ArrayList<ITimeGraphEntry> elements = new ArrayList<ITimeGraphEntry>();
+        ArrayList<ITimeGraphEntry> elements = new ArrayList<>();
         for (Item item : fItemData.fExpandedItems) {
             elements.add(item.fTrace);
         }
@@ -2436,9 +2436,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
         private Item[] fExpandedItems = new Item[0];
         private Item[] fItems = new Item[0];
         private ITimeGraphEntry fTraces[] = new ITimeGraphEntry[0];
-        private List<ILinkEvent> fLinks = new ArrayList<ILinkEvent>();
+        private List<ILinkEvent> fLinks = new ArrayList<>();
         private boolean fTraceFilter[] = new boolean[0];
-        private final ArrayList<ITimeGraphEntry> fFilteredOut = new ArrayList<ITimeGraphEntry>();
+        private final ArrayList<ITimeGraphEntry> fFilteredOut = new ArrayList<>();
 
         public ItemData() {
         }
@@ -2474,7 +2474,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         public void refreshData() {
-            List<Item> itemList = new ArrayList<Item>();
+            List<Item> itemList = new ArrayList<>();
             fFilteredOut.clear();
             ITimeGraphEntry selection = getSelectedTrace();
             for (int i = 0; i < fTraces.length; i++) {
@@ -2514,7 +2514,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         public void updateExpandedItems() {
-            List<Item> expandedItemList = new ArrayList<Item>();
+            List<Item> expandedItemList = new ArrayList<>();
             for (int i = 0; i < fTraces.length; i++) {
                 ITimeGraphEntry entry = fTraces[i];
                 Item item = findItem(entry);
@@ -2565,7 +2565,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (events != null) {
                 fLinks = events;
             } else {
-                fLinks = new ArrayList<ILinkEvent>();
+                fLinks = new ArrayList<>();
             }
         }
 
@@ -2596,7 +2596,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             this.fTrace = trace;
             this.fName = name;
             this.fLevel = level;
-            this.fChildren = new ArrayList<Item>();
+            this.fChildren = new ArrayList<>();
         }
 
         @Override

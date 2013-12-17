@@ -138,10 +138,10 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
         fPrefStore.setDefault(PREF_USE_GRADIENT, true);
         fPrefStore.setDefault(PREF_TOOLTIP, true);
 
-        fFontPref = new Hashtable<String, IFont>();
-        fForeColorPref = new Hashtable<String, IColor>();
-        fBackColorPref = new Hashtable<String, IColor>();
-        fTextColorPref = new Hashtable<String, IColor>();
+        fFontPref = new Hashtable<>();
+        fForeColorPref = new Hashtable<>();
+        fBackColorPref = new Hashtable<>();
+        fTextColorPref = new Hashtable<>();
 
         for (int i = 0; i < FONT_LIST.length; i++) {
             if (FONT_LIST[i].equals(PREF_FRAME_NAME)) {

@@ -52,7 +52,7 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
      * Standard constructor
      */
     protected SDWidgetSelectionProvider() {
-        fListenerList = new ArrayList<ISelectionChangedListener>();
+        fListenerList = new ArrayList<>();
     }
 
     // ------------------------------------------------------------------------

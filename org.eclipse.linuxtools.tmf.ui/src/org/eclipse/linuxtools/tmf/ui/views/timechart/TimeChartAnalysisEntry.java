@@ -39,7 +39,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
 
     TimeChartAnalysisEntry(ITmfTrace trace, int modelSize) {
         fTrace = trace;
-        fTraceEvents = new Vector<TimeChartEvent>(modelSize);
+        fTraceEvents = new Vector<>(modelSize);
     }
 
     /**

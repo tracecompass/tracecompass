@@ -67,7 +67,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
     private CheckboxTreeViewer traceTypeViewer;
 
     final ScanRunnable fRunnable = new ScanRunnable("Scan job"); //$NON-NLS-1$
-    final private BlockingQueue<TraceValidationHelper> fTracesToScan = new ArrayBlockingQueue<TraceValidationHelper>(MAX_TRACES);
+    final private BlockingQueue<TraceValidationHelper> fTracesToScan = new ArrayBlockingQueue<>(MAX_TRACES);
     private volatile boolean fCanRun = true;
 
     // --------------------------------------------------------------------------------

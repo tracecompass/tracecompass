@@ -51,7 +51,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
     private static final Image DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
     private final CustomTxtParserWizard wizard;
     private CustomTxtTraceDefinition definition;
-    private List<Output> outputs = new ArrayList<Output>();
+    private List<Output> outputs = new ArrayList<>();
     private Composite container;
     private SashForm sash;
     private ScrolledComposite outputsScrolledComposite;
@@ -213,13 +213,15 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
     private void updatePreviewTable() {
         final int CACHE_SIZE = 50;
         definition.outputs = extractOutputs();
+        tmpFile = Activator.getDefault().getStateLocation().addTrailingSeparator().append("customwizard.tmp").toFile(); //$NON-NLS-1$
+
+        try (final FileWriter writer = new FileWriter(tmpFile);) {
+            writer.write(wizard.inputPage.getInputText());
+        } catch (final IOException e) {
+            Activator.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
+        }
 
         try {
-            tmpFile = Activator.getDefault().getStateLocation().addTrailingSeparator().append("customwizard.tmp").toFile(); //$NON-NLS-1$
-            final FileWriter writer = new FileWriter(tmpFile);
-            writer.write(wizard.inputPage.getInputText());
-            writer.close();
-
             final CustomTxtTrace trace = new CustomTxtTrace(null, definition, tmpFile.getAbsolutePath(), CACHE_SIZE);
             trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, false);
             previewTable.dispose();
@@ -227,8 +229,6 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
         } catch (final TmfTraceException e) {
-            Activator.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
-        } catch (final IOException e) {
             Activator.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
         }
 
@@ -248,7 +248,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
                 numColumns++;
             }
         }
-        final List<OutputColumn> outputColumns = new ArrayList<OutputColumn>(numColumns);
+        final List<OutputColumn> outputColumns = new ArrayList<>(numColumns);
         numColumns = 0;
         for (int i = 0; i < outputs.size(); i++) {
             final Output output = outputs.get(i);

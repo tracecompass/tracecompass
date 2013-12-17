@@ -60,7 +60,7 @@ public class TraceUtils {
      */
     public static List<IProject> getOpenedTmfProjects() {
         IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-        List<IProject> tmfProjects = new ArrayList<IProject>();
+        List<IProject> tmfProjects = new ArrayList<>();
         for (IProject project : projects) {
             try {
                 if (project.isAccessible() && project.getNature(TmfProjectNature.ID) != null) {

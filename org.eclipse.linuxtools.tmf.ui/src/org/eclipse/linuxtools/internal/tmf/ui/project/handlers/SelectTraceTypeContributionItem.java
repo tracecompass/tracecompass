@@ -61,7 +61,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
     @Override
     protected IContributionItem[] getContributionItems() {
 
-        Set<String> selectedTraceTypes = new HashSet<String>();
+        Set<String> selectedTraceTypes = new HashSet<>();
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         ISelection selection = page.getSelection();
@@ -74,9 +74,9 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
             }
         }
 
-        List<IContributionItem> list = new LinkedList<IContributionItem>();
+        List<IContributionItem> list = new LinkedList<>();
 
-        Map<String, MenuManager> categoriesMap = new HashMap<String, MenuManager>();
+        Map<String, MenuManager> categoriesMap = new HashMap<>();
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(
                 TmfTraceType.TMF_TRACE_TYPE_ID);
         for (IConfigurationElement ce : config) {
@@ -147,7 +147,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
             MenuManager subMenu) {
         Map<String, String> params;
 
-        params = new HashMap<String, String>();
+        params = new HashMap<>();
         params.put(BUNDLE_PARAMETER, traceBundle);
         params.put(TYPE_PARAMETER, traceTypeId);
         params.put(ICON_PARAMETER, traceIcon);

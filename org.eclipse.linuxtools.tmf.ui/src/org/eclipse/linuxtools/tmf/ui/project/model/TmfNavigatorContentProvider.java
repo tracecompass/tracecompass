@@ -159,10 +159,10 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
     private Object[] getProjectChildren(IProject project) {
         // The children structure
-        List<Object> children = new ArrayList<Object>();
+        List<Object> children = new ArrayList<>();
 
         // Get the children from the model
-        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<String, ITmfProjectModelElement>();
+        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, true);
         for (ITmfProjectModelElement element : tmfProject.getChildren()) {
             if (element instanceof TmfTraceFolder) {
@@ -212,10 +212,10 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
     private Object[] getTraceFolderChildren(TmfTraceFolder tmfTraceFolder) {
         // The children structure
-        List<Object> children = new ArrayList<Object>();
+        List<Object> children = new ArrayList<>();
 
         // Get the children from the model
-        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<String, ITmfProjectModelElement>();
+        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();
         for (ITmfProjectModelElement element : tmfTraceFolder.getChildren()) {
             if (element instanceof TmfTraceElement) {
                 String name = element.getResource().getName();
@@ -248,10 +248,10 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
     private Object[] getExperimentFolderChildren(TmfExperimentFolder tmfExperimentFolder) {
         // The children structure
-        List<Object> children = new ArrayList<Object>();
+        List<Object> children = new ArrayList<>();
 
         // Get the children from the model
-        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<String, ITmfProjectModelElement>();
+        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();
         for (ITmfProjectModelElement element : tmfExperimentFolder.getChildren()) {
             if (element instanceof TmfExperimentElement) {
                 String name = element.getResource().getName();
@@ -287,10 +287,10 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
     private Object[] getExperimentChildren(TmfExperimentElement tmfExperiment) {
         // The children structure
-        List<Object> children = new ArrayList<Object>();
+        List<Object> children = new ArrayList<>();
 
         // Get the children from the model
-        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<String, ITmfProjectModelElement>();
+        Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();
         for (ITmfProjectModelElement element : tmfExperiment.getChildren()) {
             if (element instanceof TmfTraceElement) {
                 String name = element.getResource().getName();
@@ -327,7 +327,7 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
     private static Object[] getTraceChildren(TmfTraceElement parentElement) {
         // The children structure
-        List<Object> children = new ArrayList<Object>();
+        List<Object> children = new ArrayList<>();
 
         for (TmfAnalysisElement analysis : parentElement.getAvailableAnalysis()) {
             children.add(analysis);
@@ -338,7 +338,7 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
     private static Object[] getAnalysisChildren(TmfAnalysisElement parentElement) {
         // The children structure
-        List<Object> children = new ArrayList<Object>();
+        List<Object> children = new ArrayList<>();
 
         for (TmfAnalysisOutputElement output : parentElement.getAvailableOutputs()) {
             children.add(output);
@@ -350,7 +350,7 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
     private void cleanupModel(ITmfProjectModelElement parent, Map<String, ITmfProjectModelElement> danglingChildren) {
         if (parent != null) {
             for (ITmfProjectModelElement child : danglingChildren.values()) {
-                Map<String, ITmfProjectModelElement> grandChildren = new HashMap<String, ITmfProjectModelElement>();
+                Map<String, ITmfProjectModelElement> grandChildren = new HashMap<>();
                 for (ITmfProjectModelElement element : child.getChildren()) {
                     String name = element.getResource().getName();
                     grandChildren.put(name, element);

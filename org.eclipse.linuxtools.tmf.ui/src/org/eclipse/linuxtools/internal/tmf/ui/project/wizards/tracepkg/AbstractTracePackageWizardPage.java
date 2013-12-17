@@ -481,7 +481,7 @@ abstract public class AbstractTracePackageWizardPage extends WizardPage {
     }
 
     private static String[] addToHistory(String[] history, String newEntry) {
-        ArrayList<String> l = new ArrayList<String>(Arrays.asList(history));
+        ArrayList<String> l = new ArrayList<>(Arrays.asList(history));
         addToHistory(l, newEntry);
         String[] r = new String[l.size()];
         l.toArray(r);

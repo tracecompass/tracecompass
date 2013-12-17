@@ -342,7 +342,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     }
 
     private IStatus importTraceFiles(TracePackageFilesElement traceFilesElement, IProgressMonitor monitor) {
-        List<String> fileNames = new ArrayList<String>();
+        List<String> fileNames = new ArrayList<>();
         fileNames.add(traceFilesElement.getFileName());
         IPath containerPath = fTmfTraceFolder.getPath();
         IStatus status = importFiles(getSpecifiedArchiveFile(), fileNames, containerPath, monitor);
@@ -353,7 +353,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     }
 
     private IStatus importSupplFiles(TracePackageSupplFilesElement suppFilesElement, TracePackageTraceElement traceElement, IProgressMonitor monitor) {
-        List<String> fileNames = new ArrayList<String>();
+        List<String> fileNames = new ArrayList<>();
         for (TracePackageElement child : suppFilesElement.getChildren()) {
             TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
             fileNames.add(supplFile.getText());
@@ -383,7 +383,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     }
 
     private IStatus importFiles(ArchiveFile archiveFile, List<String> fileNames, IPath destinationContainerPath, IProgressMonitor monitor) {
-        List<ArchiveProviderElement> objects = new ArrayList<ArchiveProviderElement>();
+        List<ArchiveProviderElement> objects = new ArrayList<>();
         Enumeration<?> entries = archiveFile.entries();
         while (entries.hasMoreElements()) {
             ArchiveEntry entry = (ArchiveEntry) entries.nextElement();

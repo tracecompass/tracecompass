@@ -80,7 +80,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private Font fFixedFont;
 	private Slider fSlider;
 
-	private final List<LineData> fLines = new ArrayList<LineData>();
+	private final List<LineData> fLines = new ArrayList<>();
 	private boolean fActualRanks = false;
 	private int fTopLineIndex;
 	private int fLastTopLineIndex;

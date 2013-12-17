@@ -39,7 +39,7 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     private final String fStateTypeName;
 
     // The list of listeners for graph color changes
-    private final List<ITimeGraphColorListener> fListeners = new ArrayList<ITimeGraphColorListener>();
+    private final List<ITimeGraphColorListener> fListeners = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Constants

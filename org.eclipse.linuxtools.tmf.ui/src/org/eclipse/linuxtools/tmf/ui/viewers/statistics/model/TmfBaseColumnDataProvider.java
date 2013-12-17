@@ -74,14 +74,14 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
     /**
      * Level for which statistics should not be displayed.
      */
-    protected Set<String> fFolderLevels = new HashSet<String>(Arrays.asList(new String[] { "Event Types" })); //$NON-NLS-1$
+    protected Set<String> fFolderLevels = new HashSet<>(Arrays.asList(new String[] { "Event Types" })); //$NON-NLS-1$
 
     /**
      * Create basic columns to represent the statistics data
      */
     public TmfBaseColumnDataProvider() {
         /* List that will be used to create the table. */
-        fColumnData = new Vector<TmfBaseColumnData>();
+        fColumnData = new Vector<>();
         /* Column showing the name of the events and its level in the tree */
         fColumnData.add(new TmfBaseColumnData(LEVEL_COLUMN, 200, SWT.LEFT, LEVEL_COLUMN_TIP, new ColumnLabelProvider() {
             @Override

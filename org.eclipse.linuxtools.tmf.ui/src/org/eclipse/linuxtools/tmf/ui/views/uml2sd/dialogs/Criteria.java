@@ -325,7 +325,7 @@ public class Criteria {
      * @return graph node summary
      */
     public String getGraphNodeSummary(ISDFilterProvider provider, String loaderClassName) {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
 
         if (provider != null) {
             if (isLifeLineSelected()) {
