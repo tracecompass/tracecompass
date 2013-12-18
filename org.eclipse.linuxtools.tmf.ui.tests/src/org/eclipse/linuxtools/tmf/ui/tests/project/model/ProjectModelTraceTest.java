@@ -18,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.concurrent.TimeoutException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -78,7 +80,11 @@ public class ProjectModelTraceTest {
         TmfOpenTraceHelper.openTraceFromElement(traceElement);
 
         /* Give the trace a chance to open */
-        ProjectModelTestData.delayThread(500);
+        try {
+            ProjectModelTestData.delayUntilTraceOpened(traceElement);
+        } catch (TimeoutException e) {
+            fail("The trace did not open in a reasonable delay");
+        }
 
         trace = traceElement.getTrace();
         assertNotNull(trace);
@@ -88,7 +94,11 @@ public class ProjectModelTraceTest {
          * the exact same element as the active trace
          */
         TmfOpenTraceHelper.openTraceFromElement(traceElement);
-        ProjectModelTestData.delayThread(500);
+        try {
+            ProjectModelTestData.delayUntilTraceOpened(traceElement);
+        } catch (TimeoutException e) {
+            fail("The trace did not open in a reasonable delay");
+        }
 
         ITmfTrace trace2 = TmfTraceManager.getInstance().getActiveTrace();
 

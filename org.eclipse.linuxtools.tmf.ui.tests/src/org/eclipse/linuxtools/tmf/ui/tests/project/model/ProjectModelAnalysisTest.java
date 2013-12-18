@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
@@ -153,17 +154,12 @@ public class ProjectModelAnalysisTest {
         traceElement.closeEditors();
         analysis.activateParent();
 
-        ITmfTrace trace = null;
-        int cnt = 0;
-
-        /* Give some time to the trace to open */
-        while ((trace == null) && (cnt++ < 10)) {
-
-            ProjectModelTestData.delayThread(500);
-
-            /* Get the analysis module associated with the element */
-            trace = traceElement.getTrace();
+        try {
+            ProjectModelTestData.delayUntilTraceOpened(traceElement);
+        } catch (TimeoutException e) {
+            fail("The analysis parent did not open in a reasonable time");
         }
+        ITmfTrace trace = traceElement.getTrace();
 
         assertNotNull(trace);
         TestAnalysisUi module = (TestAnalysisUi) trace.getAnalysisModule(analysis.getAnalysisId());

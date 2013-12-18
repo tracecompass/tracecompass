@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
@@ -105,7 +106,11 @@ public class ProjectModelOutputTest {
 
         /* To get the list of outputs the trace needs to be opened */
         analysis.activateParent();
-        ProjectModelTestData.delayThread(500);
+        try {
+            ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
+        } catch (TimeoutException e) {
+            fail("The analysis parent did not open in a reasonable time");
+        }
 
         /* Make sure the output list is not empty */
         List<TmfAnalysisOutputElement> outputList = analysis.getAvailableOutputs();
@@ -130,7 +135,11 @@ public class ProjectModelOutputTest {
         TmfAnalysisElement analysis = getTestAnalysisUi();
 
         analysis.activateParent();
-        ProjectModelTestData.delayThread(1000);
+        try {
+            ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
+        } catch (TimeoutException e) {
+            fail("The analysis parent did not open in a reasonable time");
+        }
 
         List<TmfAnalysisOutputElement> outputList = analysis.getAvailableOutputs();
         assertFalse(outputList.isEmpty());
