@@ -690,10 +690,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             final int width = image.getBounds().width;
             final int height = image.getBounds().height;
 
-            // Turn off anti-aliasing
-            int aliasing = imageGC.getAntialias();
-            imageGC.setAntialias(SWT.OFF);
-
             // Clear the drawing area
             imageGC.setBackground(fBackgroundColor);
             imageGC.fillRectangle(0, 0, image.getBounds().width + 1, image.getBounds().height + 1);
@@ -751,9 +747,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             // Fill the area to the right of delimiter with background color
             imageGC.setBackground(fFillColor);
             imageGC.fillRectangle(delimiterIndex + 1, 0, width - (delimiterIndex + 1), height);
-
-            // Restore anti-aliasing
-            imageGC.setAntialias(aliasing);
 
         } catch (final Exception e) {
             // Do nothing
