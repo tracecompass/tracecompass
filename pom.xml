@@ -139,6 +139,8 @@
     <module>org.eclipse.linuxtools.tracing.rcp</module>
     <module>org.eclipse.linuxtools.tracing.rcp.help</module>
     <module>org.eclipse.linuxtools.tracing.rcp.ui</module>
+
+    <module>org.eclipse.linuxtools.tracing.examples</module>
   </modules>
 
     <build>
