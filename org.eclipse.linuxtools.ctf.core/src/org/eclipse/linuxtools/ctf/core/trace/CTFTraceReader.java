@@ -14,7 +14,6 @@
 package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -176,12 +175,10 @@ public class CTFTraceReader {
      *             if an error occurs
      */
     private void createStreamInputReaders() throws CTFReaderException {
-        Collection<Stream> streams = this.trace.getStreams().values();
-
         /*
          * For each stream.
          */
-        for (Stream stream : streams) {
+        for (Stream stream : this.trace.getStreams()) {
             Set<StreamInput> streamInputs = stream.getStreamInputs();
 
             /*

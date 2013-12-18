@@ -23,7 +23,6 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.nio.ByteOrder;
-import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
@@ -189,15 +188,6 @@ public class CTFTraceTest {
     public void testGetStream() {
         Long id = new Long(0L);
         Stream result = fixture.getStream(id);
-        assertNotNull(result);
-    }
-
-    /**
-     * Run the Map<Long, Stream> getStreams() method test.
-     */
-    @Test
-    public void testGetStreams() {
-        Map<Long, Stream> result = fixture.getStreams();
         assertNotNull(result);
     }
 
