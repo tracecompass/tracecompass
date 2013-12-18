@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.tests.project.model;
+package org.eclipse.linuxtools.tmf.ui.tests.shared;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -155,8 +155,8 @@ public class ProjectModelTestData {
     }
 
     /**
-     * Makes the main display thread sleep, so it gives a chance to other thread
-     * needing the main display to execute
+     * Makes the main display thread sleep, so it gives a chance to other
+     * threads needing the main display to execute
      *
      * @param waitTimeMillis
      *            time to wait in millisecond

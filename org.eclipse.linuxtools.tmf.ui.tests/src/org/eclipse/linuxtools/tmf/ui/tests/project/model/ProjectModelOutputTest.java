@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisOutputElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.tests.shared.ProjectModelTestData;
 import org.eclipse.linuxtools.tmf.ui.tests.stubs.analysis.TestAnalysisUi;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
