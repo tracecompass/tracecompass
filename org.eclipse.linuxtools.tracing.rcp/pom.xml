@@ -39,6 +39,8 @@
             </goals>
             <configuration>
               <excludes>
+                <plugin id="org.eclipse.cdt.core"/>
+                <plugin id="org.eclipse.cdt.core.native"/>
                 <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
                 <plugin id="org.eclipse.swt"/>
                 <plugin id="org.eclipse.swt.wpf.win32.x86"/>

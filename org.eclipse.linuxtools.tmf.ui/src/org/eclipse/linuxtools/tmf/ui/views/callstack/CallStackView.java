@@ -9,6 +9,7 @@
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated signal handling
+ *   Marc-Andre Laperle - Map from binary file
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.callstack;
@@ -142,6 +143,7 @@ public class CallStackView extends TmfView {
     private static final Image STACKFRAME_IMAGE = Activator.getDefault().getImageFromPath("icons/obj16/stckframe_obj.gif"); //$NON-NLS-1$
 
     private static final String IMPORT_MAPPING_ICON_PATH = "icons/etool16/import.gif"; //$NON-NLS-1$
+    private static final String IMPORT_BINARY_ICON_PATH = "icons/obj16/binaries_obj.gif"; //$NON-NLS-1$
 
     private static final ImageDescriptor SORT_BY_NAME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha.gif"); //$NON-NLS-1$
     private static final ImageDescriptor SORT_BY_NAME_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha_rev.gif"); //$NON-NLS-1$
@@ -203,8 +205,11 @@ public class CallStackView extends TmfView {
     // The previous item action
     private Action fPreviousItemAction;
 
-    /** The action to import a function-name mapping file */
+    // The action to import a function-name mapping file
     private Action fImportMappingAction;
+
+    // The action to import a binary file mapping */
+    private Action fImportBinaryFileMappingAction;
 
     // The zoom thread
     private ZoomThread fZoomThread;
@@ -1108,6 +1113,7 @@ public class CallStackView extends TmfView {
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
+        manager.add(getImportBinaryAction());
         manager.add(getImportMappingAction());
         manager.add(new Separator());
         manager.add(getSortByNameAction());
@@ -1267,28 +1273,58 @@ public class CallStackView extends TmfView {
     // ------------------------------------------------------------------------
 
     /**
+     * Common code for all import file mapping actions
+     */
+    private abstract class AbstractImportFileMappingAction extends Action {
+        private final String fDialogTitle;
+
+        private AbstractImportFileMappingAction(String dialogTitle) {
+            fDialogTitle = dialogTitle;
+        }
+
+        @Override
+        public void run() {
+            FileDialog dialog = new FileDialog(getViewSite().getShell());
+            dialog.setText(fDialogTitle);
+            final String filePath = dialog.open();
+            if (filePath == null) {
+                /* No file was selected, don't change anything */
+                return;
+            }
+
+            /*
+             * Start the mapping import in a separate thread (we do not want
+             * to UI thread to do this).
+             */
+            Job job = new Job(Messages.CallStackView_ImportMappingJobName) {
+                @Override
+                public IStatus run(IProgressMonitor monitor) {
+                    fNameMapping = doMapping(new File(filePath));
+
+                    /* Refresh the time graph and the list of entries */
+                    buildThreadList(fTrace, new NullProgressMonitor());
+                    redraw();
+
+                    return Status.OK_STATUS;
+                }
+            };
+            job.schedule();
+        }
+
+        abstract Map<String, String> doMapping(File file);
+    }
+
+    /**
      * Toolbar icon to import the function address-to-name mapping file.
      */
     private Action getImportMappingAction() {
         if (fImportMappingAction != null) {
             return fImportMappingAction;
         }
-        fImportMappingAction = new Action() {
+        fImportMappingAction = new AbstractImportFileMappingAction(Messages.CallStackView_ImportMappingDialogTitle) {
             @Override
-            public void run() {
-                FileDialog dialog = new FileDialog(getViewSite().getShell());
-                dialog.setText(Messages.CallStackView_ImportMappingDialogTitle);
-                String filePath = dialog.open();
-                if (filePath == null) {
-                    /* No file was selected, don't change anything */
-                    return;
-                }
-                /*
-                 * Start the mapping import in a separate thread (we do not want
-                 * to UI thread to do this).
-                 */
-                Job job = new ImportMappingJob(new File(filePath));
-                job.schedule();
+            Map<String, String> doMapping(File file) {
+                return FunctionNameMapper.mapFromNmTextFile(file);
             }
         };
 
@@ -1419,24 +1455,26 @@ public class CallStackView extends TmfView {
         refresh();
     }
 
-    private class ImportMappingJob extends Job {
-        private final File fMappingFile;
-
-        public ImportMappingJob(File mappingFile) {
-            super(Messages.CallStackView_ImportMappingJobName);
-            fMappingFile = mappingFile;
+    /**
+     * Toolbar icon to import the function address-to-name mapping binary file.
+     */
+    private Action getImportBinaryAction() {
+        if (fImportBinaryFileMappingAction != null) {
+            return fImportBinaryFileMappingAction;
         }
 
-        @Override
-        public IStatus run(IProgressMonitor monitor) {
-            fNameMapping = FunctionNameMapper.mapFromNmTextFile(fMappingFile);
+        fImportBinaryFileMappingAction = new AbstractImportFileMappingAction(Messages.CallStackView_ImportBinaryFileDialogTitle) {
+            @Override
+            Map<String, String> doMapping(File file) {
+                return FunctionNameMapper.mapFromBinaryFile(file);
+            }
+        };
 
-            /* Refresh the time graph and the list of entries */
-            buildThreadList(fTrace, new NullProgressMonitor());
-            redraw();
+        fImportBinaryFileMappingAction.setText(Messages.CallStackView_ImportBinaryFileButtonText);
+        fImportBinaryFileMappingAction.setToolTipText(Messages.CallStackView_ImportBinaryFileButtonTooltip);
+        fImportBinaryFileMappingAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(IMPORT_BINARY_ICON_PATH));
 
-            return Status.OK_STATUS;
-        }
+        return fImportBinaryFileMappingAction;
     }
 
     String getFunctionName(String address) {
