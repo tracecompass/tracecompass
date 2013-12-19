@@ -100,4 +100,14 @@ public interface ITmfChartTimeProvider extends ITmfViewer {
      */
     long getTimeOffset();
 
+    /**
+     * Method to notify about a change of the current selected time.
+     *
+     * @param currentBeginTime
+     *            The current selection begin time
+     * @param currentEndTime
+     *            The current selection end time
+     */
+    void updateSelectionRange(long currentBeginTime, long currentEndTime);
+
 }

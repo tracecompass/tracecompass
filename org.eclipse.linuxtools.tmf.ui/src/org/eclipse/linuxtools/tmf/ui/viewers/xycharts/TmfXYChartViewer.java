@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewer;
@@ -70,6 +71,8 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
     private ITmfTrace fTrace;
     /** The SWT Chart reference */
     private Chart fSwtChart;
+    /** The mouse selection provider */
+    private TmfBaseProvider fMouseSelectionProvider;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -110,6 +113,8 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
         } else {
             yAxis.getTitle().setText(yLabel);
         }
+
+        fMouseSelectionProvider = new TmfMouseSelectionProvider(this);
     }
 
     // ------------------------------------------------------------------------
@@ -234,6 +239,20 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
         return fSwtChart;
     }
 
+    /**
+     * Sets a mouse selection provider. An existing provider will be
+     * disposed. Use <code>null</code> to disable the mouse selection provider.
+     *
+     * @param provider
+     *            The selection provider to set
+     */
+    public void setSelectionProvider(TmfBaseProvider provider) {
+        if (fMouseSelectionProvider != null) {
+            fMouseSelectionProvider.dispose();
+        }
+        fMouseSelectionProvider = provider;
+    }
+
     // ------------------------------------------------------------------------
     // ITmfChartTimeProvider
     // ------------------------------------------------------------------------
@@ -277,6 +296,20 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
         return fTimeOffset;
     }
 
+    @Override
+    public void updateSelectionRange(final long currentBeginTime, final long currentEndTime) {
+        if (fTrace != null) {
+            setSelectionBeginTime(currentBeginTime);
+            setSelectionEndTime(currentEndTime);
+
+            final ITmfTimestamp startTimestamp = new TmfTimestamp(fSelectionBeginTime, ITmfTimestamp.NANOSECOND_SCALE);
+            final ITmfTimestamp endTimestamp = new TmfTimestamp(fSelectionEndTime, ITmfTimestamp.NANOSECOND_SCALE);
+
+            TmfTimeSynchSignal signal = new TmfTimeSynchSignal(TmfXYChartViewer.this, startTimestamp, endTimestamp);
+            broadcast(signal);
+        }
+    }
+
     // ------------------------------------------------------------------------
     // ITmfViewer interface
     // ------------------------------------------------------------------------
@@ -297,6 +330,10 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
     public void dispose() {
         super.dispose();
         fSwtChart.dispose();
+
+        if (fMouseSelectionProvider != null) {
+            fMouseSelectionProvider.dispose();
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -409,6 +446,9 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
             ITmfTimestamp selectedEndTime = signal.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
             setSelectionBeginTime(selectedTime.getValue());
             setSelectionEndTime(selectedEndTime.getValue());
+            if (fMouseSelectionProvider != null) {
+                fMouseSelectionProvider.refresh();
+            }
         }
     }
 
