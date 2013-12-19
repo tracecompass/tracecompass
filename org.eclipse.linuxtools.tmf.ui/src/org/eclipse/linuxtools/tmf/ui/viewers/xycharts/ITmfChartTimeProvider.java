@@ -120,5 +120,4 @@ public interface ITmfChartTimeProvider extends ITmfViewer {
      */
     void updateWindow(long windowStartTime, long windowEndTime);
 
-
 }

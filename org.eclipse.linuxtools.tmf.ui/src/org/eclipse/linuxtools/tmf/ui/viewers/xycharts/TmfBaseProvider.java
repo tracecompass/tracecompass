@@ -145,11 +145,11 @@ abstract public class TmfBaseProvider {
     /**
      * Method to register the provider to chart viewer.
      */
-    abstract void register();
+    protected abstract void register();
 
     /**
      * Method to deregister the provider from chart viewer.
      */
-    abstract void deregister();
+    protected abstract void deregister();
 
 }
