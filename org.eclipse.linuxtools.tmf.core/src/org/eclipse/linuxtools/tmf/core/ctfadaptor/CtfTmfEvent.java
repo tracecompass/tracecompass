@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
+import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
@@ -28,8 +29,8 @@ import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 
 /**
- * A wrapper class around CTF's Event Definition/Declaration that maps all
- * types of Declaration to native Java types.
+ * A wrapper class around CTF's Event Definition/Declaration that maps all types
+ * of Declaration to native Java types.
  *
  * @version 1.0
  * @author Alexandre Montplaisir
@@ -138,7 +139,10 @@ public class CtfTmfEvent extends TmfEvent
 
     @Override
     public CtfTmfTrace getTrace() {
-        /* Should be of the right type, since we take a CtfTmfTrace at the constructor */
+        /*
+         * Should be of the right type, since we take a CtfTmfTrace at the
+         * constructor
+         */
         return (CtfTmfTrace) super.getTrace();
     }
 
@@ -183,18 +187,24 @@ public class CtfTmfEvent extends TmfEvent
     @Override
     public CtfTmfCallsite getCallsite() {
         CTFCallsite callsite = null;
-        if (getTrace() == null) {
+        CtfTmfTrace trace = getTrace();
+        if (trace == null) {
+            return null;
+        }
+        CTFTrace ctfTrace = trace.getCTFTrace();
+        /* Should not happen, but it is a good check */
+        if (ctfTrace == null) {
             return null;
         }
         if (getContent() != null) {
             ITmfEventField ipField = getContent().getField(CtfConstants.CONTEXT_FIELD_PREFIX + CtfConstants.IP_KEY);
             if (ipField != null && ipField.getValue() instanceof Long) {
                 long ip = (Long) ipField.getValue();
-                callsite = getTrace().getCTFTrace().getCallsite(eventName, ip);
+                callsite = ctfTrace.getCallsite(eventName, ip);
             }
         }
         if (callsite == null) {
-            callsite = getTrace().getCTFTrace().getCallsite(eventName);
+            callsite = ctfTrace.getCallsite(eventName);
         }
         if (callsite != null) {
             return new CtfTmfCallsite(callsite);
