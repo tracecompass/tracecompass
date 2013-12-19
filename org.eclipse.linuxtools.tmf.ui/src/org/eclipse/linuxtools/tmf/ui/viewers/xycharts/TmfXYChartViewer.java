@@ -78,6 +78,8 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
     private TmfBaseProvider fMouseSelectionProvider;
     /** The mouse drag zoom provider */
     private TmfBaseProvider fMouseDragZoomProvider;
+    /** The mouse wheel zoom provider */
+    private TmfBaseProvider fMouseWheelZoomProvider;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -121,6 +123,7 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
 
         fMouseSelectionProvider = new TmfMouseSelectionProvider(this);
         fMouseDragZoomProvider = new TmfMouseDragZoomProvider(this);
+        fMouseWheelZoomProvider = new TmfMouseWheelZoomProvider(this);
     }
 
     // ------------------------------------------------------------------------
@@ -273,6 +276,21 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
         fMouseDragZoomProvider = provider;
     }
 
+    /**
+     * Sets a mouse wheel zoom provider. An existing provider will be
+     * disposed. Use <code>null</code> to disable the mouse wheel zoom
+     * provider.
+     *
+     * @param provider
+     *            The mouse wheel zoom provider to set
+     */
+    public void setMouseWheelZoomProvider(TmfBaseProvider provider) {
+        if (fMouseWheelZoomProvider != null) {
+            fMouseWheelZoomProvider.dispose();
+        }
+        fMouseWheelZoomProvider = provider;
+    }
+
     // ------------------------------------------------------------------------
     // ITmfChartTimeProvider
     // ------------------------------------------------------------------------
@@ -374,6 +392,10 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
 
         if (fMouseDragZoomProvider != null) {
             fMouseDragZoomProvider.dispose();
+        }
+
+        if (fMouseWheelZoomProvider != null) {
+            fMouseWheelZoomProvider.dispose();
         }
     }
 
