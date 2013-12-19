@@ -110,4 +110,15 @@ public interface ITmfChartTimeProvider extends ITmfViewer {
      */
     void updateSelectionRange(long currentBeginTime, long currentEndTime);
 
+    /**
+     * Updates the current time range window.
+     *
+     * @param windowStartTime
+     *            The window start time
+     * @param windowEndTime
+     *            The window end time.
+     */
+    void updateWindow(long windowStartTime, long windowEndTime);
+
+
 }
