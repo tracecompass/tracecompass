@@ -34,6 +34,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -379,6 +380,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             try (FileWriter writer = new FileWriter(file);) {
                 writer.write(xmlString);
             }
+
+            TmfTraceType.getInstance().addCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+
         } catch (ParserConfigurationException e) {
             Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerConfigurationException e) {
@@ -726,6 +730,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             try (FileWriter writer = new FileWriter(file);) {
                 writer.write(xmlString);
             }
+
+            TmfTraceType.getInstance().removeCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+
         } catch (ParserConfigurationException e) {
             Activator.getDefault().logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {

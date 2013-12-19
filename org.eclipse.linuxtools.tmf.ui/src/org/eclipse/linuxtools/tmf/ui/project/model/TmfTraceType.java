@@ -252,8 +252,6 @@ public final class TmfTraceType {
         // Generate the list of Category:TraceType to populate the ComboBox
         List<String> traceTypes = new ArrayList<>();
 
-        // re-populate custom trace types
-        getCustomTraceTypes();
         for (String key : this.fTraceTypes.keySet()) {
             TraceTypeHelper tt = this.fTraceTypes.get(key);
             traceTypes.add(tt.getCategoryName() + SEPARATOR + tt.getName());
@@ -294,25 +292,27 @@ public final class TmfTraceType {
      * @return the list of custom trace types
      * @since 2.0
      */
-    public List<String> getCustomTraceTypes() {
-        List<String> traceTypes = new ArrayList<>();
-        // remove the customTraceTypes
-        final String[] keySet = fTraceTypes.keySet().toArray(new String[0]);
-        for (String key : keySet) {
-            TraceTypeHelper helper = fTraceTypes.get(key);
-            if (helper.getCategoryName().equals(CUSTOM_TXT_CATEGORY) || helper.getCategoryName().equals(CUSTOM_XML_CATEGORY)) {
-                helper.getTrace().dispose();
-                fTraceTypes.remove(key);
-            }
-        }
+    public static List<String> getCustomTraceTypes() {
 
+        List<String> traceTypes = new ArrayList<>();
+        for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+            String traceTypeName = def.definitionName;
+            traceTypes.add(traceTypeName);
+        }
+        for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+            String traceTypeName = def.definitionName;
+            traceTypes.add(traceTypeName);
+        }
+        return traceTypes;
+    }
+
+    private void populateCustomTraceTypes() {
         // add the custom trace types
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
             String traceTypeId = CustomTxtTrace.class.getCanonicalName() + SEPARATOR + def.definitionName;
             ITmfTrace trace = new CustomTxtTrace(def);
             TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_TXT_CATEGORY, def.definitionName, trace);
             fTraceTypes.put(traceTypeId, tt);
-            traceTypes.add(traceTypeId);
             // Deregister trace as signal handler because it is only used for validation
             TmfSignalManager.deregister(trace);
         }
@@ -321,11 +321,73 @@ public final class TmfTraceType {
             ITmfTrace trace = new CustomXmlTrace(def);
             TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_XML_CATEGORY, def.definitionName, trace);
             fTraceTypes.put(traceTypeId, tt);
-            traceTypes.add(traceTypeId);
             // Deregister trace as signal handler because it is only used for validation
             TmfSignalManager.deregister(trace);
         }
-        return traceTypes;
+    }
+
+    /**
+     * Add or replace a custom trace type
+     *
+     * @param category
+     *            The custom parser category
+     * @param definitionName
+     *            The custom parser definition name to add or replace
+     * @since 3.0
+     */
+    public void addCustomTraceType(String category, String definitionName) {
+        String traceTypeId = null;
+        ITmfTrace trace = null;
+
+        if (category.equals(CUSTOM_TXT_CATEGORY)) {
+            traceTypeId = CustomTxtTrace.class.getCanonicalName() + SEPARATOR + definitionName;
+            CustomTxtTraceDefinition def = CustomTxtTraceDefinition.load(definitionName);
+            if (def != null) {
+                trace = new CustomTxtTrace(def);
+            }
+        } else if (category.equals(CUSTOM_XML_CATEGORY)) {
+            traceTypeId = CustomXmlTrace.class.getCanonicalName() + SEPARATOR + definitionName;
+            CustomXmlTraceDefinition def = CustomXmlTraceDefinition.load(definitionName);
+            if (def != null) {
+                trace = new CustomXmlTrace(def);
+            }
+        }
+
+        if (traceTypeId != null && trace != null) {
+            TraceTypeHelper helper = fTraceTypes.get(traceTypeId);
+            if (helper != null) {
+                helper.getTrace().dispose();
+            }
+            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, category, definitionName, trace);
+            fTraceTypes.put(traceTypeId, tt);
+            // Deregister trace as signal handler because it is only used for validation
+            TmfSignalManager.deregister(trace);
+        }
+    }
+
+    /**
+     * Remove a custom trace type
+     *
+     * @param category
+     *            The custom parser category
+     * @param definitionName
+     *            The custom parser definition name to add or replace
+     * @since 3.0
+     */
+    public void removeCustomTraceType(String category, String definitionName) {
+        if (category.equals(CUSTOM_TXT_CATEGORY)) {
+            String traceTypeId = CustomTxtTrace.class.getCanonicalName() + SEPARATOR + definitionName;
+            TraceTypeHelper helper = fTraceTypes.remove(traceTypeId);
+            if (helper != null) {
+                helper.getTrace().dispose();
+            }
+        } else if (category.equals(CUSTOM_XML_CATEGORY)) {
+            String traceTypeId = CustomXmlTrace.class.getCanonicalName() + SEPARATOR + definitionName;
+            TraceTypeHelper helper = fTraceTypes.remove(traceTypeId);
+            if (helper != null) {
+                helper.getTrace().dispose();
+            }
+        }
     }
 
     /**
@@ -337,7 +399,6 @@ public final class TmfTraceType {
      * @since 2.0
      */
     public TraceTypeHelper getTraceType(String id) {
-        init();
         return fTraceTypes.get(id);
     }
 
@@ -411,7 +472,6 @@ public final class TmfTraceType {
      */
 
     public List<TraceTypeHelper> getTraceTypes(String categoryName) {
-        init();
         List<TraceTypeHelper> traceNames = new ArrayList<>();
         for (String key : fTraceTypes.keySet()) {
             final String storedCategoryName = fTraceTypes.get(key).getCategoryName();
@@ -424,7 +484,7 @@ public final class TmfTraceType {
 
     private void init() {
         populateCategoriesAndTraceTypes();
-        getCustomTraceTypes();
+        populateCustomTraceTypes();
 
     }
 
@@ -638,7 +698,6 @@ public final class TmfTraceType {
      */
     public TraceTypeHelper selectTraceType(String path, Shell shell, String traceTypeHint) throws TmfTraceImportException {
         List<TraceTypeHelper> validCandidates = new ArrayList<>();
-        getCustomTraceTypes();
         final Set<String> traceTypes = fTraceTypes.keySet();
         for (String traceType : traceTypes) {
             if (validate(traceType, path)) {
