@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.navigator,
- org.eclipse.ui.navigator.resources
+ org.eclipse.ui.navigator.resources,
+ org.swtchart
 Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.linuxtools.tmf.ui.tests",
  org.eclipse.linuxtools.internal.tmf.ui.commands;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.ui.dialogs;x-internal:=true,
@@ -38,6 +39,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.viewers.events,
  org.eclipse.linuxtools.tmf.ui.viewers.statistics,
  org.eclipse.linuxtools.tmf.ui.viewers.statistics.model,
+ org.eclipse.linuxtools.tmf.ui.viewers.xycharts;x-internal:=true,
  org.eclipse.linuxtools.tmf.ui.views,
  org.eclipse.linuxtools.tmf.ui.views.callstack,
  org.eclipse.linuxtools.tmf.ui.views.colors,
