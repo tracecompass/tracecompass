@@ -28,7 +28,7 @@ public class CliParser {
 
     private static final String OPEN_ARG = "--open"; //$NON-NLS-1$
 
-    private final Map<String, String> params = new HashMap<String, String>();
+    private final Map<String, String> params = new HashMap<>();
 
     /** Open key     */
     public static final String OPEN_FILE_LOCATION = ".,-=open=-,."; //$NON-NLS-1$

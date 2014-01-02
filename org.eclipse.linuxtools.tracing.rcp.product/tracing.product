@@ -24,13 +24,14 @@ http://www.eclipse.org/legal/epl-v10.html
 
    <launcherArgs>
       <programArgs>--launcher.XXMaxPermSize 256m -data @noDefault</programArgs>
-      <vmArgsLin>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.6</vmArgsLin>
-      <vmArgsMac>-Xms512m -Xmx1024m -XstartOnFirstThread -Dosgi.requiredJavaVersion=1.6 -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
-      <vmArgsSol>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.6</vmArgsSol>
-      <vmArgsWin>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.6</vmArgsWin>
+      <vmArgsLin>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.7</vmArgsLin>
+      <vmArgsMac>-Xms512m -Xmx1024m -XstartOnFirstThread -Dosgi.requiredJavaVersion=1.7 -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+      <vmArgsSol>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.7</vmArgsSol>
+      <vmArgsWin>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.7</vmArgsWin>
    </launcherArgs>
 
    <windowImages i16="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_window_16.gif" i32="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_window_32.gif"/>
+
 
    <launcher name="traceViewer">
       <solaris/>
@@ -39,11 +40,12 @@ http://www.eclipse.org/legal/epl-v10.html
       </win>
    </launcher>
 
+
    <vm>
-      <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</linux>
-      <macos include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</macos>
-      <solaris include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</solaris>
-      <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
+      <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
+      <macos include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</macos>
+      <solaris include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</solaris>
+      <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</windows>
    </vm>
 
    <license>
