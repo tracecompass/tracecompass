@@ -82,6 +82,8 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
     private TmfBaseProvider fMouseWheelZoomProvider;
     /** The tooltip provider */
     private TmfBaseProvider fToolTipProvider;
+    /** The middle mouse drag provider */
+    private TmfBaseProvider fMouseDragProvider;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -127,6 +129,7 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
         fMouseDragZoomProvider = new TmfMouseDragZoomProvider(this);
         fMouseWheelZoomProvider = new TmfMouseWheelZoomProvider(this);
         fToolTipProvider = new TmfSimpleTooltipProvider(this);
+        fMouseDragProvider = new TmfMouseDragProvider(this);
     }
 
     // ------------------------------------------------------------------------
@@ -308,6 +311,20 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
         fToolTipProvider = provider;
     }
 
+    /**
+     * Sets a mouse drag provider. An existing provider will be
+     * disposed. Use <code>null</code> to disable the mouse drag provider.
+     *
+     * @param provider
+     *            The mouse drag provider to set
+     */
+    public void setMouseDrageProvider(TmfBaseProvider provider) {
+        if (fMouseDragProvider != null) {
+            fMouseDragProvider.dispose();
+        }
+        fMouseDragProvider = provider;
+    }
+
     // ------------------------------------------------------------------------
     // ITmfChartTimeProvider
     // ------------------------------------------------------------------------
@@ -417,6 +434,10 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
 
         if (fToolTipProvider != null) {
             fToolTipProvider.dispose();
+        }
+
+        if (fMouseDragProvider != null) {
+            fMouseDragProvider.dispose();
         }
     }
 
