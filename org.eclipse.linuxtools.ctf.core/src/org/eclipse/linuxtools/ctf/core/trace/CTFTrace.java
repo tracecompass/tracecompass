@@ -463,6 +463,7 @@ public class CTFTrace implements IDefinitionScope {
      * Get all the streams as an iterable.
      *
      * @return Iterable<Stream> an iterable over streams.
+     * @since 3.0
      */
     public Iterable<Stream> getStreams() {
         return streams.values();
