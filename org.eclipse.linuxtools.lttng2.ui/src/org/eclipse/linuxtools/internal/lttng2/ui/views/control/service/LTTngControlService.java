@@ -137,7 +137,7 @@ public class LTTngControlService implements ILttngControlService {
         //
         // Use lttng list <session_name> for more details
 
-        ArrayList<String> retArray = new ArrayList<String>();
+        ArrayList<String> retArray = new ArrayList<>();
         int index = 0;
         while (index < result.getOutput().length) {
             String line = result.getOutput()[index];
@@ -209,7 +209,7 @@ public class LTTngControlService implements ILttngControlService {
                 domainInfo.setIsKernel(true);
 
                 // in domain kernel
-                ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
+                ArrayList<IChannelInfo> channels = new ArrayList<>();
                 index = parseDomain(result.getOutput(), index, channels, domainInfo);
 
                 if (channels.size() > 0) {
@@ -230,7 +230,7 @@ public class LTTngControlService implements ILttngControlService {
                 domainInfo.setIsKernel(false);
 
                 // in domain UST
-                ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
+                ArrayList<IChannelInfo> channels = new ArrayList<>();
                 index = parseDomain(result.getOutput(), index, channels, domainInfo);
 
                 if (channels.size() > 0) {
@@ -293,7 +293,7 @@ public class LTTngControlService implements ILttngControlService {
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_LIST_KERNEL);
         ICommandResult result = executeCommand(command.toString(), monitor, false);
 
-        List<IBaseEventInfo> events = new ArrayList<IBaseEventInfo>();
+        List<IBaseEventInfo> events = new ArrayList<>();
 
         if (result.getOutput() != null) {
             // Ignore the following 2 cases:
@@ -338,7 +338,7 @@ public class LTTngControlService implements ILttngControlService {
         }
 
         ICommandResult result = executeCommand(command.toString(), monitor, false);
-        List<IUstProviderInfo> allProviders = new ArrayList<IUstProviderInfo>();
+        List<IUstProviderInfo> allProviders = new ArrayList<>();
 
         // Workaround for versions 2.0.x which causes a segmentation fault for this command
         // if LTTng Tools is compiled without UST support.
@@ -400,7 +400,7 @@ public class LTTngControlService implements ILttngControlService {
             if (matcher.matches()) {
                 provider = new UstProviderInfo(matcher.group(2).trim());
                 provider.setPid(Integer.valueOf(matcher.group(1).trim()));
-                List<IBaseEventInfo> events = new ArrayList<IBaseEventInfo>();
+                List<IBaseEventInfo> events = new ArrayList<>();
                 index = getProviderEventInfo(result.getOutput(), ++index, events);
                 provider.setEvents(events);
                 allProviders.add(provider);
@@ -912,7 +912,7 @@ public class LTTngControlService implements ILttngControlService {
 
         String[] output = result.getOutput();
 
-        List<String> contexts = new ArrayList<String>(0);
+        List<String> contexts = new ArrayList<>(0);
 
         int index = 0;
         boolean inList = false;
@@ -1156,7 +1156,7 @@ public class LTTngControlService implements ILttngControlService {
                         }
 
                     } else if (LTTngControlServiceConstants.EVENT_SECTION_PATTERN.matcher(subLine).matches()) {
-                        List<IEventInfo> events = new ArrayList<IEventInfo>();
+                        List<IEventInfo> events = new ArrayList<>();
                         index = parseEvents(output, index, events);
                         if (channelInfo != null) {
                             channelInfo.setEvents(events);
@@ -1331,7 +1331,7 @@ public class LTTngControlService implements ILttngControlService {
                 index++;
             } else if (LTTngControlServiceConstants.EVENT_FIELD_PATTERN.matcher(line).matches()) {
                 if (eventInfo != null) {
-                    List<IFieldInfo> fields = new ArrayList<IFieldInfo>();
+                    List<IFieldInfo> fields = new ArrayList<>();
                     index = getFieldInfo(output, index, fields);
                     eventInfo.setFields(fields);
                 } else {

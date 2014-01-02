@@ -405,7 +405,7 @@ public class TraceControlComponentTest {
     public void testGetAndSetChildren() {
         TraceControlComponent fixture = new TraceControlComponent("", new TraceControlRoot());
         fixture.setToolTip("");
-        List<ITraceControlComponent> children = new LinkedList<ITraceControlComponent>();
+        List<ITraceControlComponent> children = new LinkedList<>();
         children.add(new TraceControlComponent("child1"));
         children.add(new TraceControlComponent("child2"));
 

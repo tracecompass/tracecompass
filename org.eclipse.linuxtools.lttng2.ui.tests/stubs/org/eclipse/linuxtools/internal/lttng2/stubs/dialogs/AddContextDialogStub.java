@@ -35,19 +35,19 @@ public class AddContextDialogStub implements IAddContextDialog {
 
     @Override
     public void setAvalibleContexts(List<String> contexts) {
-        fAvailableContexts = new HashSet<String>();
+        fAvailableContexts = new HashSet<>();
         fAvailableContexts.addAll(contexts);
     }
 
     @Override
     public List<String> getContexts() {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         ret.addAll(fContexts);
         return ret;
     }
 
     public void setContexts(List<String> contexts) throws IllegalArgumentException{
-        fContexts = new ArrayList<String>();
+        fContexts = new ArrayList<>();
         fContexts.addAll(contexts);
         // If availableContexts are null we cannot verify
         if (fAvailableContexts != null) {

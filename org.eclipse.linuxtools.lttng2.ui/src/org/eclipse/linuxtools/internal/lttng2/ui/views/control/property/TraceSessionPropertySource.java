@@ -109,7 +109,7 @@ public class TraceSessionPropertySource extends BasePropertySource {
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor> ();
+        List<IPropertyDescriptor> list = new ArrayList<>();
         list.add(new ReadOnlyTextPropertyDescriptor(TRACE_SESSION_NAME_PROPERTY_ID, TRACE_SESSION_NAME_PROPERTY_NAME));
         list.add(new ReadOnlyTextPropertyDescriptor(TRACE_SESSION_STATE_PROPERTY_ID, TRACE_SESSION_STATE_PROPERTY_NAME));
         if (fSession.isSnapshotSession()) {

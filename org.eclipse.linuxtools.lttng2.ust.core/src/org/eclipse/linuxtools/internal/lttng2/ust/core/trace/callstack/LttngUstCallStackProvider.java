@@ -50,10 +50,10 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     private static final String FIELD_ADDR = "addr"; //$NON-NLS-1$
 
     /** Event names indicating function entry */
-    private static final Set<String> FUNC_ENTRY_EVENTS = new HashSet<String>();
+    private static final Set<String> FUNC_ENTRY_EVENTS = new HashSet<>();
 
     /** Event names indicating function exit */
-    private static final Set<String> FUNC_EXIT_EVENTS = new HashSet<String>();
+    private static final Set<String> FUNC_EXIT_EVENTS = new HashSet<>();
 
     static {
         /* This seems overkill, but it will be checked every event. Gotta go FAST! */

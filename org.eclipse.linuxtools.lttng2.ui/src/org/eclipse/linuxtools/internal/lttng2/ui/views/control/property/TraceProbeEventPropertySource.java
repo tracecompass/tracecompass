@@ -88,7 +88,7 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
         IPropertyDescriptor[] superProperties = super.getPropertyDescriptors();
 
         List<IPropertyDescriptor> superList = Arrays.asList(superProperties);
-        ArrayList<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor>();
+        ArrayList<IPropertyDescriptor> list = new ArrayList<>();
         list.addAll(superList);
 
         if (fEvent instanceof TraceProbeEventComponent) {

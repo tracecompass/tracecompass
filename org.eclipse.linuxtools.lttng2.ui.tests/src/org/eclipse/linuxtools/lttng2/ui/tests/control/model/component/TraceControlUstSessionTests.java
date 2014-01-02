@@ -232,7 +232,7 @@ public class TraceControlUstSessionTests {
         // ------------------------------------------------------------------------
         EnableEventsDialogStub eventsDialogStub = new EnableEventsDialogStub();
         eventsDialogStub.setIsTracePoints(true);
-        List<String> events = new ArrayList<String>();
+        List<String> events = new ArrayList<>();
         events.add("ust_tests_hello:tptest_sighandler");
         eventsDialogStub.setNames(events);
         eventsDialogStub.setIsKernel(false);

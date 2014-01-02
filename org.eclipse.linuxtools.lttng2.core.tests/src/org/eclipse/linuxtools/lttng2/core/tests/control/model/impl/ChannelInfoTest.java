@@ -254,7 +254,7 @@ public class ChannelInfoTest {
         fixture.setNumberOfSubBuffers(1);
         fixture.setOutputType("");
         fixture.setSubBufferSize(1L);
-        List<IEventInfo> events = new LinkedList<IEventInfo>();
+        List<IEventInfo> events = new LinkedList<>();
 
         for (int i = 0; i < 2; i++) {
             IEventInfo info = new EventInfo("event" + i);

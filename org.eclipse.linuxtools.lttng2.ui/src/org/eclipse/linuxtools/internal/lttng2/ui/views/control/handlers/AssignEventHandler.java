@@ -87,7 +87,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
                     Exception error = null;
 
                     try {
-                        List<String> eventNames = new ArrayList<String>();
+                        List<String> eventNames = new ArrayList<>();
                         List<BaseEventComponent> events = param.getEvents();
                         // Create list of event names
                         for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
@@ -127,7 +127,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
 
     @Override
     public boolean isEnabled() {
-        ArrayList<BaseEventComponent> events = new ArrayList<BaseEventComponent>();
+        ArrayList<BaseEventComponent> events = new ArrayList<>();
         TraceSessionComponent[] sessions = null;
         Boolean isKernel = null;
 
@@ -225,7 +225,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
          */
         public Parameter(TraceSessionComponent[] sessions, List<BaseEventComponent> events, boolean isKernel) {
             fSessions = Arrays.copyOf(sessions, sessions.length);
-            fEvents = new ArrayList<BaseEventComponent>();
+            fEvents = new ArrayList<>();
             fEvents.addAll(events);
             fIsKernel = isKernel;
         }

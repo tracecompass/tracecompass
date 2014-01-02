@@ -47,7 +47,7 @@ public abstract class ChangeSessionStateHandler extends BaseControlViewHandler {
     /**
      * The list of session components the command is to be executed on.
      */
-    protected List<TraceSessionComponent> fSessions = new ArrayList<TraceSessionComponent>();
+    protected List<TraceSessionComponent> fSessions = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Accessors
@@ -86,7 +86,7 @@ public abstract class ChangeSessionStateHandler extends BaseControlViewHandler {
         fLock.lock();
         try {
 
-            final List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>();
+            final List<TraceSessionComponent> sessions = new ArrayList<>();
             sessions.addAll(fSessions);
 
             Job job = new Job(Messages.TraceControl_ChangeSessionStateJob) {
@@ -125,7 +125,7 @@ public abstract class ChangeSessionStateHandler extends BaseControlViewHandler {
             return false;
         }
 
-        List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>(0);
+        List<TraceSessionComponent> sessions = new ArrayList<>(0);
 
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);

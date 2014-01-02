@@ -44,7 +44,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     /**
      * The Event fields
      */
-    private final List<IFieldInfo> fFields = new ArrayList<IFieldInfo>();
+    private final List<IFieldInfo> fFields = new ArrayList<>();
     /**
      * The filter expression.
      */

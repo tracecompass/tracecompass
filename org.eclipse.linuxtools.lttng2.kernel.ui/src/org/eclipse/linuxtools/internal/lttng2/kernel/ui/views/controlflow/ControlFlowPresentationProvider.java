@@ -120,7 +120,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
-        Map<String, String> retMap = new LinkedHashMap<String, String>();
+        Map<String, String> retMap = new LinkedHashMap<>();
         if (!(event instanceof TimeEvent) || !((TimeEvent) event).hasValue() ||
                 !(event.getEntry() instanceof ControlFlowEntry)) {
             return retMap;

@@ -820,7 +820,7 @@ public class LTTngControlServiceTest {
         try {
             ((LTTngControlService)fService).setVersion("2.2.0");
             String sessionName = "mysession2";
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             String kernelChannel0 = "mychannel0";
             String kernelChannel1 = "mychannel1";
             list.add(kernelChannel0);
@@ -864,7 +864,7 @@ public class LTTngControlServiceTest {
         try {
             ((LTTngControlService)fService).setVersion("2.2.0");
             String sessionName = "mysession2";
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             String USTChannel = "ustChannel";
             list.add(USTChannel);
             fShell.setScenario(SCEN_CHANNEL_HANDLING);
@@ -891,7 +891,7 @@ public class LTTngControlServiceTest {
         try {
             ((LTTngControlService)fService).setVersion("2.2.0");
             String sessionName = "mysession2";
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             String USTChannel = "ustChannel";
             list.add(USTChannel);
             fShell.setScenario(SCEN_CHANNEL_HANDLING);
@@ -920,7 +920,7 @@ public class LTTngControlServiceTest {
         try {
 
             String sessionName = "mysession2";
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             String kernelChannel0 = "mychannel0";
             String kernelChannel1 = "mychannel1";
             list.add(kernelChannel0);
@@ -943,7 +943,7 @@ public class LTTngControlServiceTest {
         try {
 
             String sessionName = "mysession2";
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             String kernelChannel0 = "mychannel0";
             String kernelChannel1 = "mychannel1";
             list.add(kernelChannel0);
@@ -968,7 +968,7 @@ public class LTTngControlServiceTest {
         try {
             // 1) session name, channel = null, 3 event names, kernel
             String sessionName = "mysession2";
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             String eventName0 = "block_rq_remap";
             String eventName1 = "block_bio_remap";
             String eventName2 = "softirq_entry";
@@ -1077,7 +1077,7 @@ public class LTTngControlServiceTest {
             String sessionName = "mysession2";
             String channelName = "mychannel";
             String eventName = "ust_tests_hello:tptest_sighandler";
-            List<String> contexts = new ArrayList<String>();
+            List<String> contexts = new ArrayList<>();
             contexts.add("prio");
             contexts.add("pid");
 
@@ -1088,7 +1088,7 @@ public class LTTngControlServiceTest {
             assertEquals(12, availContexts.size());
 
             // A very "hard-coded" way to verify but it works ...
-            Set<String> expectedContexts = new HashSet<String>();
+            Set<String> expectedContexts = new HashSet<>();
             expectedContexts.add("pid");
             expectedContexts.add("procname");
             expectedContexts.add("prio");
@@ -1119,7 +1119,7 @@ public class LTTngControlServiceTest {
         String sessionName = "mysession2";
         String channelName = "mychannel";
         String eventName = "ust_tests_hello:tptest_sighandler";
-        List<String> contexts = new ArrayList<String>();
+        List<String> contexts = new ArrayList<>();
         contexts.add("prio");
         contexts.add("pid");
         fShell.setScenario(SCEN_CONTEXT_ERROR_HANDLING);

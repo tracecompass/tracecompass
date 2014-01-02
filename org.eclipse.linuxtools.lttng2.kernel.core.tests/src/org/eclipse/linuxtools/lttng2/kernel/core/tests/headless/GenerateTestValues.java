@@ -58,66 +58,66 @@ public class GenerateTestValues {
         File stateFile = File.createTempFile("test-values", ".ht");
         stateFile.deleteOnExit();
         File logFile = File.createTempFile("TestValues", ".java");
-        PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);
+        try (PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
 
-        /* Build and query the state system */
-        ITmfStateProvider input = new LttngKernelStateProvider(testTrace.getTrace());
-        ITmfStateSystem ssq = TmfStateSystemFactory.newFullHistory(stateFile, input, true);
-        List<ITmfStateInterval> fullState = ssq.queryFullState(targetTimestamp);
+            /* Build and query the state system */
+            ITmfStateProvider input = new LttngKernelStateProvider(testTrace.getTrace());
+            ITmfStateSystem ssq = TmfStateSystemFactory.newFullHistory(stateFile, input, true);
+            List<ITmfStateInterval> fullState = ssq.queryFullState(targetTimestamp);
 
-        /* Start printing the java file's contents */
-        writer.println("interface TestValues {");
-        writer.println();
-        writer.println(INDENT + "static final int size = " + fullState.size() +";");
-        writer.println();
+            /* Start printing the java file's contents */
+            writer.println("interface TestValues {");
+            writer.println();
+            writer.println(INDENT + "static final int size = " + fullState.size() + ";");
+            writer.println();
 
-        /* Print the array contents */
-        writer.println(INDENT + "static final long[] startTimes = {");
-        for (ITmfStateInterval interval : fullState) {
-            writer.println(INDENT + INDENT + String.valueOf(interval.getStartTime()) + "L,");
-        }
-        writer.println(INDENT + "};");
-        writer.println();
-
-        writer.println(INDENT + "static final long[] endTimes = {");
-        for (ITmfStateInterval interval : fullState) {
-            writer.println(INDENT + INDENT + String.valueOf(interval.getEndTime())+ "L,");
-        }
-        writer.println(INDENT + "};");
-        writer.println();
-
-        writer.println(INDENT + "static final ITmfStateValue[] values = {");
-        for (ITmfStateInterval interval : fullState) {
-            ITmfStateValue val = interval.getStateValue();
-            writer.print(INDENT + INDENT);
-
-            switch (val.getType()) {
-            case NULL:
-                writer.println("TmfStateValue.nullValue(),");
-                break;
-            case INTEGER:
-                writer.println("TmfStateValue.newValueInt(" + val.unboxInt() + "),");
-                break;
-            case LONG:
-                writer.println("TmfStateValue.newValueLong(" + val.unboxLong() +"),");
-                break;
-            case DOUBLE:
-                writer.println("TmfStateValue.newValueDouble(" + val.unboxDouble() +"),");
-                break;
-            case STRING:
-                writer.println("TmfStateValue.newValueString(\"" + val.unboxStr() + "\"),");
-                break;
-            default:
-                writer.println(val.toString());
-                break;
+            /* Print the array contents */
+            writer.println(INDENT + "static final long[] startTimes = {");
+            for (ITmfStateInterval interval : fullState) {
+                writer.println(INDENT + INDENT + String.valueOf(interval.getStartTime()) + "L,");
             }
+            writer.println(INDENT + "};");
+            writer.println();
+
+            writer.println(INDENT + "static final long[] endTimes = {");
+            for (ITmfStateInterval interval : fullState) {
+                writer.println(INDENT + INDENT + String.valueOf(interval.getEndTime()) + "L,");
+            }
+            writer.println(INDENT + "};");
+            writer.println();
+
+            writer.println(INDENT + "static final ITmfStateValue[] values = {");
+            for (ITmfStateInterval interval : fullState) {
+                ITmfStateValue val = interval.getStateValue();
+                writer.print(INDENT + INDENT);
+
+                switch (val.getType()) {
+                case NULL:
+                    writer.println("TmfStateValue.nullValue(),");
+                    break;
+                case INTEGER:
+                    writer.println("TmfStateValue.newValueInt(" + val.unboxInt() + "),");
+                    break;
+                case LONG:
+                    writer.println("TmfStateValue.newValueLong(" + val.unboxLong() + "),");
+                    break;
+                case DOUBLE:
+                    writer.println("TmfStateValue.newValueDouble(" + val.unboxDouble() + "),");
+                    break;
+                case STRING:
+                    writer.println("TmfStateValue.newValueString(\"" + val.unboxStr() + "\"),");
+                    break;
+                default:
+                    writer.println(val.toString());
+                    break;
+                }
+            }
+            writer.println(INDENT + "};");
+
+            writer.println("}");
+            writer.println();
+
         }
-        writer.println(INDENT + "};");
-
-        writer.println("}");
-        writer.println();
-
-        writer.close();
         System.exit(0);
     }
 

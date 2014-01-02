@@ -459,7 +459,7 @@ public class BaseEventInfoTest {
         IFieldInfo field2 =  new FieldInfo("stringfield");
         field2.setFieldType("string");
 
-        List<IFieldInfo> fields = new LinkedList<IFieldInfo>();
+        List<IFieldInfo> fields = new LinkedList<>();
         fields.add(field1);
         fields.add(field2);
         info.setFields(fields);

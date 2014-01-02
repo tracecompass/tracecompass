@@ -234,7 +234,7 @@ public class TraceControlKernelSessionTests {
 
         EnableEventsDialogStub eventsDialogStub = new EnableEventsDialogStub();
         eventsDialogStub.setIsTracePoints(true);
-        List<String> events = new ArrayList<String>();
+        List<String> events = new ArrayList<>();
         events.add("sched_kthread_stop");
         events.add("sched_kthread_stop_ret");
         eventsDialogStub.setNames(events);
@@ -694,7 +694,7 @@ public class TraceControlKernelSessionTests {
         assertEquals(1, domains.length);
 
         AddContextDialogStub addContextStub = new AddContextDialogStub();
-        List<String> contexts = new ArrayList<String>();
+        List<String> contexts = new ArrayList<>();
         contexts.add("prio");
         contexts.add("perf:branch-misses");
         contexts.add("perf:cache-misses");

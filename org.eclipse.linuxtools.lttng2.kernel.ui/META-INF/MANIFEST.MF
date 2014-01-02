@@ -7,7 +7,7 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng2.kernel.ui;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.lttng2.kernel.ui.Activator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.resources,

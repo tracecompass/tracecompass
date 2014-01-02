@@ -171,7 +171,7 @@ public class TraceControlSnapshotSessionTests {
         IPropertyDescriptor[] descriptors = sessionSource.getPropertyDescriptors();
         assertNotNull(descriptors);
 
-        Map<String,String> map = new HashMap<String,String>();
+        Map<String,String> map = new HashMap<>();
         map.put(TraceSessionPropertySource.TRACE_SESSION_NAME_PROPERTY_ID, "mysession");
         map.put(TraceSessionPropertySource.TRACE_SNAPSHOT_NAME_PROPERTY_ID, "snapshot-1");
         map.put(TraceSessionPropertySource.TRACE_SNAPSHOT_PATH_PROPERTY_ID, "/home/user/lttng-traces/mysession-20130913-141651");

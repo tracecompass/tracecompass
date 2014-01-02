@@ -518,7 +518,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
          * TODO Replace with straight strings in the switch/case once we move to
          * Java 7
          */
-        HashMap<String, Integer> map = new HashMap<String, Integer>();
+        HashMap<String, Integer> map = new HashMap<>();
 
         map.put(LttngStrings.EXIT_SYSCALL, 1);
         map.put(LttngStrings.IRQ_HANDLER_ENTRY, 2);

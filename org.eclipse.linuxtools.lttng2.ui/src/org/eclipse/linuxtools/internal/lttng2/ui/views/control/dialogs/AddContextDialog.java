@@ -69,7 +69,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     /**
      * The contexts to add.
      */
-    private final List<String> fSelectedContexts = new ArrayList<String>();
+    private final List<String> fSelectedContexts = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -95,7 +95,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
 
     @Override
     public List<String> getContexts() {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         ret.addAll(fSelectedContexts);
         return ret;
     }
@@ -320,7 +320,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
          *            The contexts to set
          */
         public void setAvalibleContexts(List<String> contexts) {
-            fAvailableContexts = new ArrayList<Context>();
+            fAvailableContexts = new ArrayList<>();
             if (contexts != null) {
                 for (Iterator<String> iterator = contexts.iterator(); iterator.hasNext();) {
                     String name = iterator.next();

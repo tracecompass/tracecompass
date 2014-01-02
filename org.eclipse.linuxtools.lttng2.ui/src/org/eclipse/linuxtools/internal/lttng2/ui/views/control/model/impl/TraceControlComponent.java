@@ -58,7 +58,7 @@ public class TraceControlComponent implements ITraceControlComponent {
     /**
      * The list if children components.
      */
-    private final List<ITraceControlComponent> fChildren = new ArrayList<ITraceControlComponent>();
+    private final List<ITraceControlComponent> fChildren = new ArrayList<>();
     /**
      * The list of listeners to be notified about changes.
      */
@@ -178,7 +178,7 @@ public class TraceControlComponent implements ITraceControlComponent {
 
     @Override
     public List<ITraceControlComponent> getChildren(Class<? extends ITraceControlComponent> clazz) {
-       List<ITraceControlComponent> list = new ArrayList<ITraceControlComponent>();
+       List<ITraceControlComponent> list = new ArrayList<>();
 
        for (Iterator<ITraceControlComponent> iterator = fChildren.iterator(); iterator.hasNext();) {
            ITraceControlComponent child = iterator.next();

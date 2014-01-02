@@ -46,7 +46,7 @@ public class SnaphshotHandler extends BaseControlViewHandler {
     /**
      * The list of session components the command is to be executed on.
      */
-    protected List<TraceSessionComponent> fSessions = new ArrayList<TraceSessionComponent>();
+    protected List<TraceSessionComponent> fSessions = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Operations
@@ -57,7 +57,7 @@ public class SnaphshotHandler extends BaseControlViewHandler {
         fLock.lock();
         try {
             // Make a copy for thread safety
-            final List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>();
+            final List<TraceSessionComponent> sessions = new ArrayList<>();
             sessions.addAll(fSessions);
 
             Job job = new Job(Messages.TraceControl_RecordSnapshotJob) {
@@ -96,7 +96,7 @@ public class SnaphshotHandler extends BaseControlViewHandler {
             return false;
         }
 
-        List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>(0);
+        List<TraceSessionComponent> sessions = new ArrayList<>(0);
 
         // Check if one session is selected
         ISelection selection = page.getSelection(ControlView.ID);

@@ -40,7 +40,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     /**
      * List of event information.
      */
-    private final List<IBaseEventInfo> fEvents = new ArrayList<IBaseEventInfo>();
+    private final List<IBaseEventInfo> fEvents = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Constructors

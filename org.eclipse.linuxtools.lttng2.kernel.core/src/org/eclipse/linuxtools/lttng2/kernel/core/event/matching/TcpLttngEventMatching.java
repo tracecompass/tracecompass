@@ -63,7 +63,7 @@ public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
      */
     @Override
     public List<Object> getUniqueField(ITmfEvent event) {
-        List<Object> keys = new ArrayList<Object>();
+        List<Object> keys = new ArrayList<>();
 
         TmfEventField field = (TmfEventField) event.getContent();
         ITmfEventField data;

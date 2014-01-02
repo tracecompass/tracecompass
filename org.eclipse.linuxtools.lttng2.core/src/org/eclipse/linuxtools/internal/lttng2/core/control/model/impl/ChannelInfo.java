@@ -64,7 +64,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     /**
      * The events information of the channel.
      */
-    private final List<IEventInfo> fEvents = new ArrayList<IEventInfo>();
+    private final List<IEventInfo> fEvents = new ArrayList<>();
     /**
      * The maximum size of trace files
      */

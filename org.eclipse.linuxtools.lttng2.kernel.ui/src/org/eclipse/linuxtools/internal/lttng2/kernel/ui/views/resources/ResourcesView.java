@@ -90,7 +90,7 @@ public class ResourcesView extends AbstractTimeGraphView {
         setStartTime(Long.MAX_VALUE);
         setEndTime(Long.MIN_VALUE);
 
-        ArrayList<ResourcesEntry> entryList = new ArrayList<ResourcesEntry>();
+        ArrayList<ResourcesEntry> entryList = new ArrayList<>();
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
             if (monitor.isCanceled()) {
                 return;
@@ -176,7 +176,7 @@ public class ResourcesView extends AbstractTimeGraphView {
             if (resourcesEntry.getType().equals(Type.CPU)) {
                 int statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
                 List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, realStart, realEnd - 1, resolution, monitor);
-                eventList = new ArrayList<ITimeEvent>(statusIntervals.size());
+                eventList = new ArrayList<>(statusIntervals.size());
                 long lastEndTime = -1;
                 for (ITmfStateInterval statusInterval : statusIntervals) {
                     if (monitor.isCanceled()) {
@@ -198,7 +198,7 @@ public class ResourcesView extends AbstractTimeGraphView {
                 }
             } else if (resourcesEntry.getType().equals(Type.IRQ)) {
                 List<ITmfStateInterval> irqIntervals = ssq.queryHistoryRange(quark, realStart, realEnd - 1, resolution, monitor);
-                eventList = new ArrayList<ITimeEvent>(irqIntervals.size());
+                eventList = new ArrayList<>(irqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
                 for (ITmfStateInterval irqInterval : irqIntervals) {
@@ -231,7 +231,7 @@ public class ResourcesView extends AbstractTimeGraphView {
                 }
             } else if (resourcesEntry.getType().equals(Type.SOFT_IRQ)) {
                 List<ITmfStateInterval> softIrqIntervals = ssq.queryHistoryRange(quark, realStart, realEnd - 1, resolution, monitor);
-                eventList = new ArrayList<ITimeEvent>(softIrqIntervals.size());
+                eventList = new ArrayList<>(softIrqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
                 for (ITmfStateInterval softIrqInterval : softIrqIntervals) {

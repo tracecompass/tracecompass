@@ -117,7 +117,7 @@ public class DomainInfoTest {
         assertEquals(fChannelInfo1, fDomainInfo1.getChannels()[0]);
 
         IDomainInfo domain = new DomainInfo("domain");
-        List<IChannelInfo> list = new LinkedList<IChannelInfo>();
+        List<IChannelInfo> list = new LinkedList<>();
         list.add(fChannelInfo1);
         list.add(fChannelInfo2);
         domain.setChannels(list);

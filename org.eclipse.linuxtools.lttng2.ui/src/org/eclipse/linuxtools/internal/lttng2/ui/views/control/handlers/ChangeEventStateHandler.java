@@ -96,7 +96,7 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                         boolean isAll = false;
                         if (param.getChannel() != null) {
                             session = param.getChannel().getSession();
-                            List<String> eventNames = new ArrayList<String>();
+                            List<String> eventNames = new ArrayList<>();
                             List<TraceEventComponent> events = param.getEvents();
 
                             for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
@@ -160,7 +160,7 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
         ISelection selection = page.getSelection(ControlView.ID);
 
         TraceChannelComponent channel = null;
-        List<TraceEventComponent> events = new ArrayList<TraceEventComponent>();
+        List<TraceEventComponent> events = new ArrayList<>();
 
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
@@ -224,7 +224,7 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
         /**
          * The list of kernel channel components the command is to be executed on.
          */
-        private final List<TraceEventComponent> fEvents = new ArrayList<TraceEventComponent>();
+        private final List<TraceEventComponent> fEvents = new ArrayList<>();
 
         /**
          * Constructor

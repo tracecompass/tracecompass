@@ -180,7 +180,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
 
     @Override
     public List<String> getEventNames() {
-        return new ArrayList<String>(fSelectedEvents);
+        return new ArrayList<>(fSelectedEvents);
     }
 
     @Override
@@ -256,10 +256,10 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
 
         // initialize tracepoint fields
         fIsAllTracepoints = false;
-        fSelectedEvents = new ArrayList<String>();
+        fSelectedEvents = new ArrayList<>();
         if (fIsTracepoints) {
             fIsAllTracepoints = fTracepointsViewer.getChecked(fProviderGroup);
-            Set<String> set = new HashSet<String>();
+            Set<String> set = new HashSet<>();
             Object[] checkedElements = fTracepointsViewer.getCheckedElements();
             for (int i = 0; i < checkedElements.length; i++) {
                 ITraceControlComponent component = (ITraceControlComponent)checkedElements[i];

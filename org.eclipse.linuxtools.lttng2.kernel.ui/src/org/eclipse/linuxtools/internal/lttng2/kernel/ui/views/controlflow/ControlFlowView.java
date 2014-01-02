@@ -202,13 +202,13 @@ public class ControlFlowView extends AbstractTimeGraphView {
         setStartTime(Long.MAX_VALUE);
         setEndTime(Long.MIN_VALUE);
 
-        ArrayList<ControlFlowEntry> rootList = new ArrayList<ControlFlowEntry>();
+        ArrayList<ControlFlowEntry> rootList = new ArrayList<>();
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
             if (monitor.isCanceled()) {
                 return;
             }
             if (aTrace instanceof LttngKernelTrace) {
-                ArrayList<ControlFlowEntry> entryList = new ArrayList<ControlFlowEntry>();
+                ArrayList<ControlFlowEntry> entryList = new ArrayList<>();
                 LttngKernelTrace ctfKernelTrace = (LttngKernelTrace) aTrace;
                 ITmfStateSystem ssq = ctfKernelTrace.getStateSystems().get(LttngKernelTrace.STATE_ID);
                 if (!ssq.waitUntilBuilt()) {
@@ -360,7 +360,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         try {
             int statusQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.STATUS);
             List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, realStart, realEnd - 1, resolution, monitor);
-            eventList = new ArrayList<ITimeEvent>(statusIntervals.size());
+            eventList = new ArrayList<>(statusIntervals.size());
             long lastEndTime = -1;
             for (ITmfStateInterval statusInterval : statusIntervals) {
                 if (monitor.isCanceled()) {
@@ -457,7 +457,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
 
     @Override
     protected List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        List<ILinkEvent> list = new ArrayList<ILinkEvent>();
+        List<ILinkEvent> list = new ArrayList<>();
         ITmfTrace[] traces = TmfTraceManager.getTraceSet(getTrace());
         List<TimeGraphEntry> entryList = getEntryListMap().get(getTrace());
         if (traces == null || entryList == null) {

@@ -50,7 +50,7 @@ public class DestroySessionHandler extends BaseControlViewHandler {
     /**
      * The list of session components the command is to be executed on.
      */
-    private final List<TraceSessionComponent> fSessions = new ArrayList<TraceSessionComponent>();
+    private final List<TraceSessionComponent> fSessions = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Operations

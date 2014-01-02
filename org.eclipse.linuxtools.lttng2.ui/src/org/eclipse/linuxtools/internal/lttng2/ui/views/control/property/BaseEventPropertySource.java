@@ -92,7 +92,7 @@ public class BaseEventPropertySource extends BasePropertySource {
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor> ();
+        List<IPropertyDescriptor> list = new ArrayList<> ();
         list.add(new ReadOnlyTextPropertyDescriptor(BASE_EVENT_NAME_PROPERTY_ID, BASE_EVENT_NAME_PROPERTY_NAME));
         list.add(new ReadOnlyTextPropertyDescriptor(BASE_EVENT_TYPE_PROPERTY_ID, BASE_EVENT_TYPE_PROPERTY_NAME));
         if (fBaseEvent.getLogLevel() != TraceLogLevel.LEVEL_UNKNOWN) {

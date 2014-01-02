@@ -129,7 +129,7 @@ public class SessionInfoTest {
         assertEquals(fDomainInfo1, fSessionInfo1.getDomains()[0]);
 
         ISessionInfo session = new SessionInfo("session");
-        List<IDomainInfo> list = new LinkedList<IDomainInfo>();
+        List<IDomainInfo> list = new LinkedList<>();
         list.add(fDomainInfo1);
         list.add(fDomainInfo2);
         session.setDomains(list);

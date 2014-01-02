@@ -127,10 +127,10 @@ public class CommandShell implements ICommandShell {
     @Override
     public ICommandResult executeCommand(final String command, final IProgressMonitor monitor, final boolean checkReturnValue) throws ExecutionException {
         if (fIsConnected) {
-            FutureTask<CommandResult> future = new FutureTask<CommandResult>(new Callable<CommandResult>() {
+            FutureTask<CommandResult> future = new FutureTask<>(new Callable<CommandResult>() {
                 @Override
                 public CommandResult call() throws IOException, CancellationException {
-                    final ArrayList<String> result = new ArrayList<String>();
+                    final ArrayList<String> result = new ArrayList<>();
 
                     synchronized (fHostShell) {
                         // Initialize return value which will be updated in isAliasEchoResult()
