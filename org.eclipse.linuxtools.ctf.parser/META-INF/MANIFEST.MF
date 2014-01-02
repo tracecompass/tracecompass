@@ -5,7 +5,7 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-Version: 3.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.ctf.parser
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.eclipse.linuxtools.ctf.parser;x-friends:="org.eclipse.linuxtools.ctf.core,org.eclipse.linuxtools.ctf.parser.tests"
 Import-Package: org.antlr.runtime;version="3.2.0",
  org.antlr.runtime.tree;version="3.2.0"

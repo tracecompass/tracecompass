@@ -34,7 +34,7 @@ public class CTFClock {
     /**
      * Field properties.
      */
-    private final Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<>();
     /**
      * Field name.
      */

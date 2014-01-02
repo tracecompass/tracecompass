@@ -43,7 +43,7 @@ public class CTFTraceReader {
     /**
      * Vector of all the trace file readers.
      */
-    private final List<StreamInputReader> streamInputReaders = new ArrayList<StreamInputReader>();
+    private final List<StreamInputReader> streamInputReaders = new ArrayList<>();
 
     /**
      * Priority queue to order the trace file readers by timestamp.
@@ -213,7 +213,7 @@ public class CTFTraceReader {
      */
     private void populateStreamInputReaderHeap() throws CTFReaderException {
         if (this.streamInputReaders.isEmpty()) {
-            this.prio = new PriorityQueue<StreamInputReader>();
+            this.prio = new PriorityQueue<>();
             return;
         }
 
@@ -221,7 +221,7 @@ public class CTFTraceReader {
          * Create the priority queue with a size twice as bigger as the number
          * of reader in order to avoid constant resizing.
          */
-        this.prio = new PriorityQueue<StreamInputReader>(
+        this.prio = new PriorityQueue<>(
                 this.streamInputReaders.size() * 2,
                 new StreamInputReaderTimestampComparator());
 

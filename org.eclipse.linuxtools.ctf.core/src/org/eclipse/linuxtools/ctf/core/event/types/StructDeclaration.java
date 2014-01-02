@@ -34,8 +34,8 @@ public class StructDeclaration implements IDeclaration {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final Map<String, IDeclaration> fields = new HashMap<String, IDeclaration>();
-    private final List<String> fieldsList = new LinkedList<String>();
+    private final Map<String, IDeclaration> fields = new HashMap<>();
+    private final List<String> fieldsList = new LinkedList<>();
     private long maxAlign;
 
     // ------------------------------------------------------------------------

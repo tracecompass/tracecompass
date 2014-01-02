@@ -7,7 +7,7 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.ctf.core;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.ctf.core.Activator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.linuxtools.ctf.parser;bundle-version="3.0.0"
 Export-Package: org.eclipse.linuxtools.ctf.core,

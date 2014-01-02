@@ -125,8 +125,7 @@ public class Metadata {
      *             If there was a problem parsing the metadata
      */
     public void parse() throws CTFReaderException {
-        FileInputStream fis = null;
-        FileChannel metadataFileChannel = null;
+
 
         /*
          * Reader. It will contain a StringReader if we are using packet-based
@@ -135,9 +134,8 @@ public class Metadata {
          */
         Reader metadataTextInput = null;
 
-        try {
-            fis = new FileInputStream(metadataFile);
-            metadataFileChannel = fis.getChannel();
+        try (FileInputStream fis = new FileInputStream(metadataFile);
+                FileChannel metadataFileChannel = fis.getChannel();) {
 
             /* Check if metadata is packet-based */
             if (isPacketBased(metadataFileChannel)) {
@@ -179,29 +177,6 @@ public class Metadata {
             throw new CtfAntlrException(e);
         } catch (RewriteCardinalityException e){
             throw new CtfAntlrException(e);
-        } finally {
-            /* Ghetto resource management. Java 7 will deliver us from this... */
-            if (metadataTextInput != null) {
-                try {
-                    metadataTextInput.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (metadataFileChannel != null) {
-                try {
-                    metadataFileChannel.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
         }
     }
 

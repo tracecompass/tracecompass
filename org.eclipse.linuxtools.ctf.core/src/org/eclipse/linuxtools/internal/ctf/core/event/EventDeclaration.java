@@ -73,7 +73,7 @@ public class EventDeclaration implements IEventDeclaration {
     private long logLevel;
 
     /** Map of this event type's custom CTF attributes */
-    private final Map<String, String> customAttributes = new HashMap<String, String>();
+    private final Map<String, String> customAttributes = new HashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructors

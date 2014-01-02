@@ -34,7 +34,7 @@ public class StreamInputPacketIndex {
      * Entries of the index. They are sorted by increasing begin timestamp.
      * index builder.
      */
-    private final Vector<StreamInputPacketIndexEntry> entries = new Vector<StreamInputPacketIndexEntry>();
+    private final Vector<StreamInputPacketIndexEntry> entries = new Vector<>();
 
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates

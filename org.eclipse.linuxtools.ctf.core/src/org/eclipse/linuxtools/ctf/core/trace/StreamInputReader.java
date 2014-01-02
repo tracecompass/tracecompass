@@ -60,7 +60,7 @@ public class StreamInputReader {
     private CTFTraceReader parent;
 
     /** Map of all the event types */
-    private final Map<Long, EventDefinition> eventDefs = new HashMap<Long, EventDefinition>();
+    private final Map<Long, EventDefinition> eventDefs = new HashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructors

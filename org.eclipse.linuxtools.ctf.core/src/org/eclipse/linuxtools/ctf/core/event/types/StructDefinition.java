@@ -38,7 +38,7 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     private final StructDeclaration declaration;
-    private final Map<String, Definition> definitions = new LinkedHashMap<String, Definition>();
+    private final Map<String, Definition> definitions = new LinkedHashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructors

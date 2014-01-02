@@ -38,7 +38,7 @@ public class VariantDefinition extends Definition implements IDefinitionScope {
     private VariantDeclaration declaration;
 
     private EnumDefinition tagDefinition;
-    private Map<String, Definition> definitions = new HashMap<String, Definition>();
+    private Map<String, Definition> definitions = new HashMap<>();
     private String currentField;
 
     // ------------------------------------------------------------------------

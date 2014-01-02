@@ -43,11 +43,11 @@ class DeclarationScope {
 
     private DeclarationScope parentScope = null;
 
-    private final Map<String, StructDeclaration> structs = new HashMap<String, StructDeclaration>();
-    private final Map<String, EnumDeclaration> enums = new HashMap<String, EnumDeclaration>();
-    private final Map<String, VariantDeclaration> variants = new HashMap<String, VariantDeclaration>();
-    private final Map<String, IDeclaration> types = new HashMap<String, IDeclaration>();
-    private final Map<String, IDeclaration> identifiers = new HashMap<String, IDeclaration>();
+    private final Map<String, StructDeclaration> structs = new HashMap<>();
+    private final Map<String, EnumDeclaration> enums = new HashMap<>();
+    private final Map<String, VariantDeclaration> variants = new HashMap<>();
+    private final Map<String, IDeclaration> types = new HashMap<>();
+    private final Map<String, IDeclaration> identifiers = new HashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructors

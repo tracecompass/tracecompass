@@ -336,80 +336,77 @@ public class IOstructgenTest {
     }
 
     private static void createDummyTrace(String metadata) {
+        File dir = new File(tempTraceDir);
+        if (dir.exists()) {
+            deltree(dir);
+        }
+        dir.mkdirs();
 
-        try {
-            File dir;
-            dir = new File(tempTraceDir);
-            if (dir.exists()) {
-                deltree(dir);
-            }
-            dir.mkdirs();
-            File metadataFile;
-            metadataFile = new File(tempTraceDir + "/metadata");
-            FileWriter fw = new FileWriter(metadataFile);
+        File metadataFile = new File(tempTraceDir + "/metadata");
+        try (FileWriter fw = new FileWriter(metadataFile);) {
             fw.write(metadata);
-            fw.close();
-
-            byte magicLE[] = { (byte) 0xC1, (byte) 0x1F, (byte) 0xFC,
-                    (byte) 0xC1 };
-            byte uuid[] = { (byte) 0xb0, 0x4d, 0x39, 0x1b, (byte) 0xe7,
-                    0x36, 0x44, (byte) 0xc1, (byte) 0x8d, (byte) 0x89, 0x4b,
-                    (byte) 0xb4, 0x38, (byte) 0x85, 0x7f, (byte) 0x8d };
-
-            Event ev = new Event(2, 2);
-
-            final int nbEvents = (DATA_SIZE / ev.getSize()) - 1;
-            final int contentSize = (nbEvents * ev.getSize() +
-                    HEADER_SIZE) * 8;
-
-            ByteBuffer data = ByteBuffer.allocate(PACKET_SIZE);
-            data.order(ByteOrder.LITTLE_ENDIAN);
-            data.clear();
-
-            // packet header
-            // magic number 4
-            data.put(magicLE);
-            // uuid 16
-            data.put(uuid);
-            // stream ID 4
-            data.putInt(0);
-
-            // packet context
-            // timestamp_begin 8
-            data.putLong(0xa500);
-
-            // timestamp_end 8
-            data.putLong(nbEvents * 0x10000 + 0xa5a6);
-
-            // content_size 8
-            data.putLong(contentSize);
-
-            // packet_size 8
-            data.putLong(PACKET_SIZE * 8);
-
-            // events_discarded 8
-            data.putLong(0);
-
-            // cpu_id 4
-            data.putInt(0);
-
-            // fill me
-            for (int i = 0; i < nbEvents; i++) {
-                ev.setEventTimestamp(i * 0x10000 + 0xa5a5);
-                ev.setEventContent(i);
-                ev.writeEvent(data);
-            }
-
-            File dummyFile;
-            dummyFile = new File(tempTraceDir + "/dummyChan");
-            FileOutputStream fos = new FileOutputStream(dummyFile);
-            // The byteBuffer needs to be flipped in file writing mode
-            data.flip();
-            fos.getChannel().write(data);
-            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        }
+
+        byte magicLE[] = { (byte) 0xC1, (byte) 0x1F, (byte) 0xFC,
+                (byte) 0xC1 };
+        byte uuid[] = { (byte) 0xb0, 0x4d, 0x39, 0x1b, (byte) 0xe7,
+                0x36, 0x44, (byte) 0xc1, (byte) 0x8d, (byte) 0x89, 0x4b,
+                (byte) 0xb4, 0x38, (byte) 0x85, 0x7f, (byte) 0x8d };
+
+        Event ev = new Event(2, 2);
+
+        final int nbEvents = (DATA_SIZE / ev.getSize()) - 1;
+        final int contentSize = (nbEvents * ev.getSize() +
+                HEADER_SIZE) * 8;
+
+        ByteBuffer data = ByteBuffer.allocate(PACKET_SIZE);
+        data.order(ByteOrder.LITTLE_ENDIAN);
+        data.clear();
+
+        // packet header
+        // magic number 4
+        data.put(magicLE);
+        // uuid 16
+        data.put(uuid);
+        // stream ID 4
+        data.putInt(0);
+
+        // packet context
+        // timestamp_begin 8
+        data.putLong(0xa500);
+
+        // timestamp_end 8
+        data.putLong(nbEvents * 0x10000 + 0xa5a6);
+
+        // content_size 8
+        data.putLong(contentSize);
+
+        // packet_size 8
+        data.putLong(PACKET_SIZE * 8);
+
+        // events_discarded 8
+        data.putLong(0);
+
+        // cpu_id 4
+        data.putInt(0);
+
+        // fill me
+        for (int i = 0; i < nbEvents; i++) {
+            ev.setEventTimestamp(i * 0x10000 + 0xa5a5);
+            ev.setEventContent(i);
+            ev.writeEvent(data);
+        }
+
+        // The byteBuffer needs to be flipped in file writing mode
+        data.flip();
+
+        File dummyFile = new File(tempTraceDir + "/dummyChan");
+        try (FileOutputStream fos = new FileOutputStream(dummyFile);) {
+            fos.getChannel().write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

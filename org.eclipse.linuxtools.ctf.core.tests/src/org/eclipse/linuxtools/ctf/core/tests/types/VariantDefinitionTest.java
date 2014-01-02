@@ -289,7 +289,7 @@ public class VariantDefinitionTest {
      */
     @Test
     public void testSetDefinitions() {
-        HashMap<String, Definition> definitions = new HashMap<String, Definition>();
+        HashMap<String, Definition> definitions = new HashMap<>();
         fixture.setDefinitions(definitions);
     }
 

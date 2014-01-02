@@ -55,12 +55,12 @@ public class Stream {
     /**
      * Maps event ids to events
      */
-    private Map<Long, IEventDeclaration> events = new HashMap<Long, IEventDeclaration>();
+    private Map<Long, IEventDeclaration> events = new HashMap<>();
 
     /**
      * The inputs associated to this stream
      */
-    private final Set<StreamInput> inputs = new HashSet<StreamInput>();
+    private final Set<StreamInput> inputs = new HashSet<>();
 
     // ------------------------------------------------------------------------
     // Constructors
