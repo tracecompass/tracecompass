@@ -131,7 +131,7 @@ public class DsfGdbAdaptor {
 
     // To save tracepoints detailed info.  The key is the rank of the
     // breakpoint (tracepoint is a kind of breakpoint)
-    private  Map<Integer, MIBreakpointDMData> fTpInfo = new HashMap<Integer, MIBreakpointDMData>();
+    private  Map<Integer, MIBreakpointDMData> fTpInfo = new HashMap<>();
 
     private TmfEventType tmfEventType = new TmfEventType(ITmfEventType.DEFAULT_CONTEXT_ID, "GDB Tracepoint", TmfEventField.makeRoot(new String[] { "Content" })); //$NON-NLS-1$ //$NON-NLS-2$
 
