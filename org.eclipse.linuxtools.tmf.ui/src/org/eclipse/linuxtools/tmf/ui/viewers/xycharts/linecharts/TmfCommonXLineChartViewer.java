@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
 import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.swtchart.IAxisTick;
@@ -26,6 +27,7 @@ import org.swtchart.ILineSeries;
 import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries;
 import org.swtchart.ISeries.SeriesType;
+import org.swtchart.ISeriesSet;
 import org.swtchart.LineStyle;
 import org.swtchart.Range;
 
@@ -45,6 +47,13 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     /* The desired number of points per pixel */
     private static final double RESOLUTION = 1.0;
+
+    private static final int[] LINE_COLORS = { SWT.COLOR_BLUE, SWT.COLOR_RED, SWT.COLOR_GREEN,
+            SWT.COLOR_MAGENTA, SWT.COLOR_CYAN,
+            SWT.COLOR_DARK_BLUE, SWT.COLOR_DARK_RED, SWT.COLOR_DARK_GREEN,
+            SWT.COLOR_DARK_MAGENTA, SWT.COLOR_DARK_CYAN, SWT.COLOR_DARK_YELLOW,
+            SWT.COLOR_BLACK, SWT.COLOR_GRAY };
+    private static final LineStyle[] LINE_STYLES = { LineStyle.SOLID, LineStyle.DASH, LineStyle.DOT, LineStyle.DASHDOT };
 
     private final Map<String, double[]> fSeriesValues = new LinkedHashMap<>();
     private double[] fXValues;
@@ -165,15 +174,15 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     /**
      * Update the series data because the time range has changed. The x axis
      * values for this data update can be computed using the
-     * {@link TmfCommonXLineChartViewer#getXAxis(long, long, int)} method which will
-     * return a list of uniformely separated time values.
+     * {@link TmfCommonXLineChartViewer#getXAxis(long, long, int)} method which
+     * will return a list of uniformely separated time values.
      *
      * Each series values should be set by calling the
      * {@link TmfCommonXLineChartViewer#setSeries(String, double[])}.
      *
      * This method is responsible for calling the
-     * {@link TmfCommonXLineChartViewer#updateDisplay()} when needed for the new values
-     * to be displayed.
+     * {@link TmfCommonXLineChartViewer#updateDisplay()} when needed for the new
+     * values to be displayed.
      *
      * @param start
      *            The start time of the range for which the get the data
@@ -208,19 +217,20 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * Add a new series to the XY line chart. By default, it is a simple solid
      * line.
      *
-     * TODO: This is where the color alternance and other defaults should be set
-     *
      * @param seriesName
      *            The name of the series to create
      * @return The series so that the concrete viewer can modify its properties
      *         if required
      */
     protected ILineSeries addSeries(String seriesName) {
-        ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().createSeries(SeriesType.LINE, seriesName);
+        ISeriesSet seriesSet = getSwtChart().getSeriesSet();
+        int seriesCount = seriesSet.getSeries().length;
+        ILineSeries series = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
         series.setVisible(true);
         series.enableArea(false);
-        series.setLineStyle(LineStyle.SOLID);
+        series.setLineStyle(LINE_STYLES[(seriesCount / (LINE_COLORS.length)) % LINE_STYLES.length]);
         series.setSymbolType(PlotSymbolType.NONE);
+        series.setLineColor(Display.getDefault().getSystemColor(LINE_COLORS[seriesCount % LINE_COLORS.length]));
         return series;
     }
 

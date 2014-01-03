@@ -133,6 +133,8 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
 
         IAxis xAxis = getChart().getAxisSet().getXAxis(0);
         e.gc.setBackground(TmfXYChartViewer.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+        e.gc.setForeground(TmfXYChartViewer.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+        e.gc.setLineStyle(SWT.LINE_SOLID);
         if ((fBeginTime >= windowStartTime) && (fBeginTime <= windowEndTime)) {
             int beginX = xAxis.getPixelCoordinate(fBeginTime);
             e.gc.drawLine(beginX, 0, beginX, e.height);
