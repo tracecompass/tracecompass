@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
@@ -40,7 +41,10 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
  *
  * @author alexmont
  *
+ * @deprecated Building state systems should now be done via
+ *             {@link TmfStateSystemAnalysisModule}
  */
+@Deprecated
 public class HistoryBuilder extends TmfComponent {
 
     private final ITmfStateProvider sp;

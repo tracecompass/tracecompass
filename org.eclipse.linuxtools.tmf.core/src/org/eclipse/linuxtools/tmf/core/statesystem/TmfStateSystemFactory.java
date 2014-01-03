@@ -33,7 +33,11 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  *
  * @author Alexandre Montplaisir
  * @since 2.0
+ *
+ * @deprecated Building state systems should now be done via
+ *             {@link TmfStateSystemAnalysisModule}
  */
+@Deprecated
 public final class TmfStateSystemFactory extends TmfComponent {
 
     /** "static" class */
