@@ -13,8 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -35,10 +34,11 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
  * @since 3.0
  */
 public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisModule
-        implements ITmfStateSystemAnalysisModule {
+        implements ITmfAnalysisModuleWithStateSystems {
+
+    private static final String EXTENSION = ".ht"; //$NON-NLS-1$
 
     private ITmfStateSystem fStateSystem = null;
-    private static final String EXTENSION = ".ht"; //$NON-NLS-1$
 
     /**
      * State system backend types
@@ -136,10 +136,27 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         fStateSystem.dispose();
     }
 
+    // ------------------------------------------------------------------------
+    // ITmfAnalysisModuleWithStateSystems
+    // ------------------------------------------------------------------------
+
     @Override
-    public Map<String, ITmfStateSystem> getStateSystems() {
-        Map<String, ITmfStateSystem> map = new HashMap<>();
-        map.put(getId(), fStateSystem);
-        return map;
+    public ITmfStateSystem getStateSystem(@NonNull String id) {
+        if (id.equals(getId())) {
+            return fStateSystem;
+        }
+        return null;
+    }
+
+    @Override
+    public String getStateSystemId(@NonNull ITmfStateSystem ss) {
+        return getId();
+    }
+
+    @SuppressWarnings("null")
+    @Override
+    @NonNull
+    public Iterable<ITmfStateSystem> getStateSystems() {
+        return Collections.singleton(fStateSystem);
     }
 }

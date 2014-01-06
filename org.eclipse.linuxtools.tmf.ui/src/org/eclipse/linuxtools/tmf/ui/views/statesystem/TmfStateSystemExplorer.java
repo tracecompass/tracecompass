@@ -40,7 +40,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemAnalysisModule;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -172,40 +172,41 @@ public class TmfStateSystemExplorer extends TmfView {
              * We will first do all the queries for this trace, then update that
              * sub-tree in the UI thread.
              */
-            Map<String, ITmfStateSystemAnalysisModule> modules = currentTrace.getAnalysisModules(ITmfStateSystemAnalysisModule.class);
+            Map<String, ITmfAnalysisModuleWithStateSystems> modules = currentTrace.getAnalysisModules(ITmfAnalysisModuleWithStateSystems.class);
             final Map<String, ITmfStateSystem> sss = new HashMap<>();
             final Map<String, List<ITmfStateInterval>> fullStates =
                     new LinkedHashMap<>();
-            for (Entry<String, ITmfStateSystemAnalysisModule> entry : modules.entrySet()) {
+            for (Entry<String, ITmfAnalysisModuleWithStateSystems> entry : modules.entrySet()) {
                 /*
                  * FIXME: For now, this view is a way to execute and display
                  * state system. But with phase 2 of analysis API, we won't want
                  * to run state system that have not been requested. We will
                  * leave the title, but there won't be anything underneath.
                  */
-                ITmfStateSystemAnalysisModule module = entry.getValue();
+                ITmfAnalysisModuleWithStateSystems module = entry.getValue();
                 if (module instanceof IAnalysisModule) {
                     IAnalysisModule mod = (IAnalysisModule) module;
                     mod.schedule();
                     mod.waitForCompletion(new NullProgressMonitor());
                 }
-                for (Entry<String, ITmfStateSystem> ssEntry : module.getStateSystems().entrySet()) {
-                    String ssName = ssEntry.getKey();
-                    ITmfStateSystem ss = ssEntry.getValue();
+                for (ITmfStateSystem ss : module.getStateSystems()) {
+                    if (ss == null) {
+                        continue;
+                    }
+                    String ssName = module.getStateSystemId(ss);
                     sss.put(ssName, ss);
-                    if (ss != null) {
-                        if (ts == -1 || ts < ss.getStartTime() || ts > ss.getCurrentEndTime()) {
-                            ts = ss.getStartTime();
-                        }
-                        try {
-                            fullStates.put(ssName, ss.queryFullState(ts));
-                        } catch (TimeRangeException e) {
-                            /* We already checked the limits ourselves */
-                            throw new IllegalStateException();
-                        } catch (StateSystemDisposedException e) {
-                            /* Probably shutting down, cancel and return */
-                            return;
-                        }
+
+                    if (ts == -1 || ts < ss.getStartTime() || ts > ss.getCurrentEndTime()) {
+                        ts = ss.getStartTime();
+                    }
+                    try {
+                        fullStates.put(ssName, ss.queryFullState(ts));
+                    } catch (TimeRangeException e) {
+                        /* We already checked the limits ourselves */
+                        throw new IllegalStateException();
+                    } catch (StateSystemDisposedException e) {
+                        /* Probably shutting down, cancel and return */
+                        return;
                     }
                 }
             }
@@ -290,18 +291,17 @@ public class TmfStateSystemExplorer extends TmfView {
 
         /* For each trace... */
         for (int traceNb = 0; traceNb < traces.length; traceNb++) {
-            Map<String, ITmfStateSystemAnalysisModule> modules = traces[traceNb].getAnalysisModules(ITmfStateSystemAnalysisModule.class);
+            Map<String, ITmfAnalysisModuleWithStateSystems> modules = traces[traceNb].getAnalysisModules(ITmfAnalysisModuleWithStateSystems.class);
 
             /* For each state system associated with this trace... */
             int ssNb = 0;
-            for (Entry<String, ITmfStateSystemAnalysisModule> module : modules.entrySet()) {
+            for (Entry<String, ITmfAnalysisModuleWithStateSystems> module : modules.entrySet()) {
 
                 /*
                  * Even though we only use the value, it just feels safer to
                  * iterate the same way as before to keep the order the same.
                  */
-                for (Entry<String, ITmfStateSystem> ssEntry : module.getValue().getStateSystems().entrySet()) {
-                    final ITmfStateSystem ss = ssEntry.getValue();
+                for (final ITmfStateSystem ss : module.getValue().getStateSystems()) {
                     final int traceNb1 = traceNb;
                     final int ssNb1 = ssNb;
                     if (ss != null) {
