@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.statesystem;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -33,7 +34,7 @@ public interface ITmfAnalysisModuleWithStateSystems {
      *         no match.
      */
     @Nullable
-    ITmfStateSystem getStateSystem(String id);
+    ITmfStateSystem getStateSystem(@NonNull String id);
 
     /**
      * FIXME The ID's should be saved in the state system themselves
@@ -47,7 +48,7 @@ public interface ITmfAnalysisModuleWithStateSystems {
      * @return The corresponding state system
      */
     @Nullable
-    String getStateSystemId(ITmfStateSystem ss);
+    String getStateSystemId(@NonNull ITmfStateSystem ss);
 
     /**
      * Return all the state systems provided by this analysis module, in
