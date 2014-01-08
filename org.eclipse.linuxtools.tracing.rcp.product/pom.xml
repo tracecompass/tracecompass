@@ -52,7 +52,7 @@
                         <product>
                             <archiveFileName>linuxtools-trace-viewer-${project.version}-${build.timestamp}</archiveFileName>
                             <id>${productId}</id>
-                            <rootFolder>traceviewer</rootFolder>
+                            <rootFolder>linuxtools-trace-viewer</rootFolder>
                         </product>
                     </products>
                 </configuration>
