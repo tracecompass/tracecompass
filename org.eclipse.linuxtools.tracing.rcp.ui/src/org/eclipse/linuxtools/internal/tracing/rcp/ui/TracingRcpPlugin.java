@@ -71,12 +71,20 @@ public class TracingRcpPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Gets the tracing workspace root directory
+     * Gets the tracing workspace root directory. By default it uses the user's
+     * home directory. This value can be overwritten by using the global
+     * TRACING_RCP_ROOT environment variable.
      *
      * @return the tracing workspace root directory
      */
     public static String getWorkspaceRoot() {
-        return System.getProperty("user.home"); //$NON-NLS-1$
+        /* Look for the environment variable in the global environment variables */
+        String workspaceRoot = System.getenv().get("TRACING_RCP_ROOT"); //$NON-NLS-1$
+        if (workspaceRoot == null) {
+            /* Use the user's home directory */
+            workspaceRoot = System.getProperty("user.home"); //$NON-NLS-1$
+        }
+        return workspaceRoot;
     }
 
     // ------------------------------------------------------------------------
