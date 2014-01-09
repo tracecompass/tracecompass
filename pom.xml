@@ -83,7 +83,8 @@
       </os>
     </activation>
     <properties>
-      <base.ui.test.vmargs>${base.test.vmargs}</base.ui.test.vmargs>
+      <!-- Disable webkit integration, especially unstable on Linux -->
+      <base.ui.test.vmargs>${base.test.vmargs} -Dorg.eclipse.swt.browser.DefaultType=mozilla</base.ui.test.vmargs>
     </properties>
   </profile>
 </profiles>
