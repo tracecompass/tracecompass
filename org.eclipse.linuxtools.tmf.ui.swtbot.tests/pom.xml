@@ -36,6 +36,7 @@
           <testClass>org.eclipse.linuxtools.tmf.ui.swtbot.tests.AllTmfUISWTBotTests</testClass>
           <useUIHarness>true</useUIHarness>
           <useUIThread>false</useUIThread>
+          <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
           <product>org.eclipse.platform.ide</product>
         </configuration>
       </plugin>
