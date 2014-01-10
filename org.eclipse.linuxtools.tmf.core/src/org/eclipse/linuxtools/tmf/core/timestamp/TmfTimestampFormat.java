@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 
 /**
  * A formatting and parsing facility that can handle timestamps that span the
- * epoch with a precision down to the nanosecond. It can  be understood as a
+ * epoch with a precision down to the nanosecond. It can be understood as a
  * simplified and more constrained version of SimpleDateFormat as it limits the
  * number of allowed pattern characters and the acceptable timestamp formats.
  * <p>
@@ -86,7 +86,7 @@ import java.util.regex.Pattern;
  *     <tr bgcolor="#eeeeff">
  *         <td><code>T</code>
  *         <td>The seconds since the epoch
- *         <td><code>00-...</code>
+ *         <td><code>0-...</code>
  *         <td><code>1332170682</code>
  * </table>
  * </blockquote>
@@ -111,7 +111,7 @@ import java.util.regex.Pattern;
  *         <td><code>456</code>
  *     <tr>
  *         <td><code>NNN</code>
- *         <td>Nanosecond in &#181s
+ *         <td>Nanoseconds in &#181s
  *         <td><code>000-999</code>
  *         <td><code>789</code>
  * </table>
@@ -120,12 +120,13 @@ import java.util.regex.Pattern;
  * <strong>Note: </strong>If "T" is used, no other Date or Time pattern
  * can be used. Also, "T" should be used for time intervals.
  * <p>
- * <strong>Note: </strong>Each sub-field can be separated by a single,
- * optional character delimiter. However, the between Date/Time and the
- * Sub-seconds pattern is mandatory (if there is a fractional part) and
- * has to be separated from Date/time by "." (period).
+ * <strong>Note: </strong>When parsing, the Sub-Seconds sub-field digits can be
+ * separated by a single, optional character delimiter. However, the delimiter
+ * between the Date/Time pattern and the Sub-Seconds pattern is mandatory (if
+ * there is a fractional part) and must be a "." (period). The Date and Time
+ * patterns must not contain any "." (period).
  * <p>
- * The recognized delimiters are:
+ * The recognized Sub-Seconds delimiters are:
  * <ul>
  * <li>Space ("<code> </code>")
  * <li>Period (<code>".</code>")
@@ -190,13 +191,13 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss.SSS CCC NNN"; //$NON-NLS-1$
 
     /**
-     * The LTTng 0.x legacy timestamp format
+     * The default interval pattern
      */
     public static final String DEFAULT_INTERVAL_PATTERN = "TTT.SSS CCC NNN"; //$NON-NLS-1$
 
     // Fractions of seconds supported patterns
     private static final String DOT_RE = "\\.";                 //$NON-NLS-1$
-    private static final String SEP_RE = "[ \\.,-_:;/\\\"]?";   //$NON-NLS-1$
+    private static final String SEP_RE = "[ \\.,\\-_:;/\\\"]?"; //$NON-NLS-1$
     private static final String DGTS_3_RE  = "(\\d{3})";        //$NON-NLS-1$
     private static final String DGTS_13_RE = "(\\d{1,3})";      //$NON-NLS-1$
 
@@ -221,7 +222,10 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     // The timestamp pattern
     private String fPattern;
 
-    // The timestamp pattern
+    // The sub-seconds pattern
+    private String fSubSecPattern;
+
+    // The list of supplementary patterns
     private List<String> fSupplPatterns = new ArrayList<>();
 
     /**
@@ -340,8 +344,14 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     @Override
     public void applyPattern(String pattern) {
         fPattern = pattern;
-        String quotedPattern = quoteSpecificTags(pattern);
-        super.applyPattern(quotedPattern);
+        int dot = pattern.indexOf('.');
+        if (dot == -1) {
+            dot = pattern.length();
+        }
+        // The super pattern is the date/time pattern, quoted and bracketed
+        super.applyPattern(quoteSpecificTags(pattern.substring(0, dot), true));
+        // The sub-seconds pattern is bracketed (but not quoted)
+        fSubSecPattern = quoteSpecificTags(pattern.substring(dot), false);
     }
 
     @Override
@@ -364,32 +374,23 @@ public class TmfTimestampFormat extends SimpleDateFormat {
         // Split the timestamp value into its sub-components
         long date = value / 1000000; // milliseconds since January 1, 1970, 00:00:00 GMT
         long sec = value / 1000000000;    // seconds since January 1, 1970, 00:00:00 GMT
-        long ms  = Math.abs(value) % 1000000000 / 1000000;  // milliseconds
-        long cs  = Math.abs(value) % 1000000    / 1000;     // microseconds
-        long ns  = Math.abs(value) % 1000;                  // nanoseconds
+        long ms  = Math.abs((value % 1000000000) / 1000000); // milliseconds
+        long cs  = Math.abs((value % 1000000)    / 1000);    // microseconds
+        long ns  = Math.abs(value % 1000);                   // nanoseconds
 
         // Adjust for negative value when formatted as a date
-        if (value < 0 && ms + cs + ns > 0 && !fPattern.contains("T")) { //$NON-NLS-1$
+        if (value < 0 && ms + cs + ns > 0 && !super.toPattern().contains(fOpenBracket + "T")) { //$NON-NLS-1$
             date -= 1;
             long nanosec = 1000000000 - (1000000 * ms + 1000 * cs + ns);
             ms = nanosec / 1000000;
-            cs = nanosec % 1000000 / 1000;
+            cs = (nanosec % 1000000) / 1000;
             ns = nanosec % 1000;
         }
 
-        // Let the base class fill the stuff it knows about
+        // Let the base class format the date/time pattern
         StringBuffer result = new StringBuffer(super.format(date));
-
-        // In the case where there is no separation between 2 supplementary
-        // fields, the pattern will have the form "..'[pat-1]''[pat-2]'.." and
-        // the base class format() will interpret the 2 adjacent quotes as a
-        // wanted character in the result string as ("..[pat-1]'[pat-2]..").
-        // Remove these extra quotes before filling the supplementary fields.
-        int loc = result.indexOf(fCloseBracket + "'" + fOpenBracket); //$NON-NLS-1$
-        while (loc != -1) {
-            result.deleteCharAt(loc + fCloseBracket.length());
-            loc = result.indexOf(fCloseBracket + "'" + fOpenBracket); //$NON-NLS-1$
-        }
+        // Append the sub-second pattern
+        result.append(fSubSecPattern);
 
         // Fill in our extensions
         for (String pattern : fSupplPatterns) {
@@ -424,9 +425,9 @@ public class TmfTimestampFormat extends SimpleDateFormat {
                     break;
             }
 
-            // Substitute the placeholder with the formatted value
+            // Substitute the placeholder pattern with the formatted value
             String ph = new StringBuffer(fOpenBracket + pattern + fCloseBracket).toString();
-            loc = result.indexOf(ph);
+            int loc = result.indexOf(ph);
             result.replace(loc, loc + length + fOpenBracket.length() + fCloseBracket.length(), fmtVal);
         }
 
@@ -437,8 +438,8 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * Parse a string according to the format pattern
      *
      * @param string the source string
-     * @param ref the reference (base) time
-     * @return the parsed value
+     * @param ref the reference (base) time (in ns)
+     * @return the parsed value (in ns)
      * @throws ParseException if the string has an invalid format
      */
     public synchronized long parseValue(final String string, final long ref) throws ParseException {
@@ -454,39 +455,28 @@ public class TmfTimestampFormat extends SimpleDateFormat {
         long microsec =  0;
         long nanosec  =  0;
 
-        // Since we are processing the fractional part, substitute it with
-        // its pattern so the base parser doesn't complain
-        StringBuilder sb = new StringBuilder(string);
         int dot = string.indexOf('.');
         if (dot == -1) {
-            sb.append('.');
             dot = string.length();
-        }
-        sb = new StringBuilder(string.substring(0, dot));
-        String basePattern = super.toPattern();
-        int dot2 = basePattern.indexOf('.');
-        if (dot2 != -1) {
-            sb.append(basePattern.substring(dot2));
         }
 
         // Fill in our extensions
         for (String pattern : fSupplPatterns) {
-            String pat = fOpenBracket + pattern + fCloseBracket;
             Matcher matcher;
 
             // Extract the substring corresponding to the extra pattern letters
-            // and replace with the pattern so the base parser can do its job.
             switch (pattern.charAt(0)) {
                 case 'T':
                     // Remove everything up to the first "." and  compute the
                     // number of seconds since the epoch. If there is no period,
                     // assume an integer value and return immediately
-                    if (dot < 1) {
+                    if (dot < 0) {
                         return new DecimalFormat("0").parse(string).longValue() * 1000000000; //$NON-NLS-1$
+                    } else if (dot == 0) {
+                        seconds = 0;
+                    } else {
+                        seconds = new DecimalFormat("0").parse(string.substring(0, dot)).longValue(); //$NON-NLS-1$
                     }
-                    seconds = new DecimalFormat("0").parse(string.substring(0, dot)).longValue(); //$NON-NLS-1$
-                    sb.delete(0, dot);
-                    sb.insert(0, pat);
                     break;
                 case 'S':
                     matcher = MILLISEC_PAT.matcher(string.substring(dot));
@@ -496,7 +486,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
                             millisec *= 10;
                         }
                     }
-                    stripQuotes(sb, pattern);
                     break;
                 case 'C':
                     matcher = MICROSEC_PAT.matcher(string.substring(dot));
@@ -506,7 +495,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
                             microsec *= 10;
                         }
                     }
-                    stripQuotes(sb, pattern);
                     break;
                 case 'N':
                     matcher = NANOSEC_PAT.matcher(string.substring(dot));
@@ -516,7 +504,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
                             nanosec *= 10;
                         }
                     }
-                    stripQuotes(sb, pattern);
                     break;
                 default:
                     break;
@@ -525,7 +512,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
 
         // If there was no "T" (thus not an interval), parse as a date
         if (seconds == -1) {
-            Date baseDate = super.parse(sb.toString());
+            Date baseDate = super.parse(string.substring(0, dot));
 
             Calendar refTime = Calendar.getInstance(getTimeZone());
             refTime.setTimeInMillis(ref / 1000000);
@@ -559,7 +546,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * Parse a string according to the format pattern
      *
      * @param string the source string
-     * @return the parsed value
+     * @return the parsed value (in ns)
      * @throws ParseException if the string has an invalid format
      */
     public long parseValue(final String string) throws ParseException {
@@ -574,16 +561,17 @@ public class TmfTimestampFormat extends SimpleDateFormat {
 
     /**
      * Copy the pattern but quote (bracket with "[&" and "&]") the
-     * TmfTimestampFormat specific tags so these fields are treated as
-     * comments by the base class.
+     * TmfTimestampFormat specific tags. Optionally surround tags with single
+     * quotes so these fields are treated as comments by the base class.
      *
      * It also keeps track of the corresponding quoted fields so they can be
      * properly populated later on (by format()).
      *
      * @param pattern the 'extended' pattern
+     * @param addQuotes true to add single quotes around tags
      * @return the quoted and bracketed pattern
      */
-    private String quoteSpecificTags(final String pattern) {
+    private String quoteSpecificTags(final String pattern, boolean addQuotes) {
 
         StringBuffer result = new StringBuffer();
 
@@ -611,33 +599,24 @@ public class TmfTimestampFormat extends SimpleDateFormat {
                 if (fSupplPatternLetters.indexOf(c) != -1) {
                     StringBuilder pat = new StringBuilder();
                     pat.append(c);
-                    result.insert(result.length() - 1, "'" + fOpenBracket); //$NON-NLS-1$
+                    if (addQuotes) {
+                        result.insert(result.length() - 1, "'"); //$NON-NLS-1$
+                    }
+                    result.insert(result.length() - 1, fOpenBracket);
                     while ((i + 1) < length && pattern.charAt(i + 1) == c) {
                         result.append(c);
                         pat.append(c);
                         i++;
                     }
-                    result.append(fCloseBracket + "'"); //$NON-NLS-1$
+                    result.append(fCloseBracket);
+                    if (addQuotes) {
+                        result.append("'"); //$NON-NLS-1$
+                    }
                     fSupplPatterns.add(pat.toString());
                 }
             }
         }
         return result.toString();
-    }
-
-    /**
-     * Remove the quotes from the pattern
-     *
-     * @param sb
-     * @param pattern
-     */
-    private void stripQuotes(StringBuilder sb, String pattern) {
-        String pt = "'" + fOpenBracket + pattern + fCloseBracket + "'";  //$NON-NLS-1$//$NON-NLS-2$
-        int l = sb.indexOf(pt);
-        if (l != -1) {
-            sb.delete(l + pt.length() - 1, l + pt.length());
-            sb.delete(l, l + 1);
-        }
     }
 
 }
