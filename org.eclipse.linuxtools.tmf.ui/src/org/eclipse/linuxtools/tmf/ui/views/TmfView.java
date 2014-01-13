@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -88,6 +88,14 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     @Override
     public void broadcast(TmfSignal signal) {
         TmfSignalManager.dispatchSignal(signal);
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void broadcastAsync(TmfSignal signal) {
+        TmfSignalManager.dispatchSignalAsync(signal);
     }
 
     // ------------------------------------------------------------------------

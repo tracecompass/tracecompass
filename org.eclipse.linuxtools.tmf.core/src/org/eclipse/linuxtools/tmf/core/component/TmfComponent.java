@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Add interface for broadcasting signals asynchronously
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.component;
@@ -108,4 +109,11 @@ public abstract class TmfComponent implements ITmfComponent {
         TmfSignalManager.dispatchSignal(signal);
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void broadcastAsync(TmfSignal signal) {
+        TmfSignalManager.dispatchSignalAsync(signal);
+    }
 }

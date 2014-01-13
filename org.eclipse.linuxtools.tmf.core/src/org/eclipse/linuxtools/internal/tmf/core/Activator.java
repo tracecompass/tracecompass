@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Add signal manager disposal
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core;
@@ -16,6 +17,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.osgi.framework.BundleContext;
 
@@ -89,6 +91,7 @@ public class Activator extends Plugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         TmfCoreTracer.stop();
+        TmfSignalManager.dispose();
         setDefault(null);
         super.stop(context);
     }
