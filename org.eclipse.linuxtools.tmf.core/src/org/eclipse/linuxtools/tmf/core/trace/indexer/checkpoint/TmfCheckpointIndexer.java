@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Update way of broadcasting of TmfTraceUpdatedSignal
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint;
@@ -22,7 +23,6 @@ import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
@@ -151,6 +151,19 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
             fIsIndexing = true;
         }
 
+        // No need to build the index, it has been restored
+        if (!fTraceIndex.isCreatedFromScratch()) {
+            // Set some trace attributes that depends on indexing
+            TmfTraceUpdatedSignal signal = new TmfTraceUpdatedSignal(this, fTrace, new TmfTimeRange(fTraceIndex.getTimeRange().getStartTime(), fTraceIndex.getTimeRange().getEndTime()), fTraceIndex.getNbEvents());
+            if (waitForCompletion) {
+                fTrace.broadcast(signal);
+            } else {
+                fTrace.broadcastAsync(signal);
+            }
+            fIsIndexing = false;
+            return;
+        }
+
         // The monitoring job
         final Job job = new Job("Indexing " + fTrace.getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
             @Override
@@ -158,7 +171,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
                 monitor.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
                 while (!monitor.isCanceled()) {
                     try {
-
                         long prevNbEvents = fTrace.getNbEvents();
                         Thread.sleep(250);
                         long nbEvents = fTrace.getNbEvents();
@@ -176,68 +188,43 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         };
         job.schedule();
 
-        if (fTraceIndex.isCreatedFromScratch()) {
-            // Build a background request for all the trace data. The index is
-            // updated as we go by readNextEvent().
-            fIndexingRequest = new TmfEventRequest(ITmfEvent.class,
-                    range, offset, ITmfEventRequest.ALL_DATA,
-                    ITmfEventRequest.ExecutionType.BACKGROUND) {
-                @Override
-                public void handleData(final ITmfEvent event) {
-                    super.handleData(event);
-                    if (event != null) {
-                        // Update the trace status at regular intervals
-                        if ((getNbRead() % fCheckpointInterval) == 0) {
-                            updateTraceStatus();
-                        }
+        // Build a background request for all the trace data. The index is
+        // updated as we go by readNextEvent().
+        fIndexingRequest = new TmfEventRequest(ITmfEvent.class,
+                range, offset, ITmfEventRequest.ALL_DATA,
+                ITmfEventRequest.ExecutionType.BACKGROUND) {
+            @Override
+            public void handleData(final ITmfEvent event) {
+                super.handleData(event);
+                if (event != null) {
+                    // Update the trace status at regular intervals
+                    if ((getNbRead() % fCheckpointInterval) == 0) {
+                        updateTraceStatus();
                     }
                 }
+            }
 
-                @Override
-                public void handleSuccess() {
-                    fTraceIndex.setTimeRange(fTrace.getTimeRange());
-                    fTraceIndex.setNbEvents(fTrace.getNbEvents());
-                    fTraceIndex.setIndexComplete();
-                    updateTraceStatus();
-                }
+            @Override
+            public void handleSuccess() {
+                fTraceIndex.setTimeRange(fTrace.getTimeRange());
+                fTraceIndex.setNbEvents(fTrace.getNbEvents());
+                fTraceIndex.setIndexComplete();
+                updateTraceStatus();
+            }
 
-                @Override
-                public void handleCompleted() {
-                    job.cancel();
-                    super.handleCompleted();
-                    fIsIndexing = false;
-                }
+            @Override
+            public void handleCompleted() {
+                job.cancel();
+                super.handleCompleted();
+                fIsIndexing = false;
+            }
 
-                private void updateTraceStatus() {
-                    if (fTrace.getNbEvents() > 0) {
-                        signalNewTimeRange(fTrace.getStartTime(), fTrace.getEndTime());
-                    }
+            private void updateTraceStatus() {
+                if (fTrace.getNbEvents() > 0) {
+                    signalNewTimeRange(fTrace.getStartTime(), fTrace.getEndTime());
                 }
-            };
-        } else {
-            // Trace index already exists. Send TmfTraceUpdatedSignal to set
-            // trace attributes.
-
-            // Note: buildIndex() is called from a signal handler. To make sure
-            // that all other signal handlers are executed before signal
-            // TmfTraceUpdatedSignal is sent the sending of signal
-            // TmfTraceUpdatedSignal is wrapped in a request.
-            fIndexingRequest = new TmfEventRequest(ITmfEvent.class,
-                    TmfTimeRange.ETERNITY, 0, 1, ExecutionType.FOREGROUND) {
-                @Override
-                public void handleCompleted() {
-                    super.handleCompleted();
-                    // Set some trace attributes that depends on indexing
-                    fTrace.broadcast(new TmfTraceUpdatedSignal(
-                            TmfCheckpointIndexer.this,
-                            fTrace,
-                            new TmfTimeRange(fTraceIndex.getTimeRange().getStartTime(), fTraceIndex.getTimeRange().getEndTime()),
-                            fTraceIndex.getNbEvents()));
-                    job.cancel();
-                    fIsIndexing = false;
-                }
-            };
-        }
+            }
+        };
 
         // Submit the request and wait for completion if required
         fTrace.sendRequest(fIndexingRequest);
@@ -359,5 +346,4 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     protected ITmfCheckpointIndex getTraceIndex() {
         return fTraceIndex;
     }
-
 }
