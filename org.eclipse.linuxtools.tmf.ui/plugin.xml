@@ -1659,5 +1659,9 @@
             icon="icons/eview16/events_view.gif"
             tracetype="org.eclipse.linuxtools.tmf.ui.type.ctf">
       </type>
+      <experiment
+            tracetype="org.eclipse.linuxtools.tmf.core.experiment.generic"
+            icon="icons/elcl16/experiment.gif">
+      </experiment>
    </extension>
 </plugin>

@@ -30,5 +30,10 @@
             name="%tracetype.type.ctf"
             trace_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace">
       </type>
+      <experiment
+            id="org.eclipse.linuxtools.tmf.core.experiment.generic"
+            name="%experimenttype.type.generic"
+            experiment_type="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment">
+      </experiment>
    </extension>
 </plugin>

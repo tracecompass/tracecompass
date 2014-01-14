@@ -19,6 +19,7 @@
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="type"/>
+            <element ref="experiment"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -67,6 +68,35 @@
             <annotation>
                <documentation>
                   The icon associated to the trace type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="experiment">
+      <complexType>
+         <sequence>
+            <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
+            <element ref="defaultEditor" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="tracetype" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique ID that identifies this experiment type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.core.tracetype/experiment/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  The icon associated to the experiment type.
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
@@ -131,7 +161,7 @@ If empty, the default events editor will be used.
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         Example use of the extension point: the GDB trace type, which specifies a custom icon and a custom editor. The &apos;type/tracetype&apos; element has to point to an existing tmf.core.tracetype extension!
+         Example use of the extension point: the GDB trace type, which specifies a custom icon and a custom editor, also the generic experiment, which specifies a custom icon. The &apos;type/tracetype&apos; element has to point to an existing tmf.core.tracetype extension!
 
 &lt;extension
       point=&quot;org.eclipse.linuxtools.tmf.ui.tracetypeui&quot;&gt;
@@ -142,6 +172,10 @@ If empty, the default events editor will be used.
             class=&quot;org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventsTable&quot;&gt;
       &lt;/eventsTableType&gt;
    &lt;/type&gt;
+   &lt;experiment_type
+         tracetype=&quot;org.eclipse.linuxtools.tmf.core.experiment.generic&quot;
+         icon=&quot;icons/elcl16/experiment.gif&quot;&gt;
+   &lt;/experiment_type&gt;
 &lt;/extension&gt;
       </documentation>
    </annotation>

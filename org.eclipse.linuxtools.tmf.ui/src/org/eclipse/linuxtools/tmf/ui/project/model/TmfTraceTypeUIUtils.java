@@ -55,6 +55,12 @@ public final class TmfTraceTypeUIUtils {
     /** Extension point element 'type' (should match the type in TmfTraceType) */
     public static final String TYPE_ELEM = "type"; //$NON-NLS-1$
 
+    /**
+     * Extension point element 'experiment' (should match the type in
+     * TmfTraceType)
+     */
+    public static final String EXPERIMENT_ELEM = "experiment"; //$NON-NLS-1$
+
     /** Extension point element 'Default editor' */
     public static final String DEFAULT_EDITOR_ELEM = "defaultEditor"; //$NON-NLS-1$
 

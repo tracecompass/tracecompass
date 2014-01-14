@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Matthew Khouzam - Added import functionalities
+ *   Geneviève Bastien - Added support for experiment types
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.project.model;
@@ -55,6 +56,9 @@ public final class TmfTraceType {
     /** Extension point element 'Type' */
     public static final String TYPE_ELEM = "type"; //$NON-NLS-1$
 
+    /** Extension point element 'Experiment' */
+    public static final String EXPERIMENT_ELEM = "experiment"; //$NON-NLS-1$
+
     /** Extension point attribute 'ID' */
     public static final String ID_ATTR = "id"; //$NON-NLS-1$
 
@@ -70,6 +74,9 @@ public final class TmfTraceType {
     /** Extension point attribute 'event_type' */
     public static final String EVENT_TYPE_ATTR = "event_type"; //$NON-NLS-1$
 
+    /** Extension point attribute 'experiment_type' */
+    public static final String EXPERIMENT_TYPE_ATTR = "experiment_type"; //$NON-NLS-1$
+
     /** Extension point attribute 'isDirectory' */
     public static final String IS_DIR_ATTR = "isDirectory"; //$NON-NLS-1$
 
@@ -83,6 +90,9 @@ public final class TmfTraceType {
      * Custom XML label used internally and therefore should not be externalized
      */
     public static final String CUSTOM_XML_CATEGORY = "Custom XML"; //$NON-NLS-1$
+
+    /** Default experiment type */
+    public static final String DEFAULT_EXPERIMENT_TYPE = "org.eclipse.linuxtools.tmf.core.experiment.generic"; //$NON-NLS-1$
 
     // The mapping of available trace type IDs to their corresponding
     // configuration element

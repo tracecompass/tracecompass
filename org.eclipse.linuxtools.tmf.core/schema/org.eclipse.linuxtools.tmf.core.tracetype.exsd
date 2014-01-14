@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.linuxtools.tmf.core" id="tracetype" name="TMF Trace Type"/>
       </appinfo>
       <documentation>
-         This extension point is used to contribute new trace types to the generic components of the TMF framework.
+         This extension point is used to contribute new trace types or experiment types to the generic components of the TMF framework.
       </documentation>
    </annotation>
 
@@ -20,6 +20,7 @@
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="category"/>
             <element ref="type"/>
+            <element ref="experiment"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -123,6 +124,45 @@
       </complexType>
    </element>
 
+   <element name="experiment">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique ID that identifies this experiment type.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The type name as it is displayed to the end user.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="category" type="string">
+            <annotation>
+               <documentation>
+                  An optional attribute that is composed of the category ID. The referenced category must be declared in a corresponding category element.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.core.tracetype/category/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="experiment_type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The fully qualified name of a class that extends the &lt;samp&gt;TmfExperiment&lt;/samp&gt; class
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <annotation>
       <appinfo>
          <meta.section type="since"/>
@@ -137,7 +177,7 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         Example use of the tmftracetype extension point for generic CTF traces (CtfTmfTrace):
+         Example use of the tmftracetype extension point for generic CTF traces (CtfTmfTrace) and a category-less generic experiment type:
 
 &lt;extension
       point=&quot;org.eclipse.linuxtools.tmf.core.tracetype&quot;&gt;
@@ -152,6 +192,11 @@
          name=&quot;Generic CTF Trace&quot;
          trace_type=&quot;org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace&quot;&gt;
    &lt;/type&gt;
+   &lt;experiment
+         id=&quot;org.eclipse.linuxtools.tmf.core.experiment.generic&quot;
+         name=&quot;Generic experiment&quot;
+         experiment_type=&quot;org.eclipse.linuxtools.tmf.core.trace.TmfExperiment&quot;&gt;
+   &lt;/experiment&gt;
 &lt;/extension&gt;
       </documentation>
    </annotation>
@@ -165,6 +210,10 @@
 
 * trace_type: Has to implement ITmfTrace. It&apos;s *highly* recommend to extend &apos;TmfTrace&apos; to get default implementations.
 * event_type: Has to implement ITmfEvent. Once again, TmfEvent provides a reference implementation that should work in most cases.
+
+Experiment types using this extension point have to specify the following class:
+
+* experiment_type: Has to extend TmfExperiment. This class is the default experiment class, to be used to analyse sets of traces, where each trace is treated equally.
       </documentation>
    </annotation>
 
