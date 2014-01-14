@@ -23,8 +23,10 @@
 
 	<xs:complexType name="stateProvider">
 		<xs:sequence maxOccurs="1" minOccurs="1">
-			<xs:element maxOccurs="1" minOccurs="0" name="head"
-				type="headProvider" />
+			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headProvider" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" />
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="eventHandler" type="eventHandler" />
 		</xs:sequence>
 		<xs:attribute name="analysisId" type="xs:string" use="required" />
 		<xs:attribute name="version" type="xs:integer" use="required" />
@@ -43,6 +45,134 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="definedValue">
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:attribute name="value" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="location">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:anyAttribute />
+	</xs:complexType>
+
+	<xs:complexType name="eventHandler">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="stateChange" type="stateChange" />
+		</xs:sequence>
+		<xs:attribute name="eventName" type="xs:string" use="required" />
+		<xs:anyAttribute />
+	</xs:complexType>
+
+	<xs:complexType name="stateChange">
+		<xs:choice maxOccurs="1" minOccurs="1">
+			<xs:sequence maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" />
+				<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" />
+			</xs:sequence>
+			<xs:sequence maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" name="if" type="conditionSingle" />
+				<xs:element maxOccurs="1" minOccurs="1" name="then" type="stateChange" />
+				<xs:element maxOccurs="1" minOccurs="0" name="else" type="stateChange" />
+			</xs:sequence>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="condition">
+		<xs:sequence maxOccurs="1" minOccurs="1">
+			<xs:choice maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" />
+				<xs:element maxOccurs="1" minOccurs="1" name="field" type="eventField" />
+			</xs:choice>
+			<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" />
+		</xs:sequence>
+		<xs:anyAttribute />
+	</xs:complexType>
+
+	<xs:complexType name="conditionSingle">
+		<xs:choice maxOccurs="1" minOccurs="1">
+			<xs:element name="condition" type="condition" />
+			<xs:element name="not" type="conditionSingle" />
+			<xs:element name="and" type="conditionMultiple" />
+			<xs:element name="or" type="conditionMultiple" />
+		</xs:choice>
+		<xs:anyAttribute />
+	</xs:complexType>
+
+	<xs:complexType name="conditionMultiple">
+		<xs:sequence maxOccurs="unbounded" minOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="condition" type="condition" />
+			<xs:element maxOccurs="1" minOccurs="0" name="or" type="conditionMultiple" />
+			<xs:element maxOccurs="1" minOccurs="0" name="and" type="conditionMultiple" />
+			<xs:element maxOccurs="1" minOccurs="0" name="not" type="conditionSingle" />
+		</xs:sequence>
+		<xs:anyAttribute />
+	</xs:complexType>
+
+	<xs:complexType name="stateAttribute">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="null" />
+					<xs:enumeration value="constant" />
+					<xs:enumeration value="eventField" />
+					<xs:enumeration value="location" />
+					<xs:enumeration value="query" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="stateValue">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="null" />
+					<xs:enumeration value="int" />
+					<xs:enumeration value="long" />
+					<xs:enumeration value="string" />
+					<xs:enumeration value="eventField" />
+					<xs:enumeration value="eventName" />
+					<xs:enumeration value="delete" />
+					<xs:enumeration value="query" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="increment" type="xs:boolean" />
+		<xs:attribute name="stack">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="pop"/>
+					<xs:enumeration value="push"/>
+					<xs:enumeration value="peek"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="forcedType">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="int" />
+					<xs:enumeration value="long" />
+					<xs:enumeration value="string" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="eventField">
+		<xs:attribute name="name" type="xs:string" use="required" />
 	</xs:complexType>
 
 </xs:schema>
