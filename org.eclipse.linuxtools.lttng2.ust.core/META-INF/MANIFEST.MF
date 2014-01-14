@@ -9,6 +9,7 @@ Bundle-Activator: org.eclipse.linuxtools.internal.lttng2.ust.core.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.eclipse.linuxtools.internal.lttng2.ust.core;x-internal:=true,
+ org.eclipse.linuxtools.internal.lttng2.ust.core.memoryusage;x-friends:="org.eclipse.linuxtools.lttng2.ust.ui",
  org.eclipse.linuxtools.internal.lttng2.ust.core.trace.callstack;x-internal:=true,
  org.eclipse.linuxtools.lttng2.ust.core.trace
 Require-Bundle: org.eclipse.core.runtime,

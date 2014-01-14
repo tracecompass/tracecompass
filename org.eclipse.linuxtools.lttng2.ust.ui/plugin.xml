@@ -12,4 +12,15 @@
             trace_type="org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace">
       </type>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.linuxtools.lttng2.ust.ui.analysis.memory.UstMemoryAnalysisModule"
+            id="org.eclipse.linuxtools.lttng2.ust.analysis.memory"
+            name="Ust Memory">
+         <tracetype
+               class="org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace">
+         </tracetype>
+      </module>
+   </extension>
 </plugin>
