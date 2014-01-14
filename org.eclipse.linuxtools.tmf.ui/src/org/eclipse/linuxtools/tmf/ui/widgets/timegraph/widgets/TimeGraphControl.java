@@ -240,6 +240,26 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Gets the timegraph provider used by this timegraph viewer.
+     *
+     * @return the timegraph provider, or <code>null</code> if not set.
+     * @since 3.0
+     */
+    public ITimeGraphPresentationProvider getTimeGraphProvider() {
+        return fTimeGraphProvider;
+    }
+
+    /**
+     * Gets the color map used by this timegraph viewer.
+     *
+     * @return a color map, or <code>null</code> if not set.
+     * @since 3.0
+     */
+    public Color[] getEventColorMap() {
+        return fEventColorMap;
+    }
+
+    /**
      * Assign the given time provider
      *
      * @param timeProvider
