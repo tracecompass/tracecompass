@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 École Polytechnique de Montréal
+ * Copyright (c) 2013, 2014 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator;
 import org.junit.Test;
 
 /**
- * Test the Xml Analysis UI plug-in activator
+ * Test the XML Analysis UI plug-in activator
  *
  * @author Geneviève Bastien
  */

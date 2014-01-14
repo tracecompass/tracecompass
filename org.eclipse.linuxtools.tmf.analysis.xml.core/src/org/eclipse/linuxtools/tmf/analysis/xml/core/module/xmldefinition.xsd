@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- ***************************************************************************
+ * Copyright (c) 2014 École Polytechnique de Montréal
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Florian Wininger - Initial API and implementation
+ *************************************************************************** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	attributeFormDefault="unqualified" elementFormDefault="qualified">
+
+	<xs:element name="tmfxml">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="stateProvider" type="stateProvider" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="stateProvider">
+		<xs:sequence maxOccurs="1" minOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="head"
+				type="headProvider" />
+		</xs:sequence>
+		<xs:attribute name="analysisId" type="xs:string" use="required" />
+		<xs:attribute name="version" type="xs:integer" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="headProvider">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="traceType">
+				<xs:complexType>
+					<xs:attribute name="id" />
+				</xs:complexType>
+			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="label">
+				<xs:complexType>
+					<xs:attribute name="value" />
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>

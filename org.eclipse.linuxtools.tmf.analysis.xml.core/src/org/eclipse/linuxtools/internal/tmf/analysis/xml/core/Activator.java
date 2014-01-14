@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.internal.tmf.analysis.xml.core;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -22,7 +22,7 @@ import org.osgi.framework.BundleContext;
  *
  * @author Geneviève Bastien
  */
-public class Activator extends AbstractUIPlugin {
+public class Activator extends Plugin {
 
     /** The plug-in ID */
     public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.analysis.xml.core"; //$NON-NLS-1$

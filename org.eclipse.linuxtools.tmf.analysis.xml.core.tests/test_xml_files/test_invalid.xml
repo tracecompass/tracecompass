@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="stateprovider.xsd">
+
+	<!-- This element does not belong to the schema -->
+	<element id="fail"></element>
+</tmfxml>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,18 +10,18 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.analysis.xml.ui.tests;
+package org.eclipse.linuxtools.tmf.analysis.xml.core.tests.module;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Master test suite for TMF XML Analysis UI plug-in.
+ * Test suite for org.eclipse.linuxtools.tmf.analysis.xml.core.module package
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        XmlAnalysisUiPluginTest.class
+        XmlUtilsTest.class
 })
-public class AllAnalysisXmlUiTests {
+public class AllTests {
 
 }

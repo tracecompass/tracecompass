@@ -8,7 +8,9 @@ Bundle-SymbolicName: org.eclipse.linuxtools.tmf.analysis.xml.core;singleton:=tru
 Bundle-Activator: org.eclipse.linuxtools.internal.tmf.analysis.xml.core.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.linuxtools.tmf.core
-Export-Package: org.eclipse.linuxtools.internal.tmf.analysis.xml.core;x-friends:="org.eclipse.linuxtools.tmf.analysis.xml.core.tests"
+Export-Package: org.eclipse.linuxtools.internal.tmf.analysis.xml.core;x-friends:="org.eclipse.linuxtools.tmf.analysis.xml.core.tests",
+ org.eclipse.linuxtools.tmf.analysis.xml.core.module,
+ org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider
+
