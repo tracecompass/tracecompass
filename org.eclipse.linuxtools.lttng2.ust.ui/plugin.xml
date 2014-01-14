@@ -13,6 +13,16 @@
       </type>
    </extension>
    <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.linuxtools.internal.lttng2.ust.ui.views.memusage.MemoryUsageView"
+            id="org.eclipse.linuxtools.lttng2.ust.memoryusage"
+            name="%memoryusage.view.name"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
             analysis_module="org.eclipse.linuxtools.lttng2.ust.ui.analysis.memory.UstMemoryAnalysisModule"
