@@ -46,6 +46,15 @@
                class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestExperimentAnalysis"
+            id="org.eclipse.linuxtools.tmf.core.tests.experiment"
+            name="Experiment analysis">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub">
+         </tracetype>
+      </module>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.tracetype">
@@ -68,6 +77,12 @@
             name="CTF Tests"
             trace_type="org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub">
       </type>
+      <experiment
+            category="org.eclipse.linuxtools.tmf.core.tests.category"
+            id="org.eclipse.linuxtools.tmf.core.tests.experimenttype"
+            name="Test experiment"
+            experiment_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub">
+      </experiment>
    </extension>
 
 </plugin>

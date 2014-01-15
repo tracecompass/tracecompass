@@ -37,6 +37,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
@@ -46,6 +47,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
+import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestExperimentAnalysis;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.junit.Before;
@@ -206,6 +208,13 @@ public class TmfExperimentTest {
         /* There should not be any modules at this point */
         Iterable<IAnalysisModule> modules = fExperiment.getAnalysisModules();
         assertFalse(modules.iterator().hasNext());
+
+        /* Open the experiment, the modules should be populated */
+        fExperiment.traceOpened(new TmfTraceOpenedSignal(this, fExperiment, null));
+        modules = fExperiment.getAnalysisModules();
+        Iterable<TestExperimentAnalysis> testModules = fExperiment.getAnalysisModulesOfClass(TestExperimentAnalysis.class);
+        assertTrue(modules.iterator().hasNext());
+        assertTrue(testModules.iterator().hasNext());
     }
 
     // ------------------------------------------------------------------------

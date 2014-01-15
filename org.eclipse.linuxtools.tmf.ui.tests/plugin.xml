@@ -62,7 +62,6 @@
           view="org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders">
     </uml2SDLoader>
  </extension>
-
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
@@ -83,6 +82,30 @@
                class="org.eclipse.linuxtools.tmf.ui.tests.stubs.analysis.TestAnalysisUi">
          </analysisModuleClass>
       </output>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.linuxtools.tmf.ui.tests.experiment.type.TmfEventsEditorStub"
+            default="false"
+            id="org.eclipse.linuxtools.tmf.ui.editors.events.stub"
+            name="%events.editor.name">
+         <contentTypeBinding
+               contentTypeId="org.eclipse.linuxtools.tmf.ui.content-type.trace">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
+      <experiment
+            tracetype="org.eclipse.linuxtools.tmf.core.tests.experimenttype">
+         <defaultEditor
+               id="org.eclipse.linuxtools.tmf.ui.editors.events.stub">
+         </defaultEditor>
+         <eventsTableType
+               class="org.eclipse.linuxtools.tmf.ui.tests.experiment.type.TmfEventsTableExperimentStub">
+         </eventsTableType>
+      </experiment>
    </extension>
 
 </plugin>
