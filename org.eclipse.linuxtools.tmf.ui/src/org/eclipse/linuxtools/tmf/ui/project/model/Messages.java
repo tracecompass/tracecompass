@@ -31,6 +31,24 @@ public class Messages extends NLS {
     /** The message when analysis view is not available
      * @since 3.0*/
     public static String TmfAnalysisViewOutput_ViewUnavailable;
+    /** Analysis view title
+     * @since 3.0 */
+    public static String TmfAnalysisViewOutput_Title;
+
+    /** Error message when closing editor
+     * @since 3.0 */
+    public static String TmfCommonProjectElement_ErrorClosingEditor;
+
+    /** Error message when refreshing persistent property
+     * @since 3.0 */
+    public static String TmfCommonProjectElement_ErrorRefreshingProperty;
+
+    /** Error message when instantiating trace
+     * @since 3.0 */
+    public static String TmfExperimentElement_ErrorInstantiatingTrace;
+    /** Experiment text
+     * @since 3.0*/
+    public static String TmfExperimentElement_TypeName;
 
     /** The category of the resource properties */
     public static String TmfTraceElement_ResourceProperties;
@@ -52,6 +70,9 @@ public class Messages extends NLS {
 
     /** The description for the linked property */
     public static String TmfTraceElement_IsLinked;
+    /** Trace text
+     * @since 3.0*/
+    public static String TmfTraceElement_TypeName;
     /**
      * The title for the select trace type dialog
      * @since 2.2
@@ -80,10 +101,6 @@ public class Messages extends NLS {
     public static String TmfOpenTraceHelper_ErrorExperiment;
     /** Init error */
     public static String TmfOpenTraceHelper_InitError;
-
-    /** Analysis view title
-     * @since 3.0*/
-    public static String TmfAnalysisViewOutput_Title;
 
     static {
         // initialize resource bundle

@@ -85,8 +85,8 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
          * instantiated when the trace is opened
          */
         ITmfProjectModelElement parent = getParent();
-        if (parent instanceof TmfTraceElement) {
-            ITmfTrace trace = ((TmfTraceElement) parent).getTrace();
+        if (parent instanceof TmfCommonProjectElement) {
+            ITmfTrace trace = ((TmfCommonProjectElement) parent).getTrace();
             if (trace == null) {
                 deleteOutputs();
                 return;
