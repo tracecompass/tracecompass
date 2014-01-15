@@ -76,6 +76,26 @@ public interface ITmfStateSystem {
     void waitUntilBuilt();
 
     /**
+     * Wait until the state system construction is finished. Similar to
+     * {@link #waitUntilBuilt()}, but we also specify a timeout. If the timeout
+     * elapses before the construction is finished, the method will return.
+     *
+     * The return value determines if the return was due to the construction
+     * finishing (true), or the timeout elapsing (false).
+     *
+     * This can be useful, for example, for a component doing queries
+     * periodically to the system while it is being built.
+     *
+     * @param timeout
+     *            Timeout value in milliseconds
+     * @return True if the return was due to the construction finishing, false
+     *         if it was because the timeout elapsed. Same logic as
+     *         {@link java.util.concurrent.CountDownLatch#await(long, java.util.concurrent.TimeUnit)}
+     * @since 3.0
+     */
+    boolean waitUntilBuilt(long timeout);
+
+    /**
      * Notify the state system that the trace is being closed, so it should
      * clean up, close its files, etc.
      */
