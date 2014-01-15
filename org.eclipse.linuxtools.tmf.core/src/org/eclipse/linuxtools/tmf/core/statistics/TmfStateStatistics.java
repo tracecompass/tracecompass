@@ -214,7 +214,8 @@ public class TmfStateStatistics implements ITmfStatistics {
         final List<Long> list = new LinkedList<>();
         final long increment = (end - start) / nb;
 
-        if (!totalsStats.waitUntilBuilt()) {
+        totalsStats.waitUntilBuilt();
+        if (totalsStats.isCancelled()) {
             return list;
         }
 
@@ -450,8 +451,10 @@ public class TmfStateStatistics implements ITmfStatistics {
      * @return If both state systems were built successfully
      */
     private boolean waitUntilBuilt() {
-        boolean check1 = totalsStats.waitUntilBuilt();
-        boolean check2 = typesStats.waitUntilBuilt();
+        totalsStats.waitUntilBuilt();
+        typesStats.waitUntilBuilt();
+        boolean check1 = !totalsStats.isCancelled();
+        boolean check2 = !typesStats.isCancelled();
         return (check1 && check2);
     }
 

@@ -98,7 +98,11 @@ public class ResourcesView extends AbstractTimeGraphView {
             if (aTrace instanceof LttngKernelTrace) {
                 LttngKernelTrace lttngKernelTrace = (LttngKernelTrace) aTrace;
                 ITmfStateSystem ssq = lttngKernelTrace.getStateSystems().get(LttngKernelTrace.STATE_ID);
-                if (!ssq.waitUntilBuilt()) {
+                if (ssq == null) {
+                    return;
+                }
+                ssq.waitUntilBuilt();
+                if (ssq.isCancelled()) {
                     return;
                 }
                 long startTime = ssq.getStartTime();

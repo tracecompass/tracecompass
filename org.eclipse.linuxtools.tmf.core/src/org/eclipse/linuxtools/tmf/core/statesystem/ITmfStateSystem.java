@@ -48,6 +48,18 @@ public interface ITmfStateSystem {
     long getCurrentEndTime();
 
     /**
+     * Check if the construction of this state system was cancelled or not. If
+     * false is returned, it can mean that the building was finished
+     * successfully, or that it is still ongoing. You can check independently
+     * with {@link #waitUntilBuilt()} if it is finished or not.
+     *
+     * @return If the construction was cancelled or not. In true is returned, no
+     *         queries should be run afterwards.
+     * @since 3.0
+     */
+    boolean isCancelled();
+
+    /**
      * While it's possible to query a state history that is being built,
      * sometimes we might want to wait until the construction is finished before
      * we start doing queries.
@@ -56,12 +68,12 @@ public interface ITmfStateSystem {
      * building. If it's already built (ie, opening a pre-existing file) this
      * should return immediately.
      *
-     * @return If the build was successful. If false is returned, this either
-     *         means there was a problem during the build, or it got cancelled
-     *         before it could finished. In that case, no queries should be run
-     *         afterwards.
+     * You should always check with {@link #isCancelled()} if it is safe to
+     * query this state system before doing queries.
+     *
+     * @since 3.0
      */
-    boolean waitUntilBuilt();
+    void waitUntilBuilt();
 
     /**
      * Notify the state system that the trace is being closed, so it should

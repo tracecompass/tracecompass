@@ -211,7 +211,11 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 ArrayList<ControlFlowEntry> entryList = new ArrayList<>();
                 LttngKernelTrace ctfKernelTrace = (LttngKernelTrace) aTrace;
                 ITmfStateSystem ssq = ctfKernelTrace.getStateSystems().get(LttngKernelTrace.STATE_ID);
-                if (!ssq.waitUntilBuilt()) {
+                if (ssq == null) {
+                    return;
+                }
+                ssq.waitUntilBuilt();
+                if (ssq.isCancelled()) {
                     return;
                 }
                 long start = ssq.getStartTime();

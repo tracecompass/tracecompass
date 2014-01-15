@@ -101,13 +101,17 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
-    public boolean waitUntilBuilt() {
+    public boolean isCancelled() {
+        return buildCancelled;
+    }
+
+    @Override
+    public void waitUntilBuilt() {
         try {
             finishedLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return !buildCancelled;
     }
 
     @Override
