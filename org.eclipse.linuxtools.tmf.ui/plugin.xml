@@ -741,7 +741,7 @@
                mnemonic="%command.select_trace_type.mnemonic"
                tooltip="%command.select_trace_type.description">
             <dynamic
-                  class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTraceTypeContributionItem"
+                  class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectElementTypeContributionItem"
                   id="org.eclipse.linuxtools.tmf.ui.command.select_trace_type.dynamic">
             </dynamic>
             <separator
@@ -760,9 +760,31 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                     </instanceof>
+                      <instanceof
+                            value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                      </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </menu>
+         <menu
+               label="%command.select_experiment_type"
+               mnemonic="%command.select_experiment_type.mnemonic"
+               tooltip="%command.select_experiment_type.description">
+            <dynamic
+                  class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectElementTypeContributionItem"
+                  id="org.eclipse.linuxtools.tmf.ui.command.select_trace_type.dynamic">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                      <instanceof
+                            value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                      </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -1372,9 +1394,14 @@
             <iterate
                   ifEmpty="false"
                   operator="and">
-               <instanceof
+               <or>
+                  <instanceof
                      value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-               </instanceof>
+                  </instanceof>
+                  <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                  </instanceof>
+               </or>
             </iterate>
          </activeWhen>
       </handler>

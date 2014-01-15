@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Geneviève Bastien - Moved SelectTraceTypeContributionItem to this class
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
@@ -32,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.ui.IWorkbenchPage;
@@ -42,15 +44,13 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 /**
- * ContributionItem for the trace type selection.
+ * ContributionItem for the element type selection.
  *
  * @author Patrick Tassé
  */
-public class SelectTraceTypeContributionItem extends CompoundContributionItem {
+public class SelectElementTypeContributionItem extends CompoundContributionItem {
 
-    //private static final ImageDescriptor SELECTED_ICON = ImageDescriptor.createFromImage(TmfUiPlugin.getDefault().getImageFromPath("icons/elcl16/bullet.gif")); //$NON-NLS-1$
-    private static final ImageDescriptor SELECTED_ICON = Activator.getDefault().getImageDescripterFromPath(
-            "icons/elcl16/bullet.gif"); //$NON-NLS-1$
+    private static final ImageDescriptor SELECTED_ICON = Activator.getDefault().getImageDescripterFromPath("icons/elcl16/bullet.gif"); //$NON-NLS-1$
     private static final String BUNDLE_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.bundle"; //$NON-NLS-1$
     private static final String TYPE_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.type"; //$NON-NLS-1$
     private static final String ICON_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.icon"; //$NON-NLS-1$
@@ -62,18 +62,51 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
     @Override
     protected IContributionItem[] getContributionItems() {
 
+        /*
+         * Fill the selected trace types and verify if selection applies only to
+         * either traces or experiments
+         */
         Set<String> selectedTraceTypes = new HashSet<>();
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         ISelection selection = page.getSelection();
+        boolean forTraces = false, forExperiments = false;
         if (selection instanceof StructuredSelection) {
             for (Object element : ((StructuredSelection) selection).toList()) {
                 if (element instanceof TmfTraceElement) {
                     TmfTraceElement trace = (TmfTraceElement) element;
                     selectedTraceTypes.add(trace.getTraceType());
+                    forTraces = true;
+                } else if (element instanceof TmfExperimentElement) {
+                    TmfExperimentElement exp = (TmfExperimentElement) element;
+                    selectedTraceTypes.add(exp.getTraceType());
+                    forExperiments = true;
                 }
             }
         }
+
+        if (forTraces && forExperiments) {
+            /* This should never happen anyways */
+            throw new RuntimeException("You must select only experiments or only traces to set the element type"); //$NON-NLS-1$
+        }
+
+        return getContributionItems(selectedTraceTypes, forExperiments);
+    }
+
+    /**
+     * Get the contribution items for traces
+     *
+     * @param selectedTraceTypes
+     *            The set of selected trace types
+     * @param forExperiments
+     *            <code>true</code> if the contribution items are requested for
+     *            experiments, <code>false</code> for traces
+     *
+     * @return The list of contribution items
+     */
+    protected IContributionItem[] getContributionItems(Set<String> selectedTraceTypes, boolean forExperiments) {
+
+        String ceType = forExperiments ? TmfTraceType.EXPERIMENT_ELEM : TmfTraceType.TYPE_ELEM;
 
         List<IContributionItem> list = new LinkedList<>();
 
@@ -89,6 +122,34 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
                 list.add(subMenu);
             }
         }
+
+        for (IConfigurationElement ce : config) {
+            if (ce.getName().equals(ceType)) {
+                String traceBundle = ce.getContributor().getName();
+                String traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
+                String label = ce.getAttribute(TmfTraceType.NAME_ATTR).replaceAll("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
+                boolean selected = selectedTraceTypes.contains(traceTypeId);
+                MenuManager subMenu = categoriesMap.get(ce.getAttribute(TmfTraceType.CATEGORY_ATTR));
+
+                /* Get the icon from the tmftracetypeui extension, if it exists */
+                String traceIcon = null;
+                IConfigurationElement uiCE = TmfTraceTypeUIUtils.getTraceUIAttributes(traceTypeId);
+                if (uiCE != null) {
+                    traceIcon = uiCE.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
+                }
+
+                addContributionItem(list, traceBundle, traceTypeId, traceIcon, label, selected, subMenu);
+            }
+        }
+
+        if (forExperiments) {
+            return list.toArray(new IContributionItem[list.size()]);
+        }
+
+        /*
+         * Add the custom txt and xml trace type to the contribution items for
+         * traces
+         */
         CustomTxtTraceDefinition[] customTxtTraceDefinitions = CustomTxtTraceDefinition.loadAll();
         if (customTxtTraceDefinitions.length > 0) {
             ImageDescriptor icon = isSelectedCategory(customTxtTraceDefinitions, selectedTraceTypes) ? SELECTED_ICON : null;
@@ -104,29 +165,10 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
             list.add(subMenu);
         }
 
-        for (IConfigurationElement ce : config) {
-            if (ce.getName().equals(TmfTraceType.TYPE_ELEM)) {
-                String traceBundle = ce.getContributor().getName();
-                String traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
-                String label = ce.getAttribute(TmfTraceType.NAME_ATTR).replaceAll("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
-                boolean selected =  selectedTraceTypes.contains(traceTypeId);
-                MenuManager subMenu = categoriesMap.get(ce.getAttribute(TmfTraceType.CATEGORY_ATTR));
-
-                /* Get the icon from the tmftracetypeui extension, if it exists */
-                String traceIcon = null;
-                IConfigurationElement uiCE = TmfTraceTypeUIUtils.getTraceUIAttributes(traceTypeId);
-                if (uiCE != null) {
-                    traceIcon = uiCE.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
-                }
-
-                addContributionItem(list, traceBundle, traceTypeId, traceIcon, label, selected, subMenu);
-            }
-        }
-
         // add the custom trace types
         for (CustomTxtTraceDefinition def : customTxtTraceDefinitions) {
             String traceBundle = Activator.getDefault().getBundle().getSymbolicName();
-            String traceTypeId = CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
+            String traceTypeId = CustomTxtTrace.class.getCanonicalName() + ':' + def.definitionName;
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;
             boolean selected = selectedTraceTypes.contains(traceTypeId);
@@ -136,7 +178,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
         }
         for (CustomXmlTraceDefinition def : customXmlTraceDefinitions) {
             String traceBundle = Activator.getDefault().getBundle().getSymbolicName();
-            String traceTypeId = CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
+            String traceTypeId = CustomXmlTrace.class.getCanonicalName() + ':' + def.definitionName;
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;
             boolean selected = selectedTraceTypes.contains(traceTypeId);
@@ -200,7 +242,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
 
     private static boolean isSelectedCategory(CustomTxtTraceDefinition[] customTxtTraceDefinitions, Set<String> selectedTraceTypes) {
         for (CustomTxtTraceDefinition def : customTxtTraceDefinitions) {
-            String traceTypeId = CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
+            String traceTypeId = CustomTxtTrace.class.getCanonicalName() + ':' + def.definitionName;
             if (selectedTraceTypes.contains(traceTypeId)) {
                 return true;
             }
@@ -210,7 +252,7 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
 
     private static boolean isSelectedCategory(CustomXmlTraceDefinition[] customXmlTraceDefinitions, Set<String> selectedTraceTypes) {
         for (CustomXmlTraceDefinition def : customXmlTraceDefinitions) {
-            String traceTypeId = CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
+            String traceTypeId = CustomXmlTrace.class.getCanonicalName() + ':' + def.definitionName;
             if (selectedTraceTypes.contains(traceTypeId)) {
                 return true;
             }
