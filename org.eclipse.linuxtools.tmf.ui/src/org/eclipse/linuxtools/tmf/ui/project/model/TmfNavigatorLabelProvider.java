@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISharedImages;
@@ -111,7 +112,7 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
                     return fUnknownTraceIcon;
                 }
 
-                IConfigurationElement traceUIAttributes = TmfTraceTypeUIUtils.getTraceUIAttributes(traceType);
+                IConfigurationElement traceUIAttributes = TmfTraceTypeUIUtils.getTraceUIAttributes(traceType, (element instanceof TmfTraceElement) ? TraceElementType.TRACE : TraceElementType.EXPERIMENT);
                 if (traceUIAttributes != null) {
                     String iconAttr = traceUIAttributes.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
                     if (iconAttr != null) {

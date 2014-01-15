@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
@@ -107,6 +108,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
     protected IContributionItem[] getContributionItems(Set<String> selectedTraceTypes, boolean forExperiments) {
 
         String ceType = forExperiments ? TmfTraceType.EXPERIMENT_ELEM : TmfTraceType.TYPE_ELEM;
+        TraceElementType elementType = forExperiments ? TraceElementType.EXPERIMENT : TraceElementType.TRACE;
 
         List<IContributionItem> list = new LinkedList<>();
 
@@ -133,7 +135,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
 
                 /* Get the icon from the tmftracetypeui extension, if it exists */
                 String traceIcon = null;
-                IConfigurationElement uiCE = TmfTraceTypeUIUtils.getTraceUIAttributes(traceTypeId);
+                IConfigurationElement uiCE = TmfTraceTypeUIUtils.getTraceUIAttributes(traceTypeId, elementType);
                 if (uiCE != null) {
                     traceIcon = uiCE.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
                 }

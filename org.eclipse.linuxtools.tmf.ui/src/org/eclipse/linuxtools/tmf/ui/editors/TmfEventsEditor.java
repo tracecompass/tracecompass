@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Geneviève Bastien - Experiment instantiated with experiment type
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.editors;
@@ -41,6 +42,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
@@ -300,9 +302,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     private TmfEventsTable getEventsTable(final Composite parent, final int cacheSize) {
-        if (fTrace instanceof TmfExperiment) {
-            return getExperimentEventsTable((TmfExperiment) fTrace, parent, cacheSize);
-        }
         TmfEventsTable eventsTable = null;
         try {
             if (fTrace.getResource() == null) {
@@ -318,9 +317,14 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (traceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
                 return new CustomEventsTable(((CustomXmlTrace) fTrace).getDefinition(), parent, cacheSize);
             }
-            for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements()) {
+            TraceElementType type = TraceElementType.TRACE;
+            if (fTrace instanceof TmfExperiment) {
+                type = TraceElementType.EXPERIMENT;
+            }
+            for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(type)) {
                 if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(traceType)) {
                     final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceTypeUIUtils.EVENTS_TABLE_TYPE_ELEM);
+
                     if (eventsTableTypeCE.length != 1) {
                         break;
                     }
@@ -336,6 +340,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     eventsTable = (TmfEventsTable) constructor.newInstance(args);
                     break;
                 }
+            }
+            if (fTrace instanceof TmfExperiment && (eventsTable == null)) {
+                eventsTable = getExperimentEventsTable((TmfExperiment) fTrace, parent, cacheSize);
             }
         } catch (final InvalidRegistryObjectException e) {
             Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
@@ -397,7 +404,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (commonTraceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
                 return new CustomEventsTable(((CustomXmlTrace) experiment.getTraces()[0]).getDefinition(), parent, cacheSize);
             }
-            for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements()) {
+            for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(TraceElementType.TRACE)) {
                 if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(commonTraceType)) {
                     final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceTypeUIUtils.EVENTS_TABLE_TYPE_ELEM);
                     if (eventsTableTypeCE.length != 1) {

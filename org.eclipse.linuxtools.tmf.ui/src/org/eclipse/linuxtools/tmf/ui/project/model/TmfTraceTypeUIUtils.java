@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.util.Pair;
@@ -78,7 +79,8 @@ public final class TmfTraceTypeUIUtils {
 
     private static final char SEPARATOR = ':';
 
-    private TmfTraceTypeUIUtils() {}
+    private TmfTraceTypeUIUtils() {
+    }
 
     private static List<Pair<Integer, TraceTypeHelper>> reduce(List<Pair<Integer, TraceTypeHelper>> candidates) {
         List<Pair<Integer, TraceTypeHelper>> retVal = new ArrayList<>();
@@ -112,7 +114,6 @@ public final class TmfTraceTypeUIUtils {
         }
         return count == 0;
     }
-
 
     /**
      * Is the trace type id a custom (user-defined) trace type. These are the
@@ -246,7 +247,6 @@ public final class TmfTraceTypeUIUtils {
         return traceTypeToSet;
     }
 
-
     /**
      * Set the trace type of a {@Link TraceTypeHelper}. Should only be
      * used internally by this project.
@@ -292,14 +292,20 @@ public final class TmfTraceTypeUIUtils {
      * Retrieves all configuration elements from the platform extension registry
      * for the trace type UI extension.
      *
+     * @param elType
+     *            The type of trace type requested, either TRACE or EXPERIMENT
      * @return An array of trace type configuration elements
      */
-    public static IConfigurationElement[] getTypeUIElements() {
+    public static IConfigurationElement[] getTypeUIElements(TraceElementType elType) {
+        String elementName = TYPE_ELEM;
+        if (elType == TraceElementType.EXPERIMENT) {
+            elementName = EXPERIMENT_ELEM;
+        }
         IConfigurationElement[] elements =
                 Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_TRACE_TYPE_UI_ID);
         List<IConfigurationElement> typeElements = new LinkedList<>();
         for (IConfigurationElement element : elements) {
-            if (element.getName().equals(TYPE_ELEM)) {
+            if (element.getName().equals(elementName)) {
                 typeElements.add(element);
             }
         }
@@ -311,12 +317,14 @@ public final class TmfTraceTypeUIUtils {
      *
      * @param traceType
      *            The tracetype ID
+     * @param elType
+     *            The type of trace type requested, either TRACE or EXPERIMENT
      * @return The top-level configuration element (access its children with
      *         .getChildren()). Or null if there is no such element.
      */
     @Nullable
-    public static IConfigurationElement getTraceUIAttributes(String traceType) {
-        IConfigurationElement[] elements = getTypeUIElements();
+    public static IConfigurationElement getTraceUIAttributes(String traceType, TraceElementType elType) {
+        IConfigurationElement[] elements = getTypeUIElements(elType);
         for (IConfigurationElement ce : elements) {
             if (traceType.equals(ce.getAttribute(TRACETYPE_ATTR))) {
                 return ce;
