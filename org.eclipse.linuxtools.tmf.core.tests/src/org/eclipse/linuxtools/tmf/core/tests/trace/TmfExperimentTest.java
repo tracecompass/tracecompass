@@ -140,6 +140,35 @@ public class TmfExperimentTest {
     }
 
     // ------------------------------------------------------------------------
+    // Experiment setup
+    // ------------------------------------------------------------------------
+
+    @Test
+    public void testExperimentInitialization() {
+        /*
+         * Calling default constructor, then init should be equivalent to
+         * calling the full constructor
+         */
+
+        TmfExperimentStub experiment = new TmfExperimentStub();
+        experiment.initExperiment(ITmfEvent.class, EXPERIMENT, fTestTraces, 5000, null);
+        experiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
+
+        assertEquals("GetId", EXPERIMENT, fExperiment.getName());
+        assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
+
+        final long nbExperimentEvents = fExperiment.getNbEvents();
+        assertEquals("GetNbEvents", NB_EVENTS, nbExperimentEvents);
+
+        final long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
+        assertEquals("GetNbEvents", NB_EVENTS, nbTraceEvents);
+
+        final TmfTimeRange timeRange = fExperiment.getTimeRange();
+        assertEquals("getStartTime", 1, timeRange.getStartTime().getValue());
+        assertEquals("getEndTime", NB_EVENTS, timeRange.getEndTime().getValue());
+    }
+
+    // ------------------------------------------------------------------------
     // getTimestamp
     // ------------------------------------------------------------------------
 
