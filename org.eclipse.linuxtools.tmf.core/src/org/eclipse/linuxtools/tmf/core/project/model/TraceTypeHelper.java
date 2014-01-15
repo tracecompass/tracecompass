@@ -9,11 +9,13 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *   Bernd Hufmann - Handling of directory traces types
+ *   Geneviève Bastien - Added support of experiment types
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.project.model;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 
@@ -29,6 +31,7 @@ public class TraceTypeHelper {
     private final String fName;
     private final String fCategoryName;
     private final String fCanonicalName;
+    private final TraceElementType fElementType;
     private final ITmfTrace fTrace;
     private final boolean fIsDirectory;
 
@@ -47,13 +50,16 @@ public class TraceTypeHelper {
      *            an object of the trace type
      * @param isDir
      *            flag indicating whether the trace type is for a directory or file trace
+     * @param elementType
+     *            True if this helper is for an experiment type
      */
-    public TraceTypeHelper(String canonicalName, String categoryName, String name, ITmfTrace trace, boolean isDir) {
+    public TraceTypeHelper(String canonicalName, String categoryName, String name, ITmfTrace trace, boolean isDir, TraceElementType elementType) {
         fName = name;
         fCategoryName = categoryName;
         fCanonicalName = canonicalName;
         fTrace = trace;
         fIsDirectory = isDir;
+        fElementType = elementType;
     }
 
     /**
@@ -127,6 +133,15 @@ public class TraceTypeHelper {
      */
     public ITmfTrace getTrace() {
         return fTrace;
+    }
+
+    /**
+     * Return whether this helper applies to a trace type or experiment type
+     *
+     * @return True if experiment type, false otherwise
+     */
+    public boolean isExperimentType() {
+        return fElementType == TraceElementType.EXPERIMENT;
     }
 
     private boolean standardValidate(String path) {
