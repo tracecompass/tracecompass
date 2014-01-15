@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Geneviève Bastien - Experiment instantiates with an experiment type
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
@@ -91,7 +92,7 @@ public class OpenExperimentHandler extends AbstractHandler {
             return null;
         }
 
-        TmfOpenTraceHelper.openExperimentFromElement(fExperiment);
+        TmfOpenTraceHelper.openTraceFromElement(fExperiment);
         return null;
     }
 

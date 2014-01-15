@@ -135,7 +135,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             setPartName(experimentElement.getName());
                             super.setSite(site);
                             super.setInput(fileEditorInput);
-                            TmfOpenTraceHelper.reopenExperimentFromElement(experimentElement, this);
+                            TmfOpenTraceHelper.reopenTraceFromElement(experimentElement, this);
                             return;
                         }
                     }

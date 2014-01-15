@@ -79,28 +79,32 @@ public class Messages extends NLS {
      * */
     public static String TmfTraceType_SelectTraceType;
 
-    /** Error opening a trace */
-    public static String TmfOpenTraceHelper_ErrorOpeningTrace;
-    /** Error opening an experiment */
-    public static String TmfOpenTraceHelper_ErrorOpeningExperiment;
+    /** Error opening a trace or experiment
+     * @since 3.0*/
+    public static String TmfOpenTraceHelper_ErrorOpeningElement;
     /** Could not link trace */
     public static String TmfOpenTraceHelper_LinkFailed;
     /** No trace type match */
     public static String TmfOpenTraceHelper_NoTraceTypeMatch;
-    /** Open Trace*/
-    public static String TmfOpenTraceHelper_OpenTrace;
-    /** Open Experiment*/
-    public static String TmfOpenTraceHelper_OpenExperiment;
+    /** Open trace or experiment
+     * @since 3.0*/
+    public static String TmfOpenTraceHelper_OpenElement;
     /** Reduce was too efficient, no candidates found! */
     public static String TmfOpenTraceHelper_ReduceError;
+    /** No trace or experiment type
+     * @since 3.0*/
+    public static String TmfOpenTraceHelper_NoTraceOrExperimentType;
     /** No trace type */
     public static String TmfOpenTraceHelper_NoTraceType;
-    /** Error opening trace*/
-    public static String TmfOpenTraceHelper_ErrorTrace;
-    /** Error opening experiment */
-    public static String TmfOpenTraceHelper_ErrorExperiment;
+    /** Error opening trace or experiment
+     * @since 3.0*/
+    public static String TmfOpenTraceHelper_ErrorElement;
     /** Init error */
     public static String TmfOpenTraceHelper_InitError;
+    /** Trace not found
+     * @since 3.0*/
+    public static String TmfOpenTraceHelper_TraceNotFound;
+
 
     static {
         // initialize resource bundle

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Copied and adapted from NewFolderDialog
+ *   Geneviève Bastien - Add support of experiment types
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
@@ -20,15 +21,19 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -183,6 +188,18 @@ public class NewExperimentDialog extends SelectionStatusDialog {
                         throw new OperationCanceledException();
                     }
                     experimentFolder.create(false, true, monitor);
+
+                    /*
+                     * Experiments can be set to the default experiment type. No
+                     * need to force user to select an experiment type
+                     */
+                    IConfigurationElement ce = TmfTraceType.getInstance().getTraceAttributes(TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
+                    if (ce != null) {
+                        try {
+                            experimentFolder.setPersistentProperty(TmfCommonConstants.TRACETYPE, ce.getAttribute(TmfTraceType.ID_ATTR));
+                        } catch (InvalidRegistryObjectException | CoreException e) {
+                        }
+                    }
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
@@ -193,12 +210,10 @@ public class NewExperimentDialog extends SelectionStatusDialog {
         };
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
-        } catch (InterruptedException exception) {
+        } catch (InterruptedException | RuntimeException exception) {
             return null;
         } catch (InvocationTargetException exception) {
             MessageDialog.openError(getShell(), "", NLS.bind("", exception.getTargetException().getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
-            return null;
-        } catch (RuntimeException exception) {
             return null;
         }
 
