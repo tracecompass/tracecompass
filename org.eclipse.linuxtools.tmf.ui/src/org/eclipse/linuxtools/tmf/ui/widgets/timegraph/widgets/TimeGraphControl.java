@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2013 Intel Corporation and others
+ * Copyright (c) 2007, 2014 Intel Corporation and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,6 +14,7 @@
  *   Geneviève Bastien, École Polytechnique de Montréal - Move code to
  *                            provide base classes for time graph view
  *                            Add display of links between items
+ *   Xavier Raynaud, Kalray - Code optimization
  *****************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
@@ -1700,15 +1701,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return false;
         }
         boolean visible = rect.width == 0 ? false : true;
+        Color black =  Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+        gc.setForeground(black);
 
         if (visible) {
             if (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT) {
                 // Only draw the top and bottom borders
-                gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
                 gc.drawLine(rect.x, rect.y, rect.x + rect.width - 1, rect.y);
                 gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1, rect.y + rect.height - 1);
                 if (rect.width == 1) {
-                    gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
                     gc.drawPoint(rect.x, rect.y - 2);
                 }
                 return false;
@@ -1717,24 +1718,19 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (colorIdx < fEventColorMap.length) {
                 stateColor = fEventColorMap[colorIdx];
             } else {
-                stateColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+                stateColor = black;
             }
 
             boolean reallySelected = timeSelected && selected;
             // fill all rect area
             gc.setBackground(stateColor);
             gc.fillRectangle(rect);
-            // get the border color?
-            gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
 
-            // draw bounds
-            if (!reallySelected) {
-                // Draw the top and bottom borders i.e. no side borders
-                gc.drawLine(rect.x, rect.y, rect.x + rect.width - 1, rect.y);
-                gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1, rect.y + rect.height - 1);
+            if (reallySelected) {
+                gc.drawLine(rect.x, rect.y - 1, rect.x + rect.width - 1, rect.y - 1);
+                gc.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width - 1, rect.y + rect.height);
             }
         } else {
-            gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
             gc.drawPoint(rect.x, rect.y - 2);
         }
         fTimeGraphProvider.postDrawEvent(event, rect, gc);
