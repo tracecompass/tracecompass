@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.core.analysis;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
@@ -165,7 +163,7 @@ public interface IAnalysisModule {
      *
      * @return The list of {@link IAnalysisOutput}
      */
-    List<IAnalysisOutput> getOutputs();
+    Iterable<IAnalysisOutput> getOutputs();
 
     /**
      * Registers an output for this analysis
