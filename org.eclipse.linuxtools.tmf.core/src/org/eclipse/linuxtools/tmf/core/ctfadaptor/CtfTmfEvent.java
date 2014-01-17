@@ -128,15 +128,6 @@ public class CtfTmfEvent extends TmfEvent
         return this.typeId;
     }
 
-    /**
-     * Gets the name of a current event.
-     *
-     * @return The event name
-     */
-    public String getEventName() {
-        return eventName;
-    }
-
     @Override
     public CtfTmfTrace getTrace() {
         /*
@@ -151,7 +142,7 @@ public class CtfTmfEvent extends TmfEvent
         CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(eventName);
         if (ctfTmfEventType == null) {
             /* Should only return null the first time */
-            ctfTmfEventType = new CtfTmfEventType(this.getEventName(), this.getContent());
+            ctfTmfEventType = new CtfTmfEventType(eventName, this.getContent());
         }
         return ctfTmfEventType;
     }

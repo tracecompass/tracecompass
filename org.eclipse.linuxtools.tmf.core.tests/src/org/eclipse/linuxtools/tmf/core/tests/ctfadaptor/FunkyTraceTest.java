@@ -85,7 +85,7 @@ public class FunkyTraceTest {
     @Test
     public void testFirstEvent() {
         CtfTmfEvent event = getEvent(0);
-        assertEquals("Simple Event", event.getEventName());
+        assertEquals("Simple Event", event.getType().getName());
         assertEquals(1234567, event.getTimestamp().getValue());
         assertEquals(42, ((Long) event.getContent().getField("integer_field").getValue()).intValue());
         assertEquals(3.1415, ((Double) event.getContent().getField("float_field").getValue()).doubleValue(), DELTA);
@@ -97,7 +97,7 @@ public class FunkyTraceTest {
     @Test
     public void testSecondEvent() {
         CtfTmfEvent event = getEvent(1);
-        assertEquals("Spammy_Event", event.getEventName());
+        assertEquals("Spammy_Event", event.getType().getName());
         assertEquals(1234568, event.getTimestamp().getValue());
         assertEquals(0, ((Long) event.getContent().getField("field_1").getValue()).intValue());
         assertEquals("This is a test", event.getContent().getField("a_string").getValue());
@@ -109,7 +109,7 @@ public class FunkyTraceTest {
     @Test
     public void testSecondToLastEvent() {
         CtfTmfEvent event = getEvent(100000);
-        assertEquals("Spammy_Event", event.getEventName());
+        assertEquals("Spammy_Event", event.getType().getName());
         assertEquals(1334567, event.getTimestamp().getValue());
         assertEquals(99999, ((Long) event.getContent().getField("field_1").getValue()).intValue());
         assertEquals("This is a test", event.getContent().getField("a_string").getValue());
@@ -138,7 +138,7 @@ public class FunkyTraceTest {
          */
 
         CtfTmfEvent event = getEvent(100001);
-        assertEquals("Complex Test Event", event.getEventName());
+        assertEquals("Complex Test Event", event.getType().getName());
         assertEquals(1334568, event.getTimestamp().getValue());
         assertEquals(0xddf00d, ((Long) event.getContent().getField("uint_35").getValue()).intValue());
         assertEquals(-12345, ((Long) event.getContent().getField("int_16").getValue()).intValue());

@@ -96,7 +96,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
         ITmfStateValue value;
 
         final ITmfEventField content = event.getContent();
-        final String eventName = event.getEventName();
+        final String eventName = event.getType().getName();
         final long ts = event.getTimestamp().getValue();
 
         try {

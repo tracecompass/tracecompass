@@ -64,7 +64,7 @@ public class Benchmark {
                     if (USE_TEXT) {
 
                         System.out.println("Event " + nbEvent + " Time "
-                                + current.getTimestamp().toString() + " type " + current.getEventName()
+                                + current.getTimestamp().toString() + " type " + current.getType().getName()
                                 + " on CPU " + current.getSource() + " " + current.getContent().toString());
                     }
                     // advance the trace to the next event.

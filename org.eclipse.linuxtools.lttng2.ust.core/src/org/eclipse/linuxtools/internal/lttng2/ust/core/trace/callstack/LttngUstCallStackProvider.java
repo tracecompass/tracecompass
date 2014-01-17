@@ -128,7 +128,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
 
     @Override
     public String functionEntry(ITmfEvent event) {
-        String eventName = ((CtfTmfEvent) event).getEventName();
+        String eventName = event.getType().getName();
         if (!FUNC_ENTRY_EVENTS.contains(eventName)) {
             return null;
         }
@@ -138,7 +138,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
 
     @Override
     public String functionExit(ITmfEvent event) {
-        String eventName = ((CtfTmfEvent) event).getEventName();
+        String eventName = event.getType().getName();
         if (!FUNC_EXIT_EVENTS.contains(eventName)) {
             return null;
         }
