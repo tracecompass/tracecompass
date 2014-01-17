@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -305,6 +305,11 @@ public class TmfSchedulerTest {
         TmfTimeRange shortTimeRange = new TmfTimeRange(new TmfTimestamp(fStartTime, ITmfTimestamp.NANOSECOND_SCALE, 0), new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 16), ITmfTimestamp.NANOSECOND_SCALE, 0));
         ForegroundRequest shortForeground = new ForegroundRequest(shortTimeRange);
         fixture.sendRequest(foreground9);
+        try {
+            foreground9.waitForStart();
+        } catch (InterruptedException e) {
+            fail();
+        }
         fixture.sendRequest(shortForeground);
         try {
             shortForeground.waitForCompletion();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,12 +10,16 @@
  *   Francois Chouinard - Initial API and implementation, replace background
  *       requests by preemptable requests
  *   Alexandre Montplaisir - Merge with TmfDataProvider
+ *   Bernd Hufmann - Add timer based coalescing for background requests
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
@@ -58,6 +62,9 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      * @since 3.0 */
     public static final int DEFAULT_QUEUE_SIZE = 1000;
 
+    /** Delay for coalescing background requests (in milli-seconds) */
+    private static final long DELAY = 1000;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -86,6 +93,10 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
 
     private int fRequestPendingCounter = 0;
 
+    private final Timer fTimer;
+
+    private boolean fIsTimeout = false;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -98,6 +109,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         fQueueSize = DEFAULT_QUEUE_SIZE;
         fDataQueue = new LinkedBlockingQueue<>(fQueueSize);
         fExecutor = new TmfRequestExecutor();
+        fTimer = new Timer();
     }
 
     /**
@@ -114,6 +126,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<ITmfEvent>(fQueueSize) : new SynchronousQueue<ITmfEvent>();
 
         fExecutor.init();
+
         fSignalDepth = 0;
 
         TmfProviderManager.register(fType, this);
@@ -197,10 +210,33 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     @Override
     public void sendRequest(final ITmfEventRequest request) {
         synchronized (fLock) {
-            if (fSignalDepth > 0) {
-                coalesceEventRequest(request);
-            } else {
-                dispatchRequest(request);
+            if (request.getExecType() == ExecutionType.FOREGROUND) {
+                if ((fSignalDepth > 0) || (fRequestPendingCounter > 0)) {
+                    coalesceEventRequest(request);
+                } else {
+                    dispatchRequest(request);
+                }
+                return;
+            }
+
+            /*
+             *  For the first background request in the request pending queue
+             *  a timer will be started to allow other background requests to
+             *  coalesce.
+             */
+            boolean startTimer = (getNbPendingBackgroundRequests() == 0);
+            coalesceEventRequest(request);
+            if (startTimer) {
+                TimerTask task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        synchronized (fLock) {
+                            fIsTimeout = true;
+                            fireRequest();
+                        }
+                    }
+                };
+                fTimer.schedule(task, DELAY);
             }
         }
     }
@@ -211,11 +247,17 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
             if (fRequestPendingCounter > 0) {
                 return;
             }
+
             if (fPendingCoalescedRequests.size() > 0) {
-                for (ITmfEventRequest request : fPendingCoalescedRequests) {
-                    dispatchRequest(request);
+                Iterator<TmfCoalescedEventRequest> iter = fPendingCoalescedRequests.iterator();
+                while (iter.hasNext()) {
+                    ExecutionType type = (fIsTimeout ? ExecutionType.BACKGROUND : ExecutionType.FOREGROUND);
+                    ITmfEventRequest request = iter.next();
+                    if (type == request.getExecType()) {
+                        dispatchRequest(request);
+                        iter.remove();
+                    }
                 }
-                fPendingCoalescedRequests.clear();
             }
         }
     }
@@ -233,9 +275,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     public void notifyPendingRequest(boolean isIncrement) {
         synchronized (fLock) {
             if (isIncrement) {
-                if (fSignalDepth > 0) {
-                    fRequestPendingCounter++;
-                }
+                fRequestPendingCounter++;
             } else {
                 if (fRequestPendingCounter > 0) {
                     fRequestPendingCounter--;
@@ -261,7 +301,8 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      *            The request to copy
      * @since 3.0
      */
-    protected synchronized void newCoalescedEventRequest(ITmfEventRequest request) {
+    protected void newCoalescedEventRequest(ITmfEventRequest request) {
+        synchronized (fLock) {
             TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(
                     request.getDataType(),
                     request.getRange(),
@@ -274,6 +315,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                 TmfCoreTracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
             }
             fPendingCoalescedRequests.add(coalescedRequest);
+        }
     }
 
     /**
@@ -297,6 +339,23 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
             }
             newCoalescedEventRequest(request);
         }
+    }
+
+    /**
+     * Gets the number of background requests in pending queue.
+     *
+     * @return the number of background requests in pending queue
+     */
+    private int getNbPendingBackgroundRequests() {
+        int nbBackgroundRequests = 0;
+        synchronized (fLock) {
+            for (ITmfEventRequest request : fPendingCoalescedRequests) {
+                if (request.getExecType() == ExecutionType.BACKGROUND) {
+                    nbBackgroundRequests++;
+                }
+            }
+        }
+        return nbBackgroundRequests;
     }
 
     // ------------------------------------------------------------------------
@@ -432,6 +491,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         synchronized (fLock) {
             fSignalDepth--;
             if (fSignalDepth == 0) {
+                fIsTimeout = false;
                 fireRequest();
             }
         }
