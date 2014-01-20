@@ -290,7 +290,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
                     TmfTimeRange.ETERNITY,
                     0,
                     ITmfEventRequest.ALL_DATA,
-                    ITmfEventRequest.ExecutionType.BACKGROUND);
+                    ITmfEventRequest.ExecutionType.FOREGROUND);
             checkpoints.clear();
             this.trace = input.getTrace();
             this.checkpts = checkpoints;
