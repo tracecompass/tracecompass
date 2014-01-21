@@ -17,7 +17,6 @@ import java.lang.reflect.Field;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.RewriteCardinalityException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.parser.CTFLexer;
 
@@ -72,7 +71,7 @@ public class CtfAntlrException extends CTFReaderException {
      * @param e
      *            the previous rewrite exception (Antlr specific)
      */
-    public CtfAntlrException(RewriteCardinalityException e) {
+    public CtfAntlrException(Exception e) {
         super(e);
         this.fErrorLine = -1;
         this.fFile = "metadata"; //$NON-NLS-1$ // we're in CTF, the only thing using antlr is metadata

@@ -183,13 +183,32 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         /* Open and parse the metadata file */
-        metadata.parse();
+        metadata.parseFile();
 
-        /* Open all the trace files */
+        init(path);
+    }
+
+    /**
+     * Streamed constructor
+     * @since 3.0
+     */
+    public CTFTrace() {
+        path=null;
+        init();
+    }
+
+    private void init() {
         /* Create the definitions needed to read things from the files */
         if (packetHeaderDecl != null) {
             packetHeaderDef = packetHeaderDecl.createDefinition(this, "packet.header"); //$NON-NLS-1$
         }
+    }
+
+    private void init(File path) throws CTFReaderException {
+
+        init();
+
+        /* Open all the trace files */
 
         /* List files not called metadata and not hidden. */
         File[] files = path.listFiles(METADATA_FILE_FILTER);

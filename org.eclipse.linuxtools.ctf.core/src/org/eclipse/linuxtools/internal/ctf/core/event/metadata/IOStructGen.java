@@ -62,12 +62,18 @@ public class IOStructGen {
      * The trace
      */
     private final CTFTrace trace;
-    private final CommonTree tree;
+    private CommonTree tree;
 
     /**
      * The current declaration scope.
      */
     private DeclarationScope scope = null;
+
+    /**
+     * Data helpers needed for streaming
+     */
+
+    private boolean fHasBeenParsed = false;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -84,6 +90,7 @@ public class IOStructGen {
     public IOStructGen(CommonTree tree, CTFTrace trace) {
         this.trace = trace;
         this.tree = tree;
+
     }
 
     /**
@@ -96,9 +103,31 @@ public class IOStructGen {
         parseRoot(tree);
     }
 
+    /**
+     * Parse a partial tree and populate the trace defined in the constructor.
+     * Does not check for a "trace" block as there is only one in the trace and
+     * thus
+     *
+     * @throws ParseException
+     *             If there was a problem parsing the metadata
+     */
+    public void generateFragment() throws ParseException {
+        parseIncompleteRoot(tree);
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
+    /**
+     * Sets a new tree to parse
+     *
+     * @param newTree
+     *            the new tree to parse
+     */
+    public void setTree(CommonTree newTree) {
+        tree = newTree;
+    }
 
     /**
      * Parse the root node.
@@ -132,6 +161,7 @@ public class IOStructGen {
         List<CommonTree> environments = new ArrayList<>();
         List<CommonTree> clocks = new ArrayList<>();
         List<CommonTree> callsites = new ArrayList<>();
+
         /* Create a new declaration scope with no parent. */
         pushScope();
 
@@ -242,6 +272,73 @@ public class IOStructGen {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        popScope();
+        fHasBeenParsed = true;
+    }
+
+    private void parseIncompleteRoot(CommonTree root) throws ParseException {
+        List<CommonTree> children = root.getChildren();
+
+        if (fHasBeenParsed == false) {
+            throw new ParseException("You need to run generate first"); //$NON-NLS-1$
+        }
+        List<CommonTree> streams = new ArrayList<>();
+        List<CommonTree> events = new ArrayList<>();
+        List<CommonTree> declarations = new ArrayList<>();
+        List<CommonTree> environments = new ArrayList<>();
+        List<CommonTree> clocks = new ArrayList<>();
+        List<CommonTree> callsites = new ArrayList<>();
+        /* Create a new declaration scope with no parent. */
+        pushScope();
+
+        for (CommonTree child : children) {
+            final int type = child.getType();
+            switch (type) {
+            case CTFParser.DECLARATION:
+                declarations.add(child);
+                break;
+            case CTFParser.TRACE:
+                throw new ParseException("Trace block defined here, please use generate and not generateFragment to parse this fragment"); //$NON-NLS-1$
+            case CTFParser.STREAM:
+                streams.add(child);
+                break;
+            case CTFParser.EVENT:
+                events.add(child);
+                break;
+            case CTFParser.CLOCK:
+                clocks.add(child);
+                break;
+            case CTFParser.ENV:
+                environments.add(child);
+                break;
+            case CTFParser.CALLSITE:
+                callsites.add(child);
+                break;
+            default:
+                childTypeError(child);
+            }
+        }
+        for (CommonTree decl : declarations) {
+            parseRootDeclaration(decl);
+        }
+
+        for (CommonTree environment : environments) {
+            parseEnvironment(environment);
+        }
+        for (CommonTree clock : clocks) {
+            parseClock(clock);
+        }
+        for (CommonTree callsite : callsites) {
+            parseCallsite(callsite);
+        }
+
+        for (CommonTree stream : streams) {
+            parseStream(stream);
+        }
+
+        for (CommonTree event : events) {
+            parseEvent(event);
         }
         popScope();
     }
@@ -2321,7 +2418,8 @@ public class IOStructGen {
      * @param unaryInteger
      *            An unary integer node.
      * @return The integer value.
-     * @throws ParseException on an invalid integer format ("bob" for example)
+     * @throws ParseException
+     *             on an invalid integer format ("bob" for example)
      */
     private static long parseUnaryInteger(CommonTree unaryInteger) throws ParseException {
 
