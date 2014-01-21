@@ -126,20 +126,19 @@ public class TransientState {
 
     /**
      * Convenience method to return the "ongoing" value for a given attribute as
-     * a dummy interval whose end time = -1 (since we don't know its real end
-     * time yet).
+     * a dummy interval whose end time = the current latest time.
      *
      * @param quark
      *            The quark of the attribute
      * @return An interval representing the current state (but whose end time is
-     *         meaningless)
+     *         the current one, and probably not the "final" one)
      * @throws AttributeNotFoundException
      *             If the quark is invalid
      */
     public ITmfStateInterval getOngoingInterval(int quark) throws AttributeNotFoundException {
         checkValidAttribute(quark);
-        return new TmfStateInterval(ongoingStateStartTimes.get(quark), -1, quark,
-                ongoingStateInfo.get(quark));
+        return new TmfStateInterval(ongoingStateStartTimes.get(quark), latestTime,
+                quark, ongoingStateInfo.get(quark));
     }
 
     private void checkValidAttribute(int quark) throws AttributeNotFoundException {
