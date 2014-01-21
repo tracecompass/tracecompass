@@ -612,7 +612,7 @@ public class HistoryTree {
         if (currentNode.isDone()) {
             return treeIO.readNode(potentialNextSeqNb);
         }
-        return treeIO.readNode(potentialNextSeqNb);
+        return readNode(potentialNextSeqNb);
     }
 
     /**
