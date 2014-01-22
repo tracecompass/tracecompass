@@ -14,6 +14,7 @@
 package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -30,6 +31,8 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestamp
  * @author Alexandre Montplaisir
  */
 public class CTFTraceReader {
+
+    private static final int MIN_PRIO_SIZE = 16;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -206,6 +209,45 @@ public class CTFTraceReader {
     }
 
     /**
+     * Update the priority queue to make it match the parent trace
+     *
+     * @throws CTFReaderException
+     *             An error occured
+     *
+     * @since 3.0
+     */
+    public void update() throws CTFReaderException {
+        Set<StreamInputReader> readers = new HashSet<>();
+        for (Stream stream : fTrace.getStreams()) {
+            Set<StreamInput> streamInputs = stream.getStreamInputs();
+            for (StreamInput streamInput : streamInputs) {
+                /*
+                 * Create a reader.
+                 */
+                StreamInputReader streamInputReader = new StreamInputReader(
+                        streamInput);
+
+                /*
+                 * Add it to the group.
+                 */
+                if (!fStreamInputReaders.contains(streamInputReader)) {
+                    streamInputReader.readNextEvent();
+                    fStreamInputReaders.add(streamInputReader);
+                    readers.add(streamInputReader);
+                }
+            }
+        }
+        long[] temp = fEventCountPerTraceFile;
+        fEventCountPerTraceFile = new long[readers.size() + temp.length];
+        for (StreamInputReader reader : readers) {
+            fPrio.add(reader);
+        }
+        for (int i = 0; i < temp.length; i++) {
+            fEventCountPerTraceFile[i] = temp[i];
+        }
+    }
+
+    /**
      * Initializes the priority queue used to choose the trace file with the
      * lower next event timestamp.
      *
@@ -214,7 +256,8 @@ public class CTFTraceReader {
      */
     private void populateStreamInputReaderHeap() throws CTFReaderException {
         if (fStreamInputReaders.isEmpty()) {
-            fPrio = new PriorityQueue<>();
+            fPrio = new PriorityQueue<>(MIN_PRIO_SIZE,
+                    new StreamInputReaderTimestampComparator());
             return;
         }
 
@@ -223,7 +266,7 @@ public class CTFTraceReader {
          * of reader in order to avoid constant resizing.
          */
         fPrio = new PriorityQueue<>(
-                fStreamInputReaders.size() * 2,
+                Math.max(fStreamInputReaders.size() * 2, MIN_PRIO_SIZE),
                 new StreamInputReaderTimestampComparator());
 
         int pos = 0;

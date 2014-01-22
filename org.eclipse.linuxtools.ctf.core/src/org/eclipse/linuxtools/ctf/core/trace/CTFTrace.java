@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2014 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -67,44 +67,44 @@ public class CTFTrace implements IDefinitionScope {
     @Override
     public String toString() {
         /* Only for debugging, shouldn't be externalized */
-        return "CTFTrace [path=" + path + ", major=" + major + ", minor="
-                + minor + ", uuid=" + uuid + "]";
+        return "CTFTrace [path=" + fPath + ", major=" + fMajor + ", minor="
+                + fMinor + ", uuid=" + fUuid + "]";
     }
 
     /**
      * The trace directory on the filesystem.
      */
-    private final File path;
+    private final File fPath;
 
     /**
      * Major CTF version number
      */
-    private Long major;
+    private Long fMajor;
 
     /**
      * Minor CTF version number
      */
-    private Long minor;
+    private Long fMinor;
 
     /**
      * Trace UUID
      */
-    private UUID uuid;
+    private UUID fUuid;
 
     /**
      * Trace byte order
      */
-    private ByteOrder byteOrder;
+    private ByteOrder fByteOrder;
 
     /**
      * Packet header structure declaration
      */
-    private StructDeclaration packetHeaderDecl = null;
+    private StructDeclaration fPacketHeaderDecl = null;
 
     /**
      * The clock of the trace
      */
-    private CTFClock singleClock;
+    private CTFClock fSingleClock;
 
     /**
      * Packet header structure definition
@@ -112,37 +112,37 @@ public class CTFTrace implements IDefinitionScope {
      * This is only used when opening the trace files, to read the first packet
      * header and see if they are valid trace files.
      */
-    private StructDefinition packetHeaderDef;
+    private StructDefinition fPacketHeaderDef;
 
     /**
      * Collection of streams contained in the trace.
      */
-    private final Map<Long, Stream> streams = new HashMap<>();
+    private final Map<Long, Stream> fStreams = new HashMap<>();
 
     /**
      * Collection of environment variables set by the tracer
      */
-    private final Map<String, String> environment = new HashMap<>();
+    private final Map<String, String> fEnvironment = new HashMap<>();
 
     /**
      * Collection of all the clocks in a system.
      */
-    private final Map<String, CTFClock> clocks = new HashMap<>();
+    private final Map<String, CTFClock> fClocks = new HashMap<>();
 
     /** FileInputStreams to the streams */
-    private final List<FileInputStream> fileInputStreams = new LinkedList<>();
+    private final List<FileInputStream> fFileInputStreams = new LinkedList<>();
 
     /** Handlers for the metadata files */
     private static final FileFilter METADATA_FILE_FILTER = new MetadataFileFilter();
     private static final Comparator<File> METADATA_COMPARATOR = new MetadataComparator();
 
     /** Callsite helpers */
-    private CTFCallsiteComparator ctfCallsiteComparator = new CTFCallsiteComparator();
+    private CTFCallsiteComparator fCtfCallsiteComparator = new CTFCallsiteComparator();
 
-    private Map<String, TreeSet<CTFCallsite>> callsitesByName = new HashMap<>();
+    private Map<String, TreeSet<CTFCallsite>> fCallsitesByName = new HashMap<>();
 
     /** Callsite helpers */
-    private TreeSet<CTFCallsite> callsitesByIP = new TreeSet<>();
+    private TreeSet<CTFCallsite> fCallsitesByIP = new TreeSet<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -170,15 +170,15 @@ public class CTFTrace implements IDefinitionScope {
      *             If no CTF trace was found at the path
      */
     public CTFTrace(File path) throws CTFReaderException {
-        this.path = path;
+        fPath = path;
         final Metadata metadata = new Metadata(this);
 
         /* Set up the internal containers for this trace */
-        if (!this.path.exists()) {
+        if (!fPath.exists()) {
             throw new CTFReaderException("Trace (" + path.getPath() + ") doesn't exist. Deleted or moved?"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        if (!this.path.isDirectory()) {
+        if (!fPath.isDirectory()) {
             throw new CTFReaderException("Path must be a valid directory"); //$NON-NLS-1$
         }
 
@@ -190,17 +190,18 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Streamed constructor
+     *
      * @since 3.0
      */
     public CTFTrace() {
-        path=null;
+        fPath = null;
         init();
     }
 
     private void init() {
         /* Create the definitions needed to read things from the files */
-        if (packetHeaderDecl != null) {
-            packetHeaderDef = packetHeaderDecl.createDefinition(this, "packet.header"); //$NON-NLS-1$
+        if (fPacketHeaderDecl != null) {
+            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(this, "packet.header"); //$NON-NLS-1$
         }
     }
 
@@ -213,6 +214,7 @@ public class CTFTrace implements IDefinitionScope {
         /* List files not called metadata and not hidden. */
         File[] files = path.listFiles(METADATA_FILE_FILTER);
         Arrays.sort(files, METADATA_COMPARATOR);
+
         /* Try to open each file */
         for (File streamFile : files) {
             openStreamInput(streamFile);
@@ -222,22 +224,7 @@ public class CTFTrace implements IDefinitionScope {
         for (Stream stream : getStreams()) {
             Set<StreamInput> inputs = stream.getStreamInputs();
             for (StreamInput s : inputs) {
-                /*
-                 * Copy the events
-                 */
-                Iterator<Entry<Long, IEventDeclaration>> it = s.getStream()
-                        .getEvents().entrySet().iterator();
-                while (it.hasNext()) {
-                    Entry<Long, IEventDeclaration> pairs = it.next();
-                    Long eventNum = pairs.getKey();
-                    IEventDeclaration eventDec = pairs.getValue();
-                    getEvents(s.getStream().getId()).put(eventNum, eventDec);
-                }
-
-                /*
-                 * index the trace
-                 */
-                s.setupIndex();
+                addStream(s);
             }
         }
     }
@@ -248,7 +235,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 2.0
      */
     public void dispose() {
-        for (FileInputStream fis : fileInputStreams) {
+        for (FileInputStream fis : fFileInputStreams) {
             if (fis != null) {
                 try {
                     fis.close();
@@ -274,7 +261,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 2.0
      */
     public Map<Long, IEventDeclaration> getEvents(Long streamId) {
-        return streams.get(streamId).getEvents();
+        return fStreams.get(streamId).getEvents();
     }
 
     /**
@@ -315,7 +302,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 2.0
      */
     public Stream getStream(Long id) {
-        return streams.get(id);
+        return fStreams.get(id);
     }
 
     /**
@@ -324,7 +311,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return int the number of streams
      */
     public int nbStreams() {
-        return streams.size();
+        return fStreams.size();
     }
 
     /**
@@ -334,7 +321,7 @@ public class CTFTrace implements IDefinitionScope {
      *            long the major version
      */
     public void setMajor(long major) {
-        this.major = major;
+        fMajor = major;
     }
 
     /**
@@ -344,7 +331,7 @@ public class CTFTrace implements IDefinitionScope {
      *            long the minor version
      */
     public void setMinor(long minor) {
-        this.minor = minor;
+        fMinor = minor;
     }
 
     /**
@@ -354,7 +341,7 @@ public class CTFTrace implements IDefinitionScope {
      *            UUID
      */
     public void setUUID(UUID uuid) {
-        this.uuid = uuid;
+        fUuid = uuid;
     }
 
     /**
@@ -364,7 +351,7 @@ public class CTFTrace implements IDefinitionScope {
      *            ByteOrder of the trace, can be little-endian or big-endian
      */
     public void setByteOrder(ByteOrder byteOrder) {
-        this.byteOrder = byteOrder;
+        fByteOrder = byteOrder;
     }
 
     /**
@@ -374,7 +361,7 @@ public class CTFTrace implements IDefinitionScope {
      *            StructDeclaration the header in structdeclaration form
      */
     public void setPacketHeader(StructDeclaration packetHeader) {
-        this.packetHeaderDecl = packetHeader;
+        fPacketHeaderDecl = packetHeader;
     }
 
     /**
@@ -384,7 +371,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 3.0
      */
     public boolean majorIsSet() {
-        return major != null;
+        return fMajor != null;
     }
 
     /**
@@ -393,7 +380,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return boolean is the minor set?
      */
     public boolean minorIsSet() {
-        return minor != null;
+        return fMinor != null;
     }
 
     /**
@@ -403,7 +390,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 2.0
      */
     public boolean uuidIsSet() {
-        return uuid != null;
+        return fUuid != null;
     }
 
     /**
@@ -412,7 +399,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return boolean is the byteorder set?
      */
     public boolean byteOrderIsSet() {
-        return byteOrder != null;
+        return fByteOrder != null;
     }
 
     /**
@@ -421,7 +408,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return boolean is the packet header set?
      */
     public boolean packetHeaderIsSet() {
-        return packetHeaderDecl != null;
+        return fPacketHeaderDecl != null;
     }
 
     /**
@@ -430,7 +417,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return UUID gets the trace UUID
      */
     public UUID getUUID() {
-        return uuid;
+        return fUuid;
     }
 
     /**
@@ -439,7 +426,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return long gets the trace major version
      */
     public long getMajor() {
-        return major;
+        return fMajor;
     }
 
     /**
@@ -448,7 +435,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return long gets the trace minor version
      */
     public long getMinor() {
-        return minor;
+        return fMinor;
     }
 
     /**
@@ -457,7 +444,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return ByteOrder gets the trace byte order
      */
     public final ByteOrder getByteOrder() {
-        return byteOrder;
+        return fByteOrder;
     }
 
     /**
@@ -466,7 +453,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return StructDeclaration gets the trace packet header
      */
     public StructDeclaration getPacketHeader() {
-        return packetHeaderDecl;
+        return fPacketHeaderDecl;
     }
 
     /**
@@ -475,7 +462,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return File the path in "File" format.
      */
     public File getTraceDirectory() {
-        return path;
+        return fPath;
     }
 
     /**
@@ -485,7 +472,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 3.0
      */
     public Iterable<Stream> getStreams() {
-        return streams.values();
+        return fStreams.values();
     }
 
     /**
@@ -496,16 +483,36 @@ public class CTFTrace implements IDefinitionScope {
      */
     @Override
     public String getPath() {
-        return path.getPath();
+        return (fPath != null) ? fPath.getPath() : ""; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
+    private void addStream(StreamInput s) {
+
+        /*
+         * Copy the events
+         */
+        Iterator<Entry<Long, IEventDeclaration>> it = s.getStream()
+                .getEvents().entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<Long, IEventDeclaration> pairs = it.next();
+            Long eventNum = pairs.getKey();
+            IEventDeclaration eventDec = pairs.getValue();
+            getEvents(s.getStream().getId()).put(eventNum, eventDec);
+        }
+
+        /*
+         * index the trace
+         */
+        s.setupIndex();
+    }
+
     /**
      * Tries to open the given file, reads the first packet header of the file
-     * and check its validity.
+     * and check its validity. This will add a file to a stream as a streaminput
      *
      * @param streamFile
      *            A trace file in the trace directory.
@@ -513,8 +520,9 @@ public class CTFTrace implements IDefinitionScope {
      *            Which index in the class' streamFileChannel array this file
      *            must use
      * @throws CTFReaderException
+     *             if there is a file error
      */
-    private void openStreamInput(File streamFile) throws CTFReaderException {
+    private Stream openStreamInput(File streamFile) throws CTFReaderException {
         MappedByteBuffer byteBuffer;
         BitBuffer streamBitBuffer;
         Stream stream;
@@ -525,15 +533,19 @@ public class CTFTrace implements IDefinitionScope {
                     + streamFile.getPath());
         }
 
+        FileInputStream fis = null;
         try {
             /* Open the file and get the FileChannel */
-            FileInputStream fis = new FileInputStream(streamFile);
-            fileInputStreams.add(fis);
+            fis = new FileInputStream(streamFile);
+            fFileInputStreams.add(fis);
             fc = fis.getChannel();
 
             /* Map one memory page of 4 kiB */
             byteBuffer = fc.map(MapMode.READ_ONLY, 0, (int) Math.min(fc.size(), 4096L));
         } catch (IOException e) {
+            if (fis != null) {
+                fFileInputStreams.remove(fis);
+            }
             /* Shouldn't happen at this stage if every other check passed */
             throw new CTFReaderException(e);
         }
@@ -541,12 +553,12 @@ public class CTFTrace implements IDefinitionScope {
         /* Create a BitBuffer with this mapping and the trace byte order */
         streamBitBuffer = new BitBuffer(byteBuffer, this.getByteOrder());
 
-        if (packetHeaderDef != null) {
+        if (fPacketHeaderDef != null) {
             /* Read the packet header */
-            packetHeaderDef.read(streamBitBuffer);
+            fPacketHeaderDef.read(streamBitBuffer);
 
             /* Check the magic number */
-            IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef
+            IntegerDefinition magicDef = (IntegerDefinition) fPacketHeaderDef
                     .lookupDefinition("magic"); //$NON-NLS-1$
             int magic = (int) magicDef.getValue();
             if (magic != Utils.CTF_MAGIC) {
@@ -554,7 +566,7 @@ public class CTFTrace implements IDefinitionScope {
             }
 
             /* Check UUID */
-            ArrayDefinition uuidDef = (ArrayDefinition) packetHeaderDef
+            ArrayDefinition uuidDef = (ArrayDefinition) fPacketHeaderDef
                     .lookupDefinition("uuid"); //$NON-NLS-1$
             if (uuidDef != null) {
                 byte[] uuidArray = new byte[Utils.UUID_LEN];
@@ -567,26 +579,26 @@ public class CTFTrace implements IDefinitionScope {
 
                 UUID otheruuid = Utils.makeUUID(uuidArray);
 
-                if (!this.uuid.equals(otheruuid)) {
+                if (!fUuid.equals(otheruuid)) {
                     throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
                 }
             }
 
             /* Read the stream ID */
-            Definition streamIDDef = packetHeaderDef.lookupDefinition("stream_id"); //$NON-NLS-1$
+            Definition streamIDDef = fPacketHeaderDef.lookupDefinition("stream_id"); //$NON-NLS-1$
 
             if (streamIDDef instanceof IntegerDefinition) { // this doubles as a
                                                             // null check
                 long streamID = ((IntegerDefinition) streamIDDef).getValue();
-                stream = streams.get(streamID);
+                stream = fStreams.get(streamID);
             } else {
                 /* No stream_id in the packet header */
-                stream = streams.get(null);
+                stream = fStreams.get(null);
             }
 
         } else {
             /* No packet header, we suppose there is only one stream */
-            stream = streams.get(null);
+            stream = fStreams.get(null);
         }
 
         if (stream == null) {
@@ -598,6 +610,8 @@ public class CTFTrace implements IDefinitionScope {
 
         /* Add a reference to the streamInput in the stream */
         stream.addInput(streamInput);
+
+        return stream;
     }
 
     /**
@@ -611,13 +625,29 @@ public class CTFTrace implements IDefinitionScope {
     @Override
     public Definition lookupDefinition(String lookupPath) {
         if (lookupPath.equals("trace.packet.header")) { //$NON-NLS-1$
-            return packetHeaderDef;
+            return fPacketHeaderDef;
         }
         return null;
     }
 
     /**
-     * Adds a new stream to the trace.
+     * Add a new stream file to support new streams while the trace is being
+     * read.
+     *
+     * @param streamFile
+     *            the file of the stream
+     * @throws CTFReaderException
+     *             A stream had an issue being read
+     * @throws ParseException
+     *             the stream may have conflicts
+     * @since 3.0
+     */
+    public void addStreamFile(File streamFile) throws CTFReaderException {
+        openStreamInput(streamFile);
+    }
+
+    /**
+     * Registers a new stream to the trace.
      *
      * @param stream
      *            A stream object.
@@ -628,10 +658,15 @@ public class CTFTrace implements IDefinitionScope {
     public void addStream(Stream stream) throws ParseException {
 
         /*
+         * Init if not done before
+         */
+        init();
+
+        /*
          * If there is already a stream without id (the null key), it must be
          * the only one
          */
-        if (streams.get(null) != null) {
+        if (fStreams.get(null) != null) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
         }
 
@@ -639,17 +674,20 @@ public class CTFTrace implements IDefinitionScope {
          * If the stream we try to add has the null key, it must be the only
          * one. Thus, if the streams container is not empty, it is not valid.
          */
-        if ((stream.getId() == null) && (streams.size() != 0)) {
+        if ((stream.getId() == null) && (fStreams.size() != 0)) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
         }
 
-        /* If a stream with the same ID already exists, it is not valid. */
-        if (streams.get(stream.getId()) != null) {
+        /*
+         * If a stream with the same ID already exists, it is not valid.
+         */
+        Stream existingStream = fStreams.get(stream.getId());
+        if (existingStream != null) {
             throw new ParseException("Stream id already exists"); //$NON-NLS-1$
         }
 
         /* This stream is valid and has a unique id. */
-        streams.put(stream.getId(), stream);
+        fStreams.put(stream.getId(), stream);
     }
 
     /**
@@ -660,7 +698,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 2.0
      */
     public Map<String, String> getEnvironment() {
-        return Collections.unmodifiableMap(environment);
+        return Collections.unmodifiableMap(fEnvironment);
     }
 
     /**
@@ -672,7 +710,7 @@ public class CTFTrace implements IDefinitionScope {
      *            the value of the variable
      */
     public void addEnvironmentVar(String varName, String varValue) {
-        environment.put(varName, varValue);
+        fEnvironment.put(varName, varValue);
     }
 
     /**
@@ -684,7 +722,7 @@ public class CTFTrace implements IDefinitionScope {
      *            the clock
      */
     public void addClock(String nameValue, CTFClock ctfClock) {
-        clocks.put(nameValue, ctfClock);
+        fClocks.put(nameValue, ctfClock);
     }
 
     /**
@@ -695,7 +733,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return the clock
      */
     public CTFClock getClock(String name) {
-        return clocks.get(name);
+        return fClocks.get(name);
     }
 
     /**
@@ -705,9 +743,9 @@ public class CTFTrace implements IDefinitionScope {
      * @return the clock
      */
     public final CTFClock getClock() {
-        if (clocks.size() == 1) {
-            singleClock = clocks.get(clocks.keySet().iterator().next());
-            return singleClock;
+        if (fClocks.size() == 1) {
+            fSingleClock = fClocks.get(fClocks.keySet().iterator().next());
+            return fSingleClock;
         }
         return null;
     }
@@ -721,7 +759,7 @@ public class CTFTrace implements IDefinitionScope {
         if (getClock() == null) {
             return 0;
         }
-        return singleClock.getClockOffset();
+        return fSingleClock.getClockOffset();
     }
 
     /**
@@ -733,7 +771,7 @@ public class CTFTrace implements IDefinitionScope {
         if (getClock() == null) {
             return 1.0;
         }
-        return singleClock.getClockScale();
+        return fSingleClock.getClockScale();
     }
 
     /**
@@ -745,7 +783,7 @@ public class CTFTrace implements IDefinitionScope {
         if (getClock() == null) {
             return false;
         }
-        return singleClock.isClockScaled();
+        return fSingleClock.isClockScaled();
     }
 
     /**
@@ -757,7 +795,7 @@ public class CTFTrace implements IDefinitionScope {
         if (getClock() == null) {
             return 1.0;
         }
-        return singleClock.getClockAntiScale();
+        return fSingleClock.getClockAntiScale();
     }
 
     /**
@@ -816,15 +854,15 @@ public class CTFTrace implements IDefinitionScope {
             String fileName, long lineNumber) {
         final CTFCallsite cs = new CTFCallsite(eventName, funcName, ip,
                 fileName, lineNumber);
-        TreeSet<CTFCallsite> csl = callsitesByName.get(eventName);
+        TreeSet<CTFCallsite> csl = fCallsitesByName.get(eventName);
         if (csl == null) {
-            csl = new TreeSet<>(ctfCallsiteComparator);
-            callsitesByName.put(eventName, csl);
+            csl = new TreeSet<>(fCtfCallsiteComparator);
+            fCallsitesByName.put(eventName, csl);
         }
 
         csl.add(cs);
 
-        callsitesByIP.add(cs);
+        fCallsitesByIP.add(cs);
     }
 
     /**
@@ -836,9 +874,9 @@ public class CTFTrace implements IDefinitionScope {
      * @since 3.0
      */
     public TreeSet<CTFCallsite> getCallsiteCandidates(String eventName) {
-        TreeSet<CTFCallsite> retVal = callsitesByName.get(eventName);
+        TreeSet<CTFCallsite> retVal = fCallsitesByName.get(eventName);
         if (retVal == null) {
-            retVal = new TreeSet<>(ctfCallsiteComparator);
+            retVal = new TreeSet<>(fCtfCallsiteComparator);
         }
         return retVal;
     }
@@ -852,7 +890,7 @@ public class CTFTrace implements IDefinitionScope {
      * @since 1.2
      */
     public CTFCallsite getCallsite(String eventName) {
-        TreeSet<CTFCallsite> callsites = callsitesByName.get(eventName);
+        TreeSet<CTFCallsite> callsites = fCallsitesByName.get(eventName);
         if (callsites != null) {
             return callsites.first();
         }
@@ -870,7 +908,7 @@ public class CTFTrace implements IDefinitionScope {
      */
     public CTFCallsite getCallsite(long ip) {
         CTFCallsite cs = new CTFCallsite(null, null, ip, null, 0L);
-        return callsitesByIP.ceiling(cs);
+        return fCallsitesByIP.ceiling(cs);
     }
 
     /**
@@ -883,7 +921,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return the closest matching callsite, can be null
      */
     public CTFCallsite getCallsite(String eventName, long ip) {
-        final TreeSet<CTFCallsite> candidates = callsitesByName.get(eventName);
+        final TreeSet<CTFCallsite> candidates = fCallsitesByName.get(eventName);
         final CTFCallsite dummyCs = new CTFCallsite(null, null, ip, null, -1);
         final CTFCallsite callsite = candidates.ceiling(dummyCs);
         if (callsite == null) {
