@@ -43,9 +43,9 @@
                     <id>prepare</id>
                     <phase>validate</phase>
                     <configuration>
-                    <tasks>
+                    <target>
                         <echo message="prepare phase" />
-                    </tasks>
+                    </target>
                     </configuration>
                         <goals>
                             <goal>run</goal>

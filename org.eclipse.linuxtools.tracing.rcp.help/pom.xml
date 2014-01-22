@@ -34,10 +34,10 @@
             <phase>generate-sources</phase>
             <configuration>
               <echo>Generating Trace Viewer Help Files</echo>
-              <tasks>
+              <target>
                 <property name="compile_classpath" refid="maven.compile.classpath" />
                 <ant target="build" inheritRefs="true" antfile="build.xml" />
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
@@ -48,9 +48,9 @@
             <phase>clean</phase>
             <configuration>
               <echo>Cleaning up generated Trace Viewer Help Files</echo>
-              <tasks>
+              <target>
                 <ant target="clean" antfile="build.xml" />
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
