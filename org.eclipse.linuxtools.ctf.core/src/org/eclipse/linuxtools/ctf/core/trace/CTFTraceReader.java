@@ -106,7 +106,8 @@ public class CTFTraceReader {
      * Copy constructor
      *
      * @return The new CTFTraceReader
-     * @throws CTFReaderException if an error occurs
+     * @throws CTFReaderException
+     *             if an error occurs
      */
     public CTFTraceReader copyFrom() throws CTFReaderException {
         CTFTraceReader newReader = null;
@@ -233,7 +234,8 @@ public class CTFTraceReader {
              * to read an event from it.
              */
             reader.setParent(this);
-            if (reader.readNextEvent()) {
+            CTFResponse readNextEvent = reader.readNextEvent();
+            if (readNextEvent == CTFResponse.OK || readNextEvent == CTFResponse.WAIT) {
                 fPrio.add(reader);
 
                 fEventCountPerTraceFile[pos] = 0;
@@ -279,7 +281,8 @@ public class CTFTraceReader {
         /*
          * Read the next event of this reader.
          */
-        if (top.readNextEvent()) {
+        switch (top.readNextEvent()) {
+        case OK: {
             /*
              * Add it back in the queue.
              */
@@ -292,6 +295,17 @@ public class CTFTraceReader {
                 fEndTime = Math.max(top.getCurrentEvent().getTimestamp(),
                         fEndTime);
             }
+            break;
+        }
+        case WAIT: {
+            fPrio.add(top);
+            break;
+        }
+        case FINISH:
+            break;
+        case ERROR:
+        default:
+            // something bad happend
         }
         /*
          * If there is no reader in the queue, it means the trace reader reached
@@ -322,8 +336,8 @@ public class CTFTraceReader {
      *
      * @param timestamp
      *            the timestamp to seek to
-     * @return true if there are events above or equal the seek timestamp,
-     *         false if seek at the end of the trace (no valid event).
+     * @return true if there are events above or equal the seek timestamp, false
+     *         if seek at the end of the trace (no valid event).
      * @throws CTFReaderException
      *             if an error occurs
      */
@@ -419,6 +433,30 @@ public class CTFTraceReader {
      */
     public long getEndTime() {
         return fEndTime;
+    }
+
+    /**
+     * Sets a trace to be live or not
+     *
+     * @param live
+     *            whether the trace is live
+     * @since 3.0
+     */
+    public void setLive(boolean live) {
+        for (StreamInputReader s : fPrio) {
+            s.setLive(live);
+        }
+    }
+
+    /**
+     * Get if the trace is to read live or not
+     *
+     * @return whether the trace is live or not
+     * @since 3.0
+     *
+     */
+    public boolean isLive() {
+        return fPrio.peek().isLive();
     }
 
     @Override
