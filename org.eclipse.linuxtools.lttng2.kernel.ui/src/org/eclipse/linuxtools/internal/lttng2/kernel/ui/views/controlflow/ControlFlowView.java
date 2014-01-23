@@ -94,6 +94,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         setTreeColumns(COLUMN_NAMES);
         setTreeLabelProvider(new ControlFlowTreeLabelProvider());
         setFilterColumns(FILTER_COLUMN_NAMES);
+        setFilterLabelProvider(new ControlFlowFilterLabelProvider());
         setEntryComparator(new ControlFlowEntryComparator());
     }
 
@@ -189,6 +190,22 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 return Utils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
             } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_traceColumn)) {
                 return entry.getTrace().getName();
+            }
+            return ""; //$NON-NLS-1$
+        }
+
+    }
+
+    private static class ControlFlowFilterLabelProvider extends TreeLabelProvider {
+
+        @Override
+        public String getColumnText(Object element, int columnIndex) {
+            ControlFlowEntry entry = (ControlFlowEntry) element;
+
+            if (columnIndex == 0) {
+                return entry.getName();
+            } else if (columnIndex == 1) {
+                return Integer.toString(entry.getThreadId());
             }
             return ""; //$NON-NLS-1$
         }

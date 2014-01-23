@@ -148,6 +148,9 @@ public abstract class AbstractTimeGraphView extends TmfView {
     /** The filter column label array, or null if filter is not used */
     private String[] fFilterColumns;
 
+    /** The filter label provider, or null if filter is not used */
+    private TreeLabelProvider fFilterLabelProvider;
+
     // ------------------------------------------------------------------------
     // Classes
     // ------------------------------------------------------------------------
@@ -554,6 +557,19 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     /**
+     * Sets the filter label provider.
+     * This should be called from the constructor.
+     *
+     * @param labelProvider
+     *            The filter label provider
+     *
+     * @since 3.0
+     */
+    protected void setFilterLabelProvider(final TreeLabelProvider labelProvider) {
+        fFilterLabelProvider = labelProvider;
+    }
+
+    /**
      * Gets the display width
      *
      * @return the display width
@@ -703,7 +719,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
             combo.setTreeLabelProvider(fLabelProvider);
             combo.setTreeColumns(fColumns);
             combo.setFilterContentProvider(new TreeContentProvider());
-            combo.setFilterLabelProvider(new TreeLabelProvider());
+            combo.setFilterLabelProvider(fFilterLabelProvider);
             combo.setFilterColumns(fFilterColumns);
         }
 
@@ -1081,7 +1097,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
      */
     protected void fillLocalToolBar(IToolBarManager manager) {
         if (fTimeGraphWrapper instanceof TimeGraphComboWrapper) {
-            if (fFilterColumns.length > 0) {
+            if (fFilterColumns != null && fFilterLabelProvider != null && fFilterColumns.length > 0) {
                 manager.add(((TimeGraphComboWrapper) fTimeGraphWrapper).getShowFilterAction());
             }
         }
