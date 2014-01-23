@@ -15,8 +15,10 @@ package org.eclipse.linuxtools.internal.tmf.core.statesystem;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -44,9 +46,12 @@ public class TransientState {
     /* Indicates where to insert state changes that we generate */
     @NonNull private final IStateHistoryBackend backend;
 
-    private boolean isActive;
-    private long latestTime;
+    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(false);
 
+    private volatile boolean isActive;
+    private volatile long latestTime;
+
+    /* A method accessing these arrays will have to go through the lock */
     private List<ITmfStateValue> ongoingStateInfo;
     private List<Long> ongoingStateStartTimes;
     private List<Type> stateValueTypes;
@@ -86,8 +91,13 @@ public class TransientState {
      *             If the quark is invalid
      */
     public ITmfStateValue getOngoingStateValue(int quark) throws AttributeNotFoundException {
-        checkValidAttribute(quark);
-        return ongoingStateInfo.get(quark);
+        rwl.readLock().lock();
+        try {
+            checkValidAttribute(quark);
+            return ongoingStateInfo.get(quark);
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
@@ -100,8 +110,13 @@ public class TransientState {
      *             If the quark is invalid
      */
     public long getOngoingStartTime(int quark) throws AttributeNotFoundException {
-        checkValidAttribute(quark);
-        return ongoingStateStartTimes.get(quark);
+        rwl.readLock().lock();
+        try {
+            checkValidAttribute(quark);
+            return ongoingStateStartTimes.get(quark);
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
@@ -117,8 +132,13 @@ public class TransientState {
      */
     public void changeOngoingStateValue(int quark, ITmfStateValue newValue)
             throws AttributeNotFoundException {
-        checkValidAttribute(quark);
-        ongoingStateInfo.set(quark, newValue);
+        rwl.writeLock().lock();
+        try {
+            checkValidAttribute(quark);
+            ongoingStateInfo.set(quark, newValue);
+        } finally {
+            rwl.writeLock().unlock();
+        }
     }
 
     /**
@@ -133,9 +153,43 @@ public class TransientState {
      *             If the quark is invalid
      */
     public ITmfStateInterval getOngoingInterval(int quark) throws AttributeNotFoundException {
-        checkValidAttribute(quark);
-        return new TmfStateInterval(ongoingStateStartTimes.get(quark), latestTime,
-                quark, ongoingStateInfo.get(quark));
+        rwl.readLock().lock();
+        try {
+            checkValidAttribute(quark);
+            return new TmfStateInterval(ongoingStateStartTimes.get(quark), latestTime,
+                    quark, ongoingStateInfo.get(quark));
+        } finally {
+            rwl.readLock().unlock();
+        }
+    }
+
+    /**
+     * Try to get the state interval valid for time/quark, if it is present in
+     * this transient state. If it is not (for example, a new value is active
+     * since after the specified timestamp) then null will be returned.
+     *
+     * @param time
+     *            The timestamp to look for
+     * @param quark
+     *            The quark of the attribute to look for
+     * @return The corresponding TmfStateInterval object if we could find it in
+     *         this transient state, or null if we couldn't.
+     */
+    @Nullable
+    public ITmfStateInterval getIntervalAt(long time, int quark) {
+        rwl.readLock().lock();
+        try {
+            checkValidAttribute(quark);
+            if (!isActive() || time < ongoingStateStartTimes.get(quark)) {
+                return null;
+            }
+            return new TmfStateInterval(ongoingStateStartTimes.get(quark),
+                    latestTime, quark, ongoingStateInfo.get(quark));
+        } catch (AttributeNotFoundException e) {
+            return null;
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     private void checkValidAttribute(int quark) throws AttributeNotFoundException {
@@ -155,16 +209,22 @@ public class TransientState {
      *            "ongoing state". Their end times don't matter, we will only
      *            check their value and start times.
      */
-    public synchronized void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
-        int size = newStateIntervals.size();
-        ongoingStateInfo = new ArrayList<>(size);
-        ongoingStateStartTimes = new ArrayList<>(size);
-        stateValueTypes = new ArrayList<>(size);
+    public void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
+        final int size = newStateIntervals.size();
 
-        for (ITmfStateInterval interval : newStateIntervals) {
-            ongoingStateInfo.add(interval.getStateValue());
-            ongoingStateStartTimes.add(interval.getStartTime());
-            stateValueTypes.add(interval.getStateValue().getType());
+        rwl.writeLock().lock();
+        try {
+            ongoingStateInfo = new ArrayList<>(size);
+            ongoingStateStartTimes = new ArrayList<>(size);
+            stateValueTypes = new ArrayList<>(size);
+
+            for (ITmfStateInterval interval : newStateIntervals) {
+                ongoingStateInfo.add(interval.getStateValue());
+                ongoingStateStartTimes.add(interval.getStartTime());
+                stateValueTypes.add(interval.getStateValue().getType());
+            }
+        } finally {
+            rwl.writeLock().unlock();
         }
     }
 
@@ -173,36 +233,22 @@ public class TransientState {
      * Ongoing... tables can stay in sync with the number of attributes in the
      * attribute tree, namely when we add sub-path attributes.
      */
-    public synchronized void addEmptyEntry() {
-        /*
-         * Since this is a new attribute, we suppose it was in the "null state"
-         * since the beginning (so we can have intervals covering for all
-         * timestamps). A null interval will then get added at the first state
-         * change.
-         */
-        ongoingStateInfo.add(TmfStateValue.nullValue());
-        stateValueTypes.add(Type.NULL);
+    public void addEmptyEntry() {
+        rwl.writeLock().lock();
+        try {
+            /*
+             * Since this is a new attribute, we suppose it was in the
+             * "null state" since the beginning (so we can have intervals
+             * covering for all timestamps). A null interval will then get added
+             * at the first state change.
+             */
+            ongoingStateInfo.add(TmfStateValue.nullValue());
+            stateValueTypes.add(Type.NULL);
 
-        ongoingStateStartTimes.add(backend.getStartTime());
-    }
-
-    /**
-     * Ask if the state information about attribute 'quark' at time 'time' is
-     * present in the Builder as it is right now. If it's not, it's either in
-     * the History Tree, or not in the system at all.
-     *
-     * Note that this method does not return the value itself (we don't even
-     * look for it, we can know by just looking at the timestamp)
-     *
-     * @param time
-     *            The timestamp to look for
-     * @param quark
-     *            The quark of the attribute to look for
-     * @return True if the value is present in the Transient State at this
-     *         moment in time, false if it's not
-     */
-    public boolean hasInfoAboutStateOf(long time, int quark) {
-        return (this.isActive() && time >= ongoingStateStartTimes.get(quark));
+            ongoingStateStartTimes.add(backend.getStartTime());
+        } finally {
+            rwl.writeLock().unlock();
+        }
     }
 
     /**
@@ -222,60 +268,65 @@ public class TransientState {
      *             If the state value to be inserted is of a different type of
      *             what was inserted so far for this attribute.
      */
-    public synchronized void processStateChange(long eventTime,
-            ITmfStateValue value, int quark) throws TimeRangeException,
-            AttributeNotFoundException, StateValueTypeException {
+    public void processStateChange(long eventTime, ITmfStateValue value, int quark)
+            throws TimeRangeException, AttributeNotFoundException, StateValueTypeException {
+        rwl.writeLock().lock();
         assert (this.isActive);
 
-        Type expectedSvType = stateValueTypes.get(quark);
-        checkValidAttribute(quark);
+        try {
+            Type expectedSvType = stateValueTypes.get(quark);
+            checkValidAttribute(quark);
 
-        /*
-         * Make sure the state value type we're inserting is the same as the
-         * one registered for this attribute.
-         */
-        if (expectedSvType == Type.NULL) {
             /*
-             * The value hasn't been used yet, set it to the value
-             * we're currently inserting (which might be null/-1 again).
+             * Make sure the state value type we're inserting is the same as the
+             * one registered for this attribute.
              */
-            stateValueTypes.set(quark, value.getType());
-        } else if ((value.getType() != Type.NULL) && (value.getType() != expectedSvType)) {
-            /*
-             * We authorize inserting null values in any type of attribute,
-             * but for every other types, it needs to match our expectations!
-             */
-            throw new StateValueTypeException();
-        }
+            if (expectedSvType == Type.NULL) {
+                /*
+                 * The value hasn't been used yet, set it to the value we're
+                 * currently inserting (which might be null/-1 again).
+                 */
+                stateValueTypes.set(quark, value.getType());
+            } else if ((value.getType() != Type.NULL) && (value.getType() != expectedSvType)) {
+                /*
+                 * We authorize inserting null values in any type of attribute,
+                 * but for every other types, it needs to match our
+                 * expectations!
+                 */
+                throw new StateValueTypeException();
+            }
 
-        /* Update the Transient State's lastestTime, if needed */
-        if (latestTime < eventTime) {
-            latestTime = eventTime;
-        }
+            if (ongoingStateInfo.get(quark).equals(value)) {
+                /*
+                 * This is the case where the new value and the one already
+                 * present in the Builder are the same. We do not need to create
+                 * an interval, we'll just keep the current one going.
+                 */
+                return;
+            }
 
-        if (ongoingStateInfo.get(quark).equals(value)) {
-            /*
-             * This is the case where the new value and the one already present
-             * in the Builder are the same. We do not need to create an
-             * interval, we'll just keep the current one going.
-             */
-            return;
-        }
+            if (ongoingStateStartTimes.get(quark) < eventTime) {
+                /*
+                 * These two conditions are necessary to create an interval and
+                 * update ongoingStateInfo.
+                 */
+                backend.insertPastState(ongoingStateStartTimes.get(quark),
+                        eventTime - 1, /* End Time */
+                        quark, /* attribute quark */
+                        ongoingStateInfo.get(quark)); /* StateValue */
 
-        if (ongoingStateStartTimes.get(quark) < eventTime) {
-            /*
-             * These two conditions are necessary to create an interval and
-             * update ongoingStateInfo.
-             */
-            backend.insertPastState(ongoingStateStartTimes.get(quark),
-                    eventTime - 1, /* End Time */
-                    quark, /* attribute quark */
-                    ongoingStateInfo.get(quark)); /* StateValue */
+                ongoingStateStartTimes.set(quark, eventTime);
+            }
+            ongoingStateInfo.set(quark, value);
 
-            ongoingStateStartTimes.set(quark, eventTime);
+            /* Update the Transient State's lastestTime, if needed */
+            if (latestTime < eventTime) {
+                latestTime = eventTime;
+            }
+
+        } finally {
+            rwl.writeLock().unlock();
         }
-        ongoingStateInfo.set(quark, value);
-        return;
     }
 
     /**
@@ -288,23 +339,25 @@ public class TransientState {
      *            The requested timestamp
      */
     public void doQuery(List<ITmfStateInterval> stateInfo, long t) {
-        ITmfStateInterval interval;
-
-        if (!this.isActive) {
-            return;
-        }
-        assert (stateInfo.size() == ongoingStateInfo.size());
-
-        for (int i = 0; i < ongoingStateInfo.size(); i++) {
-            /*
-             * We build a dummy interval with end time = -1 to put in the answer
-             * to the query.
-             */
-            if (this.hasInfoAboutStateOf(t, i)) {
-                interval = new TmfStateInterval(ongoingStateStartTimes.get(i), -1,
-                        i, ongoingStateInfo.get(i));
-                stateInfo.set(i, interval);
+        rwl.readLock().lock();
+        try {
+            if (!this.isActive) {
+                return;
             }
+            assert (stateInfo.size() == ongoingStateInfo.size());
+
+            for (int i = 0; i < ongoingStateInfo.size(); i++) {
+                /*
+                 * We build a dummy interval with end time = -1 to put in the
+                 * answer to the query.
+                 */
+                final ITmfStateInterval interval = getIntervalAt(t, i);
+                if (interval != null) {
+                    stateInfo.set(i, interval);
+                }
+            }
+        } finally {
+            rwl.readLock().unlock();
         }
     }
 
@@ -319,35 +372,41 @@ public class TransientState {
      *            change)
      */
     public void closeTransientState(long endTime) {
-        assert (this.isActive);
+        rwl.writeLock().lock();
+        try {
+            assert (this.isActive);
 
-        for (int i = 0; i < ongoingStateInfo.size(); i++) {
-            if (ongoingStateStartTimes.get(i) > endTime) {
-                /*
-                 * Handle the cases where trace end > timestamp of last state
-                 * change. This can happen when inserting "future" changes.
-                 */
-                continue;
-            }
-            try {
-                backend.insertPastState(ongoingStateStartTimes.get(i),
-                        endTime, /* End Time */
-                        i, /* attribute quark */
-                        ongoingStateInfo.get(i)); /* StateValue */
+            for (int i = 0; i < ongoingStateInfo.size(); i++) {
+                if (ongoingStateStartTimes.get(i) > endTime) {
+                    /*
+                     * Handle the cases where trace end > timestamp of last
+                     * state change. This can happen when inserting "future"
+                     * changes.
+                     */
+                    continue;
+                }
+                try {
+                    backend.insertPastState(ongoingStateStartTimes.get(i),
+                            endTime, /* End Time */
+                            i, /* attribute quark */
+                            ongoingStateInfo.get(i)); /* StateValue */
 
-            } catch (TimeRangeException e) {
-                /*
-                 * This shouldn't happen, since we control where the interval's
-                 * start time comes from
-                 */
-                throw new IllegalStateException(e);
+                } catch (TimeRangeException e) {
+                    /*
+                     * This shouldn't happen, since we control where the
+                     * interval's start time comes from
+                     */
+                    throw new IllegalStateException(e);
+                }
             }
+
+            ongoingStateInfo.clear();
+            ongoingStateStartTimes.clear();
+            this.isActive = false;
+
+        } finally {
+            rwl.writeLock().unlock();
         }
-
-        ongoingStateInfo.clear();
-        ongoingStateStartTimes.clear();
-        this.isActive = false;
-        return;
     }
 
     /**

@@ -562,10 +562,12 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
 
-        ITmfStateInterval ret;
-        if (transState.hasInfoAboutStateOf(t, attributeQuark)) {
-            ret = transState.getOngoingInterval(attributeQuark);
-        } else {
+        ITmfStateInterval ret = transState.getIntervalAt(t, attributeQuark);
+        if (ret == null) {
+            /*
+             * The transient state did not have the information, let's look into
+             * the backend next.
+             */
             ret = backend.doSingularQuery(t, attributeQuark);
         }
 
