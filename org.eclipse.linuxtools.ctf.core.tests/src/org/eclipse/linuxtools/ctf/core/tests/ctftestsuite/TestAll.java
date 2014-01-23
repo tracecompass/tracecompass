@@ -20,12 +20,10 @@ import org.junit.runners.Suite;
  * package.
  *
  * @author ematkho
- * @version $Revision: 1.0 $
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    // FIXME Disabled until the failures are actually fixed
-    // CtfTestSuiteTests.class
+     CtfTestSuiteTests.class
 })
 public class TestAll {
 
