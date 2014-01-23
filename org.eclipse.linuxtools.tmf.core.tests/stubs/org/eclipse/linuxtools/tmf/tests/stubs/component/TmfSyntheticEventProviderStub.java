@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.component;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfProviderManager;
@@ -35,6 +37,8 @@ import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
 public class TmfSyntheticEventProviderStub extends TmfEventProvider {
 
     public static final int NB_EVENTS  = 1000;
+
+    private final BlockingQueue<ITmfEvent> fDataQueue = new LinkedBlockingQueue<>(1000);
 
     public TmfSyntheticEventProviderStub() {
         super("TmfSyntheticEventProviderStub", TmfSyntheticEventStub.class);

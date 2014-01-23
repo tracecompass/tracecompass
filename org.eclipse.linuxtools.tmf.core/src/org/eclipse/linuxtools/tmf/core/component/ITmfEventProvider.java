@@ -35,11 +35,6 @@ public interface ITmfEventProvider extends ITmfComponent {
     void sendRequest(ITmfEventRequest request);
 
     /**
-     * Queue the coalesced requests.
-     */
-    void fireRequest();
-
-    /**
      * Increments/decrements the pending requests counters and fires the request
      * if necessary (counter == 0). Used for coalescing requests across multiple
      * TmfDataProvider's.

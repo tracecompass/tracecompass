@@ -15,14 +15,11 @@
 
 package org.eclipse.linuxtools.tmf.core.component;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 
 import org.eclipse.linuxtools.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.linuxtools.internal.tmf.core.component.TmfEventThread;
@@ -58,10 +55,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      * @since 3.0 */
     public static final int DEFAULT_BLOCK_SIZE = 50000;
 
-    /** Default size of the queue
-     * @since 3.0 */
-    public static final int DEFAULT_QUEUE_SIZE = 1000;
-
     /** Delay for coalescing background requests (in milli-seconds) */
     private static final long DELAY = 1000;
 
@@ -69,21 +62,11 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     // Attributes
     // ------------------------------------------------------------------------
 
-    /** List of coalesced requests
-     * @since 3.0*/
-    protected final List<TmfCoalescedEventRequest> fPendingCoalescedRequests = new ArrayList<>();
+    /** List of coalesced requests */
+    private final List<TmfCoalescedEventRequest> fPendingCoalescedRequests = new LinkedList<>();
 
-    /** The type of event handled by this provider
-     * @since 3.0*/
-    protected Class<? extends ITmfEvent> fType;
-
-    /** Queue of events
-     * @since 3.0*/
-    protected BlockingQueue<ITmfEvent> fDataQueue;
-
-    /** Size of the fDataQueue
-     * @since 3.0*/
-    protected int fQueueSize = DEFAULT_QUEUE_SIZE;
+    /** The type of event handled by this provider */
+    private Class<? extends ITmfEvent> fType;
 
     private final TmfRequestExecutor fExecutor;
 
@@ -106,10 +89,21 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      */
     public TmfEventProvider() {
         super();
-        fQueueSize = DEFAULT_QUEUE_SIZE;
-        fDataQueue = new LinkedBlockingQueue<>(fQueueSize);
         fExecutor = new TmfRequestExecutor();
         fTimer = new Timer();
+    }
+
+    /**
+     * Standard constructor. Instantiate and initialize at the same time.
+     *
+     * @param name
+     *            Name of the provider
+     * @param type
+     *            The type of events that will be handled
+     */
+    public TmfEventProvider(String name, Class<? extends ITmfEvent> type) {
+        this();
+        init(name, type);
     }
 
     /**
@@ -123,52 +117,10 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     public void init(String name, Class<? extends ITmfEvent> type) {
         super.init(name);
         fType = type;
-        fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<ITmfEvent>(fQueueSize) : new SynchronousQueue<ITmfEvent>();
-
         fExecutor.init();
 
         fSignalDepth = 0;
-
         TmfProviderManager.register(fType, this);
-    }
-
-    /**
-     * Constructor specifying the event type and the queue size.
-     *
-     * @param name
-     *            Name of the provider
-     * @param type
-     *            Type of event that will be handled
-     * @param queueSize
-     *            Size of the event queue
-     */
-    protected TmfEventProvider(String name, Class<? extends ITmfEvent> type, int queueSize) {
-        this();
-        fQueueSize = queueSize;
-        init(name, type);
-    }
-
-    /**
-     * Copy constructor
-     *
-     * @param other
-     *            The other object to copy
-     */
-    public TmfEventProvider(TmfEventProvider other) {
-        this();
-        init(other.getName(), other.fType);
-    }
-
-    /**
-     * Standard constructor. Instantiate and initialize at the same time.
-     *
-     * @param name
-     *            Name of the provider
-     * @param type
-     *            The type of events that will be handled
-     */
-    public TmfEventProvider(String name, Class<? extends ITmfEvent> type) {
-        this(name, type, DEFAULT_QUEUE_SIZE);
     }
 
     @Override
@@ -181,15 +133,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-
-    /**
-     * Get the queue size of this provider
-     *
-     * @return The size of the queue
-     */
-    public int getQueueSize() {
-        return fQueueSize;
-    }
 
     /**
      * Get the event type this provider handles
@@ -214,7 +157,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                 if ((fSignalDepth > 0) || (fRequestPendingCounter > 0)) {
                     coalesceEventRequest(request);
                 } else {
-                    dispatchRequest(request);
+                    queueRequest(request);
                 }
                 return;
             }
@@ -241,8 +184,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         }
     }
 
-    @Override
-    public void fireRequest() {
+    private void fireRequest() {
         synchronized (fLock) {
             if (fRequestPendingCounter > 0) {
                 return;
@@ -254,7 +196,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                     ExecutionType type = (fIsTimeout ? ExecutionType.BACKGROUND : ExecutionType.FOREGROUND);
                     ITmfEventRequest request = iter.next();
                     if (type == request.getExecType()) {
-                        dispatchRequest(request);
+                        queueRequest(request);
                         iter.remove();
                     }
                 }
@@ -362,14 +304,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     // Request processing
     // ------------------------------------------------------------------------
 
-    private void dispatchRequest(final ITmfEventRequest request) {
-        if (request.getExecType() == ExecutionType.FOREGROUND) {
-            queueRequest(request);
-        } else {
-            queueBackgroundRequest(request, true);
-        }
-    }
-
     /**
      * Queue a request.
      *
@@ -391,19 +325,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         }
 
         fExecutor.execute(thread);
-    }
-
-    /**
-     * Queue a background request
-     *
-     * @param request
-     *            The request
-     * @param indexing
-     *            Should we index the chunks
-     * @since 3.0
-     */
-    protected void queueBackgroundRequest(final ITmfEventRequest request, final boolean indexing) {
-        queueRequest(request);
     }
 
     /**
