@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -23,8 +24,8 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**
  * The Transient State is used to build intervals from punctual state changes.
@@ -41,7 +42,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
 public class TransientState {
 
     /* Indicates where to insert state changes that we generate */
-    private final IStateHistoryBackend backend;
+    @NonNull private final IStateHistoryBackend backend;
 
     private boolean isActive;
     private long latestTime;
@@ -56,18 +57,14 @@ public class TransientState {
      * @param backend
      *            The back-end in which to insert the generated state intervals
      */
-    public TransientState(IStateHistoryBackend backend) {
+    public TransientState(@NonNull IStateHistoryBackend backend) {
         this.backend = backend;
         isActive = true;
         ongoingStateInfo = new ArrayList<>();
         ongoingStateStartTimes = new ArrayList<>();
         stateValueTypes = new ArrayList<>();
 
-        if (backend != null) {
-            latestTime = backend.getStartTime();
-        } else {
-            latestTime = 0;
-        }
+        latestTime = backend.getStartTime();
     }
 
     /**
@@ -186,11 +183,7 @@ public class TransientState {
         ongoingStateInfo.add(TmfStateValue.nullValue());
         stateValueTypes.add(Type.NULL);
 
-        if (backend == null) {
-            ongoingStateStartTimes.add(0L);
-        } else {
-            ongoingStateStartTimes.add(backend.getStartTime());
-        }
+        ongoingStateStartTimes.add(backend.getStartTime());
     }
 
     /**
@@ -269,7 +262,7 @@ public class TransientState {
             return;
         }
 
-        if (backend != null && ongoingStateStartTimes.get(quark) < eventTime) {
+        if (ongoingStateStartTimes.get(quark) < eventTime) {
             /*
              * These two conditions are necessary to create an interval and
              * update ongoingStateInfo.

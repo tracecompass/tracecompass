@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
@@ -69,7 +70,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
      * @param backend
      *            Back-end plugin to use
      */
-    public StateSystem(IStateHistoryBackend backend) {
+    public StateSystem(@NonNull IStateHistoryBackend backend) {
         this.backend = backend;
         this.transState = new TransientState(backend);
         this.attributeTree = new AttributeTree(this);
@@ -86,7 +87,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
      * @throws IOException
      *             If there was a problem creating the new history file
      */
-    public StateSystem(IStateHistoryBackend backend, boolean newFile)
+    public StateSystem(@NonNull IStateHistoryBackend backend, boolean newFile)
             throws IOException {
         this.backend = backend;
         this.transState = new TransientState(backend);

@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.internal.tmf.core.statesystem;
 
 import java.io.IOException;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -106,7 +107,7 @@ public class HistoryBuilder extends TmfComponent {
      *             If there was something wrong.
      */
     public static ITmfStateSystemBuilder openExistingHistory(
-            IStateHistoryBackend hb) throws IOException {
+            @NonNull IStateHistoryBackend hb) throws IOException {
         return new StateSystem(hb, false);
     }
 

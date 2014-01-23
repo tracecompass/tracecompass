@@ -40,7 +40,6 @@ public class VerifyHistoryFile {
     public static final String pathToHistoryFile = "";
 
     private static File htFile;
-    private static IStateHistoryBackend htBackend;
     private static ITmfStateSystem ss;
 
     private static long startTime;
@@ -51,8 +50,8 @@ public class VerifyHistoryFile {
             TimeRangeException, AttributeNotFoundException,
             StateSystemDisposedException {
         htFile = new File(pathToHistoryFile);
-        htBackend = new HistoryTreeBackend(htFile, ITmfStateProvider.IGNORE_PROVIDER_VERSION);
-        ss = HistoryBuilder.openExistingHistory(htBackend);
+        IStateHistoryBackend backend = new HistoryTreeBackend(htFile, ITmfStateProvider.IGNORE_PROVIDER_VERSION);
+        ss = HistoryBuilder.openExistingHistory(backend);
 
         startTime = ss.getStartTime();
         endTime = ss.getCurrentEndTime();
