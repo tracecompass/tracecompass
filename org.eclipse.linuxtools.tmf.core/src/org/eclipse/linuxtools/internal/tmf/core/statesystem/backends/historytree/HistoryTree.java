@@ -609,7 +609,7 @@ public class HistoryTree {
          * through the whole latestBranch array if we know for sure the next
          * node has to be on disk
          */
-        if (currentNode.isDone()) {
+        if (currentNode.isOnDisk()) {
             return treeIO.readNode(potentialNextSeqNb);
         }
         return readNode(potentialNextSeqNb);
@@ -667,7 +667,7 @@ public class HistoryTree {
                             + otherNode.getSequenceNumber() + ")\n");
                     ret = false;
                 }
-                if (node.isDone()) {
+                if (node.isOnDisk()) {
                     otherNode = treeIO.readNode(node.getLatestChild());
                     if (node.getNodeEnd() != otherNode.getNodeEnd()) {
                         buf.append("End time of node (" + node.getNodeEnd()

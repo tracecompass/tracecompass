@@ -56,8 +56,8 @@ public abstract class HTNode {
     /* Where the Strings section begins (from the start of the node */
     private int stringSectionOffset;
 
-    /* True if this node is closed (and to be committed to disk) */
-    private boolean isDone;
+    /* True if this node was read from disk (meaning its end time is now fixed) */
+    private volatile boolean isOnDisk;
 
     /* Vector containing all the intervals contained in this node */
     private final List<HTInterval> intervals;
@@ -81,7 +81,7 @@ public abstract class HTNode {
         this.parentSequenceNumber = parentSeqNumber;
 
         this.stringSectionOffset = config.getBlockSize();
-        this.isDone = false;
+        this.isOnDisk = false;
         this.intervals = new ArrayList<>();
     }
 
@@ -118,7 +118,7 @@ public abstract class HTNode {
         int parentSeqNb = buffer.getInt();
         int intervalCount = buffer.getInt();
         int stringSectionOffset = buffer.getInt();
-        boolean done = byteToBool(buffer.get());
+        buffer.get(); // TODO Used to be "isDone", to be removed from the header
 
         /* Now the rest of the header depends on the node type */
         switch (type) {
@@ -154,7 +154,7 @@ public abstract class HTNode {
         /* Assign the node's other information we have read previously */
         newNode.nodeEnd = end;
         newNode.stringSectionOffset = stringSectionOffset;
-        newNode.isDone = done;
+        newNode.isOnDisk = true;
 
         return newNode;
     }
@@ -184,7 +184,7 @@ public abstract class HTNode {
         buffer.putInt(parentSequenceNumber);
         buffer.putInt(intervals.size());
         buffer.putInt(stringSectionOffset);
-        buffer.put(boolToByte(isDone));
+        buffer.put((byte) 1); // TODO Used to be "isDone", to be removed from header
 
         /* Now call the inner method to write the specific header part */
         this.writeSpecificHeader(buffer);
@@ -218,6 +218,7 @@ public abstract class HTNode {
         buffer.flip();
         int res = fc.write(buffer);
         assert (res == blockSize);
+        isOnDisk = true;
     }
 
     // ------------------------------------------------------------------------
@@ -248,7 +249,7 @@ public abstract class HTNode {
      * @return The end time  of this node
      */
     public long getNodeEnd() {
-        if (this.isDone) {
+        if (this.isOnDisk) {
             return nodeEnd;
         }
         return 0;
@@ -288,8 +289,8 @@ public abstract class HTNode {
      *
      * @return If this node is done or not
      */
-    public boolean isDone() {
-        return isDone;
+    public boolean isOnDisk() {
+        return isOnDisk;
     }
 
     /**
@@ -333,7 +334,6 @@ public abstract class HTNode {
             assert (endtime >= intervals.get(intervals.size() - 1).getEndTime());
         }
 
-        this.isDone = true;
         this.nodeEnd = endtime;
         return;
     }
@@ -353,7 +353,6 @@ public abstract class HTNode {
      */
     public void writeInfoFromNode(List<ITmfStateInterval> stateInfo, long t)
             throws TimeRangeException {
-        assert (this.isDone); // not sure this will always be the case...
         int startIndex;
 
         if (intervals.size() == 0) {
@@ -386,7 +385,6 @@ public abstract class HTNode {
      * @throws TimeRangeException If 't' is invalid
      */
     public HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
-        assert (this.isDone);
         int startIndex;
         HTInterval curInterval;
 
@@ -485,31 +483,6 @@ public abstract class HTNode {
     }
 
     /**
-     * Convert from a boolean to a byte primitive.
-     *
-     * @param thebool
-     *            The boolean to convert
-     * @return A byte worth 0 (false) or 1 (true)
-     */
-    protected static final byte boolToByte(boolean thebool) {
-        if (thebool) {
-            return (byte) 1;
-        }
-        return (byte) 0;
-    }
-
-    /**
-     * Convert from a byte primitive (0 or 1) to a boolean.
-     *
-     * @param thebyte
-     *            The byte to convert
-     * @return True if 'thebyte' is 1, false otherwise
-     */
-    protected static final boolean byteToBool(byte thebyte) {
-        return (thebyte == (byte) 1);
-    }
-
-    /**
      * @name Debugging functions
      */
 
@@ -523,7 +496,7 @@ public abstract class HTNode {
                 + "% used), ");
 
         buf.append("[" + this.nodeStart + " - ");
-        if (this.isDone) {
+        if (this.isOnDisk) {
             buf = buf.append("" + this.nodeEnd + "]");
         } else {
             buf = buf.append("...]");
