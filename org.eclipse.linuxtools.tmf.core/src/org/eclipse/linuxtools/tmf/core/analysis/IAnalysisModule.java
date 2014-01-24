@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.analysis;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
@@ -40,7 +41,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public interface IAnalysisModule {
+public interface IAnalysisModule extends ITmfComponent {
 
     // --------------------------------------------------------
     // Getters and setters
@@ -53,13 +54,6 @@ public interface IAnalysisModule {
      *            name of the module
      */
     void setName(String name);
-
-    /**
-     * Gets the name of the analysis module
-     *
-     * @return Name of the module
-     */
-    String getName();
 
     /**
      * Sets the id of the module

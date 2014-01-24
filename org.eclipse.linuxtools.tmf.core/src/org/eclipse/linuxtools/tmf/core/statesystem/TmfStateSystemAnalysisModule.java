@@ -176,6 +176,14 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         }
     }
 
+    @Override
+    public void dispose() {
+        if (fStateSystem != null) {
+            fStateSystem.dispose();
+        }
+        super.dispose();
+    }
+
     // ------------------------------------------------------------------------
     // History creation methods
     // ------------------------------------------------------------------------
@@ -323,7 +331,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         build(provider);
     }
 
-    private void dispose(boolean deleteFiles) {
+    private void disposeProvider(boolean deleteFiles) {
         ITmfStateProvider provider = fStateProvider;
         if (provider != null) {
             provider.dispose();
@@ -400,19 +408,19 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         @Override
         public void handleSuccess() {
             super.handleSuccess();
-            dispose(false);
+            disposeProvider(false);
         }
 
         @Override
         public void handleCancel() {
             super.handleCancel();
-            dispose(true);
+            disposeProvider(true);
         }
 
         @Override
         public void handleFailure() {
             super.handleFailure();
-            dispose(true);
+            disposeProvider(true);
         }
     }
 

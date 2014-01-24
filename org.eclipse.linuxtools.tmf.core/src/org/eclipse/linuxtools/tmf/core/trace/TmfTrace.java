@@ -131,13 +131,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      *
      * @since 2.0
      */
-    protected final Map<String, ITmfStateSystem> fStateSystems =
-            new LinkedHashMap<>();
+    @Deprecated
+    protected final Map<String, ITmfStateSystem> fStateSystems = new LinkedHashMap<>();
 
     private ITmfTimestampTransform fTsTransform;
 
-    private final Map<String, IAnalysisModule> fAnalysisModules =
-            new LinkedHashMap<>();
+    private final Map<String, IAnalysisModule> fAnalysisModules = new LinkedHashMap<>();
 
     private static final String SYNCHRONIZATION_FORMULA_FILE = "sync_formula"; //$NON-NLS-1$
 
@@ -392,6 +391,11 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         /* Clean up the state systems */
         for (ITmfStateSystem ss : fStateSystems.values()) {
             ss.dispose();
+        }
+
+        /* Clean up the analysis modules */
+        for (IAnalysisModule module : fAnalysisModules.values()) {
+            module.dispose();
         }
 
         super.dispose();
