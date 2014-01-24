@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson, others
+ * Copyright (c) 2012, 2014 Ericsson, others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -88,9 +89,6 @@ public class TimeGraphCombo extends Composite {
 
     /** The time viewer */
     private TimeGraphViewer fTimeGraphViewer;
-
-    /** The top-level input (children excluded) */
-    private List<? extends ITimeGraphEntry> fTopInput;
 
     /** The selection listener map */
     private final Map<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<>();
@@ -359,6 +357,7 @@ public class TimeGraphCombo extends Composite {
         final SashForm sash = new SashForm(this, SWT.NONE);
 
         fTreeViewer = new TreeViewer(sash, SWT.FULL_SELECTION | SWT.H_SCROLL);
+        fTreeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         final Tree tree = fTreeViewer.getTree();
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
@@ -696,9 +695,10 @@ public class TimeGraphCombo extends Composite {
      * @since 2.0
      */
     public void showFilterDialog() {
-        if(fTopInput != null) {
-            List<? extends ITimeGraphEntry> allElements = listAllInputs(fTopInput);
-            fFilterDialog.setInput(fTopInput.toArray(new ITimeGraphEntry[0]));
+        ITimeGraphEntry[] topInput = fTimeGraphViewer.getTimeGraphContentProvider().getElements(fTimeGraphViewer.getInput());
+        if (topInput != null) {
+            List<? extends ITimeGraphEntry> allElements = listAllInputs(Arrays.asList(topInput));
+            fFilterDialog.setInput(fTimeGraphViewer.getInput());
             fFilterDialog.setTitle(Messages.TmfTimeFilterDialog_WINDOW_TITLE);
             fFilterDialog.setMessage(Messages.TmfTimeFilterDialog_MESSAGE);
             fFilterDialog.setExpandedElements(allElements.toArray());
@@ -834,7 +834,19 @@ public class TimeGraphCombo extends Composite {
     }
 
     /**
-     * Sets the time graph provider used by this time graph combo.
+     * Sets the time graph content provider used by this time graph combo.
+     *
+     * @param timeGraphContentProvider
+     *            the time graph content provider
+     *
+     * @since 3.0
+     */
+    public void setTimeGraphContentProvider(ITimeGraphContentProvider timeGraphContentProvider) {
+        fTimeGraphViewer.setTimeGraphContentProvider(timeGraphContentProvider);
+    }
+
+    /**
+     * Sets the time graph presentation provider used by this time graph combo.
      *
      * @param timeGraphProvider the time graph provider
      */
@@ -844,12 +856,12 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Sets or clears the input for this time graph combo.
-     * The input array should only contain top-level elements.
      *
      * @param input the input of this time graph combo, or <code>null</code> if none
+     *
+     * @since 3.0
      */
-    public void setInput(ITimeGraphEntry[] input) {
-        fTopInput = new ArrayList<>(Arrays.asList(input));
+    public void setInput(Object input) {
         fFilter.setFiltered(null);
         fInhibitTreeSelection = true;
         fTreeViewer.setInput(input);
@@ -857,11 +869,21 @@ public class TimeGraphCombo extends Composite {
             listenerWrapper.selection = null;
         }
         fInhibitTreeSelection = false;
-        fTreeViewer.expandAll();
         fTreeViewer.getTree().getVerticalBar().setEnabled(false);
         fTreeViewer.getTree().getVerticalBar().setVisible(false);
         fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree()));
         fTimeGraphViewer.setInput(input);
+    }
+
+    /**
+     * Gets the input for this time graph combo.
+     *
+     * @return The input of this time graph combo, or <code>null</code> if none
+     *
+     * @since 3.0
+     */
+    public Object getInput() {
+        return fTreeViewer.getInput();
     }
 
     /**
@@ -901,8 +923,18 @@ public class TimeGraphCombo extends Composite {
      */
     public void refresh() {
         fInhibitTreeSelection = true;
+        Tree tree = fTreeViewer.getTree();
+        tree.setRedraw(false);
         fTreeViewer.refresh();
+        fTreeViewer.expandAll();
+        tree.setRedraw(true);
         fTimeGraphViewer.refresh();
+        List<TreeItem> treeItems = getVisibleExpandedItems(tree);
+        int topIndex = fTimeGraphViewer.getTopIndex();
+        if (topIndex < treeItems.size()) {
+            TreeItem treeItem = treeItems.get(topIndex);
+            tree.setTopItem(treeItem);
+        }
         fInhibitTreeSelection = false;
     }
 
