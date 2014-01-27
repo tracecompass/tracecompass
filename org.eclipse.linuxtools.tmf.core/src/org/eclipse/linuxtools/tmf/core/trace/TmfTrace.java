@@ -23,10 +23,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -136,7 +137,8 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
     private ITmfTimestampTransform fTsTransform;
 
-    private final Map<String, IAnalysisModule> fAnalysisModules = new LinkedHashMap<>();
+    private final Map<String, IAnalysisModule> fAnalysisModules =
+            Collections.synchronizedMap(new LinkedHashMap<String, IAnalysisModule>());
 
     private static final String SYNCHRONIZATION_FORMULA_FILE = "sync_formula"; //$NON-NLS-1$
 
@@ -347,30 +349,50 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      * @since 3.0
      */
     @Override
-    public final IAnalysisModule getAnalysisModule(String analysisId) {
+    public IAnalysisModule getAnalysisModule(String analysisId) {
         return fAnalysisModules.get(analysisId);
     }
 
+
     /**
      * @since 3.0
      */
     @Override
-    public <T> Map<String, T> getAnalysisModules(Class<T> moduleclass) {
-        Map<String, T> modules = new HashMap<>();
-        for (Entry<String, IAnalysisModule> entry : fAnalysisModules.entrySet()) {
-            if (moduleclass.isAssignableFrom(entry.getValue().getClass())) {
-                modules.put(entry.getKey(), moduleclass.cast(entry.getValue()));
-            }
+    public Iterable<IAnalysisModule> getAnalysisModules() {
+        synchronized (fAnalysisModules) {
+            Set<IAnalysisModule> modules = new HashSet<>(fAnalysisModules.values());
+            return modules;
         }
-        return modules;
     }
 
     /**
      * @since 3.0
      */
     @Override
-    public Map<String, IAnalysisModule> getAnalysisModules() {
-        return Collections.unmodifiableMap(fAnalysisModules);
+    public <T extends IAnalysisModule> T getAnalysisModuleOfClass(Class<T> moduleClass, String id) {
+        Iterable<T> modules = getAnalysisModulesOfClass(moduleClass);
+        for (T module : modules) {
+            if (id.equals(module.getId())) {
+                return module;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public <T> Iterable<T> getAnalysisModulesOfClass(Class<T> moduleClass) {
+        Set<T> modules = new HashSet<>();
+        synchronized (fAnalysisModules) {
+            for (Entry<String, IAnalysisModule> entry : fAnalysisModules.entrySet()) {
+                if (moduleClass.isAssignableFrom(entry.getValue().getClass())) {
+                    modules.add(moduleClass.cast(entry.getValue()));
+                }
+            }
+        }
+        return modules;
     }
 
     /**
@@ -394,8 +416,10 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         }
 
         /* Clean up the analysis modules */
-        for (IAnalysisModule module : fAnalysisModules.values()) {
-            module.dispose();
+        synchronized (fAnalysisModules) {
+            for (IAnalysisModule module : fAnalysisModules.values()) {
+                module.dispose();
+            }
         }
 
         super.dispose();

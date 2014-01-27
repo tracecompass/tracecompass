@@ -220,7 +220,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEventList(final ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
-        LttngKernelAnalysisModule module = trace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        LttngKernelAnalysisModule module = trace.getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
         if (module == null) {
             return;
         }
@@ -354,7 +354,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
 
     private void buildStatusEvents(ITmfTrace trace, ControlFlowEntry entry, IProgressMonitor monitor, long start, long end) {
         if (start < entry.getEndTime() && end > entry.getStartTime()) {
-            LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+            LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
             if (module == null) {
                 return;
             }
@@ -397,7 +397,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         if (realEnd <= realStart) {
             return null;
         }
-        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
         if (module == null) {
             return null;
         }
@@ -456,7 +456,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
             if (thread > 0) {
                 break;
             }
-            LttngKernelAnalysisModule module = trace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+            LttngKernelAnalysisModule module = trace.getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
             if (module == null) {
                 continue;
             }
@@ -514,7 +514,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
             return list;
         }
         for (ITmfTrace trace : traces) {
-            LttngKernelAnalysisModule module = trace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+            LttngKernelAnalysisModule module = trace.getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
             if (module == null) {
                 continue;
             }

@@ -20,14 +20,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -39,8 +37,8 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -172,23 +170,19 @@ public class TmfStateSystemExplorer extends TmfView {
              * We will first do all the queries for this trace, then update that
              * sub-tree in the UI thread.
              */
-            Map<String, ITmfAnalysisModuleWithStateSystems> modules = currentTrace.getAnalysisModules(ITmfAnalysisModuleWithStateSystems.class);
+            Iterable<ITmfAnalysisModuleWithStateSystems> modules = currentTrace.getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class);
             final Map<String, ITmfStateSystem> sss = new HashMap<>();
             final Map<String, List<ITmfStateInterval>> fullStates =
                     new LinkedHashMap<>();
-            for (Entry<String, ITmfAnalysisModuleWithStateSystems> entry : modules.entrySet()) {
+            for (ITmfAnalysisModuleWithStateSystems module : modules) {
                 /*
                  * FIXME: For now, this view is a way to execute and display
                  * state system. But with phase 2 of analysis API, we won't want
                  * to run state system that have not been requested. We will
                  * leave the title, but there won't be anything underneath.
                  */
-                ITmfAnalysisModuleWithStateSystems module = entry.getValue();
-                if (module instanceof IAnalysisModule) {
-                    IAnalysisModule mod = (IAnalysisModule) module;
-                    mod.schedule();
-                    mod.waitForCompletion(new NullProgressMonitor());
-                }
+                module.schedule();
+                module.waitForCompletion(new NullProgressMonitor());
                 for (ITmfStateSystem ss : module.getStateSystems()) {
                     if (ss == null) {
                         continue;
@@ -291,17 +285,17 @@ public class TmfStateSystemExplorer extends TmfView {
 
         /* For each trace... */
         for (int traceNb = 0; traceNb < traces.length; traceNb++) {
-            Map<String, ITmfAnalysisModuleWithStateSystems> modules = traces[traceNb].getAnalysisModules(ITmfAnalysisModuleWithStateSystems.class);
+            Iterable<ITmfAnalysisModuleWithStateSystems> modules = traces[traceNb].getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class);
 
             /* For each state system associated with this trace... */
             int ssNb = 0;
-            for (Entry<String, ITmfAnalysisModuleWithStateSystems> module : modules.entrySet()) {
+            for (ITmfAnalysisModuleWithStateSystems module : modules) {
 
                 /*
                  * Even though we only use the value, it just feels safer to
                  * iterate the same way as before to keep the order the same.
                  */
-                for (final ITmfStateSystem ss : module.getValue().getStateSystems()) {
+                for (final ITmfStateSystem ss : module.getStateSystems()) {
                     final int traceNb1 = traceNb;
                     final int ssNb1 = ssNb;
                     if (ss != null) {

@@ -127,7 +127,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
             return retMap;
         }
         ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
         if (module == null) {
             return retMap;
         }
@@ -188,7 +188,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
             return;
         }
         ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
         if (module == null) {
             return;
         }

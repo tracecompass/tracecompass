@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -184,8 +183,8 @@ public class TmfExperimentTest {
     @Test
     public void testGetAnalysisModules() {
         /* There should not be any modules at this point */
-        Map<String, IAnalysisModule> modules = fExperiment.getAnalysisModules();
-        assertTrue(modules.isEmpty());
+        Iterable<IAnalysisModule> modules = fExperiment.getAnalysisModules();
+        assertFalse(modules.iterator().hasNext());
     }
 
     // ------------------------------------------------------------------------

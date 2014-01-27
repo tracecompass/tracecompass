@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -24,8 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -450,21 +449,23 @@ public class TmfTraceTest {
     @Test
     public void testGetModulesByClass() {
         /* There should not be any modules at this point */
-        Map<String, IAnalysisModule> modules = fTrace.getAnalysisModules();
-        assertTrue(modules.isEmpty());
+        Iterable<IAnalysisModule> modules = fTrace.getAnalysisModules();
+        assertFalse(modules.iterator().hasNext());
 
         /* Open the trace, the modules should be populated */
         fTrace.traceOpened(new TmfTraceOpenedSignal(this, fTrace, null));
 
         modules = fTrace.getAnalysisModules();
-        Map<String, TestAnalysis> testModules = fTrace.getAnalysisModules(TestAnalysis.class);
-        assertFalse(modules.isEmpty());
-        assertFalse(testModules.isEmpty());
+        Iterable<TestAnalysis> testModules = fTrace.getAnalysisModulesOfClass(TestAnalysis.class);
+        assertTrue(modules.iterator().hasNext());
+        assertTrue(testModules.iterator().hasNext());
 
         /* Make sure all modules of type TestAnalysis are returned in the second call */
-        for (Entry<String, IAnalysisModule> module : modules.entrySet()) {
-            if (module.getValue() instanceof TestAnalysis) {
-                assertTrue(testModules.containsKey(module.getKey()));
+        for (IAnalysisModule module : modules) {
+            if (module instanceof TestAnalysis) {
+                IAnalysisModule otherModule = fTrace.getAnalysisModule(module.getId());
+                assertNotNull(otherModule);
+                assertTrue(otherModule.equals(module));
             }
         }
 

@@ -160,7 +160,9 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
             ITmfTrace trace = traceElement.getTrace();
             if (trace != null) {
                 IAnalysisModule module = trace.getAnalysisModule(fAnalysisId);
-                return module.getHelpText();
+                if (module != null) {
+                    return module.getHelpText();
+                }
             }
         }
 

@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 
 /**
  * Interface for analysis modules providing state systems.
@@ -23,7 +24,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @since 3.0
  */
 @NonNullByDefault
-public interface ITmfAnalysisModuleWithStateSystems {
+public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
 
     /**
      * Return a specific state system provided by this analysis.
