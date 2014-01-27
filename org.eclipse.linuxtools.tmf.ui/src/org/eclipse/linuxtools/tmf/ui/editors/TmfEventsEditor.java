@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -202,7 +202,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     @Override
     public void propertyChanged(final Object source, final int propId) {
         if (propId == IEditorPart.PROP_INPUT && getEditorInput() instanceof TmfEditorInput) {
-            broadcast(new TmfTraceClosedSignal(this, fTrace));
+            if (fTrace != null) {
+                broadcast(new TmfTraceClosedSignal(this, fTrace));
+            }
             fTraceSelected = false;
             fFile = ((TmfEditorInput) getEditorInput()).getFile();
             fTrace = ((TmfEditorInput) getEditorInput()).getTrace();

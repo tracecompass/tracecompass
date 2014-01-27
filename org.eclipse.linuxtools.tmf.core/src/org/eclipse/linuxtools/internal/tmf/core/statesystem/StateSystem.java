@@ -618,7 +618,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         long ts, tEnd;
 
         /* Make sure the time range makes sense */
-        if (t2 <= t1) {
+        if (t2 < t1) {
             throw new TimeRangeException();
         }
 

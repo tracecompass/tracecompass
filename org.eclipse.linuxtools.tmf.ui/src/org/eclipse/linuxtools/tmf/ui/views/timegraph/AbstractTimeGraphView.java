@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,12 +17,12 @@
 package org.eclipse.linuxtools.tmf.ui.views.timegraph;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -48,7 +48,9 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -103,7 +105,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
     /** The trace to entry list hash map */
     private final Map<ITmfTrace, List<TimeGraphEntry>> fEntryListMap = new HashMap<>();
 
-    /* The trace to build thread hash map */
+    /** The trace to build thread hash map */
     private final Map<ITmfTrace, BuildThread> fBuildThreadMap = new HashMap<>();
 
     /** The start time */
@@ -127,7 +129,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
     /** A comparator class */
     private Comparator<ITimeGraphEntry> fEntryComparator = null;
 
-    /**  The redraw state used to prevent unnecessary queuing of display runnables */
+    /** The redraw state used to prevent unnecessary queuing of display runnables */
     private State fRedrawState = State.IDLE;
 
     /** The redraw synchronization object */
@@ -147,6 +149,9 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     /** The filter column label array, or null if filter is not used */
     private String[] fFilterColumns;
+
+    /** The pack done flag */
+    private boolean fPackDone = false;
 
     /** The filter label provider, or null if filter is not used */
     private TreeLabelProvider fFilterLabelProvider;
@@ -171,7 +176,9 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
         void refresh();
 
-        void setInput(ITimeGraphEntry[] entries);
+        void setInput(Object input);
+
+        Object getInput();
 
         void redraw();
 
@@ -217,8 +224,13 @@ public abstract class AbstractTimeGraphView extends TmfView {
         }
 
         @Override
-        public void setInput(ITimeGraphEntry[] input) {
+        public void setInput(Object input) {
             viewer.setInput(input);
+        }
+
+        @Override
+        public Object getInput() {
+            return viewer.getInput();
         }
 
         @Override
@@ -275,8 +287,13 @@ public abstract class AbstractTimeGraphView extends TmfView {
         }
 
         @Override
-        public void setInput(ITimeGraphEntry[] input) {
+        public void setInput(Object input) {
             combo.setInput(input);
+        }
+
+        @Override
+        public Object getInput() {
+            return combo.getInput();
         }
 
         @Override
@@ -318,8 +335,14 @@ public abstract class AbstractTimeGraphView extends TmfView {
         }
 
         @Override
-        public Object[] getElements(Object inputElement) {
-            return (ITimeGraphEntry[]) inputElement;
+        public ITimeGraphEntry[] getElements(Object inputElement) {
+            if (inputElement != null) {
+                try {
+                    return ((List<?>) inputElement).toArray(new ITimeGraphEntry[0]);
+                } catch (ClassCastException e) {
+                }
+            }
+            return new ITimeGraphEntry[0];
         }
 
         @Override
@@ -339,6 +362,21 @@ public abstract class AbstractTimeGraphView extends TmfView {
         public boolean hasChildren(Object element) {
             ITimeGraphEntry entry = (ITimeGraphEntry) element;
             return entry.hasChildren();
+        }
+
+    }
+
+    private class TimeGraphContentProvider implements ITimeGraphContentProvider {
+
+        @Override
+        public ITimeGraphEntry[] getElements(Object inputElement) {
+            if (inputElement != null) {
+                try {
+                    return ((List<?>) inputElement).toArray(new ITimeGraphEntry[0]);
+                } catch (ClassCastException e) {
+                }
+            }
+            return new ITimeGraphEntry[0];
         }
 
     }
@@ -385,19 +423,21 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     private class BuildThread extends Thread {
         private final ITmfTrace fBuildTrace;
+        private final ITmfTrace fParentTrace;
         private final IProgressMonitor fMonitor;
 
-        public BuildThread(final ITmfTrace trace, final String name) {
+        public BuildThread(final ITmfTrace trace, final ITmfTrace parentTrace, final String name) {
             super(name + " build"); //$NON-NLS-1$
             fBuildTrace = trace;
+            fParentTrace = parentTrace;
             fMonitor = new NullProgressMonitor();
         }
 
         @Override
         public void run() {
-            buildEventList(fBuildTrace, fMonitor);
+            buildEventList(fBuildTrace, fParentTrace, fMonitor);
             synchronized (fBuildThreadMap) {
-                fBuildThreadMap.remove(this);
+                fBuildThreadMap.remove(fBuildTrace);
             }
         }
 
@@ -645,25 +685,69 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     /**
-     * Gets the entry list map
+     * Gets the entry list for a trace
+     *
+     * @param trace
+     *            the trace
      *
      * @return the entry list map
+     * @since 3.0
      */
-    protected Map<ITmfTrace, List<TimeGraphEntry>> getEntryListMap() {
-        return Collections.unmodifiableMap(fEntryListMap);
+    protected List<TimeGraphEntry> getEntryList(ITmfTrace trace) {
+        synchronized (fEntryListMap) {
+            return fEntryListMap.get(trace);
+        }
     }
 
     /**
-     * Adds an entry to the entry list
+     * Adds a trace entry list to the entry list map
      *
      * @param trace
      *            the trace to add
      * @param list
-     *            The list of time graph entries
+     *            the list of time graph entries
      */
     protected void putEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
-        synchronized(fEntryListMap) {
-            fEntryListMap.put(trace, list);
+        synchronized (fEntryListMap) {
+            fEntryListMap.put(trace, new CopyOnWriteArrayList<>(list));
+        }
+    }
+
+    /**
+     * Adds a list of entries to a trace's entry list
+     *
+     * @param trace
+     *            the trace
+     * @param list
+     *            the list of time graph entries to add
+     * @since 3.0
+     */
+    protected void addToEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
+        synchronized (fEntryListMap) {
+            List<TimeGraphEntry> entryList = fEntryListMap.get(trace);
+            if (entryList == null) {
+                fEntryListMap.put(trace, new CopyOnWriteArrayList<>(list));
+            } else {
+                entryList.addAll(list);
+            }
+        }
+    }
+
+    /**
+     * Removes a list of entries from a trace's entry list
+     *
+     * @param trace
+     *            the trace
+     * @param list
+     *            the list of time graph entries to remove
+     * @since 3.0
+     */
+    protected void removeFromEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
+        synchronized (fEntryListMap) {
+            List<TimeGraphEntry> entryList = fEntryListMap.get(trace);
+            if (entryList != null) {
+                entryList.removeAll(list);
+            }
         }
     }
 
@@ -711,6 +795,8 @@ public abstract class AbstractTimeGraphView extends TmfView {
     public void createPartControl(Composite parent) {
         if (fColumns == null || fLabelProvider == null) {
             fTimeGraphWrapper = new TimeGraphViewerWrapper(parent, SWT.NONE);
+            TimeGraphViewer viewer = fTimeGraphWrapper.getTimeGraphViewer();
+            viewer.setTimeGraphContentProvider(new TimeGraphContentProvider());
         } else {
             TimeGraphComboWrapper wrapper = new TimeGraphComboWrapper(parent, SWT.NONE);
             fTimeGraphWrapper = wrapper;
@@ -721,6 +807,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
             combo.setFilterContentProvider(new TreeContentProvider());
             combo.setFilterLabelProvider(fFilterLabelProvider);
             combo.setFilterColumns(fFilterColumns);
+            combo.setTimeGraphContentProvider(new TimeGraphContentProvider());
         }
 
         fTimeGraphWrapper.setTimeGraphProvider(fPresentation);
@@ -820,9 +907,11 @@ public abstract class AbstractTimeGraphView extends TmfView {
     @TmfSignalHandler
     public void traceClosed(final TmfTraceClosedSignal signal) {
         synchronized (fBuildThreadMap) {
-            BuildThread buildThread = fBuildThreadMap.remove(signal.getTrace());
-            if (buildThread != null) {
-                buildThread.cancel();
+            for (ITmfTrace trace : TmfTraceManager.getTraceSet(signal.getTrace())) {
+                BuildThread buildThread = fBuildThreadMap.remove(trace);
+                if (buildThread != null) {
+                    buildThread.cancel();
+                }
             }
         }
         synchronized (fEntryListMap) {
@@ -916,10 +1005,14 @@ public abstract class AbstractTimeGraphView extends TmfView {
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
             if (fEntryList == null) {
+                setStartTime(Long.MAX_VALUE);
+                setEndTime(Long.MIN_VALUE);
                 synchronized (fBuildThreadMap) {
-                    BuildThread buildThread = new BuildThread(fTrace, getName());
-                    fBuildThreadMap.put(fTrace, buildThread);
-                    buildThread.start();
+                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
+                        BuildThread buildThread = new BuildThread(trace, fTrace, getName());
+                        fBuildThreadMap.put(trace, buildThread);
+                        buildThread.start();
+                    }
                 }
             } else {
                 fStartTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
@@ -947,10 +1040,13 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *
      * @param trace
      *            The trace being built
+     * @param parentTrace
+     *            The parent of the trace set, or the trace itself
      * @param monitor
      *            The progress monitor object
+     * @since 3.0
      */
-    protected abstract void buildEventList(final ITmfTrace trace, IProgressMonitor monitor);
+    protected abstract void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor);
 
     /**
      * Gets the list of event for an entry in a given timerange
@@ -1002,18 +1098,24 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 if (fTimeGraphWrapper.isDisposed()) {
                     return;
                 }
-                ITimeGraphEntry[] entries = null;
+                boolean hasEntries = false;
                 synchronized (fEntryListMap) {
                     fEntryList = fEntryListMap.get(fTrace);
                     if (fEntryList == null) {
-                        fEntryList = new ArrayList<>();
+                        fEntryList = new CopyOnWriteArrayList<>();
+                    } else if (fEntryComparator != null) {
+                        List<TimeGraphEntry> list = new ArrayList<>(fEntryList);
+                        Collections.sort(list, fEntryComparator);
+                        fEntryList.clear();
+                        fEntryList.addAll(list);
                     }
-                    entries = fEntryList.toArray(new ITimeGraphEntry[0]);
+                    hasEntries = fEntryList.size() != 0;
                 }
-                if (fEntryComparator != null) {
-                    Arrays.sort(entries, fEntryComparator);
+                if (fEntryList != fTimeGraphWrapper.getInput()) {
+                    fTimeGraphWrapper.setInput(fEntryList);
+                } else {
+                    fTimeGraphWrapper.refresh();
                 }
-                fTimeGraphWrapper.setInput(entries);
                 fTimeGraphWrapper.getTimeGraphViewer().setTimeBounds(fStartTime, fEndTime);
 
                 long selectionBeginTime = fTrace == null ? 0 : fTraceManager.getSelectionBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
@@ -1025,9 +1127,12 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 fTimeGraphWrapper.getTimeGraphViewer().setSelectionRange(selectionBeginTime, selectionEndTime);
                 fTimeGraphWrapper.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
 
-                if (fTimeGraphWrapper instanceof TimeGraphComboWrapper) {
+                if (fTimeGraphWrapper instanceof TimeGraphComboWrapper && !fPackDone) {
                     for (TreeColumn column : ((TimeGraphComboWrapper) fTimeGraphWrapper).getTreeViewer().getTree().getColumns()) {
                         column.pack();
+                    }
+                    if (hasEntries) {
+                        fPackDone = true;
                     }
                 }
 

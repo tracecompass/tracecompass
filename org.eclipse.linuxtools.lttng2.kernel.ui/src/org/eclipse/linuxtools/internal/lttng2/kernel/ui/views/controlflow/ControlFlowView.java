@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,19 +14,18 @@
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.linuxtools.lttng2.kernel.ui.analysis.LttngKernelAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
@@ -81,6 +80,9 @@ public class ControlFlowView extends AbstractTimeGraphView {
             PROCESS_COLUMN,
             TID_COLUMN
     };
+
+    // Timeout between updates in the build thread in ms
+    private static final long BUILD_UPDATE_TIMEOUT = 500;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -217,161 +219,169 @@ public class ControlFlowView extends AbstractTimeGraphView {
     // ------------------------------------------------------------------------
 
     @Override
-    protected void buildEventList(final ITmfTrace trace, IProgressMonitor monitor) {
-        setStartTime(Long.MAX_VALUE);
-        setEndTime(Long.MIN_VALUE);
+    protected void buildEventList(final ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
+        LttngKernelAnalysisModule module = trace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        if (module == null) {
+            return;
+        }
+        module.schedule();
+        module.waitForInitialization();
+        ITmfStateSystem ssq = module.getStateSystem();
+        if (ssq == null) {
+            return;
+        }
 
-        ArrayList<ControlFlowEntry> rootList = new ArrayList<>();
-        for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
+        List<ControlFlowEntry> entryList = new ArrayList<>();
+        Map<Integer, ControlFlowEntry> entryMap = new HashMap<>();
+
+        long start = ssq.getStartTime();
+        setStartTime(Math.min(getStartTime(), start));
+
+        boolean complete = false;
+        while (!complete) {
             if (monitor.isCanceled()) {
                 return;
             }
-            if (aTrace instanceof LttngKernelTrace) {
-                ArrayList<ControlFlowEntry> entryList = new ArrayList<>();
-                LttngKernelTrace ctfKernelTrace = (LttngKernelTrace) aTrace;
-                LttngKernelAnalysisModule module = ctfKernelTrace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
-                module.schedule();
-                if (!module.waitForCompletion(new NullProgressMonitor())) {
+            complete = ssq.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
+            if (ssq.isCancelled()) {
+                return;
+            }
+            long end = ssq.getCurrentEndTime();
+            if (start == end && !complete) { // when complete execute one last time regardless of end time
+                continue;
+            }
+            setEndTime(Math.max(getEndTime(), end + 1));
+            List<Integer> threadQuarks = ssq.getQuarks(Attributes.THREADS, "*"); //$NON-NLS-1$
+            for (int threadQuark : threadQuarks) {
+                if (monitor.isCanceled()) {
+                    return;
+                }
+                String threadName = ssq.getAttributeName(threadQuark);
+                int threadId = -1;
+                try {
+                    threadId = Integer.parseInt(threadName);
+                } catch (NumberFormatException e1) {
                     continue;
                 }
-                ITmfStateSystem ssq = module.getStateSystem();
-                if (ssq == null) {
+                if (threadId <= 0) { // ignore the 'unknown' (-1) and swapper (0) threads
                     continue;
                 }
-                ssq.waitUntilBuilt();
-                if (ssq.isCancelled()) {
-                    continue;
-                }
-                long start = ssq.getStartTime();
-                long end = ssq.getCurrentEndTime() + 1;
-                setStartTime(Math.min(getStartTime(), start));
-                setEndTime(Math.max(getEndTime(), end));
-                List<Integer> threadQuarks = ssq.getQuarks(Attributes.THREADS, "*"); //$NON-NLS-1$
-                for (int threadQuark : threadQuarks) {
-                    if (monitor.isCanceled()) {
-                        return;
-                    }
-                    String threadName = ssq.getAttributeName(threadQuark);
-                    int threadId = -1;
-                    try {
-                        threadId = Integer.parseInt(threadName);
-                    } catch (NumberFormatException e1) {
-                        continue;
-                    }
-                    if (threadId == 0) { // ignore the swapper thread
-                        continue;
-                    }
-                    int execNameQuark = -1;
-                    try {
-                        try {
-                            execNameQuark = ssq.getQuarkRelative(threadQuark, Attributes.EXEC_NAME);
-                        } catch (AttributeNotFoundException e) {
-                            continue;
-                        }
-                        int ppidQuark = ssq.getQuarkRelative(threadQuark, Attributes.PPID);
-                        List<ITmfStateInterval> execNameIntervals = ssq.queryHistoryRange(execNameQuark, start, end - 1);
-                        // use monitor when available in api
+                try {
+                    int execNameQuark = ssq.getQuarkRelative(threadQuark, Attributes.EXEC_NAME);
+                    List<ITmfStateInterval> execNameIntervals = ssq.queryHistoryRange(execNameQuark, start, end);
+                    for (ITmfStateInterval execNameInterval : execNameIntervals) {
                         if (monitor.isCanceled()) {
                             return;
                         }
-                        ControlFlowEntry entry = null;
-                        for (ITmfStateInterval execNameInterval : execNameIntervals) {
-                            if (monitor.isCanceled()) {
-                                return;
-                            }
-                            if (!execNameInterval.getStateValue().isNull() &&
-                                    execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
-                                String execName = execNameInterval.getStateValue().unboxStr();
-                                long startTime = execNameInterval.getStartTime();
-                                long endTime = execNameInterval.getEndTime() + 1;
+                        ControlFlowEntry entry = entryMap.get(threadId);
+                        if (!execNameInterval.getStateValue().isNull() &&
+                                execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
+                            String execName = execNameInterval.getStateValue().unboxStr();
+                            long startTime = execNameInterval.getStartTime();
+                            long endTime = execNameInterval.getEndTime() + 1;
+                            if (entry == null) {
                                 int ppid = -1;
-                                if (ppidQuark != -1) {
-                                    ITmfStateInterval ppidInterval = ssq.querySingleState(startTime, ppidQuark);
+                                int ppidQuark = ssq.getQuarkRelative(threadQuark, Attributes.PPID);
+                                ITmfStateInterval ppidInterval = ssq.querySingleState(startTime, ppidQuark);
+                                if (!ppidInterval.getStateValue().isNull()) {
                                     ppid = ppidInterval.getStateValue().unboxInt();
                                 }
-                                if (entry == null) {
-                                    entry = new ControlFlowEntry(threadQuark, ctfKernelTrace, execName, threadId, ppid, startTime, endTime);
-                                    entryList.add(entry);
-                                } else {
-                                    // update the name of the entry to the
-                                    // latest execName
-                                    entry.setName(execName);
-                                }
-                                entry.addEvent(new TimeEvent(entry, startTime, endTime - startTime));
+                                entry = new ControlFlowEntry(threadQuark, trace, execName, threadId, ppid, startTime, endTime);
+                                entryList.add(entry);
+                                entryMap.put(threadId, entry);
                             } else {
-                                entry = null;
+                                // update the name of the entry to the latest execName
+                                entry.setName(execName);
+                                entry.updateEndTime(endTime);
                             }
+                        } else {
+                            entryMap.remove(threadId);
                         }
-                    } catch (AttributeNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (TimeRangeException e) {
-                        e.printStackTrace();
-                    } catch (StateValueTypeException e) {
-                        e.printStackTrace();
-                    } catch (StateSystemDisposedException e) {
-                        /* Ignored */
                     }
+                } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+                    e.printStackTrace();
+                } catch (StateSystemDisposedException e) {
+                    /* Ignored */
                 }
-                buildTree(entryList, rootList);
             }
-            Collections.sort(rootList, getEntryComparator());
-            putEntryList(trace, new ArrayList<TimeGraphEntry>(rootList));
 
-            if (trace.equals(getTrace())) {
+            updateTree(entryList, parentTrace);
+
+            if (parentTrace.equals(getTrace())) {
                 refresh();
             }
-        }
-        for (ControlFlowEntry entry : rootList) {
-            if (monitor.isCanceled()) {
-                return;
+
+            for (ControlFlowEntry entry : entryList) {
+                if (monitor.isCanceled()) {
+                    return;
+                }
+                buildStatusEvents(entry.getTrace(), entry, monitor, start, end);
             }
-            buildStatusEvents(entry.getTrace(), entry, monitor);
+
+            start = end;
         }
     }
 
-    private static void buildTree(ArrayList<ControlFlowEntry> entryList,
-            ArrayList<ControlFlowEntry> rootList) {
+    private void updateTree(List<ControlFlowEntry> entryList, ITmfTrace parentTrace) {
+        List<TimeGraphEntry> rootListToAdd = new ArrayList<>();
+        List<TimeGraphEntry> rootListToRemove = new ArrayList<>();
+        List<TimeGraphEntry> rootList = getEntryList(parentTrace);
+
         for (ControlFlowEntry entry : entryList) {
-            boolean root = true;
-            if (entry.getParentThreadId() > 0) {
+            boolean root = (entry.getParent() == null);
+            if (root && entry.getParentThreadId() > 0) {
                 for (ControlFlowEntry parent : entryList) {
                     if (parent.getThreadId() == entry.getParentThreadId() &&
                             entry.getStartTime() >= parent.getStartTime() &&
                             entry.getStartTime() <= parent.getEndTime()) {
                         parent.addChild(entry);
                         root = false;
+                        if (rootList != null && rootList.contains(entry)) {
+                            rootListToRemove.add(entry);
+                        }
                         break;
                     }
                 }
             }
-            if (root) {
-                rootList.add(entry);
+            if (root && (rootList == null || !rootList.contains(entry))) {
+                rootListToAdd.add(entry);
             }
         }
+
+        addToEntryList(parentTrace, rootListToAdd);
+        removeFromEntryList(parentTrace, rootListToRemove);
     }
 
-    private void buildStatusEvents(ITmfTrace trace, ControlFlowEntry entry, IProgressMonitor monitor) {
-        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
-        ITmfStateSystem ssq = module.getStateSystem();
-        if (ssq == null) {
-            return;
-        }
-        long start = ssq.getStartTime();
-        long end = ssq.getCurrentEndTime() + 1;
-        long resolution = Math.max(1, (end - start) / getDisplayWidth());
-        List<ITimeEvent> eventList = getEventList(entry, entry.getStartTime(), entry.getEndTime(), resolution, monitor);
-        if (monitor.isCanceled()) {
-            return;
-        }
-        entry.setEventList(eventList);
-        if (trace.equals(getTrace())) {
-            redraw();
+    private void buildStatusEvents(ITmfTrace trace, ControlFlowEntry entry, IProgressMonitor monitor, long start, long end) {
+        if (start < entry.getEndTime() && end > entry.getStartTime()) {
+            LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+            if (module == null) {
+                return;
+            }
+            ITmfStateSystem ssq = module.getStateSystem();
+            if (ssq == null) {
+                return;
+            }
+
+            long startTime = Math.max(start, entry.getStartTime());
+            long endTime = Math.min(end + 1, entry.getEndTime());
+            long resolution = Math.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
+            List<ITimeEvent> eventList = getEventList(entry, startTime, endTime, resolution, monitor);
+            if (monitor.isCanceled()) {
+                return;
+            }
+            for (ITimeEvent event : eventList) {
+                entry.addEvent(event);
+            }
+            if (trace.equals(getTrace())) {
+                redraw();
+            }
         }
         for (ITimeGraphEntry child : entry.getChildren()) {
             if (monitor.isCanceled()) {
                 return;
             }
-            buildStatusEvents(trace, (ControlFlowEntry) child, monitor);
+            buildStatusEvents(trace, (ControlFlowEntry) child, monitor, start, end);
         }
     }
 
@@ -388,6 +398,9 @@ public class ControlFlowView extends AbstractTimeGraphView {
             return null;
         }
         LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        if (module == null) {
+            return null;
+        }
         ITmfStateSystem ssq = module.getStateSystem();
         if (ssq == null) {
             return null;
@@ -415,9 +428,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 eventList.add(new TimeEvent(entry, time, duration, status));
                 lastEndTime = time + duration;
             }
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
-        } catch (TimeRangeException e) {
+        } catch (AttributeNotFoundException | TimeRangeException e) {
             e.printStackTrace();
         } catch (StateSystemDisposedException e) {
             /* Ignored */
@@ -428,8 +439,8 @@ public class ControlFlowView extends AbstractTimeGraphView {
     /**
      * Returns a value corresponding to the selected entry.
      *
-     * Used in conjunction with selectEntry to change the selected entry. If one
-     * of these methods is overridden in child class, then both should be.
+     * Used in conjunction with synchingToTime to change the selected entry. If
+     * one of these methods is overridden in child class, then both should be.
      *
      * @param time
      *            The currently selected time
@@ -437,40 +448,40 @@ public class ControlFlowView extends AbstractTimeGraphView {
      */
     private int getSelectionValue(long time) {
         int thread = -1;
-        for (ITmfTrace trace : fTraceManager.getActiveTraceSet()) {
+        ITmfTrace[] traces = TmfTraceManager.getTraceSet(getTrace());
+        if (traces == null) {
+            return thread;
+        }
+        for (ITmfTrace trace : traces) {
             if (thread > 0) {
                 break;
             }
-            if (trace instanceof LttngKernelTrace) {
-                LttngKernelTrace ctfKernelTrace = (LttngKernelTrace) trace;
-                LttngKernelAnalysisModule module = ctfKernelTrace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
-                ITmfStateSystem ssq = module.getStateSystem();
-                if (ssq == null) {
-                    continue;
-                }
-                if (time >= ssq.getStartTime() && time <= ssq.getCurrentEndTime()) {
-                    List<Integer> currentThreadQuarks = ssq.getQuarks(Attributes.CPUS, "*", Attributes.CURRENT_THREAD); //$NON-NLS-1$
-                    for (int currentThreadQuark : currentThreadQuarks) {
-                        try {
-                            ITmfStateInterval currentThreadInterval = ssq.querySingleState(time, currentThreadQuark);
-                            int currentThread = currentThreadInterval.getStateValue().unboxInt();
-                            if (currentThread > 0) {
-                                int statusQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThread), Attributes.STATUS);
-                                ITmfStateInterval statusInterval = ssq.querySingleState(time, statusQuark);
-                                if (statusInterval.getStartTime() == time) {
-                                    thread = currentThread;
-                                    break;
-                                }
+            LttngKernelAnalysisModule module = trace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+            if (module == null) {
+                continue;
+            }
+            ITmfStateSystem ssq = module.getStateSystem();
+            if (ssq == null) {
+                continue;
+            }
+            if (time >= ssq.getStartTime() && time <= ssq.getCurrentEndTime()) {
+                List<Integer> currentThreadQuarks = ssq.getQuarks(Attributes.CPUS, "*", Attributes.CURRENT_THREAD); //$NON-NLS-1$
+                for (int currentThreadQuark : currentThreadQuarks) {
+                    try {
+                        ITmfStateInterval currentThreadInterval = ssq.querySingleState(time, currentThreadQuark);
+                        int currentThread = currentThreadInterval.getStateValue().unboxInt();
+                        if (currentThread > 0) {
+                            int statusQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThread), Attributes.STATUS);
+                            ITmfStateInterval statusInterval = ssq.querySingleState(time, statusQuark);
+                            if (statusInterval.getStartTime() == time) {
+                                thread = currentThread;
+                                break;
                             }
-                        } catch (AttributeNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (TimeRangeException e) {
-                            e.printStackTrace();
-                        } catch (StateValueTypeException e) {
-                            e.printStackTrace();
-                        } catch (StateSystemDisposedException e) {
-                            /* Ignored */
                         }
+                    } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+                        e.printStackTrace();
+                    } catch (StateSystemDisposedException e) {
+                        /* Ignored */
                     }
                 }
             }
@@ -498,64 +509,61 @@ public class ControlFlowView extends AbstractTimeGraphView {
     protected List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         List<ILinkEvent> list = new ArrayList<>();
         ITmfTrace[] traces = TmfTraceManager.getTraceSet(getTrace());
-        List<TimeGraphEntry> entryList = getEntryListMap().get(getTrace());
+        List<TimeGraphEntry> entryList = getEntryList(getTrace());
         if (traces == null || entryList == null) {
             return list;
         }
         for (ITmfTrace trace : traces) {
-            if (trace instanceof LttngKernelTrace) {
-                LttngKernelAnalysisModule module = trace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
-                ITmfStateSystem ssq = module.getStateSystem();
-                if (ssq == null) {
+            LttngKernelAnalysisModule module = trace.getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+            if (module == null) {
+                continue;
+            }
+            ITmfStateSystem ssq = module.getStateSystem();
+            if (ssq == null) {
+                continue;
+            }
+            try {
+                long start = Math.max(startTime, ssq.getStartTime());
+                long end = Math.min(endTime, ssq.getCurrentEndTime());
+                if (end < start) {
                     continue;
                 }
-                try {
-                    long start = Math.max(startTime, ssq.getStartTime());
-                    long end = Math.min(endTime, ssq.getCurrentEndTime());
-                    if (end < start) {
-                        continue;
-                    }
-                    List<Integer> currentThreadQuarks = ssq.getQuarks(Attributes.CPUS, "*", Attributes.CURRENT_THREAD); //$NON-NLS-1$
-                    for (int currentThreadQuark : currentThreadQuarks) {
-                        // adjust the query range to include the previous and following intervals
-                        long qstart = Math.max(ssq.querySingleState(start, currentThreadQuark).getStartTime() - 1, ssq.getStartTime());
-                        long qend = Math.min(ssq.querySingleState(end, currentThreadQuark).getEndTime() + 1, ssq.getCurrentEndTime());
-                        List<ITmfStateInterval> currentThreadIntervals = ssq.queryHistoryRange(currentThreadQuark, qstart, qend, resolution, monitor);
-                        int prevThread = 0;
-                        long prevEnd = 0;
-                        long lastEnd = 0;
-                        for (ITmfStateInterval currentThreadInterval : currentThreadIntervals) {
-                            if (monitor.isCanceled()) {
-                                return null;
-                            }
-                            long time = currentThreadInterval.getStartTime();
-                            if (time != lastEnd) {
-                                // don't create links where there are gaps in intervals due to the resolution
-                                prevThread = 0;
-                                prevEnd = 0;
-                            }
-                            int thread = currentThreadInterval.getStateValue().unboxInt();
-                            if (thread > 0 && prevThread > 0) {
-                                ITimeGraphEntry prevEntry = findEntry(entryList, trace, prevThread);
-                                ITimeGraphEntry nextEntry = findEntry(entryList, trace, thread);
-                                list.add(new TimeLinkEvent(prevEntry, nextEntry, prevEnd, time - prevEnd, 0));
-                            }
-                            lastEnd = currentThreadInterval.getEndTime() + 1;
-                            if (thread != 0) {
-                                prevThread = thread;
-                                prevEnd = lastEnd;
-                            }
+                List<Integer> currentThreadQuarks = ssq.getQuarks(Attributes.CPUS, "*", Attributes.CURRENT_THREAD); //$NON-NLS-1$
+                for (int currentThreadQuark : currentThreadQuarks) {
+                    // adjust the query range to include the previous and following intervals
+                    long qstart = Math.max(ssq.querySingleState(start, currentThreadQuark).getStartTime() - 1, ssq.getStartTime());
+                    long qend = Math.min(ssq.querySingleState(end, currentThreadQuark).getEndTime() + 1, ssq.getCurrentEndTime());
+                    List<ITmfStateInterval> currentThreadIntervals = ssq.queryHistoryRange(currentThreadQuark, qstart, qend, resolution, monitor);
+                    int prevThread = 0;
+                    long prevEnd = 0;
+                    long lastEnd = 0;
+                    for (ITmfStateInterval currentThreadInterval : currentThreadIntervals) {
+                        if (monitor.isCanceled()) {
+                            return null;
+                        }
+                        long time = currentThreadInterval.getStartTime();
+                        if (time != lastEnd) {
+                            // don't create links where there are gaps in intervals due to the resolution
+                            prevThread = 0;
+                            prevEnd = 0;
+                        }
+                        int thread = currentThreadInterval.getStateValue().unboxInt();
+                        if (thread > 0 && prevThread > 0) {
+                            ITimeGraphEntry prevEntry = findEntry(entryList, trace, prevThread);
+                            ITimeGraphEntry nextEntry = findEntry(entryList, trace, thread);
+                            list.add(new TimeLinkEvent(prevEntry, nextEntry, prevEnd, time - prevEnd, 0));
+                        }
+                        lastEnd = currentThreadInterval.getEndTime() + 1;
+                        if (thread != 0) {
+                            prevThread = thread;
+                            prevEnd = lastEnd;
                         }
                     }
-                } catch (TimeRangeException e) {
-                    e.printStackTrace();
-                } catch (AttributeNotFoundException e) {
-                    e.printStackTrace();
-                } catch (StateValueTypeException e) {
-                    e.printStackTrace();
-                } catch (StateSystemDisposedException e) {
-                    /* Ignored */
                 }
+            } catch (TimeRangeException | AttributeNotFoundException | StateValueTypeException e) {
+                e.printStackTrace();
+            } catch (StateSystemDisposedException e) {
+                /* Ignored */
             }
         }
         return list;

@@ -13,7 +13,7 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
@@ -36,7 +36,7 @@ public class ResourcesEntry extends TimeGraphEntry {
     }
 
     private final int fId;
-    private final LttngKernelTrace fTrace;
+    private final ITmfTrace fTrace;
     private final Type fType;
     private final int fQuark;
 
@@ -58,7 +58,7 @@ public class ResourcesEntry extends TimeGraphEntry {
      * @param id
      *            The id of this entry
      */
-    public ResourcesEntry(int quark, LttngKernelTrace trace, String name, long startTime, long endTime, Type type, int id) {
+    public ResourcesEntry(int quark, ITmfTrace trace, String name, long startTime, long endTime, Type type, int id) {
         super(name, startTime, endTime);
         fId = id;
         fTrace = trace;
@@ -80,7 +80,7 @@ public class ResourcesEntry extends TimeGraphEntry {
      * @param id
      *            The id of this entry
      */
-    public ResourcesEntry(LttngKernelTrace trace, String name, long startTime, long endTime, int id) {
+    public ResourcesEntry(ITmfTrace trace, String name, long startTime, long endTime, int id) {
         this(-1, trace, name, startTime, endTime, Type.NULL, id);
     }
 
@@ -100,7 +100,7 @@ public class ResourcesEntry extends TimeGraphEntry {
      * @param id
      *            The id of this entry
      */
-    public ResourcesEntry(int quark, LttngKernelTrace trace, long startTime, long endTime, Type type, int id) {
+    public ResourcesEntry(int quark, ITmfTrace trace, long startTime, long endTime, Type type, int id) {
         this(quark, trace, type.toString() + " " + id, startTime, endTime, type, id); //$NON-NLS-1$
     }
 
@@ -114,11 +114,11 @@ public class ResourcesEntry extends TimeGraphEntry {
     }
 
     /**
-     * Get the entry's kernel trace
+     * Get the entry's trace
      *
-     * @return the entry's kernel trace
+     * @return the entry's trace
      */
-    public LttngKernelTrace getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

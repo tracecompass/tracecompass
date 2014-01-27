@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,7 +13,7 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
  */
 public class ControlFlowEntry extends TimeGraphEntry {
 
-    private final LttngKernelTrace fTrace;
+    private final ITmfTrace fTrace;
     private final int fThreadId;
     private final int fParentThreadId;
     private final int fThreadQuark;
@@ -44,7 +44,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @param endTime
      *            The end time of this process
      */
-    public ControlFlowEntry(int quark, LttngKernelTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
+    public ControlFlowEntry(int quark, ITmfTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
         super(execName, startTime, endTime);
         fTrace = trace;
         fThreadId = threadId;
@@ -62,11 +62,11 @@ public class ControlFlowEntry extends TimeGraphEntry {
     }
 
     /**
-     * Get the entry's kernel trace
+     * Get the entry's trace
      *
-     * @return the entry's kernel trace
+     * @return the entry's trace
      */
-    public LttngKernelTrace getTrace() {
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

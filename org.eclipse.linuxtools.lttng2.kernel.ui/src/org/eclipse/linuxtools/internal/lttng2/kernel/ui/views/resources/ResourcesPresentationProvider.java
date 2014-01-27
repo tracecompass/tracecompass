@@ -158,6 +158,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
             if (tcEvent.hasValue()) {
                 LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+                if (module == null) {
+                    return retMap;
+                }
                 ITmfStateSystem ss = module.getStateSystem();
                 if (ss == null) {
                     return retMap;
@@ -288,6 +291,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         }
 
         LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModules(LttngKernelAnalysisModule.class).get(LttngKernelAnalysisModule.ID);
+        if (module == null) {
+            return;
+        }
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
             return;
