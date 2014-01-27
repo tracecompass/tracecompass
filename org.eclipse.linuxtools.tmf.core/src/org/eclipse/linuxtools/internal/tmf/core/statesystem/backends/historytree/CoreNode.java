@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A Core node is a first-level node of a History Tree which is not a leaf node.
@@ -40,7 +41,13 @@ public class CoreNode extends HTNode {
     private long[] childStart;
 
     /** Seq number of this node's extension. -1 if none */
-    private int extension = -1;
+    private volatile int extension = -1;
+
+    /**
+     * Lock used to gate the accesses to the children arrays. Meant to be a
+     * different lock from the one in {@link HTNode}.
+     */
+    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(false);
 
     /**
      * Initial constructor. Use this to initialize a new EMPTY node.
@@ -71,7 +78,7 @@ public class CoreNode extends HTNode {
     }
 
     @Override
-    public void readSpecificHeader(ByteBuffer buffer) {
+    protected void readSpecificHeader(ByteBuffer buffer) {
         int size = getConfig().getMaxChildren();
 
         extension = buffer.getInt();
@@ -95,7 +102,7 @@ public class CoreNode extends HTNode {
     }
 
     @Override
-    public void writeSpecificHeader(ByteBuffer buffer) {
+    protected void writeSpecificHeader(ByteBuffer buffer) {
         int size = getConfig().getMaxChildren();
 
         buffer.putInt(extension);
@@ -124,7 +131,10 @@ public class CoreNode extends HTNode {
      * @return The number of child nodes
      */
     public int getNbChildren() {
-        return nbChildren;
+        rwl.readLock().lock();
+        int ret = nbChildren;
+        rwl.readLock().unlock();
+        return ret;
     }
 
     /**
@@ -134,7 +144,12 @@ public class CoreNode extends HTNode {
      * @return The child node
      */
     public int getChild(int index) {
-        return children[index];
+        rwl.readLock().lock();
+        try {
+            return children[index];
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
@@ -143,7 +158,12 @@ public class CoreNode extends HTNode {
      * @return The latest child node
      */
     public int getLatestChild() {
-        return children[nbChildren - 1];
+        rwl.readLock().lock();
+        try {
+            return children[nbChildren - 1];
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
@@ -154,7 +174,12 @@ public class CoreNode extends HTNode {
      * @return The start time of the that child node.
      */
     public long getChildStart(int index) {
-        return childStart[index];
+        rwl.readLock().lock();
+        try {
+            return childStart[index];
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
@@ -163,7 +188,12 @@ public class CoreNode extends HTNode {
      * @return The start time of the latest child
      */
     public long getLatestChildStart() {
-        return childStart[nbChildren - 1];
+        rwl.readLock().lock();
+        try {
+            return childStart[nbChildren - 1];
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     /**
@@ -183,11 +213,17 @@ public class CoreNode extends HTNode {
      *            The SHTNode object of the new child
      */
     public void linkNewChild(CoreNode childNode) {
-        assert (this.nbChildren < getConfig().getMaxChildren());
+        rwl.writeLock().lock();
+        try {
+            assert (nbChildren < getConfig().getMaxChildren());
 
-        this.children[nbChildren] = childNode.getSequenceNumber();
-        this.childStart[nbChildren] = childNode.getNodeStart();
-        this.nbChildren++;
+            children[nbChildren] = childNode.getSequenceNumber();
+            childStart[nbChildren] = childNode.getNodeStart();
+            nbChildren++;
+
+        } finally {
+            rwl.writeLock().unlock();
+        }
     }
 
     @Override
@@ -196,7 +232,7 @@ public class CoreNode extends HTNode {
     }
 
     @Override
-    public int getTotalHeaderSize() {
+    protected int getSpecificHeaderSize() {
         int maxChildren = getConfig().getMaxChildren();
         int specificSize =
                   SIZE_INT /* 1x int (extension node) */
@@ -208,7 +244,7 @@ public class CoreNode extends HTNode {
                 /* MAX_NB * Timevalue ('childStart' table) */
                 + SIZE_LONG * maxChildren;
 
-        return COMMON_HEADER_SIZE + specificSize;
+        return specificSize;
     }
 
     @Override
