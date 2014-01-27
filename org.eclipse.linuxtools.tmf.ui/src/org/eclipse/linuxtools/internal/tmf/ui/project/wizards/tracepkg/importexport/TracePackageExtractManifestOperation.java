@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -65,9 +65,6 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
 
     private static final String SCHEMA_FOLDER_NAME = "schema"; //$NON-NLS-1$
     private static final String EXPORT_MANIFEST_SCHEMA_FILE_NAME = "export-manifest.xsd"; //$NON-NLS-1$
-
-    // Result of reading the manifest
-    private TracePackageElement[] fResultElements;
 
     /**
      * Constructs a new import operation for reading the manifest
@@ -135,7 +132,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 }
             }
 
-            fResultElements = elements;
+            setResultElements(elements);
 
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
@@ -165,15 +162,6 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
         }
 
         return packageElements.toArray(new TracePackageElement[] {});
-    }
-
-    /**
-     * Get the resulting element from extracting the manifest from the archive
-     *
-     * @return the resulting element
-     */
-    public TracePackageElement[] getResultElement() {
-        return fResultElements;
     }
 
     private static void validateManifest(InputStream xml) throws IOException

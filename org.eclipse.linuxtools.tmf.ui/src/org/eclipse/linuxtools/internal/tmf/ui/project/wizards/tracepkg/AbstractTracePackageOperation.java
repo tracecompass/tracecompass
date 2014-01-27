@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -35,6 +35,9 @@ import org.eclipse.ui.internal.wizards.datatransfer.TarFile;
 @SuppressWarnings("restriction")
 abstract public class AbstractTracePackageOperation {
     private IStatus fStatus;
+    // Result of this operation, if any
+    private TracePackageElement[] fResultElements;
+
     private final String fFileName;
 
     /**
@@ -64,6 +67,27 @@ abstract public class AbstractTracePackageOperation {
      */
     public IStatus getStatus() {
         return fStatus;
+    }
+
+    /**
+     * Get the resulting elements for this operation, if any
+     *
+     * @return the resulting elements or null if no result is produced by this
+     *         operation
+     */
+    public TracePackageElement[] getResultElements() {
+        return fResultElements;
+    }
+
+    /**
+     * Set the resulting elements for this operation, if any
+     *
+     * @param elements
+     *            the resulting elements produced by this operation, can be set
+     *            to null
+     */
+    public void setResultElements(TracePackageElement[] elements) {
+        fResultElements = elements;
     }
 
     /**
