@@ -76,7 +76,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
 
     private int fRequestPendingCounter = 0;
 
-    private final Timer fTimer;
+    private Timer fTimer;
 
     private boolean fIsTimeout = false;
 
@@ -90,7 +90,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     public TmfEventProvider() {
         super();
         fExecutor = new TmfRequestExecutor();
-        fTimer = new Timer();
     }
 
     /**
@@ -120,6 +119,11 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         fExecutor.init();
 
         fSignalDepth = 0;
+
+        synchronized (fLock) {
+             fTimer = new Timer();
+        }
+
         TmfProviderManager.register(fType, this);
     }
 
@@ -127,6 +131,12 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     public void dispose() {
         TmfProviderManager.deregister(fType, this);
         fExecutor.stop();
+        synchronized (fLock) {
+            if (fTimer != null) {
+                fTimer.cancel();
+            }
+            fTimer = null;
+        }
         super.dispose();
     }
 
@@ -159,6 +169,14 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                 } else {
                     queueRequest(request);
                 }
+                return;
+            }
+
+            /*
+             * Dispatch request in case timer is not running.
+             */
+            if (fTimer == null) {
+                queueRequest(request);
                 return;
             }
 
