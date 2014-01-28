@@ -26,6 +26,8 @@
 
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties" />
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
+    <!-- Different location in more recent versions of Mylyn (Luna ?) -->
+    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/ant/tasks.properties" />
 
     <target name="build" description="Generate Eclipse help content for the Linux Tools Trace Viewer User Guide">
         <wikitext-to-eclipse-help markupLanguage="MediaWiki"
