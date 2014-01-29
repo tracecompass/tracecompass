@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -31,6 +33,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.osgi.util.NLS;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -90,15 +95,15 @@ public class XmlUtils {
         } catch (SAXParseException e) {
             String error = NLS.bind(Messages.XmlUtils_XmlParseError, e.getLineNumber(), e.getLocalizedMessage());
             Activator.logError(error);
-            return new Status(IStatus.ERROR,  Activator.PLUGIN_ID, error, e);
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         } catch (SAXException e) {
             String error = NLS.bind(Messages.XmlUtils_XmlValidationError, e.getLocalizedMessage());
             Activator.logError(error);
-            return new Status(IStatus.ERROR,  Activator.PLUGIN_ID, error, e);
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         } catch (IOException e) {
             String error = Messages.XmlUtils_XmlValidateError;
             Activator.logError("IO exception occurred", e); //$NON-NLS-1$
-            return new Status(IStatus.ERROR,  Activator.PLUGIN_ID, error, e);
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         }
         return Status.OK_STATUS;
     }
@@ -124,7 +129,7 @@ public class XmlUtils {
         } catch (IOException e) {
             String error = Messages.XmlUtils_ErrorCopyingFile;
             Activator.logError(error, e);
-            return new Status(IStatus.ERROR,  Activator.PLUGIN_ID, error, e);
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         }
 
         try (FileInputStream fis = new FileInputStream(fromFile);
@@ -135,9 +140,27 @@ public class XmlUtils {
         } catch (IOException e) {
             String error = Messages.XmlUtils_ErrorCopyingFile;
             Activator.logError(error, e);
-            return new Status(IStatus.ERROR,  Activator.PLUGIN_ID, error, e);
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         }
         return Status.OK_STATUS;
+    }
+
+    /**
+     * Get only the XML element children of an XML element.
+     *
+     * @param parent
+     *            The parent element to get children from
+     * @return The list of children Element of the parent
+     */
+    public static List<Element> getChildElements(Element parent) {
+        NodeList childNodes = parent.getChildNodes();
+        List<Element> childElements = new ArrayList<>();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            if (childNodes.item(index).getNodeType() == Node.ELEMENT_NODE) {
+                childElements.add((Element) childNodes.item(index));
+            }
+        }
+        return childElements;
     }
 
 }
