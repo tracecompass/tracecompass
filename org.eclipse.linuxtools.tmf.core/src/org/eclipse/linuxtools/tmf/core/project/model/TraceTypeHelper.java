@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.core.project.model;
 
-import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -102,7 +101,7 @@ public class TraceTypeHelper {
     }
 
     private boolean standardValidate(String path) {
-        final boolean valid = fTrace.validate(null, path).equals(Status.OK_STATUS);
+        final boolean valid = fTrace.validate(null, path).isOK();
         return valid;
     }
 

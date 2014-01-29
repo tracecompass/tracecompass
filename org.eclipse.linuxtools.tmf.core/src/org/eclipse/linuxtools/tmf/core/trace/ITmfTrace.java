@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -159,14 +159,18 @@ public interface ITmfTrace extends ITmfEventProvider {
     void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type) throws TmfTraceException;
 
     /**
-     * Validate that the trace is of the correct type.
+     * Validate that the trace is of the correct type. The implementation should
+     * return a TraceValidationStatus to indicate success with a certain level
+     * of confidence.
      *
      * @param project
      *            the eclipse project
      * @param path
      *            the trace path
+     *
      * @return an IStatus object with validation result. Use severity OK to
      *         indicate success.
+     * @see {@link TraceValidationStatus}
      * @since 2.0
      */
     IStatus validate(IProject project, String path);
