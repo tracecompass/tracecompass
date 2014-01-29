@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="lttng-e4.3" sequenceNumber="18">
+<?pde version="3.8"?><target name="lttng-e4.3" sequenceNumber="19">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
+<unit id="org.antlr.runtime" version="0.0.0"/>
 <unit id="org.swtchart" version="0.0.0"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20130517111416/repository/"/>
 </location>
@@ -20,8 +20,8 @@
 <repository location="http://download.eclipse.org/eclipse/updates/4.3/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.swtbot.eclipse.feature.group" version="2.1.1.201307101628"/>
-<unit id="org.eclipse.swtbot.feature.group" version="2.1.1.201307101628"/>
+<unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.swtbot.feature.group" version="0.0.0"/>
 <repository location="http://download.eclipse.org/technology/swtbot/releases/latest"/>
 </location>
 </locations>
