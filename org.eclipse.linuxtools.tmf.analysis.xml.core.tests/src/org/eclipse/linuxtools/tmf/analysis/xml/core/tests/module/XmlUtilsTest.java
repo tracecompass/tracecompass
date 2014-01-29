@@ -22,6 +22,7 @@ import java.io.File;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.junit.After;
@@ -75,7 +76,10 @@ public class XmlUtilsTest {
         if ((testXmlFile == null) || !testXmlFile.exists()) {
             fail("XML test file does not exist");
         }
-        assertTrue(XmlUtils.xmlValidate(testXmlFile).isOK());
+        IStatus status = XmlUtils.xmlValidate(testXmlFile);
+        if (!status.isOK()) {
+            fail(status.getMessage());
+        }
 
         testXmlFile = TmfXmlTestFiles.INVALID_FILE.getFile();
         if ((testXmlFile == null) || !testXmlFile.exists()) {
