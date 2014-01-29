@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.tmf.core.project.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -46,6 +48,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 public final class TmfTraceType {
 
     private static final char SEPARATOR = ':';
+
+    private static final String GENERIC_CTF_TRACE_TYPE = "org.eclipse.linuxtools.tmf.ui.type.ctf"; //$NON-NLS-1$
 
     /** Extension point ID */
     public static final String TMF_TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.ui.tracetype"; //$NON-NLS-1$
@@ -223,11 +227,31 @@ public final class TmfTraceType {
     }
 
     /**
+     * Get an iterable view of the existing trace type helpers.
+     *
+     * @return The currently registered trace type helpers
+     */
+    public Iterable<TraceTypeHelper> getTraceTypeHelpers() {
+        return fTraceTypes.values();
+    }
+
+    /**
      * Returns a list of "category:tracetype , ..."
      *
      * @return returns a list of "category:tracetype , ..."
      */
     public String[] getAvailableTraceTypes() {
+        return getAvailableTraceTypes(null);
+    }
+
+    /**
+     * Returns a list of "category:tracetype , ..." sorted by given comparator.
+     *
+     * @param comparator
+     *            Comparator class (type String) or null for alphabetical order.
+     * @return sorted list according to the given comparator
+     */
+    public String[] getAvailableTraceTypes(Comparator<String> comparator) {
 
         // Generate the list of Category:TraceType to populate the ComboBox
         List<String> traceTypes = new ArrayList<>();
@@ -235,6 +259,12 @@ public final class TmfTraceType {
         for (String key : this.fTraceTypes.keySet()) {
             TraceTypeHelper tt = this.fTraceTypes.get(key);
             traceTypes.add(tt.getCategoryName() + SEPARATOR + tt.getName());
+        }
+
+        if (comparator == null) {
+            Collections.sort(traceTypes);
+        } else {
+            Collections.sort(traceTypes, comparator);
         }
 
         // Format result
@@ -576,5 +606,43 @@ public final class TmfTraceType {
         final boolean startsWithTxt = traceType.startsWith(TmfTraceType.CUSTOM_TXT_CATEGORY);
         final boolean startsWithXML = traceType.startsWith(TmfTraceType.CUSTOM_XML_CATEGORY);
         return (startsWithTxt || startsWithXML);
+    }
+
+    /**
+     * Checks if a trace is directory traces (and not a single trace file)
+     * @param fileName
+     *            the file name (and path)
+     * @return true if the trace is a valid directory trace
+     */
+    public boolean isDirectoryTrace(String fileName) {
+        // right now we only check for CTF
+        // TODO have a attribute in the extension point for that
+        TraceTypeHelper helper =  getTraceType(GENERIC_CTF_TRACE_TYPE);
+        if (helper != null) {
+            return helper.validate(fileName);
+        }
+        return false;
+    }
+
+    /**
+     * @param traceType
+     *              the trace type
+     * @return true it is a directory trace type else false
+     */
+    public boolean isDirectoryTraceType(String traceType) {
+
+        if ((traceType == null) || (getTraceType(traceType) == null)) {
+            throw new IllegalArgumentException("Trace type string is null");  //$NON-NLS-1$
+        }
+
+        // TODO provide a generic implementation using new attribute in extension point
+        if (traceType.equals("org.eclipse.linuxtools.lttng2.kernel.tracetype")) { //$NON-NLS-1$
+            return true;
+        } else if (traceType.equals(GENERIC_CTF_TRACE_TYPE)) {
+            return true;
+        } else if (traceType.equals("org.eclipse.linuxtools.lttng2.ust.tracetype")) { //$NON-NLS-1$
+            return true;
+        }
+        return false;
     }
 }

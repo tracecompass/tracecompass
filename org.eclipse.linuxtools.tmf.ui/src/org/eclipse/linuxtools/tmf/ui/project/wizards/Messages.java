@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -77,6 +77,11 @@ public class Messages extends NLS {
      */
     public static String ImportTraceWizard_TraceValidationFailed;
     /**
+     * The message when the automatic trace type detection couldn't find a valid trace type.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_NoValidTraceTypeFound;
+    /**
      * The error message when trace source is empty (import trace wizard).
      */
     public static String ImportTraceWizard_SelectTraceSourceEmpty;
@@ -104,6 +109,31 @@ public class Messages extends NLS {
      * The information label string.
      */
     public static String ImportTraceWizard_Information;
+    /**
+     * The label of the checkbox to import unrecognized trace files
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportUnrecognized;
+    /**
+     * The message when the import operation was cancelled.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportOperationCancelled;
+    /**
+     * The message when the trace type is not found.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_TraceTypeNotFound;
+    /**
+     * The import operation task name.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportOperationTaskName;
+    /**
+     * The label to indicate that trace type auto detection shall be used.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_AutoDetection;
     /**
      *  The title of the select traces wizard.
      */
