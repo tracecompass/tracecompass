@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.statistics;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfLostEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
@@ -39,6 +40,7 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
     /**
      * The ID of this analysis module (which is also the ID of the state system)
      */
+    @NonNull
     public static final String ID = "org.eclipse.linuxtools.tmf.statistics.types"; //$NON-NLS-1$
 
     private static final String NAME = "TMF Statistics, events per type"; //$NON-NLS-1$

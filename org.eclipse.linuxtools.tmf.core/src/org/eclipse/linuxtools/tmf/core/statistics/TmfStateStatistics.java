@@ -133,7 +133,6 @@ public class TmfStateStatistics implements ITmfStatistics {
         final List<Long> list = new LinkedList<>();
         final long increment = (end - start) / nb;
 
-        totalsStats.waitUntilBuilt();
         if (totalsStats.isCancelled()) {
             return list;
         }
@@ -168,9 +167,6 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     @Override
     public long getEventsTotal() {
-        /* We need the complete state history to be built to answer this. */
-        totalsStats.waitUntilBuilt();
-
         long endTime = totalsStats.getCurrentEndTime();
         int count = 0;
 
@@ -181,11 +177,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         } catch (TimeRangeException e) {
             /* Assume there is no events for that range */
             return 0;
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
-        } catch (StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException | StateValueTypeException | StateSystemDisposedException e) {
             e.printStackTrace();
         }
 
@@ -194,10 +186,7 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     @Override
     public Map<String, Long> getEventTypesTotal() {
-        /* We need the complete state history to be built to answer this. */
-        typesStats.waitUntilBuilt();
-
-        Map<String, Long> map = new HashMap<>();
+        final Map<String, Long> map = new HashMap<>();
         long endTime = typesStats.getCurrentEndTime();
 
         try {
@@ -226,10 +215,6 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     @Override
     public long getEventsInRange(long start, long end) {
-        // FIXME Instead of waiting until the end, we could check the current
-        // end time, and answer as soon as possible...
-        totalsStats.waitUntilBuilt();
-
         long startCount;
         if (start == totalsStats.getStartTime()) {
             startCount = 0;
@@ -247,11 +232,8 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     @Override
     public Map<String, Long> getEventTypesInRange(long start, long end) {
-        // FIXME Instead of waiting until the end, we could check the current
-        // end time, and answer as soon as possible...
-        typesStats.waitUntilBuilt();
-
-        Map<String, Long> map = new HashMap<>();
+        final Map<String, Long> map = new HashMap<>();
+        List<Integer> quarks;
 
         /* Make sure the start/end times are within the state history, so we
          * don't get TimeRange exceptions.
@@ -262,18 +244,24 @@ public class TmfStateStatistics implements ITmfStatistics {
         try {
             /* Get the list of quarks, one for each even type in the database */
             int quark = typesStats.getQuarkAbsolute(Attributes.EVENT_TYPES);
-            List<Integer> quarks = typesStats.getSubAttributes(quark, false);
+            quarks = typesStats.getSubAttributes(quark, false);
+        } catch (AttributeNotFoundException e) {
+            /*
+             * The state system does not (yet?) have the needed attributes, it
+             * probably means there are no events counted yet. Return the empty
+             * map.
+             */
+            return map;
+        }
 
+        try {
             List<ITmfStateInterval> endState = typesStats.queryFullState(endTime);
-
-            String curEventName;
-            long countAtStart, countAtEnd, eventCount;
 
             if (startTime == typesStats.getStartTime()) {
                 /* Only use the values picked up at the end time */
                 for (int typeQuark : quarks) {
-                    curEventName = typesStats.getAttributeName(typeQuark);
-                    eventCount = endState.get(typeQuark).getStateValue().unboxInt();
+                    String curEventName = typesStats.getAttributeName(typeQuark);
+                    long eventCount = endState.get(typeQuark).getStateValue().unboxInt();
                     if (eventCount == -1) {
                         eventCount = 0;
                     }
@@ -286,9 +274,9 @@ public class TmfStateStatistics implements ITmfStatistics {
                  */
                 List<ITmfStateInterval> startState = typesStats.queryFullState(startTime - 1);
                 for (int typeQuark : quarks) {
-                    curEventName = typesStats.getAttributeName(typeQuark);
-                    countAtStart = startState.get(typeQuark).getStateValue().unboxInt();
-                    countAtEnd = endState.get(typeQuark).getStateValue().unboxInt();
+                    String curEventName = typesStats.getAttributeName(typeQuark);
+                    long countAtStart = startState.get(typeQuark).getStateValue().unboxInt();
+                    long countAtEnd = endState.get(typeQuark).getStateValue().unboxInt();
 
                     if (countAtStart == -1) {
                         countAtStart = 0;
@@ -296,19 +284,19 @@ public class TmfStateStatistics implements ITmfStatistics {
                     if (countAtEnd == -1) {
                         countAtEnd = 0;
                     }
-                    eventCount = countAtEnd - countAtStart;
+                    long eventCount = countAtEnd - countAtStart;
                     map.put(curEventName, eventCount);
                 }
             }
 
-        } catch (TimeRangeException e) {
-            /* Assume there is no events, nothing will be put in the map. */
-        } catch (AttributeNotFoundException | StateValueTypeException | StateSystemDisposedException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
+            /* Assume there is no (more) events, nothing will be put in the map. */
+        } catch (StateValueTypeException e) {
             /*
-             * These other exception types would show a logic problem however,
+             * This exception type would show a logic problem however,
              * so they should not happen.
              */
-            e.printStackTrace();
+            throw new IllegalStateException();
         }
         return map;
     }

@@ -17,7 +17,6 @@ package org.eclipse.linuxtools.tmf.ui.viewers.statistics;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -28,7 +27,9 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
+import org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsEventTypesModule;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -79,6 +80,11 @@ public class TmfStatisticsViewer extends TmfViewer {
      * Refresh frequency.
      */
     protected final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
+
+    /**
+     * The delay (in ms) between each update in live-reading mode
+     */
+    private static final long LIVE_UPDATE_DELAY = 1000;
 
     /**
      * The actual tree viewer to display
@@ -688,15 +694,12 @@ public class TmfStatisticsViewer extends TmfViewer {
                 Thread statsThread = new Thread("Statistics update") { //$NON-NLS-1$
                     @Override
                     public void run() {
-                        /* Wait until the analysis is ready */
-                        if (!statsMod.waitForCompletion(new NullProgressMonitor())) {
-                            return;
-                        }
-
+                        /* Wait until the analysis is ready to be queried */
+                        statsMod.waitForInitialization();
                         ITmfStatistics stats = statsMod.getStatistics();
                         if (stats == null) {
                             /* It should have worked, but didn't */
-                            return;
+                            throw new IllegalStateException();
                         }
 
                         /*
@@ -706,6 +709,29 @@ public class TmfStatisticsViewer extends TmfViewer {
                         long start = timeRange.getStartTime().normalize(0, TIME_SCALE).getValue();
                         long end = timeRange.getEndTime().normalize(0, TIME_SCALE).getValue();
 
+                        /*
+                         * Wait on the state system object we are going to query.
+                         *
+                         * TODO Eventually this could be exposed through the
+                         * TmfStateSystemAnalysisModule directly.
+                         */
+                        ITmfStateSystem ss = statsMod.getStateSystem(TmfStatisticsEventTypesModule.ID);
+                        if (ss == null) {
+                            /* It should be instantiated after the
+                             * statsMod.waitForInitialization() above. */
+                            throw new IllegalStateException();
+                        }
+
+                        /*
+                         * Periodically update the statistics while they are
+                         * being built (or, if the back-end is already completely
+                         * built, it will skip over the while() immediately.
+                         */
+                        while(!ss.waitUntilBuilt(LIVE_UPDATE_DELAY)) {
+                            Map<String, Long> map = stats.getEventTypesInRange(start, end);
+                            updateStats(isGlobal, map);
+                        }
+                        /* Query one last time for the final values */
                         Map<String, Long> map = stats.getEventTypesInRange(start, end);
                         updateStats(isGlobal, map);
                     }
@@ -727,6 +753,11 @@ public class TmfStatisticsViewer extends TmfViewer {
     private void updateStats(boolean isGlobal, Map<String, Long> eventsPerType) {
 
         final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
+        if (statsData == null) {
+            /* The stat tree  has been disposed, abort mission. */
+            return;
+        }
+
         Map<String, Long> map = eventsPerType;
         String name = fTrace.getName();
 
