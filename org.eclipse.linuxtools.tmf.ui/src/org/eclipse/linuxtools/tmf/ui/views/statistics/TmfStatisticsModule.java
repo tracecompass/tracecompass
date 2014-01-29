@@ -14,9 +14,11 @@ package org.eclipse.linuxtools.tmf.ui.views.statistics;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
@@ -47,6 +49,8 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     private final TmfStateSystemAnalysisModule totalsModule = new TmfStatisticsTotalsModule();
     private final TmfStateSystemAnalysisModule eventTypesModule = new TmfStatisticsEventTypesModule();
 
+    private final CountDownLatch fInitialized = new CountDownLatch(1);
+
     /**
      * Constructor
      */
@@ -60,8 +64,18 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
      *
      * @return The ITmfStatistics object
      */
+    @Nullable
     public ITmfStatistics getStatistics() {
         return fStatistics;
+    }
+
+    /**
+     * Wait until the analyses/state systems underneath are ready to be queried.
+     */
+    public void waitForInitialization() {
+        try {
+            fInitialized.await();
+        } catch (InterruptedException e) {}
     }
 
     // ------------------------------------------------------------------------
@@ -90,14 +104,9 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
             return false;
         }
 
-        /*
-         * The "execute" of this trace will encompass the "execute" of the two
-         * sub-analyzes.
-         */
-        if (!totalsModule.waitForCompletion(monitor) ||
-                !eventTypesModule.waitForCompletion(monitor)) {
-            return false;
-        }
+        /* Wait until the two modules are initialized */
+        totalsModule.waitForInitialization();
+        eventTypesModule.waitForInitialization();
 
         ITmfStateSystem totalsSS = totalsModule.getStateSystem();
         ITmfStateSystem eventTypesSS = eventTypesModule.getStateSystem();
@@ -108,6 +117,18 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         }
 
         fStatistics = new TmfStateStatistics(totalsSS, eventTypesSS);
+
+        /* fStatistics is now set, consider this module initialized */
+        fInitialized.countDown();
+
+        /*
+         * The rest of this "execute" will encompass the "execute" of the two
+         * sub-analyzes.
+         */
+        if (!totalsModule.waitForCompletion(monitor) ||
+                !eventTypesModule.waitForCompletion(monitor)) {
+            return false;
+        }
         return true;
     }
 
