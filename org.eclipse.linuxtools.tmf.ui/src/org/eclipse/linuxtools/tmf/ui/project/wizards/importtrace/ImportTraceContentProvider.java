@@ -23,7 +23,7 @@ import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 
 /**
  * A helper class to show the trace types and files and names. it contains the

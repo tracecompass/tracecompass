@@ -10,7 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
+package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -32,9 +32,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,6 +48,7 @@ import org.xml.sax.SAXParseException;
  * Trace definition for custom XML traces.
  *
  * @author Patrick Tassé
+ * @since 3.0
  */
 public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
@@ -384,17 +384,17 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             TmfTraceType.getInstance().addCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
 
         } catch (ParserConfigurationException e) {
-            Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerConfigurationException e) {
-            Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerFactoryConfigurationError e) {
-            Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (TransformerException e) {
-            Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (IOException e) {
-            Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            Activator.getDefault().logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
     }
 
@@ -510,11 +510,11 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
             return defList.toArray(new CustomXmlTraceDefinition[0]);
         } catch (ParserConfigurationException e) {
-            Activator.getDefault().logError("Error loading all in CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error loading all in CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            Activator.getDefault().logError("Error loading all in CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error loading all in CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         } catch (IOException e) {
-            Activator.getDefault().logError("Error loading all in CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
+            Activator.logError("Error loading all in CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
         return new CustomXmlTraceDefinition[0];
     }
@@ -574,11 +574,11 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 }
             }
         } catch (ParserConfigurationException e) {
-            Activator.getDefault().logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            Activator.getDefault().logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (IOException e) {
-            Activator.getDefault().logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
         return null;
     }
@@ -734,17 +734,17 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             TmfTraceType.getInstance().removeCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
 
         } catch (ParserConfigurationException e) {
-            Activator.getDefault().logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {
-            Activator.getDefault().logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (IOException e) {
-            Activator.getDefault().logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (TransformerConfigurationException e) {
-            Activator.getDefault().logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (TransformerFactoryConfigurationError e) {
-            Activator.getDefault().logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (TransformerException e) {
-            Activator.getDefault().logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+            Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
     }
 }

@@ -10,13 +10,13 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.project.model;
+package org.eclipse.linuxtools.tmf.core.project.model;
 
 /**
  * Trace import helper class
  *
  * @author Matthew Khouzam
- * @since 2.0
+ * @since 3.0
  */
 public class TraceValidationHelper implements Comparable<TraceValidationHelper> {
 

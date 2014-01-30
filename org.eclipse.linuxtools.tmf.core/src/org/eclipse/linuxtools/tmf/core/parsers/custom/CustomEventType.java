@@ -10,7 +10,7 @@
  *   Patrick Tassé - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
+package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
  * Event type for custom text parsers.
  *
  * @author Patrick Tassé
+ * @since 3.0
  */
 public abstract class CustomEventType extends TmfEventType {
 

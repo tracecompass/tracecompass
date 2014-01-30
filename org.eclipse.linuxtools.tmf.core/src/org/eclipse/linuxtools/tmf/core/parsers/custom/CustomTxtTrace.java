@@ -10,7 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
+package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,11 +26,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition.InputLine;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
@@ -48,6 +48,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
  * Base class for custom plain text traces.
  *
  * @author Patrick Tassé
+ * @since 3.0
  */
 public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
 
@@ -150,10 +151,10 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             }
             return context;
         } catch (final FileNotFoundException e) {
-            Activator.getDefault().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
+            Activator.logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
             return context;
         } catch (final IOException e) {
-            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return context;
         }
 
@@ -178,7 +179,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         } catch (final IOException e) {
-            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         }
     }
@@ -193,7 +194,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                 return (double) ((Long) location.getLocationInfo()) / fFile.length();
             }
         } catch (final IOException e) {
-            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
         }
         return 0;
     }
@@ -353,7 +354,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                 rawPos = fFile.getFilePointer();
             }
         } catch (final IOException e) {
-            Activator.getDefault().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+            Activator.logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
         }
         for (final Entry<InputLine, Integer> entry : countMap.entrySet()) {
             if (entry.getValue() < entry.getKey().getMinCount()) {

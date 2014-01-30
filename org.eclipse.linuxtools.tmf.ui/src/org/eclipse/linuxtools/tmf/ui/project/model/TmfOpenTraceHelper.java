@@ -30,9 +30,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
-import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
@@ -103,10 +104,9 @@ public class TmfOpenTraceHelper {
      * @since 2.2
      */
     public IStatus openTraceFromPath(String projectRoot, String path, Shell shell, String tracetypeHint) throws CoreException {
-        TmfTraceType tt = TmfTraceType.getInstance();
         TraceTypeHelper traceTypeToSet = null;
         try {
-            traceTypeToSet = tt.selectTraceType(path, shell, tracetypeHint);
+            traceTypeToSet = TmfTraceTypeUIUtils.selectTraceType(path, shell, tracetypeHint);
         } catch (TmfTraceImportException e) {
             MessageBox mb = new MessageBox(shell);
             mb.setMessage(e.getMessage());
@@ -126,7 +126,7 @@ public class TmfOpenTraceHelper {
         final IPath pathString = Path.fromOSString(path);
         IResource linkedTrace = TmfImportHelper.createLink(folder, pathString, traceName);
         if (linkedTrace != null && linkedTrace.exists()) {
-            IStatus ret = TmfTraceType.setTraceType(tracePath, traceTypeToSet);
+            IStatus ret = TmfTraceTypeUIUtils.setTraceType(tracePath, traceTypeToSet);
             if (ret.isOK()) {
                 ret = openTraceFromProject(projectRoot, traceName);
             }

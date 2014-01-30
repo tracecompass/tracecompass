@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 

@@ -10,12 +10,13 @@
  *   Matthew Khouzam - Initial API and implementation
  **********************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.project.model;
+package org.eclipse.linuxtools.tmf.core.project.model;
 
 /**
  * Tmf trace import exception
  *
  * @author Matthew Khouzam
+ * @since 3.0
  */
 public class TmfTraceImportException extends Exception {
 

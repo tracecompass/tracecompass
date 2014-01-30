@@ -10,12 +10,13 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
+package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 /**
  * Event type class for custom XML traces.
  *
  * @author Patrick Tassé
+ * @since 3.0
  */
 public class CustomXmlEventType extends CustomEventType {
 

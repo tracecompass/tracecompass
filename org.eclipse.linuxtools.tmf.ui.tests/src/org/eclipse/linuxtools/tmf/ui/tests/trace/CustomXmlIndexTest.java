@@ -21,9 +21,9 @@ import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 
 /**

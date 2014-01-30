@@ -17,6 +17,7 @@
 package org.eclipse.linuxtools.tmf.ui.views.statistics;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
@@ -24,7 +25,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.viewers.ITmfViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;

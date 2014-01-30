@@ -10,7 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.parsers.custom;
+package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,12 +19,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * Base event for custom text parsers.
  *
  * @author Patrick Tassé
+ * @since 3.0
  */
 public class CustomEvent extends TmfEvent {
 

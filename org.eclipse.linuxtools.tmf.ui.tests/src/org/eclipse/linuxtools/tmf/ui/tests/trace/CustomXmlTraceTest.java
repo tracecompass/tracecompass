@@ -14,10 +14,10 @@ package org.eclipse.linuxtools.tmf.ui.tests.trace;
 
 import java.util.ArrayList;
 
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputElement;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputElement;
 import org.junit.Before;
 
 /**
