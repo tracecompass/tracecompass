@@ -350,6 +350,14 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
             String traceName = traceElement.getText();
             if (traceExists(traceName)) {
                 int returnCode = promptForOverwrite(traceName);
+                // The return code is an index to a button in the dialog but the
+                // 'X' button in the window corner is not considered a button
+                // therefore it returns -1 and unfortunately, there is no
+                // constant for that.
+                if (returnCode < 0) {
+                    return false;
+                }
+
                 final String[] response = new String[] { IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.YES_LABEL };
                 if (response[returnCode].equals(IDialogConstants.YES_TO_ALL_LABEL)) {
                     break;
