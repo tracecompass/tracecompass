@@ -19,8 +19,8 @@
 package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -54,9 +55,11 @@ import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.Messages;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusEvent;
@@ -120,6 +123,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private static String fRootDirectory = null;
     // Target import directory ('Traces' folder)
     private IFolder fTargetFolder;
+    // Target Trace folder element
+    private TmfTraceFolder fTraceFolderElement;
     // Flag to handle destination folder change event
     private Boolean fIsDestinationChanged = false;
     // Combo box containing trace types
@@ -170,14 +175,15 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         Object element = selection.getFirstElement();
 
         if (element instanceof TmfTraceFolder) {
-            TmfTraceFolder tmfTraceFolder = (TmfTraceFolder) element;
-            tmfTraceFolder.getProject().getResource();
-            traceFolder = tmfTraceFolder.getResource();
+            fTraceFolderElement = (TmfTraceFolder) element;
+            fTraceFolderElement.getProject().getResource();
+            traceFolder = fTraceFolderElement.getResource();
         } else if (element instanceof IProject) {
             IProject project = (IProject) element;
             try {
                 if (project.hasNature(TmfProjectNature.ID)) {
                     traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+                    fTraceFolderElement = TmfProjectRegistry.getProject(project).getTracesFolder();
                 }
             } catch (CoreException e) {
             }
@@ -190,6 +196,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             IProject project = TmfProjectRegistry.createProject(
                     TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
             traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+            fTraceFolderElement = TmfProjectRegistry.getProject(project).getTracesFolder();
         }
 
         // Set the target trace folder
@@ -491,6 +498,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         // Use an empty label so that display of the element's full name
         // doesn't include a confusing label
         TraceFileSystemElement dummyParent = new TraceFileSystemElement("", null, true);//$NON-NLS-1$
+        dummyParent.setFileSystemObject(((File)fileSystemObject).getParentFile());
         dummyParent.setPopulated();
         TraceFileSystemElement result = new TraceFileSystemElement(
                 elementLabel, dummyParent, isContainer);
@@ -545,6 +553,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         });
         fTraceTypes.select(0);
 
+        // Unrecognized checkbox
         fImportUnrecognizedButton = new Button(composite, SWT.CHECK);
         fImportUnrecognizedButton.setSelection(true);
         fImportUnrecognizedButton.setText(Messages.ImportTraceWizard_ImportUnrecognized);
@@ -707,59 +716,60 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Classes
     // ------------------------------------------------------------------------
 
-    class TraceValidateAndImportOperation {
+    private class TraceValidateAndImportOperation {
         private IStatus fStatus;
-        final List<String> fUnrecognizedResources = new ArrayList<>();
+        private final List<String> fUnrecognizedResources = new ArrayList<>();
         private String fTraceType;
         private IPath fContainerPath;
         private boolean fImportUnrecognizedTraces;
-        private boolean fOverwrite;
         private boolean fLink;
+        private ImportConfirmation fConfirmationMode = ImportConfirmation.SKIP;
 
-        TraceValidateAndImportOperation(String traceId, IPath containerPath, boolean doImport, boolean overwrite, boolean link) {
+        private TraceValidateAndImportOperation(String traceId, IPath containerPath, boolean doImport, boolean overwrite, boolean link) {
             fTraceType = traceId;
             fContainerPath = containerPath;
             fImportUnrecognizedTraces = doImport;
-            fOverwrite = overwrite;
+            if (overwrite) {
+                fConfirmationMode = ImportConfirmation.OVERWRITE_ALL;
+            }
             fLink = link;
         }
 
         public void run(IProgressMonitor progressMonitor) {
             String currentPath = null;
-            final Map<String, FileSystemElement> folderResources = new HashMap<>();
+            final Map<String, TraceFileSystemElement> folderElements = new HashMap<>();
             try {
-                List<FileSystemElement> resources = getSelectedResources();
-              Iterator<FileSystemElement> resourcesEnum = resources.iterator();
-              SubMonitor subMonitor = SubMonitor.convert(progressMonitor, resources.size());
-//              subMonitor.beginTask("Importing: ", resources.size());
+                List<TraceFileSystemElement> fileSystemElements = getSelectedResources();
+                Iterator<TraceFileSystemElement> fileSystemElementsIter = fileSystemElements.iterator();
+                SubMonitor subMonitor = SubMonitor.convert(progressMonitor, fileSystemElements.size());
 
-              while (resourcesEnum.hasNext()) {
+                while (fileSystemElementsIter.hasNext()) {
                     ModalContext.checkCanceled(progressMonitor);
                     currentPath = null;
-                    FileSystemElement resource = resourcesEnum.next();
-                    File resourceFile = (File) resource.getFileSystemObject();
-                    String resourcePath = resourceFile.getAbsolutePath();
+                    TraceFileSystemElement element = fileSystemElementsIter.next();
+                    File fileResource = (File) element.getFileSystemObject();
+                    String resourcePath = fileResource.getAbsolutePath();
                     currentPath = resourcePath;
                     SubMonitor sub = subMonitor.newChild(1);
-                    if (resource.isDirectory()) {
-                        if (!folderResources.containsKey(resourcePath)) {
-                            if (isDirectoryTrace(resource)) {
-                                folderResources.put(resourcePath, resource);
-                                validateAndImportDirectoryTrace(resource, sub);
+                    if (element.isDirectory()) {
+                        if (!folderElements.containsKey(resourcePath)) {
+                            if (isDirectoryTrace(element)) {
+                                folderElements.put(resourcePath, element);
+                                validateAndImportDirectoryTrace(element, sub);
                             }
                         }
                     } else {
-                        FileSystemElement parent = resource.getParent();
-                        File file = (File) parent.getFileSystemObject();
-                        String parentPath = file.getAbsolutePath();
+                        TraceFileSystemElement parentElement = (TraceFileSystemElement)element.getParent();
+                        File parentFile = (File) parentElement.getFileSystemObject();
+                        String parentPath = parentFile.getAbsolutePath();
                         currentPath = parentPath;
-                        if (!folderResources.containsKey(parentPath)) {
-                            if (isDirectoryTrace(parent)) {
-                                folderResources.put(parentPath, parent);
-                                validateAndImportDirectoryTrace(parent, sub);
+                        if (!folderElements.containsKey(parentPath)) {
+                            if (isDirectoryTrace(parentElement)) {
+                                folderElements.put(parentPath, parentElement);
+                                validateAndImportDirectoryTrace(parentElement, sub);
                             } else {
-                                if (resourceFile.exists()) {
-                                    validateAndImportFileTrace(resource, sub);
+                                if (fileResource.exists()) {
+                                    validateAndImportFileTrace(element, sub);
                                 }
                             }
                         }
@@ -781,9 +791,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return new ArrayList<>(fUnrecognizedResources);
         }
 
-        private void validateAndImportDirectoryTrace(FileSystemElement resource, IProgressMonitor monitor)
+        private void validateAndImportDirectoryTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
-            File file = (File) resource.getFileSystemObject();
+            File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
             TraceTypeHelper traceTypeHelper;
             boolean sendValidationError = true;
@@ -796,21 +806,24 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 sendValidationError = false;
                 traceTypeHelper = TmfTraceType.getInstance().getTraceType(fTraceType);
             }
-            validateAndImportTrace(file, traceTypeHelper, sendValidationError, monitor);
+            validateAndImportTrace(fileSystemElement, traceTypeHelper, sendValidationError, monitor);
         }
 
-        private void validateAndImportFileTrace(FileSystemElement resource, IProgressMonitor monitor)
+        private void validateAndImportFileTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
 
-            File file = (File) resource.getFileSystemObject();
+
+            File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
             TraceTypeHelper traceTypeHelper = null;
             boolean sendValidationError = true;
+
             if (fTraceType == null) {
                 // TODO add automatic trace type selection for trace file
                 if (fImportUnrecognizedTraces) {
-                    importResource(file, monitor);
-                    fUnrecognizedResources.add(path);
+                    if (importResource(fileSystemElement, monitor)) {
+                        fUnrecognizedResources.add(path);
+                    }
                 }
                 return;
             }
@@ -820,63 +833,207 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
             sendValidationError = false;
             traceTypeHelper = TmfTraceType.getInstance().getTraceType(fTraceType);
-            validateAndImportTrace(file, traceTypeHelper, sendValidationError, monitor);
+            validateAndImportTrace(fileSystemElement, traceTypeHelper, sendValidationError, monitor);
             return;
         }
 
-        private void validateAndImportTrace(File file, TraceTypeHelper traceTypeHelper, boolean sendValidationError, IProgressMonitor monitor)
+        private void validateAndImportTrace(TraceFileSystemElement fileSystemElement, TraceTypeHelper traceTypeHelper, boolean sendValidationError, IProgressMonitor monitor)
                 throws InvocationTargetException, InterruptedException, CoreException, TmfTraceImportException {
 
             if (traceTypeHelper == null) {
                 throw new TmfTraceImportException(Messages.ImportTraceWizard_TraceTypeNotFound);
             }
-
+            File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
 
             if (TmfTraceType.getInstance().validate(traceTypeHelper.getCanonicalName(), path)) {
-                importResource(file, monitor);
-                IResource eclipseResource = fTargetFolder.findMember(file.getName());
-                TmfTraceTypeUIUtils.setTraceType(eclipseResource.getFullPath(), traceTypeHelper);
+                if (importResource(fileSystemElement, monitor)) {
+                    IResource eclipseResource = fTargetFolder.findMember(fileSystemElement.getLabel());
+                    TmfTraceTypeUIUtils.setTraceType(eclipseResource.getFullPath(), traceTypeHelper);
+                }
                 return;
             }
             if (sendValidationError) {
-                throw new TmfTraceImportException(MessageFormat.format(Messages.ImportTraceWizard_TraceValidationFailed, path));
+                throw new TmfTraceImportException(NLS.bind(Messages.ImportTraceWizard_TraceValidationFailed, path));
             }
         }
 
-        private void importResource(File fileSystemObject, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-            File parentFolder = new File(fileSystemObject.getParent());
-            List<File> subList = new ArrayList<>();
-            subList.add(fileSystemObject);
-            FileSystemStructureProvider fileSystemStructureProvider = FileSystemStructureProvider.INSTANCE;
+        /**
+         * Imports a trace resource to project. In case of name collision the
+         * user will be asked to confirm overwriting the existing trace,
+         * overwriting or skipping the trace to be imported.
+         *
+         * @param fileSystemElement
+         *            trace file system object to import
+         * @param monitor
+         *            a progress monitor
+         * @return true if trace was imported else false
+         *
+         * @throws InvocationTargetException
+         *             if problems during import operation
+         * @throws InterruptedException
+         *             if cancelled
+         * @throws CoreException
+         *             if problems with workspace
+         */
+        private boolean importResource(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
+                throws InvocationTargetException, InterruptedException, CoreException {
+            ImportConfirmation mode = checkForNameClashes(fileSystemElement);
+            switch (mode) {
+            case RENAME:
+            case RENAME_ALL:
+                rename(fileSystemElement);
+                break;
+            case OVERWRITE:
+            case OVERWRITE_ALL:
+                delete(fileSystemElement, monitor);
+                break;
+            case CONTINUE:
+                break;
+            case SKIP:
+            case SKIP_ALL:
+            default:
+                return false;
+            }
 
-            // TODO have own IOverwriteQuery implementation for proper handling of overwrite and renaming
+            List<TraceFileSystemElement> subList = new ArrayList<>();
+
+            IPath containerPath = fContainerPath;
+            FileSystemElement parentFolder = fileSystemElement.getParent();
+
+            if (fileSystemElement.isDirectory() && (!fLink)) {
+                containerPath = containerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
+
+                Object[] array = fileSystemElement.getFiles().getChildren();
+                for (int i = 0; i < array.length; i++) {
+                    subList.add((TraceFileSystemElement)array[i]);
+                }
+                parentFolder = fileSystemElement;
+
+            } else {
+                subList.add(fileSystemElement);
+            }
+
+
+            ImportProvider fileSystemStructureProvider = new ImportProvider();
+
             IOverwriteQuery myQueryImpl = new IOverwriteQuery() {
                 @Override
                 public String queryOverwrite(String file) {
-                    return fOverwrite ? IOverwriteQuery.ALL : IOverwriteQuery.NO_ALL;
+                    return IOverwriteQuery.NO_ALL;
                 }
             };
 
-            monitor.setTaskName(Messages.ImportTraceWizard_ImportOperationTaskName + " " + fileSystemObject.getAbsolutePath()); //$NON-NLS-1$
-            ImportOperation operation = new ImportOperation(fContainerPath, parentFolder, fileSystemStructureProvider, myQueryImpl, subList);
+            monitor.setTaskName(Messages.ImportTraceWizard_ImportOperationTaskName + " " + ((File)fileSystemElement.getFileSystemObject()).getAbsolutePath()); //$NON-NLS-1$
+            ImportOperation operation = new ImportOperation(containerPath, parentFolder, fileSystemStructureProvider, myQueryImpl, subList);
             operation.setContext(getShell());
 
             operation.setCreateContainerStructure(false);
-            operation.setOverwriteResources(fOverwrite);
+            operation.setOverwriteResources(false);
             operation.setCreateLinks(fLink);
             operation.setVirtualFolders(false);
 
             operation.run(new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
-       }
+            return true;
+        }
 
-        private boolean isDirectoryTrace(FileSystemElement resource) {
-            File file = (File) resource.getFileSystemObject();
+        private boolean isDirectoryTrace(FileSystemElement fileSystemElement) {
+            File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
             if (TmfTraceType.getInstance().isDirectoryTrace(path)) {
                 return true;
             }
             return false;
+        }
+
+        private ImportConfirmation checkForNameClashes(TraceFileSystemElement fileSystemElement) throws InterruptedException {
+
+            String traceName = ((File)fileSystemElement.getFileSystemObject()).getName();
+
+            // handle rename
+            if (getExistingTrace(traceName) != null) {
+                if ((fConfirmationMode == ImportConfirmation.RENAME_ALL) ||
+                    (fConfirmationMode == ImportConfirmation.OVERWRITE_ALL) ||
+                    (fConfirmationMode == ImportConfirmation.SKIP_ALL)) {
+                    return fConfirmationMode;
+                }
+
+                int returnCode = promptForOverwrite(traceName);
+                if (returnCode < 0) {
+                    // Cancel
+                    throw new InterruptedException();
+                }
+                fConfirmationMode = ImportConfirmation.values()[returnCode];
+                return fConfirmationMode;
+            }
+            return ImportConfirmation.CONTINUE;
+        }
+
+        private int promptForOverwrite(String traceName) {
+            final MessageDialog dialog = new MessageDialog(getContainer()
+                    .getShell(), null, null, NLS.bind(Messages.ImportTraceWizard_TraceAlreadyExists, traceName),
+                    MessageDialog.QUESTION, new String[] {
+                        ImportConfirmation.RENAME.getInName(),
+                        ImportConfirmation.RENAME_ALL.getInName(),
+                        ImportConfirmation.OVERWRITE.getInName(),
+                        ImportConfirmation.OVERWRITE_ALL.getInName(),
+                        ImportConfirmation.SKIP.getInName(),
+                        ImportConfirmation.SKIP_ALL.getInName(),
+                    }, 4) {
+                @Override
+                protected int getShellStyle() {
+                    return super.getShellStyle() | SWT.SHEET;
+                }
+            };
+
+            final int[] returnValue = new int[1];
+            getShell().getDisplay().syncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    returnValue[0] = dialog.open();
+                }
+            });
+            return returnValue[0];
+        }
+
+        private void rename(TraceFileSystemElement fileSystemElement) {
+            String traceName = ((File)fileSystemElement.getFileSystemObject()).getName();
+            TmfTraceElement trace = getExistingTrace(traceName);
+            if (trace == null) {
+                return;
+            }
+
+            IFolder folder = trace.getProject().getTracesFolder().getResource();
+            int i = 2;
+            while (true) {
+                String name = trace.getName() + '(' + Integer.toString(i++) + ')';
+                IResource resource = folder.findMember(name);
+                if (resource == null) {
+                    fileSystemElement.setLabel(name);
+                    return;
+                }
+            }
+        }
+
+        private void delete(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor) throws CoreException {
+            String traceName = ((File)fileSystemElement.getFileSystemObject()).getName();
+            TmfTraceElement trace = getExistingTrace(traceName);
+            if (trace == null) {
+                return;
+            }
+
+            trace.delete(monitor);
+        }
+
+        private TmfTraceElement getExistingTrace(String traceName) {
+            List<TmfTraceElement> traces = fTraceFolderElement.getTraces();
+            for (TmfTraceElement t : traces) {
+                if (t.getName().equals(traceName)) {
+                    return t;
+                }
+            }
+            return null;
         }
 
         /**
@@ -898,25 +1055,26 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * The <code>TraceFileSystemElement</code> is a <code>FileSystemElement</code> that knows
      * if it has been populated or not.
      */
-    static class TraceFileSystemElement extends FileSystemElement {
+    private static class TraceFileSystemElement extends FileSystemElement {
 
-        private boolean populated = false;
+        private boolean fIsPopulated = false;
+        private String fLabel = null;
 
         public TraceFileSystemElement(String name, FileSystemElement parent, boolean isDirectory) {
             super(name, parent, isDirectory);
         }
 
         public void setPopulated() {
-            populated = true;
+            fIsPopulated = true;
         }
 
         public boolean isPopulated() {
-            return populated;
+            return fIsPopulated;
         }
 
         @Override
         public AdaptableList getFiles() {
-            if(!populated) {
+            if(!fIsPopulated) {
                 populateElementChildren();
             }
             return super.getFiles();
@@ -924,10 +1082,37 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         @Override
         public AdaptableList getFolders() {
-            if(!populated) {
+            if(!fIsPopulated) {
                 populateElementChildren();
             }
             return super.getFolders();
+        }
+
+        /**
+         * Sets the label for the trace to be used when importing at trace.
+         * @param name
+         *            the label for the trace
+         */
+        public void setLabel(String name) {
+            fLabel = name;
+        }
+
+        /**
+         * Returns the label for the trace to be used when importing at trace.
+         *
+         * @return the label of trace resource
+         */
+        public String getLabel() {
+            if (fLabel == null) {
+                //Get the name - if it is empty then return the path as it is a file root
+                File file = (File) getFileSystemObject();
+                String name = file.getName();
+                if (name.length() == 0) {
+                    return file.getPath();
+                }
+                return name;
+            }
+            return fLabel;
         }
 
         /**
@@ -945,6 +1130,92 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 newelement.setFileSystemObject(child);
             }
             setPopulated();
+        }
+    }
+
+    private class ImportProvider implements IImportStructureProvider {
+
+        private FileSystemStructureProvider provider = FileSystemStructureProvider.INSTANCE;
+
+        ImportProvider() {
+        }
+
+        @Override
+        public String getLabel(Object element) {
+            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            return resource.getLabel();
+        }
+
+        @Override
+        public List getChildren(Object element) {
+            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            Object[] array = resource.getFiles().getChildren();
+                    List<Object> list = new ArrayList<>();
+                    for (int i = 0; i < array.length; i++) {
+                        list.add(array[i]);
+                    }
+            return list;
+        }
+
+        @Override
+        public InputStream getContents(Object element) {
+            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            return provider.getContents(resource.getFileSystemObject());
+        }
+
+        @Override
+        public String getFullPath(Object element) {
+            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            return provider.getFullPath(resource.getFileSystemObject());
+        }
+
+        @Override
+        public boolean isFolder(Object element) {
+            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            return resource.isDirectory();
+        }
+    }
+
+    private enum ImportConfirmation {
+        // ------------------------------------------------------------------------
+        // Enum definition
+        // ------------------------------------------------------------------------
+        RENAME(Messages.ImportTraceWizard_ImportConfigurationRename),
+        RENAME_ALL(Messages.ImportTraceWizard_ImportConfigurationRenameAll),
+        OVERWRITE(Messages.ImportTraceWizard_ImportConfigurationOverwrite),
+        OVERWRITE_ALL(Messages.ImportTraceWizard_ImportConfigurationOverwriteAll),
+        SKIP(Messages.ImportTraceWizard_ImportConfigurationSkip),
+        SKIP_ALL(Messages.ImportTraceWizard_ImportConfigurationSkipAll),
+        CONTINUE("CONTINUE"); //$NON-NLS-1$
+
+        // ------------------------------------------------------------------------
+        // Attributes
+        // ------------------------------------------------------------------------
+        /**
+         * Name of enum
+         */
+        private final String fInName;
+
+        // ------------------------------------------------------------------------
+        // Constuctors
+        // ------------------------------------------------------------------------
+
+        /**
+         * Private constructor
+         * @param name the name of state
+         */
+        private ImportConfirmation(String name) {
+            fInName = name;
+        }
+
+        // ------------------------------------------------------------------------
+        // Accessors
+        // ------------------------------------------------------------------------
+        /**
+         * @return state name
+         */
+        public String getInName() {
+            return fInName;
         }
     }
 }

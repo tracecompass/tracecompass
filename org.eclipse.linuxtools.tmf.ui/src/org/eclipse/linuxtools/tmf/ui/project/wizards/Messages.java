@@ -82,6 +82,41 @@ public class Messages extends NLS {
      */
     public static String ImportTraceWizard_NoValidTraceTypeFound;
     /**
+     * The error message when a trace already exists in project (import trace wizard).
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_TraceAlreadyExists;
+    /**
+     * The title of rename button for import configuration dialog.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportConfigurationRename;
+    /**
+     * The title of rename all button for import configuration dialog.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportConfigurationRenameAll;
+    /**
+     * The title of overwrite button for import configuration dialog.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportConfigurationOverwrite;
+    /**
+     * The title of overwrite all button for import configuration dialog.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportConfigurationOverwriteAll;
+    /**
+     * The title of skip button for import configuration dialog.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportConfigurationSkip;
+    /**
+     * The title of skip all button for import configuration dialog.
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_ImportConfigurationSkipAll;
+    /**
      * The error message when trace source is empty (import trace wizard).
      */
     public static String ImportTraceWizard_SelectTraceSourceEmpty;

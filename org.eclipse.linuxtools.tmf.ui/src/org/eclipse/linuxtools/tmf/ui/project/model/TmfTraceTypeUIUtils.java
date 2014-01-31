@@ -234,9 +234,10 @@ public final class TmfTraceTypeUIUtils {
                     traceTypeToSet = reducedCandidates.get(0);
                 } else {
                     if (shell == null) {
-                        return null;
+                        traceTypeToSet = reducedCandidates.get(0);
+                    } else {
+                        traceTypeToSet = getTraceTypeToSet(type, reducedCandidates, shell);
                     }
-                    traceTypeToSet = getTraceTypeToSet(type, reducedCandidates, shell);
                 }
             }
         } else {
