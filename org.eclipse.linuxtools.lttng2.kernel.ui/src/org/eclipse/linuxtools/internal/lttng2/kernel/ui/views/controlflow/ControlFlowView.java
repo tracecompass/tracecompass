@@ -266,42 +266,57 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 if (threadId <= 0) { // ignore the 'unknown' (-1) and swapper (0) threads
                     continue;
                 }
+
+                int execNameQuark;
+                List<ITmfStateInterval> execNameIntervals;
                 try {
-                    int execNameQuark = ssq.getQuarkRelative(threadQuark, Attributes.EXEC_NAME);
-                    List<ITmfStateInterval> execNameIntervals = ssq.queryHistoryRange(execNameQuark, start, end);
-                    for (ITmfStateInterval execNameInterval : execNameIntervals) {
-                        if (monitor.isCanceled()) {
-                            return;
-                        }
-                        ControlFlowEntry entry = entryMap.get(threadId);
-                        if (!execNameInterval.getStateValue().isNull() &&
-                                execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
-                            String execName = execNameInterval.getStateValue().unboxStr();
-                            long startTime = execNameInterval.getStartTime();
-                            long endTime = execNameInterval.getEndTime() + 1;
-                            if (entry == null) {
-                                int ppid = -1;
-                                int ppidQuark = ssq.getQuarkRelative(threadQuark, Attributes.PPID);
-                                ITmfStateInterval ppidInterval = ssq.querySingleState(startTime, ppidQuark);
-                                if (!ppidInterval.getStateValue().isNull()) {
-                                    ppid = ppidInterval.getStateValue().unboxInt();
-                                }
-                                entry = new ControlFlowEntry(threadQuark, trace, execName, threadId, ppid, startTime, endTime);
-                                entryList.add(entry);
-                                entryMap.put(threadId, entry);
-                            } else {
-                                // update the name of the entry to the latest execName
-                                entry.setName(execName);
-                                entry.updateEndTime(endTime);
-                            }
-                        } else {
-                            entryMap.remove(threadId);
-                        }
-                    }
-                } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
-                    e.printStackTrace();
+                    execNameQuark = ssq.getQuarkRelative(threadQuark, Attributes.EXEC_NAME);
+                    execNameIntervals = ssq.queryHistoryRange(execNameQuark, start, end);
+                } catch (AttributeNotFoundException e) {
+                    /* No information on this thread (yet?), skip it for now */
+                    continue;
                 } catch (StateSystemDisposedException e) {
-                    /* Ignored */
+                    /* State system is closing down, no point continuing */
+                    break;
+                }
+
+                for (ITmfStateInterval execNameInterval : execNameIntervals) {
+                    if (monitor.isCanceled()) {
+                        return;
+                    }
+                    ControlFlowEntry entry = entryMap.get(threadId);
+                    if (!execNameInterval.getStateValue().isNull() &&
+                            execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
+                        String execName = execNameInterval.getStateValue().unboxStr();
+                        long startTime = execNameInterval.getStartTime();
+                        long endTime = execNameInterval.getEndTime() + 1;
+                        if (entry == null) {
+                            ITmfStateInterval ppidInterval = null;
+                            try {
+                                int ppidQuark = ssq.getQuarkRelative(threadQuark, Attributes.PPID);
+                                ppidInterval = ssq.querySingleState(startTime, ppidQuark);
+                            } catch (AttributeNotFoundException e) {
+                                /* No info, keep PPID at -1 */
+                            } catch (StateSystemDisposedException e) {
+                                /* SS is closing down, time to bail */
+                                break;
+                            }
+                            int ppid = -1;
+                            if (!(ppidInterval == null) && !ppidInterval.getStateValue().isNull()) {
+                                ppid = ppidInterval.getStateValue().unboxInt();
+                            }
+                            entry = new ControlFlowEntry(threadQuark, trace, execName, threadId, ppid, startTime, endTime);
+                            entryList.add(entry);
+                            entryMap.put(threadId, entry);
+                        } else {
+                            // update the name of the entry to the latest
+                            // execName
+                            entry.setName(execName);
+                            entry.updateEndTime(endTime);
+                        }
+                    } else {
+                        entryMap.remove(threadId);
+                    }
                 }
             }
 
