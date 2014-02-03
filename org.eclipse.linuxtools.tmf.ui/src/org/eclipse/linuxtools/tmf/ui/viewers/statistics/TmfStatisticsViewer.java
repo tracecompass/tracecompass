@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,7 +23,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
@@ -61,97 +60,38 @@ import org.eclipse.swt.widgets.Listener;
  * It is linked to a single ITmfTrace until its disposal.
  *
  * @author Mathieu Denis
- * @version 2.0
  * @since 2.0
  */
 public class TmfStatisticsViewer extends TmfViewer {
 
-    /**
-     * Timestamp scale (nanosecond)
-     */
-    public static final byte TIME_SCALE = ITmfTimestamp.NANOSECOND_SCALE;
+    /** Timestamp scale used for all statistics (nanosecond) */
+    private static final byte TIME_SCALE = ITmfTimestamp.NANOSECOND_SCALE;
 
-    /**
-     * Default PAGE_SIZE for background requests.
-     */
-    protected static final int PAGE_SIZE = 50000;
-
-    /**
-     * Refresh frequency.
-     */
-    protected final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
-
-    /**
-     * The delay (in ms) between each update in live-reading mode
-     */
+    /** The delay (in ms) between each update in live-reading mode */
     private static final long LIVE_UPDATE_DELAY = 1000;
 
-    /**
-     * The actual tree viewer to display
-     */
-    protected TreeViewer fTreeViewer;
+    /** The actual tree viewer to display */
+    private TreeViewer fTreeViewer;
 
-    /**
-     * The statistics tree linked to this viewer
-     */
-    protected TmfStatisticsTree fStatisticsData;
+    /** The statistics tree linked to this viewer */
+    private TmfStatisticsTree fStatisticsData;
 
-    /**
-     * Update synchronization parameter (used for streaming): Update busy
-     * indicator.
-     */
-    protected boolean fStatisticsUpdateBusy = false;
+    /** Update range synchronization object */
+    private final Object fStatisticsRangeUpdateSyncObj = new Object();
 
-    /**
-     * Update synchronization parameter (used for streaming): Update pending
-     * indicator.
-     */
-    protected boolean fStatisticsUpdatePending = false;
+    /** The trace that is displayed by this viewer */
+    private ITmfTrace fTrace;
 
-    /**
-     * Update synchronization parameter (used for streaming): Pending Update
-     * time range.
-     */
-    protected TmfTimeRange fStatisticsUpdateRange = null;
-
-    /**
-     * Update synchronization object.
-     */
-    protected final Object fStatisticsUpdateSyncObj = new Object();
-
-    /**
-     * Update range synchronization object.
-     */
-    protected final Object fStatisticsRangeUpdateSyncObj = new Object();
-
-    /**
-     * The trace that is displayed by this viewer
-     */
-    protected ITmfTrace fTrace;
-
-    /**
-     * Stores the requested time range.
-     */
-    protected TmfTimeRange fRequestedTimerange;
-
-    /**
-     * Indicates to process all events
-     */
+    /** Indicates to process all events */
     private boolean fProcessAll;
 
-    /**
-     * View instance counter (for multiple statistics views)
-     */
+    /** View instance counter (for multiple statistics views) */
     private static int fCountInstance = 0;
 
-    /**
-     * Number of this instance. Used as an instance ID.
-     */
+    /** Number of this instance. Used as an instance ID. */
     private int fInstanceNb;
 
-    /**
-     * Object to store the cursor while waiting for the trace to load
-     */
+    /** Object to store the cursor while waiting for the trace to load */
     private Cursor fWaitCursor = null;
 
     /**
@@ -161,22 +101,11 @@ public class TmfStatisticsViewer extends TmfViewer {
      */
     private int fWaitCursorCount = 0;
 
-    /**
-     * Tells to send a time range request when the trace gets updated.
-     */
+    /** Tells to send a time range request when the trace gets updated. */
     private boolean fSendRangeRequest = true;
 
     /** Reference to the trace manager */
     private final TmfTraceManager fTraceManager;
-
-    /**
-     * Empty constructor. To be used in conjunction with
-     * {@link TmfStatisticsViewer#init(Composite, String, ITmfTrace)}
-     */
-    public TmfStatisticsViewer() {
-        super();
-        fTraceManager = TmfTraceManager.getInstance();
-    }
 
     /**
      * Create a basic statistics viewer. To be used in conjunction with
@@ -262,20 +191,6 @@ public class TmfStatisticsViewer extends TmfViewer {
     }
 
     /**
-     * Handles the time range updated signal. It updates the time range
-     * statistics.
-     *
-     * @param signal
-     *            Contains the information about the new selected time range.
-     * @deprecated
-     *            As of 2.1, use {@link #timeSynchUpdated(TmfTimeSynchSignal)}
-     */
-    @Deprecated
-    @TmfSignalHandler
-    public void timeRangeUpdated(TmfRangeSynchSignal signal) {
-    }
-
-    /**
      * Handles the time synch updated signal. It updates the time range
      * statistics.
      *
@@ -315,25 +230,6 @@ public class TmfStatisticsViewer extends TmfViewer {
      */
     public Object getInput() {
         return fTreeViewer.getInput();
-    }
-
-    /**
-     * Return the size of the request when performing background request.
-     *
-     * @return the block size for background request.
-     */
-    public int getPageSize() {
-        return PAGE_SIZE;
-    }
-
-    /**
-     * Return the number of events to receive before a refresh of the viewer is
-     * performed.
-     *
-     * @return the input refresh rate
-     */
-    public long getRefreshRate() {
-        return STATS_INPUT_CHANGED_REFRESH;
     }
 
     /**
@@ -569,7 +465,6 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         // Sets the input to a clean data model
         fTreeViewer.setInput(statisticsTreeNode);
-        resetUpdateSynchronization();
     }
 
     /**
@@ -596,9 +491,6 @@ public class TmfStatisticsViewer extends TmfViewer {
     protected void modelComplete(boolean global) {
         refresh();
         waitCursor(false);
-        if (global) {
-            sendPendingUpdate();
-        }
     }
 
     /**
@@ -614,8 +506,6 @@ public class TmfStatisticsViewer extends TmfViewer {
              * No need to reset the global number of events, since the index of
              * the last requested event is known.
              */
-            resetUpdateSynchronization();
-            sendPendingUpdate();
         } else {    // Clean the partial statistics
             resetTimeRangeValue();
         }
@@ -644,7 +534,6 @@ public class TmfStatisticsViewer extends TmfViewer {
      *            The range to request to the trace
      */
     protected void requestTimeRangeData(final ITmfTrace trace, final TmfTimeRange timeRange) {
-        fRequestedTimerange = timeRange;
         buildStatisticsTree(trace, timeRange, false);
     }
 
@@ -860,58 +749,6 @@ public class TmfStatisticsViewer extends TmfViewer {
                     }
                 }
             });
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Methods reserved for the streaming functionality
-    // ------------------------------------------------------------------------
-
-    /**
-     * Resets update synchronization information
-     */
-    protected void resetUpdateSynchronization() {
-        synchronized (fStatisticsUpdateSyncObj) {
-            fStatisticsUpdateBusy = false;
-            fStatisticsUpdatePending = false;
-            fStatisticsUpdateRange = null;
-        }
-    }
-
-    /**
-     * Checks if statistics update is ongoing. If it is ongoing, the new time
-     * range is stored as pending
-     *
-     * @param timeRange
-     *            - new time range
-     * @return true if statistic update is ongoing else false
-     */
-    protected boolean checkUpdateBusy(TmfTimeRange timeRange) {
-        synchronized (fStatisticsUpdateSyncObj) {
-            if (fStatisticsUpdateBusy) {
-                fStatisticsUpdatePending = true;
-                if (fStatisticsUpdateRange == null
-                        || timeRange.getEndTime().compareTo(fStatisticsUpdateRange.getEndTime()) > 0) {
-                    fStatisticsUpdateRange = timeRange;
-                }
-                return true;
-            }
-            fStatisticsUpdateBusy = true;
-            return false;
-        }
-    }
-
-    /**
-     * Sends pending request (if any)
-     */
-    protected void sendPendingUpdate() {
-        synchronized (fStatisticsUpdateSyncObj) {
-            fStatisticsUpdateBusy = false;
-            if (fStatisticsUpdatePending) {
-                fStatisticsUpdatePending = false;
-                requestData(fTrace, fStatisticsUpdateRange);
-                fStatisticsUpdateRange = null;
-            }
         }
     }
 }

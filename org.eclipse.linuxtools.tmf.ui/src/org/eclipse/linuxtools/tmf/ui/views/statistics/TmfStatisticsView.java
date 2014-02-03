@@ -216,20 +216,15 @@ public class TmfStatisticsView extends TmfView {
         Composite folder = fStatsViewers.getParentFolder();
 
         // Instantiation of the global viewer
-        TmfStatisticsViewer globalViewer = getGlobalViewer();
         if (fTrace != null) {
-            if (globalViewer != null) {
-                // Shows the name of the trace in the global tab
-                globalViewer.init(folder, Messages.TmfStatisticsView_GlobalTabName + " - " + fTrace.getName(), fTrace); //$NON-NLS-1$
-            }
+            // Shows the name of the trace in the global tab
+            TmfStatisticsViewer globalViewer = new TmfStatisticsViewer(folder, Messages.TmfStatisticsView_GlobalTabName + " - " + fTrace.getName(), fTrace); //$NON-NLS-1$
             fStatsViewers.addTab(globalViewer, Messages.TmfStatisticsView_GlobalTabName, defaultStyle);
 
-            String traceName;
-            IResource traceResource;
             // Creates a statistics viewer for each trace.
             for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
-                traceName = trace.getName();
-                traceResource = trace.getResource();
+                String traceName = trace.getName();
+                IResource traceResource = trace.getResource();
                 TmfStatisticsViewer viewer = getStatisticsViewer(traceResource);
                 /*
                  * Adds a new viewer only if there is one defined for the
@@ -242,10 +237,8 @@ public class TmfStatisticsView extends TmfView {
                 }
             }
         } else {
-            if (globalViewer != null) {
-                // There is no trace selected. Shows an empty global tab
-                globalViewer.init(folder, Messages.TmfStatisticsView_GlobalTabName, fTrace);
-            }
+            // There is no trace selected. Shows an empty global tab
+            TmfStatisticsViewer globalViewer = new TmfStatisticsViewer(folder, Messages.TmfStatisticsView_GlobalTabName, fTrace);
             fStatsViewers.addTab(globalViewer, Messages.TmfStatisticsView_GlobalTabName, defaultStyle);
         }
         // Makes the global viewer visible
@@ -268,13 +261,5 @@ public class TmfStatisticsView extends TmfView {
      */
     protected static TmfStatisticsViewer getStatisticsViewer(IResource resource) {
         return (TmfStatisticsViewer) TmfTraceType.getTraceTypeElement(resource, TmfTraceType.STATISTICS_VIEWER_ELEM);
-    }
-
-    /**
-     * @return The class to use to instantiate the global statistics viewer
-     * @since 2.0
-     */
-    protected TmfStatisticsViewer getGlobalViewer() {
-        return new TmfStatisticsViewer();
     }
 }
