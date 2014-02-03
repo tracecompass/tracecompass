@@ -36,6 +36,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
@@ -64,6 +65,7 @@ public class CtfTmfTrace extends TmfTrace
      * The Ctf clock unique identifier field
      */
     private static final String CLOCK_HOST_PROPERTY = "uuid"; //$NON-NLS-1$
+    private static final int CONFIDENCE = 10;
 
     // -------------------------------------------
     // Fields
@@ -135,19 +137,14 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * Method validate.
-     *
-     * @param project
-     *            IProject
-     * @param path
-     *            String
-     * @return IStatus IStatus.error or Status.OK_STATUS
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(IProject, String)
-     * @since 2.0
+     * {@inheritDoc}
+     * <p>
+     * The default implementation sets the confidence to 10 if the trace is a
+     * valid CTF trace.
      */
     @Override
     public IStatus validate(final IProject project, final String path) {
-        IStatus validTrace = Status.OK_STATUS;
+        IStatus validTrace = new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
         try {
             final CTFTrace temp = new CTFTrace(path);
             if (!temp.majorIsSet()) {

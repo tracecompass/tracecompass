@@ -36,6 +36,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
@@ -54,6 +55,8 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
+    private static final int MAX_LINES = 100;
+    private static final int MAX_CONFIDENCE = 100;
 
     private final CustomTxtTraceDefinition fDefinition;
     private final CustomTxtEventType fEventType;
@@ -133,9 +136,9 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             } else if (location.getLocationInfo() instanceof Long) {
                 fFile.seek((Long) location.getLocationInfo());
             }
-            String line;
             long rawPos = fFile.getFilePointer();
-            while ((line = fFile.getNextLine()) != null) {
+            String line = fFile.getNextLine();
+            while (line != null) {
                 for (final InputLine input : getFirstLines()) {
                     final Matcher matcher = input.getPattern().matcher(line);
                     if (matcher.find()) {
@@ -148,6 +151,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                     }
                 }
                 rawPos = fFile.getFilePointer();
+                line = fFile.getNextLine();
             }
             return context;
         } catch (final FileNotFoundException e) {
@@ -248,9 +252,9 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             if (fFile.getFilePointer() != context.nextLineLocation) {
                 fFile.seek(context.nextLineLocation);
             }
-            String line;
             long rawPos = fFile.getFilePointer();
-            while ((line = fFile.getNextLine()) != null) {
+            String line = fFile.getNextLine();
+            while (line != null) {
                 boolean processed = false;
                 if (currentInput == null) {
                     for (final InputLine input : getFirstLines()) {
@@ -352,6 +356,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                     }
                 }
                 rawPos = fFile.getFilePointer();
+                line = fFile.getNextLine();
             }
         } catch (final IOException e) {
             Activator.logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
@@ -395,13 +400,39 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
         return fDefinition;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default implementation computes the confidence as the percentage of
+     * lines in the first 100 lines of the file which match any of the root
+     * input line patterns.
+     */
     @Override
     public IStatus validate(IProject project, String path) {
         File file = new File(path);
-        if (file.exists() && file.isFile() && file.canRead() && file.length() > 0) {
-            return Status.OK_STATUS;
+        if (!file.exists() || !file.isFile() || !file.canRead()) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
         }
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
+        int confidence = 0;
+        try (BufferedRandomAccessFile rafile = new BufferedRandomAccessFile(path, "r")) { //$NON-NLS-1$
+            int lineCount = 0;
+            int matches = 0;
+            String line = rafile.getNextLine();
+            while ((line != null) && (lineCount++ < MAX_LINES)) {
+                for (InputLine inputLine : fDefinition.inputs) {
+                    Matcher matcher = inputLine.getPattern().matcher(line);
+                    if (matcher.find()) {
+                        matches++;
+                        break;
+                    }
+                }
+                confidence = MAX_CONFIDENCE * matches / lineCount;
+                line = rafile.getNextLine();
+            }
+        } catch (IOException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "IOException validating file: " + path, e); //$NON-NLS-1$
+        }
+        return new TraceValidationStatus(confidence, Activator.PLUGIN_ID);
     }
 
     private static int fCheckpointSize = -1;

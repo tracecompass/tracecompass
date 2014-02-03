@@ -14,8 +14,6 @@ package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -39,6 +37,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
@@ -66,6 +65,8 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
+    private static final int MAX_LINES = 100;
+    private static final int CONFIDENCE = 100;
 
     private final CustomXmlTraceDefinition fDefinition;
     private final CustomXmlEventType fEventType;
@@ -147,17 +148,17 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             } else if (location.getLocationInfo() instanceof Long) {
                 fFile.seek((Long) location.getLocationInfo());
             }
-            String line;
             final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
             long rawPos = fFile.getFilePointer();
-
-            while ((line = fFile.getNextLine()) != null) {
+            String line = fFile.getNextLine();
+            while (line != null) {
                 final int idx = line.indexOf(recordElementStart);
                 if (idx != -1) {
                     context.setLocation(new TmfLongLocation(rawPos + idx));
                     return context;
                 }
                 rawPos = fFile.getFilePointer();
+                line = fFile.getNextLine();
             }
             return context;
         } catch (final IOException e) {
@@ -255,17 +256,18 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             event = extractEvent(element, fRecordInputElement);
             ((StringBuffer) event.getContent().getValue()).append(elementBuffer);
 
-            String line;
+
             final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
             long rawPos = fFile.getFilePointer();
-
-            while ((line = fFile.getNextLine()) != null) {
+            String line = fFile.getNextLine();
+            while (line != null) {
                 final int idx = line.indexOf(recordElementStart);
                 if (idx != -1) {
                     context.setLocation(new TmfLongLocation(rawPos + idx));
                     return event;
                 }
                 rawPos = fFile.getFilePointer();
+                line = fFile.getNextLine();
             }
         } catch (final IOException e) {
             Activator.logError("Error parsing event. File: " + getPath(), e); //$NON-NLS-1$
@@ -504,52 +506,43 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
         return fDefinition;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default implementation sets the confidence to 100 if any of the first
+     * 100 lines of the file contains a valid record input element, and 0
+     * otherwise.
+     */
     @Override
     public IStatus validate(IProject project, String path) {
-        File xmlFile = new File(path);
-        if (xmlFile.exists() && xmlFile.isFile() && xmlFile.canRead() && xmlFile.length() > 0) {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db;
-            try {
-                db = dbf.newDocumentBuilder();
-
-                // The following allows xml parsing without access to the dtd
-                EntityResolver resolver = new EntityResolver() {
-                    @Override
-                    public InputSource resolveEntity(String publicId, String systemId) {
-                        return new InputSource(new ByteArrayInputStream(new byte[0]));
-                    }
-                };
-                db.setEntityResolver(resolver);
-
-                // The following catches xml parsing exceptions
-                db.setErrorHandler(new ErrorHandler() {
-                    @Override
-                    public void error(SAXParseException saxparseexception) throws SAXException {
-                    }
-
-                    @Override
-                    public void warning(SAXParseException saxparseexception) throws SAXException {
-                    }
-
-                    @Override
-                    public void fatalError(SAXParseException saxparseexception) throws SAXException {
-                        throw saxparseexception;
-                    }
-                });
-                db.parse(new FileInputStream(xmlFile));
-                return Status.OK_STATUS;
-            } catch (ParserConfigurationException e) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
-            } catch (FileNotFoundException e) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
-            } catch (SAXException e) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
-            } catch (IOException e) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
-            }
+        File file = new File(path);
+        if (!file.exists() || !file.isFile() || !file.canRead()) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
         }
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
+        try (BufferedRandomAccessFile rafile = new BufferedRandomAccessFile(path, "r")) { //$NON-NLS-1$
+            int lineCount = 0;
+            final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
+            long rawPos = 0;
+            String line = rafile.getNextLine();
+            while ((line != null) && (lineCount++ < MAX_LINES)) {
+                final int idx = line.indexOf(recordElementStart);
+                if (idx != -1) {
+                    rafile.seek(rawPos + idx + 1); // +1 is for the <
+                    final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
+                    readElement(elementBuffer, rafile);
+                    final Element element = parseElementBuffer(elementBuffer);
+                    if (element != null) {
+                        rafile.close();
+                        return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
+                    }
+                }
+                rawPos = rafile.getFilePointer();
+                line = rafile.getNextLine();
+            }
+        } catch (IOException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "IOException validating file: " + path, e); //$NON-NLS-1$
+        }
+        return new TraceValidationStatus(0, Activator.PLUGIN_ID);
     }
 
     private static int fCheckpointSize = -1;

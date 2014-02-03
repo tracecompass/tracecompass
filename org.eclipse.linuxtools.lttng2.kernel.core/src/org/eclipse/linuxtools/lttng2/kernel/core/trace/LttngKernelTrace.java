@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Activator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 
 /**
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel
@@ -32,6 +33,8 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
  */
 public class LttngKernelTrace extends CtfTmfTrace {
 
+    private static final int CONFIDENCE = 100;
+
     /**
      * Default constructor
      */
@@ -40,7 +43,10 @@ public class LttngKernelTrace extends CtfTmfTrace {
     }
 
     /**
-     * @since 2.0
+     * {@inheritDoc}
+     * <p>
+     * This implementation sets the confidence to 100 if the trace is a valid
+     * CTF trace in the "kernel" domain.
      */
     @Override
     public IStatus validate(final IProject project, final String path)  {
@@ -67,7 +73,7 @@ public class LttngKernelTrace extends CtfTmfTrace {
         String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
         temp.dispose();
         if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
-            return Status.OK_STATUS;
+            return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
         }
         validStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_DomainError);
         return validStatus;
