@@ -65,7 +65,7 @@ public interface ITmfStateValue {
      * @throws StateValueTypeException
      *             If the contained value cannot be read as an integer
      */
-    int unboxInt() throws StateValueTypeException;
+    int unboxInt();
 
     /**
      * Read the contained value as a 'long' primitive
@@ -75,7 +75,7 @@ public interface ITmfStateValue {
      *             If the contained value cannot be read as a long
      * @since 2.0
      */
-    long unboxLong() throws StateValueTypeException;
+    long unboxLong();
 
     /**
      * Read the contained value as a 'double' primitive
@@ -85,7 +85,7 @@ public interface ITmfStateValue {
      *             If the contained value cannot be read as a double
      * @since 3.0
      */
-    double unboxDouble() throws StateValueTypeException;
+    double unboxDouble();
 
     /**
      * Read the contained value as a String
@@ -94,5 +94,5 @@ public interface ITmfStateValue {
      * @throws StateValueTypeException
      *             If the contained value cannot be read as a String
      */
-    String unboxStr() throws StateValueTypeException;
+    String unboxStr();
 }

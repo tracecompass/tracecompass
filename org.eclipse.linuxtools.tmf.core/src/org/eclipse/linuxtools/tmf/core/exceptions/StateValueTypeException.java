@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -20,10 +20,13 @@ package org.eclipse.linuxtools.tmf.core.exceptions;
  * This exception is thrown if the user tries to unbox a StateValue with an
  * incorrect type (for example, tries to read a String value as an Int).
  *
- * @author Alexandre Montplaisir
+ * To avoid it, always check for the state value's type before attempting to
+ * unbox it, via
+ * {@link org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue#getType()}.
  *
+ * @author Alexandre Montplaisir
  */
-public class StateValueTypeException extends Exception {
+public class StateValueTypeException extends RuntimeException {
 
     private static final long serialVersionUID = -4548793451746144513L;
 

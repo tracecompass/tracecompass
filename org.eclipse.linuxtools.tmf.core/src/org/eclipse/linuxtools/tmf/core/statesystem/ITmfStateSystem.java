@@ -271,7 +271,7 @@ public interface ITmfStateSystem {
      *             If the query is sent after the state system has been disposed
      */
     List<ITmfStateInterval> queryFullState(long t)
-            throws TimeRangeException, StateSystemDisposedException;
+            throws StateSystemDisposedException;
 
     /**
      * Singular query method. This one does not update the whole stateInfo
@@ -296,8 +296,7 @@ public interface ITmfStateSystem {
      *             If the query is sent after the state system has been disposed
      */
     ITmfStateInterval querySingleState(long t, int attributeQuark)
-            throws AttributeNotFoundException, TimeRangeException,
-            StateSystemDisposedException;
+            throws AttributeNotFoundException, StateSystemDisposedException;
 
     /**
      * Convenience method to query attribute stacks (created with
@@ -327,8 +326,7 @@ public interface ITmfStateSystem {
      * @since 2.0
      */
     ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
-            throws StateValueTypeException, AttributeNotFoundException,
-            TimeRangeException, StateSystemDisposedException;
+            throws  AttributeNotFoundException, StateSystemDisposedException;
 
     /**
      * Return a list of state intervals, containing the "history" of a given
@@ -355,9 +353,8 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
-    List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
-            long t1, long t2) throws TimeRangeException,
-            AttributeNotFoundException, StateSystemDisposedException;
+    List<ITmfStateInterval> queryHistoryRange(int attributeQuark, long t1, long t2)
+            throws AttributeNotFoundException, StateSystemDisposedException;
 
     /**
      * Return the state history of a given attribute, but with at most one
@@ -391,6 +388,5 @@ public interface ITmfStateSystem {
      */
     List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2, long resolution, IProgressMonitor monitor)
-            throws TimeRangeException, AttributeNotFoundException,
-            StateSystemDisposedException;
+            throws AttributeNotFoundException, StateSystemDisposedException;
 }
