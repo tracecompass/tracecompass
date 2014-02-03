@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider;
 
-import java.util.HashMap;
-
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.LttngStrings;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
@@ -46,9 +44,6 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
      */
     private static final int VERSION = 4;
 
-    /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
-    private final HashMap<String, Integer> knownEventNames;
-
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -61,7 +56,6 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
      */
     public LttngKernelStateProvider(CtfTmfTrace trace) {
         super(trace, CtfTmfEvent.class, "LTTng Kernel"); //$NON-NLS-1$
-        knownEventNames = fillEventNames();
     }
 
     // ------------------------------------------------------------------------
@@ -90,10 +84,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
          * AbstractStateChangeInput should have already checked for the correct
          * class type
          */
-        CtfTmfEvent event = (CtfTmfEvent) ev;
-
-        int quark;
-        ITmfStateValue value;
+        final CtfTmfEvent event = (CtfTmfEvent) ev;
 
         final ITmfEventField content = event.getContent();
         final String eventName = event.getType().getName();
@@ -107,8 +98,8 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
              * Shortcut for the "current thread" attribute node. It requires
              * querying the current CPU's current thread.
              */
-            quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
-            value = ss.queryOngoingState(quark);
+            int quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
+            ITmfStateValue value = ss.queryOngoingState(quark);
             int thread = value.isNull() ? -1 : value.unboxInt();
             final Integer currentThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), String.valueOf(thread));
 
@@ -116,9 +107,9 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
              * Feed event to the history system if it's known to cause a state
              * transition.
              */
-            switch (getEventIndex(eventName)) {
+            switch (eventName) {
 
-            case 1: // "exit_syscall":
+            case LttngStrings.EXIT_SYSCALL:
             /* Fields: int64 ret */
             {
                 /* Clear the current system call on the process */
@@ -138,7 +129,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 2: // "irq_handler_entry":
+            case LttngStrings.IRQ_HANDLER_ENTRY:
             /* Fields: int32 irq, string name */
             {
                 Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
@@ -161,7 +152,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 3: // "irq_handler_exit":
+            case LttngStrings.IRQ_HANDLER_EXIT:
             /* Fields: int32 irq, int32 ret */
             {
                 Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
@@ -179,7 +170,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 4: // "softirq_entry":
+            case LttngStrings.SOFTIRQ_ENTRY:
             /* Fields: int32 vec */
             {
                 Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
@@ -202,7 +193,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 5: // "softirq_exit":
+            case LttngStrings.SOFTIRQ_EXIT:
             /* Fields: int32 vec */
             {
                 Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
@@ -220,7 +211,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 6: // "softirq_raise":
+            case LttngStrings.SOFTIRQ_RAISE:
             /* Fields: int32 vec */
             {
                 Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
@@ -233,7 +224,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 7: // "sched_switch":
+            case LttngStrings.SCHED_SWITCH:
             /*
              * Fields: string prev_comm, int32 prev_tid, int32 prev_prio, int64 prev_state,
              *         string next_comm, int32 next_tid, int32 next_prio
@@ -290,7 +281,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 8: // "sched_process_fork":
+            case LttngStrings.SCHED_PROCESS_FORK:
             /* Fields: string parent_comm, int32 parent_tid,
              *         string child_comm, int32 child_tid */
             {
@@ -334,11 +325,11 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 9: // "sched_process_exit":
+            case LttngStrings.SCHED_PROCESS_EXIT:
             /* Fields: string comm, int32 tid, int32 prio */
                 break;
 
-            case 10: // "sched_process_free":
+            case LttngStrings.SCHED_PROCESS_FREE:
             /* Fields: string comm, int32 tid, int32 prio */
             /*
              * A sched_process_free will always happen after the sched_switch
@@ -356,7 +347,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 11: // "lttng_statedump_process_state":
+            case LttngStrings.STATEDUMP_PROCESS_STATE:
             /* Fields:
              * int32 type, int32 mode, int32 pid, int32 submode, int32 vpid,
              * int32 ppid, int32 tid, string name, int32 status, int32 vtid */
@@ -410,8 +401,8 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case 12: // "sched_wakeup":
-            case 13: // "sched_wakeup_new":
+            case LttngStrings.SCHED_WAKEUP:
+            case LttngStrings.SCHED_WAKEUP_NEW:
             /* Fields (same fields for both types):
              * string comm, int32 pid, int32 prio, int32 success,
              * int32 target_cpu */
@@ -507,39 +498,6 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
     private int getNodeSoftIRQs() {
         return ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.SOFT_IRQS);
-    }
-
-    // ------------------------------------------------------------------------
-    // Workaround for the lack of switch-on-strings in Java < 7
-    // ------------------------------------------------------------------------
-
-    private static HashMap<String, Integer> fillEventNames() {
-        /*
-         * TODO Replace with straight strings in the switch/case once we move to
-         * Java 7
-         */
-        HashMap<String, Integer> map = new HashMap<>();
-
-        map.put(LttngStrings.EXIT_SYSCALL, 1);
-        map.put(LttngStrings.IRQ_HANDLER_ENTRY, 2);
-        map.put(LttngStrings.IRQ_HANDLER_EXIT, 3);
-        map.put(LttngStrings.SOFTIRQ_ENTRY, 4);
-        map.put(LttngStrings.SOFTIRQ_EXIT, 5);
-        map.put(LttngStrings.SOFTIRQ_RAISE, 6);
-        map.put(LttngStrings.SCHED_SWITCH, 7);
-        map.put(LttngStrings.SCHED_PROCESS_FORK, 8);
-        map.put(LttngStrings.SCHED_PROCESS_EXIT, 9);
-        map.put(LttngStrings.SCHED_PROCESS_FREE, 10);
-        map.put(LttngStrings.STATEDUMP_PROCESS_STATE, 11);
-        map.put(LttngStrings.SCHED_WAKEUP, 12);
-        map.put(LttngStrings.SCHED_WAKEUP_NEW, 13);
-
-        return map;
-    }
-
-    private int getEventIndex(String eventName) {
-        Integer ret = knownEventNames.get(eventName);
-        return (ret != null) ? ret : -1;
     }
 
     // ------------------------------------------------------------------------
