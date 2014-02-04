@@ -40,6 +40,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
@@ -47,6 +49,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -260,6 +263,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
         }
         if (traceResource != null && traceResource.exists()) {
+            setTraceType(traceResource);
             createLink(targetExperiment.getResource(), traceResource, traceResource.getName());
             targetExperiment.deleteSupplementaryResources();
             targetExperiment.closeEditors();
@@ -324,7 +328,9 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             } else {
                 createLink(traceFolder.getResource(), sourceResource, targetName);
             }
-            return traceFolder.getResource().findMember(targetName);
+            IResource traceResource = traceFolder.getResource().findMember(targetName);
+            setTraceType(traceResource);
+            return traceResource;
         } catch (CoreException e) {
             displayException(e);
         }
@@ -376,6 +382,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 resource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(targetName);
             }
             if (resource != null && resource.exists()) {
+                setTraceType(resource);
                 createLink(targetExperiment.getResource(), resource, resource.getName());
                 targetExperiment.deleteSupplementaryResources();
                 targetExperiment.closeEditors();
@@ -412,6 +419,8 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         } else {
             createLink(traceFolder.getResource(), path, targetName);
         }
+        IResource traceResource = traceFolder.getResource().findMember(targetName);
+        setTraceType(traceResource);
         return true;
     }
 
@@ -604,6 +613,18 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
         resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
         resource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder);
+    }
+
+    private static void setTraceType(IResource traceResource) {
+        try {
+            TraceTypeHelper traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(traceResource.getLocationURI().getPath(), null, null);
+            if (traceTypeHelper != null) {
+                TmfTraceTypeUIUtils.setTraceType(traceResource.getFullPath(), traceTypeHelper);
+            }
+        } catch (TmfTraceImportException e) {
+        } catch (CoreException e) {
+            displayException(e);
+        }
     }
 
     /**
