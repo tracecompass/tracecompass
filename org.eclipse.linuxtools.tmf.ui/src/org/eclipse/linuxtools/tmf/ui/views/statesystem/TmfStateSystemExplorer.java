@@ -186,7 +186,7 @@ public class TmfStateSystemExplorer extends TmfView {
                     if (ss == null) {
                         continue;
                     }
-                    String ssName = module.getStateSystemId(ss);
+                    String ssName = ss.getSSID();
                     sss.put(ssName, ss);
 
                     if (ts == -1 || ts < ss.getStartTime() || ts > ss.getCurrentEndTime()) {
@@ -298,7 +298,7 @@ public class TmfStateSystemExplorer extends TmfView {
                     final int traceNb1 = traceNb;
                     final int ssNb1 = ssNb;
                     if (ss != null) {
-                        final String ssName = module.getStateSystemId(ss);
+                        final String ssName = ss.getSSID();
                         ts = (ts == -1 ? ss.getStartTime() : ts);
                         try {
                             final List<ITmfStateInterval> fullState = ss.queryFullState(ts);

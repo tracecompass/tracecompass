@@ -452,12 +452,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     }
 
     @Override
-    @Nullable
-    public String getStateSystemId(ITmfStateSystem ss) {
-        return getId();
-    }
-
-    @Override
     public Iterable<ITmfStateSystem> getStateSystems() {
         @SuppressWarnings("null")
         @NonNull Iterable<ITmfStateSystem> ret = Collections.singleton((ITmfStateSystem) fStateSystem);

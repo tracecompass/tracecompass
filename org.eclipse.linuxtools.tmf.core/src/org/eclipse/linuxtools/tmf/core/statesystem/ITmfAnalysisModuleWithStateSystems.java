@@ -38,20 +38,6 @@ public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
     ITmfStateSystem getStateSystem(@NonNull String id);
 
     /**
-     * FIXME The ID's should be saved in the state system themselves
-     * (ITmfStateSystem.getId()), so this will eventually not be needed.
-     *
-     * Return the ID of a given state system.
-     *
-     * @param ss
-     *            The state system for which you want the ID, null if there is
-     *            no match.
-     * @return The corresponding state system
-     */
-    @Nullable
-    String getStateSystemId(@NonNull ITmfStateSystem ss);
-
-    /**
      * Return all the state systems provided by this analysis module, in
      * Iterable format.
      *

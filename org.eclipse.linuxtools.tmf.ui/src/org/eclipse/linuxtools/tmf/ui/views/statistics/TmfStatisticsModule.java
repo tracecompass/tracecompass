@@ -185,16 +185,6 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     }
 
     @Override
-    public String getStateSystemId(ITmfStateSystem ss) {
-        if (ss.equals(totalsModule.getStateSystem())) {
-            return TmfStatisticsTotalsModule.ID;
-        } else if (ss.equals(eventTypesModule.getStateSystem())){
-            return TmfStatisticsEventTypesModule.ID;
-        }
-        return null;
-    }
-
-    @Override
     public Iterable<ITmfStateSystem> getStateSystems() {
         List<ITmfStateSystem> list = new LinkedList<>();
         list.add(totalsModule.getStateSystem());
