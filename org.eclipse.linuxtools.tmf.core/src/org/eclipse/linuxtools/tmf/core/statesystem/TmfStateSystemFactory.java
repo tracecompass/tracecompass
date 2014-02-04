@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.HistoryBuilder;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
@@ -42,6 +43,8 @@ public final class TmfStateSystemFactory extends TmfComponent {
 
     /** "static" class */
     private TmfStateSystemFactory() {}
+
+    @NonNull private static final String SSID = "legacy-state-system"; //$NON-NLS-1$
 
     /** Size of the blocking queue to use when building a state history */
     private static final int QUEUE_SIZE = 10000;
@@ -105,7 +108,7 @@ public final class TmfStateSystemFactory extends TmfComponent {
         try {
             htBackend = new ThreadedHistoryTreeBackend(htFile,
                     stateProvider.getStartTime(), stateProvider.getVersion(), QUEUE_SIZE);
-            StateSystem ss = new StateSystem(htBackend);
+            StateSystem ss = new StateSystem(SSID, htBackend);
             stateProvider.assignTargetStateSystem(ss);
             builder = new HistoryBuilder(stateProvider, ss, htBackend, buildManually);
         } catch (IOException e) {
@@ -133,7 +136,7 @@ public final class TmfStateSystemFactory extends TmfComponent {
      */
     public static ITmfStateSystem newNullHistory(ITmfStateProvider stateProvider) {
         IStateHistoryBackend backend = new NullBackend();
-        StateSystem ss = new StateSystem(backend);
+        StateSystem ss = new StateSystem(SSID, backend);
         stateProvider.assignTargetStateSystem(ss);
 
         HistoryBuilder builder = new HistoryBuilder(stateProvider, ss, backend, true);
@@ -159,7 +162,7 @@ public final class TmfStateSystemFactory extends TmfComponent {
     public static ITmfStateSystem newInMemHistory(ITmfStateProvider stateProvider,
             boolean buildManually) {
         IStateHistoryBackend backend = new InMemoryBackend(stateProvider.getStartTime());
-        StateSystem ss = new StateSystem(backend);
+        StateSystem ss = new StateSystem(SSID, backend);
         stateProvider.assignTargetStateSystem(ss);
 
         HistoryBuilder builder = new HistoryBuilder(stateProvider, ss, backend, buildManually);
@@ -237,7 +240,7 @@ public final class TmfStateSystemFactory extends TmfComponent {
                 new PartialHistoryBackend(partialProvider, pss, realBackend, granularity);
 
         /* 4 */
-        StateSystem realSS = new StateSystem(partialBackend);
+        StateSystem realSS = new StateSystem(SSID, partialBackend);
 
         /* 5 */
         pss.assignUpstream(realSS);

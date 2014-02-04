@@ -57,6 +57,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         implements ITmfAnalysisModuleWithStateSystems {
 
     private static final String EXTENSION = ".ht"; //$NON-NLS-1$
+    private static final String UNDEFINED_ID = "undefined"; //$NON-NLS-1$
 
     private final CountDownLatch fInitialized = new CountDownLatch(1);
 
@@ -136,6 +137,12 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         IProgressMonitor mon = (monitor == null ? new NullProgressMonitor() : monitor);
         final ITmfStateProvider provider = createStateProvider();
 
+        String id = getId();
+        if (id == null) {
+            /* The analysis module does not specify an ID, use a generic one */
+            id = UNDEFINED_ID;
+        }
+
         /* FIXME: State systems should make use of the monitor, to be cancelled */
         try {
             /* Get the state system according to backend */
@@ -146,18 +153,18 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             case FULL:
                 directory = TmfTraceManager.getSupplementaryFileDir(getTrace());
                 htFile = new File(directory + getSsFileName());
-                createFullHistory(provider, htFile);
+                createFullHistory(id, provider, htFile);
                 break;
             case PARTIAL:
                 directory = TmfTraceManager.getSupplementaryFileDir(getTrace());
                 htFile = new File(directory + getSsFileName());
-                createPartialHistory(provider, htFile);
+                createPartialHistory(id, provider, htFile);
                 break;
             case INMEM:
-                createInMemoryHistory(provider);
+                createInMemoryHistory(id, provider);
                 break;
             case NULL:
-                createNullHistory(provider);
+                createNullHistory(id, provider);
                 break;
             default:
                 break;
@@ -193,7 +200,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * exists, it will be opened directly. If not, it will be created from
      * scratch.
      */
-    private void createFullHistory(ITmfStateProvider provider, File htFile) throws TmfTraceException {
+    private void createFullHistory(String id, ITmfStateProvider provider, File htFile) throws TmfTraceException {
 
         /* If the target file already exists, do not rebuild it uselessly */
         // TODO for now we assume it's complete. Might be a good idea to check
@@ -203,8 +210,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
            /* Load an existing history */
             final int version = provider.getVersion();
             try {
-                fHtBackend = new HistoryTreeBackend(htFile, version);
-                fStateSystem = new StateSystem(fHtBackend, false);
+                IStateHistoryBackend backend = new HistoryTreeBackend(htFile, version);
+                fHtBackend = backend;
+                fStateSystem = new StateSystem(id, backend, false);
                 fInitialized.countDown();
                 return;
             } catch (IOException e) {
@@ -220,9 +228,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         final int QUEUE_SIZE = 10000;
 
         try {
-            fHtBackend = new ThreadedHistoryTreeBackend(htFile,
+            IStateHistoryBackend backend = new ThreadedHistoryTreeBackend(htFile,
                     provider.getStartTime(), provider.getVersion(), QUEUE_SIZE);
-            fStateSystem = new StateSystem(fHtBackend);
+            fHtBackend = backend;
+            fStateSystem = new StateSystem(id, backend);
             provider.assignTargetStateSystem(fStateSystem);
             build(provider);
         } catch (IOException e) {
@@ -244,7 +253,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * underneath, (which are much slower), so this might not be a good fit for
      * a use case where you have to do lots of single queries.
      */
-    private void createPartialHistory(ITmfStateProvider provider, File htPartialFile)
+    private void createPartialHistory(String id, ITmfStateProvider provider, File htPartialFile)
             throws TmfTraceException {
         /*
          * The order of initializations is very tricky (but very important!)
@@ -292,7 +301,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 new PartialHistoryBackend(partialProvider, pss, realBackend, granularity);
 
         /* 4 */
-        StateSystem realSS = new StateSystem(partialBackend);
+        StateSystem realSS = new StateSystem(id, partialBackend);
 
         /* 5 */
         pss.assignUpstream(realSS);
@@ -312,9 +321,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * no history intervals will be saved anywhere, and as such only
      * {@link ITmfStateSystem#queryOngoingState} will be available.
      */
-    private void createNullHistory(ITmfStateProvider provider) {
-        fHtBackend = new NullBackend();
-        fStateSystem = new StateSystem(fHtBackend);
+    private void createNullHistory(String id, ITmfStateProvider provider) {
+        IStateHistoryBackend backend = new NullBackend();
+        fHtBackend = backend;
+        fStateSystem = new StateSystem(id, backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
     }
@@ -324,9 +334,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * only be done for very small state system, and will be naturally limited
      * to 2^31 intervals.
      */
-    private void createInMemoryHistory(ITmfStateProvider provider) {
-        fHtBackend = new InMemoryBackend(provider.getStartTime());
-        fStateSystem = new StateSystem(fHtBackend);
+    private void createInMemoryHistory(String id, ITmfStateProvider provider) {
+        IStateHistoryBackend backend = new InMemoryBackend(provider.getStartTime());
+        fHtBackend = backend;
+        fStateSystem = new StateSystem(id, backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
     }

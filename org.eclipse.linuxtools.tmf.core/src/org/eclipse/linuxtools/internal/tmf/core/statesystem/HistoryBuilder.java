@@ -108,7 +108,7 @@ public class HistoryBuilder extends TmfComponent {
      */
     public static ITmfStateSystemBuilder openExistingHistory(
             @NonNull IStateHistoryBackend hb) throws IOException {
-        return new StateSystem(hb, false);
+        return new StateSystem("legacy-state-system", hb, false); //$NON-NLS-1$
     }
 
     /**

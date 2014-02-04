@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.InMemoryBackend;
@@ -33,6 +34,8 @@ import org.junit.Test;
  *
  */
 public class TmfMipmapStateProviderWeightedTest {
+
+    @NonNull private static final String SSID = "mipmap-test";
     private static final String TEST_ATTRIBUTE_NAME = TmfMipmapStateProviderStub.TEST_ATTRIBUTE_NAME;
     private static final long END_TIME = 250000L;
     private static final long INTERVAL = 1000L;
@@ -49,12 +52,12 @@ public class TmfMipmapStateProviderWeightedTest {
         /* setup for INTEGER test */
         TmfMipmapStateProviderStub mmpi = new TmfMipmapStateProviderStub(RESOLUTION, Type.INTEGER);
         IStateHistoryBackend bei = new InMemoryBackend(0);
-        ssqi = new StateSystem(bei);
+        ssqi = new StateSystem(SSID, bei);
         mmpi.assignTargetStateSystem(ssqi);
         /* setup for DOUBLE test */
         TmfMipmapStateProviderStub mmpd = new TmfMipmapStateProviderStub(RESOLUTION, Type.DOUBLE);
         IStateHistoryBackend bed = new InMemoryBackend(0);
-        ssqd = new StateSystem(bed);
+        ssqd = new StateSystem(SSID, bed);
         mmpd.assignTargetStateSystem(ssqd);
         /*
          * Every 10,000 ns chunk contains the following states:

@@ -52,6 +52,8 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  */
 public class StateSystem implements ITmfStateSystemBuilder {
 
+    private final String ssid;
+
     /* References to the inner structures */
     private final AttributeTree attributeTree;
     private final TransientState transState;
@@ -67,10 +69,13 @@ public class StateSystem implements ITmfStateSystemBuilder {
      * New-file constructor. For when you build a state system with a new file,
      * or if the back-end does not require a file on disk.
      *
+     * @param ssid
+     *            The ID of this statesystem. It should be unique.
      * @param backend
      *            Back-end plugin to use
      */
-    public StateSystem(@NonNull IStateHistoryBackend backend) {
+    public StateSystem(@NonNull String ssid, @NonNull IStateHistoryBackend backend) {
+        this.ssid = ssid;
         this.backend = backend;
         this.transState = new TransientState(backend);
         this.attributeTree = new AttributeTree(this);
@@ -79,6 +84,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
     /**
      * General constructor
      *
+     * @param ssid
+     *            The ID of this statesystem. It should be unique.
      * @param backend
      *            The "state history storage" back-end to use.
      * @param newFile
@@ -87,8 +94,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
      * @throws IOException
      *             If there was a problem creating the new history file
      */
-    public StateSystem(@NonNull IStateHistoryBackend backend, boolean newFile)
+    public StateSystem(@NonNull String ssid, @NonNull IStateHistoryBackend backend, boolean newFile)
             throws IOException {
+        this.ssid = ssid;
         this.backend = backend;
         this.transState = new TransientState(backend);
 
@@ -100,6 +108,11 @@ public class StateSystem implements ITmfStateSystemBuilder {
             transState.setInactive();
             finishedLatch.countDown(); /* The history is already built */
         }
+    }
+
+    @Override
+    public String getSSID() {
+        return ssid;
     }
 
     @Override

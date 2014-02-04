@@ -33,6 +33,14 @@ import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 public interface ITmfStateSystem {
 
     /**
+     * Get the ID of this state system.
+     *
+     * @return The state system's ID
+     * @since 3.0
+     */
+    String getSSID();
+
+    /**
      * Return the start time of this history. It usually matches the start time
      * of the original trace.
      *

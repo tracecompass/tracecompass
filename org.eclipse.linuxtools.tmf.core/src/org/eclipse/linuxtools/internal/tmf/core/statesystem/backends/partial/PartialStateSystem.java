@@ -53,7 +53,7 @@ public class PartialStateSystem extends StateSystem {
          * We use a Null back end here : we only use this state system for its
          * "ongoing" values, so no need to save the changes that are inserted.
          */
-        super(new NullBackend());
+        super("partial", new NullBackend()); //$NON-NLS-1$
     }
 
     /**

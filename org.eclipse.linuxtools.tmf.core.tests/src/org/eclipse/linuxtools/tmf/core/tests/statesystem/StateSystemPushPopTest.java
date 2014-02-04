@@ -82,7 +82,7 @@ public class StateSystemPushPopTest {
         testHtFile = File.createTempFile("test", ".ht");
 
         IStateHistoryBackend backend = new HistoryTreeBackend(testHtFile, 0, 0L);
-        ss = new StateSystem(backend, true);
+        ss = new StateSystem("push-pop-test", backend, true);
 
         /* Build the thing */
         final int attrib = ss.getQuarkAbsoluteAndAdd("Test", "stack");
