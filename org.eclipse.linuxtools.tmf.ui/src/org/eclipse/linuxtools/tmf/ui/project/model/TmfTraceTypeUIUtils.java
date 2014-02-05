@@ -15,10 +15,12 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,6 +35,7 @@ import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.util.Pair;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -86,13 +89,15 @@ public final class TmfTraceTypeUIUtils {
         return traces;
     }
 
-    private static List<TraceTypeHelper> reduce(List<TraceTypeHelper> candidates) {
-        List<TraceTypeHelper> retVal = new ArrayList<>();
+
+    private static List<Pair<Integer, TraceTypeHelper>> reduce(List<Pair<Integer, TraceTypeHelper>> candidates) {
+        List<Pair<Integer, TraceTypeHelper>> retVal = new ArrayList<>();
 
         // get all the tracetypes that are unique in that stage
-        for (TraceTypeHelper trace : candidates) {
-            if (isUnique(trace, candidates)) {
-                retVal.add(trace);
+        for (Pair<Integer, TraceTypeHelper> candidatePair : candidates) {
+            TraceTypeHelper candidate = candidatePair.getSecond();
+            if (isUnique(candidate, candidates)) {
+                retVal.add(candidatePair);
             }
         }
         return retVal;
@@ -101,7 +106,7 @@ public final class TmfTraceTypeUIUtils {
     /*
      * Only return the leaves of the trace types. Ignore custom trace types.
      */
-    private static boolean isUnique(TraceTypeHelper trace, List<TraceTypeHelper> set) {
+    private static boolean isUnique(TraceTypeHelper trace, List<Pair<Integer, TraceTypeHelper>> set) {
         if (isCustomTraceId(trace.getCanonicalName())) {
             return true;
         }
@@ -109,14 +114,15 @@ public final class TmfTraceTypeUIUtils {
         // type and if it is only an instance of itself, it is a leaf
         final ITmfTrace tmfTrace = trace.getTrace();
         int count = -1;
-        for (TraceTypeHelper child : set) {
-            final ITmfTrace traceCandidate = child.getTrace();
+        for (Pair<Integer, TraceTypeHelper> child : set) {
+            final ITmfTrace traceCandidate = child.getSecond().getTrace();
             if (tmfTrace.getClass().isInstance(traceCandidate)) {
                 count++;
             }
         }
         return count == 0;
     }
+
 
     /**
      * Is the trace type id a custom (user-defined) trace type. These are the
@@ -134,12 +140,13 @@ public final class TmfTraceTypeUIUtils {
         return false;
     }
 
-    private static TraceTypeHelper getTraceTypeToSet(TmfTraceType type, List<TraceTypeHelper> candidates, Shell shell) {
+    private static TraceTypeHelper getTraceTypeToSet(TmfTraceType type, List<Pair<Integer, TraceTypeHelper>> candidates, Shell shell) {
         final Map<String, String> names = new HashMap<>();
         Shell shellToShow = new Shell(shell);
         shellToShow.setText(Messages.TmfTraceType_SelectTraceType);
         final String candidatesToSet[] = new String[1];
-        for (TraceTypeHelper candidate : candidates) {
+        for (Pair<Integer, TraceTypeHelper> candidatePair : candidates) {
+            TraceTypeHelper candidate = candidatePair.getSecond();
             Button b = new Button(shellToShow, SWT.RADIO);
             final String displayName = candidate.getCategoryName() + ':' + candidate.getName();
             b.setText(displayName);
@@ -208,11 +215,25 @@ public final class TmfTraceTypeUIUtils {
      */
     public static TraceTypeHelper selectTraceType(String path, Shell shell, String traceTypeHint) throws TmfTraceImportException {
         TmfTraceType type = TmfTraceType.getInstance();
-        List<TraceTypeHelper> validCandidates = new ArrayList<>();
-        final Iterable<String> traceTypes = type.getTraceTypeIDs();
-        for (String traceType : traceTypes) {
-            if (type.validate(traceType, path)) {
-                validCandidates.add(type.getTraceTypeHelper(traceType));
+
+        Comparator<Pair<Integer, TraceTypeHelper>> comparator = new Comparator<Pair<Integer, TraceTypeHelper>>() {
+            @Override
+            public int compare(Pair<Integer, TraceTypeHelper> o1, Pair<Integer, TraceTypeHelper> o2) {
+                int res = -o1.getFirst().compareTo(o2.getFirst()); // invert so that highest confidence is first
+                if (res == 0) {
+                    res = o1.getSecond().getName().compareTo(o2.getSecond().getName());
+                }
+                return res;
+            }
+        };
+        TreeSet<Pair<Integer, TraceTypeHelper>> validCandidates = new TreeSet<>(comparator);
+        final Iterable<TraceTypeHelper> traceTypeHelpers = type.getTraceTypeHelpers();
+        for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
+            int confidence = traceTypeHelper.validateWithConfidence(path);
+            if (confidence >= 0) {
+                // insert in the tree map, ordered by confidence (highest confidence first) then name
+                Pair<Integer, TraceTypeHelper> element = new Pair<>(confidence, traceTypeHelper);
+                validCandidates.add(element);
             }
         }
 
@@ -221,27 +242,32 @@ public final class TmfTraceTypeUIUtils {
             final String errorMsg = Messages.TmfOpenTraceHelper_NoTraceTypeMatch + path;
             throw new TmfTraceImportException(errorMsg);
         } else if (validCandidates.size() != 1) {
-            List<TraceTypeHelper> reducedCandidates = reduce(validCandidates);
-            for (TraceTypeHelper tth : reducedCandidates) {
-                if (tth.getCanonicalName().equals(traceTypeHint)) {
-                    traceTypeToSet = tth;
+            List<Pair<Integer, TraceTypeHelper>> candidates = new ArrayList<>(validCandidates);
+            List<Pair<Integer, TraceTypeHelper>> reducedCandidates = reduce(candidates);
+            for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
+                TraceTypeHelper candidate = candidatePair.getSecond();
+                if (candidate.getCanonicalName().equals(traceTypeHint)) {
+                    traceTypeToSet = candidate;
+                    break;
                 }
             }
             if (traceTypeToSet == null) {
                 if (reducedCandidates.size() == 0) {
                     throw new TmfTraceImportException(Messages.TmfOpenTraceHelper_ReduceError);
                 } else if (reducedCandidates.size() == 1) {
-                    traceTypeToSet = reducedCandidates.get(0);
-                } else {
-                    if (shell == null) {
-                        traceTypeToSet = reducedCandidates.get(0);
-                    } else {
-                        traceTypeToSet = getTraceTypeToSet(type, reducedCandidates, shell);
+                    traceTypeToSet = reducedCandidates.get(0).getSecond();
+                } else if (shell == null) {
+                    Pair<Integer, TraceTypeHelper> candidate = reducedCandidates.get(0);
+                    // if the best match has lowest confidence, don't select it
+                    if (candidate.getFirst() > 0) {
+                        traceTypeToSet = candidate.getSecond();
                     }
+                } else {
+                    traceTypeToSet = getTraceTypeToSet(type, reducedCandidates, shell);
                 }
             }
         } else {
-            traceTypeToSet = validCandidates.get(0);
+            traceTypeToSet = validCandidates.first().getSecond();
         }
         return traceTypeToSet;
     }

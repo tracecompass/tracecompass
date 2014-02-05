@@ -12,7 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.core.project.model;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 
 /**
  * TraceTypeHelper, a helper that can link a few names to a configuation element
@@ -89,6 +91,28 @@ public class TraceTypeHelper {
             valid = standardValidate(path);
         }
         return valid;
+    }
+
+    /**
+     * Validate a trace against this trace type with confidence level
+     *
+     * @param path
+     *            the trace to validate
+     * @return the confidence level (0 is lowest) or -1 if validation fails
+     * @since 3.0
+     */
+    public int validateWithConfidence(String path) {
+        int result = -1;
+        if (fTrace != null) {
+            IStatus status = fTrace.validate(null, path);
+            if (status.isOK()) {
+                result = 0;
+                if (status instanceof TraceValidationStatus) {
+                    result = ((TraceValidationStatus) status).getConfidence();
+                }
+            }
+        }
+        return result;
     }
 
     /**

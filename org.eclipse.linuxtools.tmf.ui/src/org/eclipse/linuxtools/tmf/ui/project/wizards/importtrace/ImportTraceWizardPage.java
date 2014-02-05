@@ -795,10 +795,22 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
             File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
-            TraceTypeHelper traceTypeHelper;
+            TraceTypeHelper traceTypeHelper = null;
             boolean sendValidationError = true;
             if (fTraceType == null) {
-                traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(path, null, null);
+                try {
+                    traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(path, null, null);
+                } catch (TmfTraceImportException e) {
+                    // the trace did not match any trace type
+                }
+                if (traceTypeHelper == null) {
+                    if (fImportUnrecognizedTraces) {
+                        if (importResource(fileSystemElement, monitor)) {
+                            fUnrecognizedResources.add(path);
+                        }
+                    }
+                    return;
+                }
             } else {
                 if (!TmfTraceType.getInstance().isDirectoryTraceType(fTraceType)) {
                     return;
@@ -812,27 +824,33 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         private void validateAndImportFileTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
 
-
             File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
             TraceTypeHelper traceTypeHelper = null;
             boolean sendValidationError = true;
 
             if (fTraceType == null) {
-                // TODO add automatic trace type selection for trace file
-                if (fImportUnrecognizedTraces) {
-                    if (importResource(fileSystemElement, monitor)) {
-                        fUnrecognizedResources.add(path);
-                    }
+                try {
+                    traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(path, null, null);
+                } catch (TmfTraceImportException e) {
+                    // the trace did not match any trace type
                 }
-                return;
+                if (traceTypeHelper == null) {
+                    if (fImportUnrecognizedTraces) {
+                        if (importResource(fileSystemElement, monitor)) {
+                            fUnrecognizedResources.add(path);
+                        }
+                    }
+                    return;
+                }
+            } else {
+                if (TmfTraceType.getInstance().isDirectoryTraceType(fTraceType)) {
+                    return;
+                }
+                sendValidationError = false;
+                traceTypeHelper = TmfTraceType.getInstance().getTraceType(fTraceType);
             }
 
-            if (TmfTraceType.getInstance().isDirectoryTraceType(fTraceType)) {
-                return;
-            }
-            sendValidationError = false;
-            traceTypeHelper = TmfTraceType.getInstance().getTraceType(fTraceType);
             validateAndImportTrace(fileSystemElement, traceTypeHelper, sendValidationError, monitor);
             return;
         }
