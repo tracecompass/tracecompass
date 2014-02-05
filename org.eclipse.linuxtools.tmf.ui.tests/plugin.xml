@@ -100,6 +100,13 @@
                class="org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub">
          </tracetype>
       </module>
+      <output
+            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.linuxtools.tmf.ui.tests.testAnalysisView">
+         <analysisModuleClass
+               class="org.eclipse.linuxtools.tmf.ui.tests.stubs.analysis.TestAnalysisUi">
+         </analysisModuleClass>
+      </output>
    </extension>
 
 </plugin>
