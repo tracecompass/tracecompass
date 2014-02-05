@@ -172,9 +172,9 @@ public class TmfStateSystemExplorer extends TmfView {
              */
             Iterable<ITmfAnalysisModuleWithStateSystems> modules = currentTrace.getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class);
             final Map<String, ITmfStateSystem> sss = new HashMap<>();
-            final Map<String, List<ITmfStateInterval>> fullStates =
-                    new LinkedHashMap<>();
+            final Map<String, List<ITmfStateInterval>> fullStates = new LinkedHashMap<>();
             for (ITmfAnalysisModuleWithStateSystems module : modules) {
+
                 /*
                  * FIXME: For now, this view is a way to execute and display
                  * state system. But with phase 2 of analysis API, we won't want
@@ -299,6 +299,7 @@ public class TmfStateSystemExplorer extends TmfView {
                     final int traceNb1 = traceNb;
                     final int ssNb1 = ssNb;
                     if (ss != null) {
+                        final String ssName = module.getStateSystemId(ss);
                         ts = (ts == -1 ? ss.getStartTime() : ts);
                         try {
                             final List<ITmfStateInterval> fullState = ss.queryFullState(ts);
@@ -310,10 +311,19 @@ public class TmfStateSystemExplorer extends TmfView {
                                      * system
                                      */
                                     TreeItem traceItem = fTree.getItem(traceNb1);
-                                    TreeItem item = traceItem.getItem(ssNb1);
-                                    /* Update it, then its children, recursively */
-                                    item.setText(VALUE_COL, emptyString);
-                                    updateChildren(ss, fullState, -1, item);
+                                    /* Find the item corresponding to this state system */
+                                    TreeItem item = null;
+                                    for (TreeItem ssItem : traceItem.getItems()) {
+                                        if (ssItem.getText(ATTRIBUTE_NAME_COL).equals(ssName)) {
+                                            item = ssItem;
+                                            break;
+                                        }
+                                    }
+                                    if (item != null) {
+                                        /* Update it, then its children, recursively */
+                                        item.setText(VALUE_COL, emptyString);
+                                        updateChildren(ss, fullState, -1, item);
+                                    }
                                 }
                             });
 
