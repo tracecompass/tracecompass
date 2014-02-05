@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,9 @@
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.WorkbenchAdapter;
@@ -25,6 +28,7 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
     private final TracePackageElement fParent;
     private boolean fEnabled;
     private boolean fChecked;
+    private boolean fVisible;
 
     /**
      *
@@ -34,6 +38,8 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
     public TracePackageElement(TracePackageElement parent) {
         fParent = parent;
         fEnabled = true;
+        fVisible = true;
+        fChildren = new TracePackageElement[0];
     }
 
     /**
@@ -57,6 +63,21 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
      */
     public TracePackageElement[] getChildren() {
         return fChildren;
+    }
+
+    /**
+     * Get the visible children of this element
+     *
+     * @return the visible children of this element
+     */
+    public TracePackageElement[] getVisibleChildren() {
+        List<TracePackageElement> visibleChildren = new ArrayList<>();
+        for (TracePackageElement child : fChildren) {
+            if (child.isVisible()) {
+                visibleChildren.add(child);
+            }
+        }
+        return visibleChildren.toArray(new TracePackageElement[0]);
     }
 
     /**
@@ -117,6 +138,15 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
     }
 
     /**
+     * Returns whether or not the element is visible.
+     *
+     * @return whether or not the element is visible
+     */
+    public boolean isVisible() {
+        return fVisible;
+    }
+
+    /**
      * Sets whether or not the element should be enabled (grayed and not
      * modifiable).
      *
@@ -135,5 +165,15 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
      */
     public void setChecked(boolean checked) {
         fChecked = checked;
+    }
+
+    /**
+     * Sets whether or not the element is visible.
+     *
+     * @param visible
+     *            if the element should be visible
+     */
+    public void setVisible(boolean visible) {
+        fVisible = visible;
     }
 }
