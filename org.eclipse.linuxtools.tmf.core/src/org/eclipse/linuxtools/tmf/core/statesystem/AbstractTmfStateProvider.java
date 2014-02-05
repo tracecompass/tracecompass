@@ -18,7 +18,6 @@ import java.util.concurrent.BlockingQueue;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventFactory;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -47,7 +46,6 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     private final Thread eventHandlerThread;
 
     private boolean ssAssigned;
-    private ITmfEvent currentEvent;
 
     /** State system in which to insert the state changes */
     protected ITmfStateSystemBuilder ss = null;
@@ -172,6 +170,8 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      */
     private class EventProcessor implements Runnable {
 
+        private ITmfEvent currentEvent;
+
         @Override
         public void run() {
             if (ss == null) {
@@ -207,19 +207,9 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         }
 
         private void closeStateSystem() {
-            /* Close the History system, if there is one */
-            if (currentEvent == null) {
-                return;
-            }
-            try {
-                ss.closeHistory(currentEvent.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
-            } catch (TimeRangeException e) {
-                /*
-                 * Since we're using currentEvent.getTimestamp, this shouldn't
-                 * cause any problem
-                 */
-                e.printStackTrace();
-            }
+            final long endTime = (currentEvent == null) ? 0 :
+                    currentEvent.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            ss.closeHistory(endTime);
         }
     }
 

@@ -122,7 +122,7 @@ class HT_IO {
         }
     }
 
-    public void writeNode(HTNode node) {
+    public synchronized void writeNode(HTNode node) {
         try {
             /* Insert the node into the cache. */
             int seqNumber = node.getSequenceNumber();
@@ -138,7 +138,7 @@ class HT_IO {
         }
     }
 
-    public  FileChannel getFcOut() {
+    public FileChannel getFcOut() {
         return this.fcOut;
     }
 
