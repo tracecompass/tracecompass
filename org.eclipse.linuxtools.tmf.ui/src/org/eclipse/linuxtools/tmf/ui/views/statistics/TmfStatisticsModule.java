@@ -83,6 +83,17 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     // ------------------------------------------------------------------------
 
     @Override
+    public void dispose() {
+        /*
+         * The sub-analyses are not registered to the trace directly, so we need
+         * to tell them when the trace is disposed.
+         */
+        super.dispose();
+        totalsModule.dispose();
+        eventTypesModule.dispose();
+    }
+
+    @Override
     protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
         ITmfTrace trace = getTrace();
         if (trace == null) {
