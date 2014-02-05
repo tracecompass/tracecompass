@@ -84,8 +84,8 @@ public class Activator extends Plugin {
         TmfCoreTracer.init();
         /* Initialize the trace manager */
         TmfTraceManager.getInstance();
-        /* Initialize the analysis module sources */
-        TmfAnalysisManager.initializeModuleSources();
+        /* Initialize the analysis manager */
+        TmfAnalysisManager.initialize();
     }
 
     @Override

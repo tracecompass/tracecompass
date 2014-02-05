@@ -12,8 +12,12 @@
 
 package org.eclipse.linuxtools.tmf.ui.analysis;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisOutput;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisModuleOutputs;
 import org.eclipse.linuxtools.tmf.ui.project.model.Messages;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
 import org.eclipse.swt.widgets.Display;
@@ -31,9 +35,16 @@ import org.eclipse.ui.views.IViewDescriptor;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public class TmfAnalysisViewOutput implements IAnalysisOutput {
+public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtension {
 
-    private final String fViewId;
+    private String fViewId;
+
+    /**
+     * Default constructor
+     */
+    public TmfAnalysisViewOutput() {
+
+    }
 
     /**
      * Constructor
@@ -79,5 +90,10 @@ public class TmfAnalysisViewOutput implements IAnalysisOutput {
                 }
             }
         });
+    }
+
+    @Override
+    public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
+        fViewId = config.getAttribute(TmfAnalysisModuleOutputs.ID_ATTR);
     }
 }

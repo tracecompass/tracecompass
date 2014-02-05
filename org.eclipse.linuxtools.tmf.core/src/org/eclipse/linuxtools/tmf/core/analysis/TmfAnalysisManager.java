@@ -54,13 +54,34 @@ public class TmfAnalysisManager {
     }
 
     /**
-     * Cleans the module source list and initialize it from the extension point
+     * Initializes sources and new module listeners from the extension point
      */
-    public static void initializeModuleSources() {
+    public static void initialize() {
+        initializeModuleSources();
+        initializeNewModuleListeners();
+    }
+
+    /**
+     * Cleans the module sources list and initialize it from the extension point
+     */
+    private static void initializeModuleSources() {
         synchronized (fSources) {
             fSources.clear();
             for (IAnalysisModuleSource source : TmfAnalysisModuleSources.getSources()) {
                 fSources.add(source);
+            }
+        }
+    }
+
+    /**
+     * Cleans the new module listeners list and initialize it from the extension
+     * point
+     */
+    private static void initializeNewModuleListeners() {
+        synchronized (fListeners) {
+            fListeners.clear();
+            for (ITmfNewAnalysisModuleListener output : TmfAnalysisModuleOutputs.getOutputListeners()) {
+                fListeners.add(output);
             }
         }
     }
