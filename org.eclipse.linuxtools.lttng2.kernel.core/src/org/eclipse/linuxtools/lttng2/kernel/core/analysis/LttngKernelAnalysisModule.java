@@ -10,19 +10,15 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.kernel.ui.analysis;
+package org.eclipse.linuxtools.lttng2.kernel.core.analysis;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
-import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
-import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
-import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput;
 
 /**
  * State System Module for lttng kernel traces
@@ -46,8 +42,6 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
      */
     public LttngKernelAnalysisModule() {
         super();
-        this.registerOutput(new TmfAnalysisViewOutput(ControlFlowView.ID));
-        this.registerOutput(new TmfAnalysisViewOutput(ResourcesView.ID));
     }
 
     @Override
@@ -78,7 +72,7 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
 
     @Override
     protected String getFullHelpText() {
-        return Messages.LttngKernelAnalysis_Help;
+        return Messages.LttngKernelAnalysisModule_Help;
     }
 
 }

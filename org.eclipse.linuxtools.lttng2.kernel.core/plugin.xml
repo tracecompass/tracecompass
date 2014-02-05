@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.linuxtools.lttng2.kernel.core.analysis.LttngKernelAnalysisModule"
+            automatic="true"
+            id="org.eclipse.linuxtools.lttng2.kernel.analysis"
+            name="%analysis.lttngkernel">
+         <tracetype
+               class="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
+         </tracetype>
+      </module>
+   </extension>
+</plugin>
