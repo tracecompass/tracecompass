@@ -20,6 +20,7 @@
          <sequence minOccurs="0" maxOccurs="unbounded">
             <element ref="module"/>
             <element ref="source"/>
+            <element ref="output"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -163,6 +164,74 @@
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleSource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="output">
+      <annotation>
+         <documentation>
+            Associates an output with an analysis module or a class of analysis modules.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="analysisId"/>
+            <element ref="analysisModuleClass"/>
+         </choice>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class of this output.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.analysis.IAnalysisOutput"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An ID for this output. For example, for a view, it would be the view ID.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="analysisId">
+      <annotation>
+         <documentation>
+            The output will be associated with a single analysis identified by the ID attribute.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The full ID of the analysis.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="analysisModuleClass">
+      <annotation>
+         <documentation>
+            The output will be associated with all modules extending or implementing the 'class' attribute.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The module class or interface the modules need to extend or implement for this output to be applicable.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule"/>
                </appinfo>
             </annotation>
          </attribute>
