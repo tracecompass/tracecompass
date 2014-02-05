@@ -38,6 +38,7 @@ public class TmfAnalysisManager {
     private static final Map<String, List<Class<? extends IAnalysisParameterProvider>>> fParameterProviders = new HashMap<>();
     private static final Map<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider> fParamProviderInstances = new HashMap<>();
     private static final List<IAnalysisModuleSource> fSources = new ArrayList<>();
+    private static final List<ITmfNewAnalysisModuleListener> fListeners = new ArrayList<>();
 
     /**
      * Registers a new source of modules
@@ -181,6 +182,22 @@ public class TmfAnalysisManager {
     public static void refreshModules() {
         synchronized (fAnalysisModules) {
             fAnalysisModules.clear();
+        }
+    }
+
+    /**
+     * This method should be called when new analysis modules have been created
+     * by module helpers to that the {@link ITmfNewAnalysisModuleListener} can
+     * be executed on the module instance.
+     *
+     * @param module
+     *            The newly created analysis module
+     */
+    public static void analysisModuleCreated(IAnalysisModule module) {
+        synchronized (fListeners) {
+            for (ITmfNewAnalysisModuleListener listener : fListeners) {
+                listener.moduleCreated(module);
+            }
         }
     }
 

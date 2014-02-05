@@ -140,6 +140,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
                 }
             }
             module.setTrace(trace);
+            TmfAnalysisManager.analysisModuleCreated(module);
         } catch (CoreException e) {
             Activator.logError("Error getting analysis modules from configuration files", e); //$NON-NLS-1$
         }
