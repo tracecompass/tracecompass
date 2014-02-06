@@ -19,9 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.Messages;
@@ -100,8 +98,8 @@ public class AnalysisModuleTest {
 
     /**
      * Test suite for analysis module
-     * {@link TmfAbstractAnalysisModule#waitForCompletion(IProgressMonitor)} with
-     * successful execution
+     * {@link TmfAbstractAnalysisModule#waitForCompletion} with successful
+     * execution
      */
     @Test
     public void testWaitForCompletionSuccess() {
@@ -121,14 +119,14 @@ public class AnalysisModuleTest {
         module.setParameter(TestAnalysis.PARAM_TEST, 1);
         status = module.schedule();
         assertEquals(Status.OK_STATUS, status);
-        boolean completed = module.waitForCompletion(new NullProgressMonitor());
+        boolean completed = module.waitForCompletion();
 
         assertTrue(completed);
         assertEquals(1, module.getAnalysisOutput());
     }
 
     /**
-     * Test suite for {@link TmfAbstractAnalysisModule#waitForCompletion(IProgressMonitor)} with cancellation
+     * Test suite for {@link TmfAbstractAnalysisModule#waitForCompletion} with cancellation
      */
     @Test
     public void testWaitForCompletionCancelled() {
@@ -145,7 +143,7 @@ public class AnalysisModuleTest {
         module.setParameter(TestAnalysis.PARAM_TEST, 0);
         IStatus status = module.schedule();
         assertEquals(Status.OK_STATUS, status);
-        boolean completed = module.waitForCompletion(new NullProgressMonitor());
+        boolean completed = module.waitForCompletion();
 
         assertFalse(completed);
         assertEquals(0, module.getAnalysisOutput());
@@ -198,7 +196,7 @@ public class AnalysisModuleTest {
         }
 
         module.cancel();
-        assertFalse(module.waitForCompletion(new NullProgressMonitor()));
+        assertFalse(module.waitForCompletion());
         assertEquals(-1, module.getAnalysisOutput());
     }
 

@@ -168,6 +168,15 @@ public interface IAnalysisModule extends ITmfComponent {
     void registerOutput(IAnalysisOutput output);
 
     /**
+     * Block the calling thread until this analysis has completed (or has been
+     * cancelled).
+     *
+     * @return True if the analysis finished successfully, false if it was
+     *         cancelled.
+     */
+    boolean waitForCompletion();
+
+    /**
      * Typically the output of an analysis will be available only after it is
      * completed. This method allows to wait until an analysis has been
      * completed or the analysis has been cancelled
@@ -188,7 +197,7 @@ public interface IAnalysisModule extends ITmfComponent {
     /**
      * Cancels the current analysis
      */
-    public void cancel();
+    void cancel();
 
     // -----------------------------------------------------
     // Utilities

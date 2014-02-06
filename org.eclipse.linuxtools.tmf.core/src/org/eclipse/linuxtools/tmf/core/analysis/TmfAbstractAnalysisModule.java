@@ -312,6 +312,16 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     }
 
     @Override
+    public boolean waitForCompletion() {
+        try {
+            fFinishedLatch.await();
+        } catch (InterruptedException e) {
+            Activator.logError("Error while waiting for module completion", e); //$NON-NLS-1$
+        }
+        return !fAnalysisCancelled;
+    }
+
+    @Override
     public boolean waitForCompletion(IProgressMonitor monitor) {
         try {
             while (!fFinishedLatch.await(500, TimeUnit.MILLISECONDS)) {

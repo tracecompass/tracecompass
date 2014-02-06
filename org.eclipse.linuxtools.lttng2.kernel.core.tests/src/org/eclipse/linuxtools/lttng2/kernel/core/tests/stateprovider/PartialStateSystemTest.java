@@ -19,7 +19,6 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
@@ -61,7 +60,7 @@ public class PartialStateSystemTest extends StateSystemTest {
             fail();
         }
         module.schedule();
-        assertTrue(module.waitForCompletion(new NullProgressMonitor()));
+        assertTrue(module.waitForCompletion());
         ssq = module.getStateSystem();
 
         assertNotNull(ssq);

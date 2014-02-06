@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
@@ -48,7 +47,7 @@ public class StateSystemInMemoryTest extends StateSystemTest {
             fail();
         }
         module.schedule();
-        assertTrue(module.waitForCompletion(new NullProgressMonitor()));
+        assertTrue(module.waitForCompletion());
         ssq = module.getStateSystem();
         assertNotNull(ssq);
     }

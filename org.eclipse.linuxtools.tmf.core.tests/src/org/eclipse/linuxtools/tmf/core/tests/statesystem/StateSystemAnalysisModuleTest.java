@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
@@ -74,7 +73,7 @@ public class StateSystemAnalysisModuleTest {
         ITmfStateSystem ss = module.getStateSystem();
         assertNull(ss);
         module.schedule();
-        if (module.waitForCompletion(new NullProgressMonitor())) {
+        if (module.waitForCompletion()) {
             ss = module.getStateSystem();
             assertNotNull(ss);
         } else {

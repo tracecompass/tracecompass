@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -182,7 +181,7 @@ public class TmfStateSystemExplorer extends TmfView {
                  * leave the title, but there won't be anything underneath.
                  */
                 module.schedule();
-                module.waitForCompletion(new NullProgressMonitor());
+                module.waitForCompletion();
                 for (ITmfStateSystem ss : module.getStateSystems()) {
                     if (ss == null) {
                         continue;
