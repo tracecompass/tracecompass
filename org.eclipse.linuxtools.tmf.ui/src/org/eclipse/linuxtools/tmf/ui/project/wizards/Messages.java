@@ -77,11 +77,6 @@ public class Messages extends NLS {
      */
     public static String ImportTraceWizard_TraceValidationFailed;
     /**
-     * The message when the automatic trace type detection couldn't find a valid trace type.
-     * @since 3.0
-     */
-    public static String ImportTraceWizard_NoValidTraceTypeFound;
-    /**
      * The error message when a trace already exists in project (import trace wizard).
      * @since 3.0
      */

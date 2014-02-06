@@ -700,13 +700,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 return false;
             }
         }
-        if (operation.getUnrecognizedTraces().size() > 0) {
-            StringBuilder unrecognizedTraces = new StringBuilder();
-            for(String trace: operation.getUnrecognizedTraces()) {
-                unrecognizedTraces.append(System.getProperty("line.separator")).append(trace); //$NON-NLS-1$
-            }
-            displayErrorDialog(Messages.ImportTraceWizard_NoValidTraceTypeFound + ":" + unrecognizedTraces.toString()); //$NON-NLS-1$
-        }
         setErrorMessage(null);
         return true;
     }
@@ -718,7 +711,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
     private class TraceValidateAndImportOperation {
         private IStatus fStatus;
-        private final List<String> fUnrecognizedResources = new ArrayList<>();
         private String fTraceType;
         private IPath fContainerPath;
         private boolean fImportUnrecognizedTraces;
@@ -784,13 +776,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
         }
 
-        /**
-         * @return a list of trace file names for that no trace type could be detected.
-         */
-        public List<String> getUnrecognizedTraces() {
-            return new ArrayList<>(fUnrecognizedResources);
-        }
-
         private void validateAndImportDirectoryTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
             File file = (File) fileSystemElement.getFileSystemObject();
@@ -805,9 +790,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 }
                 if (traceTypeHelper == null) {
                     if (fImportUnrecognizedTraces) {
-                        if (importResource(fileSystemElement, monitor)) {
-                            fUnrecognizedResources.add(path);
-                        }
+                        importResource(fileSystemElement, monitor);
                     }
                     return;
                 }
@@ -824,6 +807,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         private void validateAndImportFileTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
 
+
             File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
             TraceTypeHelper traceTypeHelper = null;
@@ -837,9 +821,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 }
                 if (traceTypeHelper == null) {
                     if (fImportUnrecognizedTraces) {
-                        if (importResource(fileSystemElement, monitor)) {
-                            fUnrecognizedResources.add(path);
-                        }
+                        importResource(fileSystemElement, monitor);
                     }
                     return;
                 }
