@@ -65,6 +65,13 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME =
         Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
 
+    /** Legacy path to the XML definitions file (in the UI plug-in)
+     * TODO Remove once we feel the transition phase is over. */
+    private static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME_LEGACY =
+            Activator.getDefault().getStateLocation().removeLastSegments(1).addTrailingSeparator()
+                    .append("org.eclipse.linuxtools.tmf.ui") //$NON-NLS-1$
+                    .append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
+
     private static final String CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomTxtTraceDefinition_definitionRootElement;
     private static final String DEFINITION_ELEMENT = Messages.CustomTxtTraceDefinition_definition;
     private static final String NAME_ATTRIBUTE = Messages.CustomTxtTraceDefinition_name;
@@ -576,6 +583,21 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      * @return The loaded trace definitions
      */
     public static CustomTxtTraceDefinition[] loadAll() {
+        File defaultFile = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
+        File legacyFile = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME_LEGACY);
+
+        /*
+         * If there is no file at the expected location, check the legacy
+         * location instead.
+         */
+        if (!defaultFile.exists() && legacyFile.exists()) {
+            CustomTxtTraceDefinition[] oldDefs = loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME_LEGACY);
+            for (CustomTxtTraceDefinition def : oldDefs) {
+                /* Save in the new location */
+                def.save();
+            }
+        }
+
         return loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
     }
 
