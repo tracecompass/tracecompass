@@ -744,7 +744,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                         if (!folderElements.containsKey(resourcePath)) {
                             if (isDirectoryTrace(element)) {
                                 folderElements.put(resourcePath, element);
-                                validateAndImportDirectoryTrace(element, sub);
+                                validateAndImportTrace(element, sub);
                             }
                         }
                     } else {
@@ -755,10 +755,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                         if (!folderElements.containsKey(parentPath)) {
                             if (isDirectoryTrace(parentElement)) {
                                 folderElements.put(parentPath, parentElement);
-                                validateAndImportDirectoryTrace(parentElement, sub);
+                                validateAndImportTrace(parentElement, sub);
                             } else {
                                 if (fileResource.exists()) {
-                                    validateAndImportFileTrace(element, sub);
+                                    validateAndImportTrace(element, sub);
                                 }
                             }
                         }
@@ -773,13 +773,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
         }
 
-        private void validateAndImportDirectoryTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
+        private void validateAndImportTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
             File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
             TraceTypeHelper traceTypeHelper = null;
-            boolean sendValidationError = true;
+
             if (fTraceType == null) {
+                // Auto Detection
                 try {
                     traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(path, null, null);
                 } catch (TmfTraceImportException e) {
@@ -792,67 +793,29 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     return;
                 }
             } else {
-                if (!TmfTraceType.getInstance().isDirectoryTraceType(fTraceType)) {
+                boolean isDirectoryTraceType = TmfTraceType.getInstance().isDirectoryTraceType(fTraceType);
+                if (fileSystemElement.isDirectory() != isDirectoryTraceType) {
                     return;
                 }
-                sendValidationError = false;
                 traceTypeHelper = TmfTraceType.getInstance().getTraceType(fTraceType);
-            }
-            validateAndImportTrace(fileSystemElement, traceTypeHelper, sendValidationError, monitor);
-        }
 
-        private void validateAndImportFileTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
-                throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
-
-
-            File file = (File) fileSystemElement.getFileSystemObject();
-            String path = file.getAbsolutePath();
-            TraceTypeHelper traceTypeHelper = null;
-            boolean sendValidationError = true;
-
-            if (fTraceType == null) {
-                try {
-                    traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(path, null, null);
-                } catch (TmfTraceImportException e) {
-                    // the trace did not match any trace type
-                }
                 if (traceTypeHelper == null) {
-                    if (fImportUnrecognizedTraces) {
-                        importResource(fileSystemElement, monitor);
-                    }
+                    // Trace type not found
+                    throw new TmfTraceImportException(Messages.ImportTraceWizard_TraceTypeNotFound);
+                }
+
+                if (!traceTypeHelper.validate(path)) {
+                    // Trace type exist but doesn't validate for given trace.
                     return;
                 }
-            } else {
-                if (TmfTraceType.getInstance().isDirectoryTraceType(fTraceType)) {
-                    return;
-                }
-                sendValidationError = false;
-                traceTypeHelper = TmfTraceType.getInstance().getTraceType(fTraceType);
             }
 
-            validateAndImportTrace(fileSystemElement, traceTypeHelper, sendValidationError, monitor);
-            return;
-        }
-
-        private void validateAndImportTrace(TraceFileSystemElement fileSystemElement, TraceTypeHelper traceTypeHelper, boolean sendValidationError, IProgressMonitor monitor)
-                throws InvocationTargetException, InterruptedException, CoreException, TmfTraceImportException {
-
-            if (traceTypeHelper == null) {
-                throw new TmfTraceImportException(Messages.ImportTraceWizard_TraceTypeNotFound);
+            // Finally import trace
+            if (importResource(fileSystemElement, monitor)) {
+                IResource eclipseResource = fTargetFolder.findMember(fileSystemElement.getLabel());
+                TmfTraceTypeUIUtils.setTraceType(eclipseResource.getFullPath(), traceTypeHelper);
             }
-            File file = (File) fileSystemElement.getFileSystemObject();
-            String path = file.getAbsolutePath();
 
-            if (TmfTraceType.getInstance().validate(traceTypeHelper.getCanonicalName(), path)) {
-                if (importResource(fileSystemElement, monitor)) {
-                    IResource eclipseResource = fTargetFolder.findMember(fileSystemElement.getLabel());
-                    TmfTraceTypeUIUtils.setTraceType(eclipseResource.getFullPath(), traceTypeHelper);
-                }
-                return;
-            }
-            if (sendValidationError) {
-                throw new TmfTraceImportException(NLS.bind(Messages.ImportTraceWizard_TraceValidationFailed, path));
-            }
         }
 
         /**
