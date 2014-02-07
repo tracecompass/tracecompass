@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * Callstack provider for LTTng-UST traces.
@@ -80,19 +81,13 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
      * @param trace
      *            The UST trace
      */
-    public LttngUstCallStackProvider(LttngUstTrace trace) {
+    public LttngUstCallStackProvider(ITmfTrace trace) {
         super(trace);
     }
 
     // ------------------------------------------------------------------------
     // Methods from AbstractTmfStateProvider
     // ------------------------------------------------------------------------
-
-    @Override
-    public LttngUstTrace getTrace() {
-        /* Type is enforced by the constructor */
-        return (LttngUstTrace) super.getTrace();
-    }
 
     @Override
     public LttngUstCallStackProvider getNewInstance() {

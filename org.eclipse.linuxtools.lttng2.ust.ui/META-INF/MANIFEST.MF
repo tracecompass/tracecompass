@@ -16,4 +16,5 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.linuxtools.tmf.ui
 Export-Package: org.eclipse.linuxtools.internal.lttng2.ust.ui;x-friends:="org.eclipse.linuxtools.lttng2.ust.ui.tests",
  org.eclipse.linuxtools.internal.lttng2.ust.ui.views.memusage;x-friends:="org.eclipse.linuxtools.lttng2.ust.ui.tests",
+ org.eclipse.linuxtools.lttng2.ust.ui.analysis.callstack,
  org.eclipse.linuxtools.lttng2.ust.ui.analysis.memory
