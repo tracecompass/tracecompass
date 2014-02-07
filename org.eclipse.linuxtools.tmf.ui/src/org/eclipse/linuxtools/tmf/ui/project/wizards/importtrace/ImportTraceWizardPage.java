@@ -68,7 +68,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -541,14 +540,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             traceTypeList[i + 1] = availableTraceTypes[i];
         }
         fTraceTypes.setItems(traceTypeList);
-        fTraceTypes.addSelectionListener(new SelectionListener() {
+        fTraceTypes.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 updateWidgetEnablements();
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+                boolean enabled = fTraceTypes.getText().equals(AUTO_DETECT);
+                fImportUnrecognizedButton.setEnabled(enabled);
             }
         });
         fTraceTypes.select(0);
