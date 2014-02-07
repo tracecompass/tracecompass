@@ -94,12 +94,8 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     }
 
     @Override
-    protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            /* This analysis's trace should not be null when this is called */
-            throw new IllegalStateException();
-        }
+    public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+        super.setTrace(trace);
 
         /*
          * Since these sub-analyzes are not built from an extension point, we
@@ -108,10 +104,20 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
          */
         totalsModule.setTrace(trace);
         eventTypesModule.setTrace(trace);
+    }
+
+    @Override
+    protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            /* This analysis's trace should not be null when this is called */
+            throw new IllegalStateException();
+        }
 
         IStatus status1 = totalsModule.schedule();
         IStatus status2 = eventTypesModule.schedule();
-        if (!status1.isOK() || !status2.isOK()) {
+        if (!(status1.isOK() && status2.isOK())) {
+            cancelSubAnalyses();
             return false;
         }
 
@@ -136,8 +142,8 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
          * The rest of this "execute" will encompass the "execute" of the two
          * sub-analyzes.
          */
-        if (!totalsModule.waitForCompletion(monitor) ||
-                !eventTypesModule.waitForCompletion(monitor)) {
+        if (!(totalsModule.waitForCompletion(monitor) &&
+                eventTypesModule.waitForCompletion(monitor))) {
             return false;
         }
         return true;
@@ -149,13 +155,17 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
          * FIXME The "right" way to cancel state system construction is not
          * available yet...
          */
-        totalsModule.cancel();
-        eventTypesModule.cancel();
+        cancelSubAnalyses();
 
         ITmfStatistics stats = fStatistics;
         if (stats != null) {
             stats.dispose();
         }
+    }
+
+    private void cancelSubAnalyses() {
+        totalsModule.cancel();
+        eventTypesModule.cancel();
     }
 
     // ------------------------------------------------------------------------
