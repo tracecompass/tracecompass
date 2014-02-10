@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -81,6 +82,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.FileSystemElement;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.dialogs.WizardResourceImportPage;
+import org.eclipse.ui.internal.ide.dialogs.IElementFilter;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
@@ -104,6 +106,7 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  * @author Francois Chouinard
  * @since 2.0
  */
+@SuppressWarnings("restriction")
 public class ImportTraceWizardPage extends WizardResourceImportPage {
 
     // ------------------------------------------------------------------------
@@ -597,7 +600,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // ------------------------------------------------------------------------
     // Determine if the finish button can be enabled
     // ------------------------------------------------------------------------
-
     @Override
     public boolean validateSourceGroup() {
 
@@ -613,8 +615,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return false;
         }
 
-        List<FileSystemElement> resourcesToImport = getSelectedResources();
-        if (resourcesToImport.size() == 0) {
+        if (selectionGroup.getCheckedElementCount() == 0) {
             setMessage(null);
             setErrorMessage(Messages.ImportTraceWizard_SelectTraceNoneSelected);
             return false;
@@ -728,9 +729,31 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             String currentPath = null;
             final Map<String, TraceFileSystemElement> folderElements = new HashMap<>();
             try {
-                List<TraceFileSystemElement> fileSystemElements = getSelectedResources();
+
+                final ArrayList<TraceFileSystemElement> fileSystemElements = new ArrayList<>();
+                IElementFilter passThroughFilter = new IElementFilter() {
+
+                    @Override
+                    public void filterElements(Collection elements, IProgressMonitor monitor) {
+                        fileSystemElements.addAll(elements);
+                    }
+                    @Override
+                    public void filterElements(Object[] elements, IProgressMonitor monitor) {
+                        for (int i = 0; i < elements.length; i++) {
+                            fileSystemElements.add((TraceFileSystemElement)elements[i]);
+                        }
+                    }
+                };
+
+                // List fileSystemElements will be filled using the passThroughFilter
+                SubMonitor subMonitor = SubMonitor.convert(progressMonitor, 1);
+                getSelectedResources(passThroughFilter, subMonitor);
+
+                // Check if operation was cancelled.
+                ModalContext.checkCanceled(subMonitor);
+
                 Iterator<TraceFileSystemElement> fileSystemElementsIter = fileSystemElements.iterator();
-                SubMonitor subMonitor = SubMonitor.convert(progressMonitor, fileSystemElements.size());
+                subMonitor = SubMonitor.convert(progressMonitor, fileSystemElements.size());
 
                 while (fileSystemElementsIter.hasNext()) {
                     ModalContext.checkCanceled(progressMonitor);
