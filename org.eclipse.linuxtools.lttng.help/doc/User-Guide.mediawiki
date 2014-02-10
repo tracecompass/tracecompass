@@ -188,37 +188,63 @@ Tracing projects have two sub-folders: '''Traces''' which holds the individual t
 
 === Importing Traces in a Project ===
 
+The '''Traces''' folder holds the set of traces available for a tracing project. The following chapters will explain different ways to import traces to the '''Traces''' folder of a tracing project.
+
 ==== Open Trace File, Open Trace Directory ====
 
-To open a single trace, right-click on the Traces folder and select '''Open Trace File...''' (for logs and such) or '''Open Trace directory...''' (for CTF traces).
+To open a single trace, right-click on the '''Traces''' folder and select '''Open Trace File...''' (for single trace files) or '''Open Trace directory...''' (for directory traces such as Common Trace Format (CTF) traces).
 
 [[Image:images/OpenTraceFile.png]]
 
-Select the file or directory, and the trace will be imported into the selected Traces folder. It will attempt to auto-detect the trace type. If the trace validates as more than one trace type, a window will prompt the user to select a trace type. Once a trace type is selected, the trace will load.
+A new dialog will show for selecting a trace to open. Select a trace file or directory and then click on '''OK'''. Now, the trace viewer will attempt to detect the trace types of the selected trace. The auto detection algorithm will validate the trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. After successful validation the trace will be linked into the '''Traces''' folder and then opened with the detected trace type.
 
 Note that a trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of available trace types can vary.
+
+==== Importing ====
+
+To import a set of traces to the '''Traces''' folder, right-click on the '''Traces''' folder and select '''Import...''' from the context-sensitive menu.
+
+[[Image:images/ProjectImportTraceAction.png]]
+
+At this point, the '''Import Trace Wizard''' will show for selecting traces to import. By default, it shows the correct destination directory where the traces will be imported to. Now, specify the location of the traces in the '''Source directory'''. For that click on the button '''Browse''', browse the media to the location of the traces and click on '''OK'''. Then select the traces to import in the list of files and folders. Optionally, select the '''Trace Type''' from the drop-down menu.
+
+If '''Trace Type''' is set to '''<Automatic Detection>''', the wizard will attempt to detect the trace types of the selected files. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. Optionally, '''Import unrecognized traces''' can be selected to import trace files that could not be automatically detected by '''<Automatic Detection>'''.
+
+Select or deselect the checkboxes for '''Overwrite existing trace without warning''' and '''Create links into workspace'''. When all options are configured, click on '''Finish'''.
+
+Note that traces of certain types (e.g. LTTng Kernel) are actually a composite of multiple channel traces grouped under a folder. Either the folder or its files can be selected to import the trace.
+
+[[Image:images/ProjectImportTraceDialog.png]]
+
+If a trace already exists with the same name, the user can choose to rename the imported trace, overwrite the original trace or skip the trace. When rename is chosen, a number is appended to the trace name, for example smalltrace becomes smalltrace(2).
+
+[[Image:images/ProjectImportTraceDialogRename.png]]
+
+If one selects '''Rename All''', '''Overwrite All''' or '''Skip All''' the choice will be applied for all traces with a name conflict.
+
+Upon successful importing, the traces will be stored in the '''Traces''' folder. If a trace type was associated to a trace, then the corresponding icon will be displayed. If no trace type is detected the unknown icon [[Image:images/unknown_parser.gif]] will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
+
+Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
+
+Alternatively, one can open the '''Import...''' menu from the '''File''' main menu.
+
+[[Image:images/importImages/importImportMenu.png]]
+
+Then select '''Trace Import''' and click on '''Next>'''.
+
+[[Image:images/ProjectImportWizardSelect.png]]
+
+At this point, the '''Import Trace Wizard''' will show. To import traces to the tracing project, follow the instructions that were described above.
 
 ==== Batch Importing ====
 
 The '''Batch Import Trace Wizard''' allows users to search their media for traces and import multiple traces of varying trace types simultaneously. It also handles name clashes and renaming of traces.
 
-The '''Traces''' folder holds the set of traces available for a tracing project. To import a set of traces to the '''Traces''' folder, one can open the '''Import...''' menu from the '''File''' main menu.
-
-[[Image:images/importImages/importImportMenu.png]]
-
-Then select '''Batch Trace Import'''
-
-[[Image:images/importImages/importMenuSelect.png]]
-
-Or one can select the '''Traces''' folder by double clicking on the project name.
-
-[[Image:images/importImages/importSelectTracingProject.png]]
-
-Then click the right mouse button on the '''Traces''' folder. Then select '''Batch Import...''' menu item in the context-sensitive menu.
+To import a set of traces to the '''Traces''' folder, right-click on the '''Traces''' folder and select '''Batch Import...''' from the context-sensitive menu. 
 
 [[Image:images/importImages/importBatchImport.png]]
 
-At this point, the '''Batch import wizard''' is opened.
+At this point, the '''Batch Import Wizard''' is opened.
 
 The '''Available trace types''' page is visible. Select a trace type to scan for by clicking an item in trace types tree. If one selects a parent element, the new state will be propagated to the children.
 
@@ -276,6 +302,12 @@ If the '''Finish''' button is grayed, or if the user wishes to import to a diffe
 You will then see the traces in the '''Traces''' folder as shown below and can '''open''' them by '''double-clicking''' on them. For more details on how to open a trace see section [[#Opening_a_Trace_or_Experiment|Opening a Trace or Experiment]].
 
 [[Image:images/importImages/importFinish.png]]
+
+Alternatively, one can open the '''Import...''' menu from the '''File''' main menu.
+
+[[Image:images/importImages/importImportMenu.png]]
+
+Then select '''Batch Trace Import''' and click on next. This will open the '''Batch Import Wizard'''. To import traces to the tracing project, follow the instructions as described above. 
 
 === Trace Package Exporting and Importing ===
 
@@ -457,7 +489,7 @@ When opening a trace or experiment all currently open view will be filled which 
 
 Traces can be also be imported to a project by dragging from another tracing project and dropping to the project's trace folder. The trace will be copied and the trace type will be set.
 
-Any resource can be dragged and dropped from a non-tracing project, and any file or folder can be dragged from an external tool, into a tracing project's trace folder. The resource will be copied or imported as a new trace, however the trace type will be unknown and the unknown icon [[Image:images/unknown_parser.gif]] will be displayed. In this case the user needs to set the trace type manually.
+Any resource can be dragged and dropped from a non-tracing project, and any file or folder can be dragged from an external tool, into a tracing project's trace folder. The resource will be copied or imported as a new trace and it will be attempted to detect the trace types of the imported resource. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. If no trace type is detected the user needs to set the trace type manually.
 
 To import the trace as a link, use the platform-specific key modifier while dragging the source trace. A link will be created in the target project to the trace's location on the file system.
 
