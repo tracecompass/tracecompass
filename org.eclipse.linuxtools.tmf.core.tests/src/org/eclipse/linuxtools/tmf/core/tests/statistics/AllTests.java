@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TmfEventsStatisticsTest.class,
+    TmfLostEventStatisticsTest.class,
     TmfStateStatisticsTest.class
 })
 public class AllTests {}

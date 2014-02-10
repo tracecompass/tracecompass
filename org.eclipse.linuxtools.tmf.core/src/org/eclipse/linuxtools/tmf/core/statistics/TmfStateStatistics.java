@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.core.statistics;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,12 +22,8 @@ import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * Implementation of ITmfStatistics which uses a state history for storing its
@@ -72,30 +67,6 @@ public class TmfStateStatistics implements ITmfStatistics {
     public TmfStateStatistics(@NonNull ITmfStateSystem totals, @NonNull ITmfStateSystem eventTypes) {
         this.totalsStats = totals;
         this.typesStats = eventTypes;
-    }
-
-    /**
-     * Manual constructor. This should be used if the trace's Resource is null
-     * (ie, for unit tests). It requires specifying the location of the history
-     * files manually.
-     *
-     * @param trace
-     *            The trace for which we build these statistics
-     * @param totalsHistoryFile
-     *            The location of the totals state history file
-     * @param typesHistoryFile
-     *            The location of the types state history file
-     * @throws TmfTraceException
-     *             If the file could not be written to
-     * @since 2.2
-     */
-    @Deprecated
-    public TmfStateStatistics(ITmfTrace trace, File totalsHistoryFile,
-            File typesHistoryFile) throws TmfTraceException {
-        final ITmfStateProvider totalsInput = new TmfStatisticsTotalsModule().new StatsProviderTotals(trace);
-        final ITmfStateProvider typesInput = new TmfStatisticsEventTypesModule().new StatsProviderEventTypes(trace);
-        this.totalsStats = TmfStateSystemFactory.newFullHistory(totalsHistoryFile, totalsInput, true);
-        this.typesStats = TmfStateSystemFactory.newFullHistory(typesHistoryFile, typesInput, true);
     }
 
     /**

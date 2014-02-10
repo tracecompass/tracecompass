@@ -12,15 +12,19 @@
 
 package org.eclipse.linuxtools.tmf.core.tests.statistics;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
-import org.junit.AfterClass;
+import org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsEventTypesModule;
+import org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsTotalsModule;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
@@ -30,34 +34,51 @@ import org.junit.BeforeClass;
  */
 public class TmfStateStatisticsTest extends TmfStatisticsTest {
 
-    private static File htFileTotals;
-    private static File htFileTypes;
+    private ITmfTrace fTrace;
 
     /**
-     * Set up the fixture (build the state history, etc.) once for all tests.
+     * Class setup
      */
     @BeforeClass
     public static void setUpClass() {
         assumeTrue(testTrace.exists());
-        try {
-            htFileTotals = File.createTempFile("stats-test-totals", ".ht");
-            htFileTypes = File.createTempFile("stats-test-types", ".ht");
-
-            backend = new TmfStateStatistics(testTrace.getTrace(), htFileTotals, htFileTypes);
-
-        } catch (TmfTraceException e) {
-            fail();
-        } catch (IOException e) {
-            fail();
-        }
     }
 
     /**
-     * Class cleanup
+     * Test setup
      */
-    @AfterClass
-    public static void tearDownClass() {
-        htFileTotals.delete();
-        htFileTypes.delete();
+    @Before
+    public void setUp() {
+        fTrace = testTrace.getTrace();
+
+        /* Prepare the two analysis-backed state systems */
+        TmfStatisticsTotalsModule totalsMod = new TmfStatisticsTotalsModule();
+        TmfStatisticsEventTypesModule eventTypesMod = new TmfStatisticsEventTypesModule();
+        try {
+            totalsMod.setTrace(fTrace);
+            eventTypesMod.setTrace(fTrace);
+        } catch (TmfAnalysisException e) {
+            fail();
+        }
+
+        totalsMod.schedule();
+        eventTypesMod.schedule();
+        assertTrue(totalsMod.waitForCompletion());
+        assertTrue(eventTypesMod.waitForCompletion());
+
+        ITmfStateSystem totalsSS = totalsMod.getStateSystem();
+        ITmfStateSystem eventTypesSS = eventTypesMod.getStateSystem();
+        assertNotNull(totalsSS);
+        assertNotNull(eventTypesSS);
+
+        backend = new TmfStateStatistics(totalsSS, eventTypesSS);
+    }
+
+    /**
+     * Test cleanup
+     */
+    @After
+    public void tearDown() {
+        fTrace.dispose();
     }
 }
