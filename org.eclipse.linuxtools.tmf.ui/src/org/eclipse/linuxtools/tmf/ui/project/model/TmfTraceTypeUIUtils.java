@@ -14,10 +14,8 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -43,7 +41,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.dialogs.FileSystemElement;
 
 /**
  * Utils class for the UI-specific parts of @link {@link TmfTraceType}.
@@ -58,37 +55,6 @@ public final class TmfTraceTypeUIUtils {
     private static final char SEPARATOR = ':';
 
     private TmfTraceTypeUIUtils() {}
-
-    private static List<File> isolateTraces(List<FileSystemElement> selectedResources) {
-        List<File> traces = new ArrayList<>();
-
-        // Get the selection
-        Iterator<FileSystemElement> resources = selectedResources.iterator();
-
-        // Get the sorted list of unique entries
-        Map<String, File> fileSystemObjects = new HashMap<>();
-        while (resources.hasNext()) {
-            File resource = (File) resources.next().getFileSystemObject();
-            String key = resource.getAbsolutePath();
-            fileSystemObjects.put(key, resource);
-        }
-        List<String> files = new ArrayList<>(fileSystemObjects.keySet());
-        Collections.sort(files);
-
-        // After sorting, traces correspond to the unique prefixes
-        String prefix = null;
-        for (int i = 0; i < files.size(); i++) {
-            File file = fileSystemObjects.get(files.get(i));
-            String name = file.getAbsolutePath();
-            if (prefix == null || !name.startsWith(prefix)) {
-                prefix = name; // new prefix
-                traces.add(file);
-            }
-        }
-
-        return traces;
-    }
-
 
     private static List<Pair<Integer, TraceTypeHelper>> reduce(List<Pair<Integer, TraceTypeHelper>> candidates) {
         List<Pair<Integer, TraceTypeHelper>> retVal = new ArrayList<>();
@@ -178,22 +144,6 @@ public final class TmfTraceTypeUIUtils {
             }
         }
         return type.getTraceTypeHelper(candidatesToSet[0]);
-    }
-
-    /**
-     * validate list of traces with a tracetype
-     *
-     * @param type
-     *            The TmfTraceType instance
-     * @param traceTypeName
-     *            the trace category (canonical name)
-     * @param selectedResources
-     *            List of traces to validate
-     * @return true if all the traces are valid
-     */
-    public static boolean validateTrace(TmfTraceType type, String traceTypeName, List<FileSystemElement> selectedResources) {
-        List<File> traces = isolateTraces(selectedResources);
-        return type.validateTraceFiles(traceTypeName, traces);
     }
 
     /**
