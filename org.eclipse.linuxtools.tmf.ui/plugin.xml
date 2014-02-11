@@ -152,6 +152,13 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.import.category"
+            class="org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.ImportTraceWizard"
+            icon="icons/etool16/import.gif"
+            id="org.eclipse.linuxtools.tmf.ui.trace.import.wizard"
+            name="%project.import.wizard.name">
+      </wizard>
+      <wizard
+            category="org.eclipse.linuxtools.tmf.import.category"
             class="org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard"
             icon="icons/etool16/import.gif"
             id="org.eclipse.linuxtools.tmf.ui.batch_import"
@@ -375,6 +382,31 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.file.import"
+               label="%command.import"
+               mnemonic="%command.import.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.batch_import"
                label="%command.batch_import"
@@ -397,7 +429,7 @@
             </visibleWhen>
          </command>
          <separator
-               name="org.eclipse.linuxtools.tmf.ui.separator1"
+               name="org.eclipse.linuxtools.tmf.ui.separator0"
                visible="true">
          </separator>
          <command
@@ -1060,6 +1092,24 @@
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.ImportTraceHandler"
+            commandId="org.eclipse.ui.file.import">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RefreshHandler"
             commandId="org.eclipse.ui.file.refresh">
