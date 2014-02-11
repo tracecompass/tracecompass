@@ -94,7 +94,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      *
      * @return The {@link StateSystemBackendType}
      */
-    protected abstract StateSystemBackendType getBackendType();
+    protected StateSystemBackendType getBackendType() {
+        /* Using full history by default, sub-classes can override */
+        return StateSystemBackendType.FULL;
+    }
 
     /**
      * Get the supplementary file name where to save this state system. The

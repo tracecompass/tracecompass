@@ -59,11 +59,6 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
     }
 
     @Override
-    protected StateSystemBackendType getBackendType() {
-        return StateSystemBackendType.FULL;
-    }
-
-    @Override
     protected String getSsFileName() {
         return "statistics-types.ht"; //$NON-NLS-1$
     }

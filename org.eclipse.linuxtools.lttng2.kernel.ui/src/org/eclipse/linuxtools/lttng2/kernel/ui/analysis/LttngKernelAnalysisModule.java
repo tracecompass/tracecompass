@@ -72,12 +72,6 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
 
     @Override
     @NonNull
-    protected StateSystemBackendType getBackendType() {
-        return StateSystemBackendType.FULL;
-    }
-
-    @Override
-    @NonNull
     protected String getSsFileName() {
         return HISTORY_TREE_FILE_NAME;
     }

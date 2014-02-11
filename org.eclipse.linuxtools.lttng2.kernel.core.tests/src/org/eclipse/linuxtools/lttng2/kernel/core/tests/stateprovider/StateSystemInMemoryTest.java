@@ -76,7 +76,7 @@ public class StateSystemInMemoryTest extends StateSystemTest {
 
         @Override
         protected StateSystemBackendType getBackendType() {
-            return StateSystemBackendType.FULL;
+            return StateSystemBackendType.INMEM;
         }
     }
 }

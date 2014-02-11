@@ -31,11 +31,4 @@ public abstract class AbstractCallStackAnalysis extends TmfStateSystemAnalysisMo
         super();
         registerOutput(new TmfAnalysisViewOutput(CallStackView.ID));
     }
-
-    @Override
-    protected StateSystemBackendType getBackendType() {
-        /* Full history by default, sub-classes are free to override */
-        return StateSystemBackendType.FULL;
-    }
-
 }

@@ -277,11 +277,5 @@ public abstract class AbstractProviderTest {
         protected ITmfStateProvider createStateProvider() {
             return new LttngUstCallStackProvider(getTrace());
         }
-
-        @Override
-        protected StateSystemBackendType getBackendType() {
-            return StateSystemBackendType.FULL;
-        }
-
     }
 }

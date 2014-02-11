@@ -50,11 +50,6 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
     }
 
     @Override
-    protected StateSystemBackendType getBackendType() {
-        return StateSystemBackendType.FULL;
-    }
-
-    @Override
     public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
         if (!(trace instanceof LttngUstTrace)) {
             throw new IllegalStateException("UstMemoryAnalysisModule: trace should be of type LttngUstTrace"); //$NON-NLS-1$
