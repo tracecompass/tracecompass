@@ -55,6 +55,7 @@ import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -178,27 +179,27 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         if (element instanceof TmfTraceFolder) {
             fTraceFolderElement = (TmfTraceFolder) element;
-            fTraceFolderElement.getProject().getResource();
             traceFolder = fTraceFolderElement.getResource();
         } else if (element instanceof IProject) {
             IProject project = (IProject) element;
             try {
                 if (project.hasNature(TmfProjectNature.ID)) {
+                    TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+                    fTraceFolderElement = projectElement.getTracesFolder();
                     traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
-                    fTraceFolderElement = TmfProjectRegistry.getProject(project).getTracesFolder();
                 }
             } catch (CoreException e) {
             }
         }
 
-        /*
-         *  If no tracing project was selected or trace folder doesn't exist use
-         */
+         //  If no tracing project was selected or trace folder doesn't exist use
+         //  default tracing project
         if (traceFolder == null) {
             IProject project = TmfProjectRegistry.createProject(
                     TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
+            TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+            fTraceFolderElement = projectElement.getTracesFolder();
             traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
-            fTraceFolderElement = TmfProjectRegistry.getProject(project).getTracesFolder();
         }
 
         // Set the target trace folder
