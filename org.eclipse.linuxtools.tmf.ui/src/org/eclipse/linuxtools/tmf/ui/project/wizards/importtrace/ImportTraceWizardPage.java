@@ -204,7 +204,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         // Set the target trace folder
         if (traceFolder != null) {
             fTargetFolder = traceFolder;
-            String path = traceFolder.getFullPath().toOSString();
+            String path = traceFolder.getFullPath().toString();
             setContainerFieldValue(path);
         }
     }
@@ -369,7 +369,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     public void run() {
                         synchronized (fIsDestinationChanged) {
                             fIsDestinationChanged = true;
-                            String path = fTargetFolder.getFullPath().toOSString();
+                            String path = fTargetFolder.getFullPath().toString();
                             setContainerFieldValue(path);
                         }
                     }
