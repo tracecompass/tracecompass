@@ -12,11 +12,6 @@
             <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
         </fileset>
 
-        <!-- Search in the system-wide installation directory (Debian) -->
-        <fileset dir="/usr/share/eclipse/dropins/mylyn-wikitext/eclipse/plugins" erroronmissingdir="false">
-            <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
-        </fileset>
-        
         <!-- For Maven builds: use the compile_classpath -->
         <pathelement path="${compile_classpath}" />
     </path>
