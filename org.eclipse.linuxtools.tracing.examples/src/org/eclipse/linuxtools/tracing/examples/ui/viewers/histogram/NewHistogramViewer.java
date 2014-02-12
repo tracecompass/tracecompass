@@ -34,7 +34,6 @@ import org.swtchart.LineStyle;
  * @author Alexandre Montplaisir
  * @author Bernd Hufmann
  */
-@SuppressWarnings("restriction")
 public class NewHistogramViewer extends TmfBarChartViewer {
 
     /**
