@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.internal.lttng2.ust.core.trace.callstack;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.linuxtools.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
