@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 
@@ -23,7 +22,6 @@ import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
  * @author Geneviève Bastien
  * @since 3.0
  */
-@NonNullByDefault
 public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
 
     /**
@@ -43,6 +41,7 @@ public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
      *
      * @return The state systems
      */
+    @NonNull
     Iterable<ITmfStateSystem> getStateSystems();
 
 }
