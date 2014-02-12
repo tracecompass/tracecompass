@@ -21,6 +21,7 @@
         <!-- Search in the local Eclipse installation directory for the Wikitext plugin -->
         <fileset dir="${eclipse.home}/plugins" erroronmissingdir="false">
             <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
+            <include name="com.google.guava_*.jar" />
         </fileset>
 
         <!-- For Maven builds: use the compile_classpath -->
