@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Matthew Khouzam - Add support for default parsers
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.parsers.custom;
@@ -18,8 +19,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -35,6 +40,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.w3c.dom.Document;
@@ -58,12 +64,19 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /** Input lines */
     public List<InputLine> inputs;
 
+    /** File name of the default definition file */
+    protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_FILE_NAME = "custom_txt_default_parsers.xml"; //$NON-NLS-1$
     /** File name of the definition file */
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME = "custom_txt_parsers.xml"; //$NON-NLS-1$
 
     /** Path of the definition file */
+    protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME =
+            Platform.getInstallLocation().getURL().getPath() +
+            "templates/org.eclipse.linuxtools.tmf.core/" + //$NON-NLS-1$
+            CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_FILE_NAME;
+    /** Path of the definition file */
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME =
-        Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
+            Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
 
     /** Legacy path to the XML definitions file (in the UI plug-in)
      * TODO Remove once we feel the transition phase is over. */
@@ -234,7 +247,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             if (parentInput != null) {
                 int index = parentInput.childrenInputs.indexOf(this);
                 if (index > 0) {
-                    parentInput.childrenInputs.add(index - 1 , parentInput.childrenInputs.remove(index));
+                    parentInput.childrenInputs.add(index - 1, parentInput.childrenInputs.remove(index));
                     parentInput.childrenInputs.get(index).nextInput = nextInput;
                     nextInput = parentInput.childrenInputs.get(index);
                 }
@@ -248,7 +261,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             if (parentInput != null) {
                 int index = parentInput.childrenInputs.indexOf(this);
                 if (index < parentInput.childrenInputs.size() - 1) {
-                    parentInput.childrenInputs.add(index + 1 , parentInput.childrenInputs.remove(index));
+                    parentInput.childrenInputs.add(index + 1, parentInput.childrenInputs.remove(index));
                     nextInput = parentInput.childrenInputs.get(index).nextInput;
                     parentInput.childrenInputs.get(index).nextInput = this;
                 }
@@ -402,7 +415,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             this.max = max;
         }
 
-		@Override
+        @Override
         public String toString() {
             return "(" + (min >= 0 ? min : "?") + "," + (max == INF ? "\u221E" : (max >= 0 ? max : "?")) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         }
@@ -433,7 +446,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     }
 
     @Override
-	public void save() {
+    public void save() {
         save(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
     }
 
@@ -472,7 +485,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             File file = new File(path);
             if (file.canRead()) {
                 doc = db.parse(file);
-                if (! doc.getDocumentElement().getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
+                if (!doc.getDocumentElement().getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
                     return;
                 }
             } else {
@@ -517,7 +530,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
-            //initialize StreamResult with File object to save to file
+            // initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
@@ -598,14 +611,22 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
         }
 
-        return loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
+        Set<CustomTxtTraceDefinition> defs = new TreeSet<>(new Comparator<CustomTxtTraceDefinition>() {
+            @Override
+            public int compare(CustomTxtTraceDefinition o1, CustomTxtTraceDefinition o2) {
+                return o1.definitionName.compareTo(o2.definitionName);
+            }
+        });
+        defs.addAll(Arrays.asList(loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME)));
+        defs.addAll(Arrays.asList(loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
+        return defs.toArray(new CustomTxtTraceDefinition[0]);
+
     }
 
     /**
      * Load a specific text trace definition file.
      *
-     * @param path
-     *            The path to the file to load
+     * @param path The path to the file to load
      * @return The loaded trace definitions
      */
     public static CustomTxtTraceDefinition[] loadAll(String path) {
@@ -627,10 +648,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
@@ -645,7 +668,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             Document doc = db.parse(file);
 
             Element root = doc.getDocumentElement();
-            if (! root.getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
+            if (!root.getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
                 return new CustomTxtTraceDefinition[0];
             }
 
@@ -674,8 +697,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /**
      * Load a single definition.
      *
-     * @param definitionName
-     *            Name of the definition to load
+     * @param definitionName Name of the definition to load
      * @return The loaded trace definition
      */
     public static CustomTxtTraceDefinition load(String definitionName) {
@@ -697,10 +719,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
@@ -708,29 +732,37 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 }
             });
 
-            File file = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
-            Document doc = db.parse(file);
-
-            Element root = doc.getDocumentElement();
-            if (! root.getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
-                return null;
+            CustomTxtTraceDefinition value = lookupDefinition(definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
+            if (value == null) {
+                return lookupDefinition(definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME);
             }
+            return value;
+        } catch (ParserConfigurationException | SAXException | IOException e ) {
+            Activator.logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+        }
+        return null;
+    }
 
-            NodeList nodeList = root.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node instanceof Element &&
-                        node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                        definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                    return extractDefinition((Element) node);
-                }
+    private static CustomTxtTraceDefinition lookupDefinition(String definitionName, DocumentBuilder db, String source) throws SAXException, IOException {
+        File file = new File(source);
+        if (!file.exists()) {
+            return null;
+        }
+        Document doc = db.parse(file);
+
+        Element root = doc.getDocumentElement();
+        if (!root.getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
+            return null;
+        }
+
+        NodeList nodeList = root.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (node instanceof Element &&
+                    node.getNodeName().equals(DEFINITION_ELEMENT) &&
+                    definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
+                return extractDefinition((Element) node);
             }
-        } catch (ParserConfigurationException e) {
-            Activator.logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
-        } catch (SAXException e) {
-            Activator.logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
-        } catch (IOException e) {
-            Activator.logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
         return null;
     }
@@ -738,8 +770,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /**
      * Get the definition from a definition element.
      *
-     * @param definitionElement
-     *            The Element to extract from
+     * @param definitionElement The Element to extract from
      * @return The loaded trace definition
      */
     public static CustomTxtTraceDefinition extractDefinition(Element definitionElement) {
@@ -811,8 +842,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /**
      * Delete a definition from the currently loaded ones.
      *
-     * @param definitionName
-     *            The name of the definition to delete
+     * @param definitionName The name of the definition to delete
      */
     public static void delete(String definitionName) {
         try {
@@ -833,10 +863,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
@@ -848,7 +880,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             Document doc = db.parse(file);
 
             Element root = doc.getDocumentElement();
-            if (! root.getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
+            if (!root.getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
                 return;
             }
 
@@ -865,7 +897,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
-            //initialize StreamResult with File object to save to file
+            // initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
