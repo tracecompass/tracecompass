@@ -17,6 +17,7 @@
 package org.eclipse.linuxtools.tmf.ui.views.timegraph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -907,7 +908,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
     @TmfSignalHandler
     public void traceClosed(final TmfTraceClosedSignal signal) {
         synchronized (fBuildThreadMap) {
-            for (ITmfTrace trace : TmfTraceManager.getTraceSet(signal.getTrace())) {
+            for (ITmfTrace trace : getTracesToBuild(signal.getTrace())) {
                 BuildThread buildThread = fBuildThreadMap.remove(trace);
                 if (buildThread != null) {
                     buildThread.cancel();
@@ -1008,7 +1009,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 setStartTime(Long.MAX_VALUE);
                 setEndTime(Long.MIN_VALUE);
                 synchronized (fBuildThreadMap) {
-                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
+                    for (ITmfTrace trace : getTracesToBuild(fTrace)) {
                         BuildThread buildThread = new BuildThread(trace, fTrace, getName());
                         fBuildThreadMap.put(trace, buildThread);
                         buildThread.start();
@@ -1031,6 +1032,23 @@ public abstract class AbstractTimeGraphView extends TmfView {
      */
     protected void synchingToTime(long time) {
 
+    }
+
+    /**
+     * Return the list of traces whose data or analysis results will be used to
+     * populate the view. By default, if the trace is an experiment, the traces
+     * under it will be returned, otherwise, the trace itself is returned.
+     *
+     * A build thread will be started for each trace returned by this method,
+     * some of which may receive events in live streaming mode.
+     *
+     * @param trace
+     *            The trace associated with this view
+     * @return List of traces with data to display
+     * @since 3.0
+     */
+    protected Iterable<ITmfTrace> getTracesToBuild(ITmfTrace trace) {
+        return Arrays.asList(TmfTraceManager.getTraceSet(trace));
     }
 
     /**
