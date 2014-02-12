@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.kernel.core.tests.headless;
+package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,10 +18,11 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
+import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 
@@ -55,14 +56,26 @@ public class GenerateTestValues {
         }
 
         /* Prepare the files */
-        File stateFile = File.createTempFile("test-values", ".ht");
-        stateFile.deleteOnExit();
         File logFile = File.createTempFile("TestValues", ".java");
+        final CtfTmfTrace trace = testTrace.getTrace();
         try (PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
-
             /* Build and query the state system */
-            ITmfStateProvider input = new LttngKernelStateProvider(testTrace.getTrace());
-            ITmfStateSystem ssq = TmfStateSystemFactory.newFullHistory(stateFile, input, true);
+            TmfStateSystemAnalysisModule module = new TmfStateSystemAnalysisModule() {
+                @Override
+                protected ITmfStateProvider createStateProvider() {
+                    return new LttngKernelStateProvider(trace);
+                }
+                @Override
+                protected String getSsFileName() {
+                    return "test-values";
+                }
+            };
+            module.setTrace(trace);
+            module.setId("test-values");
+            module.schedule();
+            module.waitForCompletion();
+            ITmfStateSystem ssq = module.getStateSystem();
+
             List<ITmfStateInterval> fullState = ssq.queryFullState(targetTimestamp);
 
             /* Start printing the java file's contents */
