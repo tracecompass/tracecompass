@@ -83,6 +83,7 @@
             category="org.eclipse.linuxtools.tmf.tests.category.tracetype"
             event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
             id="org.eclipse.linuxtools.tmf.tests.ctf.tracetype"
+            isDirectory="true"
             name="CTF Tests"
             trace_type="org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub">
       </type>

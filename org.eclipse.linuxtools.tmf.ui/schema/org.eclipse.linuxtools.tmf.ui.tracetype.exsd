@@ -128,6 +128,13 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="isDirectory" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  Indicates whether the trace type is for traces that are directories  (true) or files (false)
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

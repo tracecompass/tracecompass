@@ -38,6 +38,7 @@
             event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
             icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng2.kernel.tracetype"
+            isDirectory="true"
             name="%tracetype.type.kernel"
             trace_type="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
          <eventsTableType

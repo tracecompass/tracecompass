@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Bernd Hufmann - Handling of directory traces types
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.project.model;
@@ -17,7 +18,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 
 /**
- * TraceTypeHelper, a helper that can link a few names to a configuation element
+ * TraceTypeHelper, a helper that can link a few names to a configuration element
  * and a trace
  *
  * @author Matthew Khouzam
@@ -29,6 +30,7 @@ public class TraceTypeHelper {
     private final String fCategoryName;
     private final String fCanonicalName;
     private final ITmfTrace fTrace;
+    private final boolean fIsDirectory;
 
     /**
      * Constructor for a trace type helper. It is a link between a canonical
@@ -43,12 +45,15 @@ public class TraceTypeHelper {
      *            the name of the trace
      * @param trace
      *            an object of the trace type
+     * @param isDir
+     *            flag indicating whether the trace type is for a directory or file trace
      */
-    public TraceTypeHelper(String canonicalName, String categoryName, String name, ITmfTrace trace) {
+    public TraceTypeHelper(String canonicalName, String categoryName, String name, ITmfTrace trace, boolean isDir) {
         fName = name;
         fCategoryName = categoryName;
         fCanonicalName = canonicalName;
         fTrace = trace;
+        fIsDirectory = isDir;
     }
 
     /**
@@ -138,6 +143,15 @@ public class TraceTypeHelper {
     public Class<? extends ITmfTrace> getTraceClass() {
         return fTrace.getClass();
     }
+
+    /**
+     * Returns whether trace type is for a directory trace or a single file trace
+     * @return <code>true</code> if trace type is for a directory trace else <code>false</code>
+     */
+    public boolean isDirectoryTraceType() {
+        return fIsDirectory;
+    }
+
 
     @Override
     public String toString() {

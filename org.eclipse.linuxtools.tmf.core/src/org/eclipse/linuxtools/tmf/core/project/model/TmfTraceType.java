@@ -49,8 +49,6 @@ public final class TmfTraceType {
 
     private static final char SEPARATOR = ':';
 
-    private static final String GENERIC_CTF_TRACE_TYPE = "org.eclipse.linuxtools.tmf.ui.type.ctf"; //$NON-NLS-1$
-
     /** Extension point ID */
     public static final String TMF_TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.ui.tracetype"; //$NON-NLS-1$
 
@@ -89,6 +87,9 @@ public final class TmfTraceType {
 
     /** Extension point attribute 'class' */
     public static final String CLASS_ATTR = "class"; //$NON-NLS-1$
+
+    /** Extension point attribute 'isDirectory' */
+    public static final String IS_DIR_ATTR = "isDirectory"; //$NON-NLS-1$
 
     /**
      * Custom text label used internally and therefore should not be
@@ -319,7 +320,7 @@ public final class TmfTraceType {
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
             String traceTypeId = CustomTxtTrace.class.getCanonicalName() + SEPARATOR + def.definitionName;
             ITmfTrace trace = new CustomTxtTrace(def);
-            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_TXT_CATEGORY, def.definitionName, trace);
+            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_TXT_CATEGORY, def.definitionName, trace, false);
             fTraceTypes.put(traceTypeId, tt);
             // Deregister trace as signal handler because it is only used for validation
             TmfSignalManager.deregister(trace);
@@ -327,7 +328,7 @@ public final class TmfTraceType {
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
             String traceTypeId = CustomXmlTrace.class.getCanonicalName() + SEPARATOR + def.definitionName;
             ITmfTrace trace = new CustomXmlTrace(def);
-            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_XML_CATEGORY, def.definitionName, trace);
+            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, CUSTOM_XML_CATEGORY, def.definitionName, trace, false);
             fTraceTypes.put(traceTypeId, tt);
             // Deregister trace as signal handler because it is only used for validation
             TmfSignalManager.deregister(trace);
@@ -365,7 +366,7 @@ public final class TmfTraceType {
             if (helper != null) {
                 helper.getTrace().dispose();
             }
-            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, category, definitionName, trace);
+            TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, category, definitionName, trace, false);
             fTraceTypes.put(traceTypeId, tt);
             // Deregister trace as signal handler because it is only used for validation
             TmfSignalManager.deregister(trace);
@@ -433,7 +434,12 @@ public final class TmfTraceType {
                     TmfSignalManager.deregister(trace);
                 } catch (CoreException e) {
                 }
-                TraceTypeHelper tt = new TraceTypeHelper(typeId, category, attribute, trace);
+
+
+                final String dirString = ce.getAttribute(TmfTraceType.IS_DIR_ATTR);
+                boolean isDir = "true".equals(dirString) ? true : false; //$NON-NLS-1$
+
+                TraceTypeHelper tt = new TraceTypeHelper(typeId, category, attribute, trace, isDir);
                 fTraceTypes.put(typeId, tt);
             }
         }
@@ -609,17 +615,18 @@ public final class TmfTraceType {
     }
 
     /**
-     * Checks if a trace is directory traces (and not a single trace file)
-     * @param fileName
+     * Checks if a trace is a valid directory trace
+     * @param path
      *            the file name (and path)
-     * @return true if the trace is a valid directory trace
+     * @return <code>true</code> if the trace is a valid directory trace else <code>false</code>
      */
-    public boolean isDirectoryTrace(String fileName) {
-        // right now we only check for CTF
-        // TODO have a attribute in the extension point for that
-        TraceTypeHelper helper =  getTraceType(GENERIC_CTF_TRACE_TYPE);
-        if (helper != null) {
-            return helper.validate(fileName);
+    public boolean isDirectoryTrace(String path) {
+        final Iterable<TraceTypeHelper> traceTypeHelpers = getTraceTypeHelpers();
+        for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
+            if (traceTypeHelper.isDirectoryTraceType() &&
+                    traceTypeHelper.validate(path)) {
+                return true;
+            }
         }
         return false;
     }
@@ -627,22 +634,16 @@ public final class TmfTraceType {
     /**
      * @param traceType
      *              the trace type
-     * @return true it is a directory trace type else false
+     * @return <code>true</code> it is a directory trace type else else <code>false</code>
      */
     public boolean isDirectoryTraceType(String traceType) {
-
-        if ((traceType == null) || (getTraceType(traceType) == null)) {
-            throw new IllegalArgumentException("Trace type string is null");  //$NON-NLS-1$
+        if (traceType != null) {
+            TraceTypeHelper traceTypeHelper = getTraceType(traceType);
+            if (traceTypeHelper != null) {
+                return traceTypeHelper.isDirectoryTraceType();
+            }
         }
-
-        // TODO provide a generic implementation using new attribute in extension point
-        if (traceType.equals("org.eclipse.linuxtools.lttng2.kernel.tracetype")) { //$NON-NLS-1$
-            return true;
-        } else if (traceType.equals(GENERIC_CTF_TRACE_TYPE)) {
-            return true;
-        } else if (traceType.equals("org.eclipse.linuxtools.lttng2.ust.tracetype")) { //$NON-NLS-1$
-            return true;
-        }
-        return false;
+        throw new IllegalArgumentException("Invalid trace type string: " + traceType); //$NON-NLS-1$
     }
+
 }

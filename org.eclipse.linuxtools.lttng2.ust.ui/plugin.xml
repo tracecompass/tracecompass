@@ -8,6 +8,7 @@
             event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
             icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng2.ust.tracetype"
+            isDirectory="true"
             name="%tracetype.type.ust"
             trace_type="org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace">
       </type>
