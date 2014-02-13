@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,10 +16,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +46,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition.Cardinality;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition.InputData;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition.InputLine;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.TitleEvent;
@@ -88,8 +87,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_REGEX = "\\s*(.*\\S)"; //$NON-NLS-1$
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
-    private static final String SIMPLE_DATE_FORMAT_URL = "http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
-    private static final String PATTERN_URL = "http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html#sum"; //$NON-NLS-1$
+    private static final String SIMPLE_DATE_FORMAT_URL = "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
+    private static final String PATTERN_URL = "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#sum"; //$NON-NLS-1$
     private static final Image LINE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/line_icon.gif"); //$NON-NLS-1$
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
     private static final Image ADD_NEXT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
@@ -810,14 +809,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 }
             } else {
                 try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(firstEntryTimeStampInputFormat);
-                    Date date = dateFormat.parse(firstEntryTimeStamp);
-                    dateFormat = new SimpleDateFormat(timestampOutputFormatText.getText().trim());
-                    timestampPreviewText.setText(dateFormat.format(date));
+                    TmfTimestampFormat timestampFormat = new TmfTimestampFormat(firstEntryTimeStampInputFormat);
+                    long timestamp = timestampFormat.parseValue(firstEntryTimeStamp);
+                    timestampFormat = new TmfTimestampFormat(timestampOutputFormatText.getText().trim());
+                    timestampPreviewText.setText(timestampFormat.format(timestamp));
                 } catch (ParseException e) {
                     timestampPreviewText.setText("*parse exception* [" + firstEntryTimeStamp + "] <> [" + firstEntryTimeStampInputFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 } catch (IllegalArgumentException e) {
-                    timestampPreviewText.setText("*parse exception* [Illegal Argument]"); //$NON-NLS-1$
+                    timestampPreviewText.setText("*parse exception* [Illegal Argument: " + e.getMessage()+ "]"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 
             }
@@ -1470,10 +1469,10 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 timestampOutputFormatText.setBackground(COLOR_LIGHT_RED);
             } else {
                 try {
-                    new SimpleDateFormat(definition.timeStampOutputFormat);
+                    new TmfTimestampFormat(definition.timeStampOutputFormat);
                     timestampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
                 } catch (IllegalArgumentException e) {
-                    errors.append("Enter a valid output format for the Time Stamp field. "); //$NON-NLS-1$
+                    errors.append("Enter a valid output format for the Time Stamp field [" + e.getMessage() + "]."); //$NON-NLS-1$ //$NON-NLS-2$
                     timestampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                 }
             }
@@ -1560,12 +1559,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     }
                 } else {
                     try {
-                        new SimpleDateFormat(inputData.format);
+                        new TmfTimestampFormat(inputData.format);
                         if (group != null) {
                             group.tagText.setBackground(COLOR_TEXT_BACKGROUND);
                         }
                     } catch (IllegalArgumentException e) {
-                        errors.append("Enter a valid input format for the Time Stamp (Line "+name+" Group "+(i+1)+"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        errors.append("Enter a valid input format for the Time Stamp (Line "+name+" Group "+(i+1)+") [" + e.getMessage() + "]. "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                         if (group != null) {
                             group.tagText.setBackground(COLOR_LIGHT_RED);
                         }

@@ -13,9 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +25,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -36,9 +35,6 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @since 3.0
  */
 public class CustomEvent extends TmfEvent {
-
-    /** Default timestamp scale for text-parser events */
-    public static final byte TIMESTAMP_SCALE = -3;
 
     /** Input format key */
     protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F"; //$NON-NLS-1$
@@ -194,14 +190,15 @@ public class CustomEvent extends TmfEvent {
     }
 
     private void processData() {
-        String timeStampString = fData.get(CustomTraceDefinition.TAG_TIMESTAMP);
-        String timeStampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
-        Date date = null;
-        if (timeStampInputFormat != null && timeStampString != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(timeStampInputFormat);
+        String timestampString = fData.get(CustomTraceDefinition.TAG_TIMESTAMP);
+        String timestampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
+        TmfTimestamp timestamp = null;
+        if (timestampInputFormat != null && timestampString != null) {
+            TmfTimestampFormat timestampFormat = new TmfTimestampFormat(timestampInputFormat);
             try {
-                date = dateFormat.parse(timeStampString);
-                setTimestamp(new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE));
+                long time = timestampFormat.parseValue(timestampString);
+                timestamp = new TmfTimestamp(time, ITmfTimestamp.NANOSECOND_SCALE);
+                setTimestamp(timestamp);
             } catch (ParseException e) {
                 setTimestamp(TmfTimestamp.ZERO);
             }
@@ -213,9 +210,9 @@ public class CustomEvent extends TmfEvent {
         fColumnData = new TmfEventField[fDefinition.outputs.size()];
         for (OutputColumn outputColumn : fDefinition.outputs) {
             String value = fData.get(outputColumn.name);
-            if (outputColumn.name.equals(CustomTraceDefinition.TAG_TIMESTAMP) && date != null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(fDefinition.timeStampOutputFormat);
-                fColumnData[i++] = new TmfEventField(outputColumn.name, dateFormat.format(date), null);
+            if (outputColumn.name.equals(CustomTraceDefinition.TAG_TIMESTAMP) && timestamp != null) {
+                TmfTimestampFormat timestampFormat = new TmfTimestampFormat(fDefinition.timeStampOutputFormat);
+                fColumnData[i++] = new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null);
             } else {
                 fColumnData[i++] = new TmfEventField(outputColumn.name, (value != null ? value : ""), null); //$NON-NLS-1$
             }

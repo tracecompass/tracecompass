@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -47,6 +45,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputAttribute;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputElement;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.TitleEvent;
@@ -94,7 +93,7 @@ import org.xml.sax.SAXParseException;
 public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
-    private static final String SIMPLE_DATE_FORMAT_URL = "http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
+    private static final String SIMPLE_DATE_FORMAT_URL = "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
     private static final Image ELEMENT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/element_icon.gif"); //$NON-NLS-1$
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
     private static final Image ADD_NEXT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
@@ -780,10 +779,10 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         if (timeStampValue != null && timeStampFormat != null) {
             try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(timeStampFormat);
-                Date date = dateFormat.parse(timeStampValue);
-                dateFormat = new SimpleDateFormat(timeStampOutputFormatText.getText().trim());
-                timeStampPreviewText.setText(dateFormat.format(date));
+                TmfTimestampFormat timestampFormat = new TmfTimestampFormat(timeStampFormat);
+                long timestamp = timestampFormat.parseValue(timeStampValue);
+                timestampFormat = new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
+                timeStampPreviewText.setText(timestampFormat.format(timestamp));
             } catch (ParseException e) {
                 timeStampPreviewText.setText("*parse exception* [" + timeStampValue + "] <> [" + timeStampFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             } catch (IllegalArgumentException e) {
@@ -1502,7 +1501,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                     } else {
                         try {
-                            new SimpleDateFormat(timeStampOutputFormatText.getText().trim());
+                            new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
                             timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
                         } catch (IllegalArgumentException e) {
                             errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampFmtError);
@@ -1565,7 +1564,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     }
                 } else {
                     try {
-                        new SimpleDateFormat(inputElement.inputFormat);
+                        new TmfTimestampFormat(inputElement.inputFormat);
                         if (elementNode != null) {
                             elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
                         }
@@ -1629,7 +1628,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         }
                     } else {
                         try {
-                            new SimpleDateFormat(attribute.inputFormat);
+                            new TmfTimestampFormat(attribute.inputFormat);
                             if (elementNode != null) {
                                 elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
                             }
