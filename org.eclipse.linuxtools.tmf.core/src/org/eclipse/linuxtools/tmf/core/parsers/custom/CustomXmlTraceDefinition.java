@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Matthew Khouzam - Add support for default xml parsers
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.parsers.custom;
@@ -18,7 +19,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,6 +37,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.w3c.dom.Document;
@@ -55,12 +61,21 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     /** "ignore" tag */
     public static final String TAG_IGNORE = Messages.CustomXmlTraceDefinition_ignoreTag;
 
+    /** Name of the default XML definitions file */
+    protected static final String CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_FILE_NAME = "custom_xml_default_parsers.xml"; //$NON-NLS-1$
+
     /** Name of the XML definitions file */
     protected static final String CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME = "custom_xml_parsers.xml"; //$NON-NLS-1$
 
     /** Path to the XML definitions file */
+    protected static final String CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME =
+            Platform.getInstallLocation().getURL().getPath() +
+            "templates/org.eclipse.linuxtools.tmf.core/" + //$NON-NLS-1$
+            CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_FILE_NAME;
+
+    /** Path to the XML definitions file */
     protected static final String CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME =
-        Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
+            Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
 
     /** Legacy path to the XML definitions file (in the UI plug-in)
      * TODO Remove once we feel the transition phase is over. */
@@ -146,7 +161,8 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         /**
          * Default (empty) constructor
          */
-        public InputElement() {}
+        public InputElement() {
+        }
 
         /**
          * Constructor
@@ -229,7 +245,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             if (parentElement != null) {
                 int index = parentElement.childElements.indexOf(this);
                 if (index > 0) {
-                    parentElement.childElements.add(index - 1 , parentElement.childElements.remove(index));
+                    parentElement.childElements.add(index - 1, parentElement.childElements.remove(index));
                     parentElement.childElements.get(index).nextElement = nextElement;
                     nextElement = parentElement.childElements.get(index);
                 }
@@ -243,7 +259,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             if (parentElement != null) {
                 int index = parentElement.childElements.indexOf(this);
                 if (index < parentElement.childElements.size() - 1) {
-                    parentElement.childElements.add(index + 1 , parentElement.childElements.remove(index));
+                    parentElement.childElements.add(index + 1, parentElement.childElements.remove(index));
                     nextElement = parentElement.childElements.get(index).nextElement;
                     parentElement.childElements.get(index).nextElement = this;
                 }
@@ -272,7 +288,8 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         /**
          * Default (empty) constructor
          */
-        public InputAttribute() {}
+        public InputAttribute() {
+        }
 
         /**
          * Constructor
@@ -300,7 +317,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         save(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
     }
 
-	@Override
+    @Override
     public void save(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -320,10 +337,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
@@ -335,7 +354,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             File file = new File(path);
             if (file.canRead()) {
                 doc = db.parse(file);
-                if (! doc.getDocumentElement().getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
+                if (!doc.getDocumentElement().getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
                     return;
                 }
             } else {
@@ -378,7 +397,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
-            //initialize StreamResult with File object to save to file
+            // initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
@@ -468,7 +487,16 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
         }
 
-        return loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
+        Set<CustomXmlTraceDefinition> defs = new TreeSet<>(new Comparator<CustomXmlTraceDefinition>() {
+
+            @Override
+            public int compare(CustomXmlTraceDefinition o1, CustomXmlTraceDefinition o2) {
+                return o1.definitionName.compareTo(o2.definitionName);
+            }
+        });
+        defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME)));
+        defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
+        return defs.toArray(new CustomXmlTraceDefinition[0]);
     }
 
     /**
@@ -497,10 +525,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
@@ -515,7 +545,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Document doc = db.parse(file);
 
             Element root = doc.getDocumentElement();
-            if (! root.getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
+            if (!root.getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
                 return new CustomXmlTraceDefinition[0];
             }
 
@@ -567,10 +597,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
@@ -578,29 +610,42 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 }
             });
 
-            File file = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
-            Document doc = db.parse(file);
-
-            Element root = doc.getDocumentElement();
-            if (! root.getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
-                return null;
+            CustomXmlTraceDefinition value = lookupXmlDefinition(definitionName, db, CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
+            if (value == null) {
+                value = lookupXmlDefinition(definitionName, db, CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME);
             }
-
-            NodeList nodeList = root.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node instanceof Element &&
-                        node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                        definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                    return extractDefinition((Element) node);
-                }
-            }
+            return value;
         } catch (ParserConfigurationException e) {
             Activator.logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (SAXException e) {
             Activator.logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         } catch (IOException e) {
             Activator.logError("Error loading CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
+        }
+        return null;
+    }
+
+    private static CustomXmlTraceDefinition lookupXmlDefinition(String definitionName, DocumentBuilder db, String source) throws SAXException, IOException {
+        File file = new File(source);
+        if (!file.exists()) {
+            return null;
+        }
+
+        Document doc = db.parse(file);
+
+        Element root = doc.getDocumentElement();
+        if (!root.getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
+            return null;
+        }
+
+        NodeList nodeList = root.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (node instanceof Element &&
+                    node.getNodeName().equals(DEFINITION_ELEMENT) &&
+                    definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
+                return extractDefinition((Element) node);
+            }
         }
         return null;
     }
@@ -711,10 +756,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
@@ -726,7 +773,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Document doc = db.parse(file);
 
             Element root = doc.getDocumentElement();
-            if (! root.getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
+            if (!root.getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
                 return;
             }
 
@@ -743,7 +790,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
-            //initialize StreamResult with File object to save to file
+            // initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
