@@ -32,8 +32,8 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class TmfTimePreferencesTest {
 
-    private static final String TIME_PATTERN = "HH:mm:ss.SSS CCC NNN";
-    private static final String INTERVAL_PATTERN = "TTT.SSS CCC NNN";
+    private static final String TIME_PATTERN = "HH:mm:ss.SSS SSS SSS";
+    private static final String INTERVAL_PATTERN = "TTT.SSS SSS SSS";
 
     /**
      * Test that the preferences get initialized to the default

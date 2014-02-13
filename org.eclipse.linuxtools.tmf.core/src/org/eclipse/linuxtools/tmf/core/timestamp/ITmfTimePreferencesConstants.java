@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.tmf.core.timestamp;
 @SuppressWarnings({ "javadoc", "nls" })
 public interface ITmfTimePreferencesConstants {
     public static final String TIME_FORMAT_PREF = "org.eclipse.linuxtools.tmf.core.prefs.time.format";
-    public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss.SSS_CCC_NNN";
+    public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss.SSS SSS SSS";
     public static final String DATIME = TIME_FORMAT_PREF + ".datime";
     public static final String SUBSEC = TIME_FORMAT_PREF + ".subsec";
     public static final String TIME_ZONE = TIME_FORMAT_PREF + ".timezone";
@@ -37,8 +37,8 @@ public interface ITmfTimePreferencesConstants {
     public static final String TIME_ELAPSED_FMT = "TTT";
     public static final String TIME_NO_FMT = "";
     public static final String SUBSEC_MILLI_FMT = "SSS";
-    public static final String SUBSEC_MICRO_FMT = "SSS CCC";
-    public static final String SUBSEC_NANO_FMT = "SSS CCC NNN";
+    public static final String SUBSEC_MICRO_FMT = "SSS SSS";
+    public static final String SUBSEC_NANO_FMT = "SSS SSS SSS";
     public static final String SUBSEC_NO_FMT = "";
     public static final String DELIMITER_NONE = "";
     public static final String DELIMITER_SPACE = " ";
@@ -50,4 +50,6 @@ public interface ITmfTimePreferencesConstants {
     public static final String DELIMITER_SEMICOLON = ";";
     public static final String DELIMITER_SLASH = "/";
     public static final String DELIMITER_DQUOT = "\"";
+    /** @since 3.0 */
+    public static final String DELIMITER_QUOTE = "''";
 }

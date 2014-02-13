@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *     Francois Chouinard - Initial API and implementation
  *     Marc-Andre Laperle - Add time zone preference
+ *     Patrick Tasse - Updated for fraction of seconds
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.properties;
@@ -86,6 +87,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
             { ": (colon)", ITmfTimePreferencesConstants.DELIMITER_COLON }, //$NON-NLS-1$
             { "; (semicolon)", ITmfTimePreferencesConstants.DELIMITER_SEMICOLON }, //$NON-NLS-1$
             { "/ (slash)", ITmfTimePreferencesConstants.DELIMITER_SLASH }, //$NON-NLS-1$
+            { "' (quote)", ITmfTimePreferencesConstants.DELIMITER_QUOTE }, //$NON-NLS-1$
             { "\" (dbl-quote)", ITmfTimePreferencesConstants.DELIMITER_DQUOT }, //$NON-NLS-1$
     };
 
@@ -99,6 +101,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
             { ": (colon)", ITmfTimePreferencesConstants.DELIMITER_COLON }, //$NON-NLS-1$
             { "; (semicolon)", ITmfTimePreferencesConstants.DELIMITER_SEMICOLON }, //$NON-NLS-1$
             { "/ (slash)", ITmfTimePreferencesConstants.DELIMITER_SLASH }, //$NON-NLS-1$
+            { "' (quote)", ITmfTimePreferencesConstants.DELIMITER_QUOTE }, //$NON-NLS-1$
             { "\" (dbl-quote)", ITmfTimePreferencesConstants.DELIMITER_DQUOT }, //$NON-NLS-1$
             { ". (period)", ITmfTimePreferencesConstants.DELIMITER_PERIOD }, //$NON-NLS-1$
     };
@@ -209,7 +212,10 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
     protected Control createContents(Composite parent) {
 
         // Overall preference page layout
-        parent.setLayout(new GridLayout());
+        GridLayout gl = new GridLayout();
+        gl.marginHeight = 0;
+        gl.marginWidth = 0;
+        parent.setLayout(gl);
         fPage = new Composite(parent, SWT.NONE);
         fPage.setLayout(new GridLayout());
         fPage.setLayoutData(new GridData(

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2014 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -108,7 +108,10 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
 
     @Override
     protected Control createContents(Composite parent) {
-        parent.setLayout(new GridLayout());
+        GridLayout gl = new GridLayout();
+        gl.marginHeight = 0;
+        gl.marginWidth = 0;
+        parent.setLayout(gl);
         Composite page = new Composite(parent, SWT.NONE);
         GridLayout pageLayout = new GridLayout();
         pageLayout.numColumns = 2;

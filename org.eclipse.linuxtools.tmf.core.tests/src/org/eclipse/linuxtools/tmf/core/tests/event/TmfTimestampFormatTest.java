@@ -33,9 +33,9 @@ import org.osgi.service.prefs.BackingStoreException;
 public class TmfTimestampFormatTest {
 
     private static final String TEST_PATTERN = "HH:mm:ss.SSS";
-    private static final String TEST_PATTERN_2 = "TTT.SSSCCCNNN";
+    private static final String TEST_PATTERN_2 = "TTT.SSSSSSSSS";
     private static final String TEST_PATTERN_3 = "TTT.SSS";
-    private static final String TEST_PATTERN_4 = "TTT.SSS CCC NNN";
+    private static final String TEST_PATTERN_4 = "TTT.SSS SSS SSS";
     private static final TimeZone TEST_TIME_ZONE = TimeZone.getTimeZone(TimeZone.getAvailableIDs(0)[0]);
 
     private static final TmfTimestampFormat tsf1 = new TmfTimestampFormat(TEST_PATTERN);
@@ -50,7 +50,7 @@ public class TmfTimestampFormatTest {
     @Test
     public void testDefaultConstructor() {
         TmfTimestampFormat ts0 = new TmfTimestampFormat();
-        assertEquals("HH:mm:ss.SSS CCC NNN", ts0.toPattern());
+        assertEquals("HH:mm:ss.SSS SSS SSS", ts0.toPattern());
     }
 
     /**
