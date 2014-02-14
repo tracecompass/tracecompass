@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,25 +8,16 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Geneviève Bastien - Moved some methods to TmfTimeViewer
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.viewers.xycharts;
 
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalThrottler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
-import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
-import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewer;
+import org.eclipse.linuxtools.tmf.ui.viewers.TmfTimeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -44,7 +35,7 @@ import org.swtchart.ISeriesSet;
  * @author Bernd Hufmann
  * @since 3.0
  */
-public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTimeProvider {
+public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChartTimeProvider {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -54,26 +45,8 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
      * precision when converting long to double and back.
      */
     private long fTimeOffset;
-    /** Start time of trace */
-    private long fStartTime;
-    /** End time of trace */
-    private long fEndTime;
-    /** Start time of current time range */
-    private long fWindowStartTime;
-    /** End time of current time range */
-    private long fWindowEndTime;
-    /** Duration of current time range */
-    private long fWindowDuration;
-    /** Current begin time of selection range */
-    private long fSelectionBeginTime;
-    /** Current end of selection range */
-    private long fSelectionEndTime;
-    /** The trace that is displayed by this viewer */
-    private ITmfTrace fTrace;
     /** The SWT Chart reference */
     private Chart fSwtChart;
-    /** A signal throttler for range updates */
-    private final TmfSignalThrottler fTimeRangeSyncThrottle = new TmfSignalThrottler(this, 200);
     /** The mouse selection provider */
     private TmfBaseProvider fMouseSelectionProvider;
     /** The mouse drag zoom provider */
@@ -144,95 +117,6 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
      */
     protected void setTimeOffset(long timeOffset) {
         fTimeOffset = timeOffset;
-    }
-
-    /**
-     * Sets the start time of the trace
-     *
-     * @param startTime
-     *            The start time to set
-     */
-    protected void setStartTime(long startTime) {
-        fStartTime = startTime;
-    }
-
-    /**
-     * Sets the end time of the trace
-     *
-     * @param endTime
-     *            The start time to set
-     */
-    protected void setEndTime(long endTime) {
-        fEndTime = endTime;
-    }
-
-    /**
-     * Sets the start time of the current time range window
-     *
-     * @param windowStartTime
-     *            The start time to set
-     */
-    protected void setWindowStartTime(long windowStartTime) {
-        fWindowStartTime = windowStartTime;
-    }
-
-    /**
-     * Sets the end time of the current time range window
-     *
-     * @param windowEndTime
-     *            The start time to set
-     */
-    protected void setWindowEndTime(long windowEndTime) {
-        fWindowEndTime = windowEndTime;
-    }
-
-    /**
-     * Sets the start time of the current time range window
-     *
-     * @param windowDuration
-     *            The start time to set
-     */
-    protected void setWindowDuration(long windowDuration) {
-        fWindowDuration = windowDuration;
-    }
-
-    /**
-     * Sets the begin time of the selection range.
-     *
-     * @param selectionBeginTime
-     *            The begin time to set
-     */
-    protected void setSelectionBeginTime(long selectionBeginTime) {
-        fSelectionBeginTime = selectionBeginTime;
-    }
-
-    /**
-     * Sets the end time of the selection range.
-     *
-     * @param selectionEndTime
-     *            The end time to set
-     */
-    protected void setSelectionEndTime(long selectionEndTime) {
-        fSelectionEndTime = selectionEndTime;
-    }
-
-    /**
-     * Sets the trace that is displayed by this viewer.
-     *
-     * @param trace
-     *            The trace to set
-     */
-    protected void setTrace(ITmfTrace trace) {
-        fTrace = trace;
-    }
-
-    /**
-     * Gets the trace that is displayed by this viewer.
-     *
-     * @return the trace
-     */
-    protected ITmfTrace getTrace() {
-        return fTrace;
     }
 
     /**
@@ -328,75 +212,10 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
     // ------------------------------------------------------------------------
     // ITmfChartTimeProvider
     // ------------------------------------------------------------------------
-    @Override
-    public long getStartTime() {
-        return fStartTime;
-    }
-
-    @Override
-    public long getEndTime() {
-        return fEndTime;
-    }
-
-    @Override
-    public long getWindowStartTime() {
-        return fWindowStartTime;
-    }
-
-    @Override
-    public long getWindowEndTime() {
-        return fWindowEndTime;
-    }
-
-    @Override
-    public long getWindowDuration() {
-        return fWindowDuration;
-    }
-
-    @Override
-    public long getSelectionBeginTime() {
-        return fSelectionBeginTime;
-    }
-
-    @Override
-    public long getSelectionEndTime() {
-        return fSelectionEndTime;
-    }
 
     @Override
     public long getTimeOffset() {
         return fTimeOffset;
-    }
-
-    @Override
-    public void updateSelectionRange(final long currentBeginTime, final long currentEndTime) {
-        if (fTrace != null) {
-            setSelectionBeginTime(currentBeginTime);
-            setSelectionEndTime(currentEndTime);
-
-            final ITmfTimestamp startTimestamp = new TmfTimestamp(fSelectionBeginTime, ITmfTimestamp.NANOSECOND_SCALE);
-            final ITmfTimestamp endTimestamp = new TmfTimestamp(fSelectionEndTime, ITmfTimestamp.NANOSECOND_SCALE);
-
-            TmfTimeSynchSignal signal = new TmfTimeSynchSignal(TmfXYChartViewer.this, startTimestamp, endTimestamp);
-            broadcast(signal);
-        }
-    }
-
-    @Override
-    public void updateWindow(long windowStartTime, long windowEndTime) {
-
-        setWindowStartTime(windowStartTime);
-        setWindowEndTime(windowEndTime);
-        fWindowDuration = windowEndTime - windowStartTime;
-
-        // Build the new time range; keep the current time
-        TmfTimeRange timeRange = new TmfTimeRange(
-                new TmfTimestamp(fWindowStartTime, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(fWindowEndTime, ITmfTimestamp.NANOSECOND_SCALE));
-
-        // Send the  signal
-        TmfRangeSynchSignal signal = new TmfRangeSynchSignal(this, timeRange);
-        fTimeRangeSyncThrottle.queue(signal);
     }
 
     // ------------------------------------------------------------------------
@@ -450,21 +269,9 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
      * @param trace
      *            A trace to apply in the viewer
      */
+    @Override
     public void loadTrace(ITmfTrace trace) {
-        fTrace = trace;
-
-        long timestamp = TmfTraceManager.getInstance().getSelectionBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long windowStartTime = TmfTraceManager.getInstance().getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long startTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long endTime = fTrace.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-
-        setSelectionBeginTime(timestamp);
-        setSelectionEndTime(timestamp);
-        setStartTime(startTime);
-        setWindowStartTime(windowStartTime);
-        setWindowDuration(fTrace.getInitialRangeOffset().getValue());
-        setEndTime(endTime);
-        setWindowEndTime(windowStartTime + getWindowDuration());
+        super.loadTrace(trace);
         clearContent();
         updateContent();
     }
@@ -472,16 +279,9 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
     /**
      * Resets the content of the viewer
      */
+    @Override
     public void reset() {
-        // Reset the internal data
-        setSelectionBeginTime(0);
-        setSelectionEndTime(0);
-        setStartTime(0);
-        setWindowStartTime(0);
-        setWindowDuration(0);
-        setEndTime(0);
-        setWindowEndTime(0);
-        setTrace(null);
+        super.reset();
         clearContent();
     }
 
@@ -495,62 +295,16 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
     // ------------------------------------------------------------------------
 
     /**
-     * Signal handler for handling of the trace opened signal.
-     *
-     * @param signal
-     *            The trace opened signal {@link TmfTraceOpenedSignal}
-     */
-    @TmfSignalHandler
-    public void traceOpened(TmfTraceOpenedSignal signal) {
-        fTrace = signal.getTrace();
-        loadTrace(getTrace());
-    }
-
-    /**
-     * Signal handler for handling of the trace selected signal.
-     *
-     * @param signal
-     *            The trace selected signal {@link TmfTraceSelectedSignal}
-     */
-    @TmfSignalHandler
-    public void traceSelected(TmfTraceSelectedSignal signal) {
-        if (fTrace != signal.getTrace()) {
-            fTrace = signal.getTrace();
-            loadTrace(getTrace());
-        }
-    }
-
-    /**
-     * Signal handler for handling of the trace closed signal.
-     *
-     * @param signal
-     *            The trace closed signal {@link TmfTraceClosedSignal}
-     */
-    @TmfSignalHandler
-    public void traceClosed(TmfTraceClosedSignal signal) {
-
-        if (signal.getTrace() != fTrace) {
-            return;
-        }
-
-        // Reset the internal data
-        fTrace = null;
-        reset();
-    }
-
-    /**
      * Signal handler for handling of the time synch signal.
      *
      * @param signal
      *            The time synch signal {@link TmfTimeSynchSignal}
      */
+    @Override
     @TmfSignalHandler
     public void selectionRangeUpdated(TmfTimeSynchSignal signal) {
-        if ((signal.getSource() != this) && (fTrace != null)) {
-            ITmfTimestamp selectedTime = signal.getBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
-            ITmfTimestamp selectedEndTime = signal.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
-            setSelectionBeginTime(selectedTime.getValue());
-            setSelectionEndTime(selectedEndTime.getValue());
+        super.selectionRangeUpdated(signal);
+        if ((signal.getSource() != this) && (getTrace() != null)) {
             if (fMouseSelectionProvider != null) {
                 fMouseSelectionProvider.refresh();
             }
@@ -563,69 +317,11 @@ public abstract class TmfXYChartViewer extends TmfViewer implements ITmfChartTim
      * @param signal
      *            The time range synch signal {@link TmfRangeSynchSignal}
      */
+    @Override
     @TmfSignalHandler
     public void timeRangeUpdated(TmfRangeSynchSignal signal) {
-
-        if (fTrace != null) {
-            // Validate the time range
-            TmfTimeRange range = signal.getCurrentRange().getIntersection(fTrace.getTimeRange());
-            if (range == null) {
-                return;
-            }
-
-            if (signal.getSource() != this) {
-                // Update the time range
-                long windowStartTime = range.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long windowEndTime = range.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long windowDuration = windowEndTime - windowStartTime;
-
-                setWindowStartTime(windowStartTime);
-                setWindowEndTime(windowEndTime);
-                setWindowDuration(windowDuration);
-            }
-        }
+        super.timeRangeUpdated(signal);
         updateContent();
-    }
-
-    /**
-     * Signal handler for handling of the trace range updated signal.
-     *
-     * @param signal
-     *            The trace range signal {@link TmfTraceRangeUpdatedSignal}
-     */
-    @TmfSignalHandler
-    public void traceRangeUpdated(TmfTraceRangeUpdatedSignal signal) {
-
-        if (signal.getTrace() != fTrace) {
-            return;
-        }
-
-        TmfTimeRange fullRange = signal.getRange();
-
-        long traceStartTime = fullRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long traceEndTime = fullRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-
-        setStartTime(traceStartTime);
-        setEndTime(traceEndTime);
-    }
-
-    /**
-     * Signal handler for handling of the trace updated signal.
-     *
-     * @param signal
-     *            The trace updated signal {@link TmfTraceUpdatedSignal}
-     */
-    @TmfSignalHandler
-    public void traceUpdated(TmfTraceUpdatedSignal signal) {
-        if (signal.getTrace() != fTrace) {
-            return;
-        }
-        TmfTimeRange fullRange = signal.getTrace().getTimeRange();
-        long traceStartTime = fullRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long traceEndTime = fullRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-
-        setStartTime(traceStartTime);
-        setEndTime(traceEndTime);
     }
 
     /**
