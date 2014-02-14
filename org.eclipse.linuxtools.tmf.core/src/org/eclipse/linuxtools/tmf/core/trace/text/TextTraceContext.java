@@ -43,6 +43,19 @@ public class TextTraceContext extends TmfContext {
         super(location, rank);
     }
 
+    /**
+     * Copy Constructor
+     *
+     * @param other
+     *            the other TextTraceContext
+     */
+    public TextTraceContext(TextTraceContext other) {
+        this(other.getLocation(), other.getRank());
+        firstLine = other.firstLine;
+        firstLineMatcher = other.firstLineMatcher;
+        nextLineLocation = other.nextLineLocation;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

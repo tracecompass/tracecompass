@@ -117,14 +117,11 @@ public class TextTraceEventContent implements ITmfEventField, Cloneable {
 
     @Override
     public ITmfEventField getSubField(String[] names) {
-        ITmfEventField field = this;
-        for (String name : names) {
-            field = field.getField(name);
-            if (field == null) {
-                return null;
-            }
+        // There are no sub fields
+        if (names.length == 1) {
+            return getField(names[0]);
         }
-        return field;
+        return null;
     }
 
     // ------------------------------------------------------------------------
