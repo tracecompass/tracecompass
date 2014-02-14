@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.analysis;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -416,4 +417,8 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         return text;
     }
 
+    @Override
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        return Collections.EMPTY_SET;
+    }
 }

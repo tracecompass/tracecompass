@@ -23,7 +23,7 @@ import org.osgi.framework.Bundle;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public interface IAnalysisModuleHelper {
+public interface IAnalysisModuleHelper extends IAnalysisRequirementProvider {
 
     // ------------------------------------
     // Getters
@@ -89,6 +89,13 @@ public interface IAnalysisModuleHelper {
      * @return whether the analysis applies
      */
     boolean appliesToTraceType(Class<? extends ITmfTrace> traceclass);
+
+    /**
+     * Gets the list of valid trace types that the analysis can operate on.
+     *
+     * @return List of the trace type
+     */
+    Iterable<Class<? extends ITmfTrace>> getValidTraceTypes();
 
     // ---------------------------------------
     // Functionalities

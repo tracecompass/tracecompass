@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.analysis.xml.ui.module;
 
 import java.io.File;
+import java.util.Collections;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator;
@@ -21,6 +22,7 @@ import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateSystem
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.Bundle;
@@ -112,6 +114,16 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
         }
 
         return fHeadInfo.checkTraceType(traceclass);
+    }
+
+    @Override
+    public Iterable<Class<? extends ITmfTrace>> getValidTraceTypes() {
+        return Collections.EMPTY_SET;
+    }
+
+    @Override
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        return Collections.EMPTY_SET;
     }
 
     @Override

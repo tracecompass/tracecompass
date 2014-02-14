@@ -42,7 +42,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public interface IAnalysisModule extends ITmfComponent {
+public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProvider {
 
     // --------------------------------------------------------
     // Getters and setters
@@ -239,5 +239,4 @@ public interface IAnalysisModule extends ITmfComponent {
      *            The of the parameter that changed
      */
     void notifyParameterChanged(String name);
-
 }

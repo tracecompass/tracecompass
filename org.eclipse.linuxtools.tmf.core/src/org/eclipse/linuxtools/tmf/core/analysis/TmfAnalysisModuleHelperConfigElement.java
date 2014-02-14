@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.analysis;
 
+import java.util.Collections;
+
 import org.eclipse.core.runtime.ContributorFactoryOSGi;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -111,6 +113,16 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
         return applies;
     }
 
+    @Override
+    public Iterable<Class<? extends ITmfTrace>> getValidTraceTypes() {
+        return Collections.EMPTY_SET;
+    }
+
+    @Override
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        return Collections.EMPTY_SET;
+    }
+
     // ---------------------------------------
     // Functionalities
     // ---------------------------------------
@@ -147,5 +159,4 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
         return module;
 
     }
-
 }

@@ -12,9 +12,12 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.analysis;
 
+import java.util.Collections;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
@@ -117,4 +120,13 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
         return module;
     }
 
+    @Override
+    public Iterable<Class<? extends ITmfTrace>> getValidTraceTypes() {
+        return Collections.EMPTY_SET;
+    }
+
+    @Override
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        return Collections.EMPTY_SET;
+    }
 }
