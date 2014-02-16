@@ -387,7 +387,7 @@
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.ui.file.import"
+               commandId="org.eclipse.linuxtools.tmf.ui.import"
                label="%command.import"
                mnemonic="%command.import.mnemonic"
                style="push">
@@ -1069,6 +1069,11 @@
             name="%commands.uml2sd.scrollright">
       </command>
       <command
+            description="%command.import.description"
+            id="org.eclipse.linuxtools.tmf.ui.import"
+            name="%command.import">
+      </command>
+      <command
             description="%command.batch_import.description"
             id="org.eclipse.linuxtools.tmf.ui.batch_import"
             name="%command.batch_import">
@@ -1098,21 +1103,7 @@
          point="org.eclipse.ui.handlers">
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.ImportTraceHandler"
-            commandId="org.eclipse.ui.file.import">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                  </instanceof>
-               </iterate>
-            </and>
-         </activeWhen>
+            commandId="org.eclipse.linuxtools.tmf.ui.import">
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RefreshHandler"

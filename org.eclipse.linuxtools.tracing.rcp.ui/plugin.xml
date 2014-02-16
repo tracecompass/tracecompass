@@ -48,13 +48,22 @@
                   label="%command.OpenDirectory.label"
                   style="push">
             </command>
+            <separator
+                  name="OpenSeparator"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.linuxtools.tmf.ui.import"
+                  label="%command.import"
+                  style="push">
+            </command>
             <command
                   commandId="org.eclipse.linuxtools.tmf.ui.batch_import"
                   label="%command.batch_import"
                   style="push">
             </command>
             <separator
-                  name="OpenSeparator"
+                  name="ImportSeparator"
                   visible="true">
             </separator>
             <command
