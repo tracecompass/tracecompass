@@ -138,7 +138,6 @@ public class Messages extends NLS {
     public static String CustomTxtParserInputWizardPage_appendWith;
     public static String CustomTxtParserInputWizardPage_capturedGroup;
     public static String CustomTxtParserInputWizardPage_cardinality;
-    public static String CustomTxtParserInputWizardPage_dateFormatHelp;
     public static String CustomTxtParserInputWizardPage_desccriptionEdit;
     public static String CustomTxtParserInputWizardPage_descriptionNew;
     public static String CustomTxtParserInputWizardPage_format;
@@ -170,6 +169,7 @@ public class Messages extends NLS {
     public static String CustomTxtParserInputWizardPage_removeLine;
     public static String CustomTxtParserInputWizardPage_set;
     public static String CustomTxtParserInputWizardPage_timestampFormat;
+    public static String CustomTxtParserInputWizardPage_timestampFormatHelp;
     public static String CustomTxtParserInputWizardPage_uncapturedText;
     public static String CustomTxtParserInputWizardPage_unidentifiedCaptureGroup;
     public static String CustomTxtParserInputWizardPage_windowTitleEdit;
@@ -205,7 +205,6 @@ public class Messages extends NLS {
     public static String CustomXmlParserInputWizardPage_append;
     public static String CustomXmlParserInputWizardPage_appendWith;
     public static String CustomXmlParserInputWizardPage_attibute;
-    public static String CustomXmlParserInputWizardPage_dateFormatHelp;
     public static String CustomXmlParserInputWizardPage_descriptionEdit;
     public static String CustomXmlParserInputWizardPage_descriptionNew;
     public static String CustomXmlParserInputWizardPage_elementName;
@@ -227,6 +226,7 @@ public class Messages extends NLS {
     public static String CustomXmlParserInputWizardPage_set;
     public static String CustomXmlParserInputWizardPage_tagName;
     public static String CustomXmlParserInputWizardPage_timestampFormat;
+    public static String CustomXmlParserInputWizardPage_timestampFormatHelp;
     public static String CustomXmlParserInputWizardPage_titleEdit;
     public static String CustomXmlParserInputWizardPage_titleNew;
     public static String CustomXmlParserOutputWizardPage_description;

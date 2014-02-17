@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,10 @@ import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -66,6 +71,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -77,6 +84,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.framework.Bundle;
 
 /**
  * Input wizard page for custom text parsers.
@@ -87,7 +95,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_REGEX = "\\s*(.*\\S)"; //$NON-NLS-1$
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
-    private static final String SIMPLE_DATE_FORMAT_URL = "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
+    private static final String TIMESTAMP_FORMAT_BUNDLE = "org.eclipse.linuxtools.lttng.help"; //$NON-NLS-1$
+    private static final String TIMESTAMP_FORMAT_PATH = "reference/api/org/eclipse/linuxtools/tmf/core/timestamp/TmfTimestampFormat.html"; //$NON-NLS-1$
     private static final String PATTERN_URL = "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#sum"; //$NON-NLS-1$
     private static final Image LINE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/line_icon.gif"); //$NON-NLS-1$
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
@@ -182,13 +191,20 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         timestampOutputFormatText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         timestampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
 
-        Button dateFormatHelpButton = new Button(headerComposite, SWT.PUSH);
-        dateFormatHelpButton.setImage(HELP_IMAGE);
-        dateFormatHelpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_dateFormatHelp);
-        dateFormatHelpButton.addSelectionListener(new SelectionAdapter() {
+        Button timeStampFormatHelpButton = new Button(headerComposite, SWT.PUSH);
+        timeStampFormatHelpButton.setImage(HELP_IMAGE);
+        timeStampFormatHelpButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_timestampFormatHelp);
+        timeStampFormatHelpButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                openHelpShell(SIMPLE_DATE_FORMAT_URL);
+                Bundle plugin = Platform.getBundle(TIMESTAMP_FORMAT_BUNDLE);
+                IPath path = new Path(TIMESTAMP_FORMAT_PATH);
+                URL fileURL = FileLocator.find(plugin, path, null);
+                try {
+                    URL pageURL = FileLocator.toFileURL(fileURL);
+                    openHelpShell(pageURL.toString());
+                } catch (IOException e1) {
+                }
             }
         });
 
@@ -915,8 +931,10 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 helpShell.setText(event.title);
             }
         });
-        helpBrowser.setBounds(0, 0, 600, 400);
-        helpShell.pack();
+        Rectangle r = container.getBounds();
+        Point p = container.toDisplay(r.x, r.y);
+        Rectangle trim = helpShell.computeTrim(p.x + (r.width - 750) / 2, p.y + (r.height - 400) / 2, 750, 400);
+        helpShell.setBounds(trim);
         helpShell.open();
         helpBrowser.setUrl(url);
     }
