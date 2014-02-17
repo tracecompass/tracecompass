@@ -105,7 +105,9 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
          * don't get TimeRange exceptions.
          */
         long startTime = Math.max(start, cpuSs.getStartTime());
+        startTime = Math.max(startTime, kernelSs.getStartTime());
         long endTime = Math.min(end, cpuSs.getCurrentEndTime());
+        endTime = Math.min(endTime, kernelSs.getCurrentEndTime());
         long totalTime = 0;
         if (endTime < startTime) {
             return map;
