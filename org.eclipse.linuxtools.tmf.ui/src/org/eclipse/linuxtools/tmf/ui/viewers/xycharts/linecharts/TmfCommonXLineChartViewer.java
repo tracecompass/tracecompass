@@ -57,6 +57,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     private final Map<String, double[]> fSeriesValues = new LinkedHashMap<>();
     private double[] fXValues;
+    private double fResolution;
 
     /**
      * Constructor
@@ -73,7 +74,18 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     public TmfCommonXLineChartViewer(Composite parent, String title, String xLabel, String yLabel) {
         super(parent, title, xLabel, yLabel);
 
+        setResolution(RESOLUTION);
         setTooltipProvider(new TmfCommonXLineChartTooltipProvider(this));
+    }
+
+    /**
+     * Set the number of requests per pixel that should be done on this chart
+     *
+     * @param resolution
+     *            The number of points per pixels
+     */
+    protected void setResolution(double resolution) {
+        fResolution = resolution;
     }
 
     @Override
@@ -115,7 +127,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
             @Override
             public void run() {
-                final int numRequests = (int) (getSwtChart().getPlotArea().getBounds().width * RESOLUTION);
+                final int numRequests = (int) (getSwtChart().getPlotArea().getBounds().width * fResolution);
                 Thread thread = new Thread("Line chart update") { //$NON-NLS-1$
                     @Override
                     public void run() {
@@ -272,6 +284,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                             miny = Math.min(miny, value);
                         }
                         series.setYSeries(entry.getValue());
+                    }
+                    if (maxy == DEFAULT_MAXY) {
+                        maxy = 1.0;
                     }
 
                     IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
