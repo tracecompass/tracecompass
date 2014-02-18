@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider2;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.Slider;
  * @version 1.0
  * @author Patrick Tasse, and others
  */
-public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
+public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     private static final int DEFAULT_NAME_WIDTH = 200;
     private static final int MIN_NAME_WIDTH = 6;
@@ -599,13 +599,6 @@ public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
     public int getTimeSpace() {
         int w = fTimeGraphCtrl.getClientArea().width;
         return w - fNameWidth;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    @Override
-    public long getSelectedTime() {
-        return fSelectionBegin;
     }
 
     @Override

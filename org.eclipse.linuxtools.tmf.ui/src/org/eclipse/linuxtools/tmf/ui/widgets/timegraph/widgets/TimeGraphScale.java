@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2013 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2014 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -312,17 +312,10 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         } else {
             int x1;
             int x2;
-            if (fTimeProvider instanceof ITimeDataProvider2) {
-                long selectionBegin = ((ITimeDataProvider2) fTimeProvider).getSelectionBegin();
-                long selectionEnd = ((ITimeDataProvider2) fTimeProvider).getSelectionEnd();
-                x1 = leftSpace + (int) ((selectionBegin - time0) * pixelsPerNanoSec);
-                x2 = leftSpace + (int) ((selectionEnd - time0) * pixelsPerNanoSec);
-            } else {
-                @SuppressWarnings("deprecation")
-                long selectedTime = fTimeProvider.getSelectedTime();
-                x1 = leftSpace + (int) ((selectedTime - time0) * pixelsPerNanoSec);
-                x2 = x1;
-            }
+            long selectionBegin = fTimeProvider.getSelectionBegin();
+            long selectionEnd = fTimeProvider.getSelectionEnd();
+            x1 = leftSpace + (int) ((selectionBegin - time0) * pixelsPerNanoSec);
+            x2 = leftSpace + (int) ((selectionEnd - time0) * pixelsPerNanoSec);
             drawRangeDecorators(rect0, gc, x1, x2);
         }
 
