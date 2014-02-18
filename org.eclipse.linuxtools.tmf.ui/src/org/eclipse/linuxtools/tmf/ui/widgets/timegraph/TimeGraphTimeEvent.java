@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -43,22 +43,6 @@ public class TimeGraphTimeEvent extends EventObject {
      *
      * @param source
      *            The source of this event
-     * @param time
-     *            The time that was requested
-     * @deprecated As of 2.1, use {@link #TimeGraphTimeEvent(Object, long, long)}
-     */
-    @Deprecated
-    public TimeGraphTimeEvent(Object source, long time) {
-        super(source);
-        fBeginTime = time;
-        fEndTime = time;
-    }
-
-    /**
-     * Standard constructor
-     *
-     * @param source
-     *            The source of this event
      * @param beginTime
      *            The selection begin time
      * @param endTime
@@ -69,15 +53,6 @@ public class TimeGraphTimeEvent extends EventObject {
         super(source);
         fBeginTime = beginTime;
         fEndTime = endTime;
-    }
-
-    /**
-     * @return the selected time
-     * @deprecated As of 2.1, use {@link #getBeginTime()} and {@link #getEndTime()}
-     */
-    @Deprecated
-    public long getTime() {
-        return fBeginTime;
     }
 
     /**

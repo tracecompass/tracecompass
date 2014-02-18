@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -270,18 +270,6 @@ public class HistogramDataModel implements IHistogramDataModel {
     }
 
     /**
-     * Returns the time of the current event in the model.
-     *
-     * @return the time of the current event.
-     * @deprecated As of 2.1, use {@link #getSelectionBegin()} and
-     *             {@link #getSelectionEnd()}
-     */
-    @Deprecated
-    public long getCurrentEventTime() {
-        return fSelectionBegin;
-    }
-
-    /**
      * Returns the begin time of the current selection in the model.
      *
      * @return the begin time of the current selection.
@@ -376,34 +364,6 @@ public class HistogramDataModel implements IHistogramDataModel {
         fLastBucket = 0;
         fBucketDuration = 1;
         updateEndTime();
-        fireModelUpdateNotification();
-    }
-
-    /**
-     * Sets the current event time (no notification of listeners)
-     *
-     * @param timestamp
-     *            A time stamp to set.
-     * @deprecated As of 2.1, use {@link #setSelection(long, long)}
-     */
-    @Deprecated
-    public void setCurrentEvent(long timestamp) {
-        fSelectionBegin = timestamp;
-        fSelectionEnd = timestamp;
-    }
-
-    /**
-     * Sets the current event time with notification of listeners
-     *
-     * @param timestamp
-     *            A time stamp to set.
-     * @deprecated As of 2.1, use
-     *             {@link #setSelectionNotifyListeners(long, long)}
-     */
-    @Deprecated
-    public void setCurrentEventNotifyListeners(long timestamp) {
-        fSelectionBegin = timestamp;
-        fSelectionEnd = timestamp;
         fireModelUpdateNotification();
     }
 

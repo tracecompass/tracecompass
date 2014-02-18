@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -73,11 +73,6 @@ public class HistogramScaledData {
      * @since 2.2
      */
     public long fMaxCombinedValue;
-    /**
-     * The index of the current bucket.
-     */
-    @Deprecated
-    public int fCurrentBucket;
     /**
      * The index of the selection begin bucket.
      * @since 2.1

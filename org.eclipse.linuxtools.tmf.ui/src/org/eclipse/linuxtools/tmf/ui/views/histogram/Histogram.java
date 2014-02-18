@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -435,19 +435,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     public void countEvent(final long eventCount, final long timestamp) {
         fDataModel.countEvent(eventCount, timestamp);
-    }
-
-    /**
-     * Sets the current event time and refresh the display
-     *
-     * @param timestamp The time of the current event
-     * @deprecated As of 2.1, use {@link #setSelection(long, long)}
-     */
-    @Deprecated
-    public void setCurrentEvent(final long timestamp) {
-        fSelectionBegin = (timestamp > 0) ? timestamp : 0;
-        fSelectionEnd = (timestamp > 0) ? timestamp : 0;
-        fDataModel.setSelectionNotifyListeners(timestamp, timestamp);
     }
 
     /**

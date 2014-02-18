@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -36,13 +36,6 @@ public class Messages extends NLS {
      * @since 2.2
      */
     public static String HistogramView_hideLostEvents;
-
-    /**
-     * The label for the current event time
-     * @deprecated As of 2.2, replaced with {@link #HistogramView_selectionStartLabel}
-     */
-    @Deprecated
-    public static String HistogramView_currentEventLabel;
     /**
      * The label for the selection start time
      * @since 2.2
