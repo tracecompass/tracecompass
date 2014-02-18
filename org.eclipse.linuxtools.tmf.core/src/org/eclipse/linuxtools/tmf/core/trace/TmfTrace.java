@@ -52,7 +52,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
@@ -119,17 +118,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
 
     // The trace parser
     private ITmfEventParser fParser;
-
-
-    /**
-     * The collection of state systems that are registered with this trace. Each
-     * sub-class can decide to add its (one or many) state system to this map
-     * during their {@link #buildStateSystem()}.
-     *
-     * @since 2.0
-     */
-    @Deprecated
-    protected final Map<String, ITmfStateSystem> fStateSystems = new LinkedHashMap<>();
 
     private ITmfTimestampTransform fTsTransform;
 
@@ -280,22 +268,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     }
 
     /**
-     * Build the state system(s) associated with this trace type.
-     *
-     * @return An IStatus indicating if the state system could be build
-     *         successfully or not.
-     * @since 3.0
-     */
-    @Deprecated
-    protected IStatus buildStateSystem() {
-        /*
-         * Nothing is done in the base implementation, please specify
-         * how/if to register a new state system in derived classes.
-         */
-        return Status.OK_STATUS;
-    }
-
-    /**
      * Instantiate the applicable analysis modules and executes the analysis
      * modules that are meant to be automatically executed
      *
@@ -380,11 +352,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             getIndexer().dispose();
         }
 
-        /* Clean up the state systems */
-        for (ITmfStateSystem ss : fStateSystems.values()) {
-            ss.dispose();
-        }
-
         /* Clean up the analysis modules */
         synchronized (fAnalysisModules) {
             for (IAnalysisModule module : fAnalysisModules.values()) {
@@ -437,26 +404,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
      */
     protected ITmfEventParser getParser() {
         return fParser;
-    }
-
-    /**
-     * @since 2.0
-     * @deprecated See {@link ITmfTrace}
-     */
-    @Deprecated
-    @Override
-    public final Map<String, ITmfStateSystem> getStateSystems() {
-        return Collections.unmodifiableMap(fStateSystems);
-    }
-
-    /**
-     * @since 2.0
-     * @deprecated See {@link ITmfTrace}
-     */
-    @Deprecated
-    @Override
-    public final void registerStateSystem(String id, ITmfStateSystem ss) {
-        fStateSystems.put(id, ss);
     }
 
     // ------------------------------------------------------------------------
@@ -748,9 +695,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
          * The signal is either for this trace, or for an experiment containing
          * this trace.
          */
-        MultiStatus status = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, null, null);
-        status.add(buildStateSystem());
-        status.add(executeAnalysis());
+        IStatus status = executeAnalysis();
         if (!status.isOK()) {
             Activator.log(status);
         }

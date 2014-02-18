@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -86,17 +86,6 @@ public final class TmfTraceManager {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-
-    /**
-     * Return the current selected time.
-     *
-     * @return the current time stamp
-     * @deprecated As of 2.1, use {@link #getSelectionBeginTime()} and {@link #getSelectionEndTime()}
-     */
-    @Deprecated
-    public synchronized ITmfTimestamp getCurrentTime() {
-        return getCurrentTraceContext().getSelectionBegin();
-    }
 
     /**
      * @return The begin timestamp of selection

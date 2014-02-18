@@ -15,9 +15,6 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
@@ -27,8 +24,6 @@ import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
@@ -198,40 +193,6 @@ public interface ITmfTrace extends ITmfEventProvider {
      * @return the trace cache size
      */
     int getCacheSize();
-
-    /**
-     * Return the map of state systems associated with this trace.
-     *
-     * This view should be read-only (implementations should use
-     * {@link Collections#unmodifiableMap}).
-     *
-     * @return The map of state systems
-     * @since 2.0
-     * @deprecated State systems now should be provided by analysis and use
-     *             {@link ITmfAnalysisModuleWithStateSystems} and retrieve the modules
-     *             with {@link TmfTrace#getAnalysisModules} with Class
-     *             being TmfStateSystemAnalysisModule.class
-     */
-    @Deprecated
-    Map<String, ITmfStateSystem> getStateSystems();
-
-    /**
-     * If a state system is not build by the trace itself, it's possible to
-     * register it if it comes from another source. It will then be accessible
-     * with {@link #getStateSystems} normally.
-     *
-     * @param id
-     *            The unique ID to assign to this state system. In case of
-     *            conflicting ID's, the new one will overwrite the previous one
-     *            (default Map behavior).
-     * @param ss
-     *            The already-built state system
-     * @since 2.0
-     * @deprecated State systems now should be provided by analysis and use
-     *             {@link ITmfAnalysisModuleWithStateSystems}
-     */
-    @Deprecated
-    void registerStateSystem(String id, ITmfStateSystem ss);
 
     /**
      * Index the trace. Depending on the trace type, this could be done at the

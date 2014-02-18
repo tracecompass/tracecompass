@@ -290,16 +290,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     }
 
     /**
-     * @param pattern the new default time pattern
-     * @deprecated The default time pattern depends on the preferences, see
-     *             {@link TmfTimePreferences}. To change the default time
-     *             pattern, modify the preferences and call {@link #updateDefaultFormats()}
-     */
-    @Deprecated
-    public static void setDefaultTimeFormat(final String pattern) {
-    }
-
-    /**
      * @return the default time format pattern
      */
     public static TmfTimestampFormat getDefaulTimeFormat() {
@@ -307,17 +297,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
             fDefaultTimeFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getTimePattern(), TmfTimePreferences.getInstance().getTimeZone());
         }
         return fDefaultTimeFormat;
-    }
-
-    /**
-     * @param pattern the new default interval pattern
-     * @deprecated The default interval format pattern depends on the
-     *             preferences, see {@link TmfTimePreferences}. To change the
-     *             default time pattern, modify the preferences and call
-     *             {@link #updateDefaultFormats()}
-     */
-    @Deprecated
-    public static void setDefaultIntervalFormat(final String pattern) {
     }
 
     /**

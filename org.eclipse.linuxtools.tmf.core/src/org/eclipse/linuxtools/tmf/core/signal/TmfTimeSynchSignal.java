@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -59,16 +59,6 @@ public class TmfTimeSynchSignal extends TmfSignal {
         super(source);
         fBeginTime = begin;
         fEndTime = end;
-    }
-
-    /**
-     * @return The synchronization timestamp of this signal
-     * @since 2.0
-     * @deprecated As of 2.1, use {@link #getBeginTime()} and {@link #getEndTime()}
-     */
-    @Deprecated
-    public ITmfTimestamp getCurrentTime() {
-        return fBeginTime;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
-import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
 /**
@@ -35,25 +34,6 @@ public class TmfRangeSynchSignal extends TmfSignal {
      * @param source
      *            Object sending this signal
      * @param range
-     *            The time range to which we synchronized
-     * @param ts
-     *            The current selected timestamp, independent from the time
-     *            range (ignored)
-     * @since 2.0
-     * @deprecated As of 2.1, use {@link #TmfRangeSynchSignal(Object, TmfTimeRange)}
-     */
-    @Deprecated
-    public TmfRangeSynchSignal(Object source, TmfTimeRange range, ITmfTimestamp ts) {
-        super(source);
-        fCurrentRange = range;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param source
-     *            Object sending this signal
-     * @param range
      *            The new time range
      * @since 2.1
      */
@@ -68,16 +48,6 @@ public class TmfRangeSynchSignal extends TmfSignal {
      */
     public TmfTimeRange getCurrentRange() {
         return fCurrentRange;
-    }
-
-    /**
-     * @return This signal's current selected timestamp
-     * @since 2.0
-     * @deprecated As of 2.1, this returns null
-     */
-    @Deprecated
-    public ITmfTimestamp getCurrentTime() {
-        return null;
     }
 
 }
