@@ -107,7 +107,7 @@ public class XmlAnalysisModuleSourceTest {
          * Make sure module sources are initialized. When run as unit test, the
          * XML module source is sometimes missing
          */
-        TmfAnalysisManager.initializeModuleSources();
+        TmfAnalysisManager.initialize();
 
         Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
         assertFalse(findStateSystemModule(modules.values()));
