@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 - 2014 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *     Marc-Andre Laperle - Initial API and implementation
  *     Matthew Khouzam - Added timestamp string tests
+ *     Patrick Tasse - Updated for fraction of second
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
@@ -33,16 +34,12 @@ import org.osgi.service.prefs.BackingStoreException;
 public class TmfTimestampFormatTest {
 
     private static final String TEST_PATTERN = "HH:mm:ss.SSS";
-    private static final String TEST_PATTERN_2 = "TTT.SSSSSSSSS";
-    private static final String TEST_PATTERN_3 = "TTT.SSS";
-    private static final String TEST_PATTERN_4 = "TTT.SSS SSS SSS";
     private static final TimeZone TEST_TIME_ZONE = TimeZone.getTimeZone(TimeZone.getAvailableIDs(0)[0]);
+    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
+    private static final TmfTimestampFormat tsf = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS", GMT);
     private static final TmfTimestampFormat tsf1 = new TmfTimestampFormat(TEST_PATTERN);
     private static final TmfTimestampFormat tsf2 = new TmfTimestampFormat(TEST_PATTERN, TEST_TIME_ZONE);
-    private static final TmfTimestampFormat tsf3 = new TmfTimestampFormat(TEST_PATTERN_2);
-    private static final TmfTimestampFormat tsf4 = new TmfTimestampFormat(TEST_PATTERN_3);
-    private static final TmfTimestampFormat tsf5 = new TmfTimestampFormat(TEST_PATTERN_4);
 
     /**
      * Test that the default value is loaded when using the default constructor
@@ -122,146 +119,266 @@ public class TmfTimestampFormatTest {
     }
 
     /**
-     * Test the time value 007, should return 7 seconds
+     * Test parsing of seconds and sub-seconds
      *
      * @throws ParseException
      *             should not happen, if it does, the test is a failure
      */
     @Test
-    public void testParseStringTime() throws ParseException {
-        long result = tsf3.parseValue("07");
-        assertEquals(7000000000L, result);
+    public void testParseSeconds() throws ParseException {
+        assertEquals(7777777777123456789L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7777777777.123456789"));
+        assertEquals(7777777777123456789L, new TmfTimestampFormat("T.SSSSSSSSS").parseValue("7777777777.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("0000000007.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.123456789"));
+        assertEquals(7123456780L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.12345678"));
+        assertEquals(7123456700L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.1234567"));
+        assertEquals(7123456000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.123456"));
+        assertEquals(7123450000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.12345"));
+        assertEquals(7123400000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.1234"));
+        assertEquals(7123000000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.123"));
+        assertEquals(7120000000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.12"));
+        assertEquals(7100000000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7.1"));
+        assertEquals(7000000000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7."));
+        assertEquals(7000000000L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue("7"));
+        assertEquals(123456789L, new TmfTimestampFormat("TTTTTTTTTT.SSSSSSSSS").parseValue(".123456789"));
+        assertEquals(123456789L, new TmfTimestampFormat(".SSSSSSSSS").parseValue(".123456789"));
+        assertEquals(123456780L, new TmfTimestampFormat(".SSSSSSSS").parseValue(".123456789"));
+        assertEquals(123456700L, new TmfTimestampFormat(".SSSSSSS").parseValue(".123456789"));
+        assertEquals(123456000L, new TmfTimestampFormat(".SSSSSS").parseValue(".123456789"));
+        assertEquals(123450000L, new TmfTimestampFormat(".SSSSS").parseValue(".123456789"));
+        assertEquals(123400000L, new TmfTimestampFormat(".SSSS").parseValue(".123456789"));
+        assertEquals(123000000L, new TmfTimestampFormat(".SSS").parseValue(".123456789"));
+        assertEquals(120000000L, new TmfTimestampFormat(".SS").parseValue(".123456789"));
+        assertEquals(100000000L, new TmfTimestampFormat(".S").parseValue(".123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSSSSSSSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS SSS SSS").parseValue("7.123 456 789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS SSS SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS.SSS.SSS").parseValue("7.123.456.789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS.SSS.SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS,SSS,SSS").parseValue("7.123,456,789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS,SSS,SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS-SSS-SSS").parseValue("7.123-456-789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS-SSS-SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS_SSS_SSS").parseValue("7.123_456_789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS_SSS_SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS:SSS:SSS").parseValue("7.123:456:789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS:SSS:SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS;SSS;SSS").parseValue("7.123;456;789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS;SSS;SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS/SSS/SSS").parseValue("7.123/456/789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS/SSS/SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS''SSS''SSS").parseValue("7.123'456'789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS''SSS''SSS").parseValue("7.123456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS\"SSS\"SSS").parseValue("7.123\"456\"789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T.SSS\"SSS\"SSS").parseValue("7.123456789"));
+        assertEquals(7000000000L, new TmfTimestampFormat("T. SSSSSSSSS").parseValue("7..123456789"));
+        assertEquals(7100000000L, new TmfTimestampFormat("T.S SSSSSSSS").parseValue("7.1,23456789"));
+        assertEquals(7120000000L, new TmfTimestampFormat("T.SS SSSSSSS").parseValue("7.12-3456789"));
+        assertEquals(7123000000L, new TmfTimestampFormat("T.SSS SSSSSS").parseValue("7.123_456789"));
+        assertEquals(7123400000L, new TmfTimestampFormat("T.SSSS SSSSS").parseValue("7.1234:56789"));
+        assertEquals(7123450000L, new TmfTimestampFormat("T.SSSSS SSSS").parseValue("7.12345;6789"));
+        assertEquals(7123456000L, new TmfTimestampFormat("T.SSSSSS SSS").parseValue("7.123456/789"));
+        assertEquals(7123456700L, new TmfTimestampFormat("T.SSSSSSS SS").parseValue("7.1234567'89"));
+        assertEquals(7123456780L, new TmfTimestampFormat("T.SSSSSSSS S").parseValue("7.12345678\"9"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T 's'.SSS ms SSS us SSS ns").parseValue("7 s.123 ms 456 us 789 ns"));
+        assertEquals(7123456789L, new TmfTimestampFormat("T 'S'.SSS 'MS' SSS 'US' SSS 'NS'").parseValue("7 S.123 MS 456 US 789 NS"));
+        assertEquals(7123000000L, new TmfTimestampFormat("T.SSSSSSSSS").parseValue("7 s.123 ms 456 ns 789"));
+        assertEquals(0L, new TmfTimestampFormat("T.").parseValue("0.123456789"));
+        assertEquals(0L, new TmfTimestampFormat("T.S").parseValue("."));
+        assertEquals(0L, new TmfTimestampFormat(".S").parseValue("7."));
+        assertEquals(0L, new TmfTimestampFormat("T.S").parseValue("-."));
+        assertEquals(0L, new TmfTimestampFormat("T.S").parseValue("-0"));
+        assertEquals(-100000000L, new TmfTimestampFormat("T.S").parseValue("-0.1"));
+        assertEquals(-100000000L, new TmfTimestampFormat("T.S").parseValue("-.1"));
+        assertEquals(-7000000000L, new TmfTimestampFormat("T.S").parseValue("-7"));
+        assertEquals(-7000000000L, new TmfTimestampFormat("T.S").parseValue("-7."));
+        assertEquals(-7000000000L, new TmfTimestampFormat("T.S").parseValue("-7.0"));
+        assertEquals(-7100000000L, new TmfTimestampFormat("T.S").parseValue("-7.1"));
     }
 
     /**
-     * Test the time value 007, should return 7 seconds
+     * Test parsing of date and time patterns
      *
      * @throws ParseException
      *             should not happen, if it does, the test is a failure
      */
     @Test
-    public void testParseStringCompleteTime() throws ParseException {
-        long result = tsf3.parseValue("07.00");
-        assertEquals(7000000000L, result);
+    public void testParseDateTime() throws ParseException {
+//        long ref = tsf.parseValue("2014-11-22 12:34:56.123456789"); // Saturday
+        long time;
+
+        time = new TmfTimestampFormat("yyyy", GMT).parseValue("2014");
+        assertEquals("2014-01-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("YYYY", GMT).parseValue("2014");
+        assertEquals("2013-12-29 00:00:00.000000000", tsf.format(time)); // 1st day of week 1
+
+        time = new TmfTimestampFormat("MM", GMT).parseValue("11");
+        assertEquals("1970-11-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("ww", GMT).parseValue("01");
+        assertEquals("1969-12-28 00:00:00.000000000", tsf.format(time)); // Sunday of week 1
+
+        time = new TmfTimestampFormat("DDD", GMT).parseValue("100");
+        assertEquals("1970-04-10 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("F", GMT).parseValue("2");
+        assertEquals("1970-01-11 00:00:00.000000000", tsf.format(time)); // 2nd Sunday of month
+
+        time = new TmfTimestampFormat("EEE", GMT).parseValue("Mon");
+        assertEquals("1970-01-05 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("u", GMT).parseValue("1");
+        assertEquals("1970-01-05 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("dd", GMT).parseValue("22");
+        assertEquals("1970-01-22 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("HH", GMT).parseValue("12");
+        assertEquals("1970-01-01 12:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("kk", GMT).parseValue("24");
+        assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("KK", GMT).parseValue("12");
+        assertEquals("1970-01-01 12:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("hh", GMT).parseValue("12");
+        assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("mm", GMT).parseValue("34");
+        assertEquals("1970-01-01 00:34:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("ss", GMT).parseValue("56");
+        assertEquals("1970-01-01 00:00:56.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM", GMT).parseValue("2014-11");
+        assertEquals("2014-11-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd", GMT).parseValue("2014-11-22");
+        assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd HH", GMT).parseValue("2014-11-22 12");
+        assertEquals("2014-11-22 12:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm", GMT).parseValue("2014-11-22 12:34");
+        assertEquals("2014-11-22 12:34:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss", GMT).parseValue("2014-11-22 12:34:56");
+        assertEquals("2014-11-22 12:34:56.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT).parseValue("2014-11-22 12:34:56.123");
+        assertEquals("2014-11-22 12:34:56.123000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-ww", GMT).parseValue("2014-01");
+        assertEquals("2013-12-29 00:00:00.000000000", tsf.format(time)); // Sunday of week 1
+
+        time = new TmfTimestampFormat("yyyy-DDD", GMT).parseValue("2014-100");
+        assertEquals("2014-04-10 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-F", GMT).parseValue("2014-11-2");
+        assertEquals("2014-11-09 00:00:00.000000000", tsf.format(time)); // 2nd Sunday of month
+
+        time = new TmfTimestampFormat("yyyy-MM-EEE", GMT).parseValue("2014-11-Mon");
+        assertEquals("2014-11-03 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-u", GMT).parseValue("2014-11-1");
+        assertEquals("2014-11-03 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT).parseValue("2014 11 22 12 34 56 123 456 789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy.MM.dd.HH.mm.ss.SSS.SSS.SSS", GMT).parseValue("2014.11.22.12.34.56.123.456.789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy,MM,dd,HH,mm,ss,SSS,SSS,SSS", GMT).parseValue("2014,11,22,12,34,56,123,456,789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd-HH-mm-ss-SSS-SSS-SSS", GMT).parseValue("2014-11-22-12-34-56-123-456-789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy_MM_dd_HH_mm_ss_SSS_SSS_SSS", GMT).parseValue("2014_11_22_12_34_56_123_456_789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy:MM:dd:HH:mm:ss:SSS:SSS:SSS", GMT).parseValue("2014:11:22:12:34:56:123:456:789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy;MM;dd;HH;mm;ss;SSS;SSS;SSS", GMT).parseValue("2014;11;22;12;34;56;123;456;789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy/MM/dd/HH/mm/ss/SSS/SSS/SSS", GMT).parseValue("2014/11/22/12/34/56/123/456/789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy''MM''dd''HH''mm''ss''SSS''SSS''SSS", GMT).parseValue("2014'11'22'12'34'56'123'456'789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy\"MM\"dd\"HH\"mm\"ss\"SSS\"SSS\"SSS", GMT).parseValue("2014\"11\"22\"12\"34\"56\"123\"456\"789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
     }
 
     /**
-     * Test the time value 007, should return 7 seconds
+     * Test parsing of date and time patterns with reference time
      *
      * @throws ParseException
      *             should not happen, if it does, the test is a failure
      */
     @Test
-    public void testParseStringCompleteMilliTime() throws ParseException {
-        long result = tsf3.parseValue("0.07");
-        assertEquals(70000000L, result);
-    }
+    public void testParseDateTimeWithRef() throws ParseException {
+        long ref = tsf.parseValue("2014-11-22 12:34:56.123456789"); // Saturday
+        long time;
 
-    /**
-     * Test the time value 007, should return 7 miliseconds
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testParseStringDecimalTime() throws ParseException {
-        long result = tsf3.parseValue(".007");
-        assertEquals(7000000L, result);
-    }
+        time = new TmfTimestampFormat("yyyy", GMT).parseValue("1970", ref);
+        assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
 
-    /**
-     * Test the time value 007, should return 7 miliseconds
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testParseStringCompleteDecimalTime() throws ParseException {
-        long result = tsf3.parseValue("0.007");
-        assertEquals(7000000L, result);
-    }
+        time = new TmfTimestampFormat("YYYY", GMT).parseValue("1970");
+        assertEquals("1969-12-28 00:00:00.000000000", tsf.format(time)); // 1st day of week 1
 
-    /**
-     * Tests the time value of 70 ns
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testParseStringNanoTime() throws ParseException {
-        long result = tsf3.parseValue("0.00000007");
-        assertEquals(70L, result);
-    }
+        time = new TmfTimestampFormat("MM", GMT).parseValue("01", ref);
+        assertEquals("2014-01-01 00:00:00.000000000", tsf.format(time));
 
-    /**
-     * Tests the time value of 70 ns
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testCustomParseStringNanoTime() throws ParseException {
-        long result = tsf3.parseValue("0.00000007");
-        assertEquals(70L, result);
-    }
+        time = new TmfTimestampFormat("ww", GMT).parseValue("01", ref);
+        assertEquals("2014-01-04 00:00:00.000000000", tsf.format(time)); // Saturday of week 1
 
-    /**
-     * Tests the time value of 70 ns
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testCustomParseStringNanoSeparatorTime() throws ParseException {
-        long result = tsf5.parseValue("0.000 000 07");
-        assertEquals(70L, result);
-    }
+        time = new TmfTimestampFormat("DDD", GMT).parseValue("1", ref);
+        assertEquals("2014-01-01 00:00:00.000000000", tsf.format(time));
 
-    /**
-     * Tests the time value of 70 ns
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testCustomParseStringNanoSeparatorTime2() throws ParseException {
-        long result = tsf5.parseValue("0.00000007");
-        assertEquals(70L, result);
-    }
+        time = new TmfTimestampFormat("F", GMT).parseValue("2", ref);
+        assertEquals("2014-11-08 00:00:00.000000000", tsf.format(time)); // 2nd Saturday of month
 
-    /**
-     * Tests the time value of 123 ms
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testCustomParseStringMiliOK() throws ParseException {
-        long result = tsf4.parseValue("0.123");
-        assertEquals(123000000L, result);
-    }
+        time = new TmfTimestampFormat("EEE", GMT).parseValue("Mon", ref);
+        assertEquals("2014-11-17 00:00:00.000000000", tsf.format(time));
 
-    /**
-     * Tests the time value of 123.456 ms
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testCustomParseStringMiliLong() throws ParseException {
-        long result = tsf4.parseValue("0.12345");
-        assertEquals(123000000L, result);
-    }
+        time = new TmfTimestampFormat("u", GMT).parseValue("1", ref);
+        assertEquals("2014-11-17 00:00:00.000000000", tsf.format(time));
 
-    /**
-     * Tests the time value of 123 ms as .123, no zero
-     *
-     * @throws ParseException
-     *             should not happen, if it does, the test is a failure
-     */
-    @Test
-    public void testCustomParseStringMiliNoZero() throws ParseException {
-        long result = tsf4.parseValue(".123");
-        assertEquals(123000000L, result);
+        time = new TmfTimestampFormat("dd", GMT).parseValue("01", ref);
+        assertEquals("2014-11-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("HH", GMT).parseValue("00", ref);
+        assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("kk", GMT).parseValue("24", ref);
+        assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("KK", GMT).parseValue("00", ref);
+        assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("hh", GMT).parseValue("12", ref);
+        assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("mm", GMT).parseValue("00", ref);
+        assertEquals("2014-11-22 12:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("ss", GMT).parseValue("00", ref);
+        assertEquals("2014-11-22 12:34:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat(".S", GMT).parseValue(".0", ref);
+        assertEquals("2014-11-22 12:34:56.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("T.S", GMT).parseValue("0.0", ref);
+        assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("T.S", GMT).parseValue(".0", ref);
+        assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
     }
 }
