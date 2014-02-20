@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.tracetype">
+      <category
+            id="org.eclipse.linuxtools.gdbtrace.core.category"
+            name="GDB">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.gdbtrace.core.category"
+            event_type="org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent"
+            id="org.eclipse.linuxtools.gdbtrace.core.type.gdb"
+            name="GDB Trace"
+            trace_type="org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace">
+      </type>
+   </extension>
+
+</plugin>

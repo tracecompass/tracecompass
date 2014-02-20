@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.linuxtools.tmf.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.linuxtools.tmf.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.linuxtools.tmf.ui" id="tracetype" name="TMF Trace Type"/>
+         <meta.schema plugin="org.eclipse.linuxtools.tmf.core" id="tracetype" name="TMF Trace Type"/>
       </appinfo>
       <documentation>
          This extension point is used to contribute new trace types to the generic components of the TMF framework.
@@ -69,11 +69,6 @@
 
    <element name="type">
       <complexType>
-         <sequence>
-            <element ref="defaultEditor" minOccurs="0" maxOccurs="1"/>
-            <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
-            <element ref="statisticsViewerType" minOccurs="0" maxOccurs="1"/>
-         </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
@@ -94,7 +89,7 @@
                   An optional attribute that is composed of the category ID. The referenced category must be declared in a corresponding category element.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.ui.tracetype/category/@id"/>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.core.tracetype/category/@id"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -118,16 +113,6 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="icon" type="string">
-            <annotation>
-               <documentation>
-                  The icon associated to the trace type.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="resource"/>
-               </appinfo>
-            </annotation>
-         </attribute>
          <attribute name="isDirectory" type="boolean" use="default" value="false">
             <annotation>
                <documentation>
@@ -138,75 +123,12 @@
       </complexType>
    </element>
 
-   <element name="defaultEditor">
-      <annotation>
-         <documentation>
-            The default editor to use for this trace type.
-If omitted, the default events editor will be used.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="id" type="string" use="default" value="org.eclipse.linuxtools.tmf.ui.editors.events">
-            <annotation>
-               <documentation>
-                  The id of the editor to use for this trace type.
-If empty, the default events editor will be used.
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="eventsTableType">
-      <annotation>
-         <documentation>
-            The events table to use for this trace type.
-If omitted, the default events table will be used.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="class" type="string" use="default" value="org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable">
-            <annotation>
-               <documentation>
-                  The fully qualified name of a class that extends &lt;samp&gt;TmfEventsTable&lt;/samp&gt; .
-If empty, the default events table will be used.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable:"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="statisticsViewerType">
-      <annotation>
-         <documentation>
-            The statistics viewer to use for this trace type.
-If omitted, the default statistics viewer will be used.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="class" type="string" use="default" value="org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer">
-            <annotation>
-               <documentation>
-                  The fully qualified name of a class that extends &lt;samp&gt;TmfStatisticsViewer&lt;/samp&gt; .
-If empty, the default statistics viewer will be used.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.ui.viewers.statistics.TmfStatisticsViewer:"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
    <annotation>
       <appinfo>
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         0.9
+         3.0
       </documentation>
    </annotation>
 
@@ -215,7 +137,22 @@ If empty, the default statistics viewer will be used.
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter extension point usage example here.]
+         Example use of the tmftracetype extension point for generic CTF traces (CtfTmfTrace):
+
+&lt;extension
+      point=&quot;org.eclipse.linuxtools.tmf.core.tracetype&quot;&gt;
+   &lt;category
+         id=&quot;org.eclipse.linuxtools.tmf.core.category.ctf&quot;
+         name=&quot;Common Trace Format&quot;&gt;
+   &lt;/category&gt;
+   &lt;type
+         category=&quot;org.eclipse.linuxtools.tmf.core.category.ctf&quot;
+         event_type=&quot;org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent&quot;
+         id=&quot;org.eclipse.linuxtools.tmf.core.type.ctf&quot;
+         name=&quot;Generic CTF Trace&quot;
+         trace_type=&quot;org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace&quot;&gt;
+   &lt;/type&gt;
+&lt;/extension&gt;
       </documentation>
    </annotation>
 
@@ -224,18 +161,23 @@ If empty, the default statistics viewer will be used.
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         [Enter API information here.]
+         Trace types using this extension point have to specify the two following classes:
+
+* trace_type: Has to implement ITmfTrace. It&apos;s *highly* recommend to extend &apos;TmfTrace&apos; to get default implementations.
+* event_type: Has to implement ITmfEvent. Once again, TmfEvent provides a reference implementation that should work in most cases.
       </documentation>
    </annotation>
+
 
    <annotation>
       <appinfo>
-         <meta.section type="implementation"/>
+         <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         Copyright (c) 2014 Ericsson
+
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
       </documentation>
    </annotation>
-
 
 </schema>

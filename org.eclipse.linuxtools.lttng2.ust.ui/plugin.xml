@@ -2,15 +2,10 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.linuxtools.tmf.ui.tracetype">
+         point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
       <type
-            category="org.eclipse.linuxtools.tmf.ui.category.ctf"
-            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
             icon="icons/obj16/garland16.png"
-            id="org.eclipse.linuxtools.lttng2.ust.tracetype"
-            isDirectory="true"
-            name="%tracetype.type.ust"
-            trace_type="org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace">
+            tracetype="org.eclipse.linuxtools.lttng2.ust.tracetype">
       </type>
    </extension>
    <extension

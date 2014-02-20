@@ -32,21 +32,6 @@
       </view>
    </extension>
    <extension
-         point="org.eclipse.linuxtools.tmf.ui.tracetype">
-      <type
-            category="org.eclipse.linuxtools.tmf.ui.category.ctf"
-            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
-            icon="icons/obj16/garland16.png"
-            id="org.eclipse.linuxtools.lttng2.kernel.tracetype"
-            isDirectory="true"
-            name="%tracetype.type.kernel"
-            trace_type="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
-         <eventsTableType
-               class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events.LTTng2EventsTable">
-         </eventsTableType>
-      </type>
-   </extension>
-   <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonWizard
             associatedExtensionId="org.eclipse.linuxtools.tmf.ui.navigator.content"
@@ -78,5 +63,15 @@
                id="org.eclipse.linuxtools.lttng2.kernel.analysis">
          </analysisId>
       </output>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
+      <type
+            icon="icons/obj16/garland16.png"
+            tracetype="org.eclipse.linuxtools.lttng2.kernel.tracetype">
+         <eventsTableType
+               class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events.LTTng2EventsTable">
+         </eventsTableType>
+      </type>
    </extension>
 </plugin>

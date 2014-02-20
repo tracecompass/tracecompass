@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.tracetype">
+      <type
+            category="org.eclipse.linuxtools.tmf.core.category.ctf"
+            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
+            id="org.eclipse.linuxtools.lttng2.ust.tracetype"
+            isDirectory="true"
+            name="%tracetype.type.ust"
+            trace_type="org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace">
+      </type>
+   </extension>
+
+</plugin>

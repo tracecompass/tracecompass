@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -107,10 +108,16 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
             if (ce.getName().equals(TmfTraceType.TYPE_ELEM)) {
                 String traceBundle = ce.getContributor().getName();
                 String traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
-                String traceIcon = ce.getAttribute(TmfTraceType.ICON_ATTR);
                 String label = ce.getAttribute(TmfTraceType.NAME_ATTR).replaceAll("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
                 boolean selected =  selectedTraceTypes.contains(traceTypeId);
                 MenuManager subMenu = categoriesMap.get(ce.getAttribute(TmfTraceType.CATEGORY_ATTR));
+
+                /* Get the icon from the tmftracetypeui extension, if it exists */
+                String traceIcon = null;
+                IConfigurationElement uiCE = TmfTraceTypeUIUtils.getTraceUIAttributes(traceTypeId);
+                if (uiCE != null) {
+                    traceIcon = uiCE.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
+                }
 
                 addContributionItem(list, traceBundle, traceTypeId, traceIcon, label, selected, subMenu);
             }

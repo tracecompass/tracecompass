@@ -47,5 +47,27 @@
          </tracetype>
       </module>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.tracetype">
+      <category
+            id="org.eclipse.linuxtools.tmf.core.tests.category"
+            name="Test trace">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.tmf.core.tests.category"
+            event_type="org.eclipse.linuxtools.tmf.core.event.TmfEvent"
+            id="org.eclipse.linuxtools.tmf.core.tests.tracetype"
+            name="TMF Tests"
+            trace_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
+      </type>
+      <type
+            category="org.eclipse.linuxtools.tmf.core.tests.category"
+            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
+            id="org.eclipse.linuxtools.tmf.core.tests.ctf.tracetype"
+            isDirectory="true"
+            name="CTF Tests"
+            trace_type="org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub">
+      </type>
+   </extension>
 
 </plugin>

@@ -19,24 +19,6 @@
       </perspective>
    </extension>
    <extension
-         point="org.eclipse.linuxtools.tmf.ui.tracetype">
-      <category
-            id="org.eclipse.linuxtools.gdbtrace.ui.category"
-            name="GDB">
-      </category>
-      <type
-            category="org.eclipse.linuxtools.gdbtrace.ui.category"
-            event_type="org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent"
-            icon="icons/obj16/gdb_icon16.png"
-            id="org.eclipse.linuxtools.gdbtrace.ui.type.gdb"
-            name="GDB Trace"
-            trace_type="org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace">
-         <eventsTableType
-               class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventsTable">
-         </eventsTableType>
-      </type>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <command
             description="%commands.project.trace.selectexecutable.description"
@@ -101,6 +83,16 @@
             </with>
          </enablement>
       </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
+      <type
+            icon="icons/obj16/gdb_icon16.png"
+            tracetype="org.eclipse.linuxtools.gdbtrace.core.type.gdb">
+         <eventsTableType
+               class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventsTable">
+         </eventsTableType>
+      </type>
    </extension>
 
 </plugin>
