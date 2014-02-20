@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
@@ -73,8 +71,6 @@ public final class TmfTraceTypeUIUtils {
 
     /** Extension point attribute 'class' (attribute of eventsTableType) */
     public static final String CLASS_ATTR = "class"; //$NON-NLS-1$
-
-    private static final String DEFAULT_TRACE_ICON_PATH = "icons" + File.separator + "elcl16" + File.separator + "trace.gif"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     private static final char SEPARATOR = ':';
 
@@ -261,26 +257,9 @@ public final class TmfTraceTypeUIUtils {
      */
     public static IStatus setTraceType(IPath path, TraceTypeHelper traceType) throws CoreException {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-        String traceBundle = null;
         String traceTypeId = traceType.getCanonicalName();
-        String traceIcon = DEFAULT_TRACE_ICON_PATH;
 
-        if (isCustomTraceId(traceTypeId)) {
-            traceBundle = Activator.getDefault().getBundle().getSymbolicName();
-        } else {
-            IConfigurationElement ce = TmfTraceType.getInstance().getTraceAttributes(traceTypeId);
-            traceBundle = ce.getContributor().getName();
-        }
-
-        /* Check if there is an icon defined in tmftracetypeui */
-        IConfigurationElement ce = getTraceUIAttributes(traceTypeId);
-        if (ce != null) {
-            traceIcon = ce.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
-        }
-
-        resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, traceBundle);
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
-        resource.setPersistentProperty(TmfCommonConstants.TRACEICON, traceIcon);
 
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject(), true);
         final TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();

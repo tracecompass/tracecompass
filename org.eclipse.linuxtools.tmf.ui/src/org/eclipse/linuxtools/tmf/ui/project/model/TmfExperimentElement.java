@@ -179,15 +179,13 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
             Map<QualifiedName, String> properties = trace.getResource().getPersistentProperties();
-            String bundleName = properties.get(TmfCommonConstants.TRACEBUNDLE);
             String traceType = properties.get(TmfCommonConstants.TRACETYPE);
-            String iconUrl = properties.get(TmfCommonConstants.TRACEICON);
 
             if (resource instanceof IFolder) {
                 IFolder folder = experiment.getFolder(trace.getName());
                 if (workspace.validateLinkLocation(folder, location).isOK()) {
                     folder.createLink(location, IResource.REPLACE, null);
-                    setProperties(folder, bundleName, traceType, iconUrl);
+                    setProperties(folder, traceType);
 
                 } else {
                     Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
@@ -196,7 +194,7 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
                 IFile file = experiment.getFile(trace.getName());
                 if (workspace.validateLinkLocation(file, location).isOK()) {
                     file.createLink(location, IResource.REPLACE, null);
-                    setProperties(file, bundleName, traceType, iconUrl);
+                    setProperties(file, traceType);
                 } else {
                     Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
                 }
@@ -225,11 +223,8 @@ public class TmfExperimentElement extends TmfWithFolderElement implements IPrope
         deleteSupplementaryResources();
     }
 
-    private static void setProperties(IResource resource, String bundleName,
-            String traceType, String iconUrl) throws CoreException {
-        resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
+    private static void setProperties(IResource resource, String traceType) throws CoreException {
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
-        resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
     }
 
     /**

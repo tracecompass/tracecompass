@@ -494,16 +494,14 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
             Map<QualifiedName, String> properties = resource.getPersistentProperties();
-            String bundleName = properties.get(TmfCommonConstants.TRACEBUNDLE);
             String traceType = properties.get(TmfCommonConstants.TRACETYPE);
-            String iconUrl = properties.get(TmfCommonConstants.TRACEICON);
             String supplFolder = properties.get(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
 
             if (resource instanceof IFolder) {
                 IFolder folder = parentFolder.getFolder(targetName);
                 if (workspace.validateLinkLocation(folder, location).isOK()) {
                     folder.createLink(location, IResource.REPLACE, null);
-                    setProperties(folder, bundleName, traceType, iconUrl, supplFolder);
+                    setProperties(folder, traceType, supplFolder);
 
                 } else {
                     Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
@@ -512,7 +510,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 IFile file = parentFolder.getFile(targetName);
                 if (workspace.validateLinkLocation(file, location).isOK()) {
                     file.createLink(location, IResource.REPLACE, null);
-                    setProperties(file, bundleName, traceType, iconUrl, supplFolder);
+                    setProperties(file, traceType, supplFolder);
                 } else {
                     Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
@@ -600,18 +598,13 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
      * Set the trace persistent properties
      *
      * @param resource the trace resource
-     * @param bundleName the bundle name
      * @param traceType the trace type
-     * @param iconUrl the icon URL
      * @param supplFolder the directory of the directory for supplementary information or null to ignore the property
      * @throws CoreException
      */
-    private static void setProperties(IResource resource, String bundleName,
-            String traceType, String iconUrl, String supplFolder)
+    private static void setProperties(IResource resource, String traceType, String supplFolder)
             throws CoreException {
-        resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
-        resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
         resource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder);
     }
 

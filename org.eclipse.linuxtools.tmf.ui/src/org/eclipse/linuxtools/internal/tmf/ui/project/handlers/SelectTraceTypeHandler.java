@@ -56,9 +56,7 @@ public class SelectTraceTypeHandler extends AbstractHandler {
     // Constants
     // ------------------------------------------------------------------------
 
-    private static final String BUNDLE_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.bundle"; //$NON-NLS-1$
     private static final String TYPE_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.type"; //$NON-NLS-1$
-    private static final String ICON_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.icon"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -130,11 +128,9 @@ public class SelectTraceTypeHandler extends AbstractHandler {
             if (resource != null) {
                 try {
                     // Set the properties for this resource
-                    String bundleName = event.getParameter(BUNDLE_PARAMETER);
                     String traceType = event.getParameter(TYPE_PARAMETER);
-                    String iconUrl = event.getParameter(ICON_PARAMETER);
                     String previousTraceType = trace.getTraceType();
-                    IStatus status = propagateProperties(trace, bundleName, traceType, iconUrl);
+                    IStatus status = propagateProperties(trace, traceType);
                     ok &= status.isOK();
 
                     if (status.isOK()) {
@@ -173,20 +169,17 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         return null;
     }
 
-    private static IStatus propagateProperties(TmfTraceElement trace,
-            String bundleName, String traceType, String iconUrl)
+    private static IStatus propagateProperties(TmfTraceElement trace, String traceType)
             throws CoreException {
 
         IResource svResource = trace.getResource();
-        String svBundleName = svResource.getPersistentProperty(TmfCommonConstants.TRACEBUNDLE);
         String svTraceType = svResource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
-        String svIconUrl = svResource.getPersistentProperty(TmfCommonConstants.TRACEICON);
 
-        setProperties(trace.getResource(), bundleName, traceType, iconUrl);
+        setProperties(trace.getResource(), traceType);
         trace.refreshTraceType();
         final IStatus validateTraceType = validateTraceType(trace);
         if (!validateTraceType.isOK()) {
-            setProperties(trace.getResource(), svBundleName, svTraceType, svIconUrl);
+            setProperties(trace.getResource(), svTraceType);
             trace.refreshTraceType();
             return validateTraceType;
         }
@@ -201,7 +194,7 @@ public class SelectTraceTypeHandler extends AbstractHandler {
                         TmfTraceElement linkedTrace = (TmfTraceElement) child;
                         if (linkedTrace.getName().equals(trace.getName())) {
                             IResource resource = linkedTrace.getResource();
-                            setProperties(resource, bundleName, traceType, iconUrl);
+                            setProperties(resource, traceType);
                             linkedTrace.refreshTraceType();
                         }
                     }
@@ -212,11 +205,8 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         return Status.OK_STATUS;
     }
 
-    private static void setProperties(IResource resource, String bundleName,
-            String traceType, String iconUrl) throws CoreException {
-        resource.setPersistentProperty(TmfCommonConstants.TRACEBUNDLE, bundleName);
+    private static void setProperties(IResource resource, String traceType) throws CoreException {
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
-        resource.setPersistentProperty(TmfCommonConstants.TRACEICON, iconUrl);
     }
 
     private static IStatus validateTraceType(TmfTraceElement trace) {
