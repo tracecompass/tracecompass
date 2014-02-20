@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 import java.net.URL;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -104,11 +105,22 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
         if (element instanceof TmfTraceElement) {
             TmfTraceElement trace = (TmfTraceElement) element;
             try {
-                if (trace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE) == null) {
+                String traceType = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
+                if (traceType == null) {
                     return fUnknownTraceIcon;
                 }
+
+                IConfigurationElement traceUIAttributes = TmfTraceTypeUIUtils.getTraceUIAttributes(traceType);
                 String name = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACEBUNDLE);
                 String icon = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACEICON);
+                if (traceUIAttributes != null) {
+                    String iconAttr = traceUIAttributes.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
+                    if (iconAttr != null) {
+                        name = traceUIAttributes.getContributor().getName();
+                        icon = iconAttr;
+                    }
+                }
+
                 if (name != null && icon != null) {
                     Bundle bundle = Platform.getBundle(name);
                     if (bundle != null) {
