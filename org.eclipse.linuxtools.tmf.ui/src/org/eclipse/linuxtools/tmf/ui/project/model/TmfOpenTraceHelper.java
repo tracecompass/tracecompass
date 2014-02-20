@@ -119,7 +119,6 @@ public class TmfOpenTraceHelper {
         if (traceExists(path, folder)) {
             return openTraceFromProject(projectRoot, traceName);
         }
-        final IPath tracePath = folder.getFullPath().append(traceName);
         final IPath pathString = Path.fromOSString(path);
         IResource linkedTrace = TmfImportHelper.createLink(folder, pathString, traceName);
 
@@ -133,7 +132,7 @@ public class TmfOpenTraceHelper {
             return Status.OK_STATUS;
         }
 
-        IStatus ret = TmfTraceTypeUIUtils.setTraceType(tracePath, traceTypeToSet);
+        IStatus ret = TmfTraceTypeUIUtils.setTraceType(linkedTrace, traceTypeToSet);
         if (ret.isOK()) {
             ret = openTraceFromProject(projectRoot, traceName);
         }

@@ -12,8 +12,10 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
@@ -121,6 +123,26 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
         for (ITmfProjectModelElement danglingChild : childrenMap.values()) {
             removeChild(danglingChild);
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+
+    /**
+     * Returns a list of experiment model elements under the experiments folder.
+     * @return list of experiment model elements
+     * @since 3.0
+     */
+    public List<TmfExperimentElement> getExperiments() {
+        List<ITmfProjectModelElement> children = getChildren();
+        List<TmfExperimentElement> traces = new ArrayList<>();
+        for (ITmfProjectModelElement child : children) {
+            if (child instanceof TmfExperimentElement) {
+                traces.add((TmfExperimentElement) child);
+            }
+        }
+        return traces;
     }
 
     // ------------------------------------------------------------------------

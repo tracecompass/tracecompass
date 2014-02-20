@@ -836,8 +836,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
             // Finally import trace
             if (importResource(fileSystemElement, monitor)) {
-                IResource eclipseResource = fTargetFolder.findMember(fileSystemElement.getLabel());
-                TmfTraceTypeUIUtils.setTraceType(eclipseResource.getFullPath(), traceTypeHelper);
+                IResource resource = fTargetFolder.findMember(fileSystemElement.getLabel());
+                TmfTraceTypeUIUtils.setTraceType(resource, traceTypeHelper);
             }
 
         }

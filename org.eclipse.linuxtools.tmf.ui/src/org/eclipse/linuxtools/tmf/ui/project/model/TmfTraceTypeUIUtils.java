@@ -21,10 +21,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -247,31 +245,41 @@ public final class TmfTraceTypeUIUtils {
      * Set the trace type of a {@Link TraceTypeHelper}. Should only be
      * used internally by this project.
      *
-     * @param path
-     *            the {@link IPath} path of the resource to set
+     * @param resource
+     *            the resource to set
      * @param traceType
      *            the {@link TraceTypeHelper} to set the trace type to.
      * @return Status.OK_Status if successful, error is otherwise.
      * @throws CoreException
      *             An exception caused by accessing eclipse project items.
      */
-    public static IStatus setTraceType(IPath path, TraceTypeHelper traceType) throws CoreException {
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+    public static IStatus setTraceType(IResource resource, TraceTypeHelper traceType) throws CoreException {
         String traceTypeId = traceType.getCanonicalName();
 
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
 
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject(), true);
-        final TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
-        List<TmfTraceElement> traces = tracesFolder.getTraces();
-        for (TmfTraceElement traceElement : traces) {
-            if (traceElement.getName().equals(resource.getName())) {
-                traceElement.refreshTraceType();
-                break;
+        if (resource.getParent().equals(tmfProject.getTracesFolder().getResource())) {
+            refreshTraceElement(tmfProject.getTracesFolder().getTraces(), resource.getName());
+        } else {
+            for (TmfExperimentElement experimentElement : tmfProject.getExperimentsFolder().getExperiments()) {
+                if (resource.getParent().equals(experimentElement.getResource())) {
+                    refreshTraceElement(experimentElement.getTraces(), resource.getName());
+                    break;
+                }
             }
         }
         tmfProject.refresh();
         return Status.OK_STATUS;
+    }
+
+    private static void refreshTraceElement(List<TmfTraceElement> traceElements, String traceName) {
+        for (TmfTraceElement traceElement : traceElements) {
+            if (traceElement.getName().equals(traceName)) {
+                traceElement.refreshTraceType();
+                break;
+            }
+        }
     }
 
     /**

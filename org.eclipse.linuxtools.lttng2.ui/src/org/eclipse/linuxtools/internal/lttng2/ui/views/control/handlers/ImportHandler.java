@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -145,7 +145,7 @@ public class ImportHandler extends BaseControlViewHandler {
                                 break;
                             }
 
-                            IFile file = traceFolder.getFile(remoteFile.getLocalTraceName());
+                            IResource file = traceFolder.findMember(remoteFile.getLocalTraceName());
 
                             TraceTypeHelper helper = null;
 
@@ -156,7 +156,7 @@ public class ImportHandler extends BaseControlViewHandler {
                             }
 
                             if (helper != null) {
-                                status.add(TmfTraceTypeUIUtils.setTraceType(file.getFullPath(), helper));
+                                status.add(TmfTraceTypeUIUtils.setTraceType(file, helper));
                             }
                         } catch (ExecutionException e) {
                             status.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e));

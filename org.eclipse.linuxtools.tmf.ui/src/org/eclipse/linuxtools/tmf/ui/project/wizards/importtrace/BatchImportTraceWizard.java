@@ -316,15 +316,14 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
 
     private IStatus setTraceType(FileAndName traceToImport) {
         IStatus validate = Status.OK_STATUS;
-        IPath path = fTargetFolder.getFullPath().append(traceToImport.getName());
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+        IResource resource = fTargetFolder.findMember(traceToImport.getName());
         if (resource != null) {
             try {
                 // Set the trace type for this resource
                 String traceTypeId = traceToImport.getTraceTypeId();
                 TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceTypeId);
                 if (traceType != null) {
-                    TmfTraceTypeUIUtils.setTraceType(path, traceType);
+                    TmfTraceTypeUIUtils.setTraceType(resource, traceType);
                 }
 
                 TmfProjectElement tmfProject =
