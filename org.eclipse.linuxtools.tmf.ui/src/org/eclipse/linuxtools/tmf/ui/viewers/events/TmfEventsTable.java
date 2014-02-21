@@ -803,9 +803,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         };
 
         class ToggleBookmarkAction extends Action {
-            long fRank;
+            Long fRank;
 
-            public ToggleBookmarkAction(final String text, final long rank) {
+            public ToggleBookmarkAction(final String text, final Long rank) {
                 super(text);
                 fRank = rank;
             }
@@ -2114,9 +2114,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         final IMarker bookmark = bookmarksFile.createMarker(IMarker.BOOKMARK);
                         if (bookmark.exists()) {
                             bookmark.setAttribute(IMarker.MESSAGE, message.toString());
-                            final long rank = (Long) tableItem.getData(Key.RANK);
-                            final int location = (int) rank;
-                            bookmark.setAttribute(IMarker.LOCATION, (Integer) location);
+                            final Long rank = (Long) tableItem.getData(Key.RANK);
+                            final int location = rank.intValue();
+                            bookmark.setAttribute(IMarker.LOCATION, Integer.valueOf(location));
                             fBookmarksMap.put(rank, bookmark.getId());
                             fTable.refresh();
                         }
@@ -2145,7 +2145,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
     }
 
-    private void toggleBookmark(final long rank) {
+    private void toggleBookmark(final Long rank) {
         if (fBookmarksFile == null) {
             return;
         }

@@ -52,11 +52,11 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
         if (part == null) {
-            return false;
+            return Boolean.FALSE;
         }
         ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
         if (selectionProvider == null) {
-            return false;
+            return Boolean.FALSE;
         }
 
         ISelection selection = selectionProvider.getSelection();

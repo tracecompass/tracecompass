@@ -41,12 +41,12 @@ public class TmfCheckpointTest {
     private ITmfTimestamp fTimestamp2 = TmfTimestamp.BIG_BANG;
     private ITmfTimestamp fTimestamp3 = TmfTimestamp.BIG_CRUNCH;
 
-    private Long aLong1 = 12345L;
-    private Long aLong2 = 23456L;
-    private Long aLong3 = 34567L;
-    private Long RANK1 = 1L;
-    private Long RANK2 = 2L;
-    private Long RANK3 = 3L;
+    private long aLong1 = 12345L;
+    private long aLong2 = 23456L;
+    private long aLong3 = 34567L;
+    private long RANK1 = 1L;
+    private long RANK2 = 2L;
+    private long RANK3 = 3L;
 
     private ITmfLocation fLocation1 = new TmfLongLocation(aLong1);
     private ITmfLocation fLocation2 = new TmfLongLocation(aLong2);

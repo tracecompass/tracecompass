@@ -25,7 +25,6 @@ import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
-import org.eclipse.linuxtools.tmf.core.util.Pair;
 
 /**
  * This class implements additional statistical operations that can be
@@ -199,7 +198,7 @@ public final class TmfStateSystemOperations {
     private static List<ITmfStateInterval> queryAttributeRange(ITmfStateSystem ss,
             long t1, long t2, int baseQuark, String featureString)
                     throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
-        Pair<Long, Long> timeRange = new Pair<>(t1, t2);
+        TimeRange timeRange = new TimeRange(t1, t2);
         int mipmapQuark = -1;
         List<ITmfStateInterval> intervals = new ArrayList<>();
         try {
@@ -238,10 +237,10 @@ public final class TmfStateSystemOperations {
 
     private static void queryMipmapAttributeRange(ITmfStateSystem ss,
             int currentLevel, int levelMax, int baseQuark, int mipmapQuark,
-            Pair<Long, Long> timeRange, List<ITmfStateInterval> intervals)
+            TimeRange timeRange, List<ITmfStateInterval> intervals)
                     throws AttributeNotFoundException, TimeRangeException {
         int level = currentLevel;
-        Pair<Long, Long> range = timeRange;
+        TimeRange range = timeRange;
         ITmfStateInterval currentLevelInterval = null, nextLevelInterval = null;
         if (range == null || range.getFirst() > range.getSecond()) {
             return;
@@ -250,7 +249,7 @@ public final class TmfStateSystemOperations {
             return;
         }
         try {
-            if (range.getFirst().longValue() == range.getSecond().longValue()) {
+            if (range.getFirst() == range.getSecond()) {
                 level = 0;
                 currentLevelInterval = ss.querySingleState(range.getFirst(), baseQuark);
                 if (!currentLevelInterval.getStateValue().isNull()) {
@@ -307,17 +306,17 @@ public final class TmfStateSystemOperations {
         }
     }
 
-    private static Pair<Long, Long> updateTimeRange(Pair<Long, Long> timeRange,
+    private static TimeRange updateTimeRange(TimeRange timeRange,
             ITmfStateInterval currentLevelInterval) {
         if (currentLevelInterval.getEndTime() >= timeRange.getSecond()) {
             return null;
         }
         long startTime = Math.max(timeRange.getFirst(),
                 Math.min(currentLevelInterval.getEndTime() + 1, timeRange.getSecond()));
-        return new Pair<>(startTime, timeRange.getSecond());
+        return new TimeRange(startTime, timeRange.getSecond());
     }
 
-    private static boolean isFullyOverlapped(Pair<Long, Long> range,
+    private static boolean isFullyOverlapped(TimeRange range,
             ITmfStateInterval interval) {
         if (range.getFirst() >= range.getSecond() ||
                 interval.getStartTime() >= interval.getEndTime()) {
@@ -328,5 +327,24 @@ public final class TmfStateSystemOperations {
             return true;
         }
         return false;
+    }
+}
+
+class TimeRange {
+
+    private final long a;
+    private final long b;
+
+    public TimeRange(long first, long second) {
+        a = first;
+        b = second;
+    }
+
+    public long getFirst() {
+        return a;
+    }
+
+    public long getSecond() {
+        return b;
     }
 }

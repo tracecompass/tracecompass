@@ -199,7 +199,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
         }
         try {
             if (location.getLocationInfo() instanceof Long) {
-                return (double) ((Long) location.getLocationInfo()) / fFile.length();
+                return ((Long) location.getLocationInfo()).doubleValue() / fFile.length();
             }
         } catch (final IOException e) {
             Activator.logError("Error getting location ration. File: " + getPath(), e); //$NON-NLS-1$

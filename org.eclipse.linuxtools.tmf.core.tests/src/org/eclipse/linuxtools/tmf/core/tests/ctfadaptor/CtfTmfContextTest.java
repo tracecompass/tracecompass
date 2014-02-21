@@ -114,11 +114,11 @@ public class CtfTmfContextTest {
             thread.start();
         }
 
-        for( Thread t: threads){
+        for (Thread t: threads){
             t.join();
         }
 
-        for( Long val : vals){
+        for (long val : vals){
             assertTrue(val >= begin);
             assertTrue(val <= end);
         }

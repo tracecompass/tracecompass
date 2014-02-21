@@ -564,7 +564,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
      * @return whether it passes or not
      * @since 3.0
      */
-    public Boolean getResult(TraceValidationHelper traceToScan) {
+    public boolean getResult(TraceValidationHelper traceToScan) {
         return fResults.get(traceToScan);
     }
 

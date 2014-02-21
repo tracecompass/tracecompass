@@ -43,7 +43,7 @@ public class ExportTracePackageHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (window == null) {
-            return false;
+            return Boolean.FALSE;
         }
 
         ISelection currentSelection = HandlerUtil.getCurrentSelection(event);

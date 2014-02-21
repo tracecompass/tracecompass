@@ -261,7 +261,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
         try {
             if (fTrace != null) {
                 if (location.getLocationInfo() instanceof Long) {
-                    return (double) ((Long) location.getLocationInfo()) / fTrace.length();
+                    return ((Long) location.getLocationInfo()).doubleValue() / fTrace.length();
                 }
             }
         } catch (final IOException e) {

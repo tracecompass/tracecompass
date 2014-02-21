@@ -162,14 +162,12 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
         if (fType == Type.NUM) {
             if (fValueNumber != null) {
                 if (value instanceof Number) {
-                    Double valueDouble = ((Number) value).doubleValue();
-                    return (valueDouble.compareTo(fValueNumber.doubleValue()) == fResult) ^ fNot;
+                    double valueDouble = ((Number) value).doubleValue();
+                    return (Double.compare(valueDouble, fValueNumber.doubleValue()) == fResult) ^ fNot;
                 }
                 try {
-                    Double valueDouble = NumberFormat.getInstance().parse(value.toString())
-                                    .doubleValue();
-                    return (valueDouble.compareTo(fValueNumber.doubleValue()) == fResult)
-                                    ^ fNot;
+                    double valueDouble = NumberFormat.getInstance().parse(value.toString()).doubleValue();
+                    return (Double.compare(valueDouble, fValueNumber.doubleValue()) == fResult) ^ fNot;
                 } catch (ParseException e) {
                 }
             }

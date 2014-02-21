@@ -39,7 +39,7 @@ public class Benchmark {
         final boolean USE_TEXT = true;
 
         // Work variables
-        Long nbEvent = 0L;
+        long nbEvent = 0L;
         final Vector<Double> benchs = new Vector<>();
         CtfTmfTrace trace = null;
         long start, stop;
@@ -82,7 +82,7 @@ public class Benchmark {
         }
         System.out.println("");
         double avg = 0;
-        for (final Double val : benchs) {
+        for (final double val : benchs) {
             avg += val;
         }
         avg /= benchs.size();

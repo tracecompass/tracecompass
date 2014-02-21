@@ -36,7 +36,7 @@ public class ImportTracePackageHandler extends AbstractHandler {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
         if (window == null) {
-            return false;
+            return Boolean.FALSE;
         }
 
         ISelection currentSelection = HandlerUtil.getCurrentSelection(event);

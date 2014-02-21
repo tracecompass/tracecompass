@@ -69,7 +69,7 @@ public class TestAnalysis extends TmfAbstractAnalysisModule {
     public Object getParameter(String name) {
         Object value = super.getParameter(name);
         if ((value != null) && name.equals(PARAM_TEST) && (value instanceof String)) {
-            return Integer.parseInt((String) value);
+            return Integer.decode((String) value);
         }
         return value;
     }

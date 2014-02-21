@@ -76,8 +76,9 @@ public class FlatArrayTest extends AbstractCheckpointCollectionTest {
         fFlatArray = createCollection();
 
         for (int i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
-            Integer checkpointIndex = list.get(i);
-            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345 + checkpointIndex), new TmfLongLocation(123456L + checkpointIndex), checkpointIndex);
+            int checkpointIndex = list.get(i);
+            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345 + checkpointIndex),
+                    new TmfLongLocation(123456L + checkpointIndex), checkpointIndex);
             ITmfCheckpoint found = fFlatArray.get(checkpointIndex);
             assertEquals(checkpoint, found);
         }

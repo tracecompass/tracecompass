@@ -63,10 +63,10 @@ public class TmfCoreTracer {
     // ------------------------------------------------------------------------
 
     // Classes tracing flags
-    static Boolean COMPONENT_CLASS_ENABLED = Boolean.FALSE;
-    static Boolean REQUEST_CLASS_ENABLED   = Boolean.FALSE;
-    static Boolean SIGNAL_CLASS_ENABLED    = Boolean.FALSE;
-    static Boolean EVENT_CLASS_ENABLED     = Boolean.FALSE;
+    static boolean COMPONENT_CLASS_ENABLED = false;
+    static boolean REQUEST_CLASS_ENABLED   = false;
+    static boolean SIGNAL_CLASS_ENABLED    = false;
+    static boolean EVENT_CLASS_ENABLED     = false;
 
     // Trace log file
     private static BufferedWriter fTraceFile;

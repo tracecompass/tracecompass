@@ -386,7 +386,7 @@ final class CTFEnumField extends CtfTmfEventField {
      */
     CTFEnumField(String name, CtfEnumPair enumValue) {
         super(name, new CtfEnumPair(enumValue.getFirst(),
-                enumValue.getSecond().longValue()), null);
+                enumValue.getSecond()), null);
     }
 
     @Override

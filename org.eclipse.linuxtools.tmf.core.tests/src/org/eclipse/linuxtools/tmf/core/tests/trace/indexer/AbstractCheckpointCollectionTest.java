@@ -353,12 +353,12 @@ public abstract class AbstractCheckpointCollectionTest {
     public void testBinarySearchInBetweenSameTimestamp() {
         int checkpointNum = 0;
         for (; checkpointNum < 100; checkpointNum++) {
-            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(0), new TmfLongLocation((long) checkpointNum), checkpointNum);
+            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(0), new TmfLongLocation(checkpointNum), checkpointNum);
             fCheckpointCollection.insert(checkpoint);
         }
 
         for (; checkpointNum < 200; checkpointNum++) {
-            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(1), new TmfLongLocation((long) checkpointNum), checkpointNum);
+            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(1), new TmfLongLocation(checkpointNum), checkpointNum);
             fCheckpointCollection.insert(checkpoint);
         }
 
