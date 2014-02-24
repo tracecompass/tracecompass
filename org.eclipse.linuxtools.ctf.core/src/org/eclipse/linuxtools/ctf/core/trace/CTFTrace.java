@@ -638,8 +638,6 @@ public class CTFTrace implements IDefinitionScope {
      *            the file of the stream
      * @throws CTFReaderException
      *             A stream had an issue being read
-     * @throws ParseException
-     *             the stream may have conflicts
      * @since 3.0
      */
     public void addStreamFile(File streamFile) throws CTFReaderException {
