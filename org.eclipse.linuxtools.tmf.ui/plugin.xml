@@ -1666,7 +1666,7 @@
          point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
       <type
             icon="icons/eview16/events_view.gif"
-            tracetype="org.eclipse.linuxtools.tmf.core.type.ctf">
+            tracetype="org.eclipse.linuxtools.tmf.ui.type.ctf">
       </type>
    </extension>
 </plugin>
