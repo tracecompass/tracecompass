@@ -38,29 +38,29 @@ public class Stream {
     /**
      * The numerical ID of the stream
      */
-    private Long id = null;
+    private Long fId = null;
 
     /**
      * Declarations of the stream-specific structures
      */
-    private StructDeclaration packetContextDecl = null;
-    private StructDeclaration eventHeaderDecl = null;
-    private StructDeclaration eventContextDecl = null;
+    private StructDeclaration fPacketContextDecl = null;
+    private StructDeclaration fEventHeaderDecl = null;
+    private StructDeclaration fEventContextDecl = null;
 
     /**
      * The trace to which the stream belongs
      */
-    private CTFTrace trace = null;
+    private CTFTrace fTrace = null;
 
     /**
      * Maps event ids to events
      */
-    private Map<Long, IEventDeclaration> events = new HashMap<>();
+    private Map<Long, IEventDeclaration> fEvents = new HashMap<>();
 
     /**
      * The inputs associated to this stream
      */
-    private final Set<StreamInput> inputs = new HashSet<>();
+    private final Set<StreamInput> fInputs = new HashSet<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -73,7 +73,7 @@ public class Stream {
      *            The trace to which belongs this stream.
      */
     public Stream(CTFTrace trace) {
-        this.trace = trace;
+        fTrace = trace;
     }
 
     // ------------------------------------------------------------------------
@@ -85,7 +85,7 @@ public class Stream {
      * @param id the id of a stream
      */
     public void setId(long id) {
-        this.id = id;
+        fId = id;
     }
 
     /**
@@ -93,7 +93,7 @@ public class Stream {
      * @return id the id of a stream
      */
     public Long getId() {
-        return id;
+        return fId;
     }
 
     /**
@@ -102,7 +102,7 @@ public class Stream {
      * @return If the ID is set or not
      */
     public boolean isIdSet() {
-        return id != null;
+        return fId != null;
     }
 
     /**
@@ -110,7 +110,7 @@ public class Stream {
      * @return is the event header set (timestamp and stuff) (see Ctf Spec)
      */
     public boolean isEventHeaderSet() {
-        return eventHeaderDecl != null;
+        return fEventHeaderDecl != null;
     }
 
     /**
@@ -118,7 +118,7 @@ public class Stream {
     * @return is the event context set (pid and stuff) (see Ctf Spec)
     */
     public boolean isEventContextSet() {
-        return eventContextDecl != null;
+        return fEventContextDecl != null;
     }
 
     /**
@@ -126,7 +126,7 @@ public class Stream {
      * @return Is the packet context set (see Ctf Spec)
      */
     public boolean isPacketContextSet() {
-        return packetContextDecl != null;
+        return fPacketContextDecl != null;
     }
 
     /**
@@ -134,7 +134,7 @@ public class Stream {
      * @param eventHeader the current event header for all events in this stream
      */
     public void setEventHeader(StructDeclaration eventHeader) {
-        this.eventHeaderDecl = eventHeader;
+        fEventHeaderDecl = eventHeader;
     }
 
     /**
@@ -142,7 +142,7 @@ public class Stream {
      * @param eventContext the context for all events in this stream
      */
     public void setEventContext(StructDeclaration eventContext) {
-        this.eventContextDecl = eventContext;
+        fEventContextDecl = eventContext;
     }
 
     /**
@@ -150,7 +150,7 @@ public class Stream {
      * @param packetContext the packet context for all packets in this stream
      */
     public void setPacketContext(StructDeclaration packetContext) {
-        this.packetContextDecl = packetContext;
+        fPacketContextDecl = packetContext;
     }
 
     /**
@@ -158,7 +158,7 @@ public class Stream {
      * @return the event header declaration in structdeclaration form
      */
     public StructDeclaration getEventHeaderDecl() {
-        return eventHeaderDecl;
+        return fEventHeaderDecl;
     }
 
     /**
@@ -166,7 +166,7 @@ public class Stream {
      * @return the event context declaration in structdeclaration form
      */
     public StructDeclaration getEventContextDecl() {
-        return eventContextDecl;
+        return fEventContextDecl;
     }
 
     /**
@@ -174,7 +174,7 @@ public class Stream {
      * @return the packet context declaration in structdeclaration form
      */
     public StructDeclaration getPacketContextDecl() {
-        return packetContextDecl;
+        return fPacketContextDecl;
     }
 
     /**
@@ -182,7 +182,7 @@ public class Stream {
      * @return the set of all stream inputs for this stream
      */
     public Set<StreamInput> getStreamInputs() {
-        return inputs;
+        return fInputs;
     }
 
     /**
@@ -190,7 +190,7 @@ public class Stream {
      * @return the parent trace
      */
     public CTFTrace getTrace() {
-        return trace;
+        return fTrace;
     }
 
     /**
@@ -198,7 +198,7 @@ public class Stream {
      * @return all the event declarations for this stream, using the id as a key for the hashmap.
      */
     public Map<Long, IEventDeclaration> getEvents() {
-        return events;
+        return fEvents;
     }
 
     // ------------------------------------------------------------------------
@@ -225,7 +225,7 @@ public class Stream {
          * If there is an event without id (the null key), it must be the only
          * one
          */
-        if (events.get(null) != null) {
+        if (fEvents.get(null) != null) {
             throw new ParseException(
                     "Event without id with multiple events in a stream"); //$NON-NLS-1$
         }
@@ -234,20 +234,20 @@ public class Stream {
          * If there is an event without id (the null key), it must be the only
          * one
          */
-        if ((event.getId() == null) && (events.size() != 0)) {
+        if ((event.getId() == null) && (fEvents.size() != 0)) {
             throw new ParseException(
                     "Event without id with multiple events in a stream"); //$NON-NLS-1$
         }
 
         /* Check if an event with the same ID already exists */
-        if (events.get(event.getId()) != null) {
+        if (fEvents.get(event.getId()) != null) {
             throw new ParseException("Event id already exists"); //$NON-NLS-1$
         }
         if (event.getId() == null) {
-            events.put(EventDeclaration.UNSET_EVENT_ID, event);
+            fEvents.put(EventDeclaration.UNSET_EVENT_ID, event);
         } else {
             /* Put the event in the map */
-            events.put(event.getId(), event);
+            fEvents.put(event.getId(), event);
         }
     }
 
@@ -258,14 +258,14 @@ public class Stream {
      *            The StreamInput to add.
      */
     public void addInput(StreamInput input) {
-        inputs.add(input);
+        fInputs.add(input);
     }
 
     @Override
     public String toString() {
-        return "Stream [id=" + id + ", packetContextDecl=" + packetContextDecl //$NON-NLS-1$ //$NON-NLS-2$
-                + ", eventHeaderDecl=" + eventHeaderDecl //$NON-NLS-1$
-                + ", eventContextDecl=" + eventContextDecl + ", trace=" + trace //$NON-NLS-1$ //$NON-NLS-2$
-                + ", events=" + events + ", inputs=" + inputs + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return "Stream [id=" + fId + ", packetContextDecl=" + fPacketContextDecl //$NON-NLS-1$ //$NON-NLS-2$
+                + ", eventHeaderDecl=" + fEventHeaderDecl //$NON-NLS-1$
+                + ", eventContextDecl=" + fEventContextDecl + ", trace=" + fTrace //$NON-NLS-1$ //$NON-NLS-2$
+                + ", events=" + fEvents + ", inputs=" + fInputs + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }
