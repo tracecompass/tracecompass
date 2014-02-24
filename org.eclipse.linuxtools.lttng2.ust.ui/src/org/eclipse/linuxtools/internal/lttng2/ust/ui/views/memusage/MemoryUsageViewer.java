@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.lttng2.ust.ui.analysis.memory.UstMemoryAnalysisModule;
@@ -68,7 +69,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
     }
 
     @Override
-    protected void updateData(long start, long end, int nb) {
+    protected void updateData(long start, long end, int nb, IProgressMonitor monitor) {
         try {
             if (getTrace() == null || fModule == null) {
                 return;
@@ -110,6 +111,9 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
              */
             double yvalue = 0.0;
             for (int i = 0; i < xvalues.length; i++) {
+                if (monitor.isCanceled()) {
+                    return;
+                }
                 double x = xvalues[i];
                 long time = (long) x + offset;
                 // make sure that time is in the trace range after double to
