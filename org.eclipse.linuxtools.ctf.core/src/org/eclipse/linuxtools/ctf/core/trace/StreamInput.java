@@ -47,39 +47,39 @@ public class StreamInput implements IDefinitionScope {
     /**
      * The associated Stream
      */
-    private final Stream stream;
+    private final Stream fStream;
 
     /**
      * FileChannel to the trace file
      */
-    private final FileChannel fileChannel;
+    private final FileChannel fFileChannel;
 
     /**
      * Information on the file (used for debugging)
      */
-    private final File file;
+    private final File fFile;
 
     /**
      * The packet index of this input
      */
-    private final StreamInputPacketIndex index;
+    private final StreamInputPacketIndex fIndex;
 
-    private long timestampEnd;
+    private long fTimestampEnd;
 
     /*
      * Definition of trace packet header
      */
-    private StructDefinition tracePacketHeaderDef = null;
+    private StructDefinition fTracePacketHeaderDef = null;
 
     /*
      * Definition of trace stream packet context
      */
-    private StructDefinition streamPacketContextDef = null;
+    private StructDefinition fStreamPacketContextDef = null;
 
     /*
      * Total number of lost events in this stream
      */
-    private long lostSoFar = 0;
+    private long fLostSoFar = 0;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -96,10 +96,10 @@ public class StreamInput implements IDefinitionScope {
      *            Information about the trace file (for debugging purposes).
      */
     public StreamInput(Stream stream, FileChannel fileChannel, File file) {
-        this.stream = stream;
-        this.fileChannel = fileChannel;
-        this.file = file;
-        this.index = new StreamInputPacketIndex();
+        fStream = stream;
+        fFileChannel = fileChannel;
+        fFile = file;
+        fIndex = new StreamInputPacketIndex();
     }
 
     // ------------------------------------------------------------------------
@@ -112,7 +112,7 @@ public class StreamInput implements IDefinitionScope {
      * @return the stream the streamInput wrapper is wrapping
      */
     public Stream getStream() {
-        return stream;
+        return fStream;
     }
 
     /**
@@ -121,7 +121,7 @@ public class StreamInput implements IDefinitionScope {
      * @return the stream input Index
      */
     StreamInputPacketIndex getIndex() {
-        return index;
+        return fIndex;
     }
 
     /**
@@ -130,7 +130,7 @@ public class StreamInput implements IDefinitionScope {
      * @return the filename of the streaminput file.
      */
     public String getFilename() {
-        return file.getName();
+        return fFile.getName();
     }
 
     /**
@@ -140,7 +140,7 @@ public class StreamInput implements IDefinitionScope {
      * @return the last read timestamp
      */
     public long getTimestampEnd() {
-        return timestampEnd;
+        return fTimestampEnd;
     }
 
     /**
@@ -151,7 +151,7 @@ public class StreamInput implements IDefinitionScope {
      *            the last read timestamp
      */
     public void setTimestampEnd(long timestampEnd) {
-        this.timestampEnd = timestampEnd;
+        fTimestampEnd = timestampEnd;
     }
 
     /**
@@ -181,18 +181,18 @@ public class StreamInput implements IDefinitionScope {
          * The BitBuffer to extract data from the StreamInput
          */
         BitBuffer bitBuffer = new BitBuffer();
-        bitBuffer.setByteOrder(this.getStream().getTrace().getByteOrder());
+        bitBuffer.setByteOrder(getStream().getTrace().getByteOrder());
 
         /*
          * Create the definitions we need to read the packet headers + contexts
          */
         if (getStream().getTrace().getPacketHeader() != null) {
-            tracePacketHeaderDef = getStream().getTrace().getPacketHeader()
+            fTracePacketHeaderDef = getStream().getTrace().getPacketHeader()
                     .createDefinition(this, "trace.packet.header"); //$NON-NLS-1$
         }
 
         if (getStream().getPacketContextDecl() != null) {
-            streamPacketContextDef = getStream().getPacketContextDecl()
+            fStreamPacketContextDef = getStream().getPacketContextDecl()
                     .createDefinition(this, "stream.packet.context"); //$NON-NLS-1$
         }
 
@@ -208,26 +208,26 @@ public class StreamInput implements IDefinitionScope {
      */
     public boolean addPacketHeaderIndex() throws CTFReaderException {
         long currentPos = 0L;
-        if (!index.getEntries().isEmpty()) {
-            StreamInputPacketIndexEntry pos = index.getEntries().lastElement();
+        if (!fIndex.getEntries().isEmpty()) {
+            StreamInputPacketIndexEntry pos = fIndex.getEntries().lastElement();
             currentPos = computeNextOffset(pos);
         }
         long fileSize = getStreamSize();
         if (currentPos < fileSize) {
             BitBuffer bitBuffer = new BitBuffer();
-            bitBuffer.setByteOrder(this.getStream().getTrace().getByteOrder());
+            bitBuffer.setByteOrder(getStream().getTrace().getByteOrder());
             StreamInputPacketIndexEntry packetIndex = new StreamInputPacketIndexEntry(
                     currentPos);
             createPacketIndexEntry(fileSize, currentPos, packetIndex,
-                    tracePacketHeaderDef, streamPacketContextDef, bitBuffer);
-            index.addEntry(packetIndex);
+                    fTracePacketHeaderDef, fStreamPacketContextDef, bitBuffer);
+            fIndex.addEntry(packetIndex);
             return true;
         }
         return false;
     }
 
     private long getStreamSize() {
-        return file.length();
+        return fFile.length();
     }
 
     private long createPacketIndexEntry(long fileSizeBytes,
@@ -291,7 +291,7 @@ public class StreamInput implements IDefinitionScope {
     }
 
     ByteBuffer getByteBufferAt(long position, long size) throws IOException {
-        return fileChannel.map(MapMode.READ_ONLY, position, size);
+        return fFileChannel.map(MapMode.READ_ONLY, position, size);
     }
 
     /**
@@ -470,8 +470,8 @@ public class StreamInput implements IDefinitionScope {
         }
 
         if (lostEvents != null) {
-            packetIndex.setLostEvents(lostEvents - lostSoFar);
-            this.lostSoFar = lostEvents;
+            packetIndex.setLostEvents(lostEvents - fLostSoFar);
+            fLostSoFar = lostEvents;
         }
     }
 
@@ -479,7 +479,7 @@ public class StreamInput implements IDefinitionScope {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((file == null) ? 0 : file.hashCode());
+        result = (prime * result) + ((fFile == null) ? 0 : fFile.hashCode());
         return result;
     }
 
@@ -495,11 +495,11 @@ public class StreamInput implements IDefinitionScope {
             return false;
         }
         StreamInput other = (StreamInput) obj;
-        if (file == null) {
-            if (other.file != null) {
+        if (fFile == null) {
+            if (other.fFile != null) {
                 return false;
             }
-        } else if (!file.equals(other.file)) {
+        } else if (!fFile.equals(other.fFile)) {
             return false;
         }
         return true;
