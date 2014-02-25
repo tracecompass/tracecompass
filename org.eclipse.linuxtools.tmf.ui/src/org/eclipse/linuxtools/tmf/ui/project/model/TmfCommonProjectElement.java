@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,8 @@
  * Contributors:
  *   Bernd Hufmann - Added supplementary files handling (in class TmfTraceElement)
  *   Geneviève Bastien - Copied supplementary files handling from TmfTracElement
- *                       Moved to this class code to copy a model element
+ *                 Moved to this class code to copy a model element
+ *                 Renamed from TmfWithFolderElement to TmfCommonProjectElement
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -24,29 +25,30 @@ import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
-
 /**
- * Base class for project elements who will have folder elements
- * under them to store supplementary files.
+ * Base class for tracing project elements: it implements the common behavior of
+ * all project elements: supplementary files, analysis, types, etc.
  *
  * @author Geneviève Bastien
- * @since 2.0
+ * @since 3.0
  */
-public abstract class TmfWithFolderElement extends TmfProjectModelElement {
+public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-
     /**
-     * Constructor.
-     * Creates model element.
-     * @param name The name of the element
-     * @param resource The resource.
-     * @param parent The parent element
+     * Constructor. Creates model element.
+     *
+     * @param name
+     *            The name of the element
+     * @param resource
+     *            The resource.
+     * @param parent
+     *            The parent element
      */
-    public TmfWithFolderElement(String name, IResource resource, TmfProjectModelElement parent) {
+    public TmfCommonProjectElement(String name, IResource resource, TmfProjectModelElement parent) {
         super(name, resource, parent);
     }
 
@@ -66,6 +68,10 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
         return ""; //$NON-NLS-1$
     }
 
+    // ------------------------------------------------------------------------
+    // Supplementary files operations
+    // ------------------------------------------------------------------------
+
     /**
      * Deletes this element specific supplementary folder.
      */
@@ -81,13 +87,15 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
     }
 
     /**
-     * Renames the element specific supplementary folder according to the new element name.
+     * Renames the element specific supplementary folder according to the new
+     * element name.
      *
-     * @param newName The new element name
+     * @param newName
+     *            The new element name
      */
     public void renameSupplementaryFolder(String newName) {
         IFolder oldSupplFolder = getTraceSupplementaryFolder(getResourceName());
-        IFolder newSupplFolder =  getTraceSupplementaryFolder(newName + getSuffix());
+        IFolder newSupplFolder = getTraceSupplementaryFolder(newName + getSuffix());
 
         // Rename supplementary folder
         if (oldSupplFolder.exists()) {
@@ -102,7 +110,8 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
     /**
      * Copies the element specific supplementary folder to the new element name.
      *
-     * @param newName The new element name
+     * @param newName
+     *            The new element name
      */
     public void copySupplementaryFolder(String newName) {
         IFolder oldSupplFolder = getTraceSupplementaryFolder(getResourceName());
@@ -121,7 +130,8 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
     /**
      * Copies the element specific supplementary folder a new folder.
      *
-     * @param destination The destination folder to copy to.
+     * @param destination
+     *            The destination folder to copy to.
      */
     public void copySupplementaryFolder(IFolder destination) {
         IFolder oldSupplFolder = getTraceSupplementaryFolder(getResourceName());
@@ -136,10 +146,10 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
         }
     }
 
-
     /**
-     * Refreshes the element specific supplementary folder information. It creates the folder if not exists.
-     * It sets the persistence property of the trace resource
+     * Refreshes the element specific supplementary folder information. It
+     * creates the folder if not exists. It sets the persistence property of the
+     * trace resource
      */
     public void refreshSupplementaryFolder() {
         createSupplementaryDirectory();
@@ -148,7 +158,8 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
     /**
      * Checks if supplementary resource exist or not.
      *
-     * @return <code>true</code> if one or more files are under the element supplementary folder
+     * @return <code>true</code> if one or more files are under the element
+     *         supplementary folder
      */
     public boolean hasSupplementaryResources() {
         IResource[] resources = getSupplementaryResources();
@@ -175,7 +186,8 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
     /**
      * Deletes the given resources.
      *
-     * @param resources array of resources to delete.
+     * @param resources
+     *            array of resources to delete.
      */
     public void deleteSupplementaryResources(IResource[] resources) {
 
@@ -213,11 +225,17 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
 
     }
 
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+
     /**
      * Copy this model element
      *
-     * @param newName The name of the new element
-     * @param copySuppFiles Whether to copy supplementary files or not
+     * @param newName
+     *            The name of the new element
+     * @param copySuppFiles
+     *            Whether to copy supplementary files or not
      * @return the new Resource object
      */
     public IResource copy(final String newName, final boolean copySuppFiles) {
@@ -233,13 +251,12 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
             getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
 
             /* Delete any bookmarks file found in copied trace folder */
-            IFolder folder = ((IFolder)getParent().getResource()).getFolder(newName);
+            IFolder folder = ((IFolder) getParent().getResource()).getFolder(newName);
             if (folder.exists()) {
                 for (IResource member : folder.members()) {
                     if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
                         member.delete(true, null);
-                    }
-                    else if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
+                    } else if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
                         member.delete(true, null);
                     }
                 }
@@ -248,9 +265,7 @@ public abstract class TmfWithFolderElement extends TmfProjectModelElement {
         } catch (CoreException e) {
 
         }
-
         return null;
-
     }
 
 }

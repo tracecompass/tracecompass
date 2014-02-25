@@ -51,7 +51,7 @@ import org.eclipse.ui.views.properties.IPropertySource2;
  * @author Francois Chouinard
  *
  */
-public class TmfExperimentElement extends TmfWithFolderElement implements IPropertySource2 {
+public class TmfExperimentElement extends TmfCommonProjectElement implements IPropertySource2 {
 
     // ------------------------------------------------------------------------
     // Constants

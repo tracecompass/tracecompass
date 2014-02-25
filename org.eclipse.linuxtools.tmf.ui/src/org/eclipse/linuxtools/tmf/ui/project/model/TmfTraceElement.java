@@ -77,7 +77,7 @@ import org.eclipse.ui.views.properties.IPropertySource2;
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfTraceElement extends TmfWithFolderElement implements IActionFilter, IPropertySource2 {
+public class TmfTraceElement extends TmfCommonProjectElement implements IActionFilter, IPropertySource2 {
 
     // ------------------------------------------------------------------------
     // Constants
