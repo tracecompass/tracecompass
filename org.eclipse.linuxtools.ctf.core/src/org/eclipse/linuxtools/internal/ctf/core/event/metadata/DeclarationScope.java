@@ -41,13 +41,13 @@ class DeclarationScope {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private DeclarationScope parentScope = null;
+    private DeclarationScope fParentScope = null;
 
-    private final Map<String, StructDeclaration> structs = new HashMap<>();
-    private final Map<String, EnumDeclaration> enums = new HashMap<>();
-    private final Map<String, VariantDeclaration> variants = new HashMap<>();
-    private final Map<String, IDeclaration> types = new HashMap<>();
-    private final Map<String, IDeclaration> identifiers = new HashMap<>();
+    private final Map<String, StructDeclaration> fStructs = new HashMap<>();
+    private final Map<String, EnumDeclaration> fEnums = new HashMap<>();
+    private final Map<String, VariantDeclaration> fVariants = new HashMap<>();
+    private final Map<String, IDeclaration> fTypes = new HashMap<>();
+    private final Map<String, IDeclaration> fIdentifiers = new HashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -66,7 +66,7 @@ class DeclarationScope {
      *            The parent of the newly created scope.
      */
     public DeclarationScope(DeclarationScope parentScope) {
-        this.parentScope = parentScope;
+        fParentScope = parentScope;
     }
 
     // ------------------------------------------------------------------------
@@ -79,7 +79,7 @@ class DeclarationScope {
      * @return The parent scope.
      */
     public DeclarationScope getParentScope() {
-        return parentScope;
+        return fParentScope;
     }
 
     // ------------------------------------------------------------------------
@@ -99,12 +99,12 @@ class DeclarationScope {
     public void registerType(String name, IDeclaration declaration)
             throws ParseException {
         /* Check if the type has been defined in the current scope */
-        if (types.containsKey(name)) {
+        if (fTypes.containsKey(name)) {
             throw new ParseException("Type has already been defined:" + name); //$NON-NLS-1$
         }
 
         /* Add it to the register. */
-        types.put(name, declaration);
+        fTypes.put(name, declaration);
     }
 
     /**
@@ -119,12 +119,12 @@ class DeclarationScope {
      */
     public void registerIdentifier(String name, IDeclaration declaration) throws ParseException {
         /* Check if the type has been defined in the current scope */
-        if (identifiers.containsKey(name)) {
+        if (fIdentifiers.containsKey(name)) {
             throw new ParseException("Identifier has already been defined:" + name); //$NON-NLS-1$
         }
 
         /* Add it to the register. */
-        identifiers.put(name, declaration);
+        fIdentifiers.put(name, declaration);
     }
 
     /**
@@ -140,12 +140,12 @@ class DeclarationScope {
     public void registerStruct(String name, StructDeclaration declaration)
             throws ParseException {
         /* Check if the struct has been defined in the current scope. */
-        if (structs.containsKey(name)) {
+        if (fStructs.containsKey(name)) {
             throw new ParseException("Struct has already been defined:" + name); //$NON-NLS-1$
         }
 
         /* Add it to the register. */
-        structs.put(name, declaration);
+        fStructs.put(name, declaration);
 
         /* It also defined a new type, so add it to the type declarations. */
         String structPrefix = "struct "; //$NON-NLS-1$
@@ -170,7 +170,7 @@ class DeclarationScope {
         }
 
         /* Add it to the register. */
-        enums.put(name, declaration);
+        fEnums.put(name, declaration);
 
         /* It also defined a new type, so add it to the type declarations. */
         String enumPrefix = "enum "; //$NON-NLS-1$
@@ -195,7 +195,7 @@ class DeclarationScope {
         }
 
         /* Add it to the register. */
-        variants.put(name, declaration);
+        fVariants.put(name, declaration);
 
         /* It also defined a new type, so add it to the type declarations. */
         String variantPrefix = "variant "; //$NON-NLS-1$
@@ -215,7 +215,7 @@ class DeclarationScope {
      *         defined.
      */
     public IDeclaration lookupType(String name) {
-        return types.get(name);
+        return fTypes.get(name);
     }
 
     /**
@@ -231,8 +231,8 @@ class DeclarationScope {
         IDeclaration declaration = lookupType(name);
         if (declaration != null) {
             return declaration;
-        } else if (parentScope != null) {
-            return parentScope.lookupTypeRecursive(name);
+        } else if (fParentScope != null) {
+            return fParentScope.lookupTypeRecursive(name);
         } else {
             return null;
         }
@@ -247,7 +247,7 @@ class DeclarationScope {
      *         been defined.
      */
     public StructDeclaration lookupStruct(String name) {
-        return structs.get(name);
+        return fStructs.get(name);
     }
 
     /**
@@ -263,8 +263,8 @@ class DeclarationScope {
         StructDeclaration declaration = lookupStruct(name);
         if (declaration != null) {
             return declaration;
-        } else if (parentScope != null) {
-            return parentScope.lookupStructRecursive(name);
+        } else if (fParentScope != null) {
+            return fParentScope.lookupStructRecursive(name);
         } else {
             return null;
         }
@@ -279,7 +279,7 @@ class DeclarationScope {
      *         defined.
      */
     public EnumDeclaration lookupEnum(String name) {
-        return enums.get(name);
+        return fEnums.get(name);
     }
 
     /**
@@ -295,8 +295,8 @@ class DeclarationScope {
         EnumDeclaration declaration = lookupEnum(name);
         if (declaration != null) {
             return declaration;
-        } else if (parentScope != null) {
-            return parentScope.lookupEnumRecursive(name);
+        } else if (fParentScope != null) {
+            return fParentScope.lookupEnumRecursive(name);
         } else {
             return null;
         }
@@ -311,7 +311,7 @@ class DeclarationScope {
      *         been defined.
      */
     public VariantDeclaration lookupVariant(String name) {
-        return variants.get(name);
+        return fVariants.get(name);
     }
 
     /**
@@ -327,8 +327,8 @@ class DeclarationScope {
         VariantDeclaration declaration = lookupVariant(name);
         if (declaration != null) {
             return declaration;
-        } else if (parentScope != null) {
-            return parentScope.lookupVariantRecursive(name);
+        } else if (fParentScope != null) {
+            return fParentScope.lookupVariantRecursive(name);
         } else {
             return null;
         }
@@ -343,7 +343,7 @@ class DeclarationScope {
      * @return the declaration of the type associated to that identifier
      */
     public IDeclaration lookupIdentifier(String identifier) {
-        return identifiers.get(identifier);
+        return fIdentifiers.get(identifier);
     }
 
     /**
@@ -359,8 +359,8 @@ class DeclarationScope {
         IDeclaration declaration = lookupIdentifier(identifier);
         if (declaration != null) {
             return declaration;
-        } else if (parentScope != null) {
-            return parentScope.lookupIdentifierRecursive(identifier);
+        } else if (fParentScope != null) {
+            return fParentScope.lookupIdentifierRecursive(identifier);
         }
         return null;
     }
@@ -371,7 +371,7 @@ class DeclarationScope {
      * @return The type names
      */
     public Set<String> getTypeNames() {
-        return types.keySet();
+        return fTypes.keySet();
     }
 
     /**
@@ -385,8 +385,8 @@ class DeclarationScope {
      *             If the type does not exist.
      */
     public void replaceType(String name, IDeclaration newType) throws ParseException {
-        if (types.containsKey(name)) {
-            types.put(name, newType);
+        if (fTypes.containsKey(name)) {
+            fTypes.put(name, newType);
         } else {
             throw new ParseException("Trace does not contain type:" + name); //$NON-NLS-1$
         }
