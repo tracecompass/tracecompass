@@ -61,13 +61,13 @@ public class IOStructGen {
     /**
      * The trace
      */
-    private final CTFTrace trace;
-    private CommonTree tree;
+    private final CTFTrace fTrace;
+    private CommonTree fTree;
 
     /**
      * The current declaration scope.
      */
-    private DeclarationScope scope = null;
+    private DeclarationScope fScope = null;
 
     /**
      * Data helpers needed for streaming
@@ -88,8 +88,8 @@ public class IOStructGen {
      *            the trace containing the places to put all the read metadata
      */
     public IOStructGen(CommonTree tree, CTFTrace trace) {
-        this.trace = trace;
-        this.tree = tree;
+        fTrace = trace;
+        fTree = tree;
 
     }
 
@@ -100,7 +100,7 @@ public class IOStructGen {
      *             If there was a problem parsing the metadata
      */
     public void generate() throws ParseException {
-        parseRoot(tree);
+        parseRoot(fTree);
     }
 
     /**
@@ -112,7 +112,7 @@ public class IOStructGen {
      *             If there was a problem parsing the metadata
      */
     public void generateFragment() throws ParseException {
-        parseIncompleteRoot(tree);
+        parseIncompleteRoot(fTree);
     }
 
     // ------------------------------------------------------------------------
@@ -126,7 +126,7 @@ public class IOStructGen {
      *            the new tree to parse
      */
     public void setTree(CommonTree newTree) {
-        tree = newTree;
+        fTree = newTree;
     }
 
     /**
@@ -251,7 +251,7 @@ public class IOStructGen {
                 }
             } else {
                 /* Add an empty stream that will have a null id */
-                trace.addStream(new Stream(trace));
+                fTrace.addStream(new Stream(fTrace));
             }
 
             if (DEBUG) {
@@ -374,7 +374,7 @@ public class IOStructGen {
                 lineNumber = Long.parseLong(child.getChild(1).getChild(0).getChild(0).getText());
             }
         }
-        trace.addCallsite(name, funcName, ip, fileName, lineNumber);
+        fTrace.addCallsite(name, funcName, ip, fileName, lineNumber);
     }
 
     private void parseEnvironment(CommonTree environment) {
@@ -384,7 +384,7 @@ public class IOStructGen {
             String right;
             left = child.getChild(0).getChild(0).getChild(0).getText();
             right = child.getChild(1).getChild(0).getChild(0).getText();
-            trace.addEnvironmentVar(left, right);
+            fTrace.addEnvironmentVar(left, right);
         }
     }
 
@@ -422,7 +422,7 @@ public class IOStructGen {
 
         }
         String nameValue = ctfClock.getName();
-        trace.addClock(nameValue, ctfClock);
+        fTrace.addClock(nameValue, ctfClock);
     }
 
     private void parseTrace(CommonTree traceNode) throws ParseException {
@@ -456,7 +456,7 @@ public class IOStructGen {
          * If trace byte order was not specified and not using packet based
          * metadata
          */
-        if (trace.getByteOrder() == null) {
+        if (fTrace.getByteOrder() == null) {
             throw new ParseException("Trace byte order not set"); //$NON-NLS-1$
         }
 
@@ -480,17 +480,17 @@ public class IOStructGen {
         String left = concatenateUnaryStrings(leftStrings);
 
         if (left.equals(MetadataStrings.MAJOR)) {
-            if (trace.majorIsSet()) {
+            if (fTrace.majorIsSet()) {
                 throw new ParseException("major is already set"); //$NON-NLS-1$
             }
 
-            trace.setMajor(getMajorOrMinor(rightNode));
+            fTrace.setMajor(getMajorOrMinor(rightNode));
         } else if (left.equals(MetadataStrings.MINOR)) {
-            if (trace.minorIsSet()) {
+            if (fTrace.minorIsSet()) {
                 throw new ParseException("minor is already set"); //$NON-NLS-1$
             }
 
-            trace.setMinor(getMajorOrMinor(rightNode));
+            fTrace.setMinor(getMajorOrMinor(rightNode));
         } else if (left.equals(MetadataStrings.UUID_STRING)) {
             UUID uuid = getUUID(rightNode);
 
@@ -498,13 +498,13 @@ public class IOStructGen {
              * If uuid was already set by a metadata packet, compare it to see
              * if it matches
              */
-            if (trace.uuidIsSet()) {
-                if (trace.getUUID().compareTo(uuid) != 0) {
+            if (fTrace.uuidIsSet()) {
+                if (fTrace.getUUID().compareTo(uuid) != 0) {
                     throw new ParseException("UUID mismatch. Packet says " //$NON-NLS-1$
-                            + trace.getUUID() + " but metadata says " + uuid); //$NON-NLS-1$
+                            + fTrace.getUUID() + " but metadata says " + uuid); //$NON-NLS-1$
                 }
             } else {
-                trace.setUUID(uuid);
+                fTrace.setUUID(uuid);
             }
 
         } else if (left.equals(MetadataStrings.BYTE_ORDER)) {
@@ -514,16 +514,16 @@ public class IOStructGen {
              * If byte order was already set by a metadata packet, compare it to
              * see if it matches
              */
-            if (trace.getByteOrder() != null) {
-                if (trace.getByteOrder() != byteOrder) {
+            if (fTrace.getByteOrder() != null) {
+                if (fTrace.getByteOrder() != byteOrder) {
                     throw new ParseException(
                             "Endianness mismatch. Magic number says " //$NON-NLS-1$
-                                    + trace.getByteOrder()
+                                    + fTrace.getByteOrder()
                                     + " but metadata says " + byteOrder); //$NON-NLS-1$
                 }
             } else {
-                trace.setByteOrder(byteOrder);
-                final DeclarationScope parentScope = scope.getParentScope();
+                fTrace.setByteOrder(byteOrder);
+                final DeclarationScope parentScope = fScope.getParentScope();
 
                 for (String type : parentScope.getTypeNames()) {
                     IDeclaration d = parentScope.lookupType(type);
@@ -535,7 +535,7 @@ public class IOStructGen {
                 }
             }
         } else if (left.equals(MetadataStrings.PACKET_HEADER)) {
-            if (trace.packetHeaderIsSet()) {
+            if (fTrace.packetHeaderIsSet()) {
                 throw new ParseException("packet.header already defined"); //$NON-NLS-1$
             }
 
@@ -552,7 +552,7 @@ public class IOStructGen {
                 throw new ParseException("packet.header expects a struct"); //$NON-NLS-1$
             }
 
-            trace.setPacketHeader((StructDeclaration) packetHeaderDecl);
+            fTrace.setPacketHeader((StructDeclaration) packetHeaderDecl);
         } else {
             Activator.log(IStatus.WARNING, Messages.IOStructGen_UnknownTraceAttributeWarning + " " + left); //$NON-NLS-1$
         }
@@ -620,7 +620,7 @@ public class IOStructGen {
 
     private void parseStream(CommonTree streamNode) throws ParseException {
 
-        Stream stream = new Stream(trace);
+        Stream stream = new Stream(fTrace);
 
         List<CommonTree> children = streamNode.getChildren();
         if (children == null) {
@@ -648,13 +648,13 @@ public class IOStructGen {
         }
 
         if (stream.isIdSet()) {
-            if (!trace.packetHeaderIsSet()
-                    || !trace.getPacketHeader().hasField(MetadataStrings.STREAM_ID)) {
+            if (!fTrace.packetHeaderIsSet()
+                    || !fTrace.getPacketHeader().hasField(MetadataStrings.STREAM_ID)) {
                 throw new ParseException("Stream has an ID, but there is no stream_id field in packet header."); //$NON-NLS-1$
             }
         }
 
-        trace.addStream(stream);
+        fTrace.addStream(stream);
 
         popScope();
     }
@@ -783,7 +783,7 @@ public class IOStructGen {
          * stream
          */
         if (!event.streamIsSet()) {
-            if (trace.nbStreams() > 1) {
+            if (fTrace.nbStreams() > 1) {
                 throw new ParseException("Event without stream_id with more than one stream"); //$NON-NLS-1$
             }
 
@@ -793,7 +793,7 @@ public class IOStructGen {
              * could be possible to just get the only existing stream, whatever
              * is its id.
              */
-            Stream stream = trace.getStream(null);
+            Stream stream = fTrace.getStream(null);
 
             if (stream != null) {
                 event.setStream(stream);
@@ -849,7 +849,7 @@ public class IOStructGen {
 
             long streamId = getStreamID(rightNode);
 
-            Stream stream = trace.getStream(streamId);
+            Stream stream = fTrace.getStream(streamId);
 
             if (stream == null) {
                 throw new ParseException("Stream " + streamId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1337,7 +1337,7 @@ public class IOStructGen {
 
         /* The return value */
         FloatDeclaration floatDeclaration = null;
-        ByteOrder byteOrder = trace.getByteOrder();
+        ByteOrder byteOrder = fTrace.getByteOrder();
         long alignment = 0;
         int exponent = 8;
         int mantissa = 24;
@@ -1451,7 +1451,7 @@ public class IOStructGen {
         /* The return value */
         IntegerDeclaration integerDeclaration = null;
         boolean signed = false;
-        ByteOrder byteOrder = trace.getByteOrder();
+        ByteOrder byteOrder = fTrace.getByteOrder();
         long size = 0;
         long alignment = 0;
         int base = 10;
@@ -2553,7 +2553,7 @@ public class IOStructGen {
                     || strval.equals(MetadataStrings.NETWORK)) {
                 return ByteOrder.BIG_ENDIAN;
             } else if (strval.equals(MetadataStrings.NATIVE)) {
-                return trace.getByteOrder();
+                return fTrace.getByteOrder();
             } else {
                 throw new ParseException("Invalid value for byte order"); //$NON-NLS-1$
             }
@@ -2823,14 +2823,14 @@ public class IOStructGen {
      * Adds a new declaration scope on the top of the scope stack.
      */
     private void pushScope() {
-        scope = new DeclarationScope(scope);
+        fScope = new DeclarationScope(fScope);
     }
 
     /**
      * Removes the top declaration scope from the scope stack.
      */
     private void popScope() {
-        scope = scope.getParentScope();
+        fScope = fScope.getParentScope();
     }
 
     /**
@@ -2839,7 +2839,7 @@ public class IOStructGen {
      * @return The current declaration scope.
      */
     private DeclarationScope getCurrentScope() {
-        return scope;
+        return fScope;
     }
 
 }
