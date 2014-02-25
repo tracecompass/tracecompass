@@ -86,7 +86,7 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
             String line = rafile.getNextLine();
             while ((line != null) && (lineCount++ < MAX_LINES)) {
                 Matcher matcher = getFirstLinePattern().matcher(line);
-                if (matcher.find()) {
+                if (matcher.matches()) {
                     matches++;
                 }
                 confidence = MAX_CONFIDENCE * matches / lineCount;
@@ -140,11 +140,8 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
             String line = fFile.getNextLine();
             while (line != null) {
                 Matcher matcher = getFirstLinePattern().matcher(line);
-                if (matcher.find()) {
-                    context.setLocation(new TmfLongLocation(rawPos));
-                    context.firstLineMatcher = matcher;
-                    context.firstLine = line;
-                    context.nextLineLocation = fFile.getFilePointer();
+                if (matcher.matches()) {
+                    setupContext(context, rawPos, line, matcher);
                     return context;
                 }
                 rawPos = fFile.getFilePointer();
@@ -155,6 +152,13 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
             Activator.logError("Error seeking file: " + getPath(), e); //$NON-NLS-1$
             return context;
         }
+    }
+
+    private void setupContext(TextTraceContext context, long rawPos, String line, Matcher matcher) throws IOException {
+        context.setLocation(new TmfLongLocation(rawPos));
+        context.firstLineMatcher = matcher;
+        context.firstLine = line;
+        context.nextLineLocation = fFile.getFilePointer();
     }
 
     @Override
@@ -251,11 +255,8 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
             String line = fFile.getNextLine();
             while (line != null) {
                 Matcher matcher = getFirstLinePattern().matcher(line);
-                if (matcher.find()) {
-                    context.setLocation(new TmfLongLocation(rawPos));
-                    context.firstLineMatcher = matcher;
-                    context.firstLine = line;
-                    context.nextLineLocation = fFile.getFilePointer();
+                if (matcher.matches()) {
+                    setupContext(context, rawPos, line, matcher);
                     return event;
                 }
                 parseNextLine(event, line);
