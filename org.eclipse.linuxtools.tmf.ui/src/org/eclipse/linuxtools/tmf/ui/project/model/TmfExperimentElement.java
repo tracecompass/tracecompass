@@ -179,9 +179,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             removeChild(danglingChild);
         }
 
-        // Will be uncommented in a coming patch
         /* Update the analysis under this experiment */
-        //super.refreshChildren();
+        super.refreshChildren();
     }
 
     // ------------------------------------------------------------------------
