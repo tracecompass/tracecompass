@@ -27,19 +27,19 @@ public class CTFClock {
     private static final String FREQ = "freq"; //$NON-NLS-1$
     private static final String OFFSET = "offset"; //$NON-NLS-1$
 
-    private long clockOffset = 0;
-    private double clockScale = 1.0;
-    private double clockAntiScale = 1.0;
+    private long fClockOffset = 0;
+    private double fClockScale = 1.0;
+    private double fClockAntiScale = 1.0;
 
     /**
      * Field properties.
      */
-    private final Map<String, Object> properties = new HashMap<>();
+    private final Map<String, Object> fProperties = new HashMap<>();
     /**
      * Field name.
      */
-    private String name;
-    private boolean isScaled = false;
+    private String fName;
+    private boolean fIsScaled = false;
 
     /**
      * Default constructor
@@ -56,9 +56,9 @@ public class CTFClock {
      *            Object
      */
     public void addAttribute(String key, Object value) {
-        this.properties.put(key, value);
+        fProperties.put(key, value);
         if (key.equals(NAME)) {
-            this.name = (String) value;
+            fName = (String) value;
         }
         if (key.equals(FREQ)) {
             /*
@@ -68,13 +68,13 @@ public class CTFClock {
              * have a system with a frequency of > 1 600 000 000 GHz with
              * 200 ppm precision
              */
-            isScaled = !((Long) getProperty(FREQ)).equals(ONE_BILLION_L);
-            clockScale = ONE_BILLION_D / ((Long) getProperty(FREQ)).doubleValue();
-            clockAntiScale = 1.0 / clockScale;
+            fIsScaled = !((Long) getProperty(FREQ)).equals(ONE_BILLION_L);
+            fClockScale = ONE_BILLION_D / ((Long) getProperty(FREQ)).doubleValue();
+            fClockAntiScale = 1.0 / fClockScale;
 
         }
         if (key.equals(OFFSET)) {
-            clockOffset = (Long) getProperty(OFFSET);
+            fClockOffset = (Long) getProperty(OFFSET);
         }
     }
 
@@ -84,7 +84,7 @@ public class CTFClock {
      * @return String
      */
     public String getName() {
-        return name;
+        return fName;
     }
 
     /**
@@ -95,7 +95,7 @@ public class CTFClock {
      * @return Object
      */
     public Object getProperty(String key) {
-        return properties.get(key);
+        return fProperties.get(key);
     }
 
     /**
@@ -103,7 +103,7 @@ public class CTFClock {
      * @since 2.0
      */
     public long getClockOffset() {
-        return clockOffset;
+        return fClockOffset;
     }
 
     /**
@@ -111,7 +111,7 @@ public class CTFClock {
      * @since 2.0
      */
     public double getClockScale() {
-        return clockScale;
+        return fClockScale;
     }
 
     /**
@@ -119,7 +119,7 @@ public class CTFClock {
      * @since 2.0
      */
     public double getClockAntiScale() {
-        return clockAntiScale;
+        return fClockAntiScale;
     }
 
     /**
@@ -127,7 +127,7 @@ public class CTFClock {
      * @since 2.0
      */
     public boolean isClockScaled() {
-        return isScaled;
+        return fIsScaled;
     }
 
 }
