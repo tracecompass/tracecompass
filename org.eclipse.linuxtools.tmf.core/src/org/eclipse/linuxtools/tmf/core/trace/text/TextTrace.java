@@ -8,12 +8,14 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Marc-Andre Laperle - Add persistent index support
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace.text;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,11 +28,17 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
 
@@ -45,7 +53,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
  *
  * @since 3.0
  */
-public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements ITmfEventParser {
+public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
     private static final int MAX_LINES = 100;
@@ -327,4 +335,28 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
         return out;
     }
 
+    private static int fCheckpointSize = -1;
+
+    @Override
+    public synchronized int getCheckpointSize() {
+        if (fCheckpointSize == -1) {
+            TmfCheckpoint c = new TmfCheckpoint(TmfTimestamp.ZERO, new TmfLongLocation(0L), 0);
+            ByteBuffer b = ByteBuffer.allocate(ITmfCheckpoint.MAX_SERIALIZE_SIZE);
+            b.clear();
+            c.serialize(b);
+            fCheckpointSize = b.position();
+        }
+
+        return fCheckpointSize;
+    }
+
+    @Override
+    protected ITmfTraceIndexer createIndexer(int interval) {
+        return new TmfBTreeTraceIndexer(this, interval);
+    }
+
+    @Override
+    public ITmfLocation restoreLocation(ByteBuffer bufferIn) {
+        return new TmfLongLocation(bufferIn);
+    }
 }
