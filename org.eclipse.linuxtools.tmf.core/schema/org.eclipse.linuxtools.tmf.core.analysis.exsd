@@ -213,6 +213,9 @@
                <documentation>
                   The full ID of the analysis.
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.core.analysis/module/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -221,7 +224,7 @@
    <element name="analysisModuleClass">
       <annotation>
          <documentation>
-            The output will be associated with all modules extending or implementing the 'class' attribute.
+            The output will be associated with all modules extending or implementing the &apos;class&apos; attribute.
          </documentation>
       </annotation>
       <complexType>
