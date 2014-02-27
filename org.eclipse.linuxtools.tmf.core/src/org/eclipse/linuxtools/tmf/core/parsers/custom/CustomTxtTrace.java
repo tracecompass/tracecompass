@@ -141,7 +141,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             while (line != null) {
                 for (final InputLine input : getFirstLines()) {
                     final Matcher matcher = input.getPattern().matcher(line);
-                    if (matcher.find()) {
+                    if (matcher.matches()) {
                         context.setLocation(new TmfLongLocation(rawPos));
                         context.firstLineMatcher = matcher;
                         context.firstLine = line;
@@ -259,7 +259,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                 if (currentInput == null) {
                     for (final InputLine input : getFirstLines()) {
                         final Matcher matcher = input.getPattern().matcher(line);
-                        if (matcher.find()) {
+                        if (matcher.matches()) {
                             context.setLocation(new TmfLongLocation(rawPos));
                             context.firstLineMatcher = matcher;
                             context.firstLine = line;
@@ -274,7 +274,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                         if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
                             for (final InputLine input : getFirstLines()) {
                                 final Matcher matcher = input.getPattern().matcher(line);
-                                if (matcher.find()) {
+                                if (matcher.matches()) {
                                     context.setLocation(new TmfLongLocation(rawPos));
                                     context.firstLineMatcher = matcher;
                                     context.firstLine = line;
@@ -286,7 +286,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                         }
                         for (final InputLine input : nextInputs) {
                             final Matcher matcher = input.getPattern().matcher(line);
-                            if (matcher.find()) {
+                            if (matcher.matches()) {
                                 event.processGroups(input, matcher);
                                 currentInput = input;
                                 if (countMap.get(currentInput) == null) {
@@ -328,7 +328,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
                     }
                     if (!processed && currentInput != null) {
                         final Matcher matcher = currentInput.getPattern().matcher(line);
-                        if (matcher.find()) {
+                        if (matcher.matches()) {
                             event.processGroups(currentInput, matcher);
                             countMap.put(currentInput, countMap.get(currentInput) + 1);
                             if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
@@ -421,7 +421,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             while ((line != null) && (lineCount++ < MAX_LINES)) {
                 for (InputLine inputLine : fDefinition.inputs) {
                     Matcher matcher = inputLine.getPattern().matcher(line);
-                    if (matcher.find()) {
+                    if (matcher.matches()) {
                         matches++;
                         break;
                     }

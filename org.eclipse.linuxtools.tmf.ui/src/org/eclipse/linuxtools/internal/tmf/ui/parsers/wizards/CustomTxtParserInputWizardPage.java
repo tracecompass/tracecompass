@@ -681,7 +681,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         continue;
                     }
                     Matcher matcher = pattern.matcher(log);
-                    if (matcher.find()) {
+                    if (matcher.matches()) {
                         rootLineMatches++;
                         inputText.setStyleRange(new StyleRange(rawPos, length,
                                 COLOR_BLACK, COLOR_YELLOW, SWT.ITALIC));
@@ -706,7 +706,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                             if (currentInput == null) {
                                 for (InputLine input : definition.inputs) {
                                     matcher = input.getPattern().matcher(log);
-                                    if (matcher.find()) {
+                                    if (matcher.matches()) {
                                         continue event;
                                     }
                                 }
@@ -716,14 +716,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                     if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
                                         for (InputLine input : definition.inputs) {
                                             matcher = input.getPattern().matcher(log);
-                                            if (matcher.find()) {
+                                            if (matcher.matches()) {
                                                 continue event;
                                             }
                                         }
                                     }
                                     for (InputLine input : nextInputs) {
                                         matcher = input.getPattern().matcher(log);
-                                        if (matcher.find()) {
+                                        if (matcher.matches()) {
                                             inputText.setStyleRange(new StyleRange(rawPos, length,
                                                     COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
                                             currentInput = input;
@@ -769,7 +769,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                 }
                                 if (!processed && currentInput != null) {
                                     matcher = currentInput.getPattern().matcher(log);
-                                    if (matcher.find()) {
+                                    if (matcher.matches()) {
                                         inputText.setStyleRange(new StyleRange(rawPos, length,
                                                 COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
                                         updatePreviewLine(currentInput, matcher, data, rawPos, rootLineMatches);
