@@ -965,6 +965,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             fTrace.dispose();
         }
         fResourceManager.dispose();
+        fRawViewer.dispose();
         super.dispose();
     }
 
