@@ -27,6 +27,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -97,14 +99,18 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     // Histogram colors
+
+    // System colors, they do not need to be disposed
     private final Color fBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
     private final Color fSelectionForegroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
     private final Color fSelectionBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
     private final Color fLastEventColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
+    private final Color fFillColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+    // Application colors, they need to be disposed
+    private final Color fTimeRangeColor = new Color(Display.getCurrent(), 255, 128, 0);
     private final Color fHistoBarColor = new Color(Display.getDefault(), 74, 112, 139);
     private final Color fLostEventColor = new Color(Display.getCurrent(), 208, 62, 120);
-    private final Color fFillColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-    private final Color fTimeRangeColor = new Color(Display.getCurrent(), 255, 128, 0);
 
     // Drag states
     /**
@@ -232,8 +238,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         TmfSignalManager.deregister(this);
 
         fHistoBarColor.dispose();
-        fLastEventColor.dispose();
+        fLostEventColor.dispose();
         fTimeRangeColor.dispose();
+        fFont.dispose();
         fDataModel.removeHistogramListener(this);
     }
 
@@ -293,6 +300,15 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         canvasComposite.setLayoutData(gridData);
         canvasComposite.setLayout(new FillLayout());
         fCanvas = new Canvas(canvasComposite, SWT.DOUBLE_BUFFERED);
+        fCanvas.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                Object image = fCanvas.getData(IMAGE_KEY);
+                if (image instanceof Image) {
+                    ((Image) image).dispose();
+                }
+            }
+        });
 
         // Y-axis min event (always 0...)
         gridData = new GridData();
@@ -653,6 +669,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         // Retrieve image; re-create only if necessary
         Image image = (Image) fCanvas.getData(IMAGE_KEY);
         if (image == null || image.getBounds().width != canvasWidth || image.getBounds().height != canvasHeight) {
+            if (image != null) {
+                image.dispose();
+            }
             image = new Image(event.display, canvasWidth, canvasHeight);
             fCanvas.setData(IMAGE_KEY, image);
         }

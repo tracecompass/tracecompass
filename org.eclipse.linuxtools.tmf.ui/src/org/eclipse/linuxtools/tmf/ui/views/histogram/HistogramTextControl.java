@@ -135,6 +135,7 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
      * @since 2.0
      */
     public void dispose() {
+        fFont.dispose();
         TmfSignalManager.deregister(this);
     }
 

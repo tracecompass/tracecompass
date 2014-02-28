@@ -18,7 +18,6 @@ package org.eclipse.linuxtools.tmf.ui.views.histogram;
 import java.text.ParseException;
 
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -50,12 +49,6 @@ public class HistogramTimeRangeControl extends HistogramTextControl {
             String groupLabel, long value)
     {
         super(parentView, parent, groupLabel, value);
-        TmfSignalManager.register(this);
-    }
-
-    @Override
-    public void dispose() {
-        TmfSignalManager.deregister(this);
     }
 
     // ------------------------------------------------------------------------
