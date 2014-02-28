@@ -1210,6 +1210,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             if (e.character == SWT.CR) {
                                 updateHeader(newEditor.getText());
                                 applyHeader();
+
+                                // Set focus on the table so that the next carriage return goes to the next result
+                                TmfEventsTable.this.getTable().setFocus();
                             } else if (e.character == SWT.ESC) {
                                 tableEditor.getEditor().dispose();
                             }
