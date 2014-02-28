@@ -16,9 +16,11 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -45,6 +47,10 @@ public class OpenFileHandler extends AbstractHandler {
         try {
             IProject project = TmfHandlerUtil.getProjectFromSelection(HandlerUtil.getCurrentSelection(event));
             String projectName = project != null ? project.getName() : TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME;
+            if (project == null) {
+                project = TmfProjectRegistry.createProject(projectName, null, new NullProgressMonitor());
+            }
+
             oth.openTraceFromPath(projectName, filePath, shell);
         } catch (CoreException e) {
             Activator.getDefault().logError(e.getMessage(), e);
