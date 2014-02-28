@@ -618,28 +618,22 @@ public class TmfStatisticsViewer extends TmfViewer {
                          */
                         while(!ss.waitUntilBuilt(LIVE_UPDATE_DELAY)) {
                             Map<String, Long> map = stats.getEventTypesInRange(start, end);
-                            updateStats(isGlobal, map);
+                            updateStats(aTrace, isGlobal, map);
                         }
                         /* Query one last time for the final values */
                         Map<String, Long> map = stats.getEventTypesInRange(start, end);
-                        updateStats(isGlobal, map);
+                        updateStats(aTrace, isGlobal, map);
                     }
                 };
                 statsThread.start();
-                return;
             }
         }
     }
 
-    /**
-     * Whenever a trace's statistics back-end finishes computing the statistics
-     * for a given interval, it will send the StatsUpdated signal. This method
-     * will receive this signal and update the statistics view accordingly.
-     *
-     * @param sig
-     *            The signal that is received
+    /*
+     * Update statistics for a given trace
      */
-    private void updateStats(boolean isGlobal, Map<String, Long> eventsPerType) {
+    private void updateStats(ITmfTrace trace, boolean isGlobal, Map<String, Long> eventsPerType) {
 
         final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
         if (statsData == null) {
@@ -648,7 +642,7 @@ public class TmfStatisticsViewer extends TmfViewer {
         }
 
         Map<String, Long> map = eventsPerType;
-        String name = fTrace.getName();
+        String name = trace.getName();
 
         /*
          * "Global", "partial", "total", etc., it's all very confusing...
