@@ -14,7 +14,6 @@
 package org.eclipse.linuxtools.tmf.ui.swtbot.tests;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -23,7 +22,6 @@ import org.apache.log4j.varia.NullAppender;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -37,10 +35,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
-import org.eclipse.linuxtools.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -63,7 +59,6 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.views.properties.PropertySheet;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -75,7 +70,7 @@ import org.junit.Test;
  */
 public class ImportAndReadSmokeTest {
 
-    private static final String TRACING_PERSPECTIVE_ID = TracingPerspectiveFactory.ID;
+
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String TRACE_NAME = "synthetic-trace";
     private static final String TRACE_TYPE_NAME = "Generic CTF Trace";
@@ -90,71 +85,18 @@ public class ImportAndReadSmokeTest {
     /** Test Class setup */
     @BeforeClass
     public static void init() {
-        if (Display.getCurrent() != null && Display.getCurrent().getThread() == Thread.currentThread()) {
-            fail("SWTBot test needs to run in a non-UI thread. Make sure that \"Run in UI thread\" is unchecked in your launch configuration or"
-                    + " that useUIThread is set to false in the pom.xml");
-        }
+        SWTBotUtil.failIfUIThread();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 50000; /* 50 second timeout */
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
-        final List<SWTBotView> openViews = fBot.views();
-        for (SWTBotView view : openViews) {
-            if (view.getTitle().equals("Welcome")) {
-                view.close();
-                fBot.waitUntil(ConditionHelpers.ViewIsClosed(view));
-            }
-        }
+        SWTBotUtil.closeView("welcome", fBot);
 
-        switchToTracingPerspective();
+        SWTBotUtil.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        waitForJobs();
-    }
-
-    private static void switchToTracingPerspective() {
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                try {
-                    PlatformUI.getWorkbench().showPerspective(TRACING_PERSPECTIVE_ID, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-                } catch (WorkbenchException e) {
-                    fail(e.getMessage());
-                }
-            }
-        });
-    }
-
-    private static void focusMainWindow() {
-        for (SWTBotShell shellBot : fBot.shells()) {
-            if (shellBot.getText().toLowerCase().contains("eclipse")) {
-                shellBot.activate();
-            }
-        }
-    }
-
-    /**
-     * Waits for all Eclipse jobs to finish
-     */
-    protected static void waitForJobs() {
-        while (!Job.getJobManager().isIdle()) {
-            delay(100);
-        }
-    }
-
-    /**
-     * Sleeps current thread for a given time.
-     *
-     * @param waitTimeMillis
-     *            time in milliseconds to wait
-     */
-    protected static void delay(final long waitTimeMillis) {
-        try {
-            Thread.sleep(waitTimeMillis);
-        } catch (final InterruptedException e) {
-            // Ignored
-        }
+        SWTBotUtil.waitForJobs();
     }
 
     /**
@@ -180,7 +122,7 @@ public class ImportAndReadSmokeTest {
     }
 
     private static void createProject() {
-        focusMainWindow();
+        SWTBotUtil.focusMainWindow(fBot.shells());
         fBot.menu("File").menu("New").menu("Project...").click();
 
         fBot.waitUntil(Conditions.shellIsActive("New Project"));
@@ -208,7 +150,7 @@ public class ImportAndReadSmokeTest {
         text.setText(TRACE_PROJECT_NAME);
 
         fBot.button("Finish").click();
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
     }
 
     private static void batchImportOpenWizard() {
@@ -280,7 +222,7 @@ public class ImportAndReadSmokeTest {
         final SWTBotButton finishButton = fBot.button("Finish");
         finishButton.click();
         fBot.waitUntil(Conditions.shellCloses(shell));
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
     }
 
     private static TmfEventsEditor openEditor() {
@@ -303,8 +245,8 @@ public class ImportAndReadSmokeTest {
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(TRACE_NAME, treeItem.getNode(nodeName)));
         treeItem.getNode(nodeName).getNode(TRACE_NAME).select();
         treeItem.getNode(nodeName).getNode(TRACE_NAME).doubleClick();
-        delay(1000);
-        waitForJobs();
+        SWTBotUtil.delay(1000);
+        SWTBotUtil.waitForJobs();
 
         final IEditorPart iep[] = new IEditorPart[1];
         UIThreadRunnable.syncExec(new VoidResult() {
@@ -331,7 +273,7 @@ public class ImportAndReadSmokeTest {
         } catch (CoreException e) {
         }
 
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
 
         final SWTBotView projectViewBot = fBot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
         projectViewBot.setFocus();
@@ -347,7 +289,7 @@ public class ImportAndReadSmokeTest {
         fBot.waitUntil(Conditions.widgetIsEnabled(okButton));
         okButton.click();
 
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
     }
 
     // ---------------------------------------------
@@ -369,8 +311,8 @@ public class ImportAndReadSmokeTest {
             }
         });
 
-        waitForJobs();
-        delay(1000);
+        SWTBotUtil.waitForJobs();
+        SWTBotUtil.delay(1000);
 
         final CtfTmfEvent desiredEvent2 = getEvent(10000);
         SWTBotView hvBot = fBot.viewById(HistogramView.ID);
@@ -384,18 +326,18 @@ public class ImportAndReadSmokeTest {
         final TmfTimeSynchSignal signal = new TmfTimeSynchSignal(hv, desiredEvent1.getTimestamp());
         final TmfTimeSynchSignal signal2 = new TmfTimeSynchSignal(hv, desiredEvent2.getTimestamp());
         hv.updateTimeRange(100000);
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
         hv.currentTimeUpdated(signal);
         hv.broadcast(signal);
-        waitForJobs();
-        delay(1000);
+        SWTBotUtil.waitForJobs();
+        SWTBotUtil.delay(1000);
 
         hv.updateTimeRange(1000000000);
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
         hv.currentTimeUpdated(signal2);
         hv.broadcast(signal2);
-        waitForJobs();
-        delay(1000);
+        SWTBotUtil.waitForJobs();
+        SWTBotUtil.delay(1000);
         assertNotNull(hv);
     }
 

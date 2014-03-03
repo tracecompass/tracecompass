@@ -24,10 +24,7 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
@@ -40,10 +37,9 @@ import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.linuxtools.tmf.ui.swtbot.tests.SWTBotUtil;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -83,10 +79,7 @@ public class ImportAndReadKernelSmokeTest {
      */
     @BeforeClass
     public static void init() {
-        if (Display.getCurrent() != null && Display.getCurrent().getThread() == Thread.currentThread()) {
-            fail("SWTBot test needs to run in a non-UI thread. Make sure that \"Run in UI thread\" is unchecked in your launch configuration or"
-                    + " that useUIThread is set to false in the pom.xml");
-        }
+        SWTBotUtil.failIfUIThread();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 300000; /* 300 second timeout */
@@ -103,7 +96,7 @@ public class ImportAndReadKernelSmokeTest {
         /* Switch perspectives */
         switchKernelPerspective();
         /* Finish waiting for eclipse to load */
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
     }
 
     private static void switchKernelPerspective() {
@@ -127,34 +120,11 @@ public class ImportAndReadKernelSmokeTest {
     }
 
     /**
-     * Waits for all Eclipse jobs to finish
-     */
-    public static void waitForJobs() {
-        while (!Job.getJobManager().isIdle()) {
-            delay(100);
-        }
-    }
-
-    /**
-     * Sleeps current thread for a given time.
-     *
-     * @param waitTimeMillis
-     *            time in milliseconds to wait
-     */
-    protected static void delay(final long waitTimeMillis) {
-        try {
-            Thread.sleep(waitTimeMillis);
-        } catch (final InterruptedException e) {
-            // Ignored
-        }
-    }
-
-    /**
      * Main test case
      */
     @Test
     public void test() {
-        createProject();
+        SWTBotUtil.createProject(TRACE_PROJECT_NAME);
         openTrace();
         openEditor();
         testHV(getViewPart("Histogram"));
@@ -179,8 +149,8 @@ public class ImportAndReadKernelSmokeTest {
             fail(exception[0].getMessage());
         }
 
-        delay(1000);
-        waitForJobs();
+        SWTBotUtil.delay(1000);
+        SWTBotUtil.waitForJobs();
     }
 
     private void openEditor() {
@@ -213,24 +183,9 @@ public class ImportAndReadKernelSmokeTest {
             }
         });
 
-        waitForJobs();
-        delay(1000);
+        SWTBotUtil.waitForJobs();
+        SWTBotUtil.delay(1000);
         assertNotNull(tmfEd);
-    }
-
-    private static void createProject() {
-        /*
-         * Make a new test
-         */
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                IProject project = TmfProjectRegistry.createProject(TRACE_PROJECT_NAME, null, new NullProgressMonitor());
-                assertNotNull(project);
-            }
-        });
-
-        waitForJobs();
     }
 
     private static void testCFV(ControlFlowView vp) {
@@ -249,18 +204,18 @@ public class ImportAndReadKernelSmokeTest {
         final TmfTimeSynchSignal signal = new TmfTimeSynchSignal(hv, fDesired1.getTimestamp());
         final TmfTimeSynchSignal signal2 = new TmfTimeSynchSignal(hv, fDesired2.getTimestamp());
         hv.updateTimeRange(100000);
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
         hv.currentTimeUpdated(signal);
         hv.broadcast(signal);
-        waitForJobs();
-        delay(1000);
+        SWTBotUtil.waitForJobs();
+        SWTBotUtil.delay(1000);
 
         hv.updateTimeRange(1000000000);
-        waitForJobs();
+        SWTBotUtil.waitForJobs();
         hv.currentTimeUpdated(signal2);
         hv.broadcast(signal2);
-        waitForJobs();
-        delay(1000);
+        SWTBotUtil.waitForJobs();
+        SWTBotUtil.delay(1000);
         assertNotNull(hv);
     }
 
