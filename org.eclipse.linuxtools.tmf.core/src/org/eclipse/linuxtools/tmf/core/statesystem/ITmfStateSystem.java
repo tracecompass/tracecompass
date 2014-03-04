@@ -179,6 +179,30 @@ public interface ITmfStateSystem {
             throws AttributeNotFoundException;
 
     /**
+     * Return the sub-attributes of the target attribute, as a List of quarks,
+     * similarly to {@link #getSubAttributes(int, boolean)}, but with an added
+     * regex pattern to filter on the return attributes.
+     *
+     * @param quark
+     *            The attribute of which you want to sub-attributes. You can use
+     *            "-1" here to specify the root node.
+     * @param recursive
+     *            True if you want all recursive sub-attributes, false if you
+     *            only want the first level. Note that the returned value will
+     *            be flattened.
+     * @param pattern
+     *            The regular expression to match the attribute base name.
+     * @return A List of integers, matching the quarks of the sub-attributes
+     *         that match the regex. An empty list is returned if there is no
+     *         matching attribute.
+     * @throws AttributeNotFoundException
+     *             If the 'quark' was not existing or invalid.
+     * @since 3.0
+     */
+    List<Integer> getSubAttributes(int quark, boolean recursive, String pattern)
+            throws AttributeNotFoundException;
+
+    /**
      * Batch quark-retrieving method. This method allows you to specify a path
      * pattern which includes a wildcard "*" somewhere. It will check all the
      * existing attributes in the attribute tree and return those who match the

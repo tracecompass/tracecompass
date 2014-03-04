@@ -264,6 +264,20 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
+    public List<Integer> getSubAttributes(int quark, boolean recursive, String pattern)
+            throws AttributeNotFoundException {
+        List<Integer> all = getSubAttributes(quark, recursive);
+        List<Integer> ret = new LinkedList<>();
+        for (Integer attQuark : all) {
+            String name = getAttributeName(attQuark.intValue());
+            if (name.matches(pattern)) {
+                ret.add(attQuark);
+            }
+        }
+        return ret;
+    }
+
+    @Override
     public List<Integer> getQuarks(String... pattern) {
         List<Integer> quarks = new LinkedList<>();
         List<String> prefix = new LinkedList<>();
