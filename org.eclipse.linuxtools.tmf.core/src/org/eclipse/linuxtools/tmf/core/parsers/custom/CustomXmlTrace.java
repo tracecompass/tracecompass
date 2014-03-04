@@ -63,7 +63,7 @@ import org.xml.sax.SAXParseException;
  */
 public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
 
-    private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
+    private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
     private static final int DEFAULT_CACHE_SIZE = 100;
     private static final int MAX_LINES = 100;
     private static final int CONFIDENCE = 100;

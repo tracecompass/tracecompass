@@ -53,7 +53,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
  */
 public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
 
-    private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation((Long) null);
+    private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
     private static final int DEFAULT_CACHE_SIZE = 100;
     private static final int MAX_LINES = 100;
     private static final int MAX_CONFIDENCE = 100;
