@@ -73,11 +73,8 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
         @Override
         public Object[] getElements(Object inputElement) {
-            if (inputElement != null) {
-                try {
-                    return ((List<?>) inputElement).toArray(new ITmfTreeViewerEntry[0]);
-                } catch (ClassCastException e) {
-                }
+            if (inputElement instanceof ITmfTreeViewerEntry) {
+                return ((ITmfTreeViewerEntry) inputElement).getChildren().toArray(new ITmfTreeViewerEntry[0]);
             }
             return new ITmfTreeViewerEntry[0];
         }
@@ -381,14 +378,14 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                final List<ITmfTreeViewerEntry> entries = updateElements(start, end, isSelection);
+                final ITmfTreeViewerEntry rootEntry = updateElements(start, end, isSelection);
                 /* Set the input in main thread only if it didn't change */
-                if (entries != null) {
+                if (rootEntry != null) {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            if (entries != fTreeViewer.getInput()) {
-                                fTreeViewer.setInput(entries);
+                            if (rootEntry != fTreeViewer.getInput()) {
+                                fTreeViewer.setInput(rootEntry);
                             } else {
                                 fTreeViewer.refresh();
                             }
@@ -407,9 +404,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     /**
      * Update the entries to the given start/end time. An extra parameter
      * defines whether these times correspond to the selection or the visible
-     * range, as the viewer may update differently in those cases. If no update
-     * is necessary, the method should return <code>null</code>. To empty the
-     * tree, an empty list should be returned.
+     * range, as the viewer may update differently in those cases. This methods
+     * returns a root node that is not meant to be visible. The children of this
+     * 'fake' root node are the first level of entries that will appear in the
+     * tree. If no update is necessary, the method should return
+     * <code>null</code>. To empty the tree, a root node containing an empty
+     * list of children should be returned.
      *
      * This method is not called in the UI thread when using the default viewer
      * content update. Resource-intensive calculations here should not block the
@@ -422,18 +422,18 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      * @param isSelection
      *            <code>true</code> if this time range is for a selection,
      *            <code>false</code> for the visible time range
-     * @return The list of entries to display or <code>null</code> if no update
-     *         necessary
+     * @return The root entry of the list of entries to display or
+     *         <code>null</code> if no update necessary
      */
-    protected abstract List<ITmfTreeViewerEntry> updateElements(long start, long end, boolean isSelection);
+    protected abstract ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection);
 
     /**
      * Get the current input displayed by the viewer
      *
-     * @return The input of the tree viewer
+     * @return The input of the tree viewer, the root entry
      */
-    protected Object getInput() {
-        return fTreeViewer.getInput();
+    protected ITmfTreeViewerEntry getInput() {
+        return (ITmfTreeViewerEntry) fTreeViewer.getInput();
     }
 
     // ------------------------------------------------------------------------

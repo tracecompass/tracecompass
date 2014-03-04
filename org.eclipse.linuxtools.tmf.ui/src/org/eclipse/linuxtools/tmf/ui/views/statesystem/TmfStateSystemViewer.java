@@ -160,14 +160,14 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
     // ------------------------------------------------------------------------
 
     @Override
-    protected List<ITmfTreeViewerEntry> updateElements(long start, long end, boolean selection) {
+    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean selection) {
         if (getTrace() == null) {
             return null;
         }
 
-        List<ITmfTreeViewerEntry> entries = (List<ITmfTreeViewerEntry>) getInput();
+        ITmfTreeViewerEntry root = getInput();
 
-        if ((!selection) && (entries != null)) {
+        if ((!selection) && (root != null)) {
             return null;
         }
 
@@ -175,35 +175,38 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
          * Build the entries if it is the first time or to show only modified
          * values
          */
-        if (entries == null || fFilterStatus) {
-            entries = buildEntriesList(start);
-        } else {
+        if (root == null || fFilterStatus) {
+            root = buildEntries(start);
+        } else if (root instanceof TmfTreeViewerEntry) {
             /*
              * Update the values of the elements of the state systems at time
              * 'start'
              */
-            entries = updateEntriesList(entries, start);
+            updateEntriesList(((TmfTreeViewerEntry)root).getChildren(), start);
         }
 
-        return entries;
+        return root;
     }
 
-    private List<ITmfTreeViewerEntry> buildEntriesList(long timestamp) {
-        List<ITmfTreeViewerEntry> rootEntries = new ArrayList<>();
+    private ITmfTreeViewerEntry buildEntries(long timestamp) {
+        // 'Fake' root node
+        TmfTreeViewerEntry rootEntry = new TmfTreeViewerEntry(""); //$NON-NLS-1$
+
+        List<ITmfTreeViewerEntry> children = rootEntry.getChildren();
         for (final ITmfTrace currentTrace : TmfTraceManager.getTraceSet(getTrace())) {
             if (currentTrace == null) {
                 continue;
             }
-            buildEntriesForTrace(currentTrace, timestamp, rootEntries);
+            buildEntriesForTrace(currentTrace, timestamp, children);
         }
-        return rootEntries;
+        return rootEntry;
     }
 
     /*
      * Update the values of the entries. It will also create trace and state
      * system entries if they do not exist yet.
      */
-    private List<ITmfTreeViewerEntry> updateEntriesList(List<ITmfTreeViewerEntry> entries, long timestamp) {
+    private void updateEntriesList(List<ITmfTreeViewerEntry> entries, long timestamp) {
         for (final ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
             if (trace == null) {
                 continue;
@@ -253,7 +256,6 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
                 }
             }
         }
-        return entries;
     }
 
     @NonNull

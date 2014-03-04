@@ -14,6 +14,8 @@ package org.eclipse.linuxtools.tmf.ui.viewers.tree;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Interface for an entry (row) in a TMF tree viewer
  *
@@ -42,6 +44,7 @@ public interface ITmfTreeViewerEntry {
      *
      * @return an array of child elements
      */
+    @NonNull
     List<? extends ITmfTreeViewerEntry> getChildren();
 
     /**

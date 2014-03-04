@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.tmf.ui.viewers.tree;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Basic implementation of an entry for the TMF tree viewer. A name is all that is needed for this entry.
  *
@@ -27,6 +29,7 @@ public class TmfTreeViewerEntry implements ITmfTreeViewerEntry {
     private ITmfTreeViewerEntry fParent = null;
 
     /** List of child entries */
+    @NonNull
     private final List<ITmfTreeViewerEntry> fChildren = new CopyOnWriteArrayList<>();
 
     /** Name of this entry (default text to show in first column) */
