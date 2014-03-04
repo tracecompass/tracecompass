@@ -559,24 +559,30 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         closeEditors();
 
         IPath path = fResource.getLocation();
-        if (path != null && (getParent() instanceof TmfTraceFolder)) {
-            TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
+        if (path != null) {
+            if (getParent() instanceof TmfTraceFolder) {
+                TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
 
-            // Propagate the removal to traces
-            for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
-                List<ITmfProjectModelElement> toRemove = new LinkedList<>();
-                for (ITmfProjectModelElement child : experiment.getChildren()) {
-                    if (child.getName().equals(getName())) {
-                        toRemove.add(child);
+                // Propagate the removal to traces
+                for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
+                    List<ITmfProjectModelElement> toRemove = new LinkedList<>();
+                    for (ITmfProjectModelElement child : experiment.getChildren()) {
+                        if (child.getName().equals(getName())) {
+                            toRemove.add(child);
+                        }
+                    }
+                    for (ITmfProjectModelElement child : toRemove) {
+                        ((TmfExperimentElement) experiment).removeTrace((TmfTraceElement) child);
                     }
                 }
-                for (ITmfProjectModelElement child : toRemove) {
-                    ((TmfExperimentElement) experiment).removeTrace((TmfTraceElement) child);
-                }
-            }
 
-            // Delete supplementary files
-            deleteSupplementaryFolder();
+                // Delete supplementary files
+                deleteSupplementaryFolder();
+
+            } else if (getParent() instanceof TmfExperimentElement) {
+                TmfExperimentElement experimentElement = (TmfExperimentElement) getParent();
+                experimentElement.removeTrace(this);
+            }
         }
 
         // Finally, delete the trace
