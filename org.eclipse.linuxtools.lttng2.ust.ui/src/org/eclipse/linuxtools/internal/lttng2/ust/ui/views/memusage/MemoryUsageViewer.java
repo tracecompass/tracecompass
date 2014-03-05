@@ -20,7 +20,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
-import org.eclipse.linuxtools.lttng2.ust.ui.analysis.memory.UstMemoryAnalysisModule;
+import org.eclipse.linuxtools.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
