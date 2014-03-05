@@ -14,16 +14,20 @@ package org.eclipse.linuxtools.lttng2.kernel.core.event.matching;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.TcpEventStrings;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
-import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfEventTypeCollectionHelper;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Class to match tcp type events. This class applies to traces obtained with
@@ -41,6 +45,10 @@ public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
     private static final String[] key_seq = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.SEQ };
     private static final String[] key_ackseq = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.ACKSEQ };
     private static final String[] key_flags = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.FLAGS };
+
+    private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
+            TcpEventStrings.NET_DEV_QUEUE,
+            TcpEventStrings.NETIF_RECEIVE_SKB);
 
     private static boolean canMatchPacket(final ITmfEvent event) {
         TmfEventField field = (TmfEventField) event.getContent();
@@ -90,8 +98,10 @@ public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
             return false;
         }
         CtfTmfTrace ktrace = (CtfTmfTrace) trace;
-        String[] events = { TcpEventStrings.NET_DEV_QUEUE, TcpEventStrings.NETIF_RECEIVE_SKB };
-        return (ktrace.hasAtLeastOneOfEvents(events));
+
+        Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(ktrace.getContainedEventTypes());
+        traceEvents.retainAll(REQUIRED_EVENTS);
+        return !traceEvents.isEmpty();
     }
 
     @Override

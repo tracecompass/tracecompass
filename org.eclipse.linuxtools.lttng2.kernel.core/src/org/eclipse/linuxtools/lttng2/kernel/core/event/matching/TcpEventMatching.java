@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng2.kernel.core.event.matching;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.TcpEventStrings;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -22,7 +23,10 @@ import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfEventTypeCollectionHelper;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Class to match tcp type events. This matching class applies to traces
@@ -37,6 +41,10 @@ import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
  * @since 3.0
  */
 public class TcpEventMatching implements ITmfNetworkMatchDefinition {
+
+    private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
+            TcpEventStrings.INET_SOCK_LOCAL_IN,
+            TcpEventStrings.INET_SOCK_LOCAL_OUT);
 
     private static boolean canMatchPacket(final ITmfEvent event) {
         /* Make sure all required fields are present to match with this event */
@@ -90,8 +98,10 @@ public class TcpEventMatching implements ITmfNetworkMatchDefinition {
             return false;
         }
         CtfTmfTrace ktrace = (CtfTmfTrace) trace;
-        String[] events = { TcpEventStrings.INET_SOCK_LOCAL_IN, TcpEventStrings.INET_SOCK_LOCAL_OUT };
-        return ktrace.hasAtLeastOneOfEvents(events);
+
+        Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(ktrace.getContainedEventTypes());
+        traceEvents.retainAll(REQUIRED_EVENTS);
+        return !traceEvents.isEmpty();
     }
 
     @Override

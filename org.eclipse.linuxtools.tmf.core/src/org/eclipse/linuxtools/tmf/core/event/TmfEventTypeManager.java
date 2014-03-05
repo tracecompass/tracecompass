@@ -14,6 +14,9 @@ package org.eclipse.linuxtools.tmf.core.event;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A central repository for the available event types. Types are managed by
@@ -90,13 +93,14 @@ public final class TmfEventTypeManager {
      *
      * @param context the context to look into
      * @return the list of types defined for that context
+     * @since 3.0
      */
-    public synchronized ITmfEventType[] getTypes(final String context) {
+    public synchronized Set<ITmfEventType> getTypes(final String context) {
         final HashMap<String, ITmfEventType> types = fEventTypes.get(context);
         if (types != null) {
-            return types.values().toArray(new ITmfEventType[types.size()]);
+            return ImmutableSet.copyOf(types.values());
         }
-        return new ITmfEventType[0];
+        return ImmutableSet.of();
     }
 
     /**

@@ -16,7 +16,10 @@ package org.eclipse.linuxtools.tmf.ctf.core;
 
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -29,12 +32,17 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.tmf.ctf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventTypeManager;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceProperties;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
@@ -44,6 +52,8 @@ import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * The CTf trace handler
  *
@@ -52,7 +62,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
  */
 public class CtfTmfTrace extends TmfTrace
         implements ITmfEventParser, ITmfTraceProperties, ITmfPersistentlyIndexable,
-        AutoCloseable {
+        ITmfTraceWithPreDefinedEvents, AutoCloseable {
 
     // -------------------------------------------
     // Constants
@@ -116,7 +126,29 @@ public class CtfTmfTrace extends TmfTrace
                 this.setStartTime(curTime);
                 this.setEndTime(curTime);
             }
+            /*
+             * Register every event type. When you call getType, it will
+             * register a trace to that type in the TmfEventTypeManager
+             */
+            try (CtfIterator iter = CtfIteratorManager.getIterator(this, ctx)) {
+                for (IEventDeclaration ied : iter.getEventDeclarations()) {
+                    CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(this, ied.getName());
+                    if (ctfTmfEventType == null) {
+                        List<ITmfEventField> content = new ArrayList<>();
+                        /* Should only return null the first time */
+                        for (String fieldName : ied.getFields().getFieldsList()) {
+                            content.add(new TmfEventField(fieldName, null, null));
+                        }
+                        ITmfEventField contentTree = new TmfEventField(
+                                ITmfEventField.ROOT_FIELD_ID,
+                                null,
+                                content.toArray(new ITmfEventField[content.size()])
+                                );
 
+                        ctfTmfEventType = new CtfTmfEventType(ied.getName(), this, contentTree);
+                    }
+                }
+            }
         } catch (final CTFReaderException e) {
             /*
              * If it failed at the init(), we can assume it's because the file
@@ -348,60 +380,15 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * Returns whether or not an event is in the metadata of the trace,
-     * therefore if it can possibly be in the trace. It does not verify whether
-     * or not the event is actually in the trace
+     * Gets the list of declared events
      *
-     * @param eventName
-     *            The name of the event to check
-     * @return Whether the event is in the metadata or not
-     * @since 2.1
+     * @since 3.0
      */
-    public boolean hasEvent(final String eventName) {
-        Map<Long, IEventDeclaration> events = fTrace.getEvents(0L);
-        if (events != null) {
-            for (IEventDeclaration decl : events.values()) {
-                if (decl.getName().equals(eventName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Return whether all requested events are in the metadata
-     *
-     * @param names
-     *            The array of events to check for
-     * @return Whether all events are in the metadata
-     * @since 2.1
-     */
-    public boolean hasAllEvents(String[] names) {
-        for (String name : names) {
-            if (!hasEvent(name)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns whether the metadata contains at least one of the requested
-     * events
-     *
-     * @param names
-     *            The array of event names of check for
-     * @return Whether one of the event is present in trace metadata
-     * @since 2.1
-     */
-    public boolean hasAtLeastOneOfEvents(String[] names) {
-        for (String name : names) {
-            if (hasEvent(name)) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public Set<ITmfEventType> getContainedEventTypes() {
+        TmfEventTypeManager instance = TmfEventTypeManager.getInstance();
+        Set<ITmfEventType> eventTypes = instance.getTypes(CtfTmfEventType.computeContextName(this));
+        return ImmutableSet.copyOf(eventTypes);
     }
 
     // -------------------------------------------

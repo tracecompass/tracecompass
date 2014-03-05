@@ -20,10 +20,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
@@ -31,6 +35,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.TmfEventTypeCollectionHelper;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfLocation;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfLocationInfo;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
@@ -84,7 +89,6 @@ public class CtfTmfTraceTest {
     public void testCtfTmfTrace() {
         try (CtfTmfTrace result = new CtfTmfTrace();) {
             assertNotNull(result);
-            assertNull(result.getEventType());
             assertEquals(1000, result.getCacheSize());
             assertEquals(0L, result.getNbEvents());
             assertEquals(0L, result.getStreamingInterval());
@@ -111,6 +115,15 @@ public class CtfTmfTraceTest {
     public void testBroadcast() {
         TmfSignal signal = new TmfEndSynchSignal(1);
         fixture.broadcast(signal);
+    }
+
+    /**
+     * Run the void dispose() method test.
+     */
+    @Test
+    public void testClose() {
+        try (CtfTmfTrace emptyFixture = new CtfTmfTrace();) {
+        }
     }
 
     /**
@@ -147,12 +160,11 @@ public class CtfTmfTraceTest {
      * Test the seekEvent() method with a location from a timestamp.
      */
     @Test
-    public void testSeekEventLoc_timetamp(){
+    public void testSeekEventLoc_timetamp() {
         CtfLocation loc = new CtfLocation(new CtfTmfTimestamp(0L));
         fixture.seekEvent(loc);
         assertNotNull(fixture);
     }
-
 
     /**
      * Run the ITmfTimestamp getEndTime() method test.
@@ -170,16 +182,27 @@ public class CtfTmfTraceTest {
     public void testGetEnvValue() {
         String key = "tracer_name";
         String result = fixture.getTraceProperties().get(key);
-        assertEquals("\"lttng-modules\"",result);
+        assertEquals("\"lttng-modules\"", result);
     }
 
     /**
-     * Run the Class<CtfTmfEvent> getEventType() method test.
+     * Test the {@link CtfTmfTrace#getEventType()} method.
      */
     @Test
     public void testGetEventType() {
-        Class<? extends ITmfEvent> result = fixture.getEventType();
+        Class<?> result = fixture.getEventType();
         assertNotNull(result);
+        assertEquals(CtfTmfEvent.class, result);
+    }
+
+    /**
+     * Run the Class<CtfTmfEvent> getContainedEventTypes() method test.
+     */
+    @Test
+    public void testGetContainedEventTypes() {
+        Set<ITmfEventType> result = fixture.getContainedEventTypes();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
     }
 
     /**
@@ -342,14 +365,20 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testEventLookup() {
-        assertTrue(fixture.hasEvent("sched_switch"));
-        assertFalse(fixture.hasEvent("Sched_switch"));
+        Set<ITmfEventType> eventTypes = fixture.getContainedEventTypes();
+        Set<String> eventNames = TmfEventTypeCollectionHelper.getEventNames(eventTypes);
+        assertTrue(eventNames.contains("sched_switch"));
+        assertFalse(eventNames.contains("Sched_switch"));
         String[] events = { "sched_switch", "sched_wakeup", "timer_init" };
-        assertTrue(fixture.hasAllEvents(events));
-        assertTrue(fixture.hasAtLeastOneOfEvents(events));
+        assertTrue(eventNames.containsAll(Arrays.asList(events)));
+        Set<String> copy = new HashSet<>(eventNames);
+        copy.retainAll(Arrays.asList(events));
+        assertFalse(copy.isEmpty());
         String[] names = { "inexistent", "sched_switch", "SomeThing" };
-        assertTrue(fixture.hasAtLeastOneOfEvents(names));
-        assertFalse(fixture.hasAllEvents(names));
+        copy = new HashSet<>(eventNames);
+        copy.retainAll(Arrays.asList(names));
+        assertTrue(!copy.isEmpty());
+        assertFalse(eventNames.containsAll(Arrays.asList(names)));
     }
 
     /**
