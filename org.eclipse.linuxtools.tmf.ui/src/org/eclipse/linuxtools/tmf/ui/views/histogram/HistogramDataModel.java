@@ -14,14 +14,19 @@
  *   Francois Chouinard - Added support for empty initial buckets
  *   Patrick Tasse - Support selection range
  *   Jean-Christian Kouamé, Simon Delisle - Added support to manage lost events
+ *   Xavier Raynaud - Support multi-trace coloring
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 
 /**
  * Histogram-independent data model.
@@ -85,9 +90,13 @@ public class HistogramDataModel implements IHistogramDataModel {
     // Attributes
     // ------------------------------------------------------------------------
 
+    // Trace management
+    private ITmfTrace fTrace = null;
+    private final Map<ITmfTrace, Integer> fTraceMap = new LinkedHashMap<>();
+
     // Bucket management
     private final int fNbBuckets;
-    private final long[] fBuckets;
+    private final HistogramBucket[] fBuckets;
     private final long[] fLostEventsBuckets;
     private long fBucketDuration;
     private long fNbEvents;
@@ -148,7 +157,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     public HistogramDataModel(long startTime, int nbBuckets) {
         fFirstBucketTime = fFirstEventTime = fEndTime = startTime;
         fNbBuckets = nbBuckets;
-        fBuckets = new long[nbBuckets];
+        fBuckets = new HistogramBucket[nbBuckets];
         fLostEventsBuckets = new long[nbBuckets];
         fModelListeners = new ListenerList();
         clear();
@@ -162,7 +171,10 @@ public class HistogramDataModel implements IHistogramDataModel {
      */
     public HistogramDataModel(HistogramDataModel other) {
         fNbBuckets = other.fNbBuckets;
-        fBuckets = Arrays.copyOf(other.fBuckets, fNbBuckets);
+        fBuckets = new HistogramBucket[fNbBuckets];
+        for (int i = 0; i < fNbBuckets; i++) {
+            fBuckets[i] = new HistogramBucket(other.fBuckets[i]);
+        }
         fLostEventsBuckets = Arrays.copyOf(other.fLostEventsBuckets, fNbBuckets);
         fBucketDuration = Math.max(other.fBucketDuration, 1);
         fNbEvents = other.fNbEvents;
@@ -227,6 +239,65 @@ public class HistogramDataModel implements IHistogramDataModel {
      */
     public long getStartTime() {
         return fFirstEventTime;
+    }
+
+    /**
+     * Sets the trace of this model.
+     * @param trace - a {@link ITmfTrace}
+     * @since 3.0
+     */
+    public void setTrace(ITmfTrace trace) {
+        this.fTrace = trace;
+        fTraceMap.clear();
+        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
+        if (traces != null) {
+            int i = 0;
+            for (ITmfTrace tr : traces) {
+                fTraceMap.put(tr, i);
+                i++;
+            }
+        }
+    }
+
+    /**
+     * Gets the trace of this model.
+     * @return a {@link ITmfTrace}
+     * @since 3.0
+     */
+    public ITmfTrace getTrace() {
+        return this.fTrace;
+    }
+
+    /**
+     * Gets the traces names of this model.
+     * @return an array of trace names
+     * @since 3.0
+     */
+    public String[] getTraceNames() {
+        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
+        if (traces == null) {
+            return new String[0];
+        }
+        String[] traceNames = new String[traces.length];
+        int i = 0;
+        for (ITmfTrace tr : traces) {
+            traceNames[i] = tr.getName();
+            i++;
+        }
+        return traceNames;
+    }
+
+    /**
+     * Gets the number of traces of this model.
+     * @return the number of traces of this model.
+     * @since 3.0
+     */
+    public int getNbTraces() {
+        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
+        if (traces == null) {
+            return 1; //
+        }
+        return traces.length;
     }
 
     /**
@@ -354,7 +425,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      */
     @Override
     public void clear() {
-        Arrays.fill(fBuckets, 0);
+        Arrays.fill(fBuckets, null);
         Arrays.fill(fLostEventsBuckets, 0);
         fNbEvents = 0;
         fFirstBucketTime = 0;
@@ -403,10 +474,12 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            The current event Count (for notification purposes)
      * @param timestamp
      *            The timestamp of the event to count
-     *
+     * @param trace
+     *            The event trace
+     * @since 3.0
      */
     @Override
-    public void countEvent(long eventCount, long timestamp) {
+    public void countEvent(long eventCount, long timestamp, ITmfTrace trace) {
 
         // Validate
         if (timestamp < 0) {
@@ -414,7 +487,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         }
 
         // Set the start/end time if not already done
-        if ((fFirstBucketTime == 0) && (fLastBucket == 0) && (fBuckets[0] == 0) && (timestamp > 0)) {
+        if ((fFirstBucketTime == 0) && (fLastBucket == 0) && (fBuckets[0] == null) && (timestamp > 0)) {
             fFirstBucketTime = timestamp;
             fFirstEventTime = timestamp;
             updateEndTime();
@@ -456,7 +529,14 @@ public class HistogramDataModel implements IHistogramDataModel {
 
         // Increment the right bucket
         int index = (int) ((timestamp - fFirstBucketTime) / fBucketDuration);
-        fBuckets[index]++;
+        if (fBuckets[index] == null) {
+            fBuckets[index] = new HistogramBucket(getNbTraces());
+        }
+        Integer traceIndex = fTraceMap.get(trace);
+        if (traceIndex == null) {
+            traceIndex = 0;
+        }
+        fBuckets[index].addEvent(traceIndex);
         fNbEvents++;
         if (fLastBucket < index) {
             fLastBucket = index;
@@ -546,14 +626,17 @@ public class HistogramDataModel implements IHistogramDataModel {
         for (int i = 0; i < nbBars; i++) {
             int count = 0;
             int countLostEvent = 0;
+            result.fData[i] = new HistogramBucket(getNbTraces());
             for (int j = i * bucketsPerBar; j < ((i + 1) * bucketsPerBar); j++) {
                 if (fNbBuckets <= j) {
                     break;
                 }
-                count += fBuckets[j];
+                if (fBuckets[j] != null) {
+                    count += fBuckets[j].getNbEvents();
+                    result.fData[i].add(fBuckets[j]);
+                }
                 countLostEvent += fLostEventsBuckets[j];
             }
-            result.fData[i] = count;
             result.fLostEventsData[i] = countLostEvent;
             result.fLastBucket = i;
             if (result.fMaxValue < count) {
@@ -592,10 +675,10 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     private void mergeBuckets() {
         for (int i = 0; i < (fNbBuckets / 2); i++) {
-            fBuckets[i] = fBuckets[2 * i] + fBuckets[(2 * i) + 1];
+            fBuckets[i] = new HistogramBucket(fBuckets[2 * i], fBuckets[(2 * i) + 1]);
             fLostEventsBuckets[i] = fLostEventsBuckets[2 * i] + fLostEventsBuckets[(2 * i) + 1];
         }
-        Arrays.fill(fBuckets, fNbBuckets / 2, fNbBuckets, 0);
+        Arrays.fill(fBuckets, fNbBuckets / 2, fNbBuckets, null);
         Arrays.fill(fLostEventsBuckets, fNbBuckets / 2, fNbBuckets, 0);
         fBucketDuration *= 2;
         updateEndTime();
@@ -604,12 +687,12 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     private void moveBuckets(int offset) {
         for (int i = fNbBuckets - 1; i >= offset; i--) {
-            fBuckets[i] = fBuckets[i - offset];
+            fBuckets[i] = new HistogramBucket(fBuckets[i - offset]);
             fLostEventsBuckets[i] = fLostEventsBuckets[i - offset];
         }
 
         for (int i = 0; i < offset; i++) {
-            fBuckets[i] = 0;
+            fBuckets[i] = null;
             fLostEventsBuckets[i] = 0;
         }
     }

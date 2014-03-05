@@ -14,6 +14,7 @@
  *   Francois Chouinard - Cleanup and refactoring
  *   Francois Chouinard - Moved from LTTng to TMF
  *   Patrick Tasse - Update for mouse wheel zoom
+ *   Xavier Raynaud - Support multi-trace coloring
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -38,18 +39,23 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IActionBars;
@@ -118,12 +124,18 @@ public class HistogramView extends TmfView {
     private static TimeRangeHistogram fTimeRangeHistogram;
     private HistogramRequest fTimeRangeRequest;
 
+    // Legend area
+    private Composite fLegendArea;
+    private Image[] fLegendImages;
+
     // Throttlers for the time sync and time-range sync signals
     private final TmfSignalThrottler fTimeSyncThrottle;
     private final TmfSignalThrottler fTimeRangeSyncThrottle;
 
     // Action for toggle showing the lost events
     private Action hideLostEventsAction;
+    // Action for toggle showing the traces
+    private Action showTraceAction;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -291,6 +303,10 @@ public class HistogramView extends TmfView {
         // Histogram
         fFullTraceHistogram = new FullTraceHistogram(this, fullRangeComposite);
 
+        fLegendArea = new Composite(viewComposite, SWT.FILL);
+        fLegendArea.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false, 2, 1));
+        fLegendArea.setLayout(new RowLayout());
+
         // Add mouse wheel listener to time span control
         MouseWheelListener listener = fFullTraceHistogram.getZoom();
         fTimeSpanControl.addMouseWheelListener(listener);
@@ -368,6 +384,32 @@ public class HistogramView extends TmfView {
             hideLostEventsAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SHOW_LOST_EVENTS));
         }
         return hideLostEventsAction;
+    }
+
+    /**
+     * get the show trace action
+     *
+     * @return The action object
+     * @since 3.0
+     */
+    public Action getShowTraceAction() {
+        if (showTraceAction == null) {
+            /* show lost events */
+            showTraceAction = new Action(Messages.HistogramView_showTraces, IAction.AS_CHECK_BOX) {
+                @Override
+                public void run() {
+                    Histogram.showTraces = showTraceAction.isChecked();
+                    fFullTraceHistogram.fCanvas.redraw();
+                    fTimeRangeHistogram.fCanvas.redraw();
+                    updateLegendArea();
+                }
+            };
+            showTraceAction.setChecked(true);
+            showTraceAction.setText(Messages.HistogramView_showTraces);
+            showTraceAction.setToolTipText(Messages.HistogramView_showTraces);
+            showTraceAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SHOW_HIST_TRACES));
+        }
+        return showTraceAction;
     }
 
     // ------------------------------------------------------------------------
@@ -537,6 +579,18 @@ public class HistogramView extends TmfView {
         fSelectionEndControl.setValue(Long.MIN_VALUE);
 
         fTimeSpanControl.setValue(Long.MIN_VALUE);
+
+        for (Control c: fLegendArea.getChildren()) {
+            c.dispose();
+        }
+        if (fLegendImages != null) {
+            for (Image i: fLegendImages) {
+                i.dispose();
+            }
+        }
+        fLegendImages = null;
+        fLegendArea.layout();
+        fLegendArea.getParent().layout();
     }
 
     /**
@@ -671,6 +725,7 @@ public class HistogramView extends TmfView {
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setTimeRange(startTime, duration);
         fTimeRangeHistogram.setSelection(selectionBeginTime, selectionEndTime);
+        fTimeRangeHistogram.fDataModel.setTrace(fTrace);
 
         if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
@@ -679,6 +734,7 @@ public class HistogramView extends TmfView {
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fFullTraceHistogram.setTimeRange(startTime, duration);
         fFullTraceHistogram.setSelection(selectionBeginTime, selectionEndTime);
+        fFullTraceHistogram.fDataModel.setTrace(fTrace);
 
         fWindowStartTime = startTime;
         fWindowSpan = duration;
@@ -691,10 +747,49 @@ public class HistogramView extends TmfView {
 
         fTimeSpanControl.setValue(duration);
 
+        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
+        if (traces != null) {
+            this.showTraceAction.setEnabled(traces.length < fFullTraceHistogram.getMaxNbTraces());
+        }
+        updateLegendArea();
+
         if (!fullRange.equals(TmfTimeRange.NULL_RANGE)) {
             sendTimeRangeRequest(startTime, startTime + duration);
             sendFullRangeRequest(fullRange);
         }
+    }
+
+    private void updateLegendArea() {
+        for (Control c: fLegendArea.getChildren()) {
+            c.dispose();
+        }
+        if (fLegendImages != null) {
+            for (Image i: fLegendImages) {
+                i.dispose();
+            }
+        }
+        fLegendImages = null;
+        if (fFullTraceHistogram.showTraces()) {
+            ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
+            fLegendImages = new Image[traces.length];
+            int traceIndex = 0;
+            for (ITmfTrace trace : traces) {
+                fLegendImages[traceIndex] = new Image(fLegendArea.getDisplay(), 16, 16);
+                GC gc = new GC(fLegendImages[traceIndex]);
+                gc.setBackground(fFullTraceHistogram.getTraceColor(traceIndex));
+                gc.fillRectangle(0, 0, 15, 15);
+                gc.setForeground(fLegendArea.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+                gc.drawRectangle(0, 0, 15, 15);
+                gc.dispose();
+
+                CLabel label = new CLabel(fLegendArea, SWT.NONE);
+                label.setText(trace.getName());
+                label.setImage(fLegendImages[traceIndex]);
+                traceIndex++;
+            }
+        }
+        fLegendArea.layout();
+        fLegendArea.getParent().layout();
     }
 
     private void updateDisplayedSelectionTime(long beginTime, long endTime) {
@@ -761,6 +856,7 @@ public class HistogramView extends TmfView {
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         bars.getToolBarManager().add(getShowLostEventsAction());
+        bars.getToolBarManager().add(getShowTraceAction());
         bars.getToolBarManager().add(new Separator());
     }
 

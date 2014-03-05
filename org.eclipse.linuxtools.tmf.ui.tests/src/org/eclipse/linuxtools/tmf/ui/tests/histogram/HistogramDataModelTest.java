@@ -22,6 +22,8 @@ import static org.junit.Assert.fail;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramBucket;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramDataModel;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramScaledData;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramModelListener;
@@ -34,6 +36,14 @@ public class HistogramDataModelTest {
 
     private static final double DELTA = 1e-15;
 
+    private final static HistogramBucket _0 = new HistogramBucket(new int[] {0});
+    private final static HistogramBucket _1 = new HistogramBucket(new int[] {1});
+    private final static HistogramBucket _2 = new HistogramBucket(new int[] {2});
+    private final static HistogramBucket _4 = new HistogramBucket(new int[] {4});
+    private final static HistogramBucket _9 = new HistogramBucket(new int[] {9});
+    private final static HistogramBucket _20 = new HistogramBucket(new int[] {20});
+    private final static HistogramBucket _24 = new HistogramBucket(new int[] {24});
+
     /**
      * Test method for {@link HistogramDataModel#HistogramDataModel()}.
      */
@@ -41,6 +51,16 @@ public class HistogramDataModelTest {
     public void testHistogramDataModel() {
         HistogramDataModel model = new HistogramDataModel();
         testModelConsistency(model, HistogramDataModel.DEFAULT_NUMBER_OF_BUCKETS,0, 1, 0 , 0 , 0 , HistogramDataModel.DEFAULT_NUMBER_OF_BUCKETS);
+    }
+
+    /**
+     * Test method for {@link HistogramDataModel#HistogramDataModel(HistogramDataModel)}.
+     */
+    @Test
+    public void testHistogramDataModelCopyConstructor() {
+        HistogramDataModel model = new HistogramDataModel();
+        HistogramDataModel copy = new HistogramDataModel(model);
+        testModelConsistency(copy, HistogramDataModel.DEFAULT_NUMBER_OF_BUCKETS,0, 1, 0 , 0 , 0 , HistogramDataModel.DEFAULT_NUMBER_OF_BUCKETS);
     }
 
     /**
@@ -54,31 +74,31 @@ public class HistogramDataModelTest {
     }
 
     /**
-     * Test methods for {@link HistogramDataModel#countEvent(long,long)}.
+     * Test methods for {@link HistogramDataModel#countEvent(long,long, ITmfTrace)}.
      */
     @Test
     public void testClear() {
         final int nbBuckets = 100;
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
-        model.countEvent(0, -1);
+        model.countEvent(0, -1, null);
 
         testModelConsistency(model, nbBuckets, 0, 1, 0, 0, 0, nbBuckets);
     }
 
     /**
-     * Test methods for {@link HistogramDataModel#countEvent(long,long)}.
+     * Test methods for {@link HistogramDataModel#countEvent(long,long, ITmfTrace)}.
      */
     @Test
     public void testCountEvent_0() {
         final int nbBuckets = 100;
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
-        model.countEvent(0, -1);
+        model.countEvent(0, -1, null);
 
         testModelConsistency(model, nbBuckets, 0, 1, 0, 0, 0, nbBuckets);
     }
 
     /**
-     * Test methods for {@link HistogramDataModel#countEvent(long,long)} and
+     * Test methods for {@link HistogramDataModel#countEvent(long,long, ITmfTrace)} and
      * {@link HistogramDataModel#scaleTo(int,int,int)}.
      */
     @Test
@@ -91,14 +111,14 @@ public class HistogramDataModelTest {
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
 
         for (int i = 0; i < result.fData.length; i++) {
-            assertEquals(0, result.fData[i]);
+            assertEquals(_0, result.fData[i]);
         }
 
         testModelConsistency(model, nbBuckets, 0, 1, 0, 0, 0, nbBuckets);
     }
 
     /**
-     * Test methods for {@link HistogramDataModel#countEvent(long,long)} and
+     * Test methods for {@link HistogramDataModel#countEvent(long,long, ITmfTrace)} and
      * {@link HistogramDataModel#scaleTo(int,int,int)}.
      */
     @Test
@@ -107,10 +127,10 @@ public class HistogramDataModelTest {
         final int maxHeight = 10;
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
-        model.countEvent(0, 1);
+        model.countEvent(0, 1, null);
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
-        assertEquals(1, result.fData[0]);
+        assertEquals(_1, result.fData[0]);
 
         assertArrayEqualsInt(0, result.fData,1);
 
@@ -118,7 +138,7 @@ public class HistogramDataModelTest {
     }
 
     /**
-     * Test methods for {@link HistogramDataModel#countEvent(long,long)} and
+     * Test methods for {@link HistogramDataModel#countEvent(long,long, ITmfTrace)} and
      * {@link HistogramDataModel#scaleTo(int,int,int)}.
      */
     @Test
@@ -137,7 +157,7 @@ public class HistogramDataModelTest {
     }
 
     /**
-     * Test methods for {@link HistogramDataModel#countEvent(long,long)} and
+     * Test methods for {@link HistogramDataModel#countEvent(long,long,ITmfTrace)} and
      * {@link HistogramDataModel#scaleTo(int,int,int)}.
      */
     @Test
@@ -148,8 +168,8 @@ public class HistogramDataModelTest {
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         // to different to call elsewhere
         for (int i = 0; i < nbBuckets; i++) {
-            model.countEvent(i, i);
-            model.countEvent(i + 1, i);
+            model.countEvent(i, i, null);
+            model.countEvent(i + 1, i, null);
         }
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
@@ -161,7 +181,7 @@ public class HistogramDataModelTest {
 
 
     /**
-     * Test methods for {@link HistogramDataModel#countEvent(long,long)} and
+     * Test methods for {@link HistogramDataModel#countEvent(long,long,ITmfTrace)} and
      * {@link HistogramDataModel#scaleTo(int,int,int)}.
      */
     @Test
@@ -172,7 +192,7 @@ public class HistogramDataModelTest {
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         for (int i = startTime; i < startTime + nbBuckets; i++) {
-            model.countEvent(i, i);
+            model.countEvent(i, i, null);
         }
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
@@ -212,7 +232,7 @@ public class HistogramDataModelTest {
         final int nbBuckets = 10;
         final int maxHeight = 10;
         final int nbEvents = nbBuckets / 2;
-        final int[] expectedResult = new int[] { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _1, _1, _1, _1, _1, _0, _0, _0, _0, _0 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -232,7 +252,7 @@ public class HistogramDataModelTest {
         final int nbBuckets = 10;
         final int maxHeight = 10;
         final int nbEvents = nbBuckets;
-        final int[] expectedResult = new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _1, _1, _1, _1, _1, _1, _1, _1, _1, _1 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -252,7 +272,7 @@ public class HistogramDataModelTest {
         final int nbBuckets = 10;
         final int maxHeight = 10;
         final int nbEvents = 2 * nbBuckets;
-        final int[] expectedResult = new int[] { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _2, _2, _2, _2, _2, _2, _2, _2, _2, _2 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -272,7 +292,7 @@ public class HistogramDataModelTest {
         final int nbBuckets = 10;
         final int maxHeight = 10;
         final int nbEvents = 3 * nbBuckets;
-        final int[] expectedResult = new int[] { 4, 4, 4, 4, 4, 4, 4, 2, 0, 0 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _4, _4, _4, _4, _4, _4, _4, _2, _0, _0 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -292,7 +312,7 @@ public class HistogramDataModelTest {
         final int nbBuckets = 100;
         final int maxHeight = 20;
         final int nbEvents = 2 * nbBuckets;
-        final int[] expectedResult = new int[] { 20, 20, 20, 20, 20, 20, 20, 20, 20, 20 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _20, _20, _20, _20, _20, _20, _20, _20, _20, _20 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -312,7 +332,7 @@ public class HistogramDataModelTest {
         final int nbBuckets = 100;
         final int maxHeight = 24;
         final int nbEvents = 2 * nbBuckets + 1;
-        final int[] expectedResult = new int[] { 24, 24, 24, 24, 24, 24, 24, 24, 9, 0 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _24, _24, _24, _24, _24, _24, _24, _24, _9, _0 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -344,7 +364,7 @@ public class HistogramDataModelTest {
         // -> buckets per bar = 50 / 2 + 1 = 26
         // -> first entry in expected result is 26 * 4 = 104
         // -> second entry in expected result is 22 * 4 + 9 = 97
-        final int[] expectedResult = new int[] { 104, 97 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { new HistogramBucket(new int[] {104}) , new HistogramBucket(new int[] {97}) };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -387,7 +407,7 @@ public class HistogramDataModelTest {
         // buckets in (model) per bar = last bucket id / nbBars + 1 (plus 1 to
         // cover all used buckets)
         // -> buckets per bar = 50 / 10 + 1 = 6
-        final int[] expectedResult = new int[] { 21, 24, 24, 24, 24, 24, 24, 24, 12, 0 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { new HistogramBucket(new int[] {21}), _24, _24, _24, _24, _24, _24, _24, new HistogramBucket(new int[] {12}), _0 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countInvertedEvents(nbEvents, model);
@@ -416,7 +436,7 @@ public class HistogramDataModelTest {
 
     private static void countInvertedEvents(final int nbEvents, HistogramDataModel model) {
         for (int i = nbEvents - 1; i >= 0; i--) {
-            model.countEvent(i, i);
+            model.countEvent(i, i, null);
         }
     }
 
@@ -514,7 +534,7 @@ public class HistogramDataModelTest {
         final int nbLostEvents_0 = 4;
         final int nbLostEvents_1 = 9;
         final int nbCombinedEvents = nbEvents + 2;
-        final int[] expectedResult = new int[] { 4, 4, 4, 4, 4, 4, 4, 2, 0, 0 };
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _4, _4, _4, _4, _4, _4, _4, _2, _0, _0 };
         final int[] expectedLostEventsResult = new int[] { 0, 2, 2, 0, 3, 3, 3, 0, 0, 0 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
@@ -656,7 +676,7 @@ public class HistogramDataModelTest {
 
     private static void countEventsInModel(final int nbEvents, HistogramDataModel model, int offset, int startTime) {
         for (int i = startTime; i < nbEvents + startTime; i++) {
-            model.countEvent(i + offset, i);
+            model.countEvent(i + offset, i, null);
         }
     }
 
@@ -670,13 +690,13 @@ public class HistogramDataModelTest {
         assertEquals(timeLimit, model.getTimeLimit());
     }
 
-    private static void assertArrayEqualsInt(final int val , int[] result) {
+    private static void assertArrayEqualsInt(final int val , HistogramBucket[] result) {
         assertArrayEqualsInt(val, result, 0);
     }
 
-    private static void assertArrayEqualsInt(final int val , int[] result, int startVal ) {
+    private static void assertArrayEqualsInt(final int val , HistogramBucket[] result, int startVal ) {
         for (int i = startVal; i < result.length; i++) {
-            assertEquals(val, result[i]);
+            assertEquals(val, result[i].getNbEvents());
         }
     }
 

@@ -12,6 +12,7 @@
  *   Francois Chouinard - Cleanup and refactoring
  *   Francois Chouinard - Moved from LTTng to TMF
  *   Simon Delisle - Added a new parameter to the constructor
+ *   Xavier Raynaud - Support multi-trace coloring
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -97,7 +98,7 @@ public class HistogramRequest extends TmfEventRequest {
 
             } else { /* handle lost event */
                 long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                fHistogram.countEvent(getNbRead(), timestamp);
+                fHistogram.countEvent(getNbRead(), timestamp, event.getTrace());
             }
         }
     }

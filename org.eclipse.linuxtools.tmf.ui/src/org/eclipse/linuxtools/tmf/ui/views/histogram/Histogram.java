@@ -11,6 +11,7 @@
  *   Bernd Hufmann - Changed to updated histogram data model
  *   Francois Chouinard - Reformat histogram labels on format change
  *   Patrick Tasse - Support selection range
+ *   Xavier Raynaud - Support multi-trace coloring
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
@@ -108,8 +109,31 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private final Color fFillColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
     // Application colors, they need to be disposed
+    private final Color[] fHistoBarColors = new Color[] {new Color(Display.getDefault(), 90, 90, 255), // blue
+            new Color(Display.getDefault(), 0, 240, 0), // green
+            new Color(Display.getDefault(), 255, 0, 0), // red
+            new Color(Display.getDefault(), 0, 255, 255), // cyan
+            new Color(Display.getDefault(), 255, 80, 255), // magenta
+            new Color(Display.getDefault(), 200, 200, 0), // yellow
+            new Color(Display.getDefault(), 200, 150, 0), // brown
+            new Color(Display.getDefault(), 150, 255, 150), // light green
+            new Color(Display.getDefault(), 200, 80, 80), // dark red
+            new Color(Display.getDefault(), 30, 150, 150), // dark cyan
+            new Color(Display.getDefault(), 200, 200, 255), // light blue
+            new Color(Display.getDefault(), 0, 120, 0), // dark green
+            new Color(Display.getDefault(), 255, 150, 150), // lighter red
+            new Color(Display.getDefault(), 140, 80, 140), // dark magenta
+            new Color(Display.getDefault(), 150, 100, 50), // brown
+            new Color(Display.getDefault(), 255, 80, 80), // light red
+            new Color(Display.getDefault(), 200, 200, 200), // light grey
+            new Color(Display.getDefault(), 255, 200, 80), // orange
+            new Color(Display.getDefault(), 255, 255, 80), // pale yellow
+            new Color(Display.getDefault(), 255, 200, 200), // pale red
+            new Color(Display.getDefault(), 255, 200, 255), // pale magenta
+            new Color(Display.getDefault(), 255, 255, 200), // pale pale yellow
+            new Color(Display.getDefault(), 200, 255, 255), // pale pale blue
+    };
     private final Color fTimeRangeColor = new Color(Display.getCurrent(), 255, 128, 0);
-    private final Color fHistoBarColor = new Color(Display.getDefault(), 74, 112, 139);
     private final Color fLostEventColor = new Color(Display.getCurrent(), 208, 62, 120);
 
     // Drag states
@@ -203,6 +227,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     private int fOffset = 0;
 
+    /**
+     * show the traces or not
+     * @since 3.0
+     */
+    static boolean showTraces = true;
+
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
@@ -236,9 +266,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     public void dispose() {
         TmfSignalManager.deregister(this);
-
-        fHistoBarColor.dispose();
         fLostEventColor.dispose();
+        for (Color c : fHistoBarColors) {
+            c.dispose();
+        }
         fTimeRangeColor.dispose();
         fFont.dispose();
         fDataModel.removeHistogramListener(this);
@@ -414,6 +445,36 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         return fMaxNbEventsText;
     }
 
+    /**
+     * Return <code>true</code> if the traces must be displayed in the histogram,
+     * <code>false</code> otherwise.
+     * @return whether the traces should be displayed
+     * @since 3.0
+     */
+    public boolean showTraces() {
+        return showTraces && fDataModel.getNbTraces() < getMaxNbTraces();
+    }
+
+    /**
+     * Returns the maximum number of traces the histogram can display with separate colors.
+     * If there is more traces, histogram will use only one color to display them.
+     * @return the maximum number of traces the histogram can display.
+     * @since 3.0
+     */
+    public int getMaxNbTraces() {
+        return fHistoBarColors.length;
+    }
+
+    /**
+     * Returns the color used to display the trace at the given index.
+     * @param traceIndex a trace index
+     * @return a {@link Color}
+     * @since 3.0
+     */
+    public Color getTraceColor(int traceIndex) {
+        return fHistoBarColors[traceIndex % fHistoBarColors.length];
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -441,16 +502,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         synchronized (fDataModel) {
             fScaledData = null;
         }
-    }
-
-    /**
-     * Increase the histogram bucket corresponding to [timestamp]
-     *
-     * @param eventCount The new event count
-     * @param timestamp The latest timestamp
-     */
-    public void countEvent(final long eventCount, final long timestamp) {
-        fDataModel.countEvent(eventCount, timestamp);
     }
 
     /**
@@ -517,7 +568,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
         case SWT.HOME:
             index = 0;
-            while (index < fScaledData.fLastBucket && fScaledData.fData[index] == 0) {
+            while (index < fScaledData.fLastBucket && fScaledData.fData[index].isEmpty()) {
                 index++;
             }
             if (index < fScaledData.fLastBucket) {
@@ -527,7 +578,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
         case SWT.ARROW_RIGHT:
             index = Math.max(0, fScaledData.fSelectionBeginBucket + 1);
-            while (index < fScaledData.fWidth && fScaledData.fData[index] == 0) {
+            while (index < fScaledData.fWidth && fScaledData.fData[index].isEmpty()) {
                 index++;
             }
             if (index < fScaledData.fLastBucket) {
@@ -537,7 +588,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
         case SWT.END:
             index = fScaledData.fLastBucket;
-            while (index >= 0 && fScaledData.fData[index] == 0) {
+            while (index >= 0 && fScaledData.fData[index].isEmpty()) {
                 index--;
             }
             if (index >= 0) {
@@ -547,7 +598,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
         case SWT.ARROW_LEFT:
             index = Math.min(fScaledData.fLastBucket - 1, fScaledData.fSelectionBeginBucket - 1);
-            while (index >= 0 && fScaledData.fData[index] == 0) {
+            while (index >= 0 && fScaledData.fData[index].isEmpty()) {
                 index--;
             }
             if (index >= 0) {
@@ -703,8 +754,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             // Draw the histogram bars
             final int limit = width < scaledData.fWidth ? width : scaledData.fWidth;
             double factor = HistogramScaledData.hideLostEvents ? scaledData.fScalingFactor : scaledData.fScalingFactorCombined;
+            final boolean showTracesColors = showTraces();
             for (int i = 0; i < limit; i++) {
-                final int value = (int) Math.ceil(scaledData.fData[i] * factor);
+                HistogramBucket hb = scaledData.fData[i];
+                int totalNbEvents = hb.getNbEvents();
+                int value = (int) Math.ceil(totalNbEvents * factor);
                 int x = i + fOffset;
 
                 // in Linux, the last pixel in a line is not drawn,
@@ -720,8 +774,24 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 }
 
                 // then draw normal events second, to overwrite that extra pixel
-                imageGC.setForeground(fHistoBarColor);
-                imageGC.drawLine(x, height - value, x, height);
+                if (!hb.isEmpty()) {
+                    if (showTracesColors) {
+                        for (int traceIndex = 0; traceIndex < hb.getNbTraces(); traceIndex++) {
+                            int nbEventsForTrace = hb.getNbEvent(traceIndex);
+                            if (nbEventsForTrace > 0) {
+                                Color c = fHistoBarColors[traceIndex % fHistoBarColors.length];
+                                imageGC.setForeground(c);
+                                imageGC.drawLine(x, height - value, x, height);
+                                totalNbEvents -= nbEventsForTrace;
+                                value = (int) Math.ceil(totalNbEvents * scaledData.fScalingFactor);
+                            }
+                        }
+                    } else {
+                        Color c = fHistoBarColors[0];
+                        imageGC.setForeground(c);
+                        imageGC.drawLine(x, height - value, x, height);
+                    }
+                }
             }
 
             // Draw the selection bars
@@ -919,7 +989,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             startTime = 0;
         }
         final long endTime = fScaledData.getBucketEndTime(index);
-        final int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
+        final int nbEvents = (index >= 0) ? fScaledData.fData[index].getNbEvents() : 0;
         final String newLine = System.getProperty("line.separator"); //$NON-NLS-1$
         final StringBuffer buffer = new StringBuffer();
         int selectionBeginBucket = Math.min(fScaledData.fSelectionBeginBucket, fScaledData.fSelectionEndBucket);
