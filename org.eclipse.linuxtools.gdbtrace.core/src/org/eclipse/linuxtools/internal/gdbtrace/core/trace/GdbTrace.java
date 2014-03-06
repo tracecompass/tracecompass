@@ -17,10 +17,14 @@ package org.eclipse.linuxtools.internal.gdbtrace.core.trace;
 
 import java.io.File;
 
+import org.eclipse.cdt.dsf.gdb.IGDBLaunchConfigurationConstants;
+import org.eclipse.cdt.dsf.gdb.IGdbDebugPreferenceConstants;
+import org.eclipse.cdt.dsf.gdb.internal.GdbPlugin;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.gdbtrace.core.Activator;
@@ -46,6 +50,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
  * @author Francois Chouinard
  * @author Matthew Khouzam
  */
+@SuppressWarnings("restriction")
 public class GdbTrace extends TmfTrace implements ITmfEventParser {
 
     // ------------------------------------------------------------------------
@@ -53,7 +58,6 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
     // ------------------------------------------------------------------------
 
     private static final int CACHE_SIZE = 20;
-    private static final String GDB_EXECUTABLE = "gdb"; //$NON-NLS-1$
 
     /** The qualified name for the 'executable' persistent property */
     public static final QualifiedName EXEC_KEY = new QualifiedName(GdbTraceCorePlugin.PLUGIN_ID, "executable"); //$NON-NLS-1$
@@ -100,7 +104,12 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
             if (tracedExecutable == null) {
                 throw new TmfTraceException(Messages.GdbTrace_ExecutableNotSet);
             }
-            fGdbTpRef = new DsfGdbAdaptor(this, GDB_EXECUTABLE, path, tracedExecutable);
+
+            String defaultGdbCommand = Platform.getPreferencesService().getString(GdbPlugin.PLUGIN_ID,
+                    IGdbDebugPreferenceConstants.PREF_DEFAULT_GDB_COMMAND,
+                    IGDBLaunchConfigurationConstants.DEBUGGER_DEBUG_NAME_DEFAULT, null);
+
+            fGdbTpRef = new DsfGdbAdaptor(this, defaultGdbCommand, path, tracedExecutable);
             fNbFrames = fGdbTpRef.getNumberOfFrames();
         } catch (CoreException e) {
             throw new TmfTraceException(Messages.GdbTrace_FailedToInitializeTrace, e);

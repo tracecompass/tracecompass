@@ -11,22 +11,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
  org.eclipse.linuxtools.tmf.core;bundle-version="3.0.0",
- org.eclipse.linuxtools.tmf.ui;bundle-version="3.0.0"
+ org.eclipse.linuxtools.tmf.ui;bundle-version="3.0.0",
+ org.eclipse.cdt.dsf,
+ org.eclipse.cdt.dsf.gdb
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.linuxtools.internal.gdbtrace.core;x-friends:="org.eclipse.linuxtools.gdbtrace.core.tests",
  org.eclipse.linuxtools.internal.gdbtrace.core.event;x-friends:="org.eclipse.linuxtools.gdbtrace.ui",
  org.eclipse.linuxtools.internal.gdbtrace.core.trace;x-friends:="org.eclipse.linuxtools.gdbtrace.ui"
-Import-Package: org.eclipse.cdt.dsf.concurrent,
- org.eclipse.cdt.dsf.datamodel,
- org.eclipse.cdt.dsf.debug.service,
- org.eclipse.cdt.dsf.debug.service.command,
- org.eclipse.cdt.dsf.gdb.internal,
- org.eclipse.cdt.dsf.gdb.internal.ui,
- org.eclipse.cdt.dsf.gdb.launching,
- org.eclipse.cdt.dsf.gdb.service,
- org.eclipse.cdt.dsf.mi.service,
- org.eclipse.cdt.dsf.mi.service.command,
- org.eclipse.cdt.dsf.mi.service.command.output,
- org.eclipse.cdt.dsf.service
