@@ -36,6 +36,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -74,6 +75,11 @@ public class TmfTraceManagerTest {
 
         trace1.indexTrace(true);
         trace2.indexTrace(true);
+
+        // Deregister traces from signal manager so that they don't
+        // interfere with the TmfTraceManager tests
+        TmfSignalManager.deregister(trace1);
+        TmfSignalManager.deregister(trace2);
     }
 
     /**
@@ -92,6 +98,15 @@ public class TmfTraceManagerTest {
         while (tm.getActiveTrace() != null) {
             closeTrace(tm.getActiveTrace());
         }
+    }
+
+    /**
+     * Test class clean-up
+     */
+    @AfterClass
+    public static void tearDownClass() {
+        CtfTmfTestTrace.TRACE2.dispose();
+        CtfTmfTestTrace.KERNEL.dispose();
     }
 
     // ------------------------------------------------------------------------
@@ -654,6 +669,9 @@ public class TmfTraceManagerTest {
         ITmfTrace[] traces = new ITmfTrace[] { t1, t2 };
         TmfExperiment exp = new TmfExperiment(ITmfEvent.class, "test-exp", traces);
         exp.indexTrace(true);
+        // Deregister experiment from signal manager so that it doesn't
+        // interfere with the TmfTraceManager tests
+        TmfSignalManager.deregister(exp);
         return exp;
     }
 
