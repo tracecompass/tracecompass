@@ -610,6 +610,8 @@ The Histogram View displays the trace events distribution with respect to time. 
 
 The '''Hide Lost Events''' toggle button [[Image:images/hide_lost_events.gif]] in the local toolbar allows to hide the bars of lost events. When the button is selected it can be toggled again to show the lost events.
 
+The '''Activate Trace Coloring''' toggle button [[Image:images/show_hist_traces.gif]] in the local toolbar allows to use separate colors for each trace of an experiment. Note that this feature is not available if your experiment contains more than twenty two traces. When activated, a legend is displayed at the bottom on the histogram view.
+
 On the top left, there are three text controls:
 
 * '''Selection Start''': Displays the start time of the current selection
