@@ -88,7 +88,7 @@
          point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
       <type
             icon="icons/obj16/gdb_icon16.png"
-            tracetype="org.eclipse.linuxtools.gdbtrace.core.type.gdb">
+            tracetype="org.eclipse.linuxtools.gdbtrace.ui.type.gdb">
          <eventsTableType
                class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventsTable">
          </eventsTableType>
