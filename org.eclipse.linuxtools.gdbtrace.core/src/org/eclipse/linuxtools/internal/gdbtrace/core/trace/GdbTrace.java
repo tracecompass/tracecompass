@@ -201,7 +201,7 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
      * @param rank
      *            the rank
      */
-    public void selectFrame(long rank) {
+    public synchronized void selectFrame(long rank) {
         fGdbTpRef.selectDataFrame(rank, true);
     }
 }

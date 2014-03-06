@@ -104,7 +104,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     private int fCacheSize = ITmfTrace.DEFAULT_TRACE_CACHE_SIZE;
 
     // The number of events collected (so far)
-    private long fNbEvents = 0;
+    private volatile long fNbEvents = 0;
 
     // The time span of the event stream
     private ITmfTimestamp fStartTime = TmfTimestamp.BIG_BANG;
@@ -411,7 +411,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     // ------------------------------------------------------------------------
 
     @Override
-    public synchronized long getNbEvents() {
+    public long getNbEvents() {
         return fNbEvents;
     }
 
