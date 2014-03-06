@@ -204,6 +204,9 @@ public final class TmfTraceTypeUIUtils {
         TreeSet<Pair<Integer, TraceTypeHelper>> validCandidates = new TreeSet<>(comparator);
         final Iterable<TraceTypeHelper> traceTypeHelpers = type.getTraceTypeHelpers();
         for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
+            if (traceTypeHelper.isExperimentType()) {
+                continue;
+            }
             int confidence = traceTypeHelper.validateWithConfidence(path);
             if (confidence >= 0) {
                 // insert in the tree map, ordered by confidence (highest confidence first) then name
