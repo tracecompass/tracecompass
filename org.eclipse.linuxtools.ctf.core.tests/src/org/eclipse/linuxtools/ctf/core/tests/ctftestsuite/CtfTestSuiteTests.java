@@ -110,7 +110,7 @@ public class CtfTestSuiteTests {
 
     private static boolean testIsBlacklisted(String fullPath) {
         for (String ignoredTest : IGNORED_TESTS) {
-            if (fullPath.contains(ignoredTest)) {
+            if (fullPath.contains(new File(ignoredTest).getPath())) {
                 return true;
             }
         }
