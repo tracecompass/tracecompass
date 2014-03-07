@@ -18,7 +18,7 @@
   <get ignoreerrors="true" dest="hello-lost.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/hello-lost.tar.bz2" />
   <get ignoreerrors="true" dest="cyg-profile.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/cyg-profile.tar.bz2" />
   <get ignoreerrors="true" dest="funky_trace.tar.bz2" skipexisting="true" src="http://www.dorsal.polymtl.ca/~alexmont/data/funky_trace.tar.bz2" />
-  <exec executable = "git" failifexecutionfails="false">
+  <exec executable = "git" failifexecutionfails="false" timeout="20000">
     <arg value = "clone"/>
     <arg value = "https://github.com/efficios/ctf-testsuite.git"/>
   </exec>
@@ -43,7 +43,7 @@
 </target>
 
 <target name="pullTestSuite" if="testSuiteExists">
-  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite">
+  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
     <arg value = "pull"/>
   </exec>
 </target>
