@@ -26,8 +26,8 @@ import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -44,9 +44,9 @@ public class EventContextTest {
     /* We use test trace #2, kernel_vm, which has event contexts */
     private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL_VM;
 
-    private static CtfTmfTrace fixture;
-    private static long startTime;
-    private static long endTime;
+    private CtfTmfTrace fixture;
+    private long startTime;
+    private long endTime;
 
     // ------------------------------------------------------------------------
     // Class  methods
@@ -58,8 +58,8 @@ public class EventContextTest {
      * @throws TmfTraceException
      *             If the test trace is not found
      */
-    @BeforeClass
-    public static void setUp() throws TmfTraceException {
+    @Before
+    public void setUp() throws TmfTraceException {
         assumeTrue(testTrace.exists());
         fixture = new CtfTmfTrace();
         fixture.initTrace((IResource) null, testTrace.getPath(), CtfTmfEvent.class);
@@ -72,8 +72,8 @@ public class EventContextTest {
     /**
      * Perform post-class clean-up.
      */
-    @AfterClass
-    public static void tearDown() {
+    @After
+    public void tearDown() {
         if (fixture != null) {
             fixture.dispose();
         }

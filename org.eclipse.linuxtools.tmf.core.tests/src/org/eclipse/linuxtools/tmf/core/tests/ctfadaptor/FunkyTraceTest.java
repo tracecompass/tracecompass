@@ -24,8 +24,8 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -51,7 +51,7 @@ public class FunkyTraceTest {
     private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.FUNKY_TRACE;
     private static final double DELTA = 0.0000001;
 
-    private static CtfTmfTrace fTrace;
+    private CtfTmfTrace fTrace;
 
     // ------------------------------------------------------------------------
     // Setup
@@ -60,8 +60,8 @@ public class FunkyTraceTest {
     /**
      * Test setup
      */
-    @BeforeClass
-    public static void setupClass() {
+    @Before
+    public void setup() {
         assumeTrue(testTrace.exists());
         fTrace = testTrace.getTrace();
         fTrace.indexTrace(true);
@@ -70,9 +70,11 @@ public class FunkyTraceTest {
     /**
      * Clean-up
      */
-    @AfterClass
-    public static void tearDownClass() {
-        fTrace.dispose();
+    @After
+    public void tearDown() {
+        if (fTrace != null) {
+            fTrace.dispose();
+        }
     }
 
     // ------------------------------------------------------------------------

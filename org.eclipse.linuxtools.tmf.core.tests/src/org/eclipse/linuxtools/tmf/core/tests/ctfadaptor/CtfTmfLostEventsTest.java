@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -48,13 +48,13 @@ public class CtfTmfLostEventsTest {
 
     private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.HELLO_LOST;
 
-    private static CtfTmfTrace fixture = null;
+    private CtfTmfTrace fixture = null;
 
     /**
      * Class setup
      */
-    @BeforeClass
-    public static void setUpClass() {
+    @Before
+    public void setUp() {
         assumeTrue(testTrace.exists());
         fixture = testTrace.getTrace();
         fixture.indexTrace(true);
@@ -63,8 +63,8 @@ public class CtfTmfLostEventsTest {
     /**
      * Clean-up
      */
-    @AfterClass
-    public static void tearDownClass() {
+    @After
+    public void tearDown() {
         if (fixture != null) {
             fixture.dispose();
         }
