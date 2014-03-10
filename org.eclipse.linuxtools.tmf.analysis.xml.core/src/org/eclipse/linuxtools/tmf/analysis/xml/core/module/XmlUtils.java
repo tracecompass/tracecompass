@@ -51,7 +51,7 @@ public class XmlUtils {
     private static final String XML_DIRECTORY = "xml_files"; //$NON-NLS-1$
 
     /** Name of the XSD schema file */
-    private static final String XSD = "xmldefinition.xsd"; //$NON-NLS-1$
+    private static final String XSD = "xmlDefinition.xsd"; //$NON-NLS-1$
 
     /** Make this class non-instantiable */
     private XmlUtils() {

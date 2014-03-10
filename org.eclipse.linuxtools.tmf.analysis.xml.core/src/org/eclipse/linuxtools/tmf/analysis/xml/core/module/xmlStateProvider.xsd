@@ -13,14 +13,6 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	attributeFormDefault="unqualified" elementFormDefault="qualified">
 
-	<xs:element name="tmfxml">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="stateProvider" type="stateProvider" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
 	<xs:complexType name="stateProvider">
 		<xs:sequence maxOccurs="1" minOccurs="1">
 			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headProvider" />
@@ -28,7 +20,7 @@
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" />
 			<xs:element maxOccurs="unbounded" minOccurs="1" name="eventHandler" type="eventHandler" />
 		</xs:sequence>
-		<xs:attribute name="analysisId" type="xs:string" use="required" />
+		<xs:attribute name="id" type="xs:string" use="required" />
 		<xs:attribute name="version" type="xs:integer" use="required" />
 	</xs:complexType>
 
@@ -36,7 +28,7 @@
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="traceType">
 				<xs:complexType>
-					<xs:attribute name="id" />
+					<xs:attribute name="id" use="required" />
 				</xs:complexType>
 			</xs:element>
 			<xs:element maxOccurs="1" minOccurs="0" name="label">
@@ -45,19 +37,6 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="definedValue">
-		<xs:attribute name="name" type="xs:string" use="required" />
-		<xs:attribute name="value" type="xs:string" use="required" />
-	</xs:complexType>
-
-	<xs:complexType name="location">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
-		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" use="required" />
-		<xs:anyAttribute />
 	</xs:complexType>
 
 	<xs:complexType name="eventHandler">

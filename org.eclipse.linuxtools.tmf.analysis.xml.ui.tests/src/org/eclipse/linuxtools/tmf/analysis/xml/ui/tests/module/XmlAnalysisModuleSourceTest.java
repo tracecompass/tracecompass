@@ -35,7 +35,7 @@ import org.junit.Test;
  */
 public class XmlAnalysisModuleSourceTest {
 
-    private static final String SS_MODULE = "polymtl.kernel.sp";
+    private static final String SS_MODULE = "kernel.linux.sp";
 
     private static void emptyXmlFolder() {
         File fFolder = XmlUtils.getXmlFilesPath().toFile();

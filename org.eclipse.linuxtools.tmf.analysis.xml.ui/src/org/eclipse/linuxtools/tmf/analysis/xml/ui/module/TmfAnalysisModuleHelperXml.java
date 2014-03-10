@@ -72,7 +72,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
 
     @Override
     public String getId() {
-        return fSourceElement.getAttribute(TmfXmlStrings.ANALYSIS_ID);
+        return fSourceElement.getAttribute(TmfXmlStrings.ID);
     }
 
     @Override

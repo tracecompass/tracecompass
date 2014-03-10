@@ -201,7 +201,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider {
 
             for (int i = 0; i < stateproviderNodes.getLength(); i++) {
                 Element node = (Element) stateproviderNodes.item(i);
-                String analysisid = node.getAttribute(TmfXmlStrings.ANALYSIS_ID);
+                String analysisid = node.getAttribute(TmfXmlStrings.ID);
                 if (analysisid.equals(fStateId)) {
                     stateproviderNode = node;
                 }

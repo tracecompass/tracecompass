@@ -22,7 +22,6 @@ public interface TmfXmlStrings {
 
     /* XML generic Element attribute names */
     static final String VALUE = "value";
-    static final String ANALYSIS_ID = "analysisId";
     static final String NAME = "name";
     static final String VERSION = "version";
     static final String TYPE = "type";

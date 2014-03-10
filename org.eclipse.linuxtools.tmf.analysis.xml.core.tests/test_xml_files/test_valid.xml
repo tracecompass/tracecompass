@@ -11,9 +11,9 @@
 * 	Florian Wininger - Initial API and implementation
 *************************************************************************** -->
 <tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="stateprovider.xsd">
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
 
-	<stateProvider analysisId="polymtl.kernel.sp" version="1">
+	<stateProvider id="kernel.linux.sp" version="1">
 		<head>
 			<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
 			<label value="Xml kernel State System" />

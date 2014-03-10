@@ -86,7 +86,7 @@ public class StateProviderTest {
 
         Element node = (Element) stateproviderNodes.item(0);
         fModule = new XmlStateSystemModule();
-        String moduleId = node.getAttribute(TmfXmlStrings.ANALYSIS_ID);
+        String moduleId = node.getAttribute(TmfXmlStrings.ID);
         fModule.setId(moduleId);
 
         fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));

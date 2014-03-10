@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
  */
 public class StateProviderModuleTest {
 
-    private static String ANALYSIS_ID = "polymtl.kernel.sp";
+    private static String ANALYSIS_ID = "kernel.linux.sp";
     private static String ANALYSIS_NAME = "Xml kernel State System";
 
     private XmlStateSystemModule fModule;
@@ -89,7 +89,7 @@ public class StateProviderModuleTest {
 
         Element node = (Element) stateproviderNodes.item(0);
         fModule = new XmlStateSystemModule();
-        String moduleId = node.getAttribute(TmfXmlStrings.ANALYSIS_ID);
+        String moduleId = node.getAttribute(TmfXmlStrings.ID);
         fModule.setId(moduleId);
         assertEquals(ANALYSIS_ID, fModule.getId());
 
@@ -119,7 +119,7 @@ public class StateProviderModuleTest {
 
         Element node = (Element) stateproviderNodes.item(0);
         fModule = new XmlStateSystemModule();
-        String moduleId = node.getAttribute(TmfXmlStrings.ANALYSIS_ID);
+        String moduleId = node.getAttribute(TmfXmlStrings.ID);
         fModule.setId(moduleId);
 
         fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));
