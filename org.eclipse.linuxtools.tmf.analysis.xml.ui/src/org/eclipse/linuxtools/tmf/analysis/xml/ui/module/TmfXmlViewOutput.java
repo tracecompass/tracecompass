@@ -64,7 +64,7 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
             if ((viewId == null) || (filePath == null)) {
                 return;
             }
-            Element viewElement = XmlUtils.getElementInFile(filePath, TmfXmlUiStrings.STATE_PROVIDER_VIEW, viewId);
+            Element viewElement = XmlUtils.getElementInFile(filePath, TmfXmlUiStrings.TIME_GRAPH_VIEW, viewId);
             if (viewElement == null) {
                 return;
             }

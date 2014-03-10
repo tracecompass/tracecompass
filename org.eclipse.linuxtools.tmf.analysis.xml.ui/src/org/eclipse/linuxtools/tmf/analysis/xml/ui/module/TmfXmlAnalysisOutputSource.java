@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.analysis.xml.ui.module;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,10 +22,17 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.linuxtools.tmf.core.analysis.ITmfNewAnalysisModuleListener;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -58,8 +66,28 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                 doc.getDocumentElement().normalize();
 
                 /* get state provider views if the analysis has state systems */
-                /* TODO: Code here will come in later patch */
+                if (module instanceof TmfStateSystemAnalysisModule) {
+                    NodeList ssViewNodes = doc.getElementsByTagName(TmfXmlUiStrings.TIME_GRAPH_VIEW);
+                    for (int i = 0; i < ssViewNodes.getLength(); i++) {
+                        Element node = (Element) ssViewNodes.item(i);
 
+                        /* Check if analysis is the right one */
+                        List<Element> headNodes = XmlUtils.getChildElements(node, TmfXmlStrings.HEAD);
+                        if (headNodes.size() != 1) {
+                            continue;
+                        }
+
+                        List<Element> analysisNodes = XmlUtils.getChildElements(headNodes.get(0), TmfXmlStrings.ANALYSIS);
+                        for (Element analysis : analysisNodes) {
+                            String analysisId = analysis.getAttribute(TmfXmlStrings.ID);
+                            if (analysisId.equals(module.getId())) {
+                                IAnalysisOutput output = new TmfXmlViewOutput(XmlTimeGraphView.ID);
+                                output.setOutputProperty(TmfXmlUiStrings.XML_OUTPUT_DATA, node.getAttribute(TmfXmlStrings.ID) + DATA_SEPARATOR + xmlFile.getAbsolutePath(), false);
+                                module.registerOutput(output);
+                            }
+                        }
+                    }
+                }
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 Activator.logError("Error opening XML file", e); //$NON-NLS-1$
             }

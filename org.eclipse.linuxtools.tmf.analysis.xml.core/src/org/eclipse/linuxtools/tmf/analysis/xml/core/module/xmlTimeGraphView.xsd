@@ -13,7 +13,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	attributeFormDefault="unqualified" elementFormDefault="qualified">
 
-	<xs:complexType name="stateSystemView">
+	<xs:complexType name="timeGraphView">
 		<xs:sequence>
 			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headOutput" />
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" />

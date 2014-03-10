@@ -24,10 +24,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public interface TmfXmlUiStrings {
 
     /* XML generic Element attribute names */
-    static final String STATE_PROVIDER_VIEW = "stateSystemView";
+    static final String TIME_GRAPH_VIEW = "timeGraphView";
 
     /* View elements and attributes */
-    static final String SSV_LINE = "line";
     static final String ENTRY_ELEMENT = "entry";
 
     /* Elements and attributes of view entries */

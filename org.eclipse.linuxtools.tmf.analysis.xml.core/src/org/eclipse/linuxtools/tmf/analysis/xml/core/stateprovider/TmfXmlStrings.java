@@ -34,11 +34,14 @@ public interface TmfXmlStrings {
     static final String TRACETYPE = "traceType";
     static final String ID = "id";
     static final String LABEL = "label";
+    static final String ANALYSIS = "analysis";
 
     /* XML String */
     static final String NULL = "";
     static final String WILDCARD = "*";
     static final String VARIABLE_PREFIX = "$";
+    static final String COLOR = "color";
+    static final String COLOR_PREFIX = "#";
 
     /* XML Element Name */
     static final String STATE_PROVIDER = "stateProvider";

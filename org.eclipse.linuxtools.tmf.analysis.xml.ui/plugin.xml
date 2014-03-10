@@ -82,4 +82,15 @@
          </activeWhen>
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView"
+            id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph"
+            name="%xmltimegraph.view.name"
+            restorable="true">
+      </view>
+   </extension>
 </plugin>
