@@ -10,23 +10,23 @@
  *   Florian Wininger - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.analysis.xml.core.stateprovider.model;
+package org.eclipse.linuxtools.tmf.analysis.xml.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
-import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.w3c.dom.Element;
 
 /**
- * This Class implement a condition tree for a state change
+ * This Class implement a condition tree in the XML-defined state system.
  *
  * <pre>
  * example:
@@ -46,9 +46,9 @@ import org.w3c.dom.Element;
 public class TmfXmlCondition {
 
     private final List<TmfXmlCondition> fConditions = new ArrayList<>();
-    private final TmfXmlStateValue fStateValue;
+    private final ITmfXmlStateValue fStateValue;
     private final ConditionOperator fOperator;
-    private final XmlStateProvider fProvider;
+    private final IXmlStateSystemContainer fContainer;
 
     private enum ConditionOperator {
         NONE,
@@ -60,13 +60,15 @@ public class TmfXmlCondition {
     /**
      * Constructor
      *
+     * @param modelFactory
+     *            The factory used to create XML model elements
      * @param node
      *            The XML root of this condition
-     * @param provider
-     *            The state provider this condition belongs to
+     * @param container
+     *            The state system container this condition belongs to
      */
-    public TmfXmlCondition(Element node, XmlStateProvider provider) {
-        fProvider = provider;
+    public TmfXmlCondition(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container) {
+        fContainer = container;
 
         Element rootNode = node;
         /* Process the conditions: in each case, only process Element nodes */
@@ -96,36 +98,36 @@ public class TmfXmlCondition {
              * state attributes
              */
             if (childElements.size() == 1 && childElements.get(0).getNodeName().equals(TmfXmlStrings.ELEMENT_FIELD)) {
-                fStateValue = new TmfXmlStateValue(stateValueElement, fProvider, childElements.get(0).getAttribute(TmfXmlStrings.NAME));
+                fStateValue = modelFactory.createStateValue(stateValueElement, fContainer, childElements.get(0).getAttribute(TmfXmlStrings.NAME));
             } else {
-                List<TmfXmlStateAttribute> attributes = new ArrayList<>();
+                List<ITmfXmlStateAttribute> attributes = new ArrayList<>();
                 for (Element element : childElements) {
                     if (!element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {
                         throw new IllegalArgumentException("TmfXmlCondition: a condition either has a eventField element or a number of TmfXmlStateAttribute elements before the state value"); //$NON-NLS-1$
                     }
-                    TmfXmlStateAttribute attribute = new TmfXmlStateAttribute(element, fProvider);
+                    ITmfXmlStateAttribute attribute = modelFactory.createStateAttribute(element, fContainer);
                     attributes.add(attribute);
                 }
-                fStateValue = new TmfXmlStateValue(stateValueElement, fProvider, attributes);
+                fStateValue = modelFactory.createStateValue(stateValueElement, fContainer, attributes);
             }
             break;
         case TmfXmlStrings.NOT:
             fOperator = ConditionOperator.NOT;
             fStateValue = null;
-            fConditions.add(new TmfXmlCondition(childElements.get(0), fProvider));
+            fConditions.add(modelFactory.createCondition(childElements.get(0), fContainer));
             break;
         case TmfXmlStrings.AND:
             fOperator = ConditionOperator.AND;
             fStateValue = null;
             for (Element condition : childElements) {
-                fConditions.add(new TmfXmlCondition(condition, fProvider));
+                fConditions.add(modelFactory.createCondition(condition, fContainer));
             }
             break;
         case TmfXmlStrings.OR:
             fOperator = ConditionOperator.OR;
             fStateValue = null;
             for (Element condition : childElements) {
-                fConditions.add(new TmfXmlCondition(condition, fProvider));
+                fConditions.add(modelFactory.createCondition(condition, fContainer));
             }
             break;
         default:
@@ -143,22 +145,22 @@ public class TmfXmlCondition {
      *             The state attribute was not found
      */
     public boolean testForEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException {
-        ITmfStateSystemBuilder ss = fProvider.getAssignedStateSystem();
+        ITmfStateSystem ss = fContainer.getStateSystem();
         /*
          * The condition is either the equality check of a state value or a
          * boolean operation on other conditions
          */
         if (fStateValue != null) {
-            TmfXmlStateValue filter = fStateValue;
-            int quark = XmlStateProvider.ROOT_QUARK;
-            for (TmfXmlStateAttribute attribute : filter.getAttributes()) {
+            ITmfXmlStateValue filter = fStateValue;
+            int quark = IXmlStateSystemContainer.ROOT_QUARK;
+            for (ITmfXmlStateAttribute attribute : filter.getAttributes()) {
                 quark = attribute.getAttributeQuark(event, quark);
                 /*
                  * When verifying a condition, the state attribute must exist,
                  * if it does not, the query is not valid, we stop the condition
                  * check
                  */
-                if (quark == XmlStateProvider.ERROR_QUARK) {
+                if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
                     throw new AttributeNotFoundException();
                 }
             }
@@ -171,8 +173,8 @@ public class TmfXmlCondition {
              * The actual value: it can be either queried in the state system or
              * found in the event
              */
-            ITmfStateValue valueState = (quark != XmlStateProvider.ROOT_QUARK) ? ss.queryOngoingState(quark) :
-                    filter.getEventField(event);
+            ITmfStateValue valueState = (quark != IXmlStateSystemContainer.ROOT_QUARK) ? ss.queryOngoingState(quark) :
+                    filter.getEventFieldValue(event);
 
             return valueXML.equals(valueState);
 

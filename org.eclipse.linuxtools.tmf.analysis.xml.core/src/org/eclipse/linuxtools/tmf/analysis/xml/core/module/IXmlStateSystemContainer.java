@@ -12,14 +12,13 @@
 
 package org.eclipse.linuxtools.tmf.analysis.xml.core.module;
 
-import org.eclipse.linuxtools.internal.tmf.analysis.xml.core.stateprovider.model.TmfXmlLocation;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 
 /**
  * Interface that all XML defined objects who provide, use or contain state
  * system must implement in order to use the state provider model elements in
- * {@link org.eclipse.linuxtools.internal.tmf.analysis.xml.core.stateprovider.model}
- * package
+ * {@link org.eclipse.linuxtools.tmf.analysis.xml.core.model} package
  *
  * @author Geneviève Bastien
  */

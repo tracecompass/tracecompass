@@ -10,15 +10,15 @@
  *   Florian Wininger - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.analysis.xml.core.stateprovider.model;
+package org.eclipse.linuxtools.tmf.analysis.xml.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
-import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * This Class implement a State Change in the XML state provider
+ * This Class implement a State Change in the XML-defined state system
  *
  * <pre>
  *  example 1: Simple state change
@@ -64,18 +64,20 @@ import org.w3c.dom.Node;
 public class TmfXmlStateChange {
 
     private final IXmlStateChange fChange;
-    private final XmlStateProvider fProvider;
+    private final IXmlStateSystemContainer fContainer;
 
     /**
      * Constructor
      *
+     * @param modelFactory
+     *            The factory used to create XML model elements
      * @param statechange
      *            XML node root of this state change
-     * @param provider
-     *            The state provider this state change belongs to
+     * @param container
+     *            The state system container this state change belongs to
      */
-    public TmfXmlStateChange(Element statechange, XmlStateProvider provider) {
-        fProvider = provider;
+    public TmfXmlStateChange(ITmfXmlModelFactory modelFactory, Element statechange, IXmlStateSystemContainer container) {
+        fContainer = container;
 
         /*
          * child nodes is either a list of TmfXmlStateAttributes and
@@ -84,10 +86,10 @@ public class TmfXmlStateChange {
         Node ifNode = statechange.getElementsByTagName(TmfXmlStrings.IF).item(0);
         if (ifNode != null) {
             /* the state change has a condition */
-            fChange = new XmlConditionalChange(statechange);
+            fChange = new XmlConditionalChange(modelFactory, statechange);
         } else {
             /* the state change does not have a condition */
-            fChange = new XmlStateValueChange(statechange);
+            fChange = new XmlStateValueChange(modelFactory, statechange);
         }
     }
 
@@ -121,29 +123,29 @@ public class TmfXmlStateChange {
         private final TmfXmlStateChange fThenChange;
         private final TmfXmlStateChange fElseChange;
 
-        public XmlConditionalChange(Element statechange) {
+        public XmlConditionalChange(ITmfXmlModelFactory modelFactory, Element statechange) {
             /*
              * The if node exists, it has been verified before calling this
              */
             Node ifNode = statechange.getElementsByTagName(TmfXmlStrings.IF).item(0);
-            fCondition = new TmfXmlCondition((Element) ifNode, fProvider);
+            fCondition = modelFactory.createCondition((Element) ifNode, fContainer);
 
             Node thenNode = statechange.getElementsByTagName(TmfXmlStrings.THEN).item(0);
             if (thenNode == null) {
                 throw new IllegalArgumentException("Conditional state change: there should be a then clause."); //$NON-NLS-1$
             }
-            fThenChange = new TmfXmlStateChange((Element) thenNode, fProvider);
+            fThenChange = modelFactory.createStateChange((Element) thenNode, fContainer);
 
             Node elseNode = statechange.getElementsByTagName(TmfXmlStrings.ELSE).item(0);
             if (elseNode != null) {
-                fElseChange = new TmfXmlStateChange((Element) elseNode, fProvider);
+                fElseChange = modelFactory.createStateChange((Element) elseNode, fContainer);
             } else {
                 fElseChange = null;
             }
         }
 
         @Override
-        public void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
+        public void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
             TmfXmlStateChange toExecute = fThenChange;
             try {
                 if (!fCondition.testForEvent(event)) {
@@ -168,9 +170,9 @@ public class TmfXmlStateChange {
      * State change with no condition
      */
     private class XmlStateValueChange implements IXmlStateChange {
-        private final TmfXmlStateValue fValue;
+        private final ITmfXmlStateValue fValue;
 
-        public XmlStateValueChange(Element statechange) {
+        public XmlStateValueChange(ITmfXmlModelFactory modelFactory, Element statechange) {
             List<Element> childElements = XmlUtils.getChildElements(statechange);
 
             /*
@@ -178,22 +180,22 @@ public class TmfXmlStateChange {
              * to reach to value to set
              */
             Element stateValueElement = childElements.remove(childElements.size() - 1);
-            List<TmfXmlStateAttribute> attributes = new ArrayList<>();
+            List<ITmfXmlStateAttribute> attributes = new ArrayList<>();
             for (Element element : childElements) {
                 if (!element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {
                     throw new IllegalArgumentException("TmfXmlStateChange: a state change must have only TmfXmlStateAttribute elements before the state value"); //$NON-NLS-1$
                 }
-                TmfXmlStateAttribute attribute = new TmfXmlStateAttribute(element, fProvider);
+                ITmfXmlStateAttribute attribute = modelFactory.createStateAttribute(element, fContainer);
                 attributes.add(attribute);
             }
             if (attributes.isEmpty()) {
                 throw new IllegalArgumentException("TmfXmlStateChange: a state change must have at least one TmfXmlStateAttribute element before the state value"); //$NON-NLS-1$
             }
-            fValue = new TmfXmlStateValue(stateValueElement, fProvider, attributes);
+            fValue = modelFactory.createStateValue(stateValueElement, fContainer, attributes);
         }
 
         @Override
-        public void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
+        public void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
             fValue.handleEvent(event);
         }
     }

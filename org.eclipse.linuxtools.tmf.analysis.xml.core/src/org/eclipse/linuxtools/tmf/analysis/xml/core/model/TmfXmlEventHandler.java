@@ -10,15 +10,15 @@
  *   Florian Wininger - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.analysis.xml.core.stateprovider.model;
+package org.eclipse.linuxtools.tmf.analysis.xml.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
-import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * This Class implements an EventHandler in the XML state provider
+ * This Class implements an EventHandler in the XML-defined state system
  *
  * <pre>
  * example:
@@ -48,24 +48,26 @@ public class TmfXmlEventHandler {
     /* list of states changes */
     private final List<TmfXmlStateChange> fStateChangeList = new ArrayList<>();
     private final String fName;
-    private final XmlStateProvider fParent;
+    private final IXmlStateSystemContainer fParent;
 
     /**
      * Constructor
      *
+     * @param modelFactory
+     *            The factory used to create XML model elements
      * @param node
      *            XML event handler element
      * @param parent
-     *            The state provider this event handler belongs to
+     *            The state system container this event handler belongs to
      */
-    public TmfXmlEventHandler(Element node, XmlStateProvider parent) {
+    public TmfXmlEventHandler(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer parent) {
         fParent = parent;
         fName = node.getAttribute(TmfXmlStrings.HANDLER_EVENT_NAME);
 
         NodeList nodesChanges = node.getElementsByTagName(TmfXmlStrings.STATE_CHANGE);
         /* load state changes */
         for (int i = 0; i < nodesChanges.getLength(); i++) {
-            TmfXmlStateChange stateChange = new TmfXmlStateChange((Element) nodesChanges.item(i), fParent);
+            TmfXmlStateChange stateChange = modelFactory.createStateChange((Element) nodesChanges.item(i), fParent);
             fStateChangeList.add(stateChange);
         }
     }

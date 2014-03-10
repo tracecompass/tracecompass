@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.analysis.xml.core.module;
 
-
 /**
  * Interface implemented by all classes representing XML top-level elements, for
  * example state providers and views

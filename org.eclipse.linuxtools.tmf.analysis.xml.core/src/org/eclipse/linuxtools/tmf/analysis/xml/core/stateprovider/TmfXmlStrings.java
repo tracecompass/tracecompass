@@ -65,6 +65,7 @@ public interface TmfXmlStrings {
     static final String EVENT_FIELD = "eventField";
     static final String TYPE_LOCATION = "location";
     static final String TYPE_QUERY = "query";
+    static final String TYPE_SELF = "self";
     static final String TYPE_INT = "int";
     static final String TYPE_LONG = "long";
     static final String TYPE_STRING = "string";
