@@ -57,7 +57,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         implements ITmfAnalysisModuleWithStateSystems {
 
     private static final String EXTENSION = ".ht"; //$NON-NLS-1$
-    private static final String UNDEFINED_ID = "undefined"; //$NON-NLS-1$
 
     private final CountDownLatch fInitialized = new CountDownLatch(1);
 
@@ -141,10 +140,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         final ITmfStateProvider provider = createStateProvider();
 
         String id = getId();
-        if (id == null) {
-            /* The analysis module does not specify an ID, use a generic one */
-            id = UNDEFINED_ID;
-        }
 
         /* FIXME: State systems should make use of the monitor, to be cancelled */
         try {

@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
@@ -41,6 +42,8 @@ import org.eclipse.osgi.util.NLS;
  * @since 3.0
  */
 public abstract class TmfAbstractAnalysisModule extends TmfComponent implements IAnalysisModule {
+
+    @NonNull private static final String UNDEFINED_ID = "undefined"; //$NON-NLS-1$
 
     private String fName, fId;
     private boolean fAutomatic = false, fStarted = false;
@@ -79,8 +82,14 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     }
 
     @Override
+    @NonNull
     public String getId() {
-        return fId;
+        String id = fId;
+        if (id == null) {
+            Activator.logError("Analysis module getId(): the id should not be null in class " + this.getClass().getSimpleName()); //$NON-NLS-1$
+            return UNDEFINED_ID;
+        }
+        return id;
     }
 
     @Override

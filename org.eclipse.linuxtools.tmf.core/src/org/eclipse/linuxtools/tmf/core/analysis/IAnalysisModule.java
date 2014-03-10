@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.analysis;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -68,6 +69,7 @@ public interface IAnalysisModule extends ITmfComponent {
      *
      * @return The id of the module
      */
+    @NonNull
     String getId();
 
     /**
