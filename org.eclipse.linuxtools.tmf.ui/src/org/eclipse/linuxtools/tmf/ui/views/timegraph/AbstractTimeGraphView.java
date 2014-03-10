@@ -52,6 +52,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -554,6 +555,16 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     /**
+     * Getter for the presentation provider
+     *
+     * @return The time graph presentation provider
+     * @since 3.0
+     */
+    protected ITimeGraphPresentationProvider2 getPresentationProvider() {
+        return fPresentation;
+    }
+
+    /**
      * Sets the tree column labels.
      * This should be called from the constructor.
      *
@@ -1006,19 +1017,27 @@ public abstract class AbstractTimeGraphView extends TmfView {
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
             if (fEntryList == null) {
-                setStartTime(Long.MAX_VALUE);
-                setEndTime(Long.MIN_VALUE);
-                synchronized (fBuildThreadMap) {
-                    for (ITmfTrace trace : getTracesToBuild(fTrace)) {
-                        BuildThread buildThread = new BuildThread(trace, fTrace, getName());
-                        fBuildThreadMap.put(trace, buildThread);
-                        buildThread.start();
-                    }
-                }
+                rebuild();
             } else {
                 fStartTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
                 fEndTime = fTrace.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
                 refresh();
+            }
+        }
+    }
+
+    /**
+     * Forces a rebuild of the entries list, even if entries already exist for this trace
+     * @since 3.0
+     */
+    protected void rebuild() {
+        setStartTime(Long.MAX_VALUE);
+        setEndTime(Long.MIN_VALUE);
+        synchronized (fBuildThreadMap) {
+            for (ITmfTrace trace : getTracesToBuild(fTrace)) {
+                BuildThread buildThread = new BuildThread(trace, fTrace, getName());
+                fBuildThreadMap.put(trace, buildThread);
+                buildThread.start();
             }
         }
     }
