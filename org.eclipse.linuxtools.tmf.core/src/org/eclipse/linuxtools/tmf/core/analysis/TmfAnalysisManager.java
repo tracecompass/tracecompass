@@ -26,9 +26,6 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * Manages the available analysis helpers from different sources and their
  * parameter providers.
  *
- * TODO: Add the concept of analysis source. Now only a plugin's extension point
- * is implemented
- *
  * @author Geneviève Bastien
  * @since 3.0
  */
@@ -46,17 +43,17 @@ public class TmfAnalysisManager {
      * @param source
      *            A {@link IAnalysisModuleSource} instance
      */
-    public static void registerModuleSource(IAnalysisModuleSource source) {
-        synchronized (fSources) {
-            fSources.add(source);
-            refreshModules();
-        }
+    public static synchronized void registerModuleSource(IAnalysisModuleSource source) {
+        fSources.add(source);
+        refreshModules();
     }
 
     /**
      * Initializes sources and new module listeners from the extension point
      */
-    public static void initialize() {
+    public static synchronized void initialize() {
+        fSources.clear();
+        fListeners.clear();
         initializeModuleSources();
         initializeNewModuleListeners();
     }
@@ -64,12 +61,9 @@ public class TmfAnalysisManager {
     /**
      * Cleans the module sources list and initialize it from the extension point
      */
-    private static void initializeModuleSources() {
-        synchronized (fSources) {
-            fSources.clear();
-            for (IAnalysisModuleSource source : TmfAnalysisModuleSources.getSources()) {
-                fSources.add(source);
-            }
+    private static synchronized void initializeModuleSources() {
+        for (IAnalysisModuleSource source : TmfAnalysisModuleSources.getSources()) {
+            fSources.add(source);
         }
     }
 
@@ -77,13 +71,20 @@ public class TmfAnalysisManager {
      * Cleans the new module listeners list and initialize it from the extension
      * point
      */
-    private static void initializeNewModuleListeners() {
-        synchronized (fListeners) {
-            fListeners.clear();
-            for (ITmfNewAnalysisModuleListener output : TmfAnalysisModuleOutputs.getOutputListeners()) {
-                fListeners.add(output);
-            }
+    private static synchronized void initializeNewModuleListeners() {
+        for (ITmfNewAnalysisModuleListener output : TmfAnalysisModuleOutputs.getOutputListeners()) {
+            fListeners.add(output);
         }
+    }
+
+    /**
+     * Add a new module listener to the list of listeners
+     *
+     * @param listener
+     *            The new module listener
+     */
+    public static synchronized void addNewModuleListener(ITmfNewAnalysisModuleListener listener) {
+        fListeners.add(listener);
     }
 
     /**
@@ -93,13 +94,11 @@ public class TmfAnalysisManager {
      *
      * @return The map of available {@link IAnalysisModuleHelper}
      */
-    public static Map<String, IAnalysisModuleHelper> getAnalysisModules() {
-        synchronized (fAnalysisModules) {
-            if (fAnalysisModules.isEmpty()) {
-                for (IAnalysisModuleSource source : fSources) {
-                    for (IAnalysisModuleHelper helper : source.getAnalysisModules()) {
-                        fAnalysisModules.put(helper.getId(), helper);
-                    }
+    public static synchronized Map<String, IAnalysisModuleHelper> getAnalysisModules() {
+        if (fAnalysisModules.isEmpty()) {
+            for (IAnalysisModuleSource source : fSources) {
+                for (IAnalysisModuleHelper helper : source.getAnalysisModules()) {
+                    fAnalysisModules.put(helper.getId(), helper);
                 }
             }
         }
@@ -200,10 +199,8 @@ public class TmfAnalysisManager {
      * Clear the list of modules so that next time, it is computed again from
      * sources
      */
-    public static void refreshModules() {
-        synchronized (fAnalysisModules) {
-            fAnalysisModules.clear();
-        }
+    public static synchronized void refreshModules() {
+        fAnalysisModules.clear();
     }
 
     /**
@@ -214,11 +211,9 @@ public class TmfAnalysisManager {
      * @param module
      *            The newly created analysis module
      */
-    public static void analysisModuleCreated(IAnalysisModule module) {
-        synchronized (fListeners) {
-            for (ITmfNewAnalysisModuleListener listener : fListeners) {
-                listener.moduleCreated(module);
-            }
+    public static synchronized void analysisModuleCreated(IAnalysisModule module) {
+        for (ITmfNewAnalysisModuleListener listener : fListeners) {
+            listener.moduleCreated(module);
         }
     }
 
