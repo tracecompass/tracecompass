@@ -32,6 +32,7 @@ import org.eclipse.linuxtools.internal.gdbtrace.core.GdbTraceCorePlugin;
 import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
@@ -110,7 +111,7 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
                     IGDBLaunchConfigurationConstants.DEBUGGER_DEBUG_NAME_DEFAULT, null);
 
             fGdbTpRef = new DsfGdbAdaptor(this, defaultGdbCommand, path, tracedExecutable);
-            fNbFrames = fGdbTpRef.getNumberOfFrames();
+            fNbFrames = getNbFrames();
         } catch (CoreException e) {
             throw new TmfTraceException(Messages.GdbTrace_FailedToInitializeTrace, e);
         }
@@ -136,7 +137,7 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
     /**
      * @return the number of frames in current tp session
      */
-    public long getNbFrames() {
+    public synchronized long getNbFrames() {
         fNbFrames = fGdbTpRef.getNumberOfFrames();
         return fNbFrames;
     }

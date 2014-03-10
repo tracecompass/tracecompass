@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
@@ -105,13 +106,6 @@ public class GdbEventsTable extends TmfEventsTable {
     }
 
     @Override
-    protected void populateCompleted() {
-        if (fSelectedTrace != null) {
-            selectFrame(fSelectedTrace, fSelectedFrame);
-        }
-    }
-
-    @Override
     protected ITmfEventField[] extractItemFields(ITmfEvent event) {
         ITmfEventField[] fields = EMPTY_FIELD_ARRAY;
         if (event != null) {
@@ -147,5 +141,14 @@ public class GdbEventsTable extends TmfEventsTable {
         };
         b.setSystem(true);
         b.schedule();
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceUpdated(TmfTraceUpdatedSignal signal) {
+        super.traceUpdated(signal);
+        if (fSelectedTrace.getNbFrames() == fSelectedTrace.getNbEvents()) {
+            selectFrame(fSelectedTrace, fSelectedFrame);
+        }
     }
 }
