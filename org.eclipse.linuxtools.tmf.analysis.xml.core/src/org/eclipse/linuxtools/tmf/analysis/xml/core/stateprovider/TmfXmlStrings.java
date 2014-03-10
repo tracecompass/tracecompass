@@ -12,12 +12,15 @@
 
 package org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * This file defines all name in the XML Structure for the State Provider
  *
  * @author Florian Wininger
  */
 @SuppressWarnings({ "javadoc", "nls" })
+@NonNullByDefault
 public interface TmfXmlStrings {
 
     /* XML generic Element attribute names */
