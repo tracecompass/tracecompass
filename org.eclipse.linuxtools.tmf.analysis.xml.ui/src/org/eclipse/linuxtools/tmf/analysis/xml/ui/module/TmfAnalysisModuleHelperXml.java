@@ -20,9 +20,9 @@ import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput;
 import org.osgi.framework.Bundle;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -127,8 +127,12 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
 
             /* Set header information if available */
             ssModule.setHeadInfo(fHeadInfo);
+            /*
+             * FIXME: There is no way to know if a module is automatic, so we
+             * default to true
+             */
+            ssModule.setAutomatic(true);
 
-            module.registerOutput(new TmfAnalysisViewOutput("org.eclipse.linuxtools.tmf.ui.views.ssvisualizer")); //$NON-NLS-1$
             break;
         default:
             break;
@@ -136,6 +140,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
         }
         if (module != null) {
             module.setTrace(trace);
+            TmfAnalysisManager.analysisModuleCreated(module);
         }
 
         return module;

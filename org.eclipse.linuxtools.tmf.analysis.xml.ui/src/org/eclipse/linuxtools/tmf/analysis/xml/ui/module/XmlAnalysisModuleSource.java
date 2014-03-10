@@ -56,6 +56,13 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
 
     private static List<IAnalysisModuleHelper> fModules = null;
 
+    /**
+     * Constructor. It adds the new module listener to the analysis manager.
+     */
+    public XmlAnalysisModuleSource() {
+        TmfAnalysisManager.addNewModuleListener(new TmfXmlAnalysisOutputSource());
+    }
+
     @Override
     public synchronized Iterable<IAnalysisModuleHelper> getAnalysisModules() {
         if (fModules == null) {
