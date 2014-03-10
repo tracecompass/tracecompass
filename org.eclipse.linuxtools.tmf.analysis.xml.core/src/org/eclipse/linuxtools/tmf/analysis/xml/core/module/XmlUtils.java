@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -30,9 +33,13 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.osgi.util.NLS;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -161,6 +168,83 @@ public class XmlUtils {
             }
         }
         return childElements;
+    }
+
+    /**
+     * Get the XML children element of an XML element, but only those of a
+     * certain type
+     *
+     * @param parent
+     *            The parent element to get the children from
+     * @param elementTag
+     *            The tag of the elements to return
+     * @return The list of children {@link Element} of the parent
+     */
+    public static List<Element> getChildElements(Element parent, String elementTag) {
+        /* get the state providers and find the corresponding one */
+        NodeList nodes = parent.getElementsByTagName(elementTag);
+        List<Element> childElements = new ArrayList<>();
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element node = (Element) nodes.item(i);
+            childElements.add(node);
+        }
+        return childElements;
+    }
+
+    /**
+     * Return the node element corresponding to the requested type in the file.
+     *
+     * TODO: Nothing prevents from having duplicate type -> id in a same file.
+     * That should not be allowed. If you want an element with the same ID as
+     * another one, it should be in a different file and we should check it at
+     * validation time.
+     *
+     * @param filePath
+     *            The absolute path to the XML file
+     * @param elementType
+     *            The type of top level element to search for
+     * @param elementId
+     *            The ID of the desired element
+     * @return The XML element or <code>null</code> if not found
+     */
+    public static Element getElementInFile(String filePath, @NonNull String elementType, @NonNull String elementId) {
+
+        if (filePath == null) {
+            return null;
+        }
+
+        IPath path = new Path(filePath);
+        File file = path.toFile();
+        if (file == null || !file.exists() || !file.isFile() || !xmlValidate(file).isOK()) {
+            return null;
+        }
+
+        try {
+            /* Load the XML File */
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder;
+
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(file);
+            doc.getDocumentElement().normalize();
+
+            /* get the state providers and find the corresponding one */
+            NodeList nodes = doc.getElementsByTagName(elementType);
+            Element foundNode = null;
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element node = (Element) nodes.item(i);
+                String id = node.getAttribute(TmfXmlStrings.ID);
+                if (id.equals(elementId)) {
+                    foundNode = node;
+                }
+            }
+            return foundNode;
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            return null;
+        }
+
     }
 
 }
