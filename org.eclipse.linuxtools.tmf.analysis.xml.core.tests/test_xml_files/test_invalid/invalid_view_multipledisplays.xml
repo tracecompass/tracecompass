@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+* Copyright (c) 2014 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* 	Geneviève Bastien - Initial API and implementation
+*************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+	<stateSystemView id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.statesystem">
+		<head>
+			<analysis id="kernel.linux.sp" />
+			<label value="Xml kernel View" />
+		</head>
+		<!-- StateValues -->
+		<definedValue name="PROCESS_STATUS_UNKNOWN" value="0" color="#EEEEEE" />
+		<definedValue name="PROCESS_STATUS_WAIT_BLOCKED" value="1" color="#CCCCCC" />
+		<definedValue name="PROCESS_STATUS_RUN_USERMODE" value="2" color="#118811" />
+		<definedValue name="PROCESS_STATUS_RUN_SYSCALL" value="3" color="#0000EE" />
+		<definedValue name="PROCESS_STATUS_INTERRUPTED" value="4" color="#DDDD00" />
+		<definedValue name="PROCESS_STATUS_WAIT_FOR_CPU" value="5" color="#AA0000" />
+
+		<!-- Control Flow View -->
+		<entry path="CPUs/*">
+			<display type="self" />
+			<display type="constant" value="a" />
+		</entry>
+	</stateSystemView>
+</tmfxml>

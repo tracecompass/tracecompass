@@ -40,6 +40,8 @@ import org.w3c.dom.Element;
  */
 public class XmlUtilsTest {
 
+    private static final String pathname = "test_xml_files/test_invalid";
+
     /**
      * Empty the XML directory after the test
      */
@@ -91,7 +93,20 @@ public class XmlUtilsTest {
             fail("XML test file does not exist");
         }
         assertFalse(XmlUtils.xmlValidate(testXmlFile).isOK());
+
     }
+
+    /**
+     * Test various invalid files and make sure they are invalid
+     */
+    @Test
+    public void testXmlValidateInvalid() {
+        File[] validFiles = (new File(pathname)).listFiles();
+        for (File f : validFiles) {
+            assertFalse("File " + f.getName(), XmlUtils.xmlValidate(f).isOK());
+        }
+    }
+
 
     /**
      * test the {@link XmlUtils#addXmlFile(File)} method

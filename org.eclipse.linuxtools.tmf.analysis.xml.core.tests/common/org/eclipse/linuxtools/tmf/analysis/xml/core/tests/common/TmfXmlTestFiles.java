@@ -23,7 +23,7 @@ public enum TmfXmlTestFiles {
     /** A valid XML test file */
     VALID_FILE("../org.eclipse.linuxtools.tmf.analysis.xml.core.tests/test_xml_files/test_valid.xml"),
     /** An invalid test file */
-    INVALID_FILE("../org.eclipse.linuxtools.tmf.analysis.xml.core.tests/test_xml_files/test_invalid.xml");
+    INVALID_FILE("../org.eclipse.linuxtools.tmf.analysis.xml.core.tests/test_xml_files/test_invalid/test_invalid.xml");
 
     private final String fPath;
 

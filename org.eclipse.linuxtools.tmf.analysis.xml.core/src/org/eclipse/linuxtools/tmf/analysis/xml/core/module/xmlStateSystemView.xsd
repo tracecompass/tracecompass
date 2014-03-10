@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- ***************************************************************************
+ * Copyright (c) 2014 École Polytechnique de Montréal
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Florian Wininger - Initial API and implementation
+ *************************************************************************** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	attributeFormDefault="unqualified" elementFormDefault="qualified">
+
+	<xs:complexType name="stateSystemView">
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headOutput" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="entry" type="viewEntry" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="headOutput">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="analysis">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required" />
+					<xs:attribute name="ssid" type="xs:string" use="optional" />
+				</xs:complexType>
+			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="label">
+				<xs:complexType>
+					<xs:attribute name="value" use="required" />
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="viewEntry">
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="0" name="display" type="viewStateAttribute" />
+			<xs:element maxOccurs="1" minOccurs="0" name="id" type="viewStateAttribute" />
+			<xs:element maxOccurs="1" minOccurs="0" name="parent" type="viewStateAttribute" />
+			<xs:element maxOccurs="1" minOccurs="0" name="name" type="viewStateAttribute" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="entry" type="viewEntry" />
+		</xs:sequence>
+		<xs:attribute name="path" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="viewStateAttribute">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="constant" />
+					<xs:enumeration value="location" />
+					<xs:enumeration value="query" />
+					<xs:enumeration value="self" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" type="xs:string" />
+		<xs:attribute name="reference" use="optional" default="relative">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="relative" />
+					<xs:enumeration value="absolute" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>
