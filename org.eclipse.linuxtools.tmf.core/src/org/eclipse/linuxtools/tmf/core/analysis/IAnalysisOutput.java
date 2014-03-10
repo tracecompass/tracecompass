@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.analysis;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Interface for all output types of analysis
  *
@@ -33,5 +35,20 @@ public interface IAnalysisOutput {
      * this output.
      */
     void requestOutput();
+
+    /**
+     * Sets an arbitrary property on the output. The key must not be null, a
+     * <code>null</code> value removes the property.
+     *
+     * @param key
+     *            The arbitrary property. Must not be null.
+     * @param value
+     *            The value of the property.
+     * @param immediate
+     *            If <code>true</code>, the property will be applied immediately
+     *            if the output is active. Otherwise, it is only applied when the
+     *            output is explicitly requested by the user.
+     */
+    void setOutputProperty(@NonNull String key, String value, boolean immediate);
 
 }
