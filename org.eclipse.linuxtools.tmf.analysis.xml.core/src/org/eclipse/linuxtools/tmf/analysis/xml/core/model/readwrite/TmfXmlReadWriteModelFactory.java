@@ -30,20 +30,20 @@ import org.w3c.dom.Element;
  *
  * @author Geneviève Bastien
  */
-public class TmfXmlModelFactoryReadWrite implements ITmfXmlModelFactory {
+public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
 
     private static ITmfXmlModelFactory fInstance = null;
 
     /**
      * Get the instance of this model creator
      *
-     * @return The {@link TmfXmlModelFactoryReadWrite} instance
+     * @return The {@link TmfXmlReadWriteModelFactory} instance
      */
     @NonNull
     public static synchronized ITmfXmlModelFactory getInstance() {
         ITmfXmlModelFactory instance = fInstance;
         if (instance == null) {
-            instance = new TmfXmlModelFactoryReadWrite();
+            instance = new TmfXmlReadWriteModelFactory();
             fInstance = instance;
         }
         return instance;
@@ -51,17 +51,17 @@ public class TmfXmlModelFactoryReadWrite implements ITmfXmlModelFactory {
 
     @Override
     public ITmfXmlStateAttribute createStateAttribute(Element attribute, IXmlStateSystemContainer container) {
-        return new TmfXmlStateAttributeReadWrite(this, attribute, container);
+        return new TmfXmlReadWriteStateAttribute(this, attribute, container);
     }
 
     @Override
     public ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes) {
-        return new TmfXmlStateValueReadWrite(this, node, container, attributes);
+        return new TmfXmlReadWriteStateValue(this, node, container, attributes);
     }
 
     @Override
     public ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, String eventField) {
-        return new TmfXmlStateValueReadWrite(this, node, container, eventField);
+        return new TmfXmlReadWriteStateValue(this, node, container, eventField);
     }
 
     @Override

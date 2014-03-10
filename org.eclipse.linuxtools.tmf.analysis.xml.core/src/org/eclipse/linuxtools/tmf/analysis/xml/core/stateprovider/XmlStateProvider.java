@@ -23,7 +23,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlEventHandler;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlLocation;
-import org.eclipse.linuxtools.tmf.analysis.xml.core.model.readwrite.TmfXmlModelFactoryReadWrite;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -78,7 +78,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
             return;
         }
 
-        ITmfXmlModelFactory modelFactory = TmfXmlModelFactoryReadWrite.getInstance();
+        ITmfXmlModelFactory modelFactory = TmfXmlReadWriteModelFactory.getInstance();
         /* parser for defined Values */
         NodeList definedStateNodes = doc.getElementsByTagName(TmfXmlStrings.DEFINED_VALUE);
         for (int i = 0; i < definedStateNodes.getLength(); i++) {

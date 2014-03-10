@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
  *
  * @author Geneviève Bastien
  */
-public class TmfXmlStateValueReadWrite extends TmfXmlStateValue {
+public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
 
     /**
      * Constructor where the path to the value is a list of state attributes
@@ -55,7 +55,7 @@ public class TmfXmlStateValueReadWrite extends TmfXmlStateValue {
      * @param attributes
      *            The attributes representing the path to this value
      */
-    public TmfXmlStateValueReadWrite(TmfXmlModelFactoryReadWrite modelFactory, Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes) {
+    public TmfXmlReadWriteStateValue(TmfXmlReadWriteModelFactory modelFactory, Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes) {
         this(modelFactory, node, container, attributes, null);
     }
 
@@ -71,11 +71,11 @@ public class TmfXmlStateValueReadWrite extends TmfXmlStateValue {
      * @param eventField
      *            The event field where to get the value
      */
-    public TmfXmlStateValueReadWrite(TmfXmlModelFactoryReadWrite modelFactory, Element node, IXmlStateSystemContainer container, String eventField) {
+    public TmfXmlReadWriteStateValue(TmfXmlReadWriteModelFactory modelFactory, Element node, IXmlStateSystemContainer container, String eventField) {
         this(modelFactory, node, container, new ArrayList<ITmfXmlStateAttribute>(), eventField);
     }
 
-    private TmfXmlStateValueReadWrite(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes, String eventField) {
+    private TmfXmlReadWriteStateValue(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes, String eventField) {
         super(modelFactory, node, container, attributes, eventField);
     }
 

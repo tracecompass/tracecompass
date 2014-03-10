@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  *
  * @author Geneviève Bastien
  */
-public class TmfXmlStateAttributeReadWrite extends TmfXmlStateAttribute {
+public class TmfXmlReadWriteStateAttribute extends TmfXmlStateAttribute {
 
     /**
      * Constructor
@@ -39,7 +39,7 @@ public class TmfXmlStateAttributeReadWrite extends TmfXmlStateAttribute {
      * @param container
      *            The state system container this state value belongs to
      */
-    public TmfXmlStateAttributeReadWrite(TmfXmlModelFactoryReadWrite modelFactory, Element attribute, IXmlStateSystemContainer container) {
+    public TmfXmlReadWriteStateAttribute(TmfXmlReadWriteModelFactory modelFactory, Element attribute, IXmlStateSystemContainer container) {
         super(modelFactory, attribute, container);
     }
 
