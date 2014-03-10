@@ -188,10 +188,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
     @Override
     public void dispose() {
+        super.dispose();
         if (fStateSystem != null) {
             fStateSystem.dispose();
         }
-        super.dispose();
     }
 
     // ------------------------------------------------------------------------
