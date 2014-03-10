@@ -14,9 +14,11 @@ package org.eclipse.linuxtools.tmf.analysis.xml.ui.module;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
@@ -24,10 +26,11 @@ import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.Bundle;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Analysis module helpers for modules provided by XML files
@@ -47,7 +50,6 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
     private final File fSourceFile;
     private final Element fSourceElement;
     private final XmlAnalysisModuleType fType;
-    private final XmlHeadInfoUi fHeadInfo;
 
     /**
      * Constructor
@@ -63,13 +65,6 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
         fSourceFile = xmlFile;
         fSourceElement = node;
         fType = type;
-
-        NodeList head = fSourceElement.getElementsByTagName(TmfXmlStrings.HEAD);
-        if (head.getLength() == 1) {
-            fHeadInfo = new XmlHeadInfoUi(head.item(0));
-        } else {
-            fHeadInfo = null;
-        }
     }
 
     @Override
@@ -79,7 +74,16 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
 
     @Override
     public String getName() {
-        String name = fHeadInfo.getName();
+        String name = null;
+        /* Label may be available in XML header */
+        List<Element> head = XmlUtils.getChildElements(fSourceElement, TmfXmlStrings.HEAD);
+        if (head.size() == 1) {
+            List<Element> labels = XmlUtils.getChildElements(head.get(0), TmfXmlStrings.LABEL);
+            if (!labels.isEmpty()) {
+                name = labels.get(0).getAttribute(TmfXmlStrings.VALUE);
+            }
+        }
+
         if (name == null) {
             name = getId();
         }
@@ -107,13 +111,28 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
     }
 
     @Override
-    public boolean appliesToTraceType(Class<? extends ITmfTrace> traceclass) {
+    public boolean appliesToTraceType(Class<? extends ITmfTrace> traceClass) {
         /* Trace types may be available in XML header */
-        if (fHeadInfo == null) {
+        List<Element> head = XmlUtils.getChildElements(fSourceElement, TmfXmlStrings.HEAD);
+        if (head.size() != 1) {
+            return true;
+        }
+        /*
+         * TODO: Test with custom trace types
+         */
+        List<Element> elements = XmlUtils.getChildElements(head.get(0), TmfXmlStrings.TRACETYPE);
+        if (elements.isEmpty()) {
             return true;
         }
 
-        return fHeadInfo.checkTraceType(traceclass);
+        for (Element element : elements) {
+            String traceTypeId = element.getAttribute(TmfXmlStrings.ID);
+            TraceTypeHelper helper = TmfTraceType.getInstance().getTraceType(traceTypeId);
+            if ((helper != null) && helper.getTrace().getClass().isAssignableFrom(traceClass)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -137,8 +156,6 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
             module.setId(analysisid);
             ssModule.setXmlFile(new Path(fSourceFile.getAbsolutePath()));
 
-            /* Set header information if available */
-            ssModule.setHeadInfo(fHeadInfo);
             /*
              * FIXME: There is no way to know if a module is automatic, so we
              * default to true

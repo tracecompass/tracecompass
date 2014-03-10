@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlHeadInfo;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -94,12 +93,6 @@ public class StateProviderModuleTest {
         assertEquals(ANALYSIS_ID, fModule.getId());
 
         fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));
-        NodeList head = node.getElementsByTagName(TmfXmlStrings.HEAD);
-        XmlHeadInfo headInfo = null;
-        if (head.getLength() == 1) {
-            headInfo = new XmlHeadInfo(head.item(0));
-        }
-        fModule.setHeadInfo(headInfo);
 
         assertEquals(ANALYSIS_NAME, fModule.getName());
     }
@@ -123,12 +116,6 @@ public class StateProviderModuleTest {
         fModule.setId(moduleId);
 
         fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));
-        NodeList head = node.getElementsByTagName(TmfXmlStrings.HEAD);
-        XmlHeadInfo headInfo = null;
-        if (head.getLength() == 1) {
-            headInfo = new XmlHeadInfo(head.item(0));
-        }
-        fModule.setHeadInfo(headInfo);
 
         try {
             ITmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();

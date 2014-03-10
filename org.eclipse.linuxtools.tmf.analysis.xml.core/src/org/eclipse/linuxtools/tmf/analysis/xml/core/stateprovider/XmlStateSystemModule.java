@@ -12,12 +12,14 @@
 
 package org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlModuleMetadata;
-import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlHeadInfo;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.w3c.dom.Element;
 
 /**
  * Analysis module for the data-driven state systems, defined in XML.
@@ -25,11 +27,9 @@ import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public class XmlStateSystemModule extends TmfStateSystemAnalysisModule
-        implements IXmlModuleMetadata {
+public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
 
     private IPath fXmlFile;
-    private XmlHeadInfo fHeadInfo = null;
 
     @Override
     protected StateSystemBackendType getBackendType() {
@@ -44,10 +44,17 @@ public class XmlStateSystemModule extends TmfStateSystemAnalysisModule
 
     @Override
     public String getName() {
-        String name = fHeadInfo.getName();
-        if (name == null) {
-            name = getId();
+        String name = getId();
+        Element doc = XmlUtils.getElementInFile(fXmlFile.makeAbsolute().toString(), TmfXmlStrings.STATE_PROVIDER, getId());
+        /* Label may be available in XML header */
+        List<Element> head = XmlUtils.getChildElements(doc, TmfXmlStrings.HEAD);
+        if (head.size() == 1) {
+            List<Element> labels = XmlUtils.getChildElements(head.get(0), TmfXmlStrings.LABEL);
+            if (!labels.isEmpty()) {
+                name = labels.get(0).getAttribute(TmfXmlStrings.VALUE);
+            }
         }
+
         return name;
     }
 
@@ -59,11 +66,6 @@ public class XmlStateSystemModule extends TmfStateSystemAnalysisModule
      */
     public void setXmlFile(IPath file) {
         fXmlFile = file;
-    }
-
-    @Override
-    public void setHeadInfo(XmlHeadInfo headInfo) {
-        fHeadInfo = headInfo;
     }
 
     /**
