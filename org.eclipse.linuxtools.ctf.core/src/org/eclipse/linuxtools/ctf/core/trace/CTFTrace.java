@@ -38,7 +38,6 @@ import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
@@ -261,21 +260,6 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      */
     public Map<Long, IEventDeclaration> getEvents(Long streamId) {
         return fStreams.get(streamId).getEvents();
-    }
-
-    /**
-     * Gets an event Declaration hashmap for a given StreamInput
-     *
-     * @param id
-     *            the StreamInput
-     * @return an empty hashmap, please see deprecated
-     * @since 2.0
-     * @deprecated You should be using
-     *             {@link StreamInputReader#getEventDefinitions()} instead.
-     */
-    @Deprecated
-    public Map<Long, EventDefinition> getEventDefs(StreamInput id) {
-        return new HashMap<>();
     }
 
     /**

@@ -13,9 +13,6 @@
 package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.nio.ByteOrder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
@@ -58,9 +55,6 @@ public class StreamInputReader implements AutoCloseable {
     private int fId;
 
     private CTFTraceReader fParent;
-
-    /** Map of all the event types */
-    private final Map<Long, EventDefinition> fEventDefs = new HashMap<>();
 
     /**
      * Live trace reading
@@ -178,30 +172,6 @@ public class StreamInputReader implements AutoCloseable {
      */
     StreamInput getStreamInput() {
         return fStreamInput;
-    }
-
-    /**
-     * Gets the event definition hashmap for this StreamInput
-     *
-     * @return Unmodifiable map with the event definitions
-     * @since 2.1
-     */
-    public Map<Long, EventDefinition> getEventDefinitions() {
-        return Collections.unmodifiableMap(fEventDefs);
-    }
-
-    /**
-     * Add an event definition to this stream input reader.
-     *
-     * @param id
-     *            The id of the event definition. This will overwrite any
-     *            existing definition with the same id.
-     * @param def
-     *            The matching event definition
-     * @since 2.1
-     */
-    public void addEventDefinition(Long id, EventDefinition def) {
-        fEventDefs.put(id, def);
     }
 
     /**

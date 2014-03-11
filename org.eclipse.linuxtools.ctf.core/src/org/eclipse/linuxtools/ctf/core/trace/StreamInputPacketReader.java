@@ -13,11 +13,9 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Collection;
 
 import org.eclipse.linuxtools.ctf.core.CTFStrings;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
@@ -130,15 +128,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
             fStreamEventContextDef = null;
         }
 
-        /* Create event definitions */
-        Collection<IEventDeclaration> eventDecls = streamInputReader.getStreamInput().getStream().getEvents().values();
-
-        for (IEventDeclaration event : eventDecls) {
-            if (!streamInputReader.getEventDefinitions().containsKey(event.getId())) {
-                EventDefinition eventDef = event.createDefinition(streamInputReader);
-                streamInputReader.addEventDefinition(event.getId(), eventDef);
-            }
-        }
     }
 
     /**
@@ -368,7 +357,7 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
         }
 
         /* Get the right event definition using the event id. */
-        EventDefinition eventDef = fStreamInputReader.getEventDefinitions().get(eventID);
+        EventDefinition eventDef = fStreamInputReader.getStreamInput().getStream().getEvents().get(eventID).createDefinition(fStreamInputReader);
         if (eventDef == null) {
             throw new CTFReaderException("Incorrect event id : " + eventID); //$NON-NLS-1$
         }
