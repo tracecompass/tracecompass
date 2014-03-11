@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.linuxtools.tmf.analysis.xml.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.linuxtools.tmf.analysis.xml.core" id="org.eclipse.linuxtools.tmf.analysis.xml.core.files" name="Builtin XML files"/>
+      </appinfo>
+      <documentation>
+         This extension point is used by plugins to contribute built-in XML files to provide XML-defined components. The files will not be writeable, but they can be copied and modified locally in the workspace by a user.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="xmlfile" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="xmlfile">
+      <complexType>
+         <attribute name="file" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The path to the XML file containing the XML-defined components.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         1.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+The xml file path is relative to the plugin&apos;s root directory. Here is an example where a plugin adds an XML file name &apos;test_builtin.xml&apos; located in the &apos;test_xml_files&apos; directory.
+&lt;/p&gt;
+
+&lt;extension
+      point=&quot;org.eclipse.linuxtools.tmf.analysis.xml.core.files&quot;&gt;
+    &lt;xmlfile
+         file=&quot;test_xml_files/test_builtin.xml&quot;&gt;
+    &lt;/xmlfile&gt;
+&lt;/extension&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+The XML file advertised by this extension point should validate with the XML plugin&apos;s XSD files, or otherwise, it will be ignored. To validate it with the XSD, it can be imported in a project from a running TMF before adding it to an extension point. Any error will be reported.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2014 École Polytechnique de Montréal
+
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>
