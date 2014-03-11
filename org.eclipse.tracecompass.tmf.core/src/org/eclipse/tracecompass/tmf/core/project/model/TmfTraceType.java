@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
@@ -459,6 +460,7 @@ public final class TmfTraceType {
                     TraceTypeHelper tt = new TraceTypeHelper(typeId, category, attribute, trace, isDir, elementType);
                     TRACE_TYPES.put(typeId, tt);
                 } catch (CoreException e) {
+                    Activator.logError("Unexpected error during populating trace types", e); //$NON-NLS-1$
                 }
 
             }

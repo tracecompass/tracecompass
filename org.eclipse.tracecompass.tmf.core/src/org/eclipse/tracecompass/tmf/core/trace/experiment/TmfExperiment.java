@@ -13,12 +13,14 @@
  *   Patrick Tasse - Updated for ranks in experiment location
  *   Geneviève Bastien - Added support of experiment synchronization
  *                       Added the initExperiment method and default constructor
+ *   Bernd Hufmann - Updated for added interfaces to ITmfEventProvider
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.trace.experiment;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,6 +37,7 @@ import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperiment
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -176,12 +179,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
             getIndexer().dispose();
         }
 
-        if (fTraces != null) {
-            for (final ITmfTrace trace : fTraces) {
-                trace.dispose();
-            }
-            fTraces = null;
-        }
         super.dispose();
     }
 
@@ -219,8 +216,18 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
         setCacheSize(indexPageSize);
         setStreamingInterval(0);
         setParser(this);
+
         // traces have to be set before super.initialize()
-        fTraces = traces;
+        if (traces != null) {
+            // initialize
+            fTraces = new ITmfTrace[0];
+            for (ITmfTrace trace : traces) {
+                if (trace != null) {
+                    addChild(trace);
+                }
+            }
+        }
+
         try {
             super.initialize(resource, path, type);
         } catch (TmfTraceException e) {
@@ -280,7 +287,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
     public synchronized ITmfContext armRequest(final ITmfEventRequest request) {
 
         // Make sure we have something to read from
-        if (fTraces == null) {
+        if (fTraces.length == 0) {
             return null;
         }
 
@@ -308,6 +315,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
         if (location != null && !(location instanceof TmfExperimentLocation)) {
             return null; // Throw an exception?
         }
+
         // Make sure we have something to read from
         if (fTraces == null) {
             return null;
@@ -459,6 +467,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      */
     @Override
     public ITmfTimestamp getInitialRangeOffset() {
+
         if ((fTraces == null) || (fTraces.length == 0)) {
             return super.getInitialRangeOffset();
         }
@@ -571,6 +580,32 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
     @SuppressWarnings("nls")
     public synchronized String toString() {
         return "[TmfExperiment (" + getName() + ")]";
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfCompositeComponent
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void addChild(ITmfEventProvider child) {
+        if (child instanceof ITmfTrace) {
+            super.addChild(child);
+            child.setParent(this);
+
+            // Cache the children in an array for performance reasons
+            if ((fTraces == null) || (fTraces.length == 0)) {
+                fTraces = new ITmfTrace[] { (ITmfTrace) child };
+            } else {
+                ITmfTrace[] tmpArray = Arrays.copyOf(fTraces, fTraces.length + 1);
+                tmpArray[fTraces.length] = (ITmfTrace) child;
+                fTraces = tmpArray;
+            }
+            return;
+        }
+        throw new IllegalArgumentException();
     }
 
     // ------------------------------------------------------------------------
