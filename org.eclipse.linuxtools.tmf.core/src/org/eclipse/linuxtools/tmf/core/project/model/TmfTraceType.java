@@ -420,7 +420,7 @@ public final class TmfTraceType {
                 }
 
                 final String dirString = ce.getAttribute(TmfTraceType.IS_DIR_ATTR);
-                boolean isDir = "true".equals(dirString) ? true : false; //$NON-NLS-1$
+                boolean isDir = Boolean.parseBoolean(dirString);
 
                 TraceTypeHelper tt = new TraceTypeHelper(typeId, category, attribute, trace, isDir, elementType);
                 fTraceTypes.put(typeId, tt);
