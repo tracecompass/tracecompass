@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
-Bundle-SymbolicName: org.eclipse.linuxtools.tmf.analysis.xml.ui.tests
+Bundle-SymbolicName: org.eclipse.linuxtools.tmf.analysis.xml.ui.tests;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.linuxtools.tmf.analysis.xml.ui.tests.Activator
 Bundle-Vendor: %Bundle-Vendor

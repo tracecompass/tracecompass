@@ -36,6 +36,7 @@ import org.junit.Test;
 public class XmlAnalysisModuleSourceTest {
 
     private static final String SS_MODULE = "kernel.linux.sp";
+    private static final String BUILTIN_MODULE = "test.builtin.sp";
 
     private static void emptyXmlFolder() {
         File fFolder = XmlUtils.getXmlFilesPath().toFile();
@@ -72,7 +73,10 @@ public class XmlAnalysisModuleSourceTest {
         XmlAnalysisModuleSource module = new XmlAnalysisModuleSource();
 
         Iterable<IAnalysisModuleHelper> modules = module.getAnalysisModules();
-        assertFalse(modules.iterator().hasNext());
+        assertFalse(findModule(modules, SS_MODULE));
+
+        /* Test that the builtin module is present */
+        assertTrue(findModule(modules, BUILTIN_MODULE));
 
         /* use the valid XML test file */
         File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
@@ -85,12 +89,13 @@ public class XmlAnalysisModuleSourceTest {
         modules = module.getAnalysisModules();
 
         assertTrue(modules.iterator().hasNext());
-        assertTrue(findStateSystemModule(modules));
+        assertTrue(findModule(modules, SS_MODULE));
+        assertTrue(findModule(modules, BUILTIN_MODULE));
     }
 
-    private static boolean findStateSystemModule(Iterable<IAnalysisModuleHelper> modules) {
+    private static boolean findModule(Iterable<IAnalysisModuleHelper> modules, String moduleName) {
         for (IAnalysisModuleHelper helper : modules) {
-            if (SS_MODULE.equals(helper.getId())) {
+            if (moduleName.equals(helper.getId())) {
                 return true;
             }
         }
@@ -110,7 +115,9 @@ public class XmlAnalysisModuleSourceTest {
         TmfAnalysisManager.initialize();
 
         Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
-        assertFalse(findStateSystemModule(modules.values()));
+        assertFalse(findModule(modules.values(), SS_MODULE));
+        /* Test that the builtin module is present */
+        assertTrue(findModule(modules.values(), BUILTIN_MODULE));
 
         /* use the valid XML test file */
         File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
@@ -121,6 +128,7 @@ public class XmlAnalysisModuleSourceTest {
         XmlUtils.addXmlFile(testXmlFile);
         XmlAnalysisModuleSource.notifyModuleChange();
         modules = TmfAnalysisManager.getAnalysisModules();
-        assertTrue(findStateSystemModule(modules.values()));
+        assertTrue(findModule(modules.values(), SS_MODULE));
+        assertTrue(findModule(modules.values(), BUILTIN_MODULE));
     }
 }
