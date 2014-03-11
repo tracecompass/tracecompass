@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -206,9 +207,9 @@ public final class TmfTraceManager {
         if (trace == null) {
             return null;
         }
-        if (trace instanceof TmfExperiment) {
-            TmfExperiment exp = (TmfExperiment) trace;
-            return exp.getTraces();
+        List<ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
+        if (traces.size() > 0) {
+            return traces.toArray(new ITmfTrace[traces.size()]);
         }
         return new ITmfTrace[] { trace };
     }
@@ -450,27 +451,28 @@ public final class TmfTraceManager {
             /* Trace is not part of the currently opened traces */
             return null;
         }
-        if (!(trace instanceof TmfExperiment)) {
+
+        List<ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
+
+        if (traces.isEmpty()) {
             /* "trace" is a single trace, return its time range directly */
             return trace.getTimeRange();
         }
-        final ITmfTrace[] traces = ((TmfExperiment) trace).getTraces();
-        if (traces.length == 0) {
-            /* We are being trolled */
-            return null;
-        }
-        if (traces.length == 1) {
+
+        if (traces.size() == 1) {
             /* Trace is an experiment with only 1 trace */
-            return traces[0].getTimeRange();
+            return traces.get(0).getTimeRange();
         }
+
         /*
-         * Trace is an experiment with 2+ traces, so get the earliest start and
+         * Trace is an trace set with 2+ traces, so get the earliest start and
          * the latest end.
          */
-        ITmfTimestamp start = traces[0].getStartTime();
-        ITmfTimestamp end = traces[0].getEndTime();
-        for (int i = 1; i < traces.length; i++) {
-            ITmfTrace curTrace = traces[i];
+        ITmfTimestamp start = traces.get(0).getStartTime();
+        ITmfTimestamp end = traces.get(0).getEndTime();
+
+        for (int i = 1; i < traces.size(); i++) {
+            ITmfTrace curTrace = traces.get(i);
             if (curTrace.getStartTime().compareTo(start) < 0) {
                 start = curTrace.getStartTime();
             }
