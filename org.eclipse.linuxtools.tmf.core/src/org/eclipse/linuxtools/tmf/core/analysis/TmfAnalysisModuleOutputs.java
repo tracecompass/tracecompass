@@ -79,7 +79,7 @@ public class TmfAnalysisModuleOutputs {
                         if (childCe.getName().equals(ANALYSIS_ID_ELEM)) {
                             listener = new TmfNewAnalysisOutputListener(output, childCe.getAttribute(ID_ATTR), null);
                         } else if (childCe.getName().equals(MODULE_CLASS_ELEM)) {
-                            listener = new TmfNewAnalysisOutputListener(output, null, (Class<? extends IAnalysisModule>) childCe.createExecutableExtension(CLASS_ATTR).getClass());
+                            listener = new TmfNewAnalysisOutputListener(output, null, childCe.createExecutableExtension(CLASS_ATTR).getClass().asSubclass(IAnalysisModule.class));
                         }
                     }
                     if (listener != null) {
