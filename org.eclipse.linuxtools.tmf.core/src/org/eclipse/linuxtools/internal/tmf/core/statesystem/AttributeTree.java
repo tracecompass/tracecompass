@@ -87,7 +87,7 @@ public final class AttributeTree {
 
         /* Expected size of the section */
         expectedSize = in.readInt();
-        if (expectedSize <= 12) {
+        if (expectedSize < 12) {
             throw new IOException(errorMessage);
         }
 
