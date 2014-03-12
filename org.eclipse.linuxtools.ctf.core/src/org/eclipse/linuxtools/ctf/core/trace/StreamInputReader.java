@@ -15,8 +15,11 @@ package org.eclipse.linuxtools.ctf.core.trace;
 import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A CTF trace event reader. Reads the events of a trace file.
@@ -163,6 +166,16 @@ public class StreamInputReader implements AutoCloseable {
      */
     StreamInput getStreamInput() {
         return fStreamInput;
+    }
+
+    /**
+     * Gets the event definition set for this StreamInput
+     *
+     * @return Unmodifiable set with the event definitions
+     * @since 3.0
+     */
+    public Iterable<IEventDeclaration> getEventDeclarations() {
+        return ImmutableSet.copyOf(fStreamInput.getStream().getEvents().values());
     }
 
     /**

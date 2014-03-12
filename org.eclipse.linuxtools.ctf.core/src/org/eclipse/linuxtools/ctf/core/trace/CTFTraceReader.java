@@ -20,8 +20,12 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestampComparator;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 
 /**
  * A CTF trace reader. Reads the events of a trace.
@@ -246,6 +250,20 @@ public class CTFTraceReader implements AutoCloseable {
         for (int i = 0; i < temp.length; i++) {
             fEventCountPerTraceFile[i] = temp[i];
         }
+    }
+
+    /**
+     * Gets an iterable of the stream input readers, useful for foreaches
+     *
+     * @return the iterable of the stream input readers
+     * @since 3.0
+     */
+    public Iterable<IEventDeclaration> getEventDeclarations() {
+        ImmutableSet.Builder<IEventDeclaration> builder = new Builder<>();
+        for (StreamInputReader sir : fStreamInputReaders) {
+            builder.addAll(sir.getEventDeclarations());
+        }
+        return builder.build();
     }
 
     /**
