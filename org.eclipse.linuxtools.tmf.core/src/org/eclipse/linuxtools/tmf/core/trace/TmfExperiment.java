@@ -224,13 +224,13 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
         setCacheSize(indexPageSize);
         setStreamingInterval(0);
         setParser(this);
+        // traces have to be set before super.initialize()
+        fTraces = traces;
         try {
             super.initialize(resource, path, type);
         } catch (TmfTraceException e) {
             Activator.logError("Error initializing experiment", e); //$NON-NLS-1$
         }
-
-        fTraces = traces;
 
         if (resource != null) {
             try {
