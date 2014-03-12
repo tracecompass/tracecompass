@@ -15,11 +15,10 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 /**
  * A CTF array declaration
  *
- * Arrays are fixed-length. Their length is declared in the type
- * declaration within the meta-data. They contain an array of "inner type"
- * elements, which can refer to any type not containing the type of the
- * array being declared (no circular dependency). The length is the number
- * of elements in an array.
+ * Arrays are fixed-length. Their length is declared in the type declaration
+ * within the meta-data. They contain an array of "inner type" elements, which
+ * can refer to any type not containing the type of the array being declared (no
+ * circular dependency). The length is the number of elements in an array.
  *
  * @version 1.0
  * @author Matthew Khouzam
@@ -40,8 +39,11 @@ public class ArrayDeclaration implements IDeclaration {
 
     /**
      * Constructor
-     * @param length how many elements in the array
-     * @param elemType what type of element is in the array
+     *
+     * @param length
+     *            how many elements in the array
+     * @param elemType
+     *            what type of element is in the array
      */
     public ArrayDeclaration(int length, IDeclaration elemType) {
         this.length = length;
@@ -68,10 +70,33 @@ public class ArrayDeclaration implements IDeclaration {
         return length;
     }
 
+    /**
+     * Sometimes, strings are encoded as an array of 1-byte integers (each one
+     * being an UTF-8 byte).
+     *
+     * @return true if this array is in fact an UTF-8 string. false if it's a
+     *         "normal" array of generic Definition's.
+     * @since 3.0
+     */
+    public boolean isString() {
+        if (elemType instanceof IntegerDeclaration) {
+            /*
+             * If the first byte is a "character", we'll consider the whole
+             * array a character string.
+             */
+            IntegerDeclaration elemInt = (IntegerDeclaration) elemType;
+            if (elemInt.isCharacter()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public long getAlignment() {
         return getElementType().getAlignment();
     }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

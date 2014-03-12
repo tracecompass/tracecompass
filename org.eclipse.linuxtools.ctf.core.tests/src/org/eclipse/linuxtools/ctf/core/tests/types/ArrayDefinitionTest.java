@@ -11,9 +11,7 @@
 
 package org.eclipse.linuxtools.ctf.core.tests.types;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -180,57 +178,6 @@ public class ArrayDefinitionTest {
         assertNotNull(result);
     }
 
-    /**
-     * Run the boolean isString() method test.
-     */
-    @Test
-    public void testIsString_ownDefs() {
-
-        boolean result = stringArrayFixture.isString();
-
-        assertFalse(result);
-    }
-
-    /**
-     * Run the boolean isString() method test.
-     */
-    @Test
-    public void testIsString_complex() {
-        final IntegerDeclaration id = new IntegerDeclaration(8, false, 16,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null, 8);
-        ArrayDeclaration ad = new ArrayDeclaration(0, id);
-        ArrayDefinition ownFixture = new ArrayDefinition(ad, this.trace, "Testx");
-
-        int size = 4;
-        int bits = 8;
-        IntegerDefinition[] defs = createIntDefs(size, bits);
-
-        ownFixture.setDefinitions(defs);
-        boolean result = ownFixture.isString();
-
-        assertTrue(result);
-    }
-
-    /**
-     * Run the boolean isString() method test.
-     */
-    @Test
-    public void testIsString_emptyDef() {
-        charArrayFixture.setDefinitions(new Definition[] {});
-        boolean result = charArrayFixture.isString();
-
-        assertTrue(result);
-    }
-
-    /**
-     * Run the boolean isString() method test.
-     */
-    @Test
-    public void testIsString_emptyDefStrDecl() {
-        ArrayDefinition ownFixture = createStringArray();
-        boolean result = ownFixture.isString();
-        assertFalse(result);
-    }
     /**
      * Run the void read(BitBuffer) method test.
      * @throws CTFReaderException error

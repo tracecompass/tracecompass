@@ -11,13 +11,16 @@
 
 package org.eclipse.linuxtools.ctf.core.tests.types;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+
+import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.junit.Before;
 import org.junit.Test;
@@ -87,6 +90,29 @@ public class ArrayDeclarationTest {
     public void testGetLength() {
         int result = fixture.getLength();
         assertEquals(1, result);
+    }
+
+    /**
+     * Run the boolean isString() method test.
+     */
+    @Test
+    public void testIsString_ownDefs() {
+        //it's an array of strings, not a string
+        assertFalse(fixture.isString());
+    }
+
+    /**
+     * Run the boolean isString() method test.
+     */
+    @Test
+    public void testIsString_complex() {
+        final IntegerDeclaration id = new IntegerDeclaration(8, false, 16,
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null, 8);
+        ArrayDeclaration ad = new ArrayDeclaration(0, id);
+
+        boolean result = ad.isString();
+
+        assertTrue(result);
     }
 
     /**

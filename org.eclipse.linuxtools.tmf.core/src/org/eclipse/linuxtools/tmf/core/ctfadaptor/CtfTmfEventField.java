@@ -106,7 +106,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
         } else if (fieldDef instanceof ArrayDefinition) {
             ArrayDefinition arrayDef = (ArrayDefinition) fieldDef;
 
-            if (arrayDef.isString()) {
+            if (arrayDef.getDeclaration().isString()) {
                 /* This is an array of UTF-8 bytes, a.k.a. a String! */
                 field = new CTFStringField(fieldName, fieldDef.toString());
 
