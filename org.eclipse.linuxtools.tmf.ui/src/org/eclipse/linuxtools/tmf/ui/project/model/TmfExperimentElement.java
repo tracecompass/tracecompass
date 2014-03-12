@@ -300,9 +300,11 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         /* See if a default editor was set for this experiment type */
         if (getTraceType() != null) {
             IConfigurationElement ce = sfTraceTypeUIAttributes.get(getTraceType());
-            IConfigurationElement[] defaultEditorCE = ce.getChildren(TmfTraceTypeUIUtils.DEFAULT_EDITOR_ELEM);
-            if (defaultEditorCE.length == 1) {
-                return defaultEditorCE[0].getAttribute(TmfTraceType.ID_ATTR);
+            if (ce != null) {
+                IConfigurationElement[] defaultEditorCE = ce.getChildren(TmfTraceTypeUIUtils.DEFAULT_EDITOR_ELEM);
+                if (defaultEditorCE.length == 1) {
+                    return defaultEditorCE[0].getAttribute(TmfTraceType.ID_ATTR);
+                }
             }
         }
 
