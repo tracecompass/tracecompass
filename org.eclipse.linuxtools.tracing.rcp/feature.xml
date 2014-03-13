@@ -5,7 +5,7 @@
       version="0.0.1.qualifier"
       provider-name="%featureProvider"
       plugin="org.eclipse.linuxtools.tracing.rcp.branding"
-      license-feature="org.eclipse.linuxtools.license.feature"
+      license-feature="org.eclipse.license"
       license-feature-version="1.0.0.qualifier">
 
    <description>
