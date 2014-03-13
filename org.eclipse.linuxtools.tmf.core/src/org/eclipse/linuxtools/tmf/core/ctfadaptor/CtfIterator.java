@@ -59,7 +59,7 @@ public class CtfIterator extends CTFTraceReader
     public CtfIterator(CtfTmfTrace trace) throws CTFReaderException {
         super(trace.getCTFTrace());
         fTrace = trace;
-        if (this.hasMoreEvents()) {
+        if (hasMoreEvents()) {
             fCurLocation = new CtfLocation(trace.getStartTime());
             fCurRank = 0;
         } else {
@@ -275,9 +275,9 @@ public class CtfIterator extends CTFTraceReader
 
     @Override
     public int compareTo(final CtfIterator o) {
-        if (this.getRank() < o.getRank()) {
+        if (getRank() < o.getRank()) {
             return -1;
-        } else if (this.getRank() > o.getRank()) {
+        } else if (getRank() > o.getRank()) {
             return 1;
         }
         return 0;
