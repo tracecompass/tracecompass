@@ -200,8 +200,8 @@ public abstract class CtfTmfEventField extends TmfEventField {
  */
 final class CTFIntegerField extends CtfTmfEventField {
 
-    private final int base;
-    private final boolean signed;
+    private final int fBase;
+    private final boolean fSigned;
 
     /**
      * A CTF "IntegerDefinition" can be an integer of any byte size, so in the
@@ -216,8 +216,8 @@ final class CTFIntegerField extends CtfTmfEventField {
      */
     CTFIntegerField(String name, long longValue, int base, boolean signed) {
         super(name, longValue, null);
-        this.signed = signed;
-        this.base = base;
+        fSigned = signed;
+        fBase = base;
     }
 
     @Override
@@ -227,7 +227,7 @@ final class CTFIntegerField extends CtfTmfEventField {
 
     @Override
     public String getFormattedValue() {
-        return IntegerDefinition.formatNumber(getValue(), base, signed);
+        return IntegerDefinition.formatNumber(getValue(), fBase, fSigned);
     }
 
 }
@@ -264,9 +264,9 @@ final class CTFStringField extends CtfTmfEventField {
  */
 final class CTFIntegerArrayField extends CtfTmfEventField {
 
-    private final int base;
-    private final boolean signed;
-    private String formattedValue = null;
+    private final int fBase;
+    private final boolean fSigned;
+    private String fFormattedValue = null;
 
     /**
      * Constructor for CTFIntegerArrayField.
@@ -281,8 +281,8 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
      */
     CTFIntegerArrayField(String name, long[] longValues, int base, boolean signed) {
         super(name, longValues, null);
-        this.base = base;
-        this.signed = signed;
+        fBase = base;
+        fSigned = signed;
     }
 
     @Override
@@ -292,14 +292,14 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
 
     @Override
     public synchronized String getFormattedValue() {
-        if (formattedValue == null) {
+        if (fFormattedValue == null) {
             List<String> strings = new ArrayList<>();
             for (long value : getValue()) {
-                strings.add(IntegerDefinition.formatNumber(value, base, signed));
+                strings.add(IntegerDefinition.formatNumber(value, fBase, fSigned));
             }
-            formattedValue = strings.toString();
+            fFormattedValue = strings.toString();
         }
-        return formattedValue;
+        return fFormattedValue;
     }
 
 }
@@ -311,7 +311,7 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
  */
 final class CTFArrayField extends CtfTmfEventField {
 
-    private String formattedValue = null;
+    private String fFormattedValue = null;
 
     /**
      * Constructor for CTFArrayField.
@@ -332,14 +332,14 @@ final class CTFArrayField extends CtfTmfEventField {
 
     @Override
     public synchronized String getFormattedValue() {
-        if (formattedValue == null) {
+        if (fFormattedValue == null) {
             List<String> strings = new ArrayList<>();
             for (CtfTmfEventField element : getValue()) {
                 strings.add(element.getFormattedValue());
             }
-            formattedValue = strings.toString();
+            fFormattedValue = strings.toString();
         }
-        return formattedValue;
+        return fFormattedValue;
     }
 }
 
