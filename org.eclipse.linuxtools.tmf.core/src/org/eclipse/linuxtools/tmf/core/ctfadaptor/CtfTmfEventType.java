@@ -44,7 +44,7 @@ public class CtfTmfEventType extends TmfEventType {
      */
     @Override
     public String toString() {
-        return this.getName();
+        return getName();
     }
 
     /**
