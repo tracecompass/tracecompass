@@ -30,8 +30,8 @@ public class CtfTmfContext implements ITmfContext {
     // Fields
     // -------------------------------------------
 
-    private CtfLocation curLocation;
-    private long curRank;
+    private CtfLocation fCurLocation;
+    private long fCurRank;
 
     private final CtfTmfTrace fTrace;
 
@@ -48,7 +48,7 @@ public class CtfTmfContext implements ITmfContext {
      */
     public CtfTmfContext(CtfTmfTrace ctfTmfTrace) {
         fTrace = ctfTmfTrace;
-        curLocation = new CtfLocation(new CtfLocationInfo(0, 0));
+        fCurLocation = new CtfLocation(new CtfLocationInfo(0, 0));
     }
 
     // -------------------------------------------
@@ -57,7 +57,7 @@ public class CtfTmfContext implements ITmfContext {
 
     @Override
     public long getRank() {
-        return curRank;
+        return fCurRank;
     }
 
     /**
@@ -65,12 +65,12 @@ public class CtfTmfContext implements ITmfContext {
      */
     @Override
     public ITmfLocation getLocation() {
-        return curLocation;
+        return fCurLocation;
     }
 
     @Override
     public boolean hasValidRank() {
-        return curRank != CtfLocation.INVALID_LOCATION.getTimestamp();
+        return fCurRank != CtfLocation.INVALID_LOCATION.getTimestamp();
     }
 
     /**
@@ -78,22 +78,22 @@ public class CtfTmfContext implements ITmfContext {
      */
     @Override
     public void setLocation(ITmfLocation location) {
-        curLocation = (CtfLocation) location;
-        if (curLocation != null) {
-            getIterator().seek(curLocation.getLocationInfo());
+        fCurLocation = (CtfLocation) location;
+        if (fCurLocation != null) {
+            getIterator().seek(fCurLocation.getLocationInfo());
         }
     }
 
     @Override
     public void setRank(long rank) {
-        curRank = rank;
+        fCurRank = rank;
 
     }
 
     @Override
     public void increaseRank() {
         if (hasValidRank()) {
-            curRank++;
+            fCurRank++;
         }
     }
 
@@ -125,19 +125,19 @@ public class CtfTmfContext implements ITmfContext {
      * @return success or not
      */
     public synchronized boolean advance() {
-        final CtfLocationInfo curLocationData = this.curLocation.getLocationInfo();
+        final CtfLocationInfo curLocationData = fCurLocation.getLocationInfo();
         boolean retVal = getIterator().advance();
         CtfTmfEvent currentEvent = getIterator().getCurrentEvent();
 
         if (currentEvent != null) {
             final long timestampValue = currentEvent.getTimestamp().getValue();
             if (curLocationData.getTimestamp() == timestampValue) {
-                curLocation = new CtfLocation(timestampValue, curLocationData.getIndex() + 1);
+                fCurLocation = new CtfLocation(timestampValue, curLocationData.getIndex() + 1);
             } else {
-                curLocation = new CtfLocation(timestampValue, 0L);
+                fCurLocation = new CtfLocation(timestampValue, 0L);
             }
         } else {
-            curLocation = new CtfLocation(CtfLocation.INVALID_LOCATION);
+            fCurLocation = new CtfLocation(CtfLocation.INVALID_LOCATION);
         }
 
         return retVal;
@@ -156,7 +156,7 @@ public class CtfTmfContext implements ITmfContext {
      * @return success or not
      */
     public synchronized boolean seek(final long timestamp) {
-        curLocation = new CtfLocation(timestamp, 0);
+        fCurLocation = new CtfLocation(timestamp, 0);
         return getIterator().seek(timestamp);
     }
 
@@ -169,7 +169,7 @@ public class CtfTmfContext implements ITmfContext {
      * @since 2.0
      */
     public synchronized boolean seek(final CtfLocationInfo location) {
-        curLocation = new CtfLocation(location);
+        fCurLocation = new CtfLocation(location);
         return getIterator().seek(location);
     }
 
