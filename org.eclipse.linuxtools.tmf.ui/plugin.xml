@@ -1678,6 +1678,10 @@
                applies="true"
                class="org.eclipse.linuxtools.tmf.core.trace.TmfTrace">
          </tracetype>
+         <tracetype
+               applies="false"
+               class="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment">
+         </tracetype>
       </module>
    </extension>
    <extension
