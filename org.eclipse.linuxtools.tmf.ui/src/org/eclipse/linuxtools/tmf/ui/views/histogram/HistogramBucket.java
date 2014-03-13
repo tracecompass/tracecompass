@@ -69,7 +69,7 @@ public class HistogramBucket {
 
     /**
      * Add an event in this bucket
-     * @param traceIndex a trace index - see {@link HistogramDataModel#setTraces}.
+     * @param traceIndex a trace index - see {@link HistogramDataModel#setTrace}.
      */
     public void addEvent(int traceIndex) {
         this.fNbEvents++;
