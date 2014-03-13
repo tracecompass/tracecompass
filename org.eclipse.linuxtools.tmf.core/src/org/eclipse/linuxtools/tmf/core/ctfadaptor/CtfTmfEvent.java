@@ -50,9 +50,9 @@ public class CtfTmfEvent extends TmfEvent
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final int sourceCPU;
-    private final long typeId;
-    private final String eventName;
+    private final int fSourceCPU;
+    private final long fTypeId;
+    private final String fEventName;
     private final IEventDeclaration fDeclaration;
 
     // ------------------------------------------------------------------------
@@ -75,9 +75,9 @@ public class CtfTmfEvent extends TmfEvent
         );
 
         fDeclaration = declaration;
-        sourceCPU = cpu;
-        typeId = declaration.getId();
-        eventName = declaration.getName();
+        fSourceCPU = cpu;
+        fTypeId = declaration.getId();
+        fEventName = declaration.getName();
 
     }
 
@@ -97,10 +97,10 @@ public class CtfTmfEvent extends TmfEvent
                 null,
                 new TmfEventField("", null, new CtfTmfEventField[0]), //$NON-NLS-1$
                 NO_STREAM);
-        this.sourceCPU = -1;
-        this.typeId = -1;
-        this.eventName = EMPTY_CTF_EVENT_NAME;
-        this.fDeclaration = null;
+        fSourceCPU = -1;
+        fTypeId = -1;
+        fEventName = EMPTY_CTF_EVENT_NAME;
+        fDeclaration = null;
     }
 
     // ------------------------------------------------------------------------
@@ -113,7 +113,7 @@ public class CtfTmfEvent extends TmfEvent
      * @return The cpu id for a given source. In lttng it's from CPUINFO
      */
     public int getCPU() {
-        return this.sourceCPU;
+        return fSourceCPU;
     }
 
     /**
@@ -125,7 +125,7 @@ public class CtfTmfEvent extends TmfEvent
      * @return The event ID
      */
     public long getID() {
-        return this.typeId;
+        return fTypeId;
     }
 
     @Override
@@ -139,10 +139,10 @@ public class CtfTmfEvent extends TmfEvent
 
     @Override
     public ITmfEventType getType() {
-        CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(eventName);
+        CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(fEventName);
         if (ctfTmfEventType == null) {
             /* Should only return null the first time */
-            ctfTmfEventType = new CtfTmfEventType(eventName, this.getContent());
+            ctfTmfEventType = new CtfTmfEventType(fEventName, getContent());
         }
         return ctfTmfEventType;
     }
@@ -191,11 +191,11 @@ public class CtfTmfEvent extends TmfEvent
             ITmfEventField ipField = getContent().getField(CtfConstants.CONTEXT_FIELD_PREFIX + CtfConstants.IP_KEY);
             if (ipField != null && ipField.getValue() instanceof Long) {
                 long ip = (Long) ipField.getValue();
-                callsite = ctfTrace.getCallsite(eventName, ip);
+                callsite = ctfTrace.getCallsite(fEventName, ip);
             }
         }
         if (callsite == null) {
-            callsite = ctfTrace.getCallsite(eventName);
+            callsite = ctfTrace.getCallsite(fEventName);
         }
         if (callsite != null) {
             return new CtfTmfCallsite(callsite);
