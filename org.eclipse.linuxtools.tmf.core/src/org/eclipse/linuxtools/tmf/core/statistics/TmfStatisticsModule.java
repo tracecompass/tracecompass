@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.views.statistics;
+package org.eclipse.linuxtools.tmf.core.statistics;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,12 +24,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
-import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
-import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
-import org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsEventTypesModule;
-import org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsTotalsModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput;
 
 /**
  * Analysis module to compute the statistics of a trace.
@@ -41,7 +36,7 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         implements ITmfAnalysisModuleWithStateSystems {
 
     /** ID of this analysis module */
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.statistics.analysis"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.tmf.core.statistics.analysis"; //$NON-NLS-1$
 
     /** The trace's statistics */
     private ITmfStatistics fStatistics = null;
@@ -56,7 +51,6 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
      */
     public TmfStatisticsModule() {
         super();
-        this.registerOutput(new TmfAnalysisViewOutput(TmfStatisticsView.ID));
     }
 
     /**

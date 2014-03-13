@@ -15,6 +15,20 @@
       <source
             class="org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement">
       </source>
+      <module
+            analysis_module="org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsModule"
+            automatic="true"
+            id="org.eclipse.linuxtools.tmf.core.statistics.analysis"
+            name="Tmf Statistics Analysis">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.tmf.core.trace.TmfTrace">
+         </tracetype>
+         <tracetype
+               applies="false"
+               class="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment">
+         </tracetype>
+      </module>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.tracetype">

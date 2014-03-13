@@ -16,10 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
+import org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.barcharts.TmfBarChartViewer;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsModule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
