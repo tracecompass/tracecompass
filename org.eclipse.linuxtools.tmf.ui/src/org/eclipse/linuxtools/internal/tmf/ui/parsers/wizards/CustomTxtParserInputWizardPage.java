@@ -164,7 +164,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         }
     }
 
-	@Override
+    @Override
     public void createControl(Composite parent) {
         container = new Composite(parent, SWT.NULL);
         container.setLayout(new GridLayout());
@@ -247,7 +247,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         addNextButton.setImage(ADD_NEXT_IMAGE);
         addNextButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_addNextLine);
         addNextButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 InputLine inputLine = new InputLine(Cardinality.ZERO_OR_MORE, "", null); //$NON-NLS-1$
                 if (((List<?>) treeViewer.getInput()).size() == 0) {
@@ -302,7 +302,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 if (inputLine.parentInput == null) {
                     for (int i = 1; i < definition.inputs.size(); i++) {
                         if (definition.inputs.get(i).equals(inputLine)) {
-                            definition.inputs.add(i - 1 , definition.inputs.remove(i));
+                            definition.inputs.add(i - 1, definition.inputs.remove(i));
                             break;
                         }
                     }
@@ -327,7 +327,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 if (inputLine.parentInput == null) {
                     for (int i = 0; i < definition.inputs.size() - 1; i++) {
                         if (definition.inputs.get(i).equals(inputLine)) {
-                            definition.inputs.add(i + 1 , definition.inputs.remove(i));
+                            definition.inputs.add(i + 1, definition.inputs.remove(i));
                             break;
                         }
                     }
@@ -389,9 +389,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         logtypeText.addModifyListener(updateListener);
         timestampOutputFormatText.addModifyListener(updateListener);
 
-        lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+        lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
 
-        hSash.setWeights(new int[] {1, 2});
+        hSash.setWeights(new int[] { 1, 2 });
 
         Composite sashBottom = new Composite(vSash, SWT.NONE);
         GridLayout sashBottomLayout = new GridLayout(3, false);
@@ -440,7 +440,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         inputText.setText(getSelectionText());
         inputText.addModifyListener(updateListener);
 
-        vSash.setWeights(new int[] {hSash.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, sashBottom.computeSize(SWT.DEFAULT, SWT.DEFAULT).y});
+        vSash.setWeights(new int[] { hSash.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, sashBottom.computeSize(SWT.DEFAULT, SWT.DEFAULT).y });
 
         setControl(container);
 
@@ -542,9 +542,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private String getName(InputLine inputLine) {
         if (inputLine.parentInput == null) {
-            return Integer.toString(definition.inputs.indexOf(inputLine)+1);
+            return Integer.toString(definition.inputs.indexOf(inputLine) + 1);
         }
-        return getName(inputLine.parentInput) + "." + Integer.toString(inputLine.parentInput.childrenInputs.indexOf(inputLine)+1); //$NON-NLS-1$
+        return getName(inputLine.parentInput) + "." + Integer.toString(inputLine.parentInput.childrenInputs.indexOf(inputLine) + 1); //$NON-NLS-1$
     }
 
     /**
@@ -597,7 +597,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         selectedLine.dispose();
         selectedLine = null;
         lineContainer.layout();
-        lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+        lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
         container.layout();
     }
 
@@ -605,7 +605,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         if (this.selection instanceof IStructuredSelection) {
             Object sel = ((IStructuredSelection) this.selection).getFirstElement();
             if (sel instanceof IFile) {
-                IFile file = (IFile)sel;
+                IFile file = (IFile) sel;
                 BufferedReader reader = null;
                 try {
                     reader = new BufferedReader(new InputStreamReader(file.getContents()));
@@ -832,7 +832,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 } catch (ParseException e) {
                     timestampPreviewText.setText("*parse exception* [" + firstEntryTimeStamp + "] <> [" + firstEntryTimeStampInputFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 } catch (IllegalArgumentException e) {
-                    timestampPreviewText.setText("*parse exception* [Illegal Argument: " + e.getMessage()+ "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                    timestampPreviewText.setText("*parse exception* [Illegal Argument: " + e.getMessage() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 
             }
@@ -842,15 +842,15 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private void updatePreviewLine(InputLine line, Matcher matcher, Map<String, String> data, int rawPos, int rootLineMatches) {
         for (int i = 0; i < line.columns.size(); i++) {
             InputData input = line.columns.get(i);
-            if (i < matcher.groupCount() && matcher.group(i+1) != null) {
+            if (i < matcher.groupCount() && matcher.group(i + 1) != null) {
                 if (line.parentInput == null) {
-                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i+1), matcher.end(i+1) - matcher.start(i+1),
+                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i + 1), matcher.end(i + 1) - matcher.start(i + 1),
                             COLOR_BLACK, COLOR_GREEN, SWT.BOLD));
                 } else {
-                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i+1), matcher.end(i+1) - matcher.start(i+1),
+                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i + 1), matcher.end(i + 1) - matcher.start(i + 1),
                             COLOR_BLACK, COLOR_LIGHT_GREEN, SWT.BOLD));
                 }
-                String value = matcher.group(i+1).trim();
+                String value = matcher.group(i + 1).trim();
                 if (selectedLine != null && selectedLine.inputLine.equals(line) && rootLineMatches == 1 &&
                         selectedLine.inputs.get(i).previewText.getText().equals(Messages.CustomTxtParserInputWizardPage_noMatchingLine)) {
                     selectedLine.inputs.get(i).previewText.setText(value);
@@ -902,12 +902,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         }
         // highlight the matching groups that have no corresponponding input
         for (int i = line.columns.size(); i < matcher.groupCount(); i++) {
-            if (matcher.group(i+1) != null) {
+            if (matcher.group(i + 1) != null) {
                 if (line.parentInput == null) {
-                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i+1), matcher.end(i+1) - matcher.start(i+1),
+                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i + 1), matcher.end(i + 1) - matcher.start(i + 1),
                             COLOR_BLACK, COLOR_MAGENTA));
                 } else {
-                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i+1), matcher.end(i+1) - matcher.start(i+1),
+                    inputText.setStyleRange(new StyleRange(rawPos + matcher.start(i + 1), matcher.end(i + 1) - matcher.start(i + 1),
                             COLOR_BLACK, COLOR_LIGHT_MAGENTA));
                 }
             }
@@ -946,7 +946,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         int line1start = 0;
         String line1 = Messages.CustomTxtParserInputWizardPage_nonMatchingLine;
         int line2start = line1start + line1.length();
-        String line2 = Messages.CustomTxtParserInputWizardPage_matchingLineRoot + cg + ' ' + ucg + ' ' + ut + " \n";  //$NON-NLS-1$
+        String line2 = Messages.CustomTxtParserInputWizardPage_matchingLineRoot + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
         int line3start = line2start + line2.length();
         String line3 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
         int line4start = line3start + line3.length();
@@ -1075,11 +1075,11 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     Cardinality.ZERO_OR_MORE.toString(),
                     Cardinality.ONE_OR_MORE.toString(),
                     Cardinality.ZERO_OR_ONE.toString(),
-                    Cardinality.ONE.toString(),
-                    "(?,?)"}); //$NON-NLS-1$
+                    Cardinality.ONE.toString(), "(?,?)" }); //$NON-NLS-1$
             cardinalityCombo.addSelectionListener(new SelectionListener() {
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {}
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
 
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -1130,11 +1130,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             infiniteButton = new Button(cardinalityContainer, SWT.PUSH);
             infiniteButton.setText(INFINITY_STRING);
             infiniteButton.setVisible(false);
-            infiniteButton.addSelectionListener(new SelectionAdapter(){
+            infiniteButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     cardinalityMaxText.setText(INFINITY_STRING);
-                }});
+                }
+            });
 
             if (inputLine.cardinality.equals(Cardinality.ZERO_OR_MORE)) {
                 cardinalityCombo.select(0);
@@ -1162,7 +1163,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
 
             VerifyListener digitsListener = new VerifyListener() {
-            	@Override
+                @Override
                 public void verifyText(VerifyEvent e) {
                     if (e.text.equals(INFINITY_STRING)) {
                         e.doit = e.widget == cardinalityMaxText && e.start == 0 && e.end == ((Text) e.widget).getText().length();
@@ -1177,7 +1178,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                             }
                         }
                     }
-                }};
+                }
+            };
 
             cardinalityMinText.addModifyListener(updateListener);
             cardinalityMaxText.addModifyListener(updateListener);
@@ -1186,7 +1188,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
             if (inputLine.columns != null) {
                 for (InputData inputData : inputLine.columns) {
-                    InputGroup inputGroup = new InputGroup(group, this, inputs.size()+1);
+                    InputGroup inputGroup = new InputGroup(group, this, inputs.size() + 1);
                     if (inputData.name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
                         inputGroup.tagCombo.select(0);
                         inputGroup.tagText.setText(inputData.format);
@@ -1218,13 +1220,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             addGroupButton.setImage(ADD_IMAGE);
             addGroupButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_addGroup);
             addGroupButton.addSelectionListener(new SelectionAdapter() {
-            	@Override
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     removeAddGroupButton();
-                    inputs.add(new InputGroup(group, Line.this, inputs.size()+1));
+                    inputs.add(new InputGroup(group, Line.this, inputs.size() + 1));
                     createAddGroupButton();
                     lineContainer.layout();
-                    lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+                    lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
                     group.getParent().layout();
                     validate();
                     updatePreviews();
@@ -1245,10 +1247,10 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             if (--nb < inputs.size()) {
                 inputs.remove(nb).dispose();
                 for (int i = nb; i < inputs.size(); i++) {
-                    inputs.get(i).setInputNumber(i+1);
+                    inputs.get(i).setInputNumber(i + 1);
                 }
                 lineContainer.layout();
-                lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+                lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
                 group.getParent().layout();
             }
         }
@@ -1272,8 +1274,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             case 3:
                 inputLine.cardinality = Cardinality.ONE;
                 break;
-            case 4: //(?,?)
-                int min, max;
+            case 4: // (?,?)
+                int min,
+                max;
                 try {
                     min = Integer.parseInt(cardinalityMinText.getText());
                 } catch (NumberFormatException e) {
@@ -1347,7 +1350,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             deleteButton.setImage(DELETE_IMAGE);
             deleteButton.setToolTipText(Messages.CustomTxtParserInputWizardPage_removeGroup);
             deleteButton.addSelectionListener(new SelectionAdapter() {
-            	@Override
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     InputGroup.this.line.removeInput(InputGroup.this.inputNumber);
                     validate();
@@ -1367,34 +1370,36 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             tagComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
             tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-            tagCombo.setItems(new String[] {CustomTraceDefinition.TAG_TIMESTAMP,
-                                            CustomTraceDefinition.TAG_MESSAGE,
-                                            CustomTraceDefinition.TAG_OTHER});
+            tagCombo.setItems(new String[] { CustomTraceDefinition.TAG_TIMESTAMP,
+                    CustomTraceDefinition.TAG_MESSAGE,
+                    CustomTraceDefinition.TAG_OTHER });
             tagCombo.select(1);
-            tagCombo.addSelectionListener(new SelectionListener(){
-            	@Override
-                public void widgetDefaultSelected(SelectionEvent e) {}
-            	@Override
+            tagCombo.addSelectionListener(new SelectionListener() {
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     tagText.removeModifyListener(updateListener);
                     switch (tagCombo.getSelectionIndex()) {
-                    case 0: //Time Stamp
+                    case 0: // Time Stamp
                         tagLabel.setText(Messages.CustomTxtParserInputWizardPage_format);
                         tagLabel.setVisible(true);
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
                         break;
-                    case 1: //Message
+                    case 1: // Message
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         break;
-                    case 2: //Other
+                    case 2: // Other
                         tagLabel.setText(Messages.CustomTxtParserInputWizardPage_name);
                         tagLabel.setVisible(true);
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
                         break;
-                    case 3: //Continue
+                    case 3: // Continue
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         break;
@@ -1404,7 +1409,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     tagComposite.layout();
                     validate();
                     updatePreviews();
-                }});
+                }
+            });
 
             tagLabel = new Label(tagComposite, SWT.NULL);
             tagLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
@@ -1417,7 +1423,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             tagText.setVisible(false);
 
             actionCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-            actionCombo.setItems(new String[] {Messages.CustomTxtParserInputWizardPage_set, Messages.CustomTxtParserInputWizardPage_append, Messages.CustomTxtParserInputWizardPage_appendWith});
+            actionCombo.setItems(new String[] { Messages.CustomTxtParserInputWizardPage_set, Messages.CustomTxtParserInputWizardPage_append, Messages.CustomTxtParserInputWizardPage_appendWith });
             actionCombo.select(0);
             actionCombo.addSelectionListener(updateListener);
 
@@ -1478,7 +1484,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         for (int i = 0; i < definition.inputs.size(); i++) {
 
             InputLine inputLine = definition.inputs.get(i);
-            String name = Integer.toString(i+1);
+            String name = Integer.toString(i + 1);
             errors.append(validateLine(inputLine, name));
         }
         if (timestampFound) {
@@ -1529,13 +1535,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 line.regexText.setBackground(COLOR_TEXT_BACKGROUND);
             }
         } catch (PatternSyntaxException e) {
-            errors.append("Enter a valid regular expression (Line "+name+"). "); //$NON-NLS-1$ //$NON-NLS-2$
+            errors.append("Enter a valid regular expression (Line " + name + "). "); //$NON-NLS-1$ //$NON-NLS-2$
             if (line != null) {
                 line.regexText.setBackground(COLOR_LIGHT_RED);
             }
         }
         if (inputLine.getMinCount() == -1) {
-            errors.append("Enter a minimum value for cardinality (Line "+name+"). "); //$NON-NLS-1$ //$NON-NLS-2$
+            errors.append("Enter a minimum value for cardinality (Line " + name + "). "); //$NON-NLS-1$ //$NON-NLS-2$
             if (line != null) {
                 line.cardinalityMinText.setBackground(COLOR_LIGHT_RED);
             }
@@ -1545,12 +1551,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         }
         if (inputLine.getMaxCount() == -1) {
-            errors.append("Enter a maximum value for cardinality (Line "+name+"). "); //$NON-NLS-1$ //$NON-NLS-2$
+            errors.append("Enter a maximum value for cardinality (Line " + name + "). "); //$NON-NLS-1$ //$NON-NLS-2$
             if (line != null) {
                 line.cardinalityMaxText.setBackground(COLOR_LIGHT_RED);
             }
         } else if (inputLine.getMinCount() > inputLine.getMaxCount()) {
-            errors.append("Enter correct (min <= max) values for cardinality (Line "+name+"). "); //$NON-NLS-1$ //$NON-NLS-2$
+            errors.append("Enter correct (min <= max) values for cardinality (Line " + name + "). "); //$NON-NLS-1$ //$NON-NLS-2$
             if (line != null) {
                 line.cardinalityMinText.setBackground(COLOR_LIGHT_RED);
             }
@@ -1571,7 +1577,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             if (inputData.name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
                 timestampFound = true;
                 if (inputData.format.length() == 0) {
-                    errors.append("Enter the input format for the Time Stamp (Line "+name+" Group "+(i+1)+"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    errors.append("Enter the input format for the Time Stamp (Line " + name + " Group " + (i + 1) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     if (group != null) {
                         group.tagText.setBackground(COLOR_LIGHT_RED);
                     }
@@ -1582,14 +1588,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                             group.tagText.setBackground(COLOR_TEXT_BACKGROUND);
                         }
                     } catch (IllegalArgumentException e) {
-                        errors.append("Enter a valid input format for the Time Stamp (Line "+name+" Group "+(i+1)+") [" + e.getMessage() + "]. "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                        errors.append("Enter a valid input format for the Time Stamp (Line " + name + " Group " + (i + 1) + ") [" + e.getMessage() + "]. "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                         if (group != null) {
                             group.tagText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                 }
             } else if (inputData.name.length() == 0) {
-                errors.append("Enter a name for the data group (Line "+name+" Group "+(i+1)+"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                errors.append("Enter a name for the data group (Line " + name + " Group " + (i + 1) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 if (group != null) {
                     group.tagText.setBackground(COLOR_LIGHT_RED);
                 }
@@ -1600,7 +1606,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         }
         for (int i = 0; inputLine.childrenInputs != null && i < inputLine.childrenInputs.size(); i++) {
-            errors.append(validateLine(inputLine.childrenInputs.get(i), name+"."+(i+1))); //$NON-NLS-1$
+            errors.append(validateLine(inputLine.childrenInputs.get(i), name + "." + (i + 1))); //$NON-NLS-1$
         }
         return errors;
     }
