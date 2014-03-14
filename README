@@ -15,17 +15,9 @@ http://wiki.eclipse.org/Linux_Tools_Project/LTTng_Eclipse_Plug-in_Development_En
 
 
 
-To build it using Maven, you first need to build the Linux Tools licensing
-feature (starting from the root of the source tree):
-$ cd releng/org.eclipse.linuxtools.license-feature
+To build the plugins manually, first cd to the directory then invoke Maven:
+$ cd lttng/
 $ mvn clean install
-Then you can build the LTTng plugins:
-$ cd ../../lttng
-$ mvn clean install
-
-As long as you don't clear the Maven reactor cache (in ~/.m2), you should not
-need to rebuild the licensing feature.
-
 
 The default command will compile and run the unit tests. Running the tests can
 take some time, to skip them you can append "-Dmaven.test.skip=true" to the
