@@ -270,6 +270,14 @@ public final class TmfTraceTypeUIUtils {
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject(), true);
         if (resource.getParent().equals(tmfProject.getTracesFolder().getResource())) {
             refreshTraceElement(tmfProject.getTracesFolder().getTraces(), resource.getName());
+        } else if (resource.getParent().equals(tmfProject.getExperimentsFolder().getResource())) {
+            /* The trace type to set is for an experiment */
+            for (TmfExperimentElement experimentElement : tmfProject.getExperimentsFolder().getExperiments()) {
+                if (resource.equals(experimentElement.getResource())) {
+                    experimentElement.refreshTraceType();
+                    break;
+                }
+            }
         } else {
             for (TmfExperimentElement experimentElement : tmfProject.getExperimentsFolder().getExperiments()) {
                 if (resource.getParent().equals(experimentElement.getResource())) {
