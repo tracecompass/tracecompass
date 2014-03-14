@@ -49,7 +49,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 public class ProjectModelTestData {
 
     /* Maximum number of thread delays the main thread will do before timing out */
-    private static final int DELAY_COUNTER = 10;
+    private static final int DELAY_COUNTER = 1000;
     /* Default delay time when having the main thread sleep. */
     private static final long DEFAULT_DELAY = 500;
 
