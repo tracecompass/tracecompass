@@ -16,7 +16,10 @@ package org.eclipse.tracecompass.tmf.tests.stubs.trace;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IProject;
@@ -24,6 +27,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.core.request.TmfCoalescedEventRequest;
+import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -422,4 +427,47 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
     public void selectTrace() {
         TmfSignalManager.dispatchSignal(new TmfTraceSelectedSignal(this, this));
     }
+
+    /**
+     * @return a copy of the pending request list
+     * @throws Exception if java reflection failed
+     */
+    public List<TmfCoalescedEventRequest> getAllPendingRequests() throws Exception {
+        Method m = TmfEventProvider.class.getDeclaredMethod("getPendingRequests");
+        m.setAccessible(true);
+        LinkedList<?> list= (LinkedList<?>) m.invoke(this);
+        LinkedList<TmfCoalescedEventRequest> retList = new LinkedList<>();
+        for (Object element : list) {
+            retList.add((TmfCoalescedEventRequest) element);
+        }
+        return retList;
+    }
+
+    /**
+     * Clears the pending request list
+     * @throws Exception if java reflection failed
+     */
+    public void clearAllPendingRequests() throws Exception {
+        Method m = TmfEventProvider.class.getDeclaredMethod("clearPendingRequests");
+        m.setAccessible(true);
+        m.invoke(this);
+    }
+
+    /**
+     * Sets the timer flag
+     * @param enabled
+     *              flag to set
+     * @throws Exception if java reflection failed
+     */
+    public void setTimerEnabledFlag(boolean enabled) throws Exception {
+        Class<?>[] paramTypes = new Class[1];
+        paramTypes[0] = Boolean.class;
+        Method m = TmfEventProvider.class.getDeclaredMethod("setTimerEnabled", paramTypes);
+
+        Object[] params = new Object[1];
+        params[0] = Boolean.valueOf(enabled);
+        m.setAccessible(true);
+        m.invoke(this, params);
+    }
+
 }
