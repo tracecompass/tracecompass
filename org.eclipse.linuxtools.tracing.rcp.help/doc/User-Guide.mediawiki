@@ -17,12 +17,12 @@ Now the application can be used as described in the User Guide for Linux Tools
 LTTng integration (see section [[#References | References]]).
 
 = Opening a Trace =
-To open a trace, click on the '''File''' menu and select '''Open Trace File...'''
-(for single trace files) or '''Open Trace Directory...''' (for directory
-traces such as Common Trace Format (CTF) traces). A new dialog will show
-for selecting a trace to open. Select a trace file or directory and then
-click on '''OK'''. Now, the trace viewer's auto detection algorithm will
-validate the trace against all known trace types. If multiple trace types
+To open a trace, click on the '''File''' menu and select '''Open Trace...'''.
+A new dialog will show for selecting a trace to open. Select a trace file
+and then click on '''OK'''. Note that for traces that are directories
+(such as Common Trace Format (CTF) traces) any file in the trace directory can
+be selected to open the trace. Now, the trace viewer's auto detection algorithm
+will validate the trace against all known trace types. If multiple trace types
 are valid, a trace type is chosen based on a confidence criteria. The
 validation process and the computation of the confidence level are trace type
 specific. After successful validation the trace will be opened with the

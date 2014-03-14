@@ -368,26 +368,6 @@
             </visibleWhen>
          </command>
          <command
-               commandId="org.eclipse.linuxtools.tmf.ui.openDir"
-               label="%command.OpenDirectory.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        operator="and">
-                     <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
                commandId="org.eclipse.ui.navigate.openResource"
                disabledIcon="/icons/dlcl16/open.gif"
                icon="/icons/elcl16/open.gif"
@@ -1180,13 +1160,6 @@
             description="%command.OpenFile.description"
             id="org.eclipse.linuxtools.tmf.ui.openFile"
             name="%command.OpenFile.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.file"
-            defaultHandler="org.eclipse.linuxtools.internal.tmf.ui.commands.OpenDirHandler"
-            description="%command.OpenDirectory.description"
-            id="org.eclipse.linuxtools.tmf.ui.openDir"
-            name="%command.OpenDirectory.name">
       </command>
    </extension>
    <extension

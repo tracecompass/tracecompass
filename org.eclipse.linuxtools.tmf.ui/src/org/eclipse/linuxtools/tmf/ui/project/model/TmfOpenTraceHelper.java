@@ -10,6 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *   Patrick Tasse - Update open trace and add open experiment
  *   Geneviève Bastien - Merge methods to open trace and experiments
+ *   Bernd Hufmann - Updated handling of directory traces
  **********************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -32,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
@@ -108,21 +110,23 @@ public class TmfOpenTraceHelper {
      * @since 3.0
      */
     public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell, String tracetypeHint) throws CoreException {
+        final String pathToUse = checkTracePath(path);
         TraceTypeHelper traceTypeToSet = null;
         try {
-            traceTypeToSet = TmfTraceTypeUIUtils.selectTraceType(path, null, tracetypeHint);
+          traceTypeToSet = TmfTraceTypeUIUtils.selectTraceType(pathToUse, null, tracetypeHint);
         } catch (TmfTraceImportException e) {
             MessageBox mb = new MessageBox(shell);
             mb.setMessage(e.getMessage());
             mb.open();
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
         }
+
         IFolder folder = destinationFolder.getResource();
-        String traceName = getTraceName(path, folder);
-        if (traceExists(path, folder)) {
+        String traceName = getTraceName(pathToUse, folder);
+        if (traceExists(pathToUse, folder)) {
             return openTraceFromFolder(destinationFolder, traceName);
         }
-        final IPath pathString = Path.fromOSString(path);
+        final IPath pathString = Path.fromOSString(pathToUse);
         IResource linkedTrace = TmfImportHelper.createLink(folder, pathString, traceName);
 
         if (linkedTrace == null || !linkedTrace.exists()) {
@@ -130,7 +134,7 @@ public class TmfOpenTraceHelper {
                     Messages.TmfOpenTraceHelper_LinkFailed);
         }
 
-        String sourceLocation = URIUtil.toUnencodedString(new File(path).toURI());
+        String sourceLocation = URIUtil.toUnencodedString(pathString.toFile().toURI());
         linkedTrace.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
 
         // No trace type was determined.
@@ -143,6 +147,36 @@ public class TmfOpenTraceHelper {
             ret = openTraceFromFolder(destinationFolder, traceName);
         }
         return ret;
+    }
+
+    /**
+     * Checks whether the parent or grandparent of given path to a file is a
+     * valid directory trace. If it is a directory trace then return the parent
+     * or grandparent path.
+     *
+     * @param path
+     *            the path to check
+     * @return path to use for trace type validation.
+     */
+    private static String checkTracePath(String path) {
+        File file = new File(path);
+        if (file.exists() && !file.isDirectory()) {
+            // First check parent
+            File parent = file.getParentFile();
+            String pathToUse = parent.getAbsolutePath();
+            if (TmfTraceType.getInstance().isDirectoryTrace(pathToUse)) {
+                return pathToUse;
+            }
+            // Second check grandparent
+            File grandParent = parent.getParentFile();
+            if (grandParent != null) {
+                pathToUse = grandParent.getAbsolutePath();
+                if (TmfTraceType.getInstance().isDirectoryTrace(pathToUse)) {
+                    return pathToUse;
+                }
+            }
+        }
+        return path;
     }
 
     private static boolean traceExists(String path, IFolder folder) {

@@ -43,11 +43,6 @@
                   label="%command.OpenFile.label"
                   style="push">
             </command>
-            <command
-                  commandId="org.eclipse.linuxtools.tmf.ui.openDir"
-                  label="%command.OpenDirectory.label"
-                  style="push">
-            </command>
             <separator
                   name="OpenSeparator"
                   visible="true">

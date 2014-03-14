@@ -190,13 +190,13 @@ Tracing projects have two sub-folders: '''Traces''' which holds the individual t
 
 The '''Traces''' folder holds the set of traces available for a tracing project. The following chapters will explain different ways to import traces to the '''Traces''' folder of a tracing project.
 
-==== Open Trace File, Open Trace Directory ====
+==== Opening a Trace ====
 
-To open a single trace, right-click on the '''Traces''' folder and select '''Open Trace File...''' (for single trace files) or '''Open Trace directory...''' (for directory traces such as Common Trace Format (CTF) traces).
+To open a trace, right-click on the '''Traces''' folder and and select '''Open Trace...'''.
 
 [[Image:images/OpenTraceFile.png]]
 
-A new dialog will show for selecting a trace to open. Select a trace file or directory and then click on '''OK'''. Now, the trace viewer will attempt to detect the trace types of the selected trace. The auto detection algorithm will validate the trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. After successful validation the trace will be linked into the '''Traces''' folder and then opened with the detected trace type.
+A new dialog will show for selecting a trace to open. Select a trace file and then click on '''OK'''. Note that for traces that are directories (such as Common Trace Format (CTF) traces) any file in the trace directory can be selected to open the trace. Now, the trace viewer will attempt to detect the trace types of the selected trace. The auto detection algorithm will validate the trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. After successful validation the trace will be linked into the '''Traces''' folder and then opened with the detected trace type.
 
 Note that a trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of available trace types can vary.
 
