@@ -9,12 +9,17 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Alexandre Montplaisir - Merge with TmfCoalescedDataRequest
+ *   Bernd Hufmann - Updated dispatching of events and added requests cache
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.core.request;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -43,6 +48,11 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
      * the global range can be modified as sub-request are added.
      */
     private TmfTimeRange fRange;
+
+    /**
+     * The requests cache to avoid iterating over all requests for each event.
+     */
+    private Map<String, Set<ITmfEventRequest>> fRequestsCache = new HashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -103,8 +113,17 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
      *            The request to add
      */
     public void addRequest(ITmfEventRequest request) {
-        fRequests.add(request);
-        merge(request);
+        // If it is a coalesced request only add the sub-requests
+        if (request instanceof TmfCoalescedEventRequest) {
+            TmfCoalescedEventRequest otherRequest = (TmfCoalescedEventRequest)request;
+            for (ITmfEventRequest subRequest : otherRequest.fRequests) {
+                fRequests.add(subRequest);
+                merge(subRequest);
+            }
+        } else {
+            fRequests.add(request);
+            merge(request);
+        }
     }
 
     /**
@@ -189,8 +208,25 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
     @Override
     public void handleData(ITmfEvent data) {
         super.handleData(data);
+
         long index = getIndex() + getNbRead() - 1;
-        for (ITmfEventRequest request : fRequests) {
+
+        String traceName = data.getTrace().getName();
+        Set<ITmfEventRequest> requests = fRequestsCache.get(traceName);
+
+        if (requests == null) {
+            // Populate requests cache
+            requests = new HashSet<>();
+            for (ITmfEventRequest myRequest : fRequests) {
+                if (myRequest.getEventProvider().providesEvent(data)) {
+                    requests.add(myRequest);
+                }
+            }
+            fRequestsCache.put(traceName, requests);
+        }
+
+        // dispatch event to relevant requests
+        for (ITmfEventRequest request : requests) {
             long start = request.getIndex();
             if (!request.isCompleted() && index >= start && request.getNbRead() < request.getNbRequested()) {
                 ITmfTimestamp ts = data.getTimestamp();

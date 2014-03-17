@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.core.request;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 
@@ -84,6 +85,21 @@ public interface ITmfEventRequest {
      * @return the requested time range
      */
     TmfTimeRange getRange();
+
+    /**
+     * @return the event provider that the request is sent initially.
+     * @since 3.0
+     */
+    ITmfEventProvider getEventProvider();
+
+    /**
+     * Sets the event provider that the request is sent initially.
+     *
+     * @param provider
+     *            event provider to set
+     * @since 3.0
+     */
+    void setEventProvider(ITmfEventProvider provider);
 
     // ------------------------------------------------------------------------
     // Request state predicates

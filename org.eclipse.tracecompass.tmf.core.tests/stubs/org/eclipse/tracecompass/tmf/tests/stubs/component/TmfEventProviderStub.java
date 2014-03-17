@@ -76,4 +76,9 @@ public class TmfEventProviderStub extends TmfEventProvider {
         return fTrace.getNext(context);
     }
 
+    @Override
+    public boolean providesEvent(ITmfEvent event) {
+        return (super.providesEvent(event) || event.getTrace() == fTrace);
+    }
+
 }

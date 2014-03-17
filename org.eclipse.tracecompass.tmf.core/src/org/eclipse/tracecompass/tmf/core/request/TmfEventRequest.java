@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.core.request;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
+import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 
@@ -100,6 +101,8 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     private boolean fRequestCompleted;
     private boolean fRequestFailed;
     private boolean fRequestCanceled;
+
+    private ITmfEventProvider fEventProvider;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -250,6 +253,22 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     @Override
     public TmfTimeRange getRange() {
         return fRange;
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public ITmfEventProvider getEventProvider() {
+        return fEventProvider;
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void setEventProvider(ITmfEventProvider provider) {
+        fEventProvider = provider;
     }
 
     // ------------------------------------------------------------------------
