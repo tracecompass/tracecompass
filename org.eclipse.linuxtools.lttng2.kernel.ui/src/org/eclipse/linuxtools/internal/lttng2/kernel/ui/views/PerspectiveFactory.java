@@ -28,7 +28,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 public class PerspectiveFactory implements IPerspectiveFactory {
 
     /** Perspective ID */
-    public static final String ID = "org.eclipse.linuxtools.lttng2.ui.perspective"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective"; //$NON-NLS-1$
 
     // LTTng views
     private static final String HISTOGRAM_VIEW_ID = HistogramView.ID;

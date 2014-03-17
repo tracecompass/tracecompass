@@ -120,18 +120,28 @@ public abstract class SWTBotUtil {
      * Switch to the tracing perspective
      */
     public static void switchToTracingPerspective() {
+        switchToPerspective(TRACING_PERSPECTIVE_ID);
+    }
+
+    /**
+     * Switch to a given perspective
+     *
+     * @param id
+     *            the perspective id (like
+     *            "org.eclipse.linuxtools.tmf.ui.perspective"
+     */
+    public static void switchToPerspective(final String id) {
         UIThreadRunnable.syncExec(new VoidResult() {
             @Override
             public void run() {
                 try {
-                    PlatformUI.getWorkbench().showPerspective(TRACING_PERSPECTIVE_ID, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+                    PlatformUI.getWorkbench().showPerspective(id, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
                     fail(e.getMessage());
                 }
             }
         });
     }
-
 
     /**
      * If the test is running in the UI thread then fail
@@ -141,7 +151,6 @@ public abstract class SWTBotUtil {
             fail("SWTBot test needs to run in a non-UI thread. Make sure that \"Run in UI thread\" is unchecked in your launch configuration or"
                     + " that useUIThread is set to false in the pom.xml");
         }
-
 
     }
 }

@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ImportAndReadKernelSmokeTest.class
+    ImportAndReadKernelSmokeTest.class,
+    KernelPerspectiveChecker.class
 })
 public class AllTests {
 
