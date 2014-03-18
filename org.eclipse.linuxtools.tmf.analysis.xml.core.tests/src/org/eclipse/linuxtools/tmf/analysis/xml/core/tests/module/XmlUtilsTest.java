@@ -156,8 +156,12 @@ public class XmlUtilsTest {
 
         Element analysis = XmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, ANALYSIS_ID);
 
-        List<Element> values = XmlUtils.getChildElements(analysis, TmfXmlStrings.DEFINED_VALUE);
-        assertEquals(12, values.size());
+        List<Element> values = XmlUtils.getChildElements(analysis, TmfXmlStrings.LOCATION);
+        assertEquals(5, values.size());
+
+        Element aLocation = values.get(0);
+        List<Element> attributes = XmlUtils.getChildElements(aLocation, TmfXmlStrings.STATE_ATTRIBUTE);
+        assertEquals(2, attributes.size());
 
         values = XmlUtils.getChildElements(analysis, TmfXmlStrings.HEAD);
         assertEquals(1, values.size());

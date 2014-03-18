@@ -187,7 +187,9 @@ public class XmlUtils {
 
         for (int i = 0; i < nodes.getLength(); i++) {
             Element node = (Element) nodes.item(i);
-            childElements.add(node);
+            if (node.getParentNode().equals(parent)) {
+                childElements.add(node);
+            }
         }
         return childElements;
     }
