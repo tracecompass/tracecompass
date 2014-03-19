@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -78,6 +80,9 @@ public class ImportHandler extends BaseControlViewHandler {
     /** Name of default project to import traces to */
     public static final String DEFAULT_REMOTE_PROJECT_NAME = "Remote"; //$NON-NLS-1$
 
+    /** The preference key to remeber whether or not the user wants the notification shown next time **/
+    private static final String NOTIFY_IMPORT_STREAMED_PREF_KEY = "NOTIFY_IMPORT_STREAMED"; //$NON-NLS-1$
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -108,6 +113,13 @@ public class ImportHandler extends BaseControlViewHandler {
             IProject project = TmfProjectRegistry.createProject(DEFAULT_REMOTE_PROJECT_NAME, null, null);
 
             if (param.getSession().isStreamedTrace()) {
+
+                IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+                String notify = store.getString(NOTIFY_IMPORT_STREAMED_PREF_KEY);
+                if (!MessageDialogWithToggle.ALWAYS.equals(notify)) {
+                    MessageDialogWithToggle.openInformation(window.getShell(), null, Messages.TraceControl_ImportDialogStreamedTraceNotification, Messages.TraceControl_ImportDialogStreamedTraceNotificationToggle, false, store, NOTIFY_IMPORT_STREAMED_PREF_KEY);
+                }
+
                 // Streamed trace
                 TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                 TmfTraceFolder traceFolder = projectElement.getTracesFolder();

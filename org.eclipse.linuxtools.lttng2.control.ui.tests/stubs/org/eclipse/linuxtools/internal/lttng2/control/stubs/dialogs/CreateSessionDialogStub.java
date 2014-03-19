@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Marc-Andre Laperle - Support for creating a live session
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs;
 
@@ -30,6 +31,8 @@ public class CreateSessionDialogStub implements ICreateSessionDialog {
     private String fControlUrl = null;
     private String fDataUrl = null;
     private boolean fIsSnapshot;
+    private boolean fIsLive = false;
+    private int fLiveDelay = 0;
 
     @Override
     public void initialize(TraceSessionGroup group) {
@@ -68,6 +71,14 @@ public class CreateSessionDialogStub implements ICreateSessionDialog {
         fIsSnapshot = isSnapshot;
     }
 
+    public void setLive(boolean isLive) {
+        fIsLive = isLive;
+    }
+
+    public void setLiveDelay(int liveDelay) {
+        fLiveDelay = liveDelay;
+    }
+
     @Override
     public ISessionInfo getParameters() {
         ISessionInfo sessionInfo = new SessionInfo(fName);
@@ -81,6 +92,8 @@ public class CreateSessionDialogStub implements ICreateSessionDialog {
             sessionInfo.setSessionPath(fPath);
         }
 
+        sessionInfo.setLive(fIsLive);
+        sessionInfo.setLiveDelay(fLiveDelay);
         sessionInfo.setSnapshot(fIsSnapshot);
 
         return sessionInfo;

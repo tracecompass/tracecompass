@@ -10,6 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
  *   Simon Delisle - Updated for support of LTTng Tools 2.2
+ *   Marc-Andre Laperle - Support for creating a live session
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.ui.views.service;
 
@@ -489,6 +490,11 @@ public class LTTngControlService implements ILttngControlService {
 
         if (sessionInfo.isSnapshotSession()) {
             command.append(LTTngControlServiceConstants.OPTION_SNAPSHOT);
+        } else if (sessionInfo.isLive()) {
+            command.append(LTTngControlServiceConstants.OPTION_LIVE);
+            if (sessionInfo.getLiveDelay() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                command.append(sessionInfo.getLiveDelay());
+            }
         }
 
         if (sessionInfo.getNetworkUrl() != null) {

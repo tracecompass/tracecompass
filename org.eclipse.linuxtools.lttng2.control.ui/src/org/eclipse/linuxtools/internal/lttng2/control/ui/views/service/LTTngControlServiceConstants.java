@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
  *   Simon Delisle - Updated for support of LTTng Tools 2.2
+ *   Marc-Andre Laperle - Support for creating a live session
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.ui.views.service;
 
@@ -139,6 +140,10 @@ public interface LTTngControlServiceConstants {
      * Command line option for output path.
      */
     static final String OPTION_SNAPSHOT = " --snapshot "; //$NON-NLS-1$
+    /**
+     * Command line option for live
+     */
+    static final String OPTION_LIVE = " --live "; //$NON-NLS-1$
     /**
      * Command line option for kernel tracer.
      */

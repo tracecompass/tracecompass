@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Marc-Andre Laperle - Support for creating a live session
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.core.model.impl;
 
@@ -30,6 +31,11 @@ import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceSessionSta
  * @author Bernd Hufmann
  */
 public class SessionInfo extends TraceInfo implements ISessionInfo {
+
+    /**
+     * The default network URL when creating a live session
+     */
+    public static final String DEFAULT_LIVE_NETWORK_URK = "net://127.0.0.1"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -71,6 +77,15 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
      */
     private String fDataUrl = null;
 
+    /**
+     * Flag to indicate whether trace is live or not.
+     */
+    private boolean fIsLive = false;
+
+    /**
+     * The delay in micro seconds before the data is flushed and streamed.
+     */
+    private int fLiveDelay = -1;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -186,6 +201,26 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     @Override
     public void setSnapshotInfo(ISnapshotInfo info) {
         fSnapshotInfo = info;
+    }
+
+    @Override
+    public boolean isLive() {
+        return fIsLive;
+    }
+
+    @Override
+    public void setLive(boolean isLive) {
+        fIsLive = isLive;
+    }
+
+    @Override
+    public int getLiveDelay() {
+        return fLiveDelay;
+    }
+
+    @Override
+    public void setLiveDelay(int liveDelay) {
+        fLiveDelay = liveDelay;
     }
 
     // ------------------------------------------------------------------------

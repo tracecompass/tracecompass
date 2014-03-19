@@ -997,9 +997,20 @@ LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing
 
 [[Image:images/LTTng2CreateSessionDialog_Snapshot.png]]
 
-Fill in all necessary information, select checkbox for '''Snapshot Mode''' and press '''Ok'''. By default, the location for the snapshot output will be on the host where the host is located.
+Fill in all necessary information, select the radio button for '''Snapshot Mode''' and press '''Ok'''. By default, the location for the snapshot output will be on the host where the host is located.
 
 Refer to chapter [[#Recording a Snapshot | Recording a Snapshot]] for how to create a snapshot.
+
+=== Creating a Live Tracing Session ====
+LTTng Tools version v2.4.0 introduces the possibility to create live tracing sessions. The live mode allows you to stream the trace and view it while it's being recorded. To create such a live session, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]].
+
+[[Image:images/LTTng2CreateSessionDialog_Live.png]]
+
+In the advanced options, it is possible to set the '''Live Delay'''. The '''Live Delay''' is the delay in micro seconds before the data is flushed and streamed.
+
+[[Image:images/LTTng2CreateSessionDialog_Live_Advanced.png]]
+
+Fill in all necessary information, select the radio button for '''Live Mode''' and press '''Ok'''.
 
 === Enabling Channels - General ===
 

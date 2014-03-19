@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Alexandre Montplaisir - Port to JUnit4
+ *   Marc-Andre Laperle - Support for creating a live session
  **********************************************************************/
 
 package org.eclipse.linuxtools.lttng2.control.ui.tests.service;
@@ -105,6 +106,8 @@ public class LTTngControlServiceTest {
     private static final String SCEN_CREATE_SNAPSHOT_SESSION = "CreateSessionSnapshot";
     private static final String SCEN_CREATE_STREAMED_SNAPSHOT_SESSION = "CreateSessionStreamedSnapshot";
     private static final String SCEN_CREATE_SNAPSHOT_SESSION_ERRORS = "CreateSessionSnapshotErrors";
+    private static final String SCEN_CREATE_LIVE_SESSION = "CreateSessionLive";
+    private static final String SCEN_CREATE_LIVE_SESSION_ERRORS = "CreateSessionLiveErrors";
 
     // ------------------------------------------------------------------------
     // Test data
@@ -1318,7 +1321,6 @@ public class LTTngControlServiceTest {
             String[] names = fService.getSessionNames(new NullProgressMonitor());
             assertEquals(names[0], "mysession");
 
-
             ISnapshotInfo snapshotInfo = sessionInfo.getSnapshotInfo();
             assertNotNull(sessionInfo);
             assertEquals("snapshot-2", snapshotInfo.getName());
@@ -1338,7 +1340,6 @@ public class LTTngControlServiceTest {
             fail(e.toString());
         }
     }
-
 
     @Test
     public void testCreateSnapshotSessionErrors() {
@@ -1368,6 +1369,61 @@ public class LTTngControlServiceTest {
         try {
             fService.recordSnapshot("mysession", new NullProgressMonitor());
             fail("getSnapshoInfo() didn't fail");
+        } catch (ExecutionException e) {
+            // successful
+        }
+    }
+
+    @Test
+    public void testCreateLiveSession() throws ExecutionException {
+        fShell.setScenario(SCEN_CREATE_LIVE_SESSION);
+
+        ISessionInfo params = new SessionInfo("mysession");
+        params.setLive(true);
+        params.setStreamedTrace(true);
+        params.setNetworkUrl("net://127.0.0.1");
+        ISessionInfo sessionInfo = fService.createSession(params, new NullProgressMonitor());
+        assertNotNull(sessionInfo);
+        assertEquals("mysession", sessionInfo.getName());
+        assertEquals(TraceSessionState.INACTIVE, sessionInfo.getSessionState());
+        assertTrue(sessionInfo.isStreamedTrace());
+        assertTrue(sessionInfo.isLive());
+        assertEquals("net://127.0.0.1", sessionInfo.getSessionPath());
+        String[] names = fService.getSessionNames(new NullProgressMonitor());
+        assertEquals(names[0], "mysession");
+        fService.destroySession("mysession", new NullProgressMonitor());
+    }
+
+    @Test
+    public void testCreateLiveSessionErrors() {
+        try {
+            fShell.setScenario(SCEN_CREATE_LIVE_SESSION_ERRORS);
+
+            ISessionInfo parameters = new SessionInfo("mysession");
+            parameters.setLive(true);
+            parameters.setSnapshot(true);
+            fService.createSession(parameters, new NullProgressMonitor());
+            fail("createSession() didn't fail");
+        } catch (ExecutionException e) {
+            // successful
+        }
+
+        try {
+            ISessionInfo parameters = new SessionInfo("mysession");
+            parameters.setNetworkUrl("blah");
+            parameters.setLive(true);
+            fService.createSession(parameters, new NullProgressMonitor());
+            fail("createSession() didn't fail");
+        } catch (ExecutionException e) {
+            // successful
+        }
+
+        try {
+            ISessionInfo parameters = new SessionInfo("mysession");
+            parameters.setControlUrl("net://127.0.0.1");
+            parameters.setLive(true);
+            fService.createSession(parameters, new NullProgressMonitor());
+            fail("createSession() didn't fail");
         } catch (ExecutionException e) {
             // successful
         }

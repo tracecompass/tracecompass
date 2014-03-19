@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Marc-Andre Laperle - Support for creating a live session
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.core.model;
 
@@ -105,6 +106,38 @@ public interface ISessionInfo extends ITraceInfo {
      * @param setSnapshotInfo - the snapshot data to set.
      */
     void setSnapshotInfo(ISnapshotInfo setSnapshotInfo);
+
+    /**
+     * Get whether or not the session should be in Live mode
+     *
+     * @return <code>true</code> if is a live session else <code>false</code>
+     */
+    public boolean isLive();
+
+    /**
+     * Set whether or not the session should be in Live mode
+     *
+     * @param isLive
+     *            true for Live mode, false otherwise
+     */
+    public void setLive(boolean isLive);
+
+    /**
+     * Get the live delay which is the delay in micro seconds before the data is
+     * flushed and streamed.
+     *
+     * @return the live delay or -1 if the default value should be used
+     */
+    public int getLiveDelay();
+
+    /**
+     * Set the live delay which is the delay in micro seconds before the data is
+     * flushed and streamed.
+     *
+     * @param liveDelay
+     *            the live delay
+     */
+    public void setLiveDelay(int liveDelay);
 
     /**
      * Get the network URL in case control and data is configured together
