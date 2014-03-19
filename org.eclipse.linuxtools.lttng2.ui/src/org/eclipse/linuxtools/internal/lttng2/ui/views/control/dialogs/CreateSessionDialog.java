@@ -13,9 +13,8 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.SessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
@@ -32,8 +31,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -51,7 +48,7 @@ import org.eclipse.swt.widgets.Text;
  *
  * @author Bernd Hufmann
  */
-public class CreateSessionDialog extends Dialog implements ICreateSessionDialog {
+public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessionDialog {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -95,8 +92,6 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
-    private Control fControl = null;
     /**
      * The dialog composite.
      */
@@ -162,6 +157,10 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
      */
     private CopyModifyListener fControlUrlKeyListener;
     /**
+     * A modify listener that updates the enablement of the dialog.
+     */
+    private UpdateEnablementModifyListener fUpdateEnablementModifyListener;
+    /**
      * The text box for the control port.
      */
     private Text fControlPortText = null;
@@ -190,7 +189,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
      */
     private String fSessionPath = null;
     /**
-     * The  session path string.
+     * Flag whether the session is snapshot or not
      */
     private boolean fIsSnapshot = false;
     /**
@@ -255,18 +254,6 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     // ------------------------------------------------------------------------
 
     @Override
-    protected Control createContents(Composite parent) {
-        fControl = super.createContents(parent);
-
-        /* set the shell minimum size */
-        Point clientArea = fControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        Rectangle trim = getShell().computeTrim(0, 0, clientArea.x, clientArea.y);
-        getShell().setMinimumSize(trim.width, trim.height);
-
-        return fControl;
-    }
-
-    @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText(Messages.TraceControl_CreateSessionDialogTitle);
@@ -275,9 +262,12 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
 
     @Override
     protected Control createDialogArea(Composite parent) {
+        Composite dialogAreaa = (Composite) super.createDialogArea(parent);
+        setTitle(Messages.TraceControl_CreateSessionDialogTitle);
+        setMessage(Messages.TraceControl_CreateSessionDialogMessage);
 
         // Main dialog panel
-        fDialogComposite = new Composite(parent, SWT.NONE);
+        fDialogComposite = new Composite(dialogAreaa, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
         fDialogComposite.setLayout(layout);
         fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -286,15 +276,19 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         sessionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         sessionGroup.setLayout(new GridLayout(4, true));
 
+        fUpdateEnablementModifyListener = new UpdateEnablementModifyListener();
+
         Label sessionNameLabel = new Label(sessionGroup, SWT.RIGHT);
         sessionNameLabel.setText(Messages.TraceControl_CreateSessionNameLabel);
         fSessionNameText = new Text(sessionGroup, SWT.NONE);
         fSessionNameText.setToolTipText(Messages.TraceControl_CreateSessionNameTooltip);
+        fSessionNameText.addModifyListener(fUpdateEnablementModifyListener);
 
         fSessionPathLabel = new Label(sessionGroup, SWT.RIGHT);
         fSessionPathLabel.setText(Messages.TraceControl_CreateSessionPathLabel);
         fSessionPathText = new Text(sessionGroup, SWT.NONE);
         fSessionPathText.setToolTipText(Messages.TraceControl_CreateSessionPathTooltip);
+        fSessionPathText.addModifyListener(fUpdateEnablementModifyListener);
 
         if (fParent.isSnapshotSupported()) {
             fSnapshotButton = new Button(sessionGroup, SWT.CHECK);
@@ -351,11 +345,8 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
                     createConfigureStreamingComposite();
                 }
 
-                fDialogComposite.layout();
-
-                Point clientArea = fControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-                Rectangle trim = getShell().computeTrim(0, 0, clientArea.x, clientArea.y);
-                getShell().setSize(trim.width, trim.height);
+                updateEnablement();
+                getShell().pack();
             }
         });
     }
@@ -381,6 +372,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
             GridData data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 6;
             fTracePathText.setLayoutData(data);
+            fTracePathText.addModifyListener(fUpdateEnablementModifyListener);
 
             fLinkDataWithControlButton = new Button(urlGroup, SWT.CHECK);
             fLinkDataWithControlButton.setText(Messages.TraceControl_CreateSessionLinkButtonText);
@@ -424,18 +416,21 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
             data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 1;
             fControlProtocolCombo.setLayoutData(data);
+            fControlProtocolCombo.addModifyListener(fUpdateEnablementModifyListener);
 
             fControlHostAddressText = new Text(urlGroup, SWT.NONE);
             fControlHostAddressText.setToolTipText(Messages.TraceControl_CreateSessionControlAddressTooltip);
             data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 4;
             fControlHostAddressText.setLayoutData(data);
+            fControlHostAddressText.addModifyListener(fUpdateEnablementModifyListener);
 
             fControlPortText = new Text(urlGroup, SWT.NONE);
             fControlPortText.setToolTipText(Messages.TraceControl_CreateSessionControlPortTooltip);
             data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 1;
             fControlPortText.setLayoutData(data);
+            fControlPortText.addModifyListener(fUpdateEnablementModifyListener);
 
             label = new Label(urlGroup, SWT.RIGHT);
             label.setText(Messages.TraceControl_CreateSessionDataUrlLabel);
@@ -449,6 +444,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
             data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 1;
             fDataProtocolCombo.setLayoutData(data);
+            fDataProtocolCombo.addModifyListener(fUpdateEnablementModifyListener);
 
             String items[] = new String[StreamingProtocol.values().length];
             for (int i = 0; i < items.length; i++) {
@@ -463,6 +459,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
             data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 4;
             fDataHostAddressText.setLayoutData(data);
+            fDataHostAddressText.addModifyListener(fUpdateEnablementModifyListener);
 
             fDataPortText = new Text(urlGroup, SWT.NONE);
             fDataPortText.setEnabled(true);
@@ -470,6 +467,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
             data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 1;
             fDataPortText.setLayoutData(data);
+            fDataPortText.addModifyListener(fUpdateEnablementModifyListener);
 
             fCopyProtocolSelectionListener = new ControlProtocolSelectionListener();
             fControlProtocolSelectionListener = new ProtocolComboSelectionListener(fControlProtocolCombo, fControlPortText);
@@ -583,11 +581,16 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 
-    @Override
-    protected void okPressed() {
+    private void updateEnablement() {
+        validate();
+        getButton(IDialogConstants.OK_ID).setEnabled(getErrorMessage() == null);
+    }
+
+    private void validate() {
         // Validate input data
         fSessionName = fSessionNameText.getText();
         fSessionPath = fSessionPathText.getText();
+        setErrorMessage(null);
 
         if (!"".equals(fSessionPath)) { //$NON-NLS-1$
             // validate sessionPath
@@ -600,22 +603,16 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
                         IRemoteFile remoteFolder = fsss.getRemoteFileObject(fSessionPath, new NullProgressMonitor());
 
                         if (remoteFolder == null) {
-                            MessageDialog.openError(getShell(),
-                                    Messages.TraceControl_CreateSessionDialogTitle,
-                                    Messages.TraceControl_InvalidSessionPathError + " (" + fSessionPath + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+                            setErrorMessage(Messages.TraceControl_InvalidSessionPathError + " (" + fSessionPath + ") \n"); //$NON-NLS-1$ //$NON-NLS-2$
                             return;
                         }
 
                         if (remoteFolder.exists()) {
-                            MessageDialog.openError(getShell(),
-                                    Messages.TraceControl_CreateSessionDialogTitle,
-                                    Messages.TraceControl_SessionPathAlreadyExistsError + " (" + fSessionPath + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+                            setErrorMessage(Messages.TraceControl_SessionPathAlreadyExistsError + " (" + fSessionPath + ") \n"); //$NON-NLS-1$ //$NON-NLS-2$
                             return;
                         }
                     } catch (SystemMessageException e) {
-                        MessageDialog.openError(getShell(),
-                                Messages.TraceControl_CreateSessionDialogTitle,
-                                Messages.TraceControl_FileSubSystemError + "\n" + e);  //$NON-NLS-1$
+                        setErrorMessage(Messages.TraceControl_FileSubSystemError + "\n" + e); //$NON-NLS-1$
                         return;
                     }
                 }
@@ -623,7 +620,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
             fIsDefaultPath = false;
         }
 
-        if(fParent.isSnapshotSupported()) {
+        if (fParent.isSnapshotSupported()) {
             fIsSnapshot = fSnapshotButton.getSelection();
         }
 
@@ -631,36 +628,28 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         fControlUrl = null;
         fDataUrl = null;
 
-        if (fIsStreamedTrace) {
+        if (fIsStreamedTrace && fStreamingComposite != null) {
             // Validate input data
             fTracePath = fTracePathText.getText();
 
             if (fControlProtocolCombo.getSelectionIndex() < 0) {
-                MessageDialog.openError(getShell(),
-                        Messages.TraceControl_CreateSessionDialogTitle,
-                        "Control Protocol Text is empty\n");  //$NON-NLS-1$
+                setErrorMessage("Control Protocol Text is empty\n");  //$NON-NLS-1$
                 return;
             }
 
             if ("".equals(fControlHostAddressText.getText())) { //$NON-NLS-1$
-                MessageDialog.openError(getShell(),
-                        Messages.TraceControl_CreateSessionDialogTitle,
-                        "Control Address Text is empty\n");  //$NON-NLS-1$
+                setErrorMessage("Control Address Text is empty\n");  //$NON-NLS-1$
                 return;
             }
 
-            if(!fLinkDataWithControlButton.getSelection()) {
+            if (!fLinkDataWithControlButton.getSelection()) {
                 if (fDataProtocolCombo.getSelectionIndex() < 0) {
-                    MessageDialog.openError(getShell(),
-                            Messages.TraceControl_CreateSessionDialogTitle,
-                            "Control Protocol Text is empty\n");  //$NON-NLS-1$
+                    setErrorMessage("Data Protocol Text is empty\n");  //$NON-NLS-1$
                     return;
                 }
 
                 if ("".equals(fDataHostAddressText.getText())) { //$NON-NLS-1$
-                    MessageDialog.openError(getShell(),
-                            Messages.TraceControl_CreateSessionDialogTitle,
-                            "Control Address Text is empty\n");  //$NON-NLS-1$
+                    setErrorMessage("Data Address Text is empty\n");  //$NON-NLS-1$
                     return;
                 }
 
@@ -670,13 +659,13 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
                         null,
                         fTracePath);
 
-                fDataUrl = getUrlString(fControlProtocolCombo.getItem(fDataProtocolCombo.getSelectionIndex()),
+                fDataUrl = getUrlString(fDataProtocolCombo.getItem(fDataProtocolCombo.getSelectionIndex()),
                         fDataHostAddressText.getText(),
                         null,
                         fDataPortText.getText(),
                         fTracePath);
             } else {
-                fNetworkUrl = getUrlString(fControlProtocolCombo.getItem(fDataProtocolCombo.getSelectionIndex()),
+                fNetworkUrl = getUrlString(fControlProtocolCombo.getItem(fControlProtocolCombo.getSelectionIndex()),
                         fControlHostAddressText.getText(),
                         fControlPortText.getText(),
                         fDataPortText.getText(),
@@ -686,22 +675,15 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
 
         // Check for invalid names
         if (!"".equals(fSessionName) && !fSessionName.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
-            MessageDialog.openError(getShell(),
-                    Messages.TraceControl_CreateSessionDialogTitle,
-                    Messages.TraceControl_InvalidSessionNameError + " (" + fSessionName + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+            setErrorMessage(Messages.TraceControl_InvalidSessionNameError + " (" + fSessionName + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
         // Check if node with name already exists in parent
         if(fParent.containsChild(fSessionName)) {
-            MessageDialog.openError(getShell(),
-                    Messages.TraceControl_CreateSessionDialogTitle,
-                    Messages.TraceControl_SessionAlreadyExistsError + " (" + fSessionName + ")");  //$NON-NLS-1$ //$NON-NLS-2$
+            setErrorMessage(Messages.TraceControl_SessionAlreadyExistsError + " (" + fSessionName + ")");  //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
-
-        // validation successful -> call super.okPressed()
-        super.okPressed();
     }
 
     private static String getUrlString(String proto, String host, String ctrlPort, String dataPort, String sessionPath) {
@@ -798,5 +780,12 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         sessionInfo.setSnapshot(fIsSnapshot);
 
         return sessionInfo;
+    }
+
+    private final class UpdateEnablementModifyListener implements ModifyListener {
+        @Override
+        public void modifyText(ModifyEvent e) {
+            updateEnablement();
+        }
     }
 }

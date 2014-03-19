@@ -104,6 +104,7 @@ final public class Messages extends NLS {
     public static String TraceControl_AlreadyExistsError;
 
     public static String TraceControl_CreateSessionDialogTitle;
+    public static String TraceControl_CreateSessionDialogMessage;
     public static String TraceControl_CreateSessionNameLabel;
     public static String TraceControl_CreateSessionNameTooltip;
     public static String TraceControl_CreateSessionPathLabel;
