@@ -412,10 +412,13 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public ISessionInfo createSession(String sessionName, String sessionPath, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException {
+    public ISessionInfo createSession(ISessionInfo sessionInfo, IProgressMonitor monitor) throws ExecutionException {
+        if (sessionInfo.isStreamedTrace()) {
+            return createStreamedSession(sessionInfo, monitor);
+        }
 
-        String newName = formatParameter(sessionName);
-        String newPath = formatParameter(sessionPath);
+        String newName = formatParameter(sessionInfo.getName());
+        String newPath = formatParameter(sessionInfo.getSessionPath());
 
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_CREATE_SESSION, newName);
 
@@ -424,7 +427,7 @@ public class LTTngControlService implements ILttngControlService {
             command.append(newPath);
         }
 
-        if (isSnapshot) {
+        if (sessionInfo.isSnapshotSession()) {
             command.append(LTTngControlServiceConstants.OPTION_SNAPSHOT);
         }
 
@@ -452,23 +455,22 @@ public class LTTngControlService implements ILttngControlService {
         }
 
         // Verify session name
-        if ((name == null) || (!"".equals(sessionName) && !name.equals(sessionName))) { //$NON-NLS-1$
+        if ((name == null) || (!"".equals(sessionInfo.getName()) && !name.equals(sessionInfo.getName()))) { //$NON-NLS-1$
             // Unexpected name returned
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.TraceControl_UnexpectedNameError + ": " + name); //$NON-NLS-1$
         }
 
-        SessionInfo sessionInfo = new SessionInfo(name);
-
+        sessionInfo.setName(name);
         // Verify session path
-        if (!isSnapshot &&
-                ((path == null) || ((sessionPath != null) && (!path.contains(sessionPath))))) {
+        if (!sessionInfo.isSnapshotSession() &&
+                ((path == null) || ((sessionInfo.getSessionPath() != null) && (!path.contains(sessionInfo.getSessionPath()))))) {
             // Unexpected path
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.TraceControl_UnexpectedPathError + ": " + name); //$NON-NLS-1$
         }
 
-        if (isSnapshot) {
+        if (sessionInfo.isSnapshotSession()) {
             // Make it a snapshot session - content of snapshot info need to
             // set afterwards using getSession() or getSnapshotInfo()
             sessionInfo.setSnapshotInfo(new SnapshotInfo("")); //$NON-NLS-1$
@@ -480,25 +482,24 @@ public class LTTngControlService implements ILttngControlService {
 
     }
 
-    @Override
-    public ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException {
+    private ISessionInfo createStreamedSession(ISessionInfo sessionInfo, IProgressMonitor monitor) throws ExecutionException {
 
-        String newName = formatParameter(sessionName);
+        String newName = formatParameter(sessionInfo.getName());
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_CREATE_SESSION, newName);
 
-        if (isSnapshot) {
+        if (sessionInfo.isSnapshotSession()) {
             command.append(LTTngControlServiceConstants.OPTION_SNAPSHOT);
         }
 
-        if (networkUrl != null) {
+        if (sessionInfo.getNetworkUrl() != null) {
             command.append(LTTngControlServiceConstants.OPTION_NETWORK_URL);
-            command.append(networkUrl);
+            command.append(sessionInfo.getNetworkUrl());
         } else {
             command.append(LTTngControlServiceConstants.OPTION_CONTROL_URL);
-            command.append(controlUrl);
+            command.append(sessionInfo.getControlUrl());
 
             command.append(LTTngControlServiceConstants.OPTION_DATA_URL);
-            command.append(dataUrl);
+            command.append(sessionInfo.getDataUrl());
         }
 
         ICommandResult result = executeCommand(command.toString(), monitor);
@@ -518,32 +519,32 @@ public class LTTngControlService implements ILttngControlService {
 
             if (nameMatcher.matches()) {
                 name = String.valueOf(nameMatcher.group(1).trim());
-            } else if (pathMatcher.matches() && (networkUrl != null)) {
+            } else if (pathMatcher.matches() && (sessionInfo.getNetworkUrl() != null)) {
                 path = String.valueOf(pathMatcher.group(1).trim());
             }
             index++;
         }
 
         // Verify session name
-        if ((name == null) || (!"".equals(sessionName) && !name.equals(sessionName))) { //$NON-NLS-1$
+        if ((name == null) || (!"".equals(sessionInfo.getName()) && !name.equals(sessionInfo.getName()))) { //$NON-NLS-1$
             // Unexpected name returned
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.TraceControl_UnexpectedNameError + ": " + name); //$NON-NLS-1$
         }
 
-        SessionInfo sessionInfo = new SessionInfo(name);
+        sessionInfo.setName(name);
 
         sessionInfo.setStreamedTrace(true);
 
         // Verify session path
-        if (networkUrl != null) {
-            if (!isSnapshot && (path == null)) {
+        if (sessionInfo.getNetworkUrl() != null) {
+            if (!sessionInfo.isSnapshotSession() && (path == null)) {
                 // Unexpected path
                 throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
                         Messages.TraceControl_UnexpectedPathError + ": " + name); //$NON-NLS-1$
             }
 
-            if (isSnapshot) {
+            if (sessionInfo.isSnapshotSession()) {
                 sessionInfo.setStreamedTrace(false);
             } else {
                 sessionInfo.setSessionPath(path);

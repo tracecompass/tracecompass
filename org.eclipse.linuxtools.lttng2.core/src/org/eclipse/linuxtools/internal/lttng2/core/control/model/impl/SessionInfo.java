@@ -53,7 +53,23 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     /**
      * Flag to indicate whether the session is a snapshot session or not.
      */
+    private boolean fIsSnapshot = false;
+    /**
+     * The snapshot information of the session
+     */
     private ISnapshotInfo fSnapshotInfo = null;
+    /**
+     * The network URL for the session (-U)
+     */
+    private String fNetworkUrl = null;
+    /**
+     * The control URL for the session (-C)
+     */
+    private String fControlUrl = null;
+    /**
+     * The data URL for the session (-D)
+     */
+    private String fDataUrl = null;
 
 
     // ------------------------------------------------------------------------
@@ -76,7 +92,11 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         fState = other.fState;
         fSessionPath = other.fSessionPath;
         fIsStreamedTrace = other.fIsStreamedTrace;
+        fIsSnapshot = other.fIsSnapshot;
         fSnapshotInfo = other.fSnapshotInfo;
+        fNetworkUrl = other.fNetworkUrl;
+        fControlUrl = other.fControlUrl;
+        fDataUrl = other.fDataUrl;
 
         for (Iterator<IDomainInfo> iterator = other.fDomains.iterator(); iterator.hasNext();) {
             IDomainInfo domain = iterator.next();
@@ -113,7 +133,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     @Override
     public String getSessionPath() {
-        if(isSnapshotSession()) {
+        if (isSnapshotSession() && fSnapshotInfo != null) {
             return fSnapshotInfo.getSnapshotPath();
         }
         return fSessionPath;
@@ -140,9 +160,6 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     @Override
     public boolean isStreamedTrace() {
-        if (isSnapshotSession()) {
-            return fSnapshotInfo.isStreamedSnapshot();
-        }
         return fIsStreamedTrace;
     }
 
@@ -153,7 +170,12 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     @Override
     public boolean isSnapshotSession() {
-        return fSnapshotInfo != null;
+        return fIsSnapshot || fSnapshotInfo != null;
+    }
+
+    @Override
+    public void setSnapshot(boolean isSnapshot) {
+        fIsSnapshot = isSnapshot;
     }
 
     @Override
@@ -188,6 +210,9 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
             output.append(fState);
             output.append(",isStreamedTrace=");
             output.append(fIsStreamedTrace);
+            output.append(",isSnapshot=");
+            output.append(fIsSnapshot);
+
             if (fSnapshotInfo != null) {
                 output.append(",snapshotInfo=");
                 output.append(fSnapshotInfo.toString());
@@ -197,7 +222,45 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
                 IDomainInfo domain = iterator.next();
                 output.append(domain.toString());
             }
+
+            output.append(",NetworkUrl=");
+            output.append(getNetworkUrl());
+            output.append(",ControlUrl=");
+            output.append(getControlUrl());
+            output.append(",DataUrl=");
+            output.append(getDataUrl());
+
             output.append(")]");
             return output.toString();
+    }
+
+    @Override
+    public String getNetworkUrl() {
+        return fNetworkUrl;
+    }
+
+    @Override
+    public void setNetworkUrl(String networkUrl) {
+        fNetworkUrl = networkUrl;
+    }
+
+    @Override
+    public String getControlUrl() {
+        return fControlUrl;
+    }
+
+    @Override
+    public void setControlUrl(String controlUrl) {
+        fControlUrl = controlUrl;
+    }
+
+    @Override
+    public void setDataUrl(String datalUrl) {
+        fDataUrl = datalUrl;
+    }
+
+    @Override
+    public String getDataUrl() {
+        return fDataUrl;
     }
 }

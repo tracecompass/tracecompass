@@ -12,6 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionGroup;
 
 /**
@@ -26,65 +27,24 @@ public interface ICreateSessionDialog {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /**
-     * @return the session name.
-     */
-    String getSessionName();
 
     /**
-     * @return the session path (null for default path)
+     * Get the parameters necessary for the creation of a LTTng session
+     *
+     * @return the parameters
      */
-    String getSessionPath();
+    ISessionInfo getParameters();
 
-    /**
-     * @return true for default location else false
-     */
-    boolean isDefaultSessionPath();
 
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
     /**
      * Initializes the dialog box.
      * @param group - the session group
      */
     void initialize(TraceSessionGroup group);
 
-    /**
-     * @return true if traces is to be streamed else false.
-     */
-    boolean isStreamedTrace();
-
-    /**
-     * Get the network URL in case control and data is configured together otherwise null
-     * If it returns a non-null value, getControlUrl() and getDataUrl() have to return null.
-     * @return The network URL or null.
-     */
-    String getNetworkUrl();
-
-    /**
-     * Get the control URL in case control and data is configured separately.
-     * If it returns a non-null value, getDataUrl() has to return a valid value too
-     * and getNetworkUrl() has to return null.
-     *
-     * @return The control URL or null.
-     */
-    String getControlUrl();
-
-    /**
-     * Get the data URL in case control and data is configured separately.
-     * If it returns a non-null value, getControlUrl() has to return a valid value too
-     * and getNetworkUrl() has to return null.
-     *
-     * @return The data URL or null.
-     */
-    String getDataUrl();
-
-    /**
-     * @return <code>true</code> if is a snapshot session else <code>false</code>
-     */
-    boolean isSnapshot();
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
     /**
      * @return the open return value
      */

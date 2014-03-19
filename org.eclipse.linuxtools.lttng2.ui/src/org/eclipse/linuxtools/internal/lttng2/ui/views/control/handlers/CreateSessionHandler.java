@@ -70,13 +70,7 @@ public class CreateSessionHandler extends BaseControlViewHandler {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
-                        if (dialog.isStreamedTrace()) {
-                            sessionGroup.createSession(dialog.getSessionName(), dialog.getNetworkUrl(), dialog.getControlUrl(),
-                                    dialog.getDataUrl(), dialog.isSnapshot(), monitor);
-                        } else {
-                            String sessionPath = dialog.isDefaultSessionPath() ? null : dialog.getSessionPath();
-                            sessionGroup.createSession(dialog.getSessionName(), sessionPath, dialog.isSnapshot(), monitor);
-                        }
+                        sessionGroup.createSession(dialog.getParameters(), monitor);
                     } catch (ExecutionException e) {
                         return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
                     }

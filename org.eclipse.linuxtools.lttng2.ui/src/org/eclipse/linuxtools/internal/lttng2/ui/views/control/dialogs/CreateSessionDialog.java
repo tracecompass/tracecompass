@@ -16,6 +16,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng2.core.control.model.impl.SessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TargetNodeComponent;
@@ -236,21 +238,6 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     // ------------------------------------------------------------------------
 
     @Override
-    public String getSessionName() {
-        return fSessionName;
-    }
-
-    @Override
-    public String getSessionPath() {
-        return fSessionPath;
-    }
-
-    @Override
-    public boolean isDefaultSessionPath() {
-        return fIsDefaultPath;
-    }
-
-    @Override
     public void initialize(TraceSessionGroup group) {
        fParent = group;
        fStreamingComposite = null;
@@ -262,27 +249,6 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
        fNetworkUrl = null;
        fControlUrl = null;
        fDataUrl = null;
-    }
-
-    @Override
-    public boolean isStreamedTrace() {
-        return fIsStreamedTrace;
-    }
-    @Override
-    public String getNetworkUrl() {
-        return fNetworkUrl;
-    }
-    @Override
-    public String getControlUrl() {
-        return fControlUrl;
-    }
-    @Override
-    public String getDataUrl() {
-        return fDataUrl;
-    }
-    @Override
-    public boolean isSnapshot() {
-        return fIsSnapshot;
     }
     // ------------------------------------------------------------------------
     // Operations
@@ -816,4 +782,21 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         }
     }
 
+    @Override
+    public ISessionInfo getParameters() {
+        ISessionInfo sessionInfo = new SessionInfo(fSessionName);
+
+        if (fIsStreamedTrace) {
+            sessionInfo.setNetworkUrl(fNetworkUrl);
+            sessionInfo.setControlUrl(fControlUrl);
+            sessionInfo.setDataUrl(fDataUrl);
+            sessionInfo.setStreamedTrace(true);
+        } else if (!fIsDefaultPath) {
+            sessionInfo.setSessionPath(fSessionPath);
+        }
+
+        sessionInfo.setSnapshot(fIsSnapshot);
+
+        return sessionInfo;
+    }
 }

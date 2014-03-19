@@ -122,41 +122,16 @@ public interface ILttngControlService {
     /**
      * Creates a session with given session name and location.
      *
-     * @param sessionName
-     *            - a session name to create
-     * @param sessionPath
-     *            - a path for storing the traces (use null for default)
-     * @param isSnapshot
-     *            - true for snapshot session else false
+     * @param sessionInfo
+     *            the session information used to create the session
      * @param monitor
      *            - a progress monitor
-     * @return the session information
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    ISessionInfo createSession(String sessionName, String sessionPath, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException;
-
-    /**
-     * Creates a session with given session name and location.
      *
-     * @param sessionName
-     *            - a session name to create
-     * @param networkUrl
-     *            - a network URL for common definition of data and control channel
-     *              or null if separate definition of data and control channel
-     * @param controlUrl
-     *            - a URL for control channel (networkUrl has to be null, dataUrl has to be set)
-     * @param dataUrl
-     *            - a URL for data channel (networkUrl has to be null, controlUrl has to be set)
-     * @param isSnapshot
-     *            - true for snapshot session else false
-     * @param monitor
-     *            - a progress monitor
      * @return the session information
      * @throws ExecutionException
      *             If the command fails
      */
-    ISessionInfo createSession(String sessionName, String networkUrl, String controlUrl, String dataUrl, boolean isSnapshot, IProgressMonitor monitor) throws ExecutionException;
+    ISessionInfo createSession(ISessionInfo sessionInfo, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Destroys a session with given session name.

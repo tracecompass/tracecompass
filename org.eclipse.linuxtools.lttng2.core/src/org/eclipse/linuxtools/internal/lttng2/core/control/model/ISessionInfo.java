@@ -86,6 +86,14 @@ public interface ISessionInfo extends ITraceInfo {
     boolean isSnapshotSession();
 
     /**
+     * Set whether or not the session should be in snapshot mode
+     *
+     * @param isSnapshot
+     *            true for snapshot mode, false otherwise
+     */
+    void setSnapshot(boolean isSnapshot);
+
+    /**
      * Gets the snapshot information the session or null if it is not a
      * snapshot session.
      * @return snapshot information
@@ -97,4 +105,55 @@ public interface ISessionInfo extends ITraceInfo {
      * @param setSnapshotInfo - the snapshot data to set.
      */
     void setSnapshotInfo(ISnapshotInfo setSnapshotInfo);
+
+    /**
+     * Get the network URL in case control and data is configured together
+     * otherwise null If it returns a non-null value, getControlUrl() and
+     * getDataUrl() have to return null.
+     *
+     * @return The network URL or null.
+     */
+    String getNetworkUrl();
+
+    /**
+     * Set the network URL
+     *
+     * @param networkUrl
+     *            the network URL
+     */
+    void setNetworkUrl(String networkUrl);
+
+    /**
+     * Get the control URL in case control and data is configured separately. If
+     * it returns a non-null value, getDataUrl() has to return a valid value too
+     * and getNetworkUrl() has to return null.
+     *
+     * @return The control URL or null.
+     */
+    String getControlUrl();
+
+    /**
+     * Set the control URL
+     *
+     * @param controlUrl
+     *            the control URL
+     */
+    void setControlUrl(String controlUrl);
+
+    /**
+     * Get the data URL in case control and data is configured separately. If it
+     * returns a non-null value, getControlUrl() has to return a valid value too
+     * and getNetworkUrl() has to return null.
+     *
+     * @return The data URL or null.
+     */
+    String getDataUrl();
+
+    /**
+     * Set the data URL
+     *
+     * @param datalUrl
+     *            the data URL
+     */
+    void setDataUrl(String datalUrl);
 }
