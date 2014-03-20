@@ -96,4 +96,12 @@ public class TmfStateSystemExplorer extends TmfView {
     @Override
     public void setFocus() {
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (fViewer != null) {
+            fViewer.dispose();
+        }
+    }
 }
